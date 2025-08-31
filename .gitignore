@@ -1,0 +1,16 @@
+# --- Node / Next.js ---
+node_modules/
+.next/
+.next/cache/
+out/
+.turbo/
+.vercel/
+
+# --- Env secrets (do NOT commit) ---
+.env
+.env.local
+.env.*.local
+
+# --- Package manager lockfiles ---
+package-lock.json
+pnpm-lock.yaml
