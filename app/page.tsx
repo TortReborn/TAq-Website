@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { fetchActiveEvent, fetchMostRecentEvent } from "@/lib/graid";
 import { fmtDate } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
