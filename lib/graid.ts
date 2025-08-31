@@ -110,10 +110,14 @@ export async function fetchActiveEvent(): Promise<{
   const pool = getPool();
   const client = await pool.connect();
   try {
+    // Debug: print DB host and database
+    // @ts-ignore
+    console.log('DB HOST:', client.connectionParameters.host, 'DB NAME:', client.connectionParameters.database);
     const evRes = await client.query(
-      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions
+      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions, active
        FROM graid_events WHERE active = TRUE LIMIT 1`
     );
+    console.log('Active event query result:', evRes.rows);
     if (evRes.rowCount === 0) {
       return { event: null, rows: [] };
     }
@@ -139,6 +143,7 @@ export async function fetchActiveEvent(): Promise<{
        LIMIT 1000`,
       [event.id]
     );
+    console.log('Event totals query result:', rowsRes.rows);
 
     // Compute ranks with ties (standard competition ranking)
     const baseRows = rowsRes.rows.map((r: any) => {
