@@ -27,10 +27,10 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
           ) : (() => {
             // Find the last index where meetsMin is true
             const lastMinIdx = rows.map(r => r.meetsMin).lastIndexOf(true);
-            // Find the last index where rankNum is 5
-            const lastRank5Idx = rows.map(r => r.rankNum).lastIndexOf(5);
-            const hasRank6Plus = rows.some(r => r.rankNum >= 6);
-            const showRankCutoff = rows.length > 5 && hasRank6Plus && lastRank5Idx !== -1 && lastRank5Idx !== rows.length - 1;
+            // Find the last index where rankNum <= 5
+            const lastRank5OrLessIdx = rows.map(r => r.rankNum <= 5).lastIndexOf(true);
+            const hasRank6Plus = rows.some(r => r.rankNum > 5);
+            const showRankCutoff = rows.length > 5 && hasRank6Plus && lastRank5OrLessIdx !== -1 && lastRank5OrLessIdx !== rows.length - 1;
             return rows.map((r, i) => (
               <>
                 <tr key={`${r.username}-${i}`} className="bg-white/70 hover:bg-white/90">
@@ -68,7 +68,7 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
                     </td>
                   </tr>
                 )}
-                {showRankCutoff && i === lastRank5Idx && (
+                {showRankCutoff && i === lastRank5OrLessIdx && (
                   <tr key={`cutoff-line-rank5-${i}`}> 
                     <td colSpan={4}>
                       <div className="border-t border-dashed border-ocean-300 opacity-60 my-0.5"></div>

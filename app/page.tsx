@@ -25,6 +25,16 @@ export default async function Page() {
 
         {/* Subtitle / event name */}
         <div className="card w-full p-6">
+          {isFallback && (
+            <>
+              <div className="mb-2">
+                <span className="block text-2xl font-extrabold text-red-600">There are currently no active events!</span>
+              </div>
+              <div className="mb-4">
+                <span className="block text-base font-semibold text-ocean-800">Here is the payout from the most recent guild raid event.</span>
+              </div>
+            </>
+          )}
           {showEvent ? (
             <>
               <h2 className="text-2xl font-bold text-ocean-800">{showEvent.title}</h2>
@@ -42,11 +52,6 @@ export default async function Page() {
               <p className="mt-4 text-ocean-800/90">
                 <span className="font-semibold">Note:</span> Rank 1 graider receives a <b>2x</b> payout multiplier, and ranks 2–5 receive a <b>1.5x</b> multiplier.
               </p>
-              {isFallback && (
-                <p className="mt-4 text-ocean-800/90 font-semibold">
-                  There are currently no active events! Here is the payout from the most recent guild raid event.
-                </p>
-              )}
             </>
           ) : (
             <>

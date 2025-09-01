@@ -53,14 +53,21 @@ export async function fetchMostRecentEvent(): Promise<{
         meetsMin
       };
     });
+    // Competition ranking: 1,2,2,4,5... (next rank skips by number of ties)
     let lastTotal: number | null = null;
     let lastRank = 0;
-    let count = 0;
+    let ties = 0;
     const rows: Row[] = baseRows.map((row, i) => {
-      count++;
-      let rankNum = lastRank + 1;
-      if (lastTotal !== null && row.total === lastTotal) {
+      let rankNum;
+      if (lastTotal === null) {
+        rankNum = 1;
+        ties = 1;
+      } else if (row.total === lastTotal) {
         rankNum = lastRank;
+        ties++;
+      } else {
+        rankNum = lastRank + ties;
+        ties = 1;
       }
       lastTotal = row.total;
       lastRank = rankNum;
@@ -110,14 +117,10 @@ export async function fetchActiveEvent(): Promise<{
   const pool = getPool();
   const client = await pool.connect();
   try {
-    // Debug: print DB host and database
-    // @ts-ignore
-    console.log('DB HOST:', client.connectionParameters.host, 'DB NAME:', client.connectionParameters.database);
     const evRes = await client.query(
       `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions, active
        FROM graid_events WHERE active = TRUE LIMIT 1`
     );
-    console.log('Active event query result:', evRes.rows);
     if (evRes.rowCount === 0) {
       return { event: null, rows: [] };
     }
@@ -143,7 +146,6 @@ export async function fetchActiveEvent(): Promise<{
        LIMIT 1000`,
       [event.id]
     );
-    console.log('Event totals query result:', rowsRes.rows);
 
     // Compute ranks with ties (standard competition ranking)
     const baseRows = rowsRes.rows.map((r: any) => {
@@ -161,15 +163,21 @@ export async function fetchActiveEvent(): Promise<{
       };
     });
 
+    // Competition ranking: 1,2,2,4,5... (next rank skips by number of ties)
     let lastTotal: number | null = null;
     let lastRank = 0;
-    let count = 0;
-    // Assign ranks and adjust payout based on rank
+    let ties = 0;
     const rows: Row[] = baseRows.map((row, i) => {
-      count++;
-      let rankNum = lastRank + 1;
-      if (lastTotal !== null && row.total === lastTotal) {
+      let rankNum;
+      if (lastTotal === null) {
+        rankNum = 1;
+        ties = 1;
+      } else if (row.total === lastTotal) {
         rankNum = lastRank;
+        ties++;
+      } else {
+        rankNum = lastRank + ties;
+        ties = 1;
       }
       lastTotal = row.total;
       lastRank = rankNum;
