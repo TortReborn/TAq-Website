@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 
 async function initSession() {
   try {
@@ -22,7 +23,17 @@ async function initSession() {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check rate limit
+  const rateLimitCheck = checkRateLimit(request, 'aspects');
+  
+  if (!rateLimitCheck.allowed) {
+    return createRateLimitResponse(rateLimitCheck.resetTime);
+  }
+
+  // Increment rate limit counter
+  incrementRateLimit(request, 'aspects');
+
   try {
     // Initialize session first
     const sessionCookies = await initSession();
@@ -50,12 +61,14 @@ export async function GET() {
 
     const data = await response.json();
     
-    return NextResponse.json(data);
+    const jsonResponse = NextResponse.json(data);
+    return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   } catch (error) {
     console.error('Error fetching aspects data:', error);
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: 'Failed to fetch aspects data' },
       { status: 500 }
     );
+    return addRateLimitHeaders(errorResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   }
 }

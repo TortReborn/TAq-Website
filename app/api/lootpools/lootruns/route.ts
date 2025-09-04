@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 
 async function initSessionAndGetCookies() {
   try {
@@ -44,7 +45,17 @@ async function initSessionAndGetCookies() {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check rate limit
+  const rateLimitCheck = checkRateLimit(request, 'lootruns');
+  
+  if (!rateLimitCheck.allowed) {
+    return createRateLimitResponse(rateLimitCheck.resetTime);
+  }
+
+  // Increment rate limit counter
+  incrementRateLimit(request, 'lootruns');
+
   try {
     // Initialize session fresh each time (like Discord bot)
     const { cookies, csrfToken } = await initSessionAndGetCookies();
@@ -79,12 +90,14 @@ export async function GET() {
     const data = await response.json();
     console.log('Lootpool request successful');
     
-    return NextResponse.json(data);
+    const jsonResponse = NextResponse.json(data);
+    return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   } catch (error) {
     console.error('Error fetching lootpool data:', error);
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: 'Failed to fetch lootpool data', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
+    return addRateLimitHeaders(errorResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   }
 }

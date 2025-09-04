@@ -29,6 +29,22 @@ export default function LootpoolsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper function to handle API responses with rate limiting
+  const handleApiResponse = async (response: Response, apiName: string) => {
+    if (!response.ok) {
+      if (response.status === 429) {
+        // Rate limit exceeded - this should be shown to user
+        const errorData = await response.json();
+        throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
+      } else {
+        // Other errors - log but don't show to user, fall back to mock data
+        console.warn(`${apiName} API responded with status: ${response.status}, falling back to mock data`);
+        return null;
+      }
+    }
+    return await response.json();
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -37,22 +53,29 @@ export default function LootpoolsPage() {
       try {
         // Only fetch aspects data since lootruns is coming soon
         console.log('Fetching aspects data...');
-        const aspectsResponse = await fetch('/api/lootpools/aspects').catch(err => {
-          console.error('Aspects fetch failed:', err);
-          return { ok: false, json: () => Promise.resolve(null) };
-        });
-
-        const aspectsData = aspectsResponse.ok ? await aspectsResponse.json() : null;
+        const aspectsResponse = await fetch('/api/lootpools/aspects');
+        const aspectsData = await handleApiResponse(aspectsResponse, 'Aspects');
+        
         setAspectsData(aspectsData || mockAspectsData);
         setUsingMockData(prev => ({ ...prev, aspects: !aspectsData }));
 
         // Set lootruns to mock data (not fetching since it's disabled)
+        // When re-enabling, use this pattern:
+        // const lootrunsResponse = await fetch('/api/lootpools/lootruns');
+        // const lootrunsData = await handleApiResponse(lootrunsResponse, 'Lootruns');
+        // setLootrunsData(lootrunsData || mockLootrunsData);
+        // setUsingMockData(prev => ({ ...prev, lootruns: !lootrunsData }));
+        
         setLootrunsData(mockLootrunsData);
         setUsingMockData(prev => ({ ...prev, lootruns: true }));
 
       } catch (err) {
         console.error('General fetch error:', err);
-        setError('Failed to load lootpool data. Please try again later.');
+        if (err instanceof Error && err.message.includes('Rate limit exceeded')) {
+          setError(err.message);
+        } else {
+          setError('Failed to load lootpool data. Please try again later.');
+        }
         // Fallback to mock data even on general error
         setLootrunsData(mockLootrunsData);
         setAspectsData(mockAspectsData);

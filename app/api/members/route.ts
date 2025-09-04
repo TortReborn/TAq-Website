@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
+import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 
 // Define types for the API response
 interface Member {
@@ -45,7 +46,17 @@ interface MemberWithDiscordRank extends Member {
   guildRankName: string;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check rate limit
+  const rateLimitCheck = checkRateLimit(request, 'members');
+  
+  if (!rateLimitCheck.allowed) {
+    return createRateLimitResponse(rateLimitCheck.resetTime);
+  }
+
+  // Increment rate limit counter
+  incrementRateLimit(request, 'members');
+
   try {
     // Fetch guild data from Wynncraft API
     const guildResponse = await fetch(
@@ -142,7 +153,7 @@ export async function GET() {
         return a.username.localeCompare(b.username);
       });
 
-      return NextResponse.json({
+      const jsonResponse = NextResponse.json({
         guild: {
           name: guildData.name,
           prefix: guildData.prefix,
@@ -154,15 +165,18 @@ export async function GET() {
         members: allMembers
       });
 
+      return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
+
     } finally {
       client.release();
     }
 
   } catch (error) {
     console.error('Error fetching guild members:', error);
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: 'Failed to fetch guild members' },
       { status: 500 }
     );
+    return addRateLimitHeaders(errorResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   }
 }

@@ -40,15 +40,23 @@ export default function GraidEventPage() {
       const response = await fetch('/api/graid-event', {
         cache: 'no-store'
       });
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch event data');
+        if (response.status === 429) {
+          // Rate limit exceeded
+          const errorData = await response.json();
+          throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
+        } else {
+          throw new Error(`HTTP ${response.status}: Failed to fetch event data`);
+        }
       }
+      
       const data = await response.json();
       setEventData(data);
       setError(null);
     } catch (err) {
       console.error('Error fetching event data:', err);
-      setError('Failed to load event data');
+      setError(err instanceof Error ? err.message : 'Failed to load event data');
     } finally {
       setLoading(false);
     }
@@ -83,7 +91,25 @@ export default function GraidEventPage() {
         paddingLeft: '1rem',
         paddingRight: '1rem'
       }}>
-        <div style={{ color: 'var(--text-primary)' }}>{error}</div>
+        <div style={{ 
+          padding: '2rem', 
+          textAlign: 'center',
+          minHeight: '50vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{ 
+            fontSize: '1.125rem', 
+            color: '#e33232',
+            background: 'var(--bg-card)',
+            padding: '1.5rem',
+            borderRadius: '0.5rem',
+            border: '1px solid #e33232'
+          }}>
+            ❌ {error}
+          </div>
+        </div>
       </main>
     );
   }
