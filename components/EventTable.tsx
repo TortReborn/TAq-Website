@@ -9,9 +9,9 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
   return (
     <div className="card" style={{ overflow: 'hidden' }}>
       <table style={{
-        minWidth: '720px',
         width: '100%',
-        borderCollapse: 'collapse'
+        borderCollapse: 'collapse',
+        tableLayout: 'fixed' // Fixed layout for better control
       }}>
         <thead style={{ 
           background: 'var(--table-header-bg)', 
@@ -20,29 +20,37 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
           <tr>
             <th style={{
               textAlign: 'left',
-              padding: '0.75rem 1rem',
-              fontWeight: '600'
+              padding: '0.75rem 0.5rem',
+              fontWeight: '600',
+              width: '15%',
+              fontSize: 'clamp(0.75rem, 2.5vw, 1rem)'
             }}>
               Rank
             </th>
             <th style={{
               textAlign: 'left',
-              padding: '0.75rem 1.5rem',
-              fontWeight: '600'
+              padding: '0.75rem 0.5rem',
+              fontWeight: '600',
+              width: '30%',
+              fontSize: 'clamp(0.75rem, 2.5vw, 1rem)'
             }}>
-              Minecraft Username
+              Username
             </th>
             <th style={{
               textAlign: 'left',
-              padding: '0.75rem 1.5rem',
-              fontWeight: '600'
+              padding: '0.75rem 0.5rem',
+              fontWeight: '600',
+              width: '30%',
+              fontSize: 'clamp(0.75rem, 2.5vw, 1rem)'
             }}>
-              Guild Raids Completed
+              Raids
             </th>
             <th style={{
               textAlign: 'left',
-              padding: '0.75rem 1.5rem',
-              fontWeight: '600'
+              padding: '0.75rem 0.5rem',
+              fontWeight: '600',
+              width: '25%',
+              fontSize: 'clamp(0.75rem, 2.5vw, 1rem)'
             }}>
               Payout
             </th>
@@ -86,8 +94,9 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
                 >
                   <td
                     style={{
-                      padding: '0.75rem 1rem',
+                      padding: '0.75rem 0.5rem',
                       fontWeight: '700',
+                      fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
                       color: r.rankNum === 1 ? '#eab308' : 
                              r.rankNum === 2 ? '#9ca3af' :
                              r.rankNum >= 3 && r.rankNum <= 5 ? '#b45309' :
@@ -97,22 +106,26 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
                     {r.rankNum}
                   </td>
                   <td style={{
-                    padding: '0.75rem 1.5rem',
+                    padding: '0.75rem 0.5rem',
                     fontWeight: '500',
-                    color: 'var(--table-text)'
+                    fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
+                    color: 'var(--table-text)',
+                    wordBreak: 'break-word'
                   }}>
                     {r.username}
                   </td>
                   <td style={{
-                    padding: '0.75rem 1.5rem',
+                    padding: '0.75rem 0.5rem',
+                    fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
                     color: 'var(--table-text)'
                   }}>
                     {fmtInt(r.total)}
                   </td>
                   <td
                     style={{
-                      padding: '0.75rem 1.5rem',
+                      padding: '0.75rem 0.5rem',
                       fontWeight: '600',
+                      fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
                       color: r.meetsMin ? 'var(--table-text)' : '#9ca3af',
                       fontStyle: r.meetsMin ? 'normal' : 'italic'
                     }}

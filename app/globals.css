@@ -120,3 +120,40 @@ body, #__next {
     transform: scaleX(1.1);
   }
 }
+
+/* Responsive table headers */
+.full-header {
+  display: inline;
+}
+.medium-header {
+  display: none;
+}
+.short-header {
+  display: none;
+}
+
+/* Medium screens - show medium headers when appropriate */
+@media (max-width: 640px) {
+  .full-header {
+    display: none;
+  }
+  .medium-header {
+    display: inline;
+  }
+  .short-header {
+    display: none;
+  }
+}
+
+/* Small screens - show short headers */
+@media (max-width: 480px) {
+  .full-header {
+    display: none;
+  }
+  .medium-header {
+    display: none;
+  }
+  .short-header {
+    display: inline;
+  }
+}
