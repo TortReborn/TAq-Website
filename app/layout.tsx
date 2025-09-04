@@ -158,6 +158,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               textDecoration: 'none',
               transition: 'color 0.2s'
             }}>Graid Event</a>
+            <a href="/members" style={{ 
+              color: 'var(--text-primary)', 
+              fontWeight: 'bold', 
+              fontSize: '1.125rem',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}>Members</a>
           </div>
           {/* Dark mode toggle pill */}
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
