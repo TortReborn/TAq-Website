@@ -165,9 +165,48 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               textDecoration: 'none',
               transition: 'color 0.2s'
             }}>Members</a>
+            <a href="/lootpools" style={{ 
+              color: 'var(--text-primary)', 
+              fontWeight: 'bold', 
+              fontSize: '1.125rem',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}>Lootpools</a>
           </div>
-          {/* Dark mode toggle pill */}
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          {/* Right side controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {/* Apply button */}
+            <a
+              href="https://discord.gg/6e87Ba5f"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(88, 101, 242, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(88, 101, 242, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 4px rgba(88, 101, 242, 0.3)';
+              }}
+            >
+              📝 Apply
+            </a>
+            
+            {/* Dark mode toggle pill */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <button
               type="button"
               aria-label="Toggle dark mode"
@@ -237,6 +276,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 }}
               />
             </button>
+            </div>
           </div>
         </nav>
         {children}
