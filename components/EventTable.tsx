@@ -1,27 +1,64 @@
 "use client";
 
 import React from "react";
-import { clsx } from "clsx";
 import type { Row } from "@/lib/graid";
 import { fmtInt } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 
 export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }) {
   return (
-    <div className="card overflow-hidden">
-      <table className="min-w-[720px] w-full">
-        <thead className="bg-ocean-100/70 text-ocean-800">
+    <div className="card" style={{ overflow: 'hidden' }}>
+      <table style={{
+        minWidth: '720px',
+        width: '100%',
+        borderCollapse: 'collapse'
+      }}>
+        <thead style={{ 
+          background: 'var(--table-header-bg)', 
+          color: 'var(--table-header-text)' 
+        }}>
           <tr>
-            <th className="text-left px-4 py-3 font-semibold">Rank</th>
-            <th className="text-left px-6 py-3 font-semibold">Minecraft Username</th>
-            <th className="text-left px-6 py-3 font-semibold">Guild Raids Completed</th>
-            <th className="text-left px-6 py-3 font-semibold">Payout</th>
+            <th style={{
+              textAlign: 'left',
+              padding: '0.75rem 1rem',
+              fontWeight: '600'
+            }}>
+              Rank
+            </th>
+            <th style={{
+              textAlign: 'left',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}>
+              Minecraft Username
+            </th>
+            <th style={{
+              textAlign: 'left',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}>
+              Guild Raids Completed
+            </th>
+            <th style={{
+              textAlign: 'left',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}>
+              Payout
+            </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/70">
+        <tbody style={{ borderTop: '1px solid var(--table-border)' }}>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={4} className="px-6 py-6 text-center text-ocean-700/80">
+              <td 
+                colSpan={4} 
+                style={{
+                  padding: '1.5rem',
+                  textAlign: 'center',
+                  color: 'var(--text-muted)'
+                }}
+              >
                 No participants yet.
               </td>
             </tr>
@@ -34,25 +71,51 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
             const showRankCutoff = rows.length > 5 && hasRank6Plus && lastRank5OrLessIdx !== -1 && lastRank5OrLessIdx !== rows.length - 1;
             return rows.map((r, i) => (
               <React.Fragment key={`row-group-${r.username}-${i}`}>
-                <tr key={`${r.username}-${i}`} className="bg-white/70 hover:bg-white/90">
+                <tr 
+                  key={`${r.username}-${i}`} 
+                  style={{ 
+                    background: 'var(--table-row-bg)',
+                    borderBottom: '1px solid var(--table-border)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--table-row-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'var(--table-row-bg)';
+                  }}
+                >
                   <td
-                    className={clsx(
-                      "px-4 py-3 font-bold",
-                      r.rankNum === 1 && "text-yellow-500",
-                      r.rankNum === 2 && "text-gray-400",
-                      r.rankNum >= 3 && r.rankNum <= 5 && "text-amber-700",
-                      !(r.rankNum >= 1 && r.rankNum <= 5) && "text-ocean-800"
-                    )}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      fontWeight: '700',
+                      color: r.rankNum === 1 ? '#eab308' : 
+                             r.rankNum === 2 ? '#9ca3af' :
+                             r.rankNum >= 3 && r.rankNum <= 5 ? '#b45309' :
+                             'var(--table-text)'
+                    }}
                   >
                     {r.rankNum}
                   </td>
-                  <td className="px-6 py-3 font-medium text-ocean-900">{r.username}</td>
-                  <td className="px-6 py-3 text-ocean-800">{fmtInt(r.total)}</td>
+                  <td style={{
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '500',
+                    color: 'var(--table-text)'
+                  }}>
+                    {r.username}
+                  </td>
+                  <td style={{
+                    padding: '0.75rem 1.5rem',
+                    color: 'var(--table-text)'
+                  }}>
+                    {fmtInt(r.total)}
+                  </td>
                   <td
-                    className={clsx(
-                      "px-6 py-3 font-semibold",
-                      r.meetsMin ? "text-ocean-900" : "text-gray-400 italic"
-                    )}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      fontWeight: '600',
+                      color: r.meetsMin ? 'var(--table-text)' : '#9ca3af',
+                      fontStyle: r.meetsMin ? 'normal' : 'italic'
+                    }}
                     title={
                       r.meetsMin
                         ? "Meets minimum completions"
@@ -65,14 +128,21 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
                 {i === lastMinIdx && lastMinIdx !== rows.length - 1 && (
                   <tr key={`cutoff-line-minc-${i}`}> 
                     <td colSpan={4}>
-                      <div className="border-t-2 border-dashed border-ocean-400 my-0.5"></div>
+                      <div style={{ 
+                        borderTop: '2px dashed var(--table-cutoff-border)', 
+                        margin: '2px 0' 
+                      }}></div>
                     </td>
                   </tr>
                 )}
                 {showRankCutoff && i === lastRank5OrLessIdx && (
                   <tr key={`cutoff-line-rank5-${i}`}> 
                     <td colSpan={4}>
-                      <div className="border-t border-dashed border-ocean-300 opacity-60 my-0.5"></div>
+                      <div style={{ 
+                        borderTop: '1px dashed var(--table-rank-cutoff-border)', 
+                        opacity: 0.8,
+                        margin: '2px 0' 
+                      }}></div>
                     </td>
                   </tr>
                 )}

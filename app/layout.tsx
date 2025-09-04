@@ -1,32 +1,195 @@
 "use client";
 import "./globals.css";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
+  const [showSplash, setShowSplash] = useState(false); // Start with false
+  const [splashFading, setSplashFading] = useState(false);
+  
+  // Toggle dark mode and update document
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    // Update the document attribute
+    if (newDarkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+  
+  // Load theme preference on mount and handle splash screen
+  useEffect(() => {
+    // Sync React state with the theme that was already applied by the script
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    
+    setDarkMode(shouldBeDark);
+    
+    // Use performance.getEntriesByType to detect navigation type
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    
+    // Show splash screen in these cases:
+    // 1. Page refresh/reload
+    // 2. New visit (no referrer)
+    // 3. Coming from external site (different origin)
+    const isPageRefresh = navigation.type === 'reload';
+    const isFromExternalSite = document.referrer && 
+                              new URL(document.referrer).origin !== window.location.origin;
+    const isNewVisit = !document.referrer;
+    
+    const shouldShowSplash = isPageRefresh || isFromExternalSite || isNewVisit;
+    
+    if (shouldShowSplash) {
+      setShowSplash(true);
+      
+      // Hide splash screen after 1000ms (1 second)
+      const fadeTimer = setTimeout(() => {
+        setSplashFading(true);
+        // Actually remove after fade completes
+        setTimeout(() => {
+          setShowSplash(false);
+        }, 300);
+      }, 1000);
+      
+      return () => clearTimeout(fadeTimer);
+    }
+    // If it's client-side navigation within the app, showSplash stays false
+  }, []);
+  
   return (
     <html lang="en">
-      <body className="min-h-screen text-ocean-900 antialiased">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+                  
+                  if (shouldBeDark) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body style={{ 
+        minHeight: '100vh', 
+        color: 'var(--text-primary)',
+        background: 'var(--bg-gradient)'
+      }}>
+        {/* Splash Screen */}
+        {showSplash && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 9999,
+              opacity: splashFading ? 0 : 1,
+              transition: 'opacity 0.3s ease-out'
+            }}
+          >
+            <div style={{
+              textAlign: 'center',
+              animation: 'fadeInUp 0.4s ease-out'
+            }}>
+              <h1 style={{
+                fontSize: '3rem',
+                fontWeight: '900',
+                color: '#ffffff',
+                marginBottom: '1rem',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              }}>
+                🌊 The Aquarium
+              </h1>
+              <div style={{
+                width: '60px',
+                height: '4px',
+                background: '#60a5fa',
+                margin: '0 auto',
+                borderRadius: '2px',
+                animation: 'pulse 1s ease-in-out infinite'
+              }}></div>
+            </div>
+          </div>
+        )}
+        
         {/* Navigation Bar - present on all pages */}
-        <nav className="w-full bg-ocean-100 py-4 px-6 flex justify-between items-center shadow-md">
-          <div className="flex gap-6">
-            <a href="/" className="text-ocean-900 font-bold text-lg hover:text-ocean-700 transition-colors">Home</a>
-            <a href="/graid-event" className="text-ocean-900 font-bold text-lg hover:text-ocean-700 transition-colors">Graid Event</a>
-            {/* Add more navigation links here as you add more subpages */}
+        <nav style={{
+          width: '100%',
+          background: 'var(--bg-nav)',
+          padding: '1rem 1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <a href="/" style={{ 
+              color: 'var(--text-primary)', 
+              fontWeight: 'bold', 
+              fontSize: '1.125rem',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}>Home</a>
+            <a href="/graid-event" style={{ 
+              color: 'var(--text-primary)', 
+              fontWeight: 'bold', 
+              fontSize: '1.125rem',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}>Graid Event</a>
           </div>
           {/* Dark mode toggle pill */}
-          <div className="relative flex items-center">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <button
               type="button"
               aria-label="Toggle dark mode"
-              className="relative w-16 h-8 bg-ocean-200 rounded-full flex items-center justify-between px-2 transition-colors duration-300 shadow-inner border border-ocean-300"
-              style={{ minWidth: '64px' }}
-              onClick={() => setDarkMode((d) => !d)}
+              onClick={toggleDarkMode}
+              style={{
+                position: 'relative',
+                width: '64px',
+                height: '32px',
+                background: darkMode ? '#374151' : '#b2e9f7',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 8px',
+                transition: 'all 0.3s',
+                border: `1px solid ${darkMode ? '#4b5563' : '#82d8f1'}`,
+                cursor: 'pointer'
+              }}
             >
               {/* Sun icon */}
-              <span className="flex-1 flex justify-center items-center">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <span style={{ 
+                flex: 1, 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                opacity: darkMode ? 0.4 : 1,
+                transition: 'opacity 0.3s'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="10" cy="10" r="4" fill="#FBBF24" />
                   <g stroke="#FBBF24" strokeWidth="2">
                     <line x1="10" y1="1" x2="10" y2="3" />
@@ -41,15 +204,30 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 </svg>
               </span>
               {/* Moon icon */}
-              <span className="flex-1 flex justify-center items-end" style={{ alignItems: 'flex-end' }}>
-                <svg width="32.5" height="32.5" viewBox="0 0 32.5 32.5" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: 'translate(-2px, 0px) scale(1.25)' }}>
-                  <path d="M25.625 23.125C23.125 23.125 21.25 21.25 21.25 18.75C21.25 16.25 23.125 14.375 25.625 14.375C26.375 14.375 27.125 14.5 27.75 14.75C27.125 11.5 24.5 9 21.25 9C17.125 9 13.75 12.375 13.75 16.5C13.75 20.625 17.125 24 21.25 24C22.75 24 24.25 23.625 25.375 22.875C25.5 23 25.5625 23.125 25.625 23.125Z" fill="#F9FAFB" stroke="#A3A3A3" strokeWidth="1.875" />
+              <span style={{ 
+                flex: 1, 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                opacity: darkMode ? 1 : 0.4,
+                transition: 'opacity 0.3s'
+              }}>
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5" />
                 </svg>
               </span>
               {/* Sliding white circle (toggle indicator) */}
               <span
-                className="absolute left-1 w-6 h-6 bg-white rounded-full shadow transition-transform duration-300"
-                style={{ top: '3px', transform: darkMode ? 'translateX(0px)' : 'translateX(32px)' }}
+                style={{
+                  position: 'absolute',
+                  left: darkMode ? '4px' : '36px',
+                  width: '24px',
+                  height: '24px',
+                  background: 'white',
+                  borderRadius: '50%',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  transition: 'left 0.3s ease'
+                }}
               />
             </button>
           </div>

@@ -1,33 +1,122 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Subtle ocean/beach gradient background */
+/* CSS Custom Properties for Light and Dark Mode */
 :root {
+  /* Light mode colors */
+  --color-ocean-50: #effbfd;
+  --color-ocean-100: #d7f4fb;
+  --color-ocean-200: #b2e9f7;
+  --color-ocean-300: #82d8f1;
+  --color-ocean-400: #54c3e7;
+  --color-ocean-500: #38a9cf;
+  --color-ocean-600: #2a86aa;
+  --color-ocean-700: #246c8b;
+  --color-ocean-800: #235a73;
+  --color-ocean-900: #204a5f;
+  
+  /* Theme colors - Light mode */
   --bg-gradient: radial-gradient(1200px 600px at 50% -10%,
     rgba(255,255,255,0.6), rgba(255,255,255,0) 60%),
   linear-gradient(180deg, #e8fbff 0%, #c8f2ff 40%, #bff0ff 55%, #fdf4df 100%);
+  --text-primary: var(--color-ocean-900);
+  --text-secondary: rgba(32, 74, 95, 0.9);
+  --text-muted: rgba(32, 74, 95, 0.7);
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-nav: var(--color-ocean-100);
+  --border-card: rgba(255, 255, 255, 0.4);
+  
+  /* Table colors */
+  --table-header-bg: rgba(232, 251, 255, 0.7);
+  --table-header-text: var(--color-ocean-800);
+  --table-row-bg: rgba(255, 255, 255, 0.7);
+  --table-row-hover: rgba(255, 255, 255, 0.9);
+  --table-border: rgba(255, 255, 255, 0.7);
+  --table-text: var(--color-ocean-900);
+  --table-cutoff-border: var(--color-ocean-400);
+  --table-rank-cutoff-border: var(--color-ocean-300);
+}
+
+/* Dark mode colors */
+[data-theme="dark"] {
+  --bg-gradient: radial-gradient(1200px 600px at 50% -10%,
+    rgba(25, 42, 86, 0.8), rgba(25, 42, 86, 0) 60%),
+  linear-gradient(180deg, #1a2654 0%, #0f1629 40%, #000000 70%, #000000 100%);
+  --text-primary: #e2e8f0;
+  --text-secondary: rgba(226, 232, 240, 0.9);
+  --text-muted: rgba(226, 232, 240, 0.7);
+  --bg-card: rgba(30, 41, 59, 0.8);
+  --bg-nav: #1e293b;
+  --border-card: rgba(71, 85, 105, 0.4);
+  
+  /* Table colors - Dark mode */
+  --table-header-bg: rgba(51, 65, 85, 0.8);
+  --table-header-text: #e2e8f0;
+  --table-row-bg: rgba(30, 41, 59, 0.6);
+  --table-row-hover: rgba(51, 65, 85, 0.8);
+  --table-border: rgba(71, 85, 105, 0.3);
+  --table-text: #e2e8f0;
+  --table-cutoff-border: #94a3b8;
+  --table-rank-cutoff-border: #cbd5e1;
+}
+
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overscroll-behavior: none;
 }
 
 html {
   min-height: 100%;
   background: var(--bg-gradient);
-  overscroll-behavior: none;
   overflow-x: hidden; /* Prevent horizontal scrolling */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
 body, #__next {
   min-height: 100%;
   height: auto;
-  overscroll-behavior: none;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-}
-
-/* Prevent overscroll on all elements */
-* {
-  overscroll-behavior: none;
+  font-family: inherit;
 }
 
 /* Soft card glass effect */
 .card {
-  @apply bg-white/75 backdrop-blur rounded-2xl shadow-soft border border-white/40;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border: 1px solid var(--border-card);
+}
+
+/* Splash Screen Animations */
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.1);
+  }
 }
