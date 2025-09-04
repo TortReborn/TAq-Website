@@ -110,23 +110,43 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             <div style={{
               textAlign: 'center',
-              animation: 'fadeInUp 0.4s ease-out'
+              animation: 'fadeInUp 0.4s ease-out',
+              height: '80vh',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '2rem'
             }}>
+              {/* Guild Icon */}
+              <img 
+                src="/images/guildimages/icontransparent.png" 
+                alt="The Aquarium Guild Icon"
+                style={{
+                  width: '450px',
+                  height: '450px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                }}
+              />
+              
+              {/* Guild Name */}
               <h1 style={{
-                fontSize: '3rem',
+                fontSize: '3.5rem',
                 fontWeight: '900',
                 color: '#ffffff',
-                marginBottom: '1rem',
+                margin: 0,
                 textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}>
-                🌊 The Aquarium
+                The Aquarium
               </h1>
+              
+              {/* Pulsing Loading Bar */}
               <div style={{
-                width: '60px',
-                height: '4px',
+                width: '120px',
+                height: '8px',
                 background: '#60a5fa',
-                margin: '0 auto',
-                borderRadius: '2px',
+                borderRadius: '4px',
                 animation: 'pulse 1s ease-in-out infinite'
               }}></div>
             </div>
@@ -143,35 +163,101 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           alignItems: 'center',
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
         }}>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
-            <a href="/" style={{ 
-              color: 'var(--text-primary)', 
-              fontWeight: 'bold', 
-              fontSize: '1.125rem',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}>Home</a>
-            <a href="/graid-event" style={{ 
-              color: 'var(--text-primary)', 
-              fontWeight: 'bold', 
-              fontSize: '1.125rem',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}>Graid Event</a>
-            <a href="/members" style={{ 
-              color: 'var(--text-primary)', 
-              fontWeight: 'bold', 
-              fontSize: '1.125rem',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}>Members</a>
-            <a href="/lootpools" style={{ 
-              color: 'var(--text-primary)', 
-              fontWeight: 'bold', 
-              fontSize: '1.125rem',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}>Lootpools</a>
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+            <a 
+              href="/" 
+              style={{ 
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.1)';
+              }}
+            >
+              <img 
+                src="/images/guildimages/icontransparent.png" 
+                alt="Home"
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.2))'
+                }}
+              />
+            </a>
+            <a 
+              href="/graid-event" 
+              style={{ 
+                color: 'var(--text-primary)', 
+                fontWeight: 'bold', 
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >Graid Event</a>
+            <a 
+              href="/members" 
+              style={{ 
+                color: 'var(--text-primary)', 
+                fontWeight: 'bold', 
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >Members</a>
+            <a 
+              href="/lootpools" 
+              style={{ 
+                color: 'var(--text-primary)', 
+                fontWeight: 'bold', 
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >Lootpools</a>
           </div>
           {/* Right side controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

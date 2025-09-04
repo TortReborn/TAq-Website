@@ -119,7 +119,7 @@ export default function GraidEventPage() {
           color: 'var(--text-primary)',
           margin: 0
         }}>
-          The Aquarium Guild Raid Event Tracking
+          Guild Raid Event Leaderboard
         </h1>
 
         {/* Subtitle / event name */}
