@@ -124,12 +124,13 @@ export default function MembersPage() {
       flexDirection: 'column',
       alignItems: 'center',
       paddingTop: '5rem',
-      paddingLeft: '1rem',
-      paddingRight: '1rem'
+      paddingLeft: 'clamp(0px, 10vw, 2rem)',
+      paddingRight: 'clamp(0px, 10vw, 2rem)'
     }}>
       <div style={{
-        maxWidth: '64rem',
         width: '100%',
+        maxWidth: '80vw',
+        minWidth: '320px',
         display: 'flex',
         flexDirection: 'column',
         gap: '2rem'
