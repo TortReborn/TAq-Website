@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { clsx } from "clsx";
 import type { Row } from "@/lib/graid";
 import { fmtInt } from "@/lib/utils";
@@ -32,7 +33,7 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
             const hasRank6Plus = rows.some(r => r.rankNum > 5);
             const showRankCutoff = rows.length > 5 && hasRank6Plus && lastRank5OrLessIdx !== -1 && lastRank5OrLessIdx !== rows.length - 1;
             return rows.map((r, i) => (
-              <>
+              <React.Fragment key={`row-group-${r.username}-${i}`}>
                 <tr key={`${r.username}-${i}`} className="bg-white/70 hover:bg-white/90">
                   <td
                     className={clsx(
@@ -75,7 +76,7 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
                     </td>
                   </tr>
                 )}
-              </>
+              </React.Fragment>
             ));
           })()}
         </tbody>

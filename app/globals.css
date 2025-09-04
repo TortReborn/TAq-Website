@@ -12,10 +12,19 @@
 html {
   min-height: 100%;
   background: var(--bg-gradient);
+  overscroll-behavior: none;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 body, #__next {
   min-height: 100%;
   height: auto;
+  overscroll-behavior: none;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Prevent overscroll on all elements */
+* {
+  overscroll-behavior: none;
 }
 
 /* Soft card glass effect */
