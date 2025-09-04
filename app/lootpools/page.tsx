@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getImageForItem, raidImageMap, classImageMap } from '@/lib/lootpool-images';
-import { getClassForAspect } from '@/app/api/lootpools/aspect-classes/route';
+import { getClassForAspect } from '@/lib/aspect-class-map';
 import { mockLootrunsData, mockAspectsData } from '@/lib/mock-lootpool-data';
 import Image from 'next/image';
 
@@ -22,7 +22,7 @@ interface LootData {
 }
 
 export default function LootpoolsPage() {
-  const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('lootruns');
+  const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('raids');
   const [lootrunsData, setLootrunsData] = useState<LootData | null>(null);
   const [aspectsData, setAspectsData] = useState<LootData | null>(null);
   const [usingMockData, setUsingMockData] = useState({ lootruns: false, aspects: false });
@@ -35,22 +35,7 @@ export default function LootpoolsPage() {
       setError(null);
       
       try {
-        // Fetch lootruns data first with updated implementation
-        console.log('Fetching lootruns data with updated implementation...');
-        const lootrunsResponse = await fetch('/api/lootpools/lootruns').catch(err => {
-          console.error('Lootruns fetch failed:', err);
-          return { ok: false, json: () => Promise.resolve(null) };
-        });
-
-        const lootrunsData = lootrunsResponse.ok ? await lootrunsResponse.json() : null;
-        setLootrunsData(lootrunsData || mockLootrunsData);
-        setUsingMockData(prev => ({ ...prev, lootruns: !lootrunsData }));
-
-        // Wait 500ms before fetching aspects to avoid potential rate limiting
-        console.log('Waiting 500ms before fetching aspects...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Then fetch aspects data
+        // Only fetch aspects data since lootruns is coming soon
         console.log('Fetching aspects data...');
         const aspectsResponse = await fetch('/api/lootpools/aspects').catch(err => {
           console.error('Aspects fetch failed:', err);
@@ -60,6 +45,10 @@ export default function LootpoolsPage() {
         const aspectsData = aspectsResponse.ok ? await aspectsResponse.json() : null;
         setAspectsData(aspectsData || mockAspectsData);
         setUsingMockData(prev => ({ ...prev, aspects: !aspectsData }));
+
+        // Set lootruns to mock data (not fetching since it's disabled)
+        setLootrunsData(mockLootrunsData);
+        setUsingMockData(prev => ({ ...prev, lootruns: true }));
 
       } catch (err) {
         console.error('General fetch error:', err);
@@ -142,16 +131,18 @@ export default function LootpoolsPage() {
         boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
         <button
-          onClick={() => setActiveTab('lootruns')}
+          disabled
+          title="Coming soon!"
           style={{
             padding: '0.75rem 1.5rem',
-            background: activeTab === 'lootruns' ? '#7a187a' : 'transparent',
-            color: activeTab === 'lootruns' ? 'white' : 'var(--text-primary)',
-            border: 'none',
+            background: 'var(--card-background)',
+            color: 'var(--text-muted)',
+            border: '1px solid var(--border-color)',
             borderRadius: '0.5rem',
             fontSize: '1rem',
             fontWeight: '600',
-            cursor: 'pointer',
+            cursor: 'not-allowed',
+            opacity: 0.6,
             transition: 'all 0.3s ease'
           }}
         >
