@@ -199,22 +199,24 @@ export default function EventTable({
                   </td>
                 </tr>
                 {i === lastMinIdx && lastMinIdx !== rows.length - 1 && (
-                  <tr key={`cutoff-line-minc-${i}`}> 
-                    <td colSpan={4}>
+                  <tr key={`cutoff-line-minc-${i}`} style={{ height: '0' }}> 
+                    <td colSpan={4} style={{ padding: '0', borderBottom: 'none' }}>
                       <div style={{ 
-                        borderTop: '2px dashed var(--table-cutoff-border)', 
-                        margin: '2px 0' 
+                        borderTop: '2px dashed var(--table-cutoff-border)',
+                        position: 'relative',
+                        top: '-1px'
                       }}></div>
                     </td>
                   </tr>
                 )}
                 {showRankCutoff && i === lastRank5OrLessIdx && (
-                  <tr key={`cutoff-line-rank5-${i}`}> 
-                    <td colSpan={4}>
+                  <tr key={`cutoff-line-rank5-${i}`} style={{ height: '0' }}> 
+                    <td colSpan={4} style={{ padding: '0', borderBottom: 'none' }}>
                       <div style={{ 
                         borderTop: '1px dashed var(--table-rank-cutoff-border)', 
                         opacity: 0.8,
-                        margin: '2px 0' 
+                        position: 'relative',
+                        top: '-1px'
                       }}></div>
                     </td>
                   </tr>
