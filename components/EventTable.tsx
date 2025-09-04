@@ -1,11 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import type { Row } from "@/lib/graid";
 import { fmtInt } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 
-export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }) {
+export default function EventTable({ 
+  rows, 
+  minc, 
+  onRefresh 
+}: { 
+  rows: Row[]; 
+  minc: number; 
+  onRefresh?: () => Promise<void>;
+}) {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+    
+    setIsRefreshing(true);
+    try {
+      await onRefresh();
+    } catch (error) {
+      console.error('Error refreshing:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="card" style={{ overflow: 'hidden' }}>
       <table style={{
@@ -50,9 +73,46 @@ export default function EventTable({ rows, minc }: { rows: Row[]; minc: number }
               padding: '0.75rem 0.5rem',
               fontWeight: '600',
               width: '25%',
-              fontSize: 'clamp(0.75rem, 2.5vw, 1rem)'
+              fontSize: 'clamp(0.75rem, 2.5vw, 1rem)',
+              position: 'relative'
             }}>
-              Payout
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                width: '100%'
+              }}>
+                <span>Payout</span>
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: isRefreshing ? 'wait' : 'pointer',
+                    padding: '0.25rem',
+                    borderRadius: '0.25rem',
+                    color: 'var(--table-header-text)',
+                    fontSize: '0.875rem',
+                    opacity: isRefreshing ? 0.6 : 1,
+                    transition: 'opacity 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isRefreshing) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                  title="Refresh table data"
+                >
+                  {isRefreshing ? '⟳' : '↻'}
+                </button>
+              </div>
             </th>
           </tr>
         </thead>

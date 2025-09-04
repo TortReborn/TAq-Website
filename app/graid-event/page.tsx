@@ -1,19 +1,98 @@
-export const dynamic = "force-dynamic";
-import { fetchActiveEvent, fetchMostRecentEvent } from "@/lib/graid";
+"use client";
+
+import { useState, useEffect } from "react";
 import { fmtDate } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 import EventTable from "@/components/EventTable";
 
-export default async function GraidEventPage() {
-  const { event, rows } = await fetchActiveEvent();
-  let fallback = null;
-  if (!event) {
-    fallback = await fetchMostRecentEvent();
+interface ActiveEvent {
+  id: number;
+  title: string;
+  startTs: string;
+  endTs: string | null;
+  low: number;
+  high: number;
+  minc: number;
+}
+
+interface Row {
+  username: string;
+  rank: string;
+  total: number;
+  payout: number;
+  meetsMin: boolean;
+  rankNum: number;
+}
+
+interface EventData {
+  event: ActiveEvent | null;
+  rows: Row[];
+  isFallback: boolean;
+}
+
+export default function GraidEventPage() {
+  const [eventData, setEventData] = useState<EventData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEventData = async () => {
+    try {
+      const response = await fetch('/api/graid-event', {
+        cache: 'no-store'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch event data');
+      }
+      const data = await response.json();
+      setEventData(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching event data:', err);
+      setError('Failed to load event data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEventData();
+  }, []);
+
+  if (loading) {
+    return (
+      <main style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: '5rem',
+        paddingLeft: '1rem',
+        paddingRight: '1rem'
+      }}>
+        <div style={{ color: 'var(--text-primary)' }}>Loading...</div>
+      </main>
+    );
   }
 
-  const showEvent = event || fallback?.event;
-  const showRows = event ? rows : fallback?.rows || [];
-  const isFallback = !event && !!fallback?.event;
+  if (error) {
+    return (
+      <main style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: '5rem',
+        paddingLeft: '1rem',
+        paddingRight: '1rem'
+      }}>
+        <div style={{ color: 'var(--text-primary)' }}>{error}</div>
+      </main>
+    );
+  }
+
+  if (!eventData) {
+    return null;
+  }
+
+  const { event: showEvent, rows: showRows, isFallback } = eventData;
 
   return (
     <main style={{
@@ -135,7 +214,11 @@ export default async function GraidEventPage() {
 
         {/* Table */}
         <div style={{ width: '100%' }}>
-          <EventTable rows={showRows} minc={showEvent?.minc ?? 0} />
+          <EventTable 
+            rows={showRows} 
+            minc={showEvent?.minc ?? 0} 
+            onRefresh={fetchEventData}
+          />
         </div>
         
         {/* Footer text */}
