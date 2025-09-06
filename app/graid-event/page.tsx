@@ -22,6 +22,7 @@ interface Row {
   payout: number;
   meetsMin: boolean;
   rankNum: number;
+  isRankLeader: boolean;
 }
 
 interface EventData {
@@ -214,7 +215,7 @@ export default function GraidEventPage() {
                 color: 'var(--text-secondary)',
                 margin: '1rem 0 0 0'
               }}>
-                <span style={{ fontWeight: '600' }}>Note:</span> Rank 1 graider receives a <b>2x</b> payout multiplier, and ranks 2–5 receive a <b>1.5x</b> multiplier.
+                <span style={{ fontWeight: '600' }}>Note:</span> Rank 1 graider receives a <b>2x</b> payout multiplier, ranks 2–5 receive a <b>1.5x</b> multiplier, and the top graider in each rank group also receives a <b>1.5x</b> multiplier (these bonuses do not stack). Additionally, anyone with <b>100+</b> raids receives a <b>64 LE bonus</b>.
               </p>
             </>
           ) : (
@@ -259,7 +260,8 @@ export default function GraidEventPage() {
             margin: 0
           }}>
             * Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br />
-            Payouts below the minimum completions threshold are shown in gray as hypothetical.
+            Payouts below the minimum completions threshold are shown in gray as hypothetical.<br />
+            ★ indicates 100+ raids bonus (+1 stack).
           </p>
         </div>
       </div>

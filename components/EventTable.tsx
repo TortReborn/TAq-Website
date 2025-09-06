@@ -5,6 +5,23 @@ import type { Row } from "@/lib/graid";
 import { fmtInt } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 
+// Rank color helper function
+const getRankColor = (rank: string) => {
+  switch (rank) {
+    case 'Hydra': return '#ac034c';
+    case 'Narwhal': return '#eb2279';
+    case 'Dolphin': return '#9d68ff';
+    case 'Sailfish': return '#396aff';
+    case 'Hammerhead': return '#04b0eb';
+    case 'Angler': return '#00e2db';
+    case 'Barracuda': return '#79e64a';
+    case 'Piranha': return '#c8ff00';
+    case 'Manatee': return '#ffe226';
+    case 'Starfish': return '#e8a41c';
+    default: return 'var(--text-muted)';
+  }
+};
+
 export default function EventTable({ 
   rows, 
   minc, 
@@ -167,9 +184,9 @@ export default function EventTable({
                   </td>
                   <td style={{
                     padding: '0.75rem 0.5rem',
-                    fontWeight: '500',
+                    fontWeight: r.isRankLeader ? '700' : '500',
                     fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
-                    color: 'var(--table-text)',
+                    color: r.isRankLeader && r.rank ? getRankColor(r.rank) : 'var(--table-text)',
                     wordBreak: 'break-word'
                   }}>
                     {r.username}
@@ -177,9 +194,24 @@ export default function EventTable({
                   <td style={{
                     padding: '0.75rem 0.5rem',
                     fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
-                    color: 'var(--table-text)'
+                    color: 'var(--table-text)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem'
                   }}>
                     {fmtInt(r.total)}
+                    {r.total >= 100 && (
+                      <span 
+                        style={{
+                          fontSize: '0.7rem',
+                          color: '#10b981',
+                          fontWeight: '600'
+                        }}
+                        title="100+ raids bonus: +262,144 emeralds (64 LE)"
+                      >
+                        ★
+                      </span>
+                    )}
                   </td>
                   <td
                     style={{

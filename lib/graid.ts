@@ -53,32 +53,8 @@ export async function fetchMostRecentEvent(): Promise<{
         meetsMin
       };
     });
-    // Competition ranking: 1,2,2,4,5... (next rank skips by number of ties)
-    let lastTotal: number | null = null;
-    let lastRank = 0;
-    let ties = 0;
-    const rows: Row[] = baseRows.map((row, i) => {
-      let rankNum;
-      if (lastTotal === null) {
-        rankNum = 1;
-        ties = 1;
-      } else if (row.total === lastTotal) {
-        rankNum = lastRank;
-        ties++;
-      } else {
-        rankNum = lastRank + ties;
-        ties = 1;
-      }
-      lastTotal = row.total;
-      lastRank = rankNum;
-      let payout = row.payout;
-      if (rankNum === 1) {
-        payout = payout * 2;
-      } else if (rankNum >= 2 && rankNum <= 5) {
-        payout = payout * 1.5;
-      }
-      return { ...row, rankNum, payout: Math.round(payout) };
-    });
+    
+    const rows = processRowsWithMultipliers(baseRows, event);
     return { event, rows };
   } finally {
     client.release();
@@ -102,12 +78,83 @@ export type Row = {
   payout: number;
   meetsMin: boolean;
   rankNum: number;
+  isRankLeader: boolean;
 };
 
 const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha", "Barracuda"]);
 
 function isLow(rank?: string | null) {
   return rank ? LOW_RANKS.has(rank) : false;
+}
+
+// Helper function to determine rank leaders and apply multipliers
+function processRowsWithMultipliers(baseRows: any[], event: ActiveEvent): Row[] {
+  // Group by rank to find leaders
+  const rankGroups: { [rank: string]: any[] } = {};
+  baseRows.forEach(row => {
+    const rankKey = row.rank || 'Unknown';
+    if (!rankGroups[rankKey]) {
+      rankGroups[rankKey] = [];
+    }
+    rankGroups[rankKey].push(row);
+  });
+
+  // Find the highest total for each rank
+  const rankLeaders: { [rank: string]: number } = {};
+  Object.keys(rankGroups).forEach(rank => {
+    const maxTotal = Math.max(...rankGroups[rank].map((r: any) => r.total));
+    rankLeaders[rank] = maxTotal;
+  });
+
+  // Competition ranking: 1,2,2,4,5... (next rank skips by number of ties)
+  let lastTotal: number | null = null;
+  let lastRank = 0;
+  let ties = 0;
+  
+  const rows: Row[] = baseRows.map((row, i) => {
+    let rankNum;
+    if (lastTotal === null) {
+      rankNum = 1;
+      ties = 1;
+    } else if (row.total === lastTotal) {
+      rankNum = lastRank;
+      ties++;
+    } else {
+      rankNum = lastRank + ties;
+      ties = 1;
+    }
+    lastTotal = row.total;
+    lastRank = rankNum;
+    
+    // Check if this person is a rank leader
+    const isRankLeader = row.rank && row.total === rankLeaders[row.rank];
+    
+    let payout = row.payout;
+    if (rankNum === 1) {
+      // Rank 1 always gets 2x multiplier (takes precedence over rank leader)
+      payout = payout * 2;
+    } else if (rankNum >= 2 && rankNum <= 5) {
+      // Ranks 2-5 get 1.5x multiplier (takes precedence over rank leader)
+      payout = payout * 1.5;
+    } else if (isRankLeader) {
+      // Rank leaders (who aren't in top 5 overall) get 1.5x multiplier
+      payout = payout * 1.5;
+    }
+    
+    // Add 100+ raids bonus (64 stacks LE = 262,144)
+    if (row.total >= 100) {
+      payout = payout + 262144;
+    }
+    
+    return { 
+      ...row, 
+      rankNum, 
+      payout: Math.round(payout), 
+      isRankLeader: isRankLeader || false 
+    };
+  });
+  
+  return rows;
 }
 
 export async function fetchActiveEvent(): Promise<{
@@ -163,33 +210,7 @@ export async function fetchActiveEvent(): Promise<{
       };
     });
 
-    // Competition ranking: 1,2,2,4,5... (next rank skips by number of ties)
-    let lastTotal: number | null = null;
-    let lastRank = 0;
-    let ties = 0;
-    const rows: Row[] = baseRows.map((row, i) => {
-      let rankNum;
-      if (lastTotal === null) {
-        rankNum = 1;
-        ties = 1;
-      } else if (row.total === lastTotal) {
-        rankNum = lastRank;
-        ties++;
-      } else {
-        rankNum = lastRank + ties;
-        ties = 1;
-      }
-      lastTotal = row.total;
-      lastRank = rankNum;
-      let payout = row.payout;
-      if (rankNum === 1) {
-        payout = payout * 2;
-      } else if (rankNum >= 2 && rankNum <= 5) {
-        payout = payout * 1.5;
-      }
-      return { ...row, rankNum, payout: Math.round(payout) };
-    });
-
+    const rows = processRowsWithMultipliers(baseRows, event);
     return { event, rows };
   } finally {
     client.release();
