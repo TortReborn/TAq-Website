@@ -211,7 +211,7 @@ export default function CacheAdminPage() {
                   <span className={`text-sm font-medium ${
                     darkMode ? 'text-gray-200' : 'text-gray-700'
                   }`}>
-                    <strong>Auto-refresh:</strong> Every 5 seconds
+                    <strong>Auto-refresh:</strong> When stale (10+ seconds old)
                   </span>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function CacheAdminPage() {
                   <span className={`text-sm font-medium ${
                     darkMode ? 'text-gray-200' : 'text-gray-700'
                   }`}>
-                    <strong>Auto-refresh:</strong> Every 5 minutes
+                    <strong>Auto-refresh:</strong> When stale (5+ minutes old)
                   </span>
                 </div>
               </div>
@@ -339,7 +339,7 @@ export default function CacheAdminPage() {
                   <span className={`text-sm font-medium ${
                     darkMode ? 'text-gray-200' : 'text-gray-700'
                   }`}>
-                    <strong>Auto-refresh:</strong> Every 2 minutes
+                    <strong>Auto-refresh:</strong> When stale (2+ minutes old)
                   </span>
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function CacheAdminPage() {
                   <span className={`text-sm font-medium ${
                     darkMode ? 'text-gray-200' : 'text-gray-700'
                   }`}>
-                    <strong>Auto-refresh:</strong> Every 5 minutes
+                    <strong>Auto-refresh:</strong> When stale (5+ minutes old)
                   </span>
                 </div>
               </div>
@@ -423,31 +423,31 @@ export default function CacheAdminPage() {
               <p className={`mb-4 ${
                 darkMode ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                This dashboard shows real-time cache status. The system automatically:
+                This dashboard shows real-time cache status. In the serverless environment (Vercel), the system automatically:
               </p>
               <div className="space-y-3 pl-6">
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-green-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes territory data every 5 seconds
+                    Refreshes territory data when stale (10+ seconds old)
                   </span>
                 </div>
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-blue-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes guild member data every 5 minutes
+                    Refreshes guild member data when stale (5+ minutes old)
                   </span>
                 </div>
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-purple-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes lootpool data every 2 minutes
+                    Refreshes lootpool data when stale (2+ minutes old)
                   </span>
                 </div>
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-yellow-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes aspect data every 5 minutes
+                    Refreshes aspect data when stale (5+ minutes old)
                   </span>
                 </div>
                 <div className="flex items-start">

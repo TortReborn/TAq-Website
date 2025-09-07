@@ -39,29 +39,33 @@ class DataCache {
   private lastFailureTime: Map<string, number> = new Map();
 
   constructor() {
-    // Start background refresh for territories (every 5 seconds)
-    this.startBackgroundRefresh('territories', this.fetchTerritories.bind(this), 5000);
-    
-    // Start background refresh for guild data (every 5 minutes)
-    this.startBackgroundRefresh('guild', this.fetchGuildData.bind(this), 300000);
-    
-    // Start background refresh for lootpool data (every 2 minutes)
-    this.startBackgroundRefresh('lootpool', this.fetchLootpoolData.bind(this), 120000);
-    
-    // Start background refresh for aspect data (every 5 minutes)
-    this.startBackgroundRefresh('aspects', this.fetchAspectData.bind(this), 300000);
+    // In serverless environments, we don't use background intervals
+    // Instead, we refresh on-demand when data is accessed and stale
+    console.log('🚀 DataCache initialized for serverless environment');
   }
 
-  private startBackgroundRefresh(key: string, fetchFunction: () => Promise<void>, interval: number) {
-    // Initial fetch
-    fetchFunction().catch((error) => this.handleFetchError(key, error));
-    
-    // Set up interval
-    const intervalId = setInterval(() => {
-      fetchFunction().catch((error) => this.handleFetchError(key, error));
-    }, interval);
-    
-    this.refreshIntervals.set(key, intervalId);
+  // Check if cache entry is stale and needs refresh
+  private isStale(entry: CacheEntry<any> | null, maxAge: number): boolean {
+    if (!entry) return true;
+    return Date.now() > entry.expiresAt;
+  }
+
+  // Refresh cache entry if stale
+  private async refreshIfStale<T>(
+    current: CacheEntry<T> | null,
+    fetchFunction: () => Promise<void>,
+    maxAge: number,
+    key: string
+  ): Promise<void> {
+    if (this.isStale(current, maxAge)) {
+      try {
+        console.log(`🔄 Refreshing stale ${key} cache...`);
+        await fetchFunction();
+        console.log(`✅ ${key} cache refreshed successfully`);
+      } catch (error) {
+        this.handleFetchError(key, error);
+      }
+    }
   }
 
   private handleFetchError(key: string, error: any) {
@@ -277,16 +281,12 @@ class DataCache {
   }
 
   getTerritories(): Record<string, Territory> | null {
+    // For Vercel: Refresh if stale, but return cached data immediately if available
+    this.refreshIfStale(this.territories, this.fetchTerritories.bind(this), 10000, 'territories');
+    
     if (!this.territories) {
       console.log('📭 No territories in cache');
       return null;
-    }
-
-    if (Date.now() > this.territories.expiresAt) {
-      console.log('⏰ Territories cache expired');
-      // Don't return null immediately, return stale data and trigger refresh
-      this.fetchTerritories().catch((error) => this.handleFetchError('territories', error));
-      return this.territories.data;
     }
 
     console.log('✨ Serving territories from cache');
@@ -294,16 +294,12 @@ class DataCache {
   }
 
   getGuildData(): GuildData | null {
+    // For Vercel: Refresh if stale, but return cached data immediately if available
+    this.refreshIfStale(this.guildData, this.fetchGuildData.bind(this), 300000, 'guild');
+    
     if (!this.guildData) {
       console.log('📭 No guild data in cache');
       return null;
-    }
-
-    if (Date.now() > this.guildData.expiresAt) {
-      console.log('⏰ Guild data cache expired');
-      // Don't return null immediately, return stale data and trigger refresh
-      this.fetchGuildData().catch((error) => this.handleFetchError('guild', error));
-      return this.guildData.data;
     }
 
     console.log('✨ Serving guild data from cache');
@@ -311,15 +307,12 @@ class DataCache {
   }
 
   getLootpoolData(): LootpoolData | null {
+    // For Vercel: Refresh if stale, but return cached data immediately if available
+    this.refreshIfStale(this.lootpoolData, this.fetchLootpoolData.bind(this), 120000, 'lootpool');
+    
     if (!this.lootpoolData) {
       console.log('📭 No lootpool data in cache');
       return null;
-    }
-
-    if (Date.now() > this.lootpoolData.expiresAt) {
-      console.log('⏰ Lootpool data cache expired');
-      this.fetchLootpoolData().catch((error) => this.handleFetchError('lootpool', error));
-      return this.lootpoolData.data;
     }
 
     console.log('✨ Serving lootpool data from cache');
@@ -327,15 +320,12 @@ class DataCache {
   }
 
   getAspectData(): AspectData | null {
+    // For Vercel: Refresh if stale, but return cached data immediately if available
+    this.refreshIfStale(this.aspectData, this.fetchAspectData.bind(this), 300000, 'aspects');
+    
     if (!this.aspectData) {
       console.log('📭 No aspect data in cache');
       return null;
-    }
-
-    if (Date.now() > this.aspectData.expiresAt) {
-      console.log('⏰ Aspect data cache expired');
-      this.fetchAspectData().catch((error) => this.handleFetchError('aspects', error));
-      return this.aspectData.data;
     }
 
     console.log('✨ Serving aspect data from cache');
