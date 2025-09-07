@@ -100,27 +100,35 @@ export default function TerritoryInfoPanel({ selectedTerritory, onClose, panelId
         pointerEvents: 'auto',
       }}
     >
+      {/* Close X button in top right */}
+      <button
+        onClick={onClose}
+        style={{
+          position: 'absolute',
+          top: '0.5rem',
+          right: '0.5rem',
+          width: '1.5rem',
+          height: '1.5rem',
+          borderRadius: '0.25rem',
+          border: 'none',
+          background: 'transparent',
+          color: 'var(--text-secondary)',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          fontSize: '0.875rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: '1',
+        }}
+      >
+        ×
+      </button>
       <div style={{ marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)' }}>{name}</div>
       <div style={{ marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '1rem', color: guildColor }}>{territory.guild.name}</div>
       {resourceRates.map((line, i) => (
         <div key={i} style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{line}</div>
       ))}
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        style={{
-          marginTop: '0.5rem',
-          padding: '0.25rem 0.75rem',
-          borderRadius: '0.25rem',
-          border: 'none',
-          background: 'var(--bg-secondary)',
-          color: 'var(--text-secondary)',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-        }}
-      >
-        Close
-      </button>
     </div>
   );
 }
