@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
+import cache from '@/lib/cache';
 
 // Define types for the API response
 interface Member {
@@ -58,22 +59,31 @@ export async function GET(request: NextRequest) {
   incrementRateLimit(request, 'members');
 
   try {
-    // Fetch guild data from Wynncraft API
-    const guildResponse = await fetch(
-      `https://api.wynncraft.com/v3/guild/The%20Aquarium`,
-      {
-        headers: {
-          'User-Agent': 'Tort-Reborn-Graid-Event-Website/1.0'
-        },
-        next: { revalidate: 600 } // 10 minutes TTL
-      }
-    );
+    // Try to get guild data from cache first
+    let guildData = cache.getGuildData();
+    
+    if (!guildData) {
+      console.log('⚠️  Guild cache miss, fetching directly from Wynncraft API');
+      // Fallback to direct API call
+      const guildResponse = await fetch(
+        `https://api.wynncraft.com/v3/guild/The%20Aquarium`,
+        {
+          headers: {
+            'User-Agent': 'Tort-Reborn-Graid-Event-Website/1.0'
+          }
+        }
+      );
 
-    if (!guildResponse.ok) {
-      throw new Error(`Guild API responded with status: ${guildResponse.status}`);
+      if (!guildResponse.ok) {
+        throw new Error(`Guild API responded with status: ${guildResponse.status}`);
+      }
+
+      guildData = await guildResponse.json();
     }
 
-    const guildData: GuildApiResponse = await guildResponse.json();
+    if (!guildData) {
+      throw new Error('Failed to get guild data from cache or API');
+    }
 
     // Fetch Discord ranks from database
     const pool = getPool();
@@ -163,6 +173,11 @@ export async function GET(request: NextRequest) {
           onlineMembers: guildData.online
         },
         members: allMembers
+      }, {
+        headers: {
+          'X-Cache': cache.getGuildData() ? 'HIT' : 'MISS',
+          'X-Cache-Timestamp': Date.now().toString()
+        }
       });
 
       return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);

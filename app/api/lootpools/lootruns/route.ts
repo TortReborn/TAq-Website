@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
+import cache from '@/lib/cache';
 
 async function initSessionAndGetCookies() {
   try {
@@ -57,6 +58,18 @@ export async function GET(request: NextRequest) {
   incrementRateLimit(request, 'lootruns');
 
   try {
+    // Try to get data from cache first
+    const cachedData = cache.getLootpoolData();
+    
+    if (cachedData) {
+      console.log('✨ Serving lootpool data from cache');
+      const jsonResponse = NextResponse.json(cachedData);
+      return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
+    }
+
+    // If no cached data, fallback to direct API call
+    console.log('📡 Cache miss - fetching lootpool data directly from Athena API');
+    
     // Initialize session fresh each time (like Discord bot)
     const { cookies, csrfToken } = await initSessionAndGetCookies();
     

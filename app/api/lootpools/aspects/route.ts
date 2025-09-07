@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
+import cache from '@/lib/cache';
 
 async function initSession() {
   try {
@@ -35,6 +36,18 @@ export async function GET(request: NextRequest) {
   incrementRateLimit(request, 'aspects');
 
   try {
+    // Try to get data from cache first
+    const cachedData = cache.getAspectData();
+    
+    if (cachedData) {
+      console.log('✨ Serving aspect data from cache');
+      const jsonResponse = NextResponse.json(cachedData);
+      return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
+    }
+
+    // If no cached data, fallback to direct API call
+    console.log('📡 Cache miss - fetching aspect data directly from Athena API');
+    
     // Initialize session first
     const sessionCookies = await initSession();
     
@@ -48,25 +61,28 @@ export async function GET(request: NextRequest) {
     
     // Add cookies if we got them
     if (sessionCookies) {
-      headers['Cookie'] = sessionCookies;
+      headers['Cookie'] = sessionCookies.split(';')[0];
     }
 
     const response = await fetch('https://nori.fish/api/aspects', {
+      method: 'GET',
       headers
     });
 
     if (!response.ok) {
+      console.error(`Aspects API error: ${response.status} ${response.statusText}`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('Aspects request successful');
     
     const jsonResponse = NextResponse.json(data);
     return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   } catch (error) {
     console.error('Error fetching aspects data:', error);
     const errorResponse = NextResponse.json(
-      { error: 'Failed to fetch aspects data' },
+      { error: 'Failed to fetch aspects data', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
     return addRateLimitHeaders(errorResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
