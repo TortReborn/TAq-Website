@@ -433,10 +433,10 @@ export default function MapPage() {
     setPosition(newPosition);
     setIsAnimating(true);
     
-    // Clear animation state after transition completes
+    // Clear animation state after transition completes with a slight buffer
     setTimeout(() => {
       setIsAnimating(false);
-    }, 800); // Match the transition duration
+    }, 2000); // Slightly longer than transition duration to avoid jerky end
   }, [territories]);
 
   return (
@@ -527,7 +527,7 @@ export default function MapPage() {
               transformOrigin: '0 0',
               width: mapDimensions.width,
               height: mapDimensions.height,
-              transition: isAnimating ? 'transform 0.8s ease-in-out' : 'none',
+              transition: isAnimating ? 'transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none',
             }}
           >
             <img
