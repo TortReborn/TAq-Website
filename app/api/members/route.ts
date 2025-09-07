@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
-import cache from '@/lib/cache';
+import dbCache from '@/lib/db-cache';
 
 // Define types for the API response
 interface Member {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Try to get guild data from cache first
-    let guildData = await cache.getGuildData();
+    let guildData = await dbCache.getGuildData();
     
     if (!guildData) {
       console.log('⚠️  Guild cache miss, fetching directly from Wynncraft API');

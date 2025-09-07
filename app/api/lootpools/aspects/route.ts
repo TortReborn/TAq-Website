@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
-import cache from '@/lib/cache';
+import dbCache from '@/lib/db-cache';
 
 async function initSession() {
   try {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Try to get data from cache first
-    const cachedData = await cache.getAspectData();
+    const cachedData = await dbCache.getAspectData();
     
     if (cachedData) {
       console.log('✨ Serving aspect data from cache');

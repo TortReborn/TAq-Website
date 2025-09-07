@@ -1,47 +1,38 @@
 import { NextResponse } from 'next/server';
-import cache from '@/lib/cache';
+import dbCache from '@/lib/db-cache';
 
 export async function GET() {
   try {
-    // Try to get territories from cache first
-    const cachedTerritories = await cache.getTerritories();
+    // Get territories from PostgreSQL cache (auto-refreshes if stale)
+    const territories = await dbCache.getTerritories();
     
-    if (cachedTerritories) {
-      return NextResponse.json(cachedTerritories, {
+    if (territories) {
+      return NextResponse.json(territories, {
         headers: {
-          'Cache-Control': 'public, max-age=30, s-maxage=30',
+          'Cache-Control': 'public, max-age=10, s-maxage=10',
           'X-Cache': 'HIT',
+          'X-Cache-Source': 'PostgreSQL',
           'X-Cache-Timestamp': Date.now().toString()
         },
       });
     }
 
-    // If no cache, try to fetch directly (fallback)
-    console.log('⚠️  Cache miss, fetching directly from Wynncraft API');
-    const response = await fetch('https://api.wynncraft.com/v3/guild/list/territory', {
-      headers: {
-        'User-Agent': 'Tort-Reborn-Graid-Event-Website/1.0',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Wynncraft API error: ${response.status} ${response.statusText}`);
-    }
-
-    const territories = await response.json();
-    
-    return NextResponse.json(territories, {
-      headers: {
-        'Cache-Control': 'public, max-age=30, s-maxage=30',
-        'X-Cache': 'MISS',
-        'X-Cache-Timestamp': Date.now().toString()
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching territories:', error);
-    
+    // If cache returns null, return error
     return NextResponse.json(
-      { error: 'Failed to fetch territories' },
+      { error: 'Territory data temporarily unavailable' },
+      { 
+        status: 503,
+        headers: {
+          'X-Cache': 'MISS',
+          'X-Cache-Source': 'PostgreSQL',
+          'Retry-After': '10'
+        }
+      }
+    );
+  } catch (error) {
+    console.error('Error in territories API:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch territory data' },
       { status: 500 }
     );
   }

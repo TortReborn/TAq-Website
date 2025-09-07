@@ -418,36 +418,36 @@ export default function CacheAdminPage() {
               <h3 className={`text-lg font-semibold mb-4 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                ℹ️ Information
+                ℹ️ PostgreSQL Cache Information
               </h3>
               <p className={`mb-4 ${
                 darkMode ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                This dashboard shows real-time cache status. In the serverless environment (Vercel), the system automatically:
+                This dashboard shows real-time cache status from PostgreSQL. The system automatically:
               </p>
               <div className="space-y-3 pl-6">
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-green-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes territory data when stale (10+ seconds old)
+                    <strong>Persistent cache</strong> - Data survives across all Vercel function instances
                   </span>
                 </div>
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-blue-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes guild member data when stale (5+ minutes old)
+                    <strong>Automatic refresh</strong> - Fetches fresh data when cache expires
                   </span>
                 </div>
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-purple-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes lootpool data when stale (2+ minutes old)
+                    <strong>Stale data fallback</strong> - Returns expired data if API calls fail
                   </span>
                 </div>
                 <div className="flex items-start">
                   <span className="w-2 h-2 rounded-full mr-4 -ml-6 mt-2 bg-yellow-500"></span>
                   <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                    Refreshes aspect data when stale (5+ minutes old)
+                    <strong>Error tracking</strong> - Monitors API failures and recovery
                   </span>
                 </div>
                 <div className="flex items-start">
