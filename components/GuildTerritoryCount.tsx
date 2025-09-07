@@ -95,7 +95,6 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
                 padding: '0.35rem 0.75rem',
                 borderRadius: '0.5rem',
                 background: 'var(--bg-secondary)',
-                transition: 'all 0.2s ease',
                 border: '1px solid transparent'
               }}
               onMouseEnter={(e) => {
@@ -115,7 +114,6 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
                   fontWeight: 'bold', 
                   cursor: onGuildClick ? 'pointer' : 'default',
                   textDecoration: 'none',
-                  transition: 'all 0.2s ease',
                   flex: 1
                 }}
                 onMouseEnter={(e) => {
@@ -152,6 +150,12 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
       )}
       
       <style jsx>{`
+        .guild-territory-count {
+          scroll-behavior: auto !important;
+          overscroll-behavior: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        
         .guild-territory-count::-webkit-scrollbar {
           width: 8px;
         }

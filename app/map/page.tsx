@@ -32,6 +32,7 @@ export default function MapPage() {
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
 
@@ -351,6 +352,12 @@ export default function MapPage() {
 
     setScale(newScale);
     setPosition(newPosition);
+    setIsAnimating(true);
+    
+    // Clear animation state after transition completes
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 800); // Match the transition duration
   }, [territories]);
 
   return (
@@ -397,7 +404,7 @@ export default function MapPage() {
               transformOrigin: '0 0',
               width: mapDimensions.width,
               height: mapDimensions.height,
-              transition: 'transform 0.8s ease-in-out',
+              transition: isAnimating ? 'transform 0.8s ease-in-out' : 'none',
             }}
           >
             <img

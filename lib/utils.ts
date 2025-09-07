@@ -61,11 +61,15 @@ export interface TerritoryVerbose {
 // Function to load territories from the Wynncraft API or local JSON
 export async function loadTerritories(): Promise<Record<string, Territory>> {
   try {
-    // First try to load from the API
-    const apiResponse = await fetch('https://api.wynncraft.com/v3/guild/list/territory');
+    // First try to load from our API proxy
+    const apiResponse = await fetch('/api/territories');
     if (apiResponse.ok) {
-      const territories = await apiResponse.json();
-      return territories;
+      const result = await apiResponse.json();
+      // Check if the response contains an error
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result;
     }
     
     // Fallback to local territories_verbose.json if API fails
