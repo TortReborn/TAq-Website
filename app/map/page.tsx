@@ -95,14 +95,18 @@ export default function MapPage() {
     }
   }, [scale, isInitialized]);
 
-  // Load territories from JSON file and auto-refresh every 10 seconds
+  // Load territories from API cache and auto-refresh every 5 seconds
   useEffect(() => {
     let isMounted = true;
     const loadTerritoriesData = async () => {
       setIsLoadingTerritories(true);
       try {
         const territoryData = await loadTerritories();
-        if (isMounted) setTerritories(territoryData);
+        if (isMounted) {
+          // Force a new object reference to ensure React detects the change
+          setTerritories({ ...territoryData });
+          console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
+        }
       } catch (error) {
         console.error('Failed to load territories:', error);
       } finally {
@@ -110,7 +114,7 @@ export default function MapPage() {
       }
     };
     loadTerritoriesData();
-    const interval = setInterval(loadTerritoriesData, 10000);
+    const interval = setInterval(loadTerritoriesData, 5000); // 5 seconds to match cache TTL
     return () => {
       isMounted = false;
       clearInterval(interval);

@@ -85,7 +85,15 @@ export default function LootpoolsPage() {
       }
     };
 
+    // Initial fetch
     fetchData();
+    
+    // Auto-refresh every 2 minutes to match lootpool cache TTL
+    const interval = setInterval(() => {
+      fetchData();
+    }, 120000); // 2 minutes
+    
+    return () => clearInterval(interval);
   }, []);
 
   const formatNextRotation = (timestamp: number) => {

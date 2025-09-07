@@ -329,7 +329,7 @@ class DatabaseCache {
         if (!response.ok) throw new Error(`Wynncraft API error: ${response.status} ${response.statusText}`);
         return response.json();
       },
-      10000 // 10 seconds TTL
+      5000 // 5 seconds TTL for territories (high-frequency updates)
     );
   }
 

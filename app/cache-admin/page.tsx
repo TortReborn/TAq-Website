@@ -35,6 +35,7 @@ export default function CacheAdminPage() {
   const [cacheStatus, setCacheStatus] = useState<CacheStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   // Check for dark mode
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function CacheAdminPage() {
       if (response.ok) {
         const data = await response.json();
         setCacheStatus(data);
+        setLastUpdate(new Date());
       } else {
         console.error('Failed to fetch cache status:', response.status);
       }
@@ -73,14 +75,30 @@ export default function CacheAdminPage() {
 
   useEffect(() => {
     fetchCacheStatus();
-    // Auto-refresh status every 60 seconds
-    const interval = setInterval(fetchCacheStatus, 60000);
+    // Auto-refresh status every 30 seconds
+    const interval = setInterval(fetchCacheStatus, 30000);
     return () => clearInterval(interval);
   }, []);
 
+  const clearCache = async () => {
+    try {
+      const response = await fetch('/api/cache/clear', { method: 'POST' });
+      if (response.ok) {
+        console.log('Cache cleared successfully');
+        // Refresh the status after clearing
+        await fetchCacheStatus();
+      } else {
+        console.error('Failed to clear cache:', response.status);
+      }
+    } catch (error) {
+      console.error('Failed to clear cache:', error);
+    }
+  };
+
   const formatTimestamp = (timestamp: number | null) => {
     if (!timestamp) return 'Never';
-    return new Date(timestamp).toLocaleString();
+    const date = new Date(timestamp);
+    return `${date.toLocaleString()} (${date.toISOString()})`;
   };
 
   const formatDuration = (timestamp: number | null) => {
@@ -88,7 +106,16 @@ export default function CacheAdminPage() {
     const diff = Date.now() - timestamp;
     const minutes = Math.floor(diff / 60000);
     const seconds = Math.floor((diff % 60000) / 1000);
-    return `${minutes}m ${seconds}s ago`;
+    
+    if (minutes === 0) {
+      return `${seconds}s ago`;
+    } else if (minutes < 60) {
+      return `${minutes}m ${seconds}s ago`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return `${hours}h ${remainingMinutes}m ago`;
+    }
   };
 
   if (loading) {
@@ -141,7 +168,7 @@ export default function CacheAdminPage() {
                 System Status: {cacheStatus.status === 'healthy' ? '✅ Healthy' : '❌ Error'}
               </h2>
               <p className="mb-2">Last checked: {formatTimestamp(cacheStatus.timestamp)}</p>
-              <p className="text-sm opacity-75">🔄 Auto-refreshes every 60 seconds</p>
+              <p className="text-sm opacity-75">🔄 Auto-refreshes every 30 seconds</p>
             </div>
 
             {/* Cache Status Grid */}
@@ -345,16 +372,73 @@ export default function CacheAdminPage() {
                   <strong>Cache Source:</strong> {cacheStatus.source || 'Unknown'}
                 </p>
                 <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <strong>Auto-refresh:</strong> Every 60 seconds
+                  <strong>Auto-refresh:</strong> Every 30 seconds
                 </p>
                 <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   <strong>Cache Strategy:</strong> PostgreSQL database with TTL expiration
+                </p>
+                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <strong>Current Browser Time:</strong> {new Date().toLocaleString()} ({new Date().toISOString()})
+                </p>
+                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <strong>Last Refresh:</strong> {lastUpdate ? formatTimestamp(lastUpdate.getTime()) : 'Never'}
                 </p>
                 {cacheStatus.error && (
                   <p className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
                     <strong>Error:</strong> {cacheStatus.error}
                   </p>
                 )}
+              </div>
+              
+              {/* Debug Links */}
+              <div className="mt-4 pt-4 border-t">
+                <h3 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                  Debug Tools
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <a 
+                    href="/api/cache/debug" 
+                    target="_blank"
+                    className={`text-xs px-3 py-1 rounded transition-colors ${
+                      darkMode 
+                        ? 'bg-blue-800 hover:bg-blue-700 text-blue-200'
+                        : 'bg-blue-100 hover:bg-blue-200 text-blue-800'
+                    }`}
+                  >
+                    Raw DB Debug
+                  </a>
+                  <a 
+                    href="/api/cache/direct" 
+                    target="_blank"
+                    className={`text-xs px-3 py-1 rounded transition-colors ${
+                      darkMode 
+                        ? 'bg-green-800 hover:bg-green-700 text-green-200'
+                        : 'bg-green-100 hover:bg-green-200 text-green-800'
+                    }`}
+                  >
+                    Direct Cache API
+                  </a>
+                  <button 
+                    onClick={fetchCacheStatus}
+                    className={`text-xs px-3 py-1 rounded transition-colors ${
+                      darkMode 
+                        ? 'bg-purple-800 hover:bg-purple-700 text-purple-200'
+                        : 'bg-purple-100 hover:bg-purple-200 text-purple-800'
+                    }`}
+                  >
+                    Force Refresh
+                  </button>
+                  <button 
+                    onClick={clearCache}
+                    className={`text-xs px-3 py-1 rounded transition-colors ${
+                      darkMode 
+                        ? 'bg-red-800 hover:bg-red-700 text-red-200'
+                        : 'bg-red-100 hover:bg-red-200 text-red-800'
+                    }`}
+                  >
+                    Clear All Cache
+                  </button>
+                </div>
               </div>
             </div>
 
