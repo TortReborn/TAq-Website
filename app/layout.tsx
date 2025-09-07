@@ -7,6 +7,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [showSplash, setShowSplash] = useState(false); // Start with false
   const [splashFading, setSplashFading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
   // Toggle dark mode and update document
   const toggleDarkMode = () => {
@@ -25,12 +26,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   
   // Load theme preference on mount and handle splash screen
   useEffect(() => {
+    setMounted(true);
+    
     // Sync React state with the theme that was already applied by the script
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
     
     setDarkMode(shouldBeDark);
+    
+    // Apply theme immediately to prevent flash
+    if (shouldBeDark) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
     
     // Use performance.getEntriesByType to detect navigation type
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
@@ -64,26 +74,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, []);
   
   return (
-    <html lang="en">
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const savedTheme = localStorage.getItem('theme');
-                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-                  
-                  if (shouldBeDark) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
+    <html lang="en" data-theme={mounted && darkMode ? 'dark' : undefined}>
+      <head />
       <body style={{ 
         minHeight: '100vh', 
         color: 'var(--text-primary)',
@@ -258,12 +250,32 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >Lootpools</a>
+            <a 
+              href="/map" 
+              style={{ 
+                color: 'var(--text-primary)', 
+                fontWeight: 'bold', 
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >Map</a>
           </div>
           {/* Right side controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             {/* Apply button */}
             <a
-              href="https://discord.gg/6e87Ba5f"
+              href="https://discord.gg/njRpZwKVaa"
               target="_blank"
               rel="noopener noreferrer"
               style={{

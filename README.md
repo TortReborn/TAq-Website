@@ -1,2 +1,3 @@
 # Tort-Reborn-Graid-Event-Website
-Graid Event Tracking for The Aquarium
+
+Website for the Wynncraft guild The Aquarium
