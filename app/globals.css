@@ -208,3 +208,58 @@ body, body *, html, html * {
 .roboto-font {
   font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
+
+/* Mobile Navigation Styles */
+.mobile-menu-button {
+  display: none;
+}
+
+/* Desktop minimum width */
+@media (min-width: 801px) {
+  body {
+    min-width: 350px;
+  }
+}
+
+@media (max-width: 800px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  .mobile-menu-button {
+    display: flex !important;
+  }
+  
+  /* Mobile Map Enhancements */
+  /* Ensure map takes full viewport on mobile */
+  body {
+    overflow: hidden;
+  }
+  
+  /* Improve touch performance */
+  .map-container {
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Territory info panel mobile adjustments */
+  .territory-info-panel {
+    max-width: 90vw;
+    font-size: 0.9rem;
+  }
+  
+  /* Guild territory count mobile adjustments */
+  .guild-territory-count {
+    max-width: 90vw;
+    max-height: 60vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-apply-button {
+    display: block !important;
+  }
+}

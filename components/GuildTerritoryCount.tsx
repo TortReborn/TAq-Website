@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Territory, getGuildColor } from "@/lib/utils";
 
 interface GuildTerritoryCountProps {
@@ -16,6 +16,26 @@ interface GuildStats {
 }
 
 export default function GuildTerritoryCount({ territories, onGuildClick }: GuildTerritoryCountProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  // Check if device is mobile and set default collapsed state only once
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      // Only set default collapsed state on first load
+      if (!hasInitialized) {
+        setIsCollapsed(mobile);
+        setHasInitialized(true);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []); // Remove isCollapsed from dependencies
+
   const guildStats = useMemo(() => {
     const counts: Record<string, { count: number, prefix: string }> = {};
 
@@ -51,36 +71,176 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
     : Math.max(minFontSize, baseFontSize * (maxGuildsForBaseFontSize / guildStats.length));
 
   return (
-    <div 
-      style={{
-        position: 'absolute',
-        top: '1rem',
-        right: '1rem',
-        width: '280px',
-        maxHeight: '70vh',
-        background: 'var(--bg-card)',
-        border: '2px solid var(--border-color)',
-        borderRadius: '0.75rem',
-        padding: '1.25rem',
-        zIndex: 10,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-        overflowY: 'auto',
-        color: 'var(--text-primary)',
-        backdropFilter: 'blur(8px)',
-      }}
-      onWheel={(e) => e.stopPropagation()}
-      className="guild-territory-count"
-    >
-      <h3 style={{ 
-        marginTop: 0, 
-        marginBottom: '1.25rem', 
-        textAlign: 'center', 
-        fontWeight: 'bold', 
-        fontSize: '1.1rem',
-        color: 'var(--accent-color)',
-        borderBottom: '2px solid var(--border-color)',
-        paddingBottom: '0.75rem'
-      }}>Territory Leaders</h3>
+    <>
+      {/* Toggle button when collapsed */}
+      {isCollapsed && (
+        <button
+          onClick={() => setIsCollapsed(false)}
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '0',
+            width: '40px',
+            height: 'calc(2.5rem + 1.1rem + 4px)', // Increased to match visual header height
+            background: 'var(--bg-card)',
+            border: '2px solid var(--border-color)',
+            borderRight: 'none',
+            borderRadius: '8px 0 0 8px',
+            zIndex: 10,
+            boxShadow: '-4px 0 12px rgba(0,0,0,0.25)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-primary)',
+            fontSize: '1.2rem',
+            backdropFilter: 'blur(8px)',
+            transition: 'none'
+          }}
+          aria-label="Show territory owners"
+        >
+          ←
+        </button>
+      )}
+      
+      {/* Main panel when expanded */}
+      {!isCollapsed && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '0',
+            width: isMobile ? '90vw' : '280px',
+            maxWidth: '320px',
+            maxHeight: isMobile ? '60vh' : '70vh',
+            background: 'var(--bg-card)',
+            border: '2px solid var(--border-color)',
+            borderRight: 'none',
+            borderRadius: '0.75rem 0 0 0.75rem',
+            zIndex: 10,
+            boxShadow: '-4px 0 24px rgba(0,0,0,0.25)',
+            color: 'var(--text-primary)',
+            backdropFilter: 'blur(8px)',
+            transform: isCollapsed ? 'translateX(100%)' : 'translateX(0)',
+            transition: 'transform 0.3s ease',
+            display: 'flex',
+            flexDirection: 'column',
+            touchAction: 'pan-y', // Allow vertical touch actions
+            overscrollBehavior: 'contain'
+          }}
+          onMouseDown={(e) => {
+            // Stop propagation to prevent map interaction
+            e.stopPropagation();
+          }}
+          onMouseMove={(e) => {
+            // Stop propagation to prevent map panning
+            e.stopPropagation();
+          }}
+          onMouseUp={(e) => {
+            // Stop propagation to prevent map interaction
+            e.stopPropagation();
+          }}
+          onTouchStart={(e) => {
+            // Stop propagation to prevent map interaction
+            e.stopPropagation();
+          }}
+          onTouchMove={(e) => {
+            // Stop propagation to prevent map panning
+            e.stopPropagation();
+          }}
+          onTouchEnd={(e) => {
+            // Stop propagation to prevent map interaction
+            e.stopPropagation();
+          }}
+          className="guild-territory-count"
+        >
+          {/* Header with close button - fixed, non-scrollable */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '1.25rem 1.25rem 0.75rem 1.25rem',
+            borderBottom: '2px solid var(--border-color)',
+            flexShrink: 0
+          }}>
+            <h3 style={{ 
+              margin: 0,
+              textAlign: 'center', 
+              fontWeight: 'bold', 
+              fontSize: '1.1rem',
+              color: 'var(--accent-color)',
+              flex: 1
+            }}>Territory Leaders</h3>
+            <button
+              onClick={() => setIsCollapsed(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                fontSize: '1.2rem',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--bg-secondary)';
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+              aria-label="Hide territory owners"
+            >
+              →
+            </button>
+          </div>
+          
+          {/* Scrollable content area */}
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '1.25rem',
+            paddingTop: '1rem',
+            touchAction: 'pan-y', // Allow only vertical scrolling
+            overscrollBehavior: 'contain', // Prevent scroll chaining
+            userSelect: 'none', // Disable text selection
+            WebkitUserSelect: 'none', // Safari
+            MozUserSelect: 'none', // Firefox
+            msUserSelect: 'none' // IE/Edge
+          }}
+          onMouseDown={(e) => {
+            // Stop propagation to prevent map panning
+            e.stopPropagation();
+            // Prevent text selection
+            e.preventDefault();
+          }}
+          onMouseMove={(e) => {
+            // Stop propagation to prevent map panning
+            e.stopPropagation();
+          }}
+          onMouseUp={(e) => {
+            // Stop propagation to prevent map panning
+            e.stopPropagation();
+          }}
+          onTouchStart={(e) => {
+            // Stop propagation to prevent map from receiving touch events
+            e.stopPropagation();
+          }}
+          onTouchMove={(e) => {
+            // Stop propagation to prevent map panning
+            e.stopPropagation();
+          }}
+          onTouchEnd={(e) => {
+            // Stop propagation to prevent map from receiving touch events
+            e.stopPropagation();
+          }}
+          className="guild-list-container"
+          >
       {guildStats.length > 0 ? (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {guildStats.map((guild, index) => (
@@ -148,45 +308,48 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
       ) : (
         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', margin: 0 }}>No guilds hold territory.</p>
       )}
+          </div>
       
       <style jsx>{`
-        .guild-territory-count {
+        .guild-list-container {
           scroll-behavior: auto !important;
           overscroll-behavior: auto !important;
           -webkit-overflow-scrolling: touch !important;
         }
         
-        .guild-territory-count::-webkit-scrollbar {
+        .guild-list-container::-webkit-scrollbar {
           width: 8px;
         }
         
-        .guild-territory-count::-webkit-scrollbar-track {
+        .guild-list-container::-webkit-scrollbar-track {
           background: var(--bg-secondary);
           border-radius: 8px;
           margin: 4px 0;
         }
         
-        .guild-territory-count::-webkit-scrollbar-thumb {
+        .guild-list-container::-webkit-scrollbar-thumb {
           background: var(--border-color);
           border-radius: 8px;
           transition: background-color 0.2s ease;
         }
         
-        .guild-territory-count::-webkit-scrollbar-thumb:hover {
+        .guild-list-container::-webkit-scrollbar-thumb:hover {
           background: var(--accent-color);
         }
         
-        .guild-territory-count::-webkit-scrollbar-thumb:active {
+        .guild-list-container::-webkit-scrollbar-thumb:active {
           background: var(--accent-color);
           opacity: 0.8;
         }
         
         /* Firefox scrollbar styling */
-        .guild-territory-count {
+        .guild-list-container {
           scrollbar-width: thin;
           scrollbar-color: var(--border-color) var(--bg-secondary);
         }
       `}</style>
-    </div>
+        </div>
+      )}
+    </>
   );
 }

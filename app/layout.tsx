@@ -8,6 +8,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [showSplash, setShowSplash] = useState(false); // Start with false
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Toggle dark mode and update document
   const toggleDarkMode = () => {
@@ -150,7 +151,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </div>
         )}
         
-        {/* Navigation Bar - present on all pages */}
+        {/* Navigation Bar - mobile responsive */}
         <nav className="nav-font" style={{
           width: '100%',
           background: 'var(--bg-nav)',
@@ -158,9 +159,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          position: 'relative'
         }}>
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          {/* Left side - Logo and Navigation Links */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <a 
               href="/" 
               style={{ 
@@ -195,6 +198,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 }}
               />
             </a>
+
+            {/* Desktop Navigation Links */}
+            <div className="desktop-nav" style={{ 
+              display: 'flex',
+              gap: '1.5rem', 
+              alignItems: 'center'
+            }}>
             <a 
               href="/graid-event" 
               style={{ 
@@ -275,7 +285,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >Map</a>
+            </div>
           </div>
+
           {/* Right side controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             {/* Apply button */}
@@ -283,6 +295,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               href="https://discord.gg/njRpZwKVaa"
               target="_blank"
               rel="noopener noreferrer"
+              className="mobile-apply-button"
               style={{
                 padding: '8px 16px',
                 background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
@@ -380,7 +393,145 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               />
             </button>
             </div>
+
+            {/* Mobile hamburger menu */}
+            <button
+              type="button"
+              aria-label="Toggle mobile menu"
+              className="mobile-menu-button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '40px',
+                height: '40px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                gap: '4px'
+              }}
+            >
+              <span style={{
+                width: '24px',
+                height: '2px',
+                background: 'var(--text-primary)',
+                transition: 'all 0.3s ease',
+                transform: mobileMenuOpen ? 'rotate(45deg) translateY(6px)' : 'none'
+              }} />
+              <span style={{
+                width: '24px',
+                height: '2px',
+                background: 'var(--text-primary)',
+                transition: 'all 0.3s ease',
+                opacity: mobileMenuOpen ? 0 : 1
+              }} />
+              <span style={{
+                width: '24px',
+                height: '2px',
+                background: 'var(--text-primary)',
+                transition: 'all 0.3s ease',
+                transform: mobileMenuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none'
+              }} />
+            </button>
           </div>
+
+          {/* Mobile dropdown menu */}
+          {mobileMenuOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: 'var(--bg-nav)',
+              border: '1px solid var(--border-color)',
+              borderTop: 'none',
+              borderRadius: '0 0 8px 8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              zIndex: 1000,
+              padding: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem'
+            }}>
+              <a 
+                href="/graid-event"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: 'var(--text-primary)', 
+                  fontWeight: 'bold', 
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Graid Event</a>
+              <a 
+                href="/members"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: 'var(--text-primary)', 
+                  fontWeight: 'bold', 
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Members</a>
+              <a 
+                href="/lootpools"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: 'var(--text-primary)', 
+                  fontWeight: 'bold', 
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Lootpools</a>
+              <a 
+                href="/map"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ 
+                  color: 'var(--text-primary)', 
+                  fontWeight: 'bold', 
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Map</a>
+            </div>
+          )}
         </nav>
         {children}
       </body>

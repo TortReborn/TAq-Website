@@ -10,6 +10,24 @@ import GuildTerritoryCount from "@/components/GuildTerritoryCount";
 export default function MapPage() {
   // Store minimum scale in a ref
   const minScaleRef = useRef(0.1);
+  
+  // Touch state for mobile
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
+  const [isTouching, setIsTouching] = useState(false);
+  
+  // Check if device is mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   // Prevent browser zoom (Ctrl+wheel, pinch) in map view
   useEffect(() => {
     const preventZoom = (e: WheelEvent) => {
@@ -167,6 +185,70 @@ export default function MapPage() {
   // Handle mouse up
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+  }, []);
+
+  // Touch event handlers for mobile
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      // Single touch - start panning
+      setIsTouching(true);
+      setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      setLastPanPoint({ x: position.x, y: position.y });
+    } else if (e.touches.length === 2) {
+      // Two touches - start pinch zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      setLastTouchDistance(distance);
+      setIsTouching(false); // Disable panning during pinch
+    }
+  }, [position]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1 && isTouching && touchStart) {
+      // Single touch - pan
+      const deltaX = e.touches[0].clientX - touchStart.x;
+      const deltaY = e.touches[0].clientY - touchStart.y;
+      
+      setPosition({
+        x: lastPanPoint.x + deltaX,
+        y: lastPanPoint.y + deltaY
+      });
+    } else if (e.touches.length === 2 && lastTouchDistance && containerRef.current) {
+      // Two touches - pinch zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const centerX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+      const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+      
+      const zoomFactor = distance / lastTouchDistance;
+      const minScale = minScaleRef.current;
+      const newScale = Math.max(minScale, Math.min(5, scale * zoomFactor));
+      
+      // Zoom towards pinch center
+      const scaleChange = newScale / scale;
+      setPosition({
+        x: centerX - (centerX - position.x) * scaleChange,
+        y: centerY - (centerY - position.y) * scaleChange
+      });
+      setScale(newScale);
+      setLastTouchDistance(distance);
+    }
+  }, [isTouching, touchStart, lastPanPoint, lastTouchDistance, scale, position]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsTouching(false);
+    setTouchStart(null);
+    setLastTouchDistance(null);
   }, []);
 
   // Handle wheel zoom
@@ -386,12 +468,56 @@ export default function MapPage() {
             position: 'relative',
             cursor: isDragging ? 'grabbing' : 'grab',
             background: 'var(--bg-card)'
+            // Remove touchAction: 'none' to allow touch events in child components
           }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onWheel={handleWheel}
+          onMouseDown={(e) => {
+            // Only handle mouse events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleMouseDown(e);
+            }
+          }}
+          onMouseMove={(e) => {
+            // Only handle mouse events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleMouseMove(e);
+            }
+          }}
+          onMouseUp={(e) => {
+            // Only handle mouse events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleMouseUp();
+            }
+          }}
+          onMouseLeave={(e) => {
+            // Only handle mouse events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleMouseUp();
+            }
+          }}
+          onWheel={(e) => {
+            // Only handle wheel events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleWheel(e);
+            }
+          }}
+          onTouchStart={(e) => {
+            // Only handle touch events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleTouchStart(e);
+            }
+          }}
+          onTouchMove={(e) => {
+            // Only handle touch events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleTouchMove(e);
+            }
+          }}
+          onTouchEnd={(e) => {
+            // Only handle touch events if they're not from the guild territory panel
+            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+              handleTouchEnd();
+            }
+          }}
         >
           {/* Map and Territory Overlays (both transformed together) */}
           <div
