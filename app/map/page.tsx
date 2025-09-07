@@ -77,7 +77,7 @@ export default function MapPage() {
     }
   }, [scale, isInitialized]);
 
-  // Load territories from JSON file and auto-refresh every 5 seconds
+  // Load territories from JSON file and auto-refresh every 10 seconds
   useEffect(() => {
     let isMounted = true;
     const loadTerritoriesData = async () => {
@@ -92,7 +92,7 @@ export default function MapPage() {
       }
     };
     loadTerritoriesData();
-    const interval = setInterval(loadTerritoriesData, 5000);
+    const interval = setInterval(loadTerritoriesData, 10000);
     return () => {
       isMounted = false;
       clearInterval(interval);

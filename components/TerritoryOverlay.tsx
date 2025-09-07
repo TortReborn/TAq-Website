@@ -58,10 +58,10 @@ export default function TerritoryOverlay({
       const maxAllowedWidth = boxWidth * 0.98;
       const maxAllowedHeight = boxHeight * 0.9;
       // Estimate outline thickness for this font size
-      let estStroke = Math.min(fontSize * 0.5, Math.max(3, Math.min(15 / zoom, 15 / 0.45)));
+      let estStroke = Math.min(fontSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)));
       // Iteratively shrink font size until text + outline fits left-right and box height
       while (fontSize > 12) {
-        estStroke = Math.min(fontSize * 0.5, Math.max(3, Math.min(15 / zoom, 15 / 0.45)));
+        estStroke = Math.min(fontSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)));
   const estTextWidth = chars * fontSize * widthFactor + estStroke;
         const estTextHeight = fontSize + estStroke * 2;
         if (estTextWidth <= maxAllowedWidth && estTextHeight <= maxAllowedHeight) break;
@@ -159,7 +159,7 @@ export default function TerritoryOverlay({
             fill="#fff"
             pointerEvents="none"
             stroke="#000"
-            strokeWidth={Math.min(fontSize * 0.5, Math.max(3, Math.min(15 / zoom, 15 / 0.45)))}
+            strokeWidth={Math.min(fontSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)))}
             style={{
               fontFamily: 'Arial Black, Arial, sans-serif',
               letterSpacing: '2px',
@@ -174,26 +174,69 @@ export default function TerritoryOverlay({
           {zoom >= 0.3 && territory.acquired && (() => {
             const { text, color } = formatHeldDuration(territory.acquired);
             if (!text) return null;
-            // Timer font size also scales with zoom, but is smaller than prefix
-            let timerFontSize = Math.max(12, fontSize * 0.6);
+            
+            // For timer font size, use a more balanced approach
+            // Start with a base size that's closer to the guild prefix size
+            // Use the minimum of: 90% of guild size, or a size based on territory dimensions
+            const baseSizeFromGuild = fontSize * 0.9;
+            const baseSizeFromTerritory = Math.min(
+              (boxWidth * 0.98) / (text.length * 0.65), // Width-based sizing
+              boxHeight * 0.25 // Height-based sizing (use 25% of available height)
+            );
+            let timerFontSize = Math.max(8, Math.min(baseSizeFromGuild, baseSizeFromTerritory));
+            
             const maxAllowedWidth = boxWidth * 0.98;
             const maxAllowedHeight = boxHeight * 0.9;
-            // Iteratively shrink timer font size until it fits within allowed width and height
+            
+            // Estimate stroke thickness for timer text
+            let estTimerStroke = Math.min(timerFontSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)));
+            
+            // For timer text, only constrain by height and bottom position, not width
+            // This prevents tiny timer text in wide territories
             const centerY = (topLeft[1] + bottomRight[1]) / 2;
             const boxBottom = bottomRight[1] - margin - boxHeight * 0.05;
             let timerY = centerY + fontSize + 8;
-            while (timerFontSize > 12) {
-              const estTimerWidth = text.length * timerFontSize * 0.65;
-              const estTimerHeight = timerFontSize;
+            while (timerFontSize > 8) { // Lower minimum for timer text
+              estTimerStroke = Math.min(timerFontSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)));
+              const estTimerHeight = timerFontSize + estTimerStroke * 2;
+              // Only check height and bottom position, not width for timer
               if (
-                estTimerWidth <= maxAllowedWidth &&
                 estTimerHeight <= maxAllowedHeight &&
                 timerY + estTimerHeight / 2 <= boxBottom
               ) break;
               timerFontSize--;
             }
+            
+            // Balance check: If there's a large disparity between prefix and timer sizes, balance them
+            const sizeRatio = fontSize / timerFontSize;
+            if (sizeRatio > 2.5) { // If prefix is more than 2.5x larger than timer
+              // Calculate a more balanced pair of sizes based on the larger font size
+              const baseSize = Math.max(fontSize, timerFontSize);
+              const balancedPrefixSize = baseSize * 0.7; // 70% of the larger size
+              const balancedTimerSize = baseSize * 0.3;  // 30% of the larger size
+              
+              // Only apply if the balanced sizes still fit within constraints
+              const newPrefixStroke = Math.min(balancedPrefixSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)));
+              const newTimerStroke = Math.min(balancedTimerSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)));
+              
+              if (territory.guild.prefix) {
+                const chars = territory.guild.prefix.length;
+                const widthFactor = 1.2;
+                const estNewPrefixWidth = chars * balancedPrefixSize * widthFactor + newPrefixStroke;
+                const estNewPrefixHeight = balancedPrefixSize + newPrefixStroke * 2;
+                
+                if (estNewPrefixWidth <= boxWidth * 0.98 && estNewPrefixHeight <= boxHeight * 0.9) {
+                  fontSize = Math.max(12, balancedPrefixSize);
+                  timerFontSize = Math.max(8, balancedTimerSize);
+                }
+              }
+            }
+            
+            // Final constraint: timer should be at most 80% of prefix size
+            timerFontSize = Math.min(timerFontSize, fontSize * 0.8);
+            
             // If timer would extend past bottom, move it up
-            const estTimerHeight = timerFontSize;
+            const estTimerHeight = timerFontSize + estTimerStroke * 2;
             if (timerY + estTimerHeight / 2 > boxBottom) {
               timerY = boxBottom - estTimerHeight / 2;
             }
@@ -208,7 +251,7 @@ export default function TerritoryOverlay({
                 fill={color}
                 pointerEvents="none"
                 stroke="#000"
-                strokeWidth={Math.min(timerFontSize * 0.5, Math.max(2, Math.min(10 / zoom, 10 / 0.45)))}
+                strokeWidth={Math.min(timerFontSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)))}
                 style={{
                   fontFamily: 'Arial Black, Arial, sans-serif',
                   letterSpacing: '1px',

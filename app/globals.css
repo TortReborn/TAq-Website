@@ -71,20 +71,31 @@
   padding: 0;
   box-sizing: border-box;
   overscroll-behavior: none;
+  font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html {
   min-height: 100%;
   background: var(--bg-gradient);
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 body, #__next {
   min-height: 100%;
   height: auto;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  font-family: inherit;
+  font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Ensure all elements use Roboto unless specifically overridden */
+body, body *, html, html * {
+  font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+/* Navigation bar preserves original font */
+.nav-font, .nav-font * {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
 /* Soft card glass effect */
@@ -186,4 +197,14 @@ body, #__next {
   .short-header {
     display: inline;
   }
+}
+
+/* Force Roboto font everywhere except navigation */
+* :not(.nav-font):not(.nav-font *) {
+  font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+/* Override any potential framework font settings */
+.roboto-font {
+  font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }

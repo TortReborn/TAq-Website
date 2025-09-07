@@ -75,11 +75,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   
   return (
     <html lang="en" data-theme={mounted && darkMode ? 'dark' : undefined}>
-      <head />
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
+      </head>
       <body style={{ 
         minHeight: '100vh', 
         color: 'var(--text-primary)',
-        background: 'var(--bg-gradient)'
+        background: 'var(--bg-gradient)',
+        fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif"
       }}>
         {/* Splash Screen */}
         {showSplash && (
@@ -146,7 +151,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         )}
         
         {/* Navigation Bar - present on all pages */}
-        <nav style={{
+        <nav className="nav-font" style={{
           width: '100%',
           background: 'var(--bg-nav)',
           padding: '1rem 1.5rem',
