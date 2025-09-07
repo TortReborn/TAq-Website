@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Try to get guild data from cache first
-    let guildData = cache.getGuildData();
+    let guildData = await cache.getGuildData();
     
     if (!guildData) {
       console.log('⚠️  Guild cache miss, fetching directly from Wynncraft API');
@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
         members: allMembers
       }, {
         headers: {
-          'X-Cache': cache.getGuildData() ? 'HIT' : 'MISS',
+          'X-Cache': guildData ? 'HIT' : 'MISS',
           'X-Cache-Timestamp': Date.now().toString()
         }
       });

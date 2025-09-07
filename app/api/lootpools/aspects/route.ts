@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Try to get data from cache first
-    const cachedData = cache.getAspectData();
+    const cachedData = await cache.getAspectData();
     
     if (cachedData) {
       console.log('✨ Serving aspect data from cache');

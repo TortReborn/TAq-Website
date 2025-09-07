@@ -4,7 +4,7 @@ import cache from '@/lib/cache';
 export async function GET() {
   try {
     // Try to get territories from cache first
-    const cachedTerritories = cache.getTerritories();
+    const cachedTerritories = await cache.getTerritories();
     
     if (cachedTerritories) {
       return NextResponse.json(cachedTerritories, {

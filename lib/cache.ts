@@ -68,6 +68,39 @@ class DataCache {
     }
   }
 
+  // Get data with automatic refresh - waits for initial fetch, backgrounds subsequent refreshes
+  private async getDataWithRefresh<T>(
+    getCurrent: () => CacheEntry<T> | null,
+    fetchFunction: () => Promise<void>,
+    maxAge: number,
+    key: string
+  ): Promise<T | null> {
+    const current = getCurrent();
+    
+    // If no data at all, we must wait for the initial fetch
+    if (!current) {
+      try {
+        console.log(`📡 Initial fetch for ${key}...`);
+        await fetchFunction();
+        const newData = getCurrent();
+        return newData?.data || null;
+      } catch (error) {
+        this.handleFetchError(key, error);
+        return null;
+      }
+    }
+    
+    // If data exists but is stale, refresh in background and return stale data
+    if (Date.now() > current.expiresAt) {
+      console.log(`⏰ ${key} cache expired, refreshing in background...`);
+      this.refreshIfStale(current, fetchFunction, maxAge, key); // Background refresh
+      return current.data; // Return stale data immediately
+    }
+    
+    // Data is fresh
+    return current.data;
+  }
+
   private handleFetchError(key: string, error: any) {
     const failures = this.failureCounts.get(key) || 0;
     const lastFailure = this.lastFailureTime.get(key) || 0;
@@ -280,56 +313,40 @@ class DataCache {
     }
   }
 
-  getTerritories(): Record<string, Territory> | null {
-    // For Vercel: Refresh if stale, but return cached data immediately if available
-    this.refreshIfStale(this.territories, this.fetchTerritories.bind(this), 10000, 'territories');
-    
-    if (!this.territories) {
-      console.log('📭 No territories in cache');
-      return null;
-    }
-
-    console.log('✨ Serving territories from cache');
-    return this.territories.data;
+  async getTerritories(): Promise<Record<string, Territory> | null> {
+    return await this.getDataWithRefresh(
+      () => this.territories,
+      this.fetchTerritories.bind(this),
+      10000,
+      'territories'
+    );
   }
 
-  getGuildData(): GuildData | null {
-    // For Vercel: Refresh if stale, but return cached data immediately if available
-    this.refreshIfStale(this.guildData, this.fetchGuildData.bind(this), 300000, 'guild');
-    
-    if (!this.guildData) {
-      console.log('📭 No guild data in cache');
-      return null;
-    }
-
-    console.log('✨ Serving guild data from cache');
-    return this.guildData.data;
+  async getGuildData(): Promise<GuildData | null> {
+    return await this.getDataWithRefresh(
+      () => this.guildData,
+      this.fetchGuildData.bind(this),
+      300000,
+      'guild'
+    );
   }
 
-  getLootpoolData(): LootpoolData | null {
-    // For Vercel: Refresh if stale, but return cached data immediately if available
-    this.refreshIfStale(this.lootpoolData, this.fetchLootpoolData.bind(this), 120000, 'lootpool');
-    
-    if (!this.lootpoolData) {
-      console.log('📭 No lootpool data in cache');
-      return null;
-    }
-
-    console.log('✨ Serving lootpool data from cache');
-    return this.lootpoolData.data;
+  async getLootpoolData(): Promise<LootpoolData | null> {
+    return await this.getDataWithRefresh(
+      () => this.lootpoolData,
+      this.fetchLootpoolData.bind(this),
+      120000,
+      'lootpool'
+    );
   }
 
-  getAspectData(): AspectData | null {
-    // For Vercel: Refresh if stale, but return cached data immediately if available
-    this.refreshIfStale(this.aspectData, this.fetchAspectData.bind(this), 300000, 'aspects');
-    
-    if (!this.aspectData) {
-      console.log('📭 No aspect data in cache');
-      return null;
-    }
-
-    console.log('✨ Serving aspect data from cache');
-    return this.aspectData.data;
+  async getAspectData(): Promise<AspectData | null> {
+    return await this.getDataWithRefresh(
+      () => this.aspectData,
+      this.fetchAspectData.bind(this),
+      300000,
+      'aspects'
+    );
   }
 
   getCacheStatus() {

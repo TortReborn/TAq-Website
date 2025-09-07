@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Try to get data from cache first
-    const cachedData = cache.getLootpoolData();
+    const cachedData = await cache.getLootpoolData();
     
     if (cachedData) {
       console.log('✨ Serving lootpool data from cache');
