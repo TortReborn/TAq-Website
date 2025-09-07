@@ -118,11 +118,6 @@ export function coordToPixel(coord: [number, number]): [number, number] {
   const pixelX = refPixelCoord[0] + deltaX * scaleX - 85;
   const pixelY = refPixelCoord[1] + deltaY * scaleY - 75;
   
-  // Debug output for first few territories to see the pattern
-  if (Math.random() < 0.05) { // Only log ~5% of calls to avoid spam
-    console.log(`DEBUG coordToPixel: [${coord[0]}, ${coord[1]}] -> [${pixelX}, ${pixelY}]`);
-  }
-  
   return [pixelX, pixelY];
 }
 

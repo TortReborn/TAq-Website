@@ -114,9 +114,6 @@ export default function MapPage() {
     const img = mapImageRef.current;
     const containerRect = containerRef.current.getBoundingClientRect();
     
-    console.log(`DEBUG Map dimensions: ${img.naturalWidth}x${img.naturalHeight}`);
-    console.log(`DEBUG Container dimensions: ${containerRect.width}x${containerRect.height}`);
-    
     // If image hasn't loaded yet, try again in a moment
     if (img.naturalWidth === 0 || img.naturalHeight === 0) {
       setTimeout(handleImageLoad, 100);
