@@ -19,7 +19,6 @@ interface GuildData {
   members: any;
   online: number;
   banner: any;
-  seasonRanks: any;
 }
 
 interface LootpoolData {
@@ -387,10 +386,6 @@ class DataCache {
 
   async refreshAspectData(): Promise<void> {
     await this.fetchAspectData();
-  }
-
-  async refreshAspectClassData(): Promise<void> {
-    await this.fetchAspectClassData();
   }
 
   // Cleanup method
