@@ -114,7 +114,7 @@ export default function MapPage() {
       }
     };
     loadTerritoriesData();
-    const interval = setInterval(loadTerritoriesData, 5000); // 5 seconds to match cache TTL
+    const interval = setInterval(loadTerritoriesData, 30000); // 30 seconds to match cache TTL
     return () => {
       isMounted = false;
       clearInterval(interval);
