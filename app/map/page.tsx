@@ -49,10 +49,17 @@ export default function MapPage() {
   const [showTerritories, setShowTerritories] = useState(true);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
+  const [guildColors, setGuildColors] = useState<Record<string, string>>({});
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
+
+  // Helper function to clamp scale between min and max values
+  const clampScale = useCallback((value: number): number => {
+    const minScale = minScaleRef.current;
+    return Math.max(minScale, Math.min(213, value));
+  }, []);
 
   // Load cached position and scale from localStorage
   useEffect(() => {
@@ -72,7 +79,7 @@ export default function MapPage() {
       try {
         const parsed = parseFloat(cachedScale);
         if (!isNaN(parsed)) {
-          setScale(parsed);
+          setScale(clampScale(parsed));
         }
       } catch (error) {
         console.error('Failed to parse cached scale:', error);
@@ -95,26 +102,51 @@ export default function MapPage() {
     }
   }, [scale, isInitialized]);
 
-  // Load territories from API cache and auto-refresh every 5 seconds
+  // Load guild colors from cached database
+  const loadGuildColorsData = async () => {
+    try {
+      const response = await fetch('/api/guild-colors/cached');
+      if (response.ok) {
+        const data = await response.json();
+        return data.guildColors || {};
+      }
+      console.warn('Failed to load guild colors from cache');
+      return {};
+    } catch (error) {
+      console.error('Error loading guild colors:', error);
+      return {};
+    }
+  };
+
+  // Load territories and guild colors from API cache
   useEffect(() => {
     let isMounted = true;
-    const loadTerritoriesData = async () => {
+    
+    const loadAllData = async () => {
       setIsLoadingTerritories(true);
       try {
-        const territoryData = await loadTerritories();
+        // Load both territories and guild colors in parallel
+        const [territoryData, guildColorData] = await Promise.all([
+          loadTerritories(),
+          loadGuildColorsData()
+        ]);
+        
         if (isMounted) {
           // Force a new object reference to ensure React detects the change
           setTerritories({ ...territoryData });
+          setGuildColors({ ...guildColorData });
           console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
+          console.log('🎨 Updated guild colors:', Object.keys(guildColorData).length, 'guilds');
         }
       } catch (error) {
-        console.error('Failed to load territories:', error);
+        console.error('Failed to load map data:', error);
       } finally {
         if (isMounted) setIsLoadingTerritories(false);
       }
     };
-    loadTerritoriesData();
-    const interval = setInterval(loadTerritoriesData, 30000); // 30 seconds to match cache TTL
+    
+    loadAllData();
+    const interval = setInterval(loadAllData, 30000); // 30 seconds to match cache TTL
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -153,7 +185,7 @@ export default function MapPage() {
     // Only set initial position and scale if not cached or if cached values are invalid
     const hasValidCache = localStorage.getItem('map-position') && localStorage.getItem('map-scale');
     if (!hasValidCache || !isInitialized) {
-      setScale(fitScale);
+      setScale(clampScale(fitScale));
       // Center the map
       const scaledWidth = img.naturalWidth * fitScale;
       const scaledHeight = img.naturalHeight * fitScale;
@@ -235,8 +267,7 @@ export default function MapPage() {
       const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
       
       const zoomFactor = distance / lastTouchDistance;
-      const minScale = minScaleRef.current;
-      const newScale = Math.max(minScale, Math.min(5, scale * zoomFactor));
+      const newScale = clampScale(scale * zoomFactor);
       
       // Zoom towards pinch center
       const scaleChange = newScale / scale;
@@ -247,7 +278,7 @@ export default function MapPage() {
       setScale(newScale);
       setLastTouchDistance(distance);
     }
-  }, [isTouching, touchStart, lastPanPoint, lastTouchDistance, scale, position]);
+  }, [isTouching, touchStart, lastPanPoint, lastTouchDistance, scale, position, clampScale]);
 
   const handleTouchEnd = useCallback(() => {
     setIsTouching(false);
@@ -266,9 +297,7 @@ export default function MapPage() {
     const mouseY = e.clientY - rect.top;
     
     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-  // Use minScaleRef for minimum scale
-  const minScale = minScaleRef.current;
-  const newScale = Math.max(minScale, Math.min(5, scale * zoomFactor));
+    const newScale = clampScale(scale * zoomFactor);
 
     // Zoom towards mouse position
     const scaleChange = newScale / scale;
@@ -277,7 +306,7 @@ export default function MapPage() {
       y: mouseY - (mouseY - position.y) * scaleChange
     });
     setScale(newScale);
-  }, [scale, position]);
+  }, [scale, position, clampScale]);
 
   // Zoom controls
   const zoomIn = useCallback(() => {
@@ -286,7 +315,7 @@ export default function MapPage() {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    const newScale = Math.min(5, scale * 1.2);
+    const newScale = clampScale(scale * 1.2);
     const scaleChange = newScale / scale;
     
     setPosition({
@@ -294,7 +323,7 @@ export default function MapPage() {
       y: centerY - (centerY - position.y) * scaleChange
     });
     setScale(newScale);
-  }, [scale, position]);
+  }, [scale, position, clampScale]);
 
   const zoomOut = useCallback(() => {
     if (!containerRef.current) return;
@@ -302,9 +331,7 @@ export default function MapPage() {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-  // Use minScaleRef for minimum scale
-  const minScale = minScaleRef.current;
-  const newScale = Math.max(minScale, scale * 0.8);
+    const newScale = clampScale(scale * 0.8);
     const scaleChange = newScale / scale;
     
     setPosition({
@@ -312,7 +339,7 @@ export default function MapPage() {
       y: centerY - (centerY - position.y) * scaleChange
     });
     setScale(newScale);
-  }, [scale, position]);
+  }, [scale, position, clampScale]);
 
   // Handle window resize
   useEffect(() => {
@@ -425,7 +452,7 @@ export default function MapPage() {
     const padding = 100; // pixels of padding around the territories
     const scaleX = (containerRect.width - padding * 2) / boundingWidth;
     const scaleY = (containerRect.height - padding * 2) / boundingHeight;
-    const newScale = Math.min(scaleX, scaleY, 5); // Cap at max zoom level
+    const newScale = clampScale(Math.min(scaleX, scaleY));
 
     // Calculate position to center the bounding box
     const newPosition = {
@@ -441,7 +468,7 @@ export default function MapPage() {
     setTimeout(() => {
       setIsAnimating(false);
     }, 2000); // Slightly longer than transition duration to avoid jerky end
-  }, [territories]);
+  }, [territories, clampScale]);
 
   return (
     <main style={{
@@ -562,9 +589,11 @@ export default function MapPage() {
                 onClick={handleTerritoryClick}
                 onMouseEnter={handleTerritoryHover}
                 onMouseLeave={handleTerritoryLeave}
+                guildColors={guildColors}
               />
             ))}
-            <TradeRoutesOverlay />
+            {/* Trade routes - only show when territories are visible */}
+            {showTerritories && <TradeRoutesOverlay />}
           </div>
 
           {/* Territory Info Panel */}
@@ -574,7 +603,7 @@ export default function MapPage() {
             panelId="territory-info-panel"
           />
           
-          <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} />
+          <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} guildColors={guildColors} />
 
           {/* Zoom Controls */}
           <div style={{
@@ -655,10 +684,10 @@ export default function MapPage() {
                 height: '40px',
                 borderRadius: '0.5rem',
                 border: '2px solid var(--border-color)',
-                background: showTerritories ? 'var(--accent-color)' : 'var(--bg-card)',
-                color: showTerritories ? '#fff' : 'var(--text-primary)',
-                fontSize: '0.75rem',
-                fontWeight: '600',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                fontSize: '1.25rem',
+                fontWeight: '700',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -667,20 +696,16 @@ export default function MapPage() {
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}
               onMouseEnter={(e) => {
-                if (!showTerritories) {
-                  e.currentTarget.style.background = 'var(--bg-secondary)';
-                }
+                e.currentTarget.style.background = 'var(--bg-secondary)';
                 e.currentTarget.style.transform = 'scale(1.05)';
               }}
               onMouseLeave={(e) => {
-                if (!showTerritories) {
-                  e.currentTarget.style.background = 'var(--bg-card)';
-                }
+                e.currentTarget.style.background = 'var(--bg-card)';
                 e.currentTarget.style.transform = 'scale(1)';
               }}
               title={showTerritories ? "Hide Territories" : "Show Territories"}
             >
-              T
+              {showTerritories ? 'H' : 'T'}
             </button>
           </div>
 

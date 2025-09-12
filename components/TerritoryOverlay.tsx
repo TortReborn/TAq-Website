@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Territory, getGuildColor, coordToPixel } from "@/lib/utils";
+import React, { useMemo } from "react";
+import { Territory, coordToPixel } from "@/lib/utils";
 
 interface TerritoryOverlayProps {
   name: string;
@@ -11,6 +11,7 @@ interface TerritoryOverlayProps {
   onClick?: (name: string, territory: Territory) => void;
   onMouseEnter?: (name: string, territory: Territory) => void;
   onMouseLeave?: () => void;
+  guildColors: Record<string, string>;
 }
 
 export default function TerritoryOverlay({
@@ -20,12 +21,31 @@ export default function TerritoryOverlay({
   isDragging = false,
   onClick,
   onMouseEnter,
-  onMouseLeave
+  onMouseLeave,
+  guildColors
 }: TerritoryOverlayProps) {
   // Use scale prop for zoom, define at top
   const zoom = scale;
   // Local drag detection
   const dragState = React.useRef({ down: false, moved: false });
+
+  // Get guild color from props, with fallback to gray
+  const guildColor = useMemo(() => {
+    const guildName = territory.guild.name;
+    const guildPrefix = territory.guild.prefix;
+    
+    if (!guildName || guildName === 'Unclaimed') {
+      return '#808080';
+    }
+    
+    // Try prefix first, then guild name, then lowercase versions
+    return guildColors[guildPrefix] || 
+           guildColors[guildName] || 
+           guildColors[guildPrefix?.toLowerCase()] || 
+           guildColors[guildName.toLowerCase()] || 
+           '#808080';
+  }, [territory.guild.name, territory.guild.prefix, guildColors]);
+
   // Get four corners in pixel coordinates
   const start = coordToPixel(territory.location.start);
   const end = coordToPixel(territory.location.end);
@@ -36,9 +56,6 @@ export default function TerritoryOverlay({
   const bottomLeft = [Math.min(start[0], end[0]), Math.max(start[1], end[1])];
 
   const points = [topLeft, topRight, bottomRight, bottomLeft].map(p => p.join(",")).join(" ");
-
-  // Synchronous guild color
-  const guildColor = getGuildColor(territory.guild.name, territory.guild.prefix);
 
   // SVG overlay positioned absolutely over the map
   // Dynamically size the guild tag so it fits inside the territory box

@@ -71,11 +71,6 @@ export default function MembersPage() {
   useEffect(() => {
     // Initial fetch
     fetchMembersData();
-    
-    // Auto-refresh every 5 minutes to match guild data cache TTL
-    const interval = setInterval(fetchMembersData, 300000); // 5 minutes
-    
-    return () => clearInterval(interval);
   }, []);
 
   if (loading) {

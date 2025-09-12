@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { Territory, getGuildColor } from "@/lib/utils";
+import { Territory } from "@/lib/utils";
 
 interface GuildTerritoryCountProps {
   territories: Record<string, Territory>;
   onGuildClick?: (guildName: string) => void;
+  guildColors: Record<string, string>;
 }
 
 interface GuildStats {
@@ -15,7 +16,7 @@ interface GuildStats {
   color: string;
 }
 
-export default function GuildTerritoryCount({ territories, onGuildClick }: GuildTerritoryCountProps) {
+export default function GuildTerritoryCount({ territories, onGuildClick, guildColors }: GuildTerritoryCountProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -36,6 +37,7 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
     return () => window.removeEventListener('resize', checkMobile);
   }, []); // Remove isCollapsed from dependencies
 
+
   const guildStats = useMemo(() => {
     const counts: Record<string, { count: number, prefix: string }> = {};
 
@@ -48,18 +50,27 @@ export default function GuildTerritoryCount({ territories, onGuildClick }: Guild
       }
     });
 
-    const stats: GuildStats[] = Object.entries(counts).map(([name, data]) => ({
-      name: data.prefix ? `${name} [${data.prefix}]` : name,
-      originalName: name,
-      count: data.count,
-      color: getGuildColor(name, data.prefix)
-    }));
+    const stats: GuildStats[] = Object.entries(counts).map(([name, data]) => {
+      // Try multiple key matching strategies like in TerritoryOverlay
+      const color = guildColors[data.prefix] || 
+                   guildColors[name] || 
+                   guildColors[data.prefix?.toLowerCase()] || 
+                   guildColors[name.toLowerCase()] || 
+                   '#808080';
+      
+      return {
+        name: data.prefix ? `${name} [${data.prefix}]` : name,
+        originalName: name,
+        count: data.count,
+        color: color
+      };
+    });
 
     // Sort by territory count descending
     stats.sort((a, b) => b.count - a.count);
 
     return stats;
-  }, [territories]);
+  }, [territories, guildColors]);
 
   // Calculate dynamic font size based on number of guilds
   const baseFontSize = 0.875; // 0.875rem base

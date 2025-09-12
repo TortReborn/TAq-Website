@@ -19,6 +19,7 @@ class SimpleDatabaseCache {
     members: { maxRequests: 30, windowMs: 60000 }, // 30 requests per minute for members
     aspects: { maxRequests: 30, windowMs: 60000 }, // 30 requests per minute for aspects
     lootpools: { maxRequests: 30, windowMs: 60000 }, // 30 requests per minute for lootpools
+    guildColors: { maxRequests: 20, windowMs: 60000 }, // 20 requests per minute for guild colors
   };
 
   // Initialize cache table if it doesn't exist (only once)
@@ -283,6 +284,54 @@ class SimpleDatabaseCache {
     }
     
     return status;
+  }
+
+  // Guild colors specific methods
+  async getGuildColors(clientIP: string): Promise<any[] | null> {
+    try {
+      await this.initializeTable();
+      
+      const client = await this.pool.connect();
+      try {
+        const result = await client.query(
+          'SELECT data FROM cache_entries WHERE cache_key = $1 AND expires_at > NOW()',
+          ['guildColors']
+        );
+        
+        if (result.rows.length > 0) {
+          return result.rows[0].data;
+        }
+        
+        return null;
+      } finally {
+        client.release();
+      }
+    } catch (error) {
+      console.error('Error getting guild colors from cache:', error);
+      return null;
+    }
+  }
+
+  async setGuildColors(guilds: any[], clientIP: string): Promise<void> {
+    try {
+      await this.initializeTable();
+      
+      const client = await this.pool.connect();
+      try {
+        await client.query(
+          `INSERT INTO cache_entries (cache_key, data, expires_at) 
+           VALUES ('guildColors', $1, NOW() + INTERVAL '1 hour')
+           ON CONFLICT (cache_key) 
+           DO UPDATE SET data = $1, expires_at = NOW() + INTERVAL '1 hour'`,
+          [JSON.stringify(guilds)]
+        );
+      } finally {
+        client.release();
+      }
+    } catch (error) {
+      console.error('Error setting guild colors in cache:', error);
+      // Don't throw - let the caller handle fallback
+    }
   }
 }
 
