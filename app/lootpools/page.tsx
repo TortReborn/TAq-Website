@@ -22,7 +22,7 @@ interface LootData {
 }
 
 export default function LootpoolsPage() {
-  const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('raids');
+  const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('lootruns');
   const [lootrunsData, setLootrunsData] = useState<LootData | null>(null);
   const [aspectsData, setAspectsData] = useState<LootData | null>(null);
   const [usingMockData, setUsingMockData] = useState({ lootruns: false, aspects: false });
@@ -162,18 +162,16 @@ export default function LootpoolsPage() {
         boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
         <button
-          disabled
-          title="Coming soon!"
+          onClick={() => setActiveTab('lootruns')}
           style={{
             padding: '0.75rem 1.5rem',
-            background: 'var(--card-background)',
-            color: 'var(--text-muted)',
-            border: '1px solid var(--border-color)',
+            background: activeTab === 'lootruns' ? '#7a187a' : 'transparent',
+            color: activeTab === 'lootruns' ? 'white' : 'var(--text-primary)',
+            border: 'none',
             borderRadius: '0.5rem',
             fontSize: '1rem',
             fontWeight: '600',
-            cursor: 'not-allowed',
-            opacity: 0.6,
+            cursor: 'pointer',
             transition: 'all 0.3s ease'
           }}
         >

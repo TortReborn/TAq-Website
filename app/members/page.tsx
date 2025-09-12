@@ -31,6 +31,7 @@ interface MembersData {
 
 export default function MembersPage() {
   const [membersData, setMembersData] = useState<MembersData | null>(null);
+  const [discordLinks, setDiscordLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,21 +40,26 @@ export default function MembersPage() {
       const response = await fetch('/api/members', {
         cache: 'no-store'
       });
-      
       if (!response.ok) {
         if (response.status === 429) {
-          // Rate limit exceeded
           const errorData = await response.json();
-          const retryAfter = response.headers.get('Retry-After');
           throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
         } else {
           throw new Error(`HTTP ${response.status}: Failed to fetch members data`);
         }
       }
-      
       const data = await response.json();
       setMembersData(data);
       setError(null);
+
+      // Fetch discord_links table from API (assume /api/discord-links returns the table)
+      const discordLinksRes = await fetch('/api/discord-links', { cache: 'no-store' });
+      if (discordLinksRes.ok) {
+        const discordLinksData = await discordLinksRes.json();
+        setDiscordLinks(discordLinksData);
+      } else {
+        setDiscordLinks([]);
+      }
     } catch (err) {
       console.error('Error fetching members data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load members data');
@@ -124,6 +130,18 @@ export default function MembersPage() {
     return null;
   }
 
+  // Map Discord ranks to members
+  const discordMap = new Map(discordLinks.map(link => [link.uuid, link]));
+  const mappedMembers = membersData.members.map(member => {
+    const discord = discordMap.get(member.uuid);
+    return {
+      ...member,
+      discordRank: discord ? discord.rank : '',
+      discordId: discord ? discord.discordId : '',
+      discordUsername: discord ? discord.username : '',
+    };
+  });
+
   return (
     <main style={{
       display: 'flex',
@@ -143,7 +161,7 @@ export default function MembersPage() {
       }}>
         {/* Members Grid */}
         <MemberGrid 
-          members={membersData.members} 
+          members={mappedMembers} 
           onRefresh={fetchMembersData}
         />
       </div>
