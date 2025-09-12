@@ -58,46 +58,28 @@ export interface TerritoryVerbose {
   Acquired: string;
 }
 
-// Function to load territories from the Wynncraft API or local JSON
+// Function to load territories from the database cache (managed by external bot)
 export async function loadTerritories(): Promise<Record<string, Territory>> {
   try {
-    // First try to load from our API proxy with cache-busting
+    // Load from our API proxy - no fallbacks, cache managed by external bot
     const apiResponse = await fetch('/api/territories', {
-      cache: 'no-store',
       headers: {
-        'Cache-Control': 'no-cache'
+        'Accept': 'application/json'
       }
     });
+    
     if (apiResponse.ok) {
       const result = await apiResponse.json();
       // Check if the response contains an error
       if (result.error) {
-        throw new Error(result.error);
+        console.warn('Territory API error:', result.error);
+        return {};
       }
       return result;
     }
     
-    // Fallback to local territories_verbose.json if API fails
-    const localResponse = await fetch('/territories_verbose.json');
-    if (!localResponse.ok) {
-      throw new Error(`Failed to load territories: ${localResponse.statusText}`);
-    }
-    
-    const verboseTerritories: Record<string, TerritoryVerbose> = await localResponse.json();
-    
-    // Convert verbose format to simplified format
-    const territories: Record<string, Territory> = {};
-    for (const [name, verboseTerritory] of Object.entries(verboseTerritories)) {
-      territories[name] = {
-        guild: verboseTerritory.Guild,
-        acquired: verboseTerritory.Acquired,
-        location: verboseTerritory.Location,
-        resources: verboseTerritory.resources,
-        "Trading Routes": verboseTerritory["Trading Routes"]
-      };
-    }
-    
-    return territories;
+    console.warn('Failed to load territories from cache, status:', apiResponse.status);
+    return {};
   } catch (error) {
     console.error('Error loading territories:', error);
     return {};
@@ -143,39 +125,53 @@ export function getTerritoryAtCoord(coord: [number, number], territories: Record
 }
 
 // Helper function to get guild color
-// Athena API guild color cache
-let athenaGuildColorMap: Record<string, string> = {};
-// Fetch colors at module load
-(async () => {
-  try {
-    const res = await fetch("https://athena.wynntils.com/cache/get/guildList");
-    if (res.ok) {
-      const guilds = await res.json();
-      athenaGuildColorMap = {};
-      for (const g of guilds) {
-        if (g.prefix && g.color) {
-          athenaGuildColorMap[g.prefix.toUpperCase()] = g.color;
-        }
-      }
-    }
-  } catch (e) {
-    // fallback silently
-  }
-})();
-
-// Synchronous color getter
+// Note: Guild colors are now managed by external bot and included in guild data
+// This function provides fallback colors for display
 export function getGuildColor(guildName: string, guildPrefix?: string): string {
-  function isValidHexColor(hex: string | undefined): boolean {
-    return typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex);
+  // Define some common known guild colors as fallback
+  const knownGuildColors: Record<string, string> = {
+    'AQU': '#0066CC', // The Aquarium - blue
+    'ANK': '#8B0000', // Ankh - dark red
+    'AVO': '#228B22', // Avicia - green
+    'ICO': '#FFD700', // Icon - gold
+    'IMP': '#8A2BE2', // Imperium - purple
+    'SUN': '#FF8C00', // Sundal - orange
+    'TNA': '#DC143C', // The Aquarium - red variant
+  };
+
+  // Check if we have a known color for the prefix
+  if (guildPrefix && knownGuildColors[guildPrefix.toUpperCase()]) {
+    return knownGuildColors[guildPrefix.toUpperCase()];
   }
-  const colorByPrefix = guildPrefix ? athenaGuildColorMap[guildPrefix.toUpperCase()] : undefined;
-  const colorByName = guildName ? athenaGuildColorMap[guildName.toUpperCase()] : undefined;
-  if (isValidHexColor(colorByPrefix)) {
-    return colorByPrefix!;
+
+  // Check if we have a known color for the name
+  if (guildName && knownGuildColors[guildName.toUpperCase()]) {
+    return knownGuildColors[guildName.toUpperCase()];
   }
-  if (isValidHexColor(colorByName)) {
-    return colorByName!;
+
+  // Generate a consistent color based on guild name/prefix
+  const text = guildPrefix || guildName || 'default';
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = text.charCodeAt(i) + ((hash << 5) - hash);
   }
-  // Always return gray if no valid color found or color is invalid
-  return "#666666";
+  
+  // Convert to color, ensuring it's not too dark or too light
+  const hue = Math.abs(hash) % 360;
+  const saturation = 60 + (Math.abs(hash) % 30); // 60-90%
+  const lightness = 40 + (Math.abs(hash) % 20); // 40-60%
+  
+  // Convert HSL to hex
+  const hslToHex = (h: number, s: number, l: number) => {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = (n: number) => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  };
+  
+  return hslToHex(hue, saturation, lightness);
 }

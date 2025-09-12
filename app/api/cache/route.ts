@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server';
-import dbCache from '@/lib/db-cache';
+import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export async function GET() {
   try {
-    // Clean up expired entries first
-    await dbCache.cleanupExpired();
-    
-    // Get cache status from PostgreSQL
-    const status = await dbCache.getCacheStatus();
+    // Get cache status from PostgreSQL (external bot managed)
+    const status = await simpleDatabaseCache.getCacheStatus();
+    const rateLimits = simpleDatabaseCache.getRateLimitStatus();
     
     return NextResponse.json({
       status: 'healthy',
       cache: status,
+      rateLimits: rateLimits,
       timestamp: Date.now(),
-      source: 'PostgreSQL'
+      source: 'PostgreSQL-Bot-Managed',
+      message: 'Cache data is managed by external bot'
     });
   } catch (error) {
     console.error('Error getting cache status:', error);
@@ -23,7 +23,7 @@ export async function GET() {
         status: 'error',
         error: 'Failed to get cache status',
         timestamp: Date.now(),
-        source: 'PostgreSQL'
+        source: 'PostgreSQL-Bot-Managed'
       },
       { status: 500 }
     );

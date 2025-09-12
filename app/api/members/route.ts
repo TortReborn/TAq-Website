@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
-import dbCache from '@/lib/db-cache';
+import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 // Define types for the API response
 interface Member {
@@ -59,30 +59,26 @@ export async function GET(request: NextRequest) {
   incrementRateLimit(request, 'members');
 
   try {
-    // Try to get guild data from cache first
-    let guildData = await dbCache.getGuildData();
+    // Get client IP for rate limiting
+    const clientIP = request.headers.get('x-forwarded-for') || 
+                    request.headers.get('x-real-ip') || 
+                    'unknown';
+
+    // Get guild data from database cache only (managed by external bot)
+    const guildData = await simpleDatabaseCache.getGuildData(clientIP) as GuildApiResponse | null;
     
     if (!guildData) {
-      console.log('⚠️  Guild cache miss, fetching directly from Wynncraft API');
-      // Fallback to direct API call
-      const guildResponse = await fetch(
-        `https://api.wynncraft.com/v3/guild/The%20Aquarium`,
-        {
+      return NextResponse.json(
+        { error: 'Guild member data not available. External bot may be updating data.' },
+        { 
+          status: 503,
           headers: {
-            'User-Agent': 'Tort-Reborn-Graid-Event-Website/1.0'
+            'X-Cache': 'MISS',
+            'X-Cache-Source': 'PostgreSQL-Bot-Managed',
+            'Retry-After': '30'
           }
         }
       );
-
-      if (!guildResponse.ok) {
-        throw new Error(`Guild API responded with status: ${guildResponse.status}`);
-      }
-
-      guildData = await guildResponse.json();
-    }
-
-    if (!guildData) {
-      throw new Error('Failed to get guild data from cache or API');
     }
 
     // Fetch Discord ranks from database
