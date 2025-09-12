@@ -65,9 +65,8 @@ export async function GET(request: NextRequest) {
                     'unknown';
 
     // Get guild data from database cache only (managed by external bot)
-    const guildData = await simpleDatabaseCache.getGuildData(clientIP) as GuildApiResponse | null;
-    
-    if (!guildData) {
+    const guildDataRaw = await simpleDatabaseCache.getGuildData(clientIP);
+    if (!guildDataRaw) {
       return NextResponse.json(
         { error: 'Guild member data not available. External bot may be updating data.' },
         { 
@@ -81,18 +80,50 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Handle new data format - members is already a flat array
+    let allMembers: any[] = [];
+    
+    if (Array.isArray(guildDataRaw.members)) {
+      // New format: members is a flat array with name, rank, uuid, etc.
+      allMembers = guildDataRaw.members.map((member: any) => ({
+        ...member,
+        username: member.name,
+        guildRankName: member.rank,
+        wars: member.wars || 0,
+        raids: member.raids || 0,
+        shells: member.shells || 0,
+        lastJoin: member.lastJoin,
+        playtime: member.playtime || 0,
+        contributed: member.contributed || 0,
+      }));
+    } else if (guildDataRaw.members && typeof guildDataRaw.members === 'object') {
+      // Old format: members organized by rank groups
+      const membersByRank = guildDataRaw.members;
+      Object.entries(membersByRank).forEach(([rank, rankGroup]) => {
+        if (rank === 'total') return;
+        Object.entries(rankGroup).forEach(([username, memberObj]) => {
+          if (memberObj && typeof memberObj === 'object' && memberObj.uuid) {
+            allMembers.push({
+              ...memberObj,
+              username,
+              guildRankName: rank,
+            });
+          }
+        });
+      });
+    }
+
     // Fetch Discord ranks from database
     const pool = getPool();
     const client = await pool.connect();
     
     try {
       const discordLinksResult = await client.query(
-        'SELECT ign, rank FROM discord_links'
+        'SELECT uuid, rank, discord_id, ign FROM discord_links'
       );
-      
-      const discordLinks: Record<string, string> = {};
-      discordLinksResult.rows.forEach((row: DiscordLink) => {
-        discordLinks[row.ign.toLowerCase()] = row.rank;
+      const discordLinks: Record<string, any> = {};
+      discordLinksResult.rows.forEach((row: any) => {
+        discordLinks[row.uuid] = row;
       });
 
       // Convert guild ranks to readable names
@@ -105,27 +136,15 @@ export async function GET(request: NextRequest) {
         'recruit': 'Recruit'
       };
 
-      // Combine all members from different ranks
-      const allMembers: MemberWithDiscordRank[] = [];
-
-      // Process each guild rank
-      Object.entries(guildData.members).forEach(([rankKey, rankMembers]) => {
-        if (rankKey === 'total') return;
-
-        Object.entries(rankMembers as Record<string, Member>).forEach(([username, member]) => {
-          const discordRank = discordLinks[username.toLowerCase()] || null;
-          
-          // Only include members with Discord ranks
-          if (discordRank) {
-            const memberWithRank: MemberWithDiscordRank = {
-              ...member,
-              username: username, // Use the key as the username
-              discordRank: discordRank,
-              guildRankName: guildRankNames[rankKey] || 'Unknown' // Use rankKey instead of member.guildRank
-            };
-            allMembers.push(memberWithRank);
-          }
-        });
+      // Map Discord ranks to members by uuid
+      const mappedMembers = allMembers.map(member => {
+        const discord = discordLinks[member.uuid];
+        return {
+          ...member,
+          discordRank: discord ? discord.rank : '',
+          discordId: discord ? discord.discord_id : '',
+          discordUsername: discord ? discord.ign : '',
+        };
       });
 
       // Sort by Discord rank priority (custom order)
@@ -142,36 +161,31 @@ export async function GET(request: NextRequest) {
         'Starfish': 10
       };
 
-      allMembers.sort((a, b) => {
+      mappedMembers.sort((a, b) => {
         const aRankPriority = a.discordRank ? (discordRankPriority[a.discordRank] || 999) : 999;
         const bRankPriority = b.discordRank ? (discordRankPriority[b.discordRank] || 999) : 999;
-        
         if (aRankPriority !== bRankPriority) {
           return aRankPriority - bRankPriority;
         }
-        
-        // If same Discord rank, sort by guild rank (higher guild rank first)
         if (a.guildRank !== b.guildRank) {
           return b.guildRank - a.guildRank;
         }
-        
-        // If same ranks, sort by username
         return a.username.localeCompare(b.username);
       });
 
       const jsonResponse = NextResponse.json({
         guild: {
-          name: guildData.name,
-          prefix: guildData.prefix,
-          level: guildData.level,
-          territories: guildData.territories,
-          totalMembers: guildData.members.total,
-          onlineMembers: guildData.online
+          name: guildDataRaw.name || 'Tort',
+          prefix: guildDataRaw.prefix || 'TORT',
+          level: guildDataRaw.level || 0,
+          territories: guildDataRaw.territories || 0,
+          totalMembers: Array.isArray(guildDataRaw.members) ? guildDataRaw.members.length : (guildDataRaw.members?.total || 0),
+          onlineMembers: guildDataRaw.online || 0
         },
-        members: allMembers
+        members: mappedMembers
       }, {
         headers: {
-          'X-Cache': guildData ? 'HIT' : 'MISS',
+          'X-Cache': guildDataRaw ? 'HIT' : 'MISS',
           'X-Cache-Timestamp': Date.now().toString()
         }
       });

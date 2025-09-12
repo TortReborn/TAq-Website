@@ -4,14 +4,21 @@ import React, { useState } from "react";
 
 interface Member {
   username: string;
-  online: boolean;
-  server: string | null;
+  online?: boolean;
+  server?: string | null;
   contributed: number;
-  guildRank: number;
+  guildRank?: number;
   contributionRank?: number;
-  joined: string;
-  discordRank: string; // Now guaranteed to be non-null
+  joined?: string;
+  discordRank: string;
+  discordId?: string;
+  discordUsername?: string;
   guildRankName: string;
+  wars: number;
+  raids: number;
+  shells: number;
+  lastJoin: string | null;
+  playtime: number;
 }
 
 interface MemberGridProps {
@@ -37,7 +44,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
   };
 
   // Filter members based on online toggle
-  const filteredMembers = showOnlineOnly ? members.filter(member => member.online) : members;
+  const filteredMembers = showOnlineOnly ? members.filter(member => member.online === true) : members;
 
   // Group members by Discord rank or create single online group
   const groupedMembers = showOnlineOnly 
@@ -87,11 +94,18 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
     return online ? '#27ae60' : '#7f8c8d';
   };
 
-  const formatJoinDate = (dateString: string) => {
+  const formatJoinDate = (dateString: string | null) => {
+    if (!dateString) return 'Unknown';
     const date = new Date(dateString);
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                     'July', 'August', 'September', 'October', 'November', 'December'];
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
+  const formatPlaytime = (hours: number) => {
+    if (hours < 1) return `${Math.round(hours * 60)} min`;
+    if (hours < 24) return `${hours.toFixed(1)} hrs`;
+    return `${(hours / 24).toFixed(1)} days`;
   };
 
   return (
@@ -263,7 +277,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         padding: '0.5rem',
-                        background: member.online 
+                        background: member.online === true
                           ? `linear-gradient(to bottom, var(--bg-card), rgba(39, 174, 96, 0.1))`
                           : 'var(--bg-card)',
                         borderRadius: '0.75rem',
@@ -280,7 +294,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         width: '8px',
                         height: '8px',
                         borderRadius: '50%',
-                        backgroundColor: getOnlineStatusColor(member.online)
+                        backgroundColor: getOnlineStatusColor(member.online === true)
                       }} />
 
                       {/* Minecraft head */}
@@ -314,10 +328,10 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                       {/* Online status */}
                       <div style={{
                         fontSize: '0.625rem',
-                        color: member.online ? getOnlineStatusColor(member.online) : '#7f8c8d',
+                        color: member.online === true ? getOnlineStatusColor(true) : '#7f8c8d',
                         textAlign: 'center'
                       }}>
-                        {member.online && member.server ? member.server : 'Offline'}
+                        {member.online === true && member.server ? member.server : 'Offline'}
                       </div>
                     </div>
 
@@ -334,7 +348,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         padding: '0.5rem',
-                        background: member.online 
+                        background: member.online === true
                           ? `linear-gradient(to bottom, var(--bg-card), rgba(39, 174, 96, 0.1))`
                           : 'var(--bg-card)',
                         borderRadius: '0.75rem',
@@ -358,24 +372,34 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         {member.username}
                       </div>
 
-                      {/* Contribution Rank */}
+                      {/* Wars/Raids/Shells */}
                       <div style={{
-                        fontSize: '0.625rem',
+                        fontSize: '0.6rem',
                         color: 'var(--text-muted)',
                         textAlign: 'center',
-                        marginBottom: '0.25rem'
+                        marginBottom: '0.2rem'
                       }}>
-                        Contribution Rank #{member.contributionRank}
+                        ⚔️ {member.wars} 🏰 {member.raids} 🐚 {member.shells}
                       </div>
 
-                      {/* Join Date */}
+                      {/* Playtime */}
                       <div style={{
-                        fontSize: '0.625rem',
+                        fontSize: '0.6rem',
+                        color: 'var(--text-muted)',
+                        textAlign: 'center',
+                        marginBottom: '0.2rem'
+                      }}>
+                        Playtime: {formatPlaytime(member.playtime)}
+                      </div>
+
+                      {/* Last Join Date */}
+                      <div style={{
+                        fontSize: '0.6rem',
                         color: 'var(--text-muted)',
                         textAlign: 'center',
                         lineHeight: '1.2'
                       }}>
-                        {formatJoinDate(member.joined)}
+                        {formatJoinDate(member.lastJoin)}
                       </div>
                     </div>
                   </div>

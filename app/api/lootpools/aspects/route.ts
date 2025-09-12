@@ -23,13 +23,11 @@ export async function GET(request: NextRequest) {
     const cachedData = await simpleDatabaseCache.getAspectData(clientIP);
     
     if (cachedData) {
-      console.log('✨ Serving aspect data from cache (external bot managed)');
       const jsonResponse = NextResponse.json(cachedData);
       return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
     }
 
     // If no cached data, return error (data managed by external bot)
-    console.log('❌ No aspect data available from cache');
     const errorResponse = NextResponse.json(
       { error: 'Aspect data not available. External bot may be updating data.' },
       { 
@@ -43,7 +41,6 @@ export async function GET(request: NextRequest) {
     );
     return addRateLimitHeaders(errorResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
   } catch (error) {
-    console.error('Error fetching aspect data from cache:', error);
     const errorResponse = NextResponse.json(
       { error: 'Failed to fetch aspect data from cache', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

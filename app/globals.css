@@ -129,6 +129,48 @@ body, body *, html, html * {
   }
 }
 
+/* Lootrun grid responsive styles - 5 columns that stay side by side as long as possible */
+.lootrun-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(200px, 1fr));
+  gap: 1rem;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Only break to 3 columns on smaller tablets */
+@media (max-width: 1200px) {
+  .lootrun-grid {
+    grid-template-columns: repeat(5, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+/* Break to 3 columns when columns would be too narrow */
+@media (max-width: 900px) {
+  .lootrun-grid {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Break to 2 columns on smaller screens */
+@media (max-width: 640px) {
+  .lootrun-grid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+/* Single column only on very small screens */
+@media (max-width: 400px) {
+  .lootrun-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
 /* Splash Screen Animations */
 @keyframes fadeOut {
   0% {

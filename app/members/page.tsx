@@ -14,14 +14,22 @@ interface Guild {
 
 interface Member {
   username: string;
-  online: boolean;
-  server: string | null;
+  uuid: string;
+  online?: boolean;
+  server?: string | null;
   contributed: number;
-  guildRank: number;
+  guildRank?: number;
   contributionRank?: number;
-  joined: string;
-  discordRank: string; // Non-null since API now filters these out
+  joined?: string;
+  discordRank: string;
+  discordId?: string;
+  discordUsername?: string;
   guildRankName: string;
+  wars: number;
+  raids: number;
+  shells: number;
+  lastJoin: string | null;
+  playtime: number;
 }
 
 interface MembersData {
@@ -31,7 +39,6 @@ interface MembersData {
 
 export default function MembersPage() {
   const [membersData, setMembersData] = useState<MembersData | null>(null);
-  const [discordLinks, setDiscordLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,17 +56,10 @@ export default function MembersPage() {
         }
       }
       const data = await response.json();
+      
+      // The API now returns members already flattened and with Discord data included
       setMembersData(data);
       setError(null);
-
-      // Fetch discord_links table from API (assume /api/discord-links returns the table)
-      const discordLinksRes = await fetch('/api/discord-links', { cache: 'no-store' });
-      if (discordLinksRes.ok) {
-        const discordLinksData = await discordLinksRes.json();
-        setDiscordLinks(discordLinksData);
-      } else {
-        setDiscordLinks([]);
-      }
     } catch (err) {
       console.error('Error fetching members data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load members data');
@@ -130,18 +130,7 @@ export default function MembersPage() {
     return null;
   }
 
-  // Map Discord ranks to members
-  const discordMap = new Map(discordLinks.map(link => [link.uuid, link]));
-  const mappedMembers = membersData.members.map(member => {
-    const discord = discordMap.get(member.uuid);
-    return {
-      ...member,
-      discordRank: discord ? discord.rank : '',
-      discordId: discord ? discord.discordId : '',
-      discordUsername: discord ? discord.username : '',
-    };
-  });
-
+  // Discord data is already included in members from the API
   return (
     <main style={{
       display: 'flex',
@@ -161,7 +150,7 @@ export default function MembersPage() {
       }}>
         {/* Members Grid */}
         <MemberGrid 
-          members={mappedMembers} 
+          members={membersData.members} 
           onRefresh={fetchMembersData}
         />
       </div>

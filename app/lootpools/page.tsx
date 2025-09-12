@@ -3,16 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { getImageForItem, raidImageMap, classImageMap } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
-import { mockLootrunsData, mockAspectsData } from '@/lib/mock-lootpool-data';
 import Image from 'next/image';
 
 interface LootData {
   Timestamp: number;
+  Icon?: { [itemName: string]: string };
   Loot: {
     [region: string]: {
       Mythic?: string[];
       Fabled?: string[];
       Legendary?: string[];
+      Rare?: string[];
+      Unique?: string[];
       Shiny?: {
         Item: string;
         Tracker: string;
@@ -25,7 +27,6 @@ export default function LootpoolsPage() {
   const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('lootruns');
   const [lootrunsData, setLootrunsData] = useState<LootData | null>(null);
   const [aspectsData, setAspectsData] = useState<LootData | null>(null);
-  const [usingMockData, setUsingMockData] = useState({ lootruns: false, aspects: false });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,8 +38,7 @@ export default function LootpoolsPage() {
         const errorData = await response.json();
         throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
       } else {
-        // Other errors - log but don't show to user, fall back to mock data
-        console.warn(`${apiName} API responded with status: ${response.status}, falling back to mock data`);
+        // Other errors - return null
         return null;
       }
     }
@@ -51,35 +51,26 @@ export default function LootpoolsPage() {
       setError(null);
       
       try {
-        // Only fetch aspects data since lootruns is coming soon
-        console.log('Fetching aspects data...');
+        // Fetch aspects data
         const aspectsResponse = await fetch('/api/lootpools/aspects');
         const aspectsData = await handleApiResponse(aspectsResponse, 'Aspects');
         
-        setAspectsData(aspectsData || mockAspectsData);
-        setUsingMockData(prev => ({ ...prev, aspects: !aspectsData }));
+        setAspectsData(aspectsData);
 
-        // Set lootruns to mock data (not fetching since it's disabled)
-        // When re-enabling, use this pattern:
-        // const lootrunsResponse = await fetch('/api/lootpools/lootruns');
-        // const lootrunsData = await handleApiResponse(lootrunsResponse, 'Lootruns');
-        // setLootrunsData(lootrunsData || mockLootrunsData);
-        // setUsingMockData(prev => ({ ...prev, lootruns: !lootrunsData }));
-        
-        setLootrunsData(mockLootrunsData);
-        setUsingMockData(prev => ({ ...prev, lootruns: true }));
+        // Fetch lootruns data
+        const lootrunsResponse = await fetch('/api/lootpools/lootruns');
+        const lootrunsData = await handleApiResponse(lootrunsResponse, 'Lootruns');
+        setLootrunsData(lootrunsData);
 
       } catch (err) {
-        console.error('General fetch error:', err);
         if (err instanceof Error && err.message.includes('Rate limit exceeded')) {
           setError(err.message);
         } else {
           setError('Failed to load lootpool data. Please try again later.');
         }
-        // Fallback to mock data even on general error
-        setLootrunsData(mockLootrunsData);
-        setAspectsData(mockAspectsData);
-        setUsingMockData({ lootruns: true, aspects: true });
+        // Don't set any data on error
+        setLootrunsData(null);
+        setAspectsData(null);
       } finally {
         setLoading(false);
       }
@@ -198,40 +189,12 @@ export default function LootpoolsPage() {
       {/* Content */}
       {activeTab === 'lootruns' && lootrunsData && (
         <div>
-          {usingMockData.lootruns && (
-            <div style={{
-              background: '#ff6b35',
-              color: 'white',
-              padding: '0.75rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-              textAlign: 'center',
-              fontSize: '0.875rem',
-              fontWeight: '600'
-            }}>
-              ⚠️ Using demo data - Live lootpool API temporarily unavailable
-            </div>
-          )}
           <LootrunsView data={lootrunsData} />
         </div>
       )}
       
       {activeTab === 'raids' && aspectsData && (
         <div>
-          {usingMockData.aspects && (
-            <div style={{
-              background: '#ff6b35',
-              color: 'white',
-              padding: '0.75rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-              textAlign: 'center',
-              fontSize: '0.875rem',
-              fontWeight: '600'
-            }}>
-              ⚠️ Using demo data - Live aspects API temporarily unavailable
-            </div>
-          )}
           <RaidsView data={aspectsData} />
         </div>
       )}
@@ -242,6 +205,7 @@ export default function LootpoolsPage() {
 // Lootruns component
 function LootrunsView({ data }: { data: LootData }) {
   const nextRotation = formatNextRotation(data.Timestamp);
+  const regions = Object.keys(data.Loot);
   
   return (
     <div>
@@ -269,19 +233,14 @@ function LootrunsView({ data }: { data: LootData }) {
         </div>
       </div>
 
-      {/* Lootrun Regions */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '2rem',
-        alignItems: 'center'
-      }}>
-        {Object.entries(data.Loot).map(([regionName, regionData], index) => (
-          <LootrunRegion
+      {/* Lootrun Regions Grid */}
+      <div className="lootrun-grid">
+        {regions.map(regionName => (
+          <LootrunColumn
             key={regionName}
             regionName={regionName}
-            regionData={regionData}
-            index={index}
+            regionData={data.Loot[regionName] || {}}
+            icons={data.Icon}
           />
         ))}
       </div>
@@ -340,35 +299,32 @@ function formatNextRotation(timestamp: number) {
   return nextRotation.toLocaleString();
 }
 
-// Region component for lootruns
-function LootrunRegion({ regionName, regionData, index }: {
+// Lootrun column component (matches raid column styling)
+function LootrunColumn({ regionName, regionData, icons }: {
   regionName: string;
   regionData: any;
-  index: number;
+  icons?: { [itemName: string]: string };
 }) {
-  const regionColors = [
-    { bg: '#55e340', stroke: '#218912' }, // Green
-    { bg: '#edca3b', stroke: '#6b4d16' }, // Yellow
-    { bg: '#58d6fc', stroke: '#1f376c' }, // Blue
-    { bg: '#bd1e1e', stroke: '#630b0b' }, // Red
-    { bg: '#3440eb', stroke: '#151b73' }  // Dark Blue
-  ];
-  
-  const regionTitles = [
-    "Silent Expanse Expedition",
-    "The Corkus Traversal", 
-    "Sky Islands Exploration",
-    "Molten Heights Hike",
-    "Canyon of the Lost Excursion (South)"
-  ];
+  const regionMap: { [key: string]: { name: string; color: string } } = {
+    'SE': { name: 'Silent Expanse', color: '#55e340' },
+    'Sky': { name: 'Sky Islands', color: '#58d6fc' },
+    'Canyon': { name: 'Canyon of the Lost', color: '#bd1e1e' },
+    'Corkus': { name: 'Corkus', color: '#edca3b' },
+    'Molten': { name: 'Molten Heights', color: '#3440eb' }
+  };
 
-  const color = regionColors[index] || regionColors[0];
-  const title = regionTitles[index] || regionName;
+  const regionInfo = regionMap[regionName] || { name: regionName, color: '#7a187a' };
   
-  const mythicItems = regionData.Mythic || [];
+  const rarityColors = {
+    Mythic: '#aa00aa',
+    Fabled: '#ff5555',
+    Legendary: '#55ffff',
+    Rare: '#ffff55',
+    Unique: '#ff7f50'
+  };
+
   const shinyItem = regionData.Shiny?.Item;
   const shinyTracker = regionData.Shiny?.Tracker;
-  const allItems = shinyItem ? [shinyItem, ...mythicItems] : mythicItems;
 
   return (
     <div style={{
@@ -376,142 +332,145 @@ function LootrunRegion({ regionName, regionData, index }: {
       borderRadius: '1rem',
       padding: '1.5rem',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-      border: '3px solid',
-      borderColor: color.stroke,
-      width: '100%',
-      maxWidth: '800px'
+      border: '3px solid #240059',
+      height: 'fit-content'
     }}>
-      <h2 style={{
-        fontSize: '1.5rem',
-        fontWeight: '700',
-        color: color.bg,
-        textAlign: 'center',
-        marginBottom: '1rem',
-        textShadow: `2px 2px 4px ${color.stroke}`
-      }}>
-        {title}
-      </h2>
-      
+      {/* Region icon placeholder */}
       <div style={{
+        width: '120px',
+        height: '120px',
+        borderRadius: '0.5rem',
+        margin: '0 auto 1rem auto',
         display: 'flex',
-        gap: '1rem',
+        alignItems: 'center',
         justifyContent: 'center',
-        flexWrap: 'wrap'
+        position: 'relative',
+        overflow: 'hidden',
+        background: regionInfo.color,
+        color: 'white',
+        fontSize: '3rem'
       }}>
-        {allItems.map((item: string, itemIndex: number) => (
-          <div
-            key={`${item}-${itemIndex}`}
+        📦
+      </div>
+      
+      <h3 style={{
+        fontSize: '1.25rem',
+        fontWeight: '700',
+        color: 'var(--text-primary)',
+        textAlign: 'center',
+        marginBottom: '1rem'
+      }}>
+        {regionInfo.name}
+      </h3>
+
+      {/* Items by rarity - Mythic and Shiny */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        {(() => {
+          const mythicItems = regionData.Mythic || [];
+          const shinyItem = regionData.Shiny?.Item;
+          
+          // Combine mythic items and shiny item (if shiny exists and isn't already in mythics)
+          const allItems = [...mythicItems];
+          if (shinyItem && !mythicItems.includes(shinyItem)) {
+            allItems.unshift(shinyItem); // Add shiny at the beginning
+          }
+          
+          return allItems.map((item: string, index: number) => {
+            const isShiny = item === shinyItem;
+            return (
+            <div
+              key={`item-${index}`}
             style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '0.5rem',
-              padding: '1rem',
-              textAlign: 'center',
-              position: 'relative',
-              minWidth: '120px'
-            }}
-          >
-            {/* Item image */}
-            <div style={{
-              width: '80px',
-              height: '80px',
-              background: '#2a2a2a',
-              borderRadius: '0.25rem',
-              margin: '0 auto 0.5rem auto',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem',
+              background: 'var(--bg-card)',
+              borderRadius: '0.5rem',
+              border: '1px solid var(--border-card)',
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s ease',
+              position: 'relative'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+            }}
+          >
+            {/* Item icon */}
+            <div style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '0.25rem',
+              flexShrink: 0,
               position: 'relative',
               overflow: 'hidden'
             }}>
               <Image
                 src={`/images/mythics/${getImageForItem(item)}`}
                 alt={item}
-                width={64}
-                height={64}
+                width={20}
+                height={20}
                 style={{
                   objectFit: 'contain',
-                  maxWidth: '100%',
-                  maxHeight: '100%'
+                  width: '100%',
+                  height: '100%'
                 }}
                 onError={(e) => {
-                  // Fallback to placeholder on error
-                  const target = e.currentTarget;
-                  target.style.display = 'none';
-                  const fallback = target.nextElementSibling as HTMLElement;
-                  if (fallback) {
-                    fallback.style.display = 'flex';
-                  }
+                  // Hide on error
+                  (e.currentTarget as HTMLElement).style.display = 'none';
                 }}
               />
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'none',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem'
-              }}>
-                📦
-              </div>
             </div>
             
             {/* Shiny indicator */}
-            {item === shinyItem && itemIndex === 0 && (
+            {isShiny && (
               <div style={{
                 position: 'absolute',
-                top: '0.5rem',
-                right: '0.5rem',
-                width: '20px',
-                height: '20px',
+                top: '0.25rem',
+                right: '0.25rem',
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: '#ffaa00',
+                fontSize: '0.6rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <Image
-                  src="/images/mythics/shiny.png"
-                  alt="Shiny"
-                  width={20}
-                  height={20}
-                  style={{
-                    objectFit: 'contain'
-                  }}
-                  onError={(e) => {
-                    // Fallback to emoji
-                    (e.currentTarget as HTMLElement).style.display = 'none';
-                    if (e.currentTarget.parentElement) {
-                      e.currentTarget.parentElement.innerHTML = '✨';
-                      (e.currentTarget.parentElement as HTMLElement).style.background = '#ffaa00';
-                      (e.currentTarget.parentElement as HTMLElement).style.borderRadius = '50%';
-                    }
-                  }}
-                />
+                ✨
               </div>
             )}
             
-            <div style={{
-              fontSize: '0.875rem',
-              fontWeight: '600',
-              color: '#aa00aa',
-              marginBottom: '0.25rem'
-            }}>
-              {item}
-            </div>
-            
-            {/* Shiny tracker */}
-            {item === shinyItem && itemIndex === 0 && shinyTracker && (
-              <div style={{
-                fontSize: '0.75rem',
-                color: '#ffaa00',
+            <div style={{ flex: 1 }}>
+              <span style={{
+                fontSize: '0.875rem',
+                color: isShiny ? '#ffaa00' : '#aa00aa',
                 fontWeight: '500'
               }}>
-                {shinyTracker}
-              </div>
-            )}
-          </div>
-        ))}
+                {item}
+              </span>
+              {/* Shiny tracker */}
+              {isShiny && shinyTracker && (
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: '#ffaa00',
+                  fontWeight: '400',
+                  marginTop: '0.25rem'
+                }}>
+                  {shinyTracker}
+                </div>
+              )}
+            </div>
+            </div>
+            );
+          });
+        })()}
       </div>
     </div>
   );
