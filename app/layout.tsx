@@ -3,7 +3,7 @@ import "./globals.css";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import BottomBar from '@/components/BottomBar';
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
