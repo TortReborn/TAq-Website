@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Simply get whatever is cached in the guildColors table

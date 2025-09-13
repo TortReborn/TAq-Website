@@ -35,6 +35,7 @@ export default function TerritoryInfoPanel({ selectedTerritory, onClose, panelId
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [adjusted, setAdjusted] = useState<{ left: number, top: number } | null>(null);
   const [territoryInfo, setTerritoryInfo] = useState<TerritoryVerboseData | null>(null);
+  const [guildColor, setGuildColor] = useState<string>('#808080');
 
   useEffect(() => {
     const fetchTerritoryInfo = async () => {
@@ -55,6 +56,18 @@ export default function TerritoryInfoPanel({ selectedTerritory, onClose, panelId
     fetchTerritoryInfo();
   }, [selectedTerritory]);
 
+  // Load guild color
+  useEffect(() => {
+    const loadGuildColor = async () => {
+      if (selectedTerritory) {
+        const color = await getGuildColor(selectedTerritory.territory.guild.name, selectedTerritory.territory.guild.prefix);
+        setGuildColor(color);
+      }
+    };
+    
+    loadGuildColor();
+  }, [selectedTerritory]);
+
   useLayoutEffect(() => {
     if (selectedTerritory && infoBoxRef.current) {
       const { pixel } = selectedTerritory;
@@ -70,7 +83,6 @@ export default function TerritoryInfoPanel({ selectedTerritory, onClose, panelId
   if (!selectedTerritory) return null;
 
   const { name, territory } = selectedTerritory;
-  const guildColor = getGuildColor(territory.guild.name);
 
   // Format resource rates
   const resourceRates = territoryInfo ? Object.entries(territoryInfo.resources)

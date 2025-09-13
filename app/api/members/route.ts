@@ -3,6 +3,8 @@ import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
+export const dynamic = 'force-dynamic';
+
 // Define types for the API response
 interface Member {
   username: string;

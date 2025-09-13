@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   // Check rate limit
   const rateLimitCheck = checkRateLimit(request, 'aspects');

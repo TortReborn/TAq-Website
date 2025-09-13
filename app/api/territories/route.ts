@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Get client IP for rate limiting
