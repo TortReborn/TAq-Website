@@ -247,7 +247,27 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >Members</a>
-            <a 
+            <a
+              href="/leaderboard"
+              style={{
+                color: 'var(--text-primary)',
+                fontWeight: 'bold',
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >Leaderboard</a>
+            <a
               href="/lootpools" 
               style={{ 
                 color: 'var(--text-primary)', 
@@ -494,7 +514,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   e.currentTarget.style.background = 'transparent';
                 }}
               >Members</a>
-              <a 
+              <a
+                href="/leaderboard"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  color: 'var(--text-primary)',
+                  fontWeight: 'bold',
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Leaderboard</a>
+              <a
                 href="/lootpools"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{ 

@@ -91,8 +91,8 @@ export default function BottomBar() {
           gap: '1rem',
           justifyContent: 'center'
         }}>
-          <Link 
-            href="/members" 
+          <Link
+            href="/members"
             style={{
               color: 'var(--text-secondary)',
               textDecoration: 'none',
@@ -104,8 +104,21 @@ export default function BottomBar() {
           >
             Members
           </Link>
-          <Link 
-            href="/map" 
+          <Link
+            href="/leaderboard"
+            style={{
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              fontWeight: '500',
+              transition: 'color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+          >
+            Leaderboard
+          </Link>
+          <Link
+            href="/map"
             style={{
               color: 'var(--text-secondary)',
               textDecoration: 'none',
@@ -117,8 +130,8 @@ export default function BottomBar() {
           >
             Map
           </Link>
-          <Link 
-            href="/lootpools" 
+          <Link
+            href="/lootpools"
             style={{
               color: 'var(--text-secondary)',
               textDecoration: 'none',
@@ -155,14 +168,18 @@ export default function BottomBar() {
           gap: '0.25rem',
           textAlign: 'right'
         }}>
-          {lastUpdated && (
-            <div style={{
-              color: 'var(--text-muted)',
-              fontSize: '0.75rem'
-            }}>
-              Updated: {lastUpdated}
-            </div>
-          )}
+          <div style={{
+            color: 'var(--text-muted)',
+            fontSize: '0.75rem'
+          }}>
+            Developed by Thundderr
+          </div>
+          <div style={{
+            color: 'var(--text-muted)',
+            fontSize: '0.75rem'
+          }}>
+            Discord: thundderr
+          </div>
         </div>
       </div>
 

@@ -290,18 +290,18 @@ class SimpleDatabaseCache {
   async getGuildColors(clientIP: string): Promise<any[] | null> {
     try {
       await this.initializeTable();
-      
+
       const client = await this.pool.connect();
       try {
         const result = await client.query(
           'SELECT data FROM cache_entries WHERE cache_key = $1 AND expires_at > NOW()',
           ['guildColors']
         );
-        
+
         if (result.rows.length > 0) {
           return result.rows[0].data;
         }
-        
+
         return null;
       } finally {
         client.release();
@@ -309,6 +309,36 @@ class SimpleDatabaseCache {
     } catch (error) {
       console.error('Error getting guild colors from cache:', error);
       return null;
+    }
+  }
+
+  // Get player activity cache for time-based leaderboards
+  async getPlayerActivityCache(requestId?: string): Promise<any | null> {
+    const rateCheck = this.checkRateLimit('members', requestId);
+    if (!rateCheck.allowed) {
+      console.warn('🚫 Rate limit exceeded for player activity cache');
+      return null;
+    }
+
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        `SELECT data FROM cache_entries WHERE cache_key = $1`,
+        ['player_activity_cache']
+      );
+
+      if (result.rows.length === 0) {
+        console.log('❌ No player activity cache found');
+        return null;
+      }
+
+      console.log('✨ Serving player_activity_cache from database');
+      return result.rows[0].data;
+    } catch (error) {
+      console.error('❌ Failed to get player activity cache:', error);
+      return null;
+    } finally {
+      client.release();
     }
   }
 
