@@ -83,8 +83,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
       </head>
-      <body style={{ 
-        minHeight: '100vh', 
+      <body style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        margin: 0,
         color: 'var(--text-primary)',
         background: 'var(--bg-gradient)',
         fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif"
@@ -574,7 +577,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           )}
         </nav>
-        {children}
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {children}
+        </main>
         <Analytics />
         <BottomBar />
       </body>

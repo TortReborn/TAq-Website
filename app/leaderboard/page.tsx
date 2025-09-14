@@ -118,7 +118,7 @@ export default function LeaderboardPage() {
         paddingTop: '5rem',
         paddingLeft: '1rem',
         paddingRight: '1rem',
-        minHeight: '100vh'
+        paddingBottom: '2rem'
       }}>
         <div style={{
           color: 'var(--text-primary)',
@@ -139,7 +139,7 @@ export default function LeaderboardPage() {
         paddingTop: '5rem',
         paddingLeft: '1rem',
         paddingRight: '1rem',
-        minHeight: '100vh'
+        paddingBottom: '2rem'
       }}>
         <div style={{
           padding: '2rem',
@@ -187,8 +187,7 @@ export default function LeaderboardPage() {
       paddingTop: '5rem',
       paddingLeft: 'clamp(1rem, 5vw, 3rem)',
       paddingRight: 'clamp(1rem, 5vw, 3rem)',
-      paddingBottom: '2rem',
-      minHeight: '100vh'
+      paddingBottom: '2rem'
     }}>
       <div style={{
         width: '60%',

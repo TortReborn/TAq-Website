@@ -118,6 +118,10 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
 
     // For numeric columns
     if (timeFrame === 'all') {
+      // Playtime is stored in hours, convert to minutes for display
+      if (column === 'playtime') {
+        return (member[column] || 0) * 60;
+      }
       return member[column] || 0;
     }
 
@@ -126,7 +130,7 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
       case 'raids': return member.timeFrameRaids || 0;
       case 'shells': return member.timeFrameShells || 0;
       case 'contributed': return member.timeFrameContributed || 0;
-      case 'playtime': return member.timeFramePlaytime || 0;
+      case 'playtime': return (member.timeFramePlaytime || 0) * 60; // Convert hours to minutes
       default: return 0;
     }
   };
