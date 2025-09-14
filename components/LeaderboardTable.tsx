@@ -137,6 +137,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
     if (sortColumn === column) {
       newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
+      // For username, default to 'asc' (alphabetical)
+      // For all other columns including discordRank, default to 'desc' (highest/best first)
       newDirection = column === 'username' ? 'asc' : 'desc';
     }
 
@@ -171,6 +173,13 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
       const aNum = typeof aValue === 'number' ? aValue : 0;
       const bNum = typeof bValue === 'number' ? bValue : 0;
 
+      // For discordRank, we need to invert the logic since lower numbers = better ranks
+      // Descending should show Hydra (1) first, ascending should show Starfish (10) first
+      if (sortColumn === 'discordRank') {
+        return sortDirection === 'desc' ? aNum - bNum : bNum - aNum;
+      }
+
+      // For all other numeric columns
       return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
     });
 
@@ -250,22 +259,29 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
               <button
                 onClick={onRefresh}
                 style={{
-                  padding: '0.5rem',
+                  padding: '0.5rem 0.75rem',
                   borderRadius: '0.5rem',
                   border: '1px solid var(--border-card)',
                   background: 'transparent',
                   color: 'var(--text-primary)',
                   cursor: 'pointer',
-                  fontSize: '1.25rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transition: 'transform 0.2s ease'
+                  transition: 'all 0.2s ease'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'rotate(180deg)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'rotate(0deg)'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.borderColor = 'var(--color-ocean-500)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'var(--border-card)';
+                }}
               >
-                🔄
+                Refresh
               </button>
             )}
           </div>
@@ -306,7 +322,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'left',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'username' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'username' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -320,7 +337,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'left',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'discordRank' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'discordRank' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -334,7 +352,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'right',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'wars' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'wars' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -348,7 +367,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'right',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'raids' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'raids' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -362,7 +382,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'right',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'shells' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'shells' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -376,7 +397,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'right',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'contributed' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'contributed' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -390,7 +412,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     textAlign: 'right',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    color: 'var(--text-secondary)',
+                    color: sortColumn === 'playtime' ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                    background: sortColumn === 'playtime' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
@@ -442,7 +465,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                       color: 'var(--text-primary)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.5rem'
+                      gap: '0.5rem',
+                      background: sortColumn === 'username' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {member.username}
                       {member.online && (
@@ -457,7 +481,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                     <td style={{
                       padding: '0.75rem',
                       fontSize: '0.875rem',
-                      color: 'var(--text-secondary)'
+                      color: 'var(--text-secondary)',
+                      background: sortColumn === 'discordRank' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {member.discordRank && (
                         <span>{member.discordRank}</span>
@@ -468,7 +493,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                       fontSize: '0.875rem',
                       fontWeight: '600',
                       color: 'var(--color-ocean-500)',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      background: sortColumn === 'wars' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {formatValue(getValue(member, 'wars') as number, 'wars')}
                     </td>
@@ -477,7 +503,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                       fontSize: '0.875rem',
                       fontWeight: '600',
                       color: 'var(--color-ocean-500)',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      background: sortColumn === 'raids' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {formatValue(getValue(member, 'raids') as number, 'raids')}
                     </td>
@@ -486,7 +513,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                       fontSize: '0.875rem',
                       fontWeight: '600',
                       color: 'var(--color-ocean-500)',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      background: sortColumn === 'shells' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {formatValue(getValue(member, 'shells') as number, 'shells')}
                     </td>
@@ -495,7 +523,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                       fontSize: '0.875rem',
                       fontWeight: '600',
                       color: 'var(--color-ocean-500)',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      background: sortColumn === 'contributed' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {formatValue(getValue(member, 'contributed') as number, 'contributed')}
                     </td>
@@ -504,7 +533,8 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                       fontSize: '0.875rem',
                       fontWeight: '600',
                       color: 'var(--color-ocean-500)',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      background: sortColumn === 'playtime' ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
                     }}>
                       {formatValue(getValue(member, 'playtime') as number, 'playtime')}
                     </td>
