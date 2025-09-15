@@ -1,3 +1,5 @@
+import PageHeader from '@/components/PageHeader';
+
 export default function HomePage() {
   return (
     <>
@@ -18,31 +20,16 @@ export default function HomePage() {
           textAlign: 'center',
           gap: '2rem'
         }}>
-          <h1 style={{
-            fontSize: '3rem',
-            fontWeight: '900',
-            color: 'var(--text-primary)',
-            margin: 0
-          }}>
-            Welcome to The Aquarium Guild Website
-          </h1>
+          <PageHeader
+            title="The Aquarium"
+            subtitle="Wynncraft's Premier Aquatic-Themed Guild"
+          />
           <p style={{
             fontSize: '1.125rem',
             color: 'var(--text-secondary)',
             margin: 0
           }}>
-            This is the homepage. Use the navigation bar above to visit subpages like the{' '}
-            <a 
-              href="/graid-event" 
-              style={{
-                color: 'var(--text-link)',
-                textDecoration: 'underline',
-                fontWeight: '600'
-              }}
-            >
-              Graid Event
-            </a>{' '}
-            page.
+            Use the navigation bar above to explore our guild resources, member statistics, and territory map.
           </p>
         </div>
       </main>

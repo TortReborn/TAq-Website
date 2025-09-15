@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { getImageForItem, raidImageMap, classImageMap } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
 import Image from 'next/image';
+import PageHeader from '@/components/PageHeader';
 
 interface LootData {
   Timestamp: number;
@@ -126,70 +127,130 @@ export default function LootpoolsPage() {
     );
   }
 
+  // Get next rotation time based on active tab
+  const nextRotation = activeTab === 'lootruns'
+    ? (lootrunsData ? formatNextRotation(lootrunsData.Timestamp) : null)
+    : (aspectsData ? formatNextRotation(aspectsData.Timestamp) : null);
+
   return (
-    <div style={{ 
-      padding: '2rem', 
-      maxWidth: '1400px', 
+    <div style={{
+      padding: '2rem',
+      maxWidth: '1400px',
       margin: '0 auto',
       minHeight: '100vh'
     }}>
-      {/* Tab Toggle */}
+      {/* Header Container */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        marginBottom: '2rem',
-        background: 'var(--bg-card)',
-        borderRadius: '0.75rem',
-        padding: '0.5rem',
-        width: 'fit-content',
-        margin: '0 auto 2rem auto',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        marginBottom: '3rem'
       }}>
-        <button
-          onClick={() => setActiveTab('lootruns')}
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: activeTab === 'lootruns' ? '#7a187a' : 'transparent',
-            color: activeTab === 'lootruns' ? 'white' : 'var(--text-primary)',
-            border: 'none',
+        {/* Unified Header */}
+        <div className="lootpools-header-container" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '2rem',
+          flexWrap: 'wrap',
+          background: 'var(--bg-card)',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          border: '3px solid #240059',
+          width: '90%',
+          maxWidth: '1200px'
+        }}>
+          {/* Next Rotation (Left) */}
+          {nextRotation && (
+            <div style={{
+              fontSize: '0.875rem',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'var(--bg-secondary)',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem'
+            }}>
+              <span style={{ fontSize: '1.125rem' }}>🔄</span>
+              <div>
+                <div style={{ fontWeight: '600' }}>Next Rotation</div>
+                <div>{nextRotation}</div>
+              </div>
+            </div>
+          )}
+
+          {/* Title (Center) */}
+          <div style={{
+            flex: '1',
+            textAlign: 'center',
+            minWidth: '200px'
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+              fontWeight: '800',
+              background: 'linear-gradient(135deg, var(--color-ocean-400), var(--color-ocean-600))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              margin: 0,
+              letterSpacing: '-0.02em'
+            }}>
+              {activeTab === 'lootruns' ? 'Weekly Mythic Lootpool' : 'Weekly Raid Aspects'}
+            </h1>
+          </div>
+
+          {/* Tab Selector (Right) */}
+          <div style={{
+            display: 'flex',
+            gap: '0.5rem',
+            background: 'var(--bg-secondary)',
             borderRadius: '0.5rem',
-            fontSize: '1rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}
-        >
-          🏃 Lootruns
-        </button>
-        <button
-          onClick={() => setActiveTab('raids')}
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: activeTab === 'raids' ? '#7a187a' : 'transparent',
-            color: activeTab === 'raids' ? 'white' : 'var(--text-primary)',
-            border: 'none',
-            borderRadius: '0.5rem',
-            fontSize: '1rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}
-        >
-          ⚔️ Raids
-        </button>
+            padding: '0.25rem'
+          }}>
+            <button
+              onClick={() => setActiveTab('lootruns')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: activeTab === 'lootruns' ? '#7a187a' : 'transparent',
+                color: activeTab === 'lootruns' ? 'white' : 'var(--text-primary)',
+                border: 'none',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🏃 Lootruns
+            </button>
+            <button
+              onClick={() => setActiveTab('raids')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: activeTab === 'raids' ? '#7a187a' : 'transparent',
+                color: activeTab === 'raids' ? 'white' : 'var(--text-primary)',
+                border: 'none',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              ⚔️ Raids
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Content */}
       {activeTab === 'lootruns' && lootrunsData && (
-        <div>
-          <LootrunsView data={lootrunsData} />
-        </div>
+        <LootrunsView data={lootrunsData} />
       )}
-      
+
       {activeTab === 'raids' && aspectsData && (
-        <div>
-          <RaidsView data={aspectsData} />
-        </div>
+        <RaidsView data={aspectsData} />
       )}
     </div>
   );
@@ -197,37 +258,18 @@ export default function LootpoolsPage() {
 
 // Lootruns component
 function LootrunsView({ data }: { data: LootData }) {
-  const nextRotation = formatNextRotation(data.Timestamp);
   const regions = Object.keys(data.Loot);
-  
-  return (
-    <div>
-      <div style={{
-        textAlign: 'center',
-        marginBottom: '2rem'
-      }}>
-        <h1 style={{
-          fontSize: '2rem',
-          fontWeight: '800',
-          color: '#7a187a',
-          marginBottom: '0.5rem'
-        }}>
-          Weekly Mythic Lootpool
-        </h1>
-        <div style={{
-          fontSize: '1rem',
-          color: 'var(--text-muted)',
-          background: 'var(--bg-card)',
-          padding: '0.75rem',
-          borderRadius: '0.5rem',
-          display: 'inline-block'
-        }}>
-          🔄 Next rotation: {nextRotation}
-        </div>
-      </div>
 
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center'
+    }}>
       {/* Lootrun Regions Grid */}
-      <div className="lootrun-grid">
+      <div className="lootpools-grid-container lootpools-grid-5" style={{
+        width: '90%',
+        maxWidth: '1200px'
+      }}>
         {regions.map(regionName => (
           <LootrunColumn
             key={regionName}
@@ -243,37 +285,18 @@ function LootrunsView({ data }: { data: LootData }) {
 
 // Raids component
 function RaidsView({ data }: { data: LootData }) {
-  const nextRotation = formatNextRotation(data.Timestamp);
   const raids = ["TNA", "TCC", "NOL", "NOTG"];
-  
-  return (
-    <div>
-      <div style={{
-        textAlign: 'center',
-        marginBottom: '2rem'
-      }}>
-        <h1 style={{
-          fontSize: '2rem',
-          fontWeight: '800',
-          color: '#7a187a',
-          marginBottom: '0.5rem'
-        }}>
-          Weekly Raid Aspects
-        </h1>
-        <div style={{
-          fontSize: '1rem',
-          color: 'var(--text-muted)',
-          background: 'var(--bg-card)',
-          padding: '0.75rem',
-          borderRadius: '0.5rem',
-          display: 'inline-block'
-        }}>
-          🔄 Next rotation: {nextRotation}
-        </div>
-      </div>
 
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center'
+    }}>
       {/* Raid Aspects Grid */}
-      <div className="raid-aspects-grid">
+      <div className="lootpools-grid-container lootpools-grid-4" style={{
+        width: '90%',
+        maxWidth: '1200px'
+      }}>
         {raids.map(raid => (
           <RaidColumn
             key={raid}

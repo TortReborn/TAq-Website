@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Helper function to check if TEST_MODE is enabled
+function isTestMode(): boolean {
+  const testMode = process.env.TEST_MODE;
+  if (!testMode) return false;
+  const s = testMode.toLowerCase().trim();
+  return s === "1" || s === "true" || s === "yes" || s === "on";
+}
+
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
 const MAX_REQUESTS_PER_WINDOW = 30; // Maximum requests per window
@@ -31,12 +39,21 @@ export function getRateLimitKey(request: NextRequest): string {
 }
 
 export function checkRateLimit(request: NextRequest, endpoint?: string): { allowed: boolean; remainingRequests: number; resetTime: number } {
+  // Skip rate limiting in TEST_MODE
+  if (isTestMode()) {
+    return {
+      allowed: true,
+      remainingRequests: 999999,
+      resetTime: Date.now() + RATE_LIMIT_WINDOW
+    };
+  }
+
   const key = getRateLimitKey(request);
   const now = Date.now();
-  
+
   // Get or create rate limit data for this key
   let rateLimitData = requestCounts.get(key);
-  
+
   if (!rateLimitData || now > rateLimitData.resetTime) {
     // Create new rate limit window
     rateLimitData = {
@@ -46,7 +63,7 @@ export function checkRateLimit(request: NextRequest, endpoint?: string): { allow
     };
     requestCounts.set(key, rateLimitData);
   }
-  
+
   // Check global rate limit
   if (rateLimitData.count >= MAX_REQUESTS_PER_WINDOW) {
     return {
@@ -55,7 +72,7 @@ export function checkRateLimit(request: NextRequest, endpoint?: string): { allow
       resetTime: rateLimitData.resetTime
     };
   }
-  
+
   // Check endpoint-specific rate limit if endpoint is provided
   if (endpoint) {
     const endpointCount = rateLimitData.endpointCounts.get(endpoint) || 0;
@@ -67,7 +84,7 @@ export function checkRateLimit(request: NextRequest, endpoint?: string): { allow
       };
     }
   }
-  
+
   return {
     allowed: true,
     remainingRequests: MAX_REQUESTS_PER_WINDOW - rateLimitData.count - 1,
@@ -76,12 +93,17 @@ export function checkRateLimit(request: NextRequest, endpoint?: string): { allow
 }
 
 export function incrementRateLimit(request: NextRequest, endpoint?: string): void {
+  // Skip rate limiting in TEST_MODE
+  if (isTestMode()) {
+    return;
+  }
+
   const key = getRateLimitKey(request);
   const rateLimitData = requestCounts.get(key);
-  
+
   if (rateLimitData) {
     rateLimitData.count++;
-    
+
     if (endpoint) {
       const currentCount = rateLimitData.endpointCounts.get(endpoint) || 0;
       rateLimitData.endpointCounts.set(endpoint, currentCount + 1);

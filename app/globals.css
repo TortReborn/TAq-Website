@@ -1,3 +1,103 @@
+/* Members page responsive styles */
+.members-header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .members-header-container {
+    width: 95% !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .members-header-container {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .members-header-container > * {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+
+/* Lootpools page responsive styles */
+.lootpools-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+}
+
+.lootpools-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+/* Large tablets and small desktops */
+@media (max-width: 1200px) {
+  .lootpools-grid-5 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .lootpools-grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+  .lootpools-grid-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .lootpools-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lootpools-header-container,
+  .lootpools-grid-container {
+    width: 95% !important;
+  }
+}
+
+/* Small tablets */
+@media (max-width: 700px) {
+  .lootpools-grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lootpools-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+  .lootpools-grid-5,
+  .lootpools-grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .lootpools-header-container,
+  .lootpools-grid-container {
+    width: 100% !important;
+  }
+
+  /* Stack header elements vertically on mobile */
+  .lootpools-header-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .lootpools-header-container > * {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+
 /* CSS Custom Properties for Light and Dark Mode */
 :root {
   /* Light mode colors */

@@ -100,6 +100,8 @@ export async function GET(request: NextRequest) {
           lastJoin: member.lastJoin,
           playtime: member.playtime || 0,
           contributed: member.contributed || 0,
+          online: member.online || false,
+          server: member.server || null,
         }));
       } else if (members && typeof members === 'object') {
         // Old format: members organized by rank groups
@@ -149,6 +151,8 @@ export async function GET(request: NextRequest) {
           discordRank: discord ? discord.rank : '',
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',
+          online: member.online === true || member.online === 'true',
+          server: member.server || null,
         };
       });
 
@@ -179,6 +183,9 @@ export async function GET(request: NextRequest) {
       });
 
       const guildData = guildDataRaw as any;
+      // Calculate online members from the actual member data
+      const onlineCount = mappedMembers.filter(m => m.online === true).length;
+
       const jsonResponse = NextResponse.json({
         guild: {
           name: guildData.name || 'Tort',
@@ -186,7 +193,7 @@ export async function GET(request: NextRequest) {
           level: guildData.level || 0,
           territories: guildData.territories || 0,
           totalMembers: Array.isArray(guildData.members) ? guildData.members.length : (guildData.members?.total || 0),
-          onlineMembers: guildData.online || 0
+          onlineMembers: onlineCount
         },
         members: mappedMembers
       }, {

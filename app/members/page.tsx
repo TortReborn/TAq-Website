@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import MemberGrid from "@/components/MemberGrid";
+import PageHeader from "@/components/PageHeader";
 
 interface Guild {
   name: string;
@@ -41,6 +42,7 @@ export default function MembersPage() {
   const [membersData, setMembersData] = useState<MembersData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   const fetchMembersData = async () => {
     try {
@@ -69,9 +71,25 @@ export default function MembersPage() {
   };
 
   useEffect(() => {
+    // Load cached preference
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('membersOnlineOnly');
+      if (cached !== null) {
+        setShowOnlineOnly(cached === 'true');
+      }
+    }
     // Initial fetch
     fetchMembersData();
   }, []);
+
+  const handleToggleOnlineOnly = () => {
+    const newValue = !showOnlineOnly;
+    setShowOnlineOnly(newValue);
+    // Cache the preference
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('membersOnlineOnly', newValue.toString());
+    }
+  };
 
   if (loading) {
     return (
@@ -131,23 +149,138 @@ export default function MembersPage() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      paddingTop: '5rem',
-      paddingLeft: 'clamp(0px, 10vw, 2rem)',
-      paddingRight: 'clamp(0px, 10vw, 2rem)'
+      padding: '2rem',
+      minHeight: '100vh'
     }}>
       <div style={{
         width: '100%',
-        maxWidth: '80vw',
-        minWidth: '320px',
+        maxWidth: '1400px',
+        margin: '0 auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: '2rem'
+        gap: '3rem'
       }}>
+        {/* Header Container */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
+          {/* Unified Header */}
+          <div className="members-header-container" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '2rem',
+            flexWrap: 'wrap',
+            background: 'var(--bg-card)',
+            borderRadius: '0.75rem',
+            padding: '1.5rem',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            border: '3px solid #240059',
+            width: '90%',
+            maxWidth: '1200px'
+          }}>
+            {/* Member Count (Left) */}
+            <div style={{
+              fontSize: '0.875rem',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'var(--bg-secondary)',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem'
+            }}>
+              <span style={{ fontSize: '1.125rem' }}>👥</span>
+              <div>
+                <div style={{ fontWeight: '600' }}>{membersData.guild.totalMembers} Total Members</div>
+                <div>{membersData.guild.onlineMembers} Currently Online</div>
+              </div>
+            </div>
+
+            {/* Title (Center) */}
+            <div style={{
+              flex: '1',
+              textAlign: 'center',
+              minWidth: '200px'
+            }}>
+              <h1 style={{
+                fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+                fontWeight: '800',
+                background: 'linear-gradient(135deg, var(--color-ocean-400), var(--color-ocean-600))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                margin: 0,
+                letterSpacing: '-0.02em'
+              }}>
+                Guild Members
+              </h1>
+            </div>
+
+            {/* Online Only Toggle (Right) */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              background: 'var(--bg-secondary)',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1rem'
+            }}>
+              <label style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: 'var(--text-primary)',
+                cursor: 'pointer',
+                userSelect: 'none'
+              }}>
+                Online Only
+              </label>
+              <button
+                onClick={handleToggleOnlineOnly}
+                style={{
+                  width: '48px',
+                  height: '24px',
+                  borderRadius: '12px',
+                  background: showOnlineOnly ? '#7a187a' : 'var(--bg-card)',
+                  border: '2px solid #7a187a',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  padding: 0
+                }}
+              >
+                <div style={{
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  background: showOnlineOnly ? 'white' : '#7a187a',
+                  position: 'absolute',
+                  top: '1px',
+                  left: showOnlineOnly ? '25px' : '1px',
+                  transition: 'all 0.3s ease'
+                }} />
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Members Grid */}
-        <MemberGrid 
-          members={membersData.members} 
-          onRefresh={fetchMembersData}
-        />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            width: '90%',
+            maxWidth: '1200px'
+          }}>
+            <MemberGrid
+              members={membersData.members}
+              onRefresh={fetchMembersData}
+              showOnlineOnly={showOnlineOnly}
+            />
+          </div>
+        </div>
       </div>
     </main>
   );

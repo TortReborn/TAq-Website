@@ -7,6 +7,14 @@ interface CacheEntry<T> {
   expires_at: Date;
 }
 
+// Helper function to check if TEST_MODE is enabled
+function isTestMode(): boolean {
+  const testMode = process.env.TEST_MODE;
+  if (!testMode) return false;
+  const s = testMode.toLowerCase().trim();
+  return s === "1" || s === "true" || s === "yes" || s === "on";
+}
+
 class SimpleDatabaseCache {
   private pool = getPool();
   private initialized = false;
@@ -74,12 +82,21 @@ class SimpleDatabaseCache {
 
   // Rate limiting check
   private checkRateLimit(key: string, requestId?: string): { allowed: boolean; remaining: number; resetTime: number } {
+    // Skip rate limiting in TEST_MODE
+    if (isTestMode()) {
+      return {
+        allowed: true,
+        remaining: 999999,
+        resetTime: Date.now() + 60000
+      };
+    }
+
     const config = this.RATE_LIMITS[key as keyof typeof this.RATE_LIMITS] || this.RATE_LIMITS.default;
     const now = Date.now();
     const rateLimitKey = `${key}:${requestId || 'global'}`;
-    
+
     const current = this.rateLimitMap.get(rateLimitKey);
-    
+
     if (!current || now > current.resetTime) {
       // Reset or initialize
       this.rateLimitMap.set(rateLimitKey, {
@@ -92,7 +109,7 @@ class SimpleDatabaseCache {
         resetTime: now + config.windowMs
       };
     }
-    
+
     if (current.count >= config.maxRequests) {
       return {
         allowed: false,
@@ -100,7 +117,7 @@ class SimpleDatabaseCache {
         resetTime: current.resetTime
       };
     }
-    
+
     current.count++;
     return {
       allowed: true,

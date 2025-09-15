@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 interface Member {
   username: string;
-  online?: boolean;
+  online?: boolean | string;
   server?: string | null;
   contributed: number;
   guildRank?: number;
@@ -24,11 +24,11 @@ interface Member {
 interface MemberGridProps {
   members: Member[];
   onRefresh?: () => Promise<void>;
+  showOnlineOnly?: boolean;
 }
 
-export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
+export default function MemberGrid({ members, onRefresh, showOnlineOnly = false }: MemberGridProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   const handleRefresh = async () => {
     if (!onRefresh) return;
@@ -43,8 +43,13 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
     }
   };
 
+  // Helper to check if member is online (handles both boolean and string values)
+  const isOnline = (member: Member) => {
+    return member.online === true || member.online === 'true';
+  };
+
   // Filter members based on online toggle
-  const filteredMembers = showOnlineOnly ? members.filter(member => member.online === true) : members;
+  const filteredMembers = showOnlineOnly ? members.filter(member => isOnline(member)) : members;
 
   // Group members by Discord rank or create single online group
   const groupedMembers = showOnlineOnly 
@@ -113,13 +118,12 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
       {/* Member grid organized by rank */}
       {sortedRanks.map((rankName) => (
         <div key={rankName} style={{ marginBottom: '3rem' }}>
-          {/* Header with rank title and toggle */}
+          {/* Header with rank title */}
           <div style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            marginBottom: '1.5rem',
-            position: 'relative'
+            marginBottom: '1.5rem'
           }}>
             <h3 style={{
               fontSize: '1.5rem',
@@ -131,88 +135,6 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
             }}>
               {rankName}
             </h3>
-            
-            {/* Toggle for online only - only show on first rank */}
-            {rankName === sortedRanks[0] && (
-              <div style={{
-                position: 'absolute',
-                right: 0
-              }}>
-                <div
-                  onClick={() => setShowOnlineOnly(!showOnlineOnly)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  cursor: 'pointer',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '1rem',
-                  background: showOnlineOnly 
-                    ? 'linear-gradient(135deg, #27ae60, #2ecc71)' 
-                    : 'var(--bg-card)',
-                  border: '2px solid',
-                  borderColor: showOnlineOnly ? '#27ae60' : 'var(--border-color)',
-                  transition: 'all 0.3s ease',
-                  boxShadow: showOnlineOnly 
-                    ? '0 4px 12px rgba(39, 174, 96, 0.3)' 
-                    : '0 2px 8px rgba(0,0,0,0.1)',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: showOnlineOnly ? 'white' : 'var(--text-primary)'
-                }}
-                onMouseEnter={(e) => {
-                  if (!showOnlineOnly) {
-                    e.currentTarget.style.borderColor = '#27ae60';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(39, 174, 96, 0.2)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!showOnlineOnly) {
-                    e.currentTarget.style.borderColor = 'var(--border-color)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                  }
-                }}
-              >
-                {/* Custom toggle switch */}
-                <div style={{
-                  position: 'relative',
-                  width: '40px',
-                  height: '20px',
-                  borderRadius: '10px',
-                  background: showOnlineOnly ? 'rgba(255,255,255,0.3)' : '#ddd',
-                  transition: 'background 0.3s ease'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '2px',
-                    left: showOnlineOnly ? '22px' : '2px',
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: '50%',
-                    background: showOnlineOnly ? 'white' : '#666',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                  }} />
-                </div>
-                
-                {/* Online indicator and text */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: '#27ae60',
-                    boxShadow: showOnlineOnly ? '0 0 8px rgba(39, 174, 96, 0.6)' : 'none'
-                  }} />
-                  Online Only
-                </div>
-              </div>
-              </div>
-            )}
           </div>
 
           {/* Member grid */}
@@ -277,7 +199,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         padding: '0.5rem',
-                        background: member.online === true
+                        background: isOnline(member)
                           ? `linear-gradient(to bottom, var(--bg-card), rgba(39, 174, 96, 0.1))`
                           : 'var(--bg-card)',
                         borderRadius: '0.75rem',
@@ -294,7 +216,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         width: '8px',
                         height: '8px',
                         borderRadius: '50%',
-                        backgroundColor: getOnlineStatusColor(member.online === true)
+                        backgroundColor: getOnlineStatusColor(isOnline(member))
                       }} />
 
                       {/* Minecraft head */}
@@ -328,10 +250,10 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                       {/* Online status */}
                       <div style={{
                         fontSize: '0.625rem',
-                        color: member.online === true ? getOnlineStatusColor(true) : '#7f8c8d',
+                        color: isOnline(member) ? getOnlineStatusColor(true) : '#7f8c8d',
                         textAlign: 'center'
                       }}>
-                        {member.online === true && member.server ? member.server : 'Offline'}
+                        {isOnline(member) ? (member.server || 'Online') : 'Offline'}
                       </div>
                     </div>
 
@@ -348,7 +270,7 @@ export default function MemberGrid({ members, onRefresh }: MemberGridProps) {
                         justifyContent: 'center',
                         alignItems: 'center',
                         padding: '0.5rem',
-                        background: member.online === true
+                        background: isOnline(member)
                           ? `linear-gradient(to bottom, var(--bg-card), rgba(39, 174, 96, 0.1))`
                           : 'var(--bg-card)',
                         borderRadius: '0.75rem',

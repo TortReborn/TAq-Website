@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { fmtDate } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 import EventTable from "@/components/EventTable";
+import PageHeader from "@/components/PageHeader";
 
 interface ActiveEvent {
   id: number;
@@ -139,15 +140,9 @@ export default function GraidEventPage() {
         gap: '1.5rem'
       }}>
         {/* Title */}
-        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: '900',
-          textAlign: 'center',
-          color: 'var(--text-primary)',
-          margin: 0
-        }}>
-          Guild Raid Event Leaderboard
-        </h1>
+        <PageHeader
+          title="Guild Raid Event Leaderboard"
+        />
 
         {/* Subtitle / event name */}
         <div className="card" style={{

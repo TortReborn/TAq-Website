@@ -114,6 +114,19 @@ export default function BottomBar() {
             Leaderboard
           </Link>
           <Link
+            href="/graid-event"
+            style={{
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              fontWeight: '500',
+              transition: 'color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+          >
+            Graid Event
+          </Link>
+          <Link
             href="/map"
             style={{
               color: 'var(--text-secondary)',
