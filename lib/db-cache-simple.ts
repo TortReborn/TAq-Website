@@ -311,7 +311,7 @@ class SimpleDatabaseCache {
       const client = await this.pool.connect();
       try {
         const result = await client.query(
-          'SELECT data FROM cache_entries WHERE cache_key = $1 AND expires_at > NOW()',
+          'SELECT data FROM cache_entries WHERE cache_key = $1',
           ['guildColors']
         );
 
