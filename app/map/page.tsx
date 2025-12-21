@@ -4,8 +4,10 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { loadTerritories, Territory } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import TerritoryInfoPanel from "@/components/TerritoryInfoPanel";
+import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
+import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
 export default function MapPage() {
   // Store minimum scale in a ref
@@ -44,12 +46,13 @@ export default function MapPage() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
   const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
-  const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory; pixel: { x: number; y: number } } | null>(null);
+  const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [hoveredTerritory, setHoveredTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [showTerritories, setShowTerritories] = useState(true);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
   const [guildColors, setGuildColors] = useState<Record<string, string>>({});
+  const [verboseData, setVerboseData] = useState<Record<string, TerritoryVerboseData> | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,25 +121,43 @@ export default function MapPage() {
     }
   };
 
-  // Load territories and guild colors from API cache
+  // Load territories verbose data for connection calculations
+  const loadVerboseData = async (): Promise<Record<string, TerritoryVerboseData>> => {
+    try {
+      const response = await fetch('/territories_verbose.json');
+      if (response.ok) {
+        return await response.json();
+      }
+      console.warn('Failed to load territories verbose data');
+      return {};
+    } catch (error) {
+      console.error('Error loading territories verbose data:', error);
+      return {};
+    }
+  };
+
+  // Load territories, guild colors, and verbose data from API cache
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadAllData = async () => {
       setIsLoadingTerritories(true);
       try {
-        // Load both territories and guild colors in parallel
-        const [territoryData, guildColorData] = await Promise.all([
+        // Load territories, guild colors, and verbose data in parallel
+        const [territoryData, guildColorData, verboseDataResult] = await Promise.all([
           loadTerritories(),
-          loadGuildColorsData()
+          loadGuildColorsData(),
+          loadVerboseData()
         ]);
-        
+
         if (isMounted) {
           // Force a new object reference to ensure React detects the change
           setTerritories({ ...territoryData });
           setGuildColors({ ...guildColorData });
+          setVerboseData(verboseDataResult);
           console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
           console.log('🎨 Updated guild colors:', Object.keys(guildColorData).length, 'guilds');
+          console.log('📊 Loaded verbose data:', Object.keys(verboseDataResult).length, 'territories');
         }
       } catch (error) {
         console.error('Failed to load map data:', error);
@@ -144,7 +165,7 @@ export default function MapPage() {
         if (isMounted) setIsLoadingTerritories(false);
       }
     };
-    
+
     loadAllData();
     const interval = setInterval(loadAllData, 30000); // 30 seconds to match cache TTL
     return () => {
@@ -367,40 +388,8 @@ export default function MapPage() {
 
   // Territory interaction handlers
   const handleTerritoryClick = useCallback((name: string, territory: Territory) => {
-    // Compute pixel coordinates for info box positioning (top center of territory)
-    const start = territory.location.start;
-    const end = territory.location.end;
-    // Top center of territory for info box positioning
-    const topY = Math.min(start[1], end[1]);
-    const centerX = (start[0] + end[0]) / 2;
-    const topCenterCoord = [centerX, topY];
-    
-    // Convert to pixel coordinates
-    // @ts-ignore
-    // eslint-disable-next-line
-    const { coordToPixel } = require("@/lib/utils");
-    const rawPixel = coordToPixel(topCenterCoord);
-    const pixel = {
-      x: position.x + rawPixel[0] * scale,
-      y: position.y + rawPixel[1] * scale
-    };
-    setSelectedTerritory({ name, territory, pixel });
-  }, [position, scale]);
-
-  // Outside click-to-close logic for info box
-  useEffect(() => {
-    if (!selectedTerritory) return;
-    const handleClick = (e: MouseEvent) => {
-      const infoBox = document.getElementById('territory-info-panel');
-      if (infoBox && !infoBox.contains(e.target as Node)) {
-        setSelectedTerritory(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, [selectedTerritory]);
+    setSelectedTerritory({ name, territory });
+  }, []);
 
   const handleTerritoryHover = useCallback((name: string, territory: Territory) => {
     setHoveredTerritory({ name, territory });
@@ -596,11 +585,22 @@ export default function MapPage() {
             {showTerritories && <TradeRoutesOverlay />}
           </div>
 
-          {/* Territory Info Panel */}
+          {/* Territory Hover Panel - shown when hovering and no territory is selected */}
+          {!selectedTerritory && (
+            <TerritoryHoverPanel
+              territory={hoveredTerritory}
+              guildColors={guildColors}
+            />
+          )}
+
+          {/* Territory Info Panel - shown when a territory is clicked */}
           <TerritoryInfoPanel
             selectedTerritory={selectedTerritory}
             onClose={() => setSelectedTerritory(null)}
             panelId="territory-info-panel"
+            guildColors={guildColors}
+            territories={territories}
+            verboseData={verboseData}
           />
           
           <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} guildColors={guildColors} />
@@ -709,47 +709,20 @@ export default function MapPage() {
             </button>
           </div>
 
-          {/* Scale indicator and info */}
+          {/* Scale indicator */}
           <div style={{
             position: 'absolute',
             bottom: '1rem',
             right: '1rem',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: '0.5rem'
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.25rem',
+            padding: '0.5rem 0.75rem',
+            fontSize: '0.875rem',
+            color: 'var(--text-secondary)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
-            {/* Hover info */}
-            {hoveredTerritory && (
-              <div style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.25rem',
-                padding: '0.5rem 0.75rem',
-                fontSize: '0.875rem',
-                color: 'var(--text-primary)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                whiteSpace: 'nowrap'
-              }}>
-                <div style={{ fontWeight: '600' }}>{hoveredTerritory.name}</div>
-                <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
-                  {hoveredTerritory.territory.guild.name || 'Unclaimed'}
-                </div>
-              </div>
-            )}
-            
-            {/* Scale indicator */}
-            <div style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '0.25rem',
-              padding: '0.5rem 0.75rem',
-              fontSize: '0.875rem',
-              color: 'var(--text-secondary)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>
-              {Math.round(scale * 100)}%
-            </div>
+            {Math.round(scale * 100)}%
           </div>
         </div>
       </div>

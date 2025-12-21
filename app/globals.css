@@ -120,6 +120,7 @@
   --text-secondary: rgba(32, 74, 95, 0.9);
   --text-muted: rgba(32, 74, 95, 0.7);
   --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-card-solid: #ffffff;
   --card-bg-secondary: rgba(232, 251, 255, 0.5);
   --card-border: rgba(255, 255, 255, 0.4);
   --bg-nav: var(--color-ocean-100);
@@ -147,6 +148,7 @@
   --text-secondary: rgba(226, 232, 240, 0.9);
   --text-muted: rgba(226, 232, 240, 0.7);
   --bg-card: rgba(30, 41, 59, 0.8);
+  --bg-card-solid: #1e293b;
   --card-bg-secondary: rgba(51, 65, 85, 0.6);
   --card-border: rgba(71, 85, 105, 0.4);
   --bg-nav: #1e293b;

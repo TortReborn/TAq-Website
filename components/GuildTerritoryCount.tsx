@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { Territory } from "@/lib/utils";
+import { Territory, getContrastColor } from "@/lib/utils";
 
 interface GuildTerritoryCountProps {
   territories: Record<string, Territory>;
@@ -20,6 +20,19 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Theme detection
+  useEffect(() => {
+    const checkTheme = () => {
+      const theme = document.documentElement.getAttribute('data-theme');
+      setIsDarkMode(theme === 'dark');
+    };
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Check if device is mobile and set default collapsed state only once
   useEffect(() => {
@@ -295,23 +308,13 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
                 e.currentTarget.style.transform = 'translateX(0)';
               }}
             >
-              <span 
-                style={{ 
-                  color: guild.color, 
-                  fontWeight: 'bold', 
+              <span
+                style={{
+                  color: getContrastColor(guild.color, isDarkMode),
+                  fontWeight: 'bold',
                   cursor: onGuildClick ? 'pointer' : 'default',
                   textDecoration: 'none',
-                  flex: 1
-                }}
-                onMouseEnter={(e) => {
-                  if (onGuildClick) {
-                    e.currentTarget.style.textShadow = '0 0 8px currentColor';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (onGuildClick) {
-                    e.currentTarget.style.textShadow = 'none';
-                  }
+                  flex: 1,
                 }}
                 onClick={() => onGuildClick && onGuildClick(guild.originalName)}
               >
