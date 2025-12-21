@@ -42,9 +42,9 @@ function getTimeBasedOutline(acquiredTime: string, currentTime: number): {
   if (diffSeconds < 540) {
     return { stroke: '#ffff00', strokeDasharray: '12 6', animate: false };
   }
-  // 9:00-9:45 minutes: dashed red
+  // 9:00-9:45 minutes: dashed lime green
   if (diffSeconds < 585) {
-    return { stroke: '#ff0000', strokeDasharray: '12 6', animate: false };
+    return { stroke: '#32cd32', strokeDasharray: '12 6', animate: false };
   }
   // 9:45-10:00 minutes: flashing red/white
   if (diffSeconds < 600) {
