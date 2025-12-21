@@ -35,7 +35,7 @@ export default function TerritoryInfoPanel({ selectedTerritory, onClose, panelId
   const infoBoxRef = useRef<HTMLDivElement>(null);
   const [adjusted, setAdjusted] = useState<{ left: number, top: number } | null>(null);
   const [territoryInfo, setTerritoryInfo] = useState<TerritoryVerboseData | null>(null);
-  const [guildColor, setGuildColor] = useState<string>('#808080');
+  const [guildColor, setGuildColor] = useState<string>('#FFFFFF');
 
   useEffect(() => {
     const fetchTerritoryInfo = async () => {

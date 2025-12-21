@@ -129,6 +129,12 @@ let guildColorCache: Record<string, string> | null = null;
 let guildColorCacheTimestamp: number = 0;
 const GUILD_COLOR_CACHE_TTL = 300000; // 5 minutes
 
+// Validate hex color format
+function isValidHexColor(color: string | undefined): boolean {
+  if (!color) return false;
+  return /^#[0-9A-Fa-f]{6}$/.test(color);
+}
+
 // Load all cached guild colors from database
 export async function loadGuildColors(guildNames: string[]): Promise<Record<string, string>> {
   try {
@@ -141,9 +147,10 @@ export async function loadGuildColors(guildNames: string[]): Promise<Record<stri
         if (name === 'Unclaimed') {
           result[name] = '#808080';
         } else {
-          // Try prefix first, then guild name
+          // Try prefix first, then guild name - only use valid hex colors
           const lowerName = name.toLowerCase();
-          result[name] = guildColorCache[lowerName] || '#808080';
+          const cachedColor = guildColorCache[lowerName];
+          result[name] = isValidHexColor(cachedColor) ? cachedColor : '#FFFFFF';
         }
       }
       return result;
@@ -154,10 +161,10 @@ export async function loadGuildColors(guildNames: string[]): Promise<Record<stri
 
     if (!response.ok) {
       console.warn('Failed to fetch cached guild colors');
-      // Return gray for all guilds
+      // Return white for all guilds (gray for Unclaimed)
       const result: Record<string, string> = {};
       for (const name of guildNames) {
-        result[name] = '#808080';
+        result[name] = name === 'Unclaimed' ? '#808080' : '#FFFFFF';
       }
       return result;
     }
@@ -178,20 +185,22 @@ export async function loadGuildColors(guildNames: string[]): Promise<Record<stri
       if (name === 'Unclaimed') {
         result[name] = '#808080';
       } else {
-        // Try exact match first, then lowercase
+        // Try exact match first, then lowercase - only use valid hex colors
         const lowerName = name.toLowerCase();
-        result[name] = guildColors[name] || guildColors[lowerName] || guildColorCache[lowerName] || '#808080';
+        const candidates = [guildColors[name], guildColors[lowerName], guildColorCache[lowerName]];
+        const validColor = candidates.find(c => isValidHexColor(c));
+        result[name] = validColor || '#FFFFFF';
       }
     }
-    
+
     return result;
-    
+
   } catch (error) {
     console.error('Error loading cached guild colors:', error);
-    // Return gray for all guilds on error
+    // Return white for all guilds on error (gray for Unclaimed)
     const result: Record<string, string> = {};
     for (const name of guildNames) {
-      result[name] = '#808080';
+      result[name] = name === 'Unclaimed' ? '#808080' : '#FFFFFF';
     }
     return result;
   }
@@ -206,20 +215,20 @@ export async function getGuildColor(guildName: string, guildPrefix?: string): Pr
   // Check client-side cache first
   const now = Date.now();
   if (guildColorCache && (now - guildColorCacheTimestamp) < GUILD_COLOR_CACHE_TTL) {
-    // Try prefix first
+    // Try prefix first - only use valid hex colors
     if (guildPrefix) {
       const prefixColor = guildColorCache[guildPrefix.toLowerCase()];
-      if (prefixColor) return prefixColor;
+      if (isValidHexColor(prefixColor)) return prefixColor;
     }
     // Try guild name
     const nameColor = guildColorCache[guildName.toLowerCase()];
-    if (nameColor) return nameColor;
-    
-    // Not in cache, return gray
-    return '#808080';
+    if (isValidHexColor(nameColor)) return nameColor;
+
+    // Not in cache or invalid color, return white
+    return '#FFFFFF';
   }
 
   // Load all cached colors once and use for this guild
   const colors = await loadGuildColors([guildName]);
-  return colors[guildName] || '#808080';
+  return colors[guildName] || '#FFFFFF';
 }

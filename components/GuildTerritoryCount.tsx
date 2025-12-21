@@ -50,13 +50,29 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
       }
     });
 
+    // Validate hex color format
+    const isValidHexColor = (color: string | undefined): boolean => {
+      if (!color) return false;
+      return /^#[0-9A-Fa-f]{6}$/.test(color);
+    };
+
     const stats: GuildStats[] = Object.entries(counts).map(([name, data]) => {
       // Try multiple key matching strategies like in TerritoryOverlay
-      const color = guildColors[data.prefix] || 
-                   guildColors[name] || 
-                   guildColors[data.prefix?.toLowerCase()] || 
-                   guildColors[name.toLowerCase()] || 
-                   '#808080';
+      // Only use color if it's a valid hex color
+      const candidates = [
+        guildColors[data.prefix],
+        guildColors[name],
+        guildColors[data.prefix?.toLowerCase()],
+        guildColors[name.toLowerCase()]
+      ];
+
+      let color = '#FFFFFF';
+      for (const c of candidates) {
+        if (isValidHexColor(c)) {
+          color = c;
+          break;
+        }
+      }
       
       return {
         name: data.prefix ? `${name} [${data.prefix}]` : name,

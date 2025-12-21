@@ -29,21 +29,37 @@ export default function TerritoryOverlay({
   // Local drag detection
   const dragState = React.useRef({ down: false, moved: false });
 
-  // Get guild color from props, with fallback to gray
+  // Validate hex color format
+  const isValidHexColor = (color: string | undefined): boolean => {
+    if (!color) return false;
+    return /^#[0-9A-Fa-f]{6}$/.test(color);
+  };
+
+  // Get guild color from props, with fallback to white (gray for unclaimed)
   const guildColor = useMemo(() => {
     const guildName = territory.guild.name;
     const guildPrefix = territory.guild.prefix;
-    
+
     if (!guildName || guildName === 'Unclaimed') {
       return '#808080';
     }
-    
+
     // Try prefix first, then guild name, then lowercase versions
-    return guildColors[guildPrefix] || 
-           guildColors[guildName] || 
-           guildColors[guildPrefix?.toLowerCase()] || 
-           guildColors[guildName.toLowerCase()] || 
-           '#808080';
+    // Only use color if it's a valid hex color
+    const candidates = [
+      guildColors[guildPrefix],
+      guildColors[guildName],
+      guildColors[guildPrefix?.toLowerCase()],
+      guildColors[guildName.toLowerCase()]
+    ];
+
+    for (const color of candidates) {
+      if (isValidHexColor(color)) {
+        return color;
+      }
+    }
+
+    return '#FFFFFF';
   }, [territory.guild.name, territory.guild.prefix, guildColors]);
 
   // Get four corners in pixel coordinates
@@ -142,7 +158,7 @@ export default function TerritoryOverlay({
         points={points}
         fill={guildColor + "40"}
         stroke={guildColor}
-        strokeWidth={8}
+        strokeWidth={4}
         style={{ pointerEvents: "auto", cursor: "pointer" }}
         onPointerDown={e => {
           dragState.current.down = true;

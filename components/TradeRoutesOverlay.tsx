@@ -87,8 +87,8 @@ const TradeRoutesOverlay = () => {
             y1={route.from[1]}
             x2={route.to[0]}
             y2={route.to[1]}
-            stroke="rgba(128, 128, 128, 1)"
-            strokeWidth="5"
+            stroke="rgba(200, 200, 200, 1)"
+            strokeWidth="2.5"
           />
         ))}
       </g>
