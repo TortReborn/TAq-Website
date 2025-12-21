@@ -1,7 +1,7 @@
 // Tower stats by level (0-11) - actual values at each level
 export const TOWER_STATS = {
   // Health values per level
-  health: [300000, 450000, 600000, 750000, 960000, 1200000, 1500000, 1800000, 2160000, 2280000, 2580000, 2820000],
+  health: [300000, 450000, 600000, 750000, 960000, 1200000, 1500000, 1860000, 2220000, 2580000, 2940000, 3300000],
   // Defense percentages per level
   defense: [0.10, 0.40, 0.55, 0.625, 0.70, 0.75, 0.79, 0.82, 0.84, 0.86, 0.88, 0.90],
   // Damage min values per level
@@ -75,21 +75,54 @@ export function calculateAvgDPS(
   return Math.round(dps * 100) / 100;
 }
 
-// Get defense tier based on effective HP and DPS
-export function getDefenseTier(effectiveHP: number, avgDPS: number): { tier: string; color: string } {
-  const score = effectiveHP + (avgDPS * 1000);
+// Calculate defense index based on upgrade levels
+// Formula: (Damage + Attack + Health + Defence) + Aura + (5 * IF(Aura > 0)) + Volley + (3 * IF(Volley > 0))
+export function calculateDefenseIndex(
+  damageLevel: number,
+  attackLevel: number,
+  healthLevel: number,
+  defenseLevel: number,
+  auraLevel: number,
+  volleyLevel: number
+): number {
+  const baseSum = damageLevel + attackLevel + healthLevel + defenseLevel;
+  const auraBonus = auraLevel + (auraLevel > 0 ? 5 : 0);
+  const volleyBonus = volleyLevel + (volleyLevel > 0 ? 3 : 0);
+  return baseSum + auraBonus + volleyBonus;
+}
 
-  if (score >= 100000000) {
-    return { tier: 'Very High', color: '#43a047' };
-  } else if (score >= 50000000) {
-    return { tier: 'High', color: '#fbc02d' };
-  } else if (score >= 20000000) {
-    return { tier: 'Medium', color: '#fb8c00' };
-  } else if (score >= 5000000) {
-    return { tier: 'Low', color: '#e57373' };
-  } else {
-    return { tier: 'Very Low', color: '#b71c1c' };
+// Get defense tier based on upgrade levels and HQ status
+// HQ territories get bumped up one tier
+export function getDefenseTier(
+  damageLevel: number,
+  attackLevel: number,
+  healthLevel: number,
+  defenseLevel: number,
+  auraLevel: number,
+  volleyLevel: number,
+  isHQ: boolean = false
+): { tier: string; color: string } {
+  const index = calculateDefenseIndex(damageLevel, attackLevel, healthLevel, defenseLevel, auraLevel, volleyLevel);
+
+  // Define tiers with their ranges and colors (inverted: low defense = good/green, high defense = dangerous/red)
+  const tiers = [
+    { tier: 'Very Low', color: '#43a047', min: 0, max: 5 },
+    { tier: 'Low', color: '#8bc34a', min: 6, max: 18 },
+    { tier: 'Medium', color: '#fb8c00', min: 19, max: 30 },
+    { tier: 'High', color: '#e57373', min: 31, max: 48 },
+    { tier: 'Very High', color: '#b71c1c', min: 49, max: Infinity }
+  ];
+
+  // Find the base tier index
+  let tierIndex = tiers.findIndex(t => index >= t.min && index <= t.max);
+  if (tierIndex === -1) tierIndex = 0;
+
+  // HQ territories get bumped up one tier (max is Very High)
+  if (isHQ && tierIndex < tiers.length - 1) {
+    tierIndex++;
   }
+
+  return { tier: tiers[tierIndex].tier, color: tiers[tierIndex].color };
 }
 
 // Get treasury tier based on time held (in seconds)
@@ -167,4 +200,34 @@ export function getDamageDisplay(level: number): string {
 // Get attack speed display
 export function getAttackSpeedDisplay(level: number): string {
   return `${TOWER_STATS.attackSpeed[level]}x`;
+}
+
+// Calculate total HP with all bonuses applied
+export function calculateTotalHP(
+  healthLevel: number,
+  connections: number,
+  isHQ: boolean,
+  externals: number
+): number {
+  const health = TOWER_STATS.health[healthLevel];
+  const connectionBonus = calculateConnectionBonus(connections);
+  const hqBonus = calculateHQBonus(isHQ, externals);
+  return Math.round(health * connectionBonus * hqBonus);
+}
+
+// Calculate total damage range with all bonuses applied
+export function calculateTotalDamage(
+  damageLevel: number,
+  connections: number,
+  isHQ: boolean,
+  externals: number
+): { min: number; max: number } {
+  const damageMin = TOWER_STATS.damageMin[damageLevel];
+  const damageMax = TOWER_STATS.damageMax[damageLevel];
+  const connectionBonus = calculateConnectionBonus(connections);
+  const hqBonus = calculateHQBonus(isHQ, externals);
+  return {
+    min: Math.round(damageMin * connectionBonus * hqBonus),
+    max: Math.round(damageMax * connectionBonus * hqBonus)
+  };
 }

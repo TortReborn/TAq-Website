@@ -70,6 +70,8 @@ export function calculateConnections(
 
 // Calculate external territories for HQ bonus
 // Externals are territories within 3 connections of the HQ that the guild owns
+// IMPORTANT: Depth 1 (direct connections) do NOT count as externals
+// Pattern: HQ -> conn (NOT ext) -> ext -> ext -> no effect
 export function calculateExternals(
   hqTerritoryName: string,
   ownerGuildName: string,
@@ -104,8 +106,11 @@ export function calculateExternals(
     if (visited.has(current.name)) continue;
     visited.add(current.name);
 
-    // Don't count the HQ itself
-    if (current.name !== hqTerritoryName) {
+    // Count as external if:
+    // - Not the HQ itself
+    // - Depth >= 2 (connections at depth 1 don't count as externals)
+    // - Territory is owned by the same guild
+    if (current.name !== hqTerritoryName && current.depth >= 2) {
       const territory = territories[current.name];
       if (territory && territory.guild.name === ownerGuildName) {
         externals++;

@@ -8,6 +8,8 @@ import {
   MAX_VOLLEY_LEVEL,
   calculateEffectiveHP,
   calculateAvgDPS,
+  calculateTotalHP,
+  calculateTotalDamage,
   getDefenseTier,
   getTreasuryTier,
   formatTimeHeld,
@@ -64,10 +66,10 @@ function StatRow({
       marginBottom: '0.5rem',
       fontSize: '0.875rem',
     }}>
-      <span style={{ color: 'var(--text-secondary)', minWidth: '100px' }}>{label}</span>
+      <span style={{ color: 'var(--text-secondary)', minWidth: '70px' }}>{label}</span>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         {displayValue && (
-          <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '50px', textAlign: 'right' }}>
+          <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '80px', textAlign: 'right' }}>
             {displayValue}
           </span>
         )}
@@ -256,10 +258,20 @@ export default function TerritoryInfoPanel({
     return calculateAvgDPS(damageLevel, attackSpeedLevel, ownedConnections, isHQ, externals);
   }, [damageLevel, attackSpeedLevel, ownedConnections, isHQ, externals]);
 
-  // Get defense tier
+  // Calculate total HP with bonuses
+  const totalHP = useMemo(() => {
+    return calculateTotalHP(healthLevel, ownedConnections, isHQ, externals);
+  }, [healthLevel, ownedConnections, isHQ, externals]);
+
+  // Calculate total damage with bonuses
+  const totalDamage = useMemo(() => {
+    return calculateTotalDamage(damageLevel, ownedConnections, isHQ, externals);
+  }, [damageLevel, ownedConnections, isHQ, externals]);
+
+  // Get defense tier based on upgrade levels and HQ status
   const defenseTier = useMemo(() => {
-    return getDefenseTier(effectiveHP, avgDPS);
-  }, [effectiveHP, avgDPS]);
+    return getDefenseTier(damageLevel, attackSpeedLevel, healthLevel, defenseLevel, auraLevel, volleyLevel, isHQ);
+  }, [damageLevel, attackSpeedLevel, healthLevel, defenseLevel, auraLevel, volleyLevel, isHQ]);
 
   // Get treasury info
   const treasuryInfo = useMemo(() => getTreasuryTier(timeHeld), [timeHeld]);
@@ -290,7 +302,7 @@ export default function TerritoryInfoPanel({
         position: 'absolute',
         top: '1rem',
         left: '1rem',
-        width: '300px',
+        width: '320px',
         backgroundColor: 'var(--bg-card-solid)',
         border: '2px solid var(--border-color)',
         borderRadius: '0.5rem',
@@ -300,7 +312,15 @@ export default function TerritoryInfoPanel({
         pointerEvents: 'auto',
         maxHeight: 'calc(100vh - 8rem)',
         overflowY: 'auto',
+        userSelect: 'text',
       }}
+      onWheel={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseMove={(e) => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
     >
       {/* Close button */}
       <button
@@ -432,6 +452,27 @@ export default function TerritoryInfoPanel({
         </label>
       </div>
 
+      {/* Base Stats Column Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '0.5rem',
+        fontSize: '0.75rem',
+      }}>
+        <span style={{ color: 'var(--text-secondary)', minWidth: '70px' }}></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '80px', textAlign: 'right' }}>
+            Base Stats
+          </span>
+          <span style={{ minWidth: '24px' }}></span>
+          <span style={{ color: 'var(--text-secondary)', minWidth: '24px', textAlign: 'center', fontWeight: '600' }}>
+            Lvl
+          </span>
+          <span style={{ minWidth: '24px' }}></span>
+        </div>
+      </div>
+
       {/* Tower Stats */}
       <StatRow
         label="Damage"
@@ -495,9 +536,9 @@ export default function TerritoryInfoPanel({
         marginBottom: '0.75rem',
         fontSize: '0.875rem',
       }}>
-        <span style={{ color: 'var(--text-secondary)', minWidth: '100px' }}>Connections</span>
+        <span style={{ color: 'var(--text-secondary)', minWidth: '70px' }}>Conns</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '50px', textAlign: 'right' }}>
+          <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '80px', textAlign: 'right' }}>
             {ownedConnections}/{totalConnections}
           </span>
           <button
@@ -566,9 +607,9 @@ export default function TerritoryInfoPanel({
           marginBottom: '0.75rem',
           fontSize: '0.875rem',
         }}>
-          <span style={{ color: 'var(--text-secondary)', minWidth: '100px' }}>Externals</span>
+          <span style={{ color: 'var(--text-secondary)', minWidth: '70px' }}>Externals</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '50px', textAlign: 'right' }}>
+            <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '80px', textAlign: 'right' }}>
               (auto: {calculatedExternals})
             </span>
             <button
@@ -635,6 +676,26 @@ export default function TerritoryInfoPanel({
       }} />
 
       {/* Calculated Stats */}
+      <div style={{
+        fontSize: '0.875rem',
+        marginBottom: '0.5rem',
+      }}>
+        <span style={{ color: 'var(--text-secondary)' }}>Total HP:</span>{' '}
+        <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
+          {formatNumber(totalHP)}
+        </span>
+      </div>
+
+      <div style={{
+        fontSize: '0.875rem',
+        marginBottom: '0.5rem',
+      }}>
+        <span style={{ color: 'var(--text-secondary)' }}>Damage Per Hit:</span>{' '}
+        <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
+          {formatNumber(totalDamage.min)}-{formatNumber(totalDamage.max)}
+        </span>
+      </div>
+
       <div style={{
         fontSize: '0.875rem',
         marginBottom: '0.5rem',

@@ -708,22 +708,6 @@ export default function MapPage() {
               {showTerritories ? 'H' : 'T'}
             </button>
           </div>
-
-          {/* Scale indicator */}
-          <div style={{
-            position: 'absolute',
-            bottom: '1rem',
-            right: '1rem',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '0.25rem',
-            padding: '0.5rem 0.75rem',
-            fontSize: '0.875rem',
-            color: 'var(--text-secondary)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            {Math.round(scale * 100)}%
-          </div>
         </div>
       </div>
     </main>
