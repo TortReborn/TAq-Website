@@ -707,7 +707,7 @@ export default function TerritoryInfoPanel({
         fontSize: '0.875rem',
         marginBottom: '0.5rem',
       }}>
-        <span style={{ color: 'var(--text-secondary)' }}>Avg DPS:</span>{' '}
+        <span style={{ color: 'var(--text-secondary)' }}>Average DPS:</span>{' '}
         <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
           {formatNumber(Math.round(avgDPS))}
         </span>
@@ -717,7 +717,7 @@ export default function TerritoryInfoPanel({
         fontSize: '0.875rem',
         marginBottom: '0.5rem',
       }}>
-        <span style={{ color: 'var(--text-secondary)' }}>EHP:</span>{' '}
+        <span style={{ color: 'var(--text-secondary)' }}>Effective HP:</span>{' '}
         <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
           {formatNumber(effectiveHP)}
         </span>
