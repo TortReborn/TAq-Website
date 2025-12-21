@@ -15,6 +15,10 @@ interface TerritoryOverlayProps {
   showTimeOutlines?: boolean;
 }
 
+// Stroke width for territory outlines
+const STROKE_WIDTH = 4;
+const STROKE_INSET = STROKE_WIDTH / 2; // Inset to keep stroke inside territory bounds
+
 // Get outline style based on time held
 function getTimeBasedOutline(acquiredTime: string, currentTime: number): {
   stroke: string;
@@ -113,10 +117,11 @@ export default function TerritoryOverlay({
   const start = coordToPixel(territory.location.start);
   const end = coordToPixel(territory.location.end);
   // Rectangle: topLeft, topRight, bottomRight, bottomLeft
-  const topLeft = [Math.min(start[0], end[0]), Math.min(start[1], end[1])];
-  const topRight = [Math.max(start[0], end[0]), Math.min(start[1], end[1])];
-  const bottomRight = [Math.max(start[0], end[0]), Math.max(start[1], end[1])];
-  const bottomLeft = [Math.min(start[0], end[0]), Math.max(start[1], end[1])];
+  // Inset corners so stroke stays within territory bounds (doesn't overlap neighbors)
+  const topLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.min(start[1], end[1]) + STROKE_INSET];
+  const topRight = [Math.max(start[0], end[0]) - STROKE_INSET, Math.min(start[1], end[1]) + STROKE_INSET];
+  const bottomRight = [Math.max(start[0], end[0]) - STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
+  const bottomLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
 
   const points = [topLeft, topRight, bottomRight, bottomLeft].map(p => p.join(",")).join(" ");
 
@@ -204,7 +209,7 @@ export default function TerritoryOverlay({
         points={points}
         fill={guildColor + "40"}
         stroke={guildColor}
-        strokeWidth={4}
+        strokeWidth={STROKE_WIDTH}
         style={{ pointerEvents: "auto", cursor: "pointer" }}
         onPointerDown={e => {
           dragState.current.down = true;
@@ -235,7 +240,7 @@ export default function TerritoryOverlay({
               points={points}
               fill="none"
               stroke={outline.animate ? undefined : outline.stroke}
-              strokeWidth={4}
+              strokeWidth={STROKE_WIDTH}
               strokeDasharray={outline.strokeDasharray}
               style={{ pointerEvents: "none" }}
             >
