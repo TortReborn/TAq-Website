@@ -7,6 +7,7 @@ import TerritoryInfoPanel from "@/components/TerritoryInfoPanel";
 import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
+import MapSettings from "@/components/MapSettings";
 import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
 export default function MapPage() {
@@ -49,6 +50,8 @@ export default function MapPage() {
   const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [hoveredTerritory, setHoveredTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [showTerritories, setShowTerritories] = useState(true);
+  const [showTimeOutlines, setShowTimeOutlines] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
   const [guildColors, setGuildColors] = useState<Record<string, string>>({});
@@ -68,7 +71,9 @@ export default function MapPage() {
   useEffect(() => {
     const cachedPosition = localStorage.getItem('map-position');
     const cachedScale = localStorage.getItem('map-scale');
-    
+    const cachedShowTerritories = localStorage.getItem('mapShowTerritories');
+    const cachedShowTimeOutlines = localStorage.getItem('mapShowTimeOutlines');
+
     if (cachedPosition) {
       try {
         const parsed = JSON.parse(cachedPosition);
@@ -77,7 +82,7 @@ export default function MapPage() {
         console.error('Failed to parse cached position:', error);
       }
     }
-    
+
     if (cachedScale) {
       try {
         const parsed = parseFloat(cachedScale);
@@ -88,7 +93,15 @@ export default function MapPage() {
         console.error('Failed to parse cached scale:', error);
       }
     }
-    
+
+    // Load map settings
+    if (cachedShowTerritories !== null) {
+      setShowTerritories(cachedShowTerritories === 'true');
+    }
+    if (cachedShowTimeOutlines !== null) {
+      setShowTimeOutlines(cachedShowTimeOutlines === 'true');
+    }
+
     setIsInitialized(true);
   }, []);
 
@@ -104,6 +117,19 @@ export default function MapPage() {
       localStorage.setItem('map-scale', scale.toString());
     }
   }, [scale, isInitialized]);
+
+  // Save map settings to localStorage
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowTerritories', String(showTerritories));
+    }
+  }, [showTerritories, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowTimeOutlines', String(showTimeOutlines));
+    }
+  }, [showTimeOutlines, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
@@ -399,10 +425,6 @@ export default function MapPage() {
     setHoveredTerritory(null);
   }, []);
 
-  const toggleTerritories = useCallback(() => {
-    setShowTerritories(prev => !prev);
-  }, []);
-
   // Handle guild click to zoom to guild territories
   const handleGuildZoom = useCallback((guildName: string) => {
     if (!containerRef.current) return;
@@ -579,6 +601,7 @@ export default function MapPage() {
                 onMouseEnter={handleTerritoryHover}
                 onMouseLeave={handleTerritoryLeave}
                 guildColors={guildColors}
+                showTimeOutlines={showTimeOutlines}
               />
             ))}
             {/* Trade routes - only show when territories are visible */}
@@ -676,38 +699,53 @@ export default function MapPage() {
               −
             </button>
             
-            {/* Territory Toggle Button */}
-            <button
-              onClick={toggleTerritories}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '0.5rem',
-                border: '2px solid var(--border-color)',
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                fontSize: '1.25rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--bg-secondary)';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'var(--bg-card)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-              title={showTerritories ? "Hide Territories" : "Show Territories"}
-            >
-              {showTerritories ? 'H' : 'T'}
-            </button>
           </div>
+
+          {/* Settings Button - Bottom Right */}
+          <button
+            onClick={() => setShowSettings(prev => !prev)}
+            style={{
+              position: 'absolute',
+              bottom: '1rem',
+              right: '1rem',
+              width: '40px',
+              height: '40px',
+              borderRadius: '0.5rem',
+              border: '2px solid var(--border-color)',
+              background: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              fontSize: '1.25rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              zIndex: 10
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-secondary)';
+              e.currentTarget.style.transform = 'scale(1.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--bg-card)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+            title="Map Settings"
+          >
+            ⚙
+          </button>
+
+          {/* Map Settings Panel */}
+          <MapSettings
+            isOpen={showSettings}
+            onClose={() => setShowSettings(false)}
+            showTerritories={showTerritories}
+            onShowTerritoriesChange={setShowTerritories}
+            showTimeOutlines={showTimeOutlines}
+            onShowTimeOutlinesChange={setShowTimeOutlines}
+          />
         </div>
       </div>
     </main>

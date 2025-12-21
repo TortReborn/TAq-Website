@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Territory, coordToPixel } from "@/lib/utils";
 
 interface TerritoryOverlayProps {
@@ -12,6 +12,42 @@ interface TerritoryOverlayProps {
   onMouseEnter?: (name: string, territory: Territory) => void;
   onMouseLeave?: () => void;
   guildColors: Record<string, string>;
+  showTimeOutlines?: boolean;
+}
+
+// Get outline style based on time held
+function getTimeBasedOutline(acquiredTime: string, currentTime: number): {
+  stroke: string;
+  strokeDasharray: string;
+  animate: boolean;
+} | null {
+  const acquired = new Date(acquiredTime).getTime();
+  const diffSeconds = Math.floor((currentTime - acquired) / 1000);
+
+  if (isNaN(diffSeconds) || diffSeconds < 0) return null;
+
+  // 0-60 seconds: dashed red
+  if (diffSeconds < 60) {
+    return { stroke: '#ff0000', strokeDasharray: '12 6', animate: false };
+  }
+  // 1-5 minutes: dashed orange
+  if (diffSeconds < 300) {
+    return { stroke: '#ff8c00', strokeDasharray: '12 6', animate: false };
+  }
+  // 5-9 minutes: dashed yellow
+  if (diffSeconds < 540) {
+    return { stroke: '#ffff00', strokeDasharray: '12 6', animate: false };
+  }
+  // 9:00-9:45 minutes: dashed red
+  if (diffSeconds < 585) {
+    return { stroke: '#ff0000', strokeDasharray: '12 6', animate: false };
+  }
+  // 9:45-10:00 minutes: flashing red/white
+  if (diffSeconds < 600) {
+    return { stroke: '#ff0000', strokeDasharray: '12 6', animate: true };
+  }
+  // 10:00+ minutes: no special outline
+  return null;
 }
 
 export default function TerritoryOverlay({
@@ -22,12 +58,23 @@ export default function TerritoryOverlay({
   onClick,
   onMouseEnter,
   onMouseLeave,
-  guildColors
+  guildColors,
+  showTimeOutlines = true
 }: TerritoryOverlayProps) {
   // Use scale prop for zoom, define at top
   const zoom = scale;
   // Local drag detection
   const dragState = React.useRef({ down: false, moved: false });
+
+  // Continuous time updates for accurate timer display
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Validate hex color format
   const isValidHexColor = (color: string | undefined): boolean => {
@@ -106,11 +153,10 @@ export default function TerritoryOverlay({
   // Get zoom from window/global (passed as prop in a real app, but we can use window for now)
   // Use scale prop for zoom
 
-  // Helper to format duration
+  // Helper to format duration using currentTime for continuous updates
   function formatHeldDuration(acquired: string): { text: string, color: string } {
-    const now = new Date();
     const acquiredDate = new Date(acquired);
-    let diff = Math.floor((now.getTime() - acquiredDate.getTime()) / 1000); // seconds
+    let diff = Math.floor((currentTime - acquiredDate.getTime()) / 1000); // seconds
     if (isNaN(diff) || diff < 0) return { text: '', color: '' };
     let days = Math.floor(diff / 86400);
     diff -= days * 86400;
@@ -178,6 +224,33 @@ export default function TerritoryOverlay({
         onMouseEnter={() => onMouseEnter?.(name, territory)}
         onMouseLeave={onMouseLeave}
       />
+      {/* Time-based dashed outline */}
+      {showTimeOutlines && territory.acquired && (() => {
+        const outline = getTimeBasedOutline(territory.acquired, currentTime);
+        if (!outline) return null;
+
+        return (
+          <>
+            <polygon
+              points={points}
+              fill="none"
+              stroke={outline.animate ? undefined : outline.stroke}
+              strokeWidth={4}
+              strokeDasharray={outline.strokeDasharray}
+              style={{ pointerEvents: "none" }}
+            >
+              {outline.animate && (
+                <animate
+                  attributeName="stroke"
+                  values="#ff0000;#ffffff;#ff0000"
+                  dur="0.5s"
+                  repeatCount="indefinite"
+                />
+              )}
+            </polygon>
+          </>
+        );
+      })()}
       {/* Guild tag centered in territory, bold white blocky font with black outline */}
       {territory.guild.prefix && (
         <>
