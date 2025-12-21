@@ -81,14 +81,15 @@ function StatRow({
             height: '24px',
             borderRadius: '4px',
             border: '1px solid var(--border-color)',
-            background: level <= 0 ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-            color: level <= 0 ? 'var(--text-secondary)' : 'var(--text-primary)',
+            background: level <= 0 ? 'var(--bg-secondary)' : '#6b3a3a',
+            color: level <= 0 ? 'var(--text-secondary)' : '#ffcccc',
             cursor: level <= 0 ? 'not-allowed' : 'pointer',
             fontWeight: 'bold',
             fontSize: '1rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            userSelect: 'none',
           }}
         >
           -
@@ -109,14 +110,15 @@ function StatRow({
             height: '24px',
             borderRadius: '4px',
             border: '1px solid var(--border-color)',
-            background: level >= maxLevel ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-            color: level >= maxLevel ? 'var(--text-secondary)' : 'var(--text-primary)',
+            background: level >= maxLevel ? 'var(--bg-secondary)' : '#3a5a3a',
+            color: level >= maxLevel ? 'var(--text-secondary)' : '#ccffcc',
             cursor: level >= maxLevel ? 'not-allowed' : 'pointer',
             fontWeight: 'bold',
             fontSize: '1rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            userSelect: 'none',
           }}
         >
           +
@@ -313,6 +315,7 @@ export default function TerritoryInfoPanel({
         maxHeight: 'calc(100vh - 8rem)',
         overflowY: 'auto',
         userSelect: 'text',
+        cursor: 'default',
       }}
       onWheel={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
@@ -552,14 +555,15 @@ export default function TerritoryInfoPanel({
               height: '24px',
               borderRadius: '4px',
               border: '1px solid var(--border-color)',
-              background: ownedConnections <= 0 ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-              color: ownedConnections <= 0 ? 'var(--text-secondary)' : 'var(--text-primary)',
+              background: ownedConnections <= 0 ? 'var(--bg-secondary)' : '#6b3a3a',
+              color: ownedConnections <= 0 ? 'var(--text-secondary)' : '#ffcccc',
               cursor: ownedConnections <= 0 ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
               fontSize: '1rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              userSelect: 'none',
             }}
           >
             -
@@ -583,14 +587,15 @@ export default function TerritoryInfoPanel({
               height: '24px',
               borderRadius: '4px',
               border: '1px solid var(--border-color)',
-              background: ownedConnections >= totalConnections ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-              color: ownedConnections >= totalConnections ? 'var(--text-secondary)' : 'var(--text-primary)',
+              background: ownedConnections >= totalConnections ? 'var(--bg-secondary)' : '#3a5a3a',
+              color: ownedConnections >= totalConnections ? 'var(--text-secondary)' : '#ccffcc',
               cursor: ownedConnections >= totalConnections ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
               fontSize: '1rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              userSelect: 'none',
             }}
           >
             +
@@ -623,14 +628,15 @@ export default function TerritoryInfoPanel({
                 height: '24px',
                 borderRadius: '4px',
                 border: '1px solid var(--border-color)',
-                background: externals <= 0 ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-                color: externals <= 0 ? 'var(--text-secondary)' : 'var(--text-primary)',
+                background: externals <= 0 ? 'var(--bg-secondary)' : '#6b3a3a',
+                color: externals <= 0 ? 'var(--text-secondary)' : '#ffcccc',
                 cursor: externals <= 0 ? 'not-allowed' : 'pointer',
                 fontWeight: 'bold',
                 fontSize: '1rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                userSelect: 'none',
               }}
             >
               -
@@ -653,14 +659,15 @@ export default function TerritoryInfoPanel({
                 height: '24px',
                 borderRadius: '4px',
                 border: '1px solid var(--border-color)',
-                background: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)',
+                background: '#3a5a3a',
+                color: '#ccffcc',
                 cursor: 'pointer',
                 fontWeight: 'bold',
                 fontSize: '1rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                userSelect: 'none',
               }}
             >
               +
