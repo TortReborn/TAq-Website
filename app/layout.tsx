@@ -100,6 +100,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="keywords" content="Wynncraft, The Aquarium, guild, territory map, leaderboard, Minecraft, MMORPG, guild wars, Tort Reborn, Wynn, guild stats" />
         <link rel="canonical" href="https://the-aquarium.com/" />
 
+        {/* Favicon */}
+        <link rel="icon" type="image/png" href="/images/guildimages/icontransparent.png" />
+        <link rel="apple-touch-icon" href="/images/guildimages/icontransparent.png" />
+
         {/* Structured Data */}
         <script
           type="application/ld+json"
