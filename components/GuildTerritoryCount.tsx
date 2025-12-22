@@ -1,22 +1,24 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { Territory, getContrastColor } from "@/lib/utils";
+import { Territory, getContrastColor, coordToPixel } from "@/lib/utils";
 
 interface GuildTerritoryCountProps {
   territories: Record<string, Territory>;
   onGuildClick?: (guildName: string) => void;
   guildColors: Record<string, string>;
+  showLandView?: boolean;
 }
 
 interface GuildStats {
   name: string;
   originalName: string;
   count: number;
+  area: number; // Area in pixels (1 pixel = 1 meter)
   color: string;
 }
 
-export default function GuildTerritoryCount({ territories, onGuildClick, guildColors }: GuildTerritoryCountProps) {
+export default function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandView = false }: GuildTerritoryCountProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -67,14 +69,23 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
 
 
   const guildStats = useMemo(() => {
-    const counts: Record<string, { count: number, prefix: string }> = {};
+    const counts: Record<string, { count: number, prefix: string, area: number }> = {};
 
     Object.values(territories).forEach(territory => {
       if (territory.guild && territory.guild.name) {
         if (!counts[territory.guild.name]) {
-          counts[territory.guild.name] = { count: 0, prefix: territory.guild.prefix };
+          counts[territory.guild.name] = { count: 0, prefix: territory.guild.prefix, area: 0 };
         }
         counts[territory.guild.name].count++;
+
+        // Calculate territory area in pixels (1 pixel = 1 meter)
+        if (territory.location) {
+          const start = coordToPixel(territory.location.start);
+          const end = coordToPixel(territory.location.end);
+          const width = Math.abs(end[0] - start[0]);
+          const height = Math.abs(end[1] - start[1]);
+          counts[territory.guild.name].area += width * height;
+        }
       }
     });
 
@@ -101,29 +112,44 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
           break;
         }
       }
-      
+
       return {
         name: data.prefix ? `${name} [${data.prefix}]` : name,
         originalName: name,
         count: data.count,
+        area: data.area,
         color: color
       };
     });
 
-    // Sort by territory count descending
-    stats.sort((a, b) => b.count - a.count);
+    // Sort by area (in land view) or territory count (default) - descending
+    if (showLandView) {
+      stats.sort((a, b) => b.area - a.area);
+    } else {
+      stats.sort((a, b) => b.count - a.count);
+    }
 
     return stats;
-  }, [territories, guildColors]);
+  }, [territories, guildColors, showLandView]);
 
   // Calculate dynamic font size based on number of guilds
   const baseFontSize = 0.875; // 0.875rem base
   const maxGuildsForBaseFontSize = 15;
   const minFontSize = 0.6; // minimum font size in rem
-  
-  const dynamicFontSize = guildStats.length <= maxGuildsForBaseFontSize 
-    ? baseFontSize 
+
+  const dynamicFontSize = guildStats.length <= maxGuildsForBaseFontSize
+    ? baseFontSize
     : Math.max(minFontSize, baseFontSize * (maxGuildsForBaseFontSize / guildStats.length));
+
+  // Format area for display (e.g., "1.2M m²" or "500K m²")
+  const formatArea = (area: number): string => {
+    if (area >= 1_000_000) {
+      return `${(area / 1_000_000).toFixed(1)}M m²`;
+    } else if (area >= 1_000) {
+      return `${(area / 1_000).toFixed(0)}K m²`;
+    }
+    return `${area.toFixed(0)} m²`;
+  };
 
   return (
     <>
@@ -230,7 +256,7 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
               fontWeight: 'bold',
               fontSize: '0.95rem',
               color: 'var(--accent-color)',
-            }}>Territory Leaders</h3>
+            }}>{showLandView ? 'Land Held' : 'Territory Leaders'}</h3>
             <button
               onClick={() => setIsCollapsed(true)}
               style={{
@@ -341,17 +367,17 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
               >
                 {guild.name}
               </span>
-              <span style={{ 
+              <span style={{
                 color: 'var(--text-secondary)',
                 fontWeight: '600',
                 backgroundColor: 'var(--bg-tertiary)',
                 padding: '0.25rem 0.5rem',
                 borderRadius: '0.25rem',
                 fontSize: '0.85em',
-                minWidth: '2rem',
+                minWidth: showLandView ? '4rem' : '2rem',
                 textAlign: 'center'
               }}>
-                {guild.count}
+                {showLandView ? formatArea(guild.area) : guild.count}
               </span>
             </li>
           ))}

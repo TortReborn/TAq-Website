@@ -667,7 +667,7 @@ export default function MapPage() {
             externalsData={externalsData}
           />
           
-          <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} guildColors={guildColors} />
+          <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} guildColors={guildColors} showLandView={showLandView} />
 
           {/* Zoom Controls */}
           <div style={{
