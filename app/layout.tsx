@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-theme={mounted && darkMode ? 'dark' : undefined}>
       <head>
-        <title>The Aquarium</title>
+        <title>The Aquarium [TAq]</title>
         <meta name="description" content="The Aquarium - Wynncraft guild territory map, leaderboards, and member statistics" />
 
         {/* Open Graph */}
