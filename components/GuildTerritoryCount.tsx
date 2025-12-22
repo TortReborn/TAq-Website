@@ -34,21 +34,36 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
     return () => observer.disconnect();
   }, []);
 
-  // Check if device is mobile and set default collapsed state only once
+  // Check if device is mobile and restore cached collapsed state
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      // Only set default collapsed state on first load
-      if (!hasInitialized) {
-        setIsCollapsed(mobile);
-        setHasInitialized(true);
-      }
     };
+
+    // On first load, check localStorage for cached state
+    if (!hasInitialized) {
+      const cached = localStorage.getItem('territoryLeadersCollapsed');
+      if (cached !== null) {
+        setIsCollapsed(cached === 'true');
+      } else {
+        // Default to collapsed on mobile if no cached value
+        setIsCollapsed(window.innerWidth <= 768);
+      }
+      setHasInitialized(true);
+    }
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []); // Remove isCollapsed from dependencies
+  }, [hasInitialized]);
+
+  // Save collapsed state to localStorage when it changes
+  useEffect(() => {
+    if (hasInitialized) {
+      localStorage.setItem('territoryLeadersCollapsed', String(isCollapsed));
+    }
+  }, [isCollapsed, hasInitialized]);
 
 
   const guildStats = useMemo(() => {
@@ -120,8 +135,8 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
             position: 'absolute',
             top: '1rem',
             right: '0',
-            width: '40px',
-            height: 'calc(2.5rem + 1.1rem + 4px)', // Increased to match visual header height
+            width: '32px',
+            height: '40px',
             background: 'var(--bg-card)',
             border: '2px solid var(--border-color)',
             borderRight: 'none',
@@ -132,14 +147,21 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--text-primary)',
-            fontSize: '1.2rem',
+            color: 'var(--text-secondary)',
             backdropFilter: 'blur(8px)',
-            transition: 'none'
+            transition: 'color 0.15s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--text-primary)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-secondary)';
           }}
           aria-label="Show territory owners"
         >
-          ←
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
         </button>
       )}
       
@@ -199,17 +221,15 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '1.25rem 1.25rem 0.75rem 1.25rem',
-            borderBottom: '2px solid var(--border-color)',
+            padding: '0.6rem 0.75rem',
+            borderBottom: '1px solid var(--border-color)',
             flexShrink: 0
           }}>
-            <h3 style={{ 
+            <h3 style={{
               margin: 0,
-              textAlign: 'center', 
-              fontWeight: 'bold', 
-              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              fontSize: '0.95rem',
               color: 'var(--accent-color)',
-              flex: 1
             }}>Territory Leaders</h3>
             <button
               onClick={() => setIsCollapsed(true)}
@@ -217,14 +237,13 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--text-secondary)',
-                fontSize: '1.2rem',
                 cursor: 'pointer',
                 padding: '4px',
                 borderRadius: '4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.15s ease'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--bg-secondary)';
@@ -236,7 +255,9 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
               }}
               aria-label="Hide territory owners"
             >
-              →
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
             </button>
           </div>
           
