@@ -278,11 +278,66 @@ function createBridgeRectangle(
   }
 }
 
+// Check if a label rectangle fits entirely within the filled polygon
+function isLabelWithinPolygon(
+  centerX: number,
+  centerY: number,
+  labelWidth: number,
+  labelHeight: number,
+  xs: number[],
+  ys: number[],
+  grid: Uint8Array,
+  xLen: number,
+  yLen: number
+): boolean {
+  const halfWidth = labelWidth / 2;
+  const halfHeight = labelHeight / 2;
+
+  const labelMinX = centerX - halfWidth;
+  const labelMaxX = centerX + halfWidth;
+  const labelMinY = centerY - halfHeight;
+  const labelMaxY = centerY + halfHeight;
+
+  // Check if label is completely outside the grid bounds
+  if (labelMinX < xs[0] || labelMaxX > xs[xLen] ||
+      labelMinY < ys[0] || labelMaxY > ys[yLen]) {
+    return false;
+  }
+
+  // Find grid cells that overlap with label bounds
+  let iStart = 0, iEnd = xLen;
+  let jStart = 0, jEnd = yLen;
+
+  for (let i = 0; i < xLen; i++) {
+    if (xs[i + 1] <= labelMinX) iStart = i + 1;
+    if (xs[i] >= labelMaxX && iEnd === xLen) iEnd = i;
+  }
+  for (let j = 0; j < yLen; j++) {
+    if (ys[j + 1] <= labelMinY) jStart = j + 1;
+    if (ys[j] >= labelMaxY && jEnd === yLen) jEnd = j;
+  }
+
+  // Check all cells that overlap with the label - all must be filled
+  for (let i = iStart; i < iEnd; i++) {
+    for (let j = jStart; j < jEnd; j++) {
+      if (grid[i * yLen + j] !== 1) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 // Compute the union of axis-aligned rectangles as a rectilinear polygon
 // Returns an SVG path with only horizontal and vertical segments
+// excludedRectangles: areas that should be "punched out" from this polygon (from smaller guilds)
 function computeRectilinearUnionPath(
   rectangles: { minX: number; maxX: number; minY: number; maxY: number }[],
-  centroid: [number, number]
+  centroid: [number, number],
+  estimatedLabelWidth: number = 100,
+  estimatedLabelHeight: number = 30,
+  excludedRectangles: { minX: number; maxX: number; minY: number; maxY: number }[] = []
 ): UnionPathResult {
   if (rectangles.length === 0) return { path: "", labelPosition: centroid, labelMaxWidth: 0, labelMaxHeight: 0 };
 
@@ -295,8 +350,8 @@ function computeRectilinearUnionPath(
     maxY: r.maxY + GAP_FILL,
   }));
 
-  // Single rectangle - simple case
-  if (expandedRects.length === 1) {
+  // Single rectangle with no exclusions - simple case
+  if (expandedRects.length === 1 && excludedRectangles.length === 0) {
     const r = expandedRects[0];
     return {
       path: `M ${r.minX} ${r.minY} H ${r.maxX} V ${r.maxY} H ${r.minX} Z`,
@@ -306,10 +361,17 @@ function computeRectilinearUnionPath(
     };
   }
 
-  // Get unique coordinates to create a grid
+  // Get unique coordinates to create a grid (include excluded rectangles for proper subdivision)
   const xSet = new Set<number>();
   const ySet = new Set<number>();
   for (const rect of expandedRects) {
+    xSet.add(rect.minX);
+    xSet.add(rect.maxX);
+    ySet.add(rect.minY);
+    ySet.add(rect.maxY);
+  }
+  // Add excluded rectangle boundaries to ensure proper grid subdivision
+  for (const rect of excludedRectangles) {
     xSet.add(rect.minX);
     xSet.add(rect.maxX);
     ySet.add(rect.minY);
@@ -344,7 +406,25 @@ function computeRectilinearUnionPath(
     }
   }
 
+  // Punch out excluded rectangles (areas belonging to smaller guilds)
+  // Mark with value 2 = "excluded, do not fill back in"
+  for (const rect of excludedRectangles) {
+    const iStart = xIndexMap.get(rect.minX);
+    const iEnd = xIndexMap.get(rect.maxX);
+    const jStart = yIndexMap.get(rect.minY);
+    const jEnd = yIndexMap.get(rect.maxY);
+
+    if (iStart !== undefined && iEnd !== undefined && jStart !== undefined && jEnd !== undefined) {
+      for (let i = iStart; i < iEnd; i++) {
+        for (let j = jStart; j < jEnd; j++) {
+          grid[i * yLen + j] = 2; // Excluded area - belongs to another guild
+        }
+      }
+    }
+  }
+
   // Fill narrow gaps (< 100px) between parallel edges
+  // Don't fill over excluded areas (value 2)
   const GAP_THRESHOLD = 100;
 
   // Horizontal gap filling
@@ -355,8 +435,15 @@ function computeRectilinearUnionPath(
         if (lastFilledI >= 0 && lastFilledI < i - 1) {
           const gapWidth = xs[i] - xs[lastFilledI + 1];
           if (gapWidth < GAP_THRESHOLD) {
+            // Check if any cell in the gap is excluded
+            let hasExcluded = false;
             for (let fillI = lastFilledI + 1; fillI < i; fillI++) {
-              grid[fillI * yLen + j] = 1;
+              if (grid[fillI * yLen + j] === 2) { hasExcluded = true; break; }
+            }
+            if (!hasExcluded) {
+              for (let fillI = lastFilledI + 1; fillI < i; fillI++) {
+                grid[fillI * yLen + j] = 1;
+              }
             }
           }
         }
@@ -373,8 +460,15 @@ function computeRectilinearUnionPath(
         if (lastFilledJ >= 0 && lastFilledJ < j - 1) {
           const gapHeight = ys[j] - ys[lastFilledJ + 1];
           if (gapHeight < GAP_THRESHOLD) {
+            // Check if any cell in the gap is excluded
+            let hasExcluded = false;
             for (let fillJ = lastFilledJ + 1; fillJ < j; fillJ++) {
-              grid[i * yLen + fillJ] = 1;
+              if (grid[i * yLen + fillJ] === 2) { hasExcluded = true; break; }
+            }
+            if (!hasExcluded) {
+              for (let fillJ = lastFilledJ + 1; fillJ < j; fillJ++) {
+                grid[i * yLen + fillJ] = 1;
+              }
             }
           }
         }
@@ -384,8 +478,20 @@ function computeRectilinearUnionPath(
   }
 
   // Fill air pockets using flood fill from edges
+  // Excluded cells (value 2) are treated as exterior and propagate to adjacent empty cells
   const exterior = new Uint8Array(xLen * yLen);
   const queue: number[] = [];
+
+  // Mark all excluded cells as exterior and add to queue (they connect to "outside")
+  // This ensures air pockets adjacent to excluded regions stay unfilled
+  for (let i = 0; i < xLen; i++) {
+    for (let j = 0; j < yLen; j++) {
+      if (grid[i * yLen + j] === 2) {
+        exterior[i * yLen + j] = 1;
+        queue.push(i * yLen + j); // Add to queue so they propagate to neighbors
+      }
+    }
+  }
 
   // Add edge cells to queue
   for (let i = 0; i < xLen; i++) {
@@ -397,7 +503,7 @@ function computeRectilinearUnionPath(
     if (grid[(xLen - 1) * yLen + j] === 0) { exterior[(xLen - 1) * yLen + j] = 1; queue.push((xLen - 1) * yLen + j); }
   }
 
-  // BFS flood fill
+  // BFS flood fill - spread through empty cells (value 0) and excluded cells (value 2)
   while (queue.length > 0) {
     const idx = queue.pop()!;
     const i = Math.floor(idx / yLen);
@@ -405,7 +511,8 @@ function computeRectilinearUnionPath(
     for (const [ni, nj] of [[i-1,j], [i+1,j], [i,j-1], [i,j+1]]) {
       if (ni >= 0 && ni < xLen && nj >= 0 && nj < yLen) {
         const nIdx = ni * yLen + nj;
-        if (grid[nIdx] === 0 && exterior[nIdx] === 0) {
+        // Spread to empty cells (0) or excluded cells (2), but not filled cells (1)
+        if ((grid[nIdx] === 0 || grid[nIdx] === 2) && exterior[nIdx] === 0) {
           exterior[nIdx] = 1;
           queue.push(nIdx);
         }
@@ -413,7 +520,7 @@ function computeRectilinearUnionPath(
     }
   }
 
-  // Fill air pockets
+  // Fill air pockets (only cells that are empty and NOT exterior)
   for (let i = 0; i < xLen; i++) {
     for (let j = 0; j < yLen; j++) {
       const idx = i * yLen + j;
@@ -498,17 +605,119 @@ function computeRectilinearUnionPath(
     }
   }
 
-  // Calculate bounding box for label dimensions
-  const minX = xs[0];
-  const maxX = xs[xLen];
-  const minY = ys[0];
-  const maxY = ys[yLen];
+  // Calculate the true centroid from filled grid cells (center of mass)
+  // This places the centroid in the largest filled area, not the bounding box center
+  let totalArea = 0;
+  let weightedX = 0;
+  let weightedY = 0;
+
+  for (let i = 0; i < xLen; i++) {
+    for (let j = 0; j < yLen; j++) {
+      if (grid[i * yLen + j] === 1) {
+        const cellWidth = xs[i + 1] - xs[i];
+        const cellHeight = ys[j + 1] - ys[j];
+        const cellArea = cellWidth * cellHeight;
+        const cellCenterX = (xs[i] + xs[i + 1]) / 2;
+        const cellCenterY = (ys[j] + ys[j + 1]) / 2;
+
+        totalArea += cellArea;
+        weightedX += cellCenterX * cellArea;
+        weightedY += cellCenterY * cellArea;
+      }
+    }
+  }
+
+  // Use weighted centroid if we have filled area, otherwise fall back to bounding box centroid
+  const trueCentroid: [number, number] = totalArea > 0
+    ? [weightedX / totalArea, weightedY / totalArea]
+    : centroid;
+
+  // Find the best label position - try true centroid first, then search outward
+  let bestLabelPos: [number, number] = trueCentroid;
+  let bestWidth = estimatedLabelWidth;
+  let bestHeight = estimatedLabelHeight;
+
+  // Calculate bounding box for search bounds
+  const boundMinX = xs[0];
+  const boundMaxX = xs[xLen];
+  const boundMinY = ys[0];
+  const boundMaxY = ys[yLen];
+
+  // Helper to find a position that fits for given dimensions
+  const findFittingPosition = (width: number, height: number): [number, number] | null => {
+    // Try true centroid first (center of mass of filled area)
+    if (isLabelWithinPolygon(trueCentroid[0], trueCentroid[1], width, height, xs, ys, grid, xLen, yLen)) {
+      return trueCentroid;
+    }
+
+    // Search outward from true centroid
+    const searchStep = 20;
+    const maxSearchRadius = Math.max(boundMaxX - boundMinX, boundMaxY - boundMinY) / 2;
+
+    for (let radius = searchStep; radius <= maxSearchRadius; radius += searchStep) {
+      const numSamples = Math.max(4, Math.floor(radius / searchStep) * 4);
+      for (let i = 0; i < numSamples; i++) {
+        const angle = (i / numSamples) * Math.PI * 2;
+        const testX = trueCentroid[0] + Math.cos(angle) * radius;
+        const testY = trueCentroid[1] + Math.sin(angle) * radius;
+
+        if (isLabelWithinPolygon(testX, testY, width, height, xs, ys, grid, xLen, yLen)) {
+          return [testX, testY];
+        }
+      }
+    }
+
+    return null;
+  };
+
+  // Start at 1x size and grow until we hit max (4x) or it doesn't fit
+  const START_SCALE = 1.0;
+  const MAX_SCALE = 4.0;
+  let currentScale = START_SCALE;
+  let lastFittingScale = 0;
+  let lastFittingPos: [number, number] | null = null;
+
+  // First, find an initial position that works at starting scale
+  let pos = findFittingPosition(estimatedLabelWidth, estimatedLabelHeight);
+
+  if (pos) {
+    lastFittingScale = START_SCALE;
+    lastFittingPos = pos;
+
+    // Now double until we hit max (4.0) or it doesn't fit
+    currentScale = START_SCALE * 2;
+    while (currentScale <= MAX_SCALE) {
+      const testWidth = estimatedLabelWidth * currentScale;
+      const testHeight = estimatedLabelHeight * currentScale;
+      pos = findFittingPosition(testWidth, testHeight);
+
+      if (pos) {
+        lastFittingScale = currentScale;
+        lastFittingPos = pos;
+        currentScale *= 2;
+      } else {
+        // Doesn't fit at this scale, stop growing
+        break;
+      }
+    }
+
+    // Clamp to max scale
+    if (lastFittingScale > MAX_SCALE) lastFittingScale = MAX_SCALE;
+
+    bestLabelPos = lastFittingPos;
+    bestWidth = estimatedLabelWidth * lastFittingScale;
+    bestHeight = estimatedLabelHeight * lastFittingScale;
+  } else {
+    // Even 1x size doesn't fit, use centroid with bounding box dimensions as fallback
+    bestWidth = boundMaxX - boundMinX;
+    bestHeight = boundMaxY - boundMinY;
+  }
 
   return {
     path: paths.join(" "),
-    labelPosition: centroid,
-    labelMaxWidth: maxX - minX,
-    labelMaxHeight: maxY - minY
+    labelPosition: bestLabelPos,
+    labelMaxWidth: bestWidth,
+    labelMaxHeight: bestHeight
   };
 }
 
@@ -540,8 +749,6 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
 
   // Compute clusters for all guilds
   const clusters = useMemo(() => {
-    const result: TerritoryCluster[] = [];
-
     // Group territories by guild
     const guildTerritories: Record<
       string,
@@ -561,7 +768,22 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
       guildTerritories[guildName].names.push(name);
     }
 
-    // For each guild, find connected clusters
+    // Phase 1: Collect all clusters with their rectangles and calculate area
+    interface PreCluster {
+      guildName: string;
+      guildPrefix: string;
+      guildColor: string;
+      territoryNames: string[];
+      rectangles: { minX: number; maxX: number; minY: number; maxY: number }[];
+      boundingBox: { minX: number; maxX: number; minY: number; maxY: number };
+      centroid: [number, number];
+      totalArea: number;
+      estimatedLabelWidth: number;
+      estimatedLabelHeight: number;
+    }
+
+    const preClusters: PreCluster[] = [];
+
     for (const [guildName, data] of Object.entries(guildTerritories)) {
       const connectedClusters = findConnectedClusters(
         data.names,
@@ -572,23 +794,16 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
       for (const clusterResult of connectedClusters) {
         const { territoryNames: clusterNames, tradeRouteConnections } = clusterResult;
 
-        // Calculate rectangles and bounding box
-        const rectangles: {
-          minX: number;
-          maxX: number;
-          minY: number;
-          maxY: number;
-        }[] = [];
-        let minX = Infinity,
-          maxX = -Infinity,
-          minY = Infinity,
-          maxY = -Infinity;
+        const rectangles: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        let totalArea = 0;
 
         // Add territory rectangles
         for (const name of clusterNames) {
           const territory = territories[name];
           const rect = getTerritoryRect(territory);
           rectangles.push(rect);
+          totalArea += (rect.maxX - rect.minX) * (rect.maxY - rect.minY);
 
           minX = Math.min(minX, rect.minX);
           maxX = Math.max(maxX, rect.maxX);
@@ -597,7 +812,6 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
         }
 
         // Add bridge rectangles for trade route connections
-        // This fills the space between connected territories
         for (const [name1, name2] of tradeRouteConnections) {
           const t1 = territories[name1];
           const t2 = territories[name2];
@@ -605,7 +819,6 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
             const bridge = createBridgeRectangle(t1, t2);
             rectangles.push(bridge);
 
-            // Update bounding box to include bridge
             minX = Math.min(minX, bridge.minX);
             maxX = Math.max(maxX, bridge.maxX);
             minY = Math.min(minY, bridge.minY);
@@ -614,12 +827,16 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
         }
 
         const guildColor = getGuildColor(guildName, data.prefix, guildColors);
-
-        // Pre-compute the union path and label position for this cluster
         const clusterCentroid: [number, number] = [(minX + maxX) / 2, (minY + maxY) / 2];
-        const { path: unionPath, labelPosition, labelMaxWidth, labelMaxHeight } = computeRectilinearUnionPath(rectangles, clusterCentroid);
 
-        result.push({
+        // Estimate label dimensions
+        const boxWidth = maxX - minX;
+        const estimatedFontSize = Math.max(12, Math.min(64, boxWidth / 4));
+        const prefixLength = data.prefix?.length || 3;
+        const estimatedLabelWidth = prefixLength * estimatedFontSize * 0.7 + 16;
+        const estimatedLabelHeight = estimatedFontSize * 1.4 + 8;
+
+        preClusters.push({
           guildName,
           guildPrefix: data.prefix,
           guildColor,
@@ -627,12 +844,46 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
           rectangles,
           boundingBox: { minX, maxX, minY, maxY },
           centroid: clusterCentroid,
-          labelPosition,
-          labelMaxWidth,
-          labelMaxHeight,
-          unionPath,
+          totalArea,
+          estimatedLabelWidth,
+          estimatedLabelHeight,
         });
       }
+    }
+
+    // Phase 2: Sort by area (smallest first) so smaller polygons are processed first
+    preClusters.sort((a, b) => a.totalArea - b.totalArea);
+
+    // Phase 3: Process in order, accumulating excluded rectangles
+    const result: TerritoryCluster[] = [];
+    const processedRectangles: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
+
+    for (const preCluster of preClusters) {
+      // Compute union path, excluding areas from previously processed (smaller) clusters
+      const { path: unionPath, labelPosition, labelMaxWidth, labelMaxHeight } = computeRectilinearUnionPath(
+        preCluster.rectangles,
+        preCluster.centroid,
+        preCluster.estimatedLabelWidth,
+        preCluster.estimatedLabelHeight,
+        processedRectangles
+      );
+
+      result.push({
+        guildName: preCluster.guildName,
+        guildPrefix: preCluster.guildPrefix,
+        guildColor: preCluster.guildColor,
+        territoryNames: preCluster.territoryNames,
+        rectangles: preCluster.rectangles,
+        boundingBox: preCluster.boundingBox,
+        centroid: preCluster.centroid,
+        labelPosition,
+        labelMaxWidth,
+        labelMaxHeight,
+        unionPath,
+      });
+
+      // Add this cluster's rectangles to the exclusion list for subsequent clusters
+      processedRectangles.push(...preCluster.rectangles);
     }
 
     return result;
