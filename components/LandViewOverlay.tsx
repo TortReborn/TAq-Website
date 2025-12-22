@@ -423,6 +423,10 @@ function computeRectilinearUnionPath(
     }
   }
 
+  // Skip gap filling and flood fill for very small grids (optimization)
+  const skipAdvancedProcessing = xLen <= 2 && yLen <= 2;
+
+  if (!skipAdvancedProcessing) {
   // Fill narrow gaps (< 100px) between parallel edges
   // Don't fill over excluded areas (value 2)
   const GAP_THRESHOLD = 100;
@@ -527,6 +531,7 @@ function computeRectilinearUnionPath(
       if (grid[idx] === 0 && exterior[idx] === 0) grid[idx] = 1;
     }
   }
+  } // End skipAdvancedProcessing check
 
   // Helper to check if cell is filled
   const isFilled = (i: number, j: number): boolean => {
@@ -854,28 +859,32 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
     // Phase 2: Sort by area (smallest first) so smaller polygons are drawn on top
     preClusters.sort((a, b) => a.totalArea - b.totalArea);
 
-    // Phase 3: Process each cluster, excluding ALL other guilds' territories
-    // This ensures no guild can ever fill over another guild's actual territory
+    // Phase 3: Pre-compute all rectangles with cluster indices (O(N) optimization)
+    // This avoids the O(N²) nested loop from before
+    const allRectsWithIndex: { rect: { minX: number; maxX: number; minY: number; maxY: number }; clusterIdx: number }[] = [];
+    for (let idx = 0; idx < preClusters.length; idx++) {
+      for (const rect of preClusters[idx].rectangles) {
+        allRectsWithIndex.push({ rect, clusterIdx: idx });
+      }
+    }
+
+    // Phase 4: Process each cluster with exclusions from other clusters
     const result: TerritoryCluster[] = [];
 
-    for (let clusterIndex = 0; clusterIndex < preClusters.length; clusterIndex++) {
-      const preCluster = preClusters[clusterIndex];
+    for (let clusterIdx = 0; clusterIdx < preClusters.length; clusterIdx++) {
+      const preCluster = preClusters[clusterIdx];
 
-      // Collect ALL other clusters' rectangles as exclusions
-      const otherGuildRectangles: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
-      for (let otherIndex = 0; otherIndex < preClusters.length; otherIndex++) {
-        if (otherIndex !== clusterIndex) {
-          otherGuildRectangles.push(...preClusters[otherIndex].rectangles);
-        }
-      }
+      // Get rectangles from all OTHER clusters (O(totalRects) filter instead of O(N²) nested loops)
+      const excludedRectangles = allRectsWithIndex
+        .filter(r => r.clusterIdx !== clusterIdx)
+        .map(r => r.rect);
 
-      // Compute union path, excluding areas from ALL other guilds
       const { path: unionPath, labelPosition, labelMaxWidth, labelMaxHeight } = computeRectilinearUnionPath(
         preCluster.rectangles,
         preCluster.centroid,
         preCluster.estimatedLabelWidth,
         preCluster.estimatedLabelHeight,
-        otherGuildRectangles
+        excludedRectangles
       );
 
       result.push({
