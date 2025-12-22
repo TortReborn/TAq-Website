@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(python:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx tsc --noEmit)"
     ],
     "deny": [],
     "ask": []

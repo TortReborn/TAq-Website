@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { loadTerritories, Territory } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
+import LandViewOverlay from "@/components/LandViewOverlay";
 import TerritoryInfoPanel from "@/components/TerritoryInfoPanel";
 import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
@@ -51,6 +52,7 @@ export default function MapPage() {
   const [hoveredTerritory, setHoveredTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [showTerritories, setShowTerritories] = useState(true);
   const [showTimeOutlines, setShowTimeOutlines] = useState(true);
+  const [showLandView, setShowLandView] = useState(true); // Default true for testing
   const [showSettings, setShowSettings] = useState(false);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
@@ -102,6 +104,10 @@ export default function MapPage() {
     if (cachedShowTimeOutlines !== null) {
       setShowTimeOutlines(cachedShowTimeOutlines === 'true');
     }
+    const cachedShowLandView = localStorage.getItem('mapShowLandView');
+    if (cachedShowLandView !== null) {
+      setShowLandView(cachedShowLandView === 'true');
+    }
 
     setIsInitialized(true);
   }, []);
@@ -131,6 +137,12 @@ export default function MapPage() {
       localStorage.setItem('mapShowTimeOutlines', String(showTimeOutlines));
     }
   }, [showTimeOutlines, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowLandView', String(showLandView));
+    }
+  }, [showLandView, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
@@ -609,7 +621,7 @@ export default function MapPage() {
               draggable={false}
             />
             {/* Territory Overlays - positioned in map pixel coordinates */}
-            {showTerritories && Object.entries(territories).map(([name, territory]) => (
+            {showTerritories && !showLandView && Object.entries(territories).map(([name, territory]) => (
               <TerritoryOverlay
                 key={name}
                 name={name}
@@ -623,8 +635,17 @@ export default function MapPage() {
                 showTimeOutlines={showTimeOutlines}
               />
             ))}
-            {/* Trade routes - only show when territories are visible */}
-            {showTerritories && <TradeRoutesOverlay />}
+            {/* Land View Overlay - merged guild territories */}
+            {showTerritories && showLandView && (
+              <LandViewOverlay
+                territories={territories}
+                verboseData={verboseData}
+                guildColors={guildColors}
+                scale={scale}
+              />
+            )}
+            {/* Trade routes - only show when territories are visible and Land View is off */}
+            {showTerritories && !showLandView && <TradeRoutesOverlay />}
           </div>
 
           {/* Territory Hover Panel - shown when hovering and no territory is selected */}
@@ -765,6 +786,8 @@ export default function MapPage() {
             onShowTerritoriesChange={setShowTerritories}
             showTimeOutlines={showTimeOutlines}
             onShowTimeOutlinesChange={setShowTimeOutlines}
+            showLandView={showLandView}
+            onShowLandViewChange={setShowLandView}
           />
         </div>
       </div>

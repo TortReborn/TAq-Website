@@ -9,50 +9,55 @@ interface MapSettingsProps {
   onShowTerritoriesChange: (value: boolean) => void;
   showTimeOutlines: boolean;
   onShowTimeOutlinesChange: (value: boolean) => void;
+  showLandView: boolean;
+  onShowLandViewChange: (value: boolean) => void;
 }
 
-// Toggle switch component
+// Compact toggle switch component for grid layout
 function ToggleSwitch({
   checked,
   onChange,
   label,
+  disabled = false,
 }: {
   checked: boolean;
   onChange: (value: boolean) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: "0.75rem",
+        gap: "0.35rem",
+        padding: "0.5rem",
+        opacity: disabled ? 0.4 : 1,
       }}
     >
-      <span style={{ color: "var(--text-primary)", fontSize: "0.875rem" }}>
-        {label}
-      </span>
       <button
-        onClick={() => onChange(!checked)}
+        onClick={() => !disabled && onChange(!checked)}
+        disabled={disabled}
         style={{
-          width: "44px",
-          height: "24px",
-          borderRadius: "12px",
+          width: "40px",
+          height: "22px",
+          borderRadius: "11px",
           border: "none",
           background: checked ? "#43a047" : "var(--bg-secondary)",
-          cursor: "pointer",
+          cursor: disabled ? "not-allowed" : "pointer",
           position: "relative",
           transition: "background 0.2s ease",
+          flexShrink: 0,
         }}
       >
         <span
           style={{
             position: "absolute",
             top: "2px",
-            left: checked ? "22px" : "2px",
-            width: "20px",
-            height: "20px",
+            left: checked ? "20px" : "2px",
+            width: "18px",
+            height: "18px",
             borderRadius: "50%",
             background: "#fff",
             boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
@@ -60,6 +65,15 @@ function ToggleSwitch({
           }}
         />
       </button>
+      <span style={{
+        color: "var(--text-primary)",
+        fontSize: "0.7rem",
+        textAlign: "center",
+        lineHeight: "1.2",
+        whiteSpace: "nowrap",
+      }}>
+        {label}
+      </span>
     </div>
   );
 }
@@ -71,8 +85,24 @@ export default function MapSettings({
   onShowTerritoriesChange,
   showTimeOutlines,
   onShowTimeOutlinesChange,
+  showLandView,
+  onShowLandViewChange,
 }: MapSettingsProps) {
   if (!isOpen) return null;
+
+  // Settings organized in columns (each column is rendered top to bottom)
+  // Grid expands to the left, so rightmost column comes first in array
+  const settings = [
+    // Column 2 (rightmost)
+    [
+      { key: "landView", label: "Land View", checked: showLandView, onChange: onShowLandViewChange, disabled: false },
+    ],
+    // Column 1
+    [
+      { key: "territories", label: "Territories", checked: showTerritories, onChange: onShowTerritoriesChange, disabled: showLandView },
+      { key: "timeOutlines", label: "Time Outlines", checked: showTimeOutlines, onChange: onShowTimeOutlinesChange, disabled: showLandView },
+    ],
+  ];
 
   return (
     <div
@@ -80,11 +110,10 @@ export default function MapSettings({
         position: "absolute",
         bottom: "1rem",
         right: "1rem",
-        width: "240px",
         backgroundColor: "var(--bg-card-solid)",
         border: "2px solid var(--border-color)",
         borderRadius: "0.5rem",
-        padding: "1rem",
+        padding: "0.5rem",
         zIndex: 1001,
         boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
         pointerEvents: "auto",
@@ -102,50 +131,58 @@ export default function MapSettings({
         onClick={onClose}
         style={{
           position: "absolute",
-          top: "0.5rem",
-          right: "0.5rem",
-          width: "1.5rem",
-          height: "1.5rem",
+          top: "0.25rem",
+          right: "0.25rem",
+          width: "1.25rem",
+          height: "1.25rem",
           borderRadius: "0.25rem",
           border: "none",
           background: "transparent",
           color: "var(--text-secondary)",
           fontWeight: "bold",
           cursor: "pointer",
-          fontSize: "1.25rem",
+          fontSize: "1rem",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           lineHeight: "1",
+          zIndex: 1,
         }}
       >
         ×
       </button>
 
-      {/* Header */}
+      {/* Grid of settings - 2 rows, columns expand left */}
       <div
         style={{
-          fontWeight: "bold",
-          fontSize: "1rem",
-          color: "var(--text-primary)",
-          marginBottom: "1rem",
-          paddingRight: "1.5rem",
+          display: "flex",
+          flexDirection: "row-reverse", // Columns added to the left
+          alignItems: "flex-start",
         }}
       >
-        Map Settings
+        {settings.map((column, colIndex) => (
+          <div
+            key={colIndex}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              borderLeft: colIndex < settings.length - 1 ? "1px solid var(--border-color)" : "none",
+              paddingLeft: colIndex < settings.length - 1 ? "0.25rem" : "0",
+              marginLeft: colIndex < settings.length - 1 ? "0.25rem" : "0",
+            }}
+          >
+            {column.map((setting) => (
+              <ToggleSwitch
+                key={setting.key}
+                checked={setting.checked}
+                onChange={setting.onChange}
+                label={setting.label}
+                disabled={setting.disabled}
+              />
+            ))}
+          </div>
+        ))}
       </div>
-
-      {/* Settings toggles */}
-      <ToggleSwitch
-        checked={showTerritories}
-        onChange={onShowTerritoriesChange}
-        label="Show Territories"
-      />
-      <ToggleSwitch
-        checked={showTimeOutlines}
-        onChange={onShowTimeOutlinesChange}
-        label="Time Outlines"
-      />
     </div>
   );
 }
