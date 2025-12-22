@@ -73,6 +73,28 @@ export default function MapPage() {
     enabled: true, // Always precompute for instant toggle
   });
 
+  // Track hovered guild for land view tooltip
+  const [hoveredGuildInfo, setHoveredGuildInfo] = useState<{ name: string; area: number } | null>(null);
+
+  // Handle guild hover from LandViewOverlay
+  const handleGuildHover = useCallback((guildName: string | null, landArea: number) => {
+    if (guildName) {
+      setHoveredGuildInfo({ name: guildName, area: landArea });
+    } else {
+      setHoveredGuildInfo(null);
+    }
+  }, []);
+
+  // Format area for display (e.g., "1.2M m²" or "500K m²")
+  const formatArea = (area: number): string => {
+    if (area >= 1_000_000) {
+      return `${(area / 1_000_000).toFixed(1)}M m²`;
+    } else if (area >= 1_000) {
+      return `${(area / 1_000).toFixed(0)}K m²`;
+    }
+    return `${area.toFixed(0)} m²`;
+  };
+
   // Helper function to clamp scale between min and max values
   const clampScale = useCallback((value: number): number => {
     const minScale = minScaleRef.current;
@@ -652,11 +674,46 @@ export default function MapPage() {
                 guildColors={guildColors}
                 scale={scale}
                 precomputedClusters={landViewClusters}
+                onHoverGuild={handleGuildHover}
               />
             )}
             {/* Trade routes - only show when territories are visible and Land View is off */}
             {showTerritories && !showLandView && <TradeRoutesOverlay />}
           </div>
+
+          {/* Guild Land Tooltip - shown when hovering over land view polygons */}
+          {showLandView && hoveredGuildInfo && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+                backgroundColor: 'var(--bg-card)',
+                border: '2px solid var(--border-color)',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                zIndex: 20,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                pointerEvents: 'none',
+                minWidth: '150px',
+              }}
+            >
+              <div style={{
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                color: 'var(--text-primary)',
+                marginBottom: '0.25rem',
+              }}>
+                {hoveredGuildInfo.name}
+              </div>
+              <div style={{
+                fontSize: '0.875rem',
+                color: 'var(--text-secondary)',
+              }}>
+                Land: {formatArea(hoveredGuildInfo.area)}
+              </div>
+            </div>
+          )}
 
           {/* Territory Hover Panel - shown when hovering and no territory is selected */}
           {!selectedTerritory && (
