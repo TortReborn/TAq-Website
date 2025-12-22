@@ -851,21 +851,31 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
       }
     }
 
-    // Phase 2: Sort by area (smallest first) so smaller polygons are processed first
+    // Phase 2: Sort by area (smallest first) so smaller polygons are drawn on top
     preClusters.sort((a, b) => a.totalArea - b.totalArea);
 
-    // Phase 3: Process in order, accumulating excluded rectangles
+    // Phase 3: Process each cluster, excluding ALL other guilds' territories
+    // This ensures no guild can ever fill over another guild's actual territory
     const result: TerritoryCluster[] = [];
-    const processedRectangles: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
 
-    for (const preCluster of preClusters) {
-      // Compute union path, excluding areas from previously processed (smaller) clusters
+    for (let clusterIndex = 0; clusterIndex < preClusters.length; clusterIndex++) {
+      const preCluster = preClusters[clusterIndex];
+
+      // Collect ALL other clusters' rectangles as exclusions
+      const otherGuildRectangles: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
+      for (let otherIndex = 0; otherIndex < preClusters.length; otherIndex++) {
+        if (otherIndex !== clusterIndex) {
+          otherGuildRectangles.push(...preClusters[otherIndex].rectangles);
+        }
+      }
+
+      // Compute union path, excluding areas from ALL other guilds
       const { path: unionPath, labelPosition, labelMaxWidth, labelMaxHeight } = computeRectilinearUnionPath(
         preCluster.rectangles,
         preCluster.centroid,
         preCluster.estimatedLabelWidth,
         preCluster.estimatedLabelHeight,
-        processedRectangles
+        otherGuildRectangles
       );
 
       result.push({
@@ -881,9 +891,6 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
         labelMaxHeight,
         unionPath,
       });
-
-      // Add this cluster's rectangles to the exclusion list for subsequent clusters
-      processedRectangles.push(...preCluster.rectangles);
     }
 
     return result;
