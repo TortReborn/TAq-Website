@@ -79,6 +79,41 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-theme={mounted && darkMode ? 'dark' : undefined}>
       <head>
+        <title>The Aquarium</title>
+        <meta name="description" content="The Aquarium - Wynncraft guild territory map, leaderboards, and member statistics" />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="The Aquarium" />
+        <meta property="og:description" content="Wynncraft guild territory map, leaderboards, and member statistics" />
+        <meta property="og:image" content="https://the-aquarium.com/images/guildimages/icontransparent.png" />
+        <meta property="og:url" content="https://the-aquarium.com" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="The Aquarium" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="The Aquarium" />
+        <meta name="twitter:description" content="Wynncraft guild territory map and statistics" />
+        <meta name="twitter:image" content="https://the-aquarium.com/images/guildimages/icontransparent.png" />
+
+        {/* SEO */}
+        <meta name="keywords" content="Wynncraft, The Aquarium, guild, territory map, leaderboard, Minecraft, MMORPG, guild wars, Tort Reborn, Wynn, guild stats" />
+        <link rel="canonical" href="https://the-aquarium.com/" />
+
+        {/* Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "The Aquarium",
+              "description": "Wynncraft guild territory tracking and statistics",
+              "url": "https://the-aquarium.com"
+            })
+          }}
+        />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
