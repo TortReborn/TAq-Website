@@ -10,6 +10,7 @@ import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
 import MapSettings from "@/components/MapSettings";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
+import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
 
 export default function MapPage() {
   // Store minimum scale in a ref
@@ -63,6 +64,14 @@ export default function MapPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
+
+  // Precompute land view clusters in background (always running, even when not visible)
+  const { landViewClusters } = useTerritoryPrecomputation({
+    territories,
+    verboseData,
+    guildColors,
+    enabled: true, // Always precompute for instant toggle
+  });
 
   // Helper function to clamp scale between min and max values
   const clampScale = useCallback((value: number): number => {
@@ -642,6 +651,7 @@ export default function MapPage() {
                 verboseData={verboseData}
                 guildColors={guildColors}
                 scale={scale}
+                precomputedClusters={landViewClusters}
               />
             )}
             {/* Trade routes - only show when territories are visible and Land View is off */}
