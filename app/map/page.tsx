@@ -53,7 +53,7 @@ export default function MapPage() {
   const [hoveredTerritory, setHoveredTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [showTerritories, setShowTerritories] = useState(true);
   const [showTimeOutlines, setShowTimeOutlines] = useState(true);
-  const [showLandView, setShowLandView] = useState(true); // Default true for testing
+  const [showLandView, setShowLandView] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
