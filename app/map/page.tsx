@@ -8,7 +8,7 @@ import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
 import MapSettings from "@/components/MapSettings";
-import { TerritoryVerboseData } from "@/lib/connection-calculator";
+import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 
 export default function MapPage() {
   // Store minimum scale in a ref
@@ -56,6 +56,7 @@ export default function MapPage() {
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
   const [guildColors, setGuildColors] = useState<Record<string, string>>({});
   const [verboseData, setVerboseData] = useState<Record<string, TerritoryVerboseData> | null>(null);
+  const [externalsData, setExternalsData] = useState<TerritoryExternalsData | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -162,6 +163,21 @@ export default function MapPage() {
     }
   };
 
+  // Load territory externals data for HQ external calculations
+  const loadExternalsData = async (): Promise<TerritoryExternalsData> => {
+    try {
+      const response = await fetch('/territory_externals.json');
+      if (response.ok) {
+        return await response.json();
+      }
+      console.warn('Failed to load territory externals data');
+      return {};
+    } catch (error) {
+      console.error('Error loading territory externals data:', error);
+      return {};
+    }
+  };
+
   // Load territories, guild colors, and verbose data from API cache
   useEffect(() => {
     let isMounted = true;
@@ -169,11 +185,12 @@ export default function MapPage() {
     const loadAllData = async () => {
       setIsLoadingTerritories(true);
       try {
-        // Load territories, guild colors, and verbose data in parallel
-        const [territoryData, guildColorData, verboseDataResult] = await Promise.all([
+        // Load territories, guild colors, verbose data, and externals data in parallel
+        const [territoryData, guildColorData, verboseDataResult, externalsDataResult] = await Promise.all([
           loadTerritories(),
           loadGuildColorsData(),
-          loadVerboseData()
+          loadVerboseData(),
+          loadExternalsData()
         ]);
 
         if (isMounted) {
@@ -181,9 +198,11 @@ export default function MapPage() {
           setTerritories({ ...territoryData });
           setGuildColors({ ...guildColorData });
           setVerboseData(verboseDataResult);
+          setExternalsData(externalsDataResult);
           console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
           console.log('🎨 Updated guild colors:', Object.keys(guildColorData).length, 'guilds');
           console.log('📊 Loaded verbose data:', Object.keys(verboseDataResult).length, 'territories');
+          console.log('🔗 Loaded externals data:', Object.keys(externalsDataResult).length, 'territories');
         }
       } catch (error) {
         console.error('Failed to load map data:', error);
@@ -624,6 +643,7 @@ export default function MapPage() {
             guildColors={guildColors}
             territories={territories}
             verboseData={verboseData}
+            externalsData={externalsData}
           />
           
           <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} guildColors={guildColors} />

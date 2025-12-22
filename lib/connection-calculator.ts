@@ -21,6 +21,9 @@ export interface TerritoryVerboseData {
   Acquired: string;
 }
 
+// Pre-computed possible externals for each territory
+export type TerritoryExternalsData = Record<string, string[]>;
+
 export interface ConnectionResult {
   owned: number;
   total: number;
@@ -68,67 +71,40 @@ export function calculateConnections(
   return { owned, total };
 }
 
-// Calculate external territories for HQ bonus
-// Externals are territories within 3 connections of the HQ that the guild owns
+// Calculate external territories for HQ bonus using pre-computed lookup
+// Externals are territories at depth 2-3 from the HQ that the guild owns
 // IMPORTANT: Depth 1 (direct connections) do NOT count as externals
 // Pattern: HQ -> conn (NOT ext) -> ext -> ext -> no effect
 export function calculateExternals(
   hqTerritoryName: string,
   ownerGuildName: string,
   territories: Record<string, Territory>,
-  verboseData: Record<string, TerritoryVerboseData> | null,
-  maxDepth: number = 3
+  externalsData: TerritoryExternalsData | null
 ): number {
-  const visited = new Set<string>();
-  const queue: { name: string; depth: number }[] = [{ name: hqTerritoryName, depth: 0 }];
+  if (!externalsData) return 0;
+
+  const possibleExternals = externalsData[hqTerritoryName];
+  if (!possibleExternals || possibleExternals.length === 0) return 0;
+
   let externals = 0;
-
-  // Helper to get trading routes for a territory
-  const getTradingRoutes = (name: string): string[] => {
-    // Try verbose data first
-    if (verboseData) {
-      const verbose = verboseData[name];
-      if (verbose && verbose["Trading Routes"]) {
-        return verbose["Trading Routes"];
-      }
-    }
-    // Fallback to territory data
-    const territory = territories[name];
-    if (territory && territory["Trading Routes"]) {
-      return territory["Trading Routes"];
-    }
-    return [];
-  };
-
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-
-    if (visited.has(current.name)) continue;
-    visited.add(current.name);
-
-    // Count as external if:
-    // - Not the HQ itself
-    // - Depth >= 2 (connections at depth 1 don't count as externals)
-    // - Territory is owned by the same guild
-    if (current.name !== hqTerritoryName && current.depth >= 2) {
-      const territory = territories[current.name];
-      if (territory && territory.guild.name === ownerGuildName) {
-        externals++;
-      }
-    }
-
-    // Continue BFS if we haven't reached max depth
-    if (current.depth < maxDepth) {
-      const tradingRoutes = getTradingRoutes(current.name);
-      for (const connectedName of tradingRoutes) {
-        if (!visited.has(connectedName)) {
-          queue.push({ name: connectedName, depth: current.depth + 1 });
-        }
-      }
+  for (const externalName of possibleExternals) {
+    const territory = territories[externalName];
+    if (territory && territory.guild.name === ownerGuildName) {
+      externals++;
     }
   }
 
   return externals;
+}
+
+// Get the maximum possible externals for a territory (from pre-computed data)
+export function getMaxPossibleExternals(
+  territoryName: string,
+  externalsData: TerritoryExternalsData | null
+): number {
+  if (!externalsData) return 0;
+  const possibleExternals = externalsData[territoryName];
+  return possibleExternals ? possibleExternals.length : 0;
 }
 
 // Get all guild-owned territories

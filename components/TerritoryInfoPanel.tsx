@@ -24,7 +24,9 @@ import {
 import {
   calculateConnections,
   calculateExternals,
+  getMaxPossibleExternals,
   TerritoryVerboseData,
+  TerritoryExternalsData,
 } from "@/lib/connection-calculator";
 
 interface TerritoryInfoPanelProps {
@@ -34,6 +36,7 @@ interface TerritoryInfoPanelProps {
   guildColors: Record<string, string>;
   territories: Record<string, Territory>;
   verboseData: Record<string, TerritoryVerboseData> | null;
+  externalsData: TerritoryExternalsData | null;
 }
 
 // Validate hex color format
@@ -135,6 +138,7 @@ export default function TerritoryInfoPanel({
   guildColors,
   territories,
   verboseData,
+  externalsData,
 }: TerritoryInfoPanelProps) {
   // Theme detection
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -239,14 +243,20 @@ export default function TerritoryInfoPanel({
 
   // Calculate externals for HQ bonus (always calculate so we can show the auto value)
   const calculatedExternals = useMemo(() => {
-    if (!selectedTerritory || !verboseData) return 0;
+    if (!selectedTerritory || !externalsData) return 0;
     return calculateExternals(
       selectedTerritory.name,
       selectedTerritory.territory.guild.name,
       territories,
-      verboseData
+      externalsData
     );
-  }, [selectedTerritory, territories, verboseData]);
+  }, [selectedTerritory, territories, externalsData]);
+
+  // Get max possible externals for this territory
+  const maxPossibleExternals = useMemo(() => {
+    if (!selectedTerritory || !externalsData) return 0;
+    return getMaxPossibleExternals(selectedTerritory.name, externalsData);
+  }, [selectedTerritory, externalsData]);
 
   // Use override if set, otherwise use calculated value
   const externals = externalsOverride !== null ? externalsOverride : calculatedExternals;
@@ -615,7 +625,7 @@ export default function TerritoryInfoPanel({
           <span style={{ color: 'var(--text-secondary)', minWidth: '70px' }}>Externals</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginRight: '0.5rem', minWidth: '80px', textAlign: 'right' }}>
-              (auto: {calculatedExternals})
+              {externals}/{maxPossibleExternals}
             </span>
             <button
               onClick={() => {
@@ -652,16 +662,17 @@ export default function TerritoryInfoPanel({
             <button
               onClick={() => {
                 const current = externalsOverride !== null ? externalsOverride : calculatedExternals;
-                setExternalsOverride(current + 1);
+                setExternalsOverride(Math.min(maxPossibleExternals, current + 1));
               }}
+              disabled={externals >= maxPossibleExternals}
               style={{
                 width: '24px',
                 height: '24px',
                 borderRadius: '4px',
                 border: '1px solid var(--border-color)',
-                background: '#3a5a3a',
-                color: '#ccffcc',
-                cursor: 'pointer',
+                background: externals >= maxPossibleExternals ? 'var(--bg-secondary)' : '#3a5a3a',
+                color: externals >= maxPossibleExternals ? 'var(--text-secondary)' : '#ccffcc',
+                cursor: externals >= maxPossibleExternals ? 'not-allowed' : 'pointer',
                 fontWeight: 'bold',
                 fontSize: '1rem',
                 display: 'flex',
