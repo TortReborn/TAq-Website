@@ -756,6 +756,81 @@ export function computeLandViewClusters(
   // Phase 4: Process each cluster with exclusions from other clusters
   const result: TerritoryCluster[] = [];
 
+  // Helper function to check if a label bounding box overlaps with any excluded rectangle
+  const labelOverlapsExcluded = (
+    labelX: number,
+    labelY: number,
+    labelWidth: number,
+    labelHeight: number,
+    excludedRects: { minX: number; maxX: number; minY: number; maxY: number }[]
+  ): boolean => {
+    const halfW = labelWidth / 2;
+    const halfH = labelHeight / 2;
+    const labelMinX = labelX - halfW;
+    const labelMaxX = labelX + halfW;
+    const labelMinY = labelY - halfH;
+    const labelMaxY = labelY + halfH;
+
+    for (const rect of excludedRects) {
+      // Check if rectangles overlap
+      if (labelMinX < rect.maxX && labelMaxX > rect.minX &&
+          labelMinY < rect.maxY && labelMaxY > rect.minY) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Helper function to check if a point is inside any excluded rectangle
+  const pointInExcluded = (
+    x: number,
+    y: number,
+    excludedRects: { minX: number; maxX: number; minY: number; maxY: number }[]
+  ): boolean => {
+    for (const rect of excludedRects) {
+      if (x >= rect.minX && x <= rect.maxX && y >= rect.minY && y <= rect.maxY) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Helper function to find the best territory center that doesn't overlap with excluded rectangles
+  const findBestTerritoryCenter = (
+    targetX: number,
+    targetY: number,
+    territoryNames: string[],
+    territories: Record<string, Territory>,
+    excludedRects: { minX: number; maxX: number; minY: number; maxY: number }[]
+  ): { center: [number, number]; rect: { minX: number; maxX: number; minY: number; maxY: number } } => {
+    let bestNonOverlapping: { center: [number, number]; rect: { minX: number; maxX: number; minY: number; maxY: number }; dist: number } | null = null;
+    let closestAny: { center: [number, number]; rect: { minX: number; maxX: number; minY: number; maxY: number }; dist: number } | null = null;
+
+    for (const name of territoryNames) {
+      const territory = territories[name];
+      const rect = getTerritoryRect(territory);
+      const centerX = (rect.minX + rect.maxX) / 2;
+      const centerY = (rect.minY + rect.maxY) / 2;
+      const dist = Math.sqrt(Math.pow(centerX - targetX, 2) + Math.pow(centerY - targetY, 2));
+
+      const isOverlapping = pointInExcluded(centerX, centerY, excludedRects);
+
+      if (!isOverlapping) {
+        if (!bestNonOverlapping || dist < bestNonOverlapping.dist) {
+          bestNonOverlapping = { center: [centerX, centerY], rect, dist };
+        }
+      }
+
+      if (!closestAny || dist < closestAny.dist) {
+        closestAny = { center: [centerX, centerY], rect, dist };
+      }
+    }
+
+    // Prefer non-overlapping, fall back to closest if all overlap
+    const best = bestNonOverlapping || closestAny;
+    return best ? { center: best.center, rect: best.rect } : { center: [targetX, targetY], rect: { minX: targetX - 50, maxX: targetX + 50, minY: targetY - 25, maxY: targetY + 25 } };
+  };
+
   for (let clusterIdx = 0; clusterIdx < preClusters.length; clusterIdx++) {
     const preCluster = preClusters[clusterIdx];
 
@@ -771,6 +846,26 @@ export function computeLandViewClusters(
       excludedRectangles
     );
 
+    // Check if the computed label position overlaps with any other polygon
+    let finalLabelPosition = labelPosition;
+    let finalLabelMaxWidth = labelMaxWidth;
+    let finalLabelMaxHeight = labelMaxHeight;
+
+    if (labelOverlapsExcluded(labelPosition[0], labelPosition[1], labelMaxWidth, labelMaxHeight, excludedRectangles)) {
+      // Find the best territory in this cluster to center the label
+      const { center: fallbackCenter, rect: fallbackRect } = findBestTerritoryCenter(
+        labelPosition[0],
+        labelPosition[1],
+        preCluster.territoryNames,
+        territories,
+        excludedRectangles
+      );
+
+      finalLabelPosition = fallbackCenter;
+      finalLabelMaxWidth = fallbackRect.maxX - fallbackRect.minX;
+      finalLabelMaxHeight = fallbackRect.maxY - fallbackRect.minY;
+    }
+
     result.push({
       guildName: preCluster.guildName,
       guildPrefix: preCluster.guildPrefix,
@@ -779,9 +874,9 @@ export function computeLandViewClusters(
       rectangles: preCluster.rectangles,
       boundingBox: preCluster.boundingBox,
       centroid: preCluster.centroid,
-      labelPosition,
-      labelMaxWidth,
-      labelMaxHeight,
+      labelPosition: finalLabelPosition,
+      labelMaxWidth: finalLabelMaxWidth,
+      labelMaxHeight: finalLabelMaxHeight,
       unionPath,
     });
   }

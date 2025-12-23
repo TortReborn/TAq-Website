@@ -127,8 +127,55 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
 
   // Pre-compute rendered elements to avoid recalculation
   const renderedClusters = useMemo(() => {
-    return clusters.map((cluster, index) => {
-      const { boundingBox, labelPosition, labelMaxWidth, labelMaxHeight, guildPrefix, guildColor, unionPath, guildName } = cluster;
+    const charWidthFactor = 0.65;
+    const heightFactor = 1.2;
+    const padding = 8;
+
+    // Helper function to check if a label bounding box overlaps with any rectangle
+    const labelOverlapsRects = (
+      labelX: number,
+      labelY: number,
+      labelWidth: number,
+      labelHeight: number,
+      rects: { minX: number; maxX: number; minY: number; maxY: number }[]
+    ): boolean => {
+      const halfW = labelWidth / 2;
+      const halfH = labelHeight / 2;
+      const labelMinX = labelX - halfW;
+      const labelMaxX = labelX + halfW;
+      const labelMinY = labelY - halfH;
+      const labelMaxY = labelY + halfH;
+
+      for (const rect of rects) {
+        if (labelMinX < rect.maxX && labelMaxX > rect.minX &&
+            labelMinY < rect.maxY && labelMaxY > rect.minY) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Helper function to get the center of a territory by name
+    const getTerritoryCenter = (name: string): { x: number; y: number; width: number; height: number } | null => {
+      const territory = territories[name];
+      if (!territory?.location) return null;
+      const start = coordToPixel(territory.location.start);
+      const end = coordToPixel(territory.location.end);
+      const minX = Math.min(start[0], end[0]);
+      const maxX = Math.max(start[0], end[0]);
+      const minY = Math.min(start[1], end[1]);
+      const maxY = Math.max(start[1], end[1]);
+      return {
+        x: (minX + maxX) / 2,
+        y: (minY + maxY) / 2,
+        width: maxX - minX,
+        height: maxY - minY
+      };
+    };
+
+    // First pass: calculate font sizes and actual label dimensions
+    const clustersWithFonts = clusters.map((cluster, index) => {
+      const { boundingBox, labelPosition, labelMaxWidth, labelMaxHeight, guildPrefix, guildColor, unionPath, guildName, rectangles, territoryNames } = cluster;
 
       // Calculate font size to fit within the inscribed rectangle
       const boxWidth = boundingBox.maxX - boundingBox.minX;
@@ -137,9 +184,6 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
       // Constrain text to fit within the available label area
       if (guildPrefix && labelMaxWidth > 0 && labelMaxHeight > 0) {
         const chars = guildPrefix.length;
-        const charWidthFactor = 0.65;
-        const heightFactor = 1.2;
-        const padding = 8;
         const availableWidth = labelMaxWidth - padding * 2;
         const availableHeight = labelMaxHeight - padding * 2;
 
@@ -150,6 +194,67 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
       }
 
       fontSize = Math.max(8, fontSize);
+
+      // Calculate actual label dimensions based on computed font size
+      const chars = guildPrefix?.length || 3;
+      const actualLabelWidth = chars * fontSize * charWidthFactor + padding * 2;
+      const actualLabelHeight = fontSize * heightFactor + padding * 2;
+
+      return {
+        index,
+        guildName,
+        guildColor,
+        guildPrefix,
+        unionPath,
+        labelPosition,
+        fontSize,
+        actualLabelWidth,
+        actualLabelHeight,
+        rectangles,
+        territoryNames,
+      };
+    });
+
+    // Second pass: check for overlaps and adjust label positions
+    return clustersWithFonts.map((cluster) => {
+      const { index, guildName, guildColor, guildPrefix, unionPath, labelPosition, fontSize, actualLabelWidth, actualLabelHeight, territoryNames } = cluster;
+
+      // Collect all rectangles from OTHER clusters (not this one)
+      const excludedRects: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
+      for (const otherCluster of clustersWithFonts) {
+        if (otherCluster.index !== index) {
+          excludedRects.push(...otherCluster.rectangles);
+        }
+      }
+
+      let finalLabelPosition = labelPosition;
+
+      // Check if the label overlaps with any other cluster's territory
+      if (labelOverlapsRects(labelPosition[0], labelPosition[1], actualLabelWidth, actualLabelHeight, excludedRects)) {
+        // Try to find a territory in this cluster where the label doesn't overlap
+        let bestFallback: { x: number; y: number; dist: number } | null = null;
+
+        for (const terrName of territoryNames) {
+          const terrCenter = getTerritoryCenter(terrName);
+          if (!terrCenter) continue;
+
+          // Check if this territory center would cause an overlap
+          if (!labelOverlapsRects(terrCenter.x, terrCenter.y, actualLabelWidth, actualLabelHeight, excludedRects)) {
+            const dist = Math.sqrt(
+              Math.pow(terrCenter.x - labelPosition[0], 2) +
+              Math.pow(terrCenter.y - labelPosition[1], 2)
+            );
+            if (!bestFallback || dist < bestFallback.dist) {
+              bestFallback = { x: terrCenter.x, y: terrCenter.y, dist };
+            }
+          }
+        }
+
+        if (bestFallback) {
+          finalLabelPosition = [bestFallback.x, bestFallback.y];
+        }
+      }
+
       const strokeWidth = Math.min(fontSize * 0.15, 4);
 
       return {
@@ -158,12 +263,12 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
         guildColor,
         guildPrefix,
         unionPath,
-        labelPosition,
+        labelPosition: finalLabelPosition,
         fontSize,
         strokeWidth,
       };
     });
-  }, [clusters, zoom]);
+  }, [clusters, zoom, territories]);
 
   return (
     <>
