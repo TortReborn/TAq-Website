@@ -66,6 +66,7 @@ export default function MapPage() {
   const [showTimeOutlines, setShowTimeOutlines] = useState(true);
   const [showLandView, setShowLandView] = useState(false);
   const [showResourceOutlines, setShowResourceOutlines] = useState(false);
+  const [showGuildNames, setShowGuildNames] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
@@ -166,6 +167,10 @@ export default function MapPage() {
     if (cachedShowResourceOutlines !== null) {
       setShowResourceOutlines(cachedShowResourceOutlines === 'true');
     }
+    const cachedShowGuildNames = localStorage.getItem('mapShowGuildNames');
+    if (cachedShowGuildNames !== null) {
+      setShowGuildNames(cachedShowGuildNames === 'true');
+    }
 
     setIsInitialized(true);
   }, []);
@@ -207,6 +212,12 @@ export default function MapPage() {
       localStorage.setItem('mapShowResourceOutlines', String(showResourceOutlines));
     }
   }, [showResourceOutlines, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowGuildNames', String(showGuildNames));
+    }
+  }, [showGuildNames, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
@@ -884,7 +895,8 @@ export default function MapPage() {
                 onMouseLeave={handleTerritoryLeave}
                 guildColors={guildColors}
                 showTimeOutlines={viewMode === 'live' && showTimeOutlines}
-                showResourceOutlines={showResourceOutlines}
+                showResourceOutlines={viewMode === 'live' && showResourceOutlines}
+                showGuildNames={viewMode === 'live' || showGuildNames}
                 verboseData={verboseData?.[name] ?? null}
               />
             ))}
@@ -1032,68 +1044,73 @@ export default function MapPage() {
             
           </div>
 
-          {/* Settings Button - Bottom Right */}
-          <button
-            onClick={() => setShowSettings(prev => !prev)}
-            style={{
-              position: 'absolute',
-              bottom: '1rem',
-              right: '1rem',
-              width: '40px',
-              height: '40px',
-              borderRadius: '0.5rem',
-              border: '2px solid var(--border-color)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              fontSize: '1.25rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              zIndex: 10
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--bg-secondary)';
-              e.currentTarget.style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--bg-card)';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-            title="Map Settings"
-          >
-            ⚙
-          </button>
-
-          {/* Map Settings Panel */}
-          <MapSettings
-            isOpen={showSettings}
-            onClose={() => setShowSettings(false)}
-            showTerritories={showTerritories}
-            onShowTerritoriesChange={setShowTerritories}
-            showTimeOutlines={showTimeOutlines}
-            onShowTimeOutlinesChange={setShowTimeOutlines}
-            showLandView={showLandView}
-            onShowLandViewChange={setShowLandView}
-            showResourceOutlines={showResourceOutlines}
-            onShowResourceOutlinesChange={setShowResourceOutlines}
-          />
-
-          {/* Mode Selector - Bottom Right, next to settings */}
+          {/* Bottom Right Controls Container - Mode selector + Settings */}
           <div style={{
             position: 'absolute',
             bottom: '1rem',
-            right: '4rem',
+            right: '1rem',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            gap: '0.5rem',
             zIndex: 15,
           }}>
+            {/* Mode Selector - always to the left */}
             <MapModeSelector
               mode={viewMode}
               onModeChange={handleModeChange}
               historyAvailable={!!historyBounds}
             />
+
+            {/* Settings Button or Panel */}
+            {showSettings ? (
+              <MapSettings
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                viewMode={viewMode}
+                showTerritories={showTerritories}
+                onShowTerritoriesChange={setShowTerritories}
+                showTimeOutlines={showTimeOutlines}
+                onShowTimeOutlinesChange={setShowTimeOutlines}
+                showLandView={showLandView}
+                onShowLandViewChange={setShowLandView}
+                showResourceOutlines={showResourceOutlines}
+                onShowResourceOutlinesChange={setShowResourceOutlines}
+                showGuildNames={showGuildNames}
+                onShowGuildNamesChange={setShowGuildNames}
+              />
+            ) : (
+              <button
+                onClick={() => setShowSettings(true)}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.5rem',
+                  border: '2px solid var(--border-color)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-card)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+                title="Map Settings"
+              >
+                ⚙
+              </button>
+            )}
           </div>
 
           {/* History Controls - Bottom center, aligned with mode selector */}

@@ -15,6 +15,7 @@ interface TerritoryOverlayProps {
   guildColors: Record<string, string>;
   showTimeOutlines?: boolean;
   showResourceOutlines?: boolean;
+  showGuildNames?: boolean;
   verboseData?: TerritoryVerboseData | null;
 }
 
@@ -78,6 +79,7 @@ export default function TerritoryOverlay({
   guildColors,
   showTimeOutlines = true,
   showResourceOutlines = false,
+  showGuildNames = true,
   verboseData,
 }: TerritoryOverlayProps) {
   // Use scale prop for zoom, define at top
@@ -405,7 +407,7 @@ export default function TerritoryOverlay({
         />
       ))}
       {/* Guild tag centered in territory, bold white blocky font with black outline */}
-      {territory.guild.prefix && (
+      {showGuildNames && territory.guild.prefix && (
         <>
           {/* Double production icon - double up arrows shown in resource view for territories with 7200+ total non-emerald resources */}
           {showResourceOutlines && isDoubleProduction && (() => {

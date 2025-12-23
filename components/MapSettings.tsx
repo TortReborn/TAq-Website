@@ -5,6 +5,8 @@ import React from "react";
 interface MapSettingsProps {
   isOpen: boolean;
   onClose: () => void;
+  viewMode: 'live' | 'history';
+  // Live mode settings
   showTerritories: boolean;
   onShowTerritoriesChange: (value: boolean) => void;
   showTimeOutlines: boolean;
@@ -13,6 +15,9 @@ interface MapSettingsProps {
   onShowLandViewChange: (value: boolean) => void;
   showResourceOutlines: boolean;
   onShowResourceOutlinesChange: (value: boolean) => void;
+  // History mode settings
+  showGuildNames: boolean;
+  onShowGuildNamesChange: (value: boolean) => void;
 }
 
 // Compact toggle switch component for grid layout
@@ -83,6 +88,7 @@ function ToggleSwitch({
 export default function MapSettings({
   isOpen,
   onClose,
+  viewMode,
   showTerritories,
   onShowTerritoriesChange,
   showTimeOutlines,
@@ -91,12 +97,14 @@ export default function MapSettings({
   onShowLandViewChange,
   showResourceOutlines,
   onShowResourceOutlinesChange,
+  showGuildNames,
+  onShowGuildNamesChange,
 }: MapSettingsProps) {
   if (!isOpen) return null;
 
-  // Settings organized in columns (each column is rendered top to bottom)
-  // Grid expands to the left, so rightmost column comes first in array
-  const settings = [
+  // Different settings based on view mode
+  const settings = viewMode === 'live' ? [
+    // Live mode: Full settings in 2 columns
     // Column 2 (rightmost)
     [
       { key: "landView", label: "Land View", checked: showLandView, onChange: onShowLandViewChange, disabled: false },
@@ -107,21 +115,23 @@ export default function MapSettings({
       { key: "territories", label: "Territories", checked: showTerritories, onChange: onShowTerritoriesChange, disabled: showLandView },
       { key: "timeOutlines", label: "Time Outlines", checked: showTimeOutlines, onChange: onShowTimeOutlinesChange, disabled: showLandView },
     ],
+  ] : [
+    // History mode: Only guild names toggle (single column)
+    [
+      { key: "guildNames", label: "Guild Names", checked: showGuildNames, onChange: onShowGuildNamesChange, disabled: false },
+    ],
   ];
 
   return (
     <div
       style={{
-        position: "absolute",
-        bottom: "1rem",
-        right: "1rem",
         backgroundColor: "var(--bg-card-solid)",
         border: "2px solid var(--border-color)",
         borderRadius: "0.5rem",
         padding: "0.5rem",
-        zIndex: 1001,
         boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
         pointerEvents: "auto",
+        position: "relative",
       }}
       onWheel={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
