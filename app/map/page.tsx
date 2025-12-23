@@ -67,6 +67,7 @@ export default function MapPage() {
   const [showLandView, setShowLandView] = useState(false);
   const [showResourceOutlines, setShowResourceOutlines] = useState(false);
   const [showGuildNames, setShowGuildNames] = useState(true);
+  const [showTradeRoutes, setShowTradeRoutes] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
@@ -171,6 +172,14 @@ export default function MapPage() {
     if (cachedShowGuildNames !== null) {
       setShowGuildNames(cachedShowGuildNames === 'true');
     }
+    const cachedShowTradeRoutes = localStorage.getItem('mapShowTradeRoutes');
+    if (cachedShowTradeRoutes !== null) {
+      setShowTradeRoutes(cachedShowTradeRoutes === 'true');
+    }
+    const cachedViewMode = localStorage.getItem('mapViewMode');
+    if (cachedViewMode === 'live' || cachedViewMode === 'history') {
+      setViewMode(cachedViewMode);
+    }
 
     setIsInitialized(true);
   }, []);
@@ -219,6 +228,18 @@ export default function MapPage() {
     }
   }, [showGuildNames, isInitialized]);
 
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowTradeRoutes', String(showTradeRoutes));
+    }
+  }, [showTradeRoutes, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapViewMode', viewMode);
+    }
+  }, [viewMode, isInitialized]);
+
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
     try {
@@ -265,44 +286,61 @@ export default function MapPage() {
     }
   };
 
-  // Load territories, guild colors, and verbose data from API cache
+  // Load static data (guild colors, verbose data, externals) - needed for both modes
   useEffect(() => {
     let isMounted = true;
 
-    const loadAllData = async () => {
-      // Skip live data loading when in history mode
-      if (viewMode === 'history') return;
-
-      setIsLoadingTerritories(true);
+    const loadStaticData = async () => {
       try {
-        // Load territories, guild colors, verbose data, and externals data in parallel
-        const [territoryData, guildColorData, verboseDataResult, externalsDataResult] = await Promise.all([
-          loadTerritories(),
+        const [guildColorData, verboseDataResult, externalsDataResult] = await Promise.all([
           loadGuildColorsData(),
           loadVerboseData(),
           loadExternalsData()
         ]);
 
         if (isMounted) {
-          // Force a new object reference to ensure React detects the change
-          setTerritories({ ...territoryData });
           setGuildColors({ ...guildColorData });
           setVerboseData(verboseDataResult);
           setExternalsData(externalsDataResult);
-          console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
-          console.log('🎨 Updated guild colors:', Object.keys(guildColorData).length, 'guilds');
+          console.log('🎨 Loaded guild colors:', Object.keys(guildColorData).length, 'guilds');
           console.log('📊 Loaded verbose data:', Object.keys(verboseDataResult).length, 'territories');
           console.log('🔗 Loaded externals data:', Object.keys(externalsDataResult).length, 'territories');
         }
       } catch (error) {
-        console.error('Failed to load map data:', error);
+        console.error('Failed to load static map data:', error);
+      }
+    };
+
+    loadStaticData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Load live territories from API cache (only in live mode)
+  useEffect(() => {
+    if (viewMode === 'history') return;
+
+    let isMounted = true;
+
+    const loadLiveData = async () => {
+      setIsLoadingTerritories(true);
+      try {
+        const territoryData = await loadTerritories();
+
+        if (isMounted) {
+          setTerritories({ ...territoryData });
+          console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
+        }
+      } catch (error) {
+        console.error('Failed to load live territory data:', error);
       } finally {
         if (isMounted) setIsLoadingTerritories(false);
       }
     };
 
-    loadAllData();
-    const interval = setInterval(loadAllData, 30000); // 30 seconds to match cache TTL
+    loadLiveData();
+    const interval = setInterval(loadLiveData, 30000); // 30 seconds to match cache TTL
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -355,6 +393,14 @@ export default function MapPage() {
       setIsLoadingHistory(false);
     }
   }, []);
+
+  // Load history data when restoring history mode from cache
+  useEffect(() => {
+    if (isInitialized && viewMode === 'history' && historyBounds && loadedSnapshots.length === 0) {
+      const centerDate = new Date(historyBounds.latest);
+      loadWeekSnapshots(centerDate);
+    }
+  }, [isInitialized, viewMode, historyBounds, loadedSnapshots.length, loadWeekSnapshots]);
 
   // Handle mode change
   const handleModeChange = useCallback((mode: 'live' | 'history') => {
@@ -951,8 +997,8 @@ export default function MapPage() {
                 onHoverGuild={handleGuildHover}
               />
             )}
-            {/* Trade routes - only show when territories are visible and Land View is off */}
-            {showTerritories && !showLandView && <TradeRoutesOverlay />}
+            {/* Trade routes - only show when enabled, territories are visible, and Land View is off */}
+            {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay />}
           </div>
 
           {/* Guild Land Tooltip - shown when hovering over land view polygons */}
@@ -1118,6 +1164,8 @@ export default function MapPage() {
                 onShowResourceOutlinesChange={setShowResourceOutlines}
                 showGuildNames={showGuildNames}
                 onShowGuildNamesChange={setShowGuildNames}
+                showTradeRoutes={showTradeRoutes}
+                onShowTradeRoutesChange={setShowTradeRoutes}
               />
             ) : (
               <button

@@ -193,17 +193,17 @@ export default function HistoryTimeline({
           />
         )}
 
-        {/* Progress fill */}
+        {/* Progress fill - uses full border-radius, parent overflow:hidden clips right edge */}
         <div
           style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
             left: 0,
-            width: percentToPosition(currentPercent),
+            right: `${100 - currentPercent}%`,
             background: 'var(--accent-primary)',
             opacity: 0.3,
-            borderRadius: '12px',
+            borderRadius: 'inherit',
           }}
         />
 

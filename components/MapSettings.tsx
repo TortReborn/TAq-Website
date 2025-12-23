@@ -18,6 +18,9 @@ interface MapSettingsProps {
   // History mode settings
   showGuildNames: boolean;
   onShowGuildNamesChange: (value: boolean) => void;
+  // Shared settings (both modes)
+  showTradeRoutes: boolean;
+  onShowTradeRoutesChange: (value: boolean) => void;
 }
 
 // Compact toggle switch component for grid layout
@@ -99,6 +102,8 @@ export default function MapSettings({
   onShowResourceOutlinesChange,
   showGuildNames,
   onShowGuildNamesChange,
+  showTradeRoutes,
+  onShowTradeRoutesChange,
 }: MapSettingsProps) {
   if (!isOpen) return null;
 
@@ -115,10 +120,15 @@ export default function MapSettings({
       { key: "territories", label: "Territories", checked: showTerritories, onChange: onShowTerritoriesChange, disabled: showLandView },
       { key: "timeOutlines", label: "Time Outlines", checked: showTimeOutlines, onChange: onShowTimeOutlinesChange, disabled: showLandView },
     ],
+    // Column 0 (far left)
+    [
+      { key: "tradeRoutes", label: "Trade Routes", checked: showTradeRoutes, onChange: onShowTradeRoutesChange, disabled: showLandView },
+    ],
   ] : [
-    // History mode: Only guild names toggle (single column)
+    // History mode: Guild names and trade routes toggles
     [
       { key: "guildNames", label: "Guild Names", checked: showGuildNames, onChange: onShowGuildNamesChange, disabled: false },
+      { key: "tradeRoutes", label: "Trade Routes", checked: showTradeRoutes, onChange: onShowTradeRoutesChange, disabled: false },
     ],
   ];
 
