@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { loadTerritories, Territory } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import LandViewOverlay from "@/components/LandViewOverlay";
@@ -9,8 +9,19 @@ import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
 import MapSettings from "@/components/MapSettings";
+import MapModeSelector from "@/components/MapModeSelector";
+import MapHistoryControls from "@/components/MapHistoryControls";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
+import {
+  HistoryBounds,
+  expandSnapshot,
+  parseSnapshots,
+  ParsedSnapshot,
+  getNextSnapshot,
+  getPrevSnapshot,
+  findNearestSnapshot,
+} from "@/lib/history-data";
 
 export default function MapPage() {
   // Store minimum scale in a ref
@@ -65,6 +76,17 @@ export default function MapPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
+
+  // History mode state
+  const [viewMode, setViewMode] = useState<'live' | 'history'>('live');
+  const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
+  const [loadedSnapshots, setLoadedSnapshots] = useState<ParsedSnapshot[]>([]);
+  const [loadedWeekCenter, setLoadedWeekCenter] = useState<Date | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [historyBounds, setHistoryBounds] = useState<HistoryBounds | null>(null);
+  const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Precompute land view clusters in background (always running, even when not visible)
   const { landViewClusters } = useTerritoryPrecomputation({
@@ -237,6 +259,9 @@ export default function MapPage() {
     let isMounted = true;
 
     const loadAllData = async () => {
+      // Skip live data loading when in history mode
+      if (viewMode === 'history') return;
+
       setIsLoadingTerritories(true);
       try {
         // Load territories, guild colors, verbose data, and externals data in parallel
@@ -271,7 +296,191 @@ export default function MapPage() {
       isMounted = false;
       clearInterval(interval);
     };
+  }, [viewMode]);
+
+  // Fetch history bounds on page load
+  useEffect(() => {
+    const fetchHistoryBounds = async () => {
+      try {
+        const response = await fetch('/api/map-history/bounds');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.earliest && data.latest) {
+            setHistoryBounds({
+              earliest: data.earliest,
+              latest: data.latest,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch history bounds:', error);
+      }
+    };
+    fetchHistoryBounds();
   }, []);
+
+  // Load a week of snapshots around a center date
+  const loadWeekSnapshots = useCallback(async (centerDate: Date) => {
+    setIsLoadingHistory(true);
+    try {
+      const response = await fetch(`/api/map-history/week?center=${centerDate.toISOString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        const parsed = parseSnapshots(data.snapshots || []);
+        setLoadedSnapshots(parsed);
+        setLoadedWeekCenter(centerDate);
+
+        // Set initial timestamp to center or nearest snapshot
+        if (parsed.length > 0) {
+          const nearest = findNearestSnapshot(parsed, centerDate);
+          if (nearest) {
+            setHistoryTimestamp(nearest.timestamp);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load week snapshots:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, []);
+
+  // Handle mode change
+  const handleModeChange = useCallback((mode: 'live' | 'history') => {
+    setViewMode(mode);
+    if (mode === 'history') {
+      // Stop playback when entering history mode
+      setIsPlaying(false);
+      // Load week around current time (or latest if bounds exist)
+      const centerDate = historyBounds?.latest ? new Date(historyBounds.latest) : new Date();
+      loadWeekSnapshots(centerDate);
+    } else {
+      // Clear history state when returning to live
+      setHistoryTimestamp(null);
+      setLoadedSnapshots([]);
+      setLoadedWeekCenter(null);
+      setIsPlaying(false);
+    }
+  }, [historyBounds, loadWeekSnapshots]);
+
+  // Handle timeline scrubbing
+  const handleTimeChange = useCallback((date: Date) => {
+    setHistoryTimestamp(date);
+
+    // Check if we need to load more snapshots (approaching edge of loaded week)
+    if (loadedWeekCenter) {
+      const dayInMs = 24 * 60 * 60 * 1000;
+      const distanceFromCenter = Math.abs(date.getTime() - loadedWeekCenter.getTime());
+      // If within 1 day of the 3.5-day boundary, preload next week
+      if (distanceFromCenter > 2.5 * dayInMs) {
+        loadWeekSnapshots(date);
+      }
+    }
+  }, [loadedWeekCenter, loadWeekSnapshots]);
+
+  // Handle date picker jump
+  const handleJumpToDate = useCallback((date: Date) => {
+    setHistoryTimestamp(date);
+    // Always load a new week when jumping
+    loadWeekSnapshots(date);
+  }, [loadWeekSnapshots]);
+
+  // Get current snapshot index
+  const currentSnapshotIndex = useMemo(() => {
+    if (!historyTimestamp || loadedSnapshots.length === 0) return -1;
+    const nearest = findNearestSnapshot(loadedSnapshots, historyTimestamp);
+    return nearest ? loadedSnapshots.indexOf(nearest) : -1;
+  }, [historyTimestamp, loadedSnapshots]);
+
+  // Step forward/backward handlers
+  const handleStepForward = useCallback(() => {
+    const next = getNextSnapshot(loadedSnapshots, historyTimestamp || new Date());
+    if (next) {
+      setHistoryTimestamp(next.timestamp);
+    }
+  }, [loadedSnapshots, historyTimestamp]);
+
+  const handleStepBackward = useCallback(() => {
+    const prev = getPrevSnapshot(loadedSnapshots, historyTimestamp || new Date());
+    if (prev) {
+      setHistoryTimestamp(prev.timestamp);
+    }
+  }, [loadedSnapshots, historyTimestamp]);
+
+  // Go to first/latest handlers
+  const handleGoToFirst = useCallback(() => {
+    if (loadedSnapshots.length > 0) {
+      setHistoryTimestamp(loadedSnapshots[0].timestamp);
+    }
+  }, [loadedSnapshots]);
+
+  const handleGoToLatest = useCallback(() => {
+    if (loadedSnapshots.length > 0) {
+      setHistoryTimestamp(loadedSnapshots[loadedSnapshots.length - 1].timestamp);
+    }
+  }, [loadedSnapshots]);
+
+  // Playback logic
+  useEffect(() => {
+    if (isPlaying && viewMode === 'history') {
+      // Calculate interval based on speed (base: 1 second per snapshot at 1x)
+      const intervalMs = 1000 / playbackSpeed;
+
+      playbackIntervalRef.current = setInterval(() => {
+        const next = getNextSnapshot(loadedSnapshots, historyTimestamp || new Date());
+        if (next) {
+          setHistoryTimestamp(next.timestamp);
+
+          // Check if approaching edge of loaded data
+          if (loadedWeekCenter) {
+            const dayInMs = 24 * 60 * 60 * 1000;
+            const distanceFromCenter = Math.abs(next.timestamp.getTime() - loadedWeekCenter.getTime());
+            if (distanceFromCenter > 2.5 * dayInMs) {
+              loadWeekSnapshots(next.timestamp);
+            }
+          }
+        } else {
+          // Reached the end of available snapshots
+          setIsPlaying(false);
+        }
+      }, intervalMs);
+
+      return () => {
+        if (playbackIntervalRef.current) {
+          clearInterval(playbackIntervalRef.current);
+        }
+      };
+    }
+  }, [isPlaying, playbackSpeed, loadedSnapshots, historyTimestamp, viewMode, loadedWeekCenter, loadWeekSnapshots]);
+
+  // Get history territories (expanded from snapshot)
+  const historyTerritories = useMemo(() => {
+    if (viewMode !== 'history' || !historyTimestamp || loadedSnapshots.length === 0) {
+      return null;
+    }
+    const snapshot = findNearestSnapshot(loadedSnapshots, historyTimestamp);
+    if (!snapshot) return null;
+    return expandSnapshot(snapshot.territories, verboseData, guildColors);
+  }, [viewMode, historyTimestamp, loadedSnapshots, verboseData, guildColors]);
+
+  // Determine which territories to display
+  const displayTerritories = viewMode === 'history' && historyTerritories
+    ? historyTerritories
+    : territories;
+
+  // Calculate loaded range for timeline display
+  const loadedRange = useMemo(() => {
+    if (loadedSnapshots.length === 0) return undefined;
+    return {
+      start: loadedSnapshots[0].timestamp,
+      end: loadedSnapshots[loadedSnapshots.length - 1].timestamp,
+    };
+  }, [loadedSnapshots]);
+
+  // Get snapshot timestamps for timeline snapping
+  const snapshotTimestamps = useMemo(() => {
+    return loadedSnapshots.map(s => s.timestamp);
+  }, [loadedSnapshots]);
 
   // Prevent body scrolling on this page
   useEffect(() => {
@@ -663,7 +872,7 @@ export default function MapPage() {
               draggable={false}
             />
             {/* Territory Overlays - positioned in map pixel coordinates */}
-            {showTerritories && !showLandView && Object.entries(territories).map(([name, territory]) => (
+            {showTerritories && !showLandView && Object.entries(displayTerritories).map(([name, territory]) => (
               <TerritoryOverlay
                 key={name}
                 name={name}
@@ -674,15 +883,15 @@ export default function MapPage() {
                 onMouseEnter={handleTerritoryHover}
                 onMouseLeave={handleTerritoryLeave}
                 guildColors={guildColors}
-                showTimeOutlines={showTimeOutlines}
+                showTimeOutlines={viewMode === 'live' && showTimeOutlines}
                 showResourceOutlines={showResourceOutlines}
                 verboseData={verboseData?.[name] ?? null}
               />
             ))}
             {/* Land View Overlay - merged guild territories */}
-            {showTerritories && showLandView && (
+            {showTerritories && showLandView && viewMode === 'live' && (
               <LandViewOverlay
-                territories={territories}
+                territories={displayTerritories}
                 verboseData={verboseData}
                 guildColors={guildColors}
                 scale={scale}
@@ -872,6 +1081,56 @@ export default function MapPage() {
             showResourceOutlines={showResourceOutlines}
             onShowResourceOutlinesChange={setShowResourceOutlines}
           />
+
+          {/* Mode Selector - Bottom Right, next to settings */}
+          <div style={{
+            position: 'absolute',
+            bottom: '1rem',
+            right: '4rem',
+            zIndex: 15,
+          }}>
+            <MapModeSelector
+              mode={viewMode}
+              onModeChange={handleModeChange}
+              historyAvailable={!!historyBounds}
+            />
+          </div>
+
+          {/* History Controls - Bottom center, aligned with mode selector */}
+          {viewMode === 'history' && historyBounds && historyTimestamp && (
+            <div
+              onMouseDown={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                bottom: '1rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 15,
+              }}
+            >
+              <MapHistoryControls
+                earliest={new Date(historyBounds.earliest)}
+                latest={new Date(historyBounds.latest)}
+                current={historyTimestamp}
+                onTimeChange={handleTimeChange}
+                onJump={handleJumpToDate}
+                isPlaying={isPlaying}
+                speed={playbackSpeed}
+                onPlayPause={() => setIsPlaying(prev => !prev)}
+                onSpeedChange={setPlaybackSpeed}
+                onStepForward={handleStepForward}
+                onStepBackward={handleStepBackward}
+                onGoToFirst={handleGoToFirst}
+                onGoToLatest={handleGoToLatest}
+                canStepForward={currentSnapshotIndex < loadedSnapshots.length - 1}
+                canStepBackward={currentSnapshotIndex > 0}
+                loadedStart={loadedRange?.start}
+                loadedEnd={loadedRange?.end}
+                isLoading={isLoadingHistory}
+                snapshots={snapshotTimestamps}
+              />
+            </div>
+          )}
         </div>
       </div>
     </main>
