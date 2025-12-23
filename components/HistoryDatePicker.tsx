@@ -41,8 +41,18 @@ export default function HistoryDatePicker({
       alignItems: 'center',
       gap: '0.5rem',
     }}>
+      <style>{`
+        .history-date-input::-webkit-calendar-picker-indicator {
+          filter: var(--calendar-icon-filter, none);
+          cursor: pointer;
+        }
+        [data-theme="dark"] .history-date-input::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+        }
+      `}</style>
       <input
         type="date"
+        className="history-date-input"
         value={dateValue}
         onChange={(e) => setDateValue(e.target.value)}
         min={formatDateInput(earliest)}
@@ -69,7 +79,7 @@ export default function HistoryDatePicker({
           borderRadius: '0.375rem',
           border: 'none',
           background: 'var(--accent-primary)',
-          color: '#fff',
+          color: 'var(--text-on-accent)',
           fontSize: '0.875rem',
           fontWeight: '500',
           cursor: 'pointer',

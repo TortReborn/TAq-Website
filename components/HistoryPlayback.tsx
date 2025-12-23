@@ -87,7 +87,7 @@ export default function HistoryPlayback({
           ...buttonStyle,
           padding: '0.5rem 1rem',
           background: isPlaying ? 'var(--accent-primary)' : 'var(--bg-secondary)',
-          color: isPlaying ? '#fff' : 'var(--text-primary)',
+          color: isPlaying ? 'var(--text-on-accent)' : 'var(--text-primary)',
         }}
         title={isPlaying ? 'Pause' : 'Play'}
       >

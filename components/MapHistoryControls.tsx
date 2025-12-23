@@ -25,6 +25,7 @@ interface MapHistoryControlsProps {
   loadedEnd?: Date;
   isLoading?: boolean;
   snapshots?: Date[];
+  onRefresh?: () => void;
 }
 
 export default function MapHistoryControls({
@@ -47,6 +48,7 @@ export default function MapHistoryControls({
   loadedEnd,
   isLoading,
   snapshots,
+  onRefresh,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -129,31 +131,88 @@ export default function MapHistoryControls({
         userSelect: 'none',
       }}
     >
-      {/* Loading indicator */}
-      {isLoading && (
-        <div style={{
-          position: 'absolute',
-          top: '0.5rem',
-          right: '0.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          fontSize: '0.75rem',
-          color: 'var(--text-secondary)',
-        }}>
-          <div
-            style={{
-              width: '12px',
-              height: '12px',
-              border: '2px solid var(--border-color)',
-              borderTopColor: 'var(--accent-primary)',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
+      {/* Top right controls - Refresh button and loading indicator */}
+      <div style={{
+        position: 'absolute',
+        top: '0.5rem',
+        right: '0.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+      }}>
+        {/* Loading indicator */}
+        {isLoading && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.75rem',
+            color: 'var(--text-secondary)',
+          }}>
+            <div
+              style={{
+                width: '12px',
+                height: '12px',
+                border: '2px solid var(--border-color)',
+                borderTopColor: 'var(--accent-primary)',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            Loading...
+          </div>
+        )}
+        {/* Refresh button */}
+        {onRefresh && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRefresh();
             }}
-          />
-          Loading...
-        </div>
-      )}
+            onMouseDown={(e) => e.stopPropagation()}
+            disabled={isLoading}
+            title="Refresh history data"
+            style={{
+              width: '24px',
+              height: '24px',
+              padding: 0,
+              borderRadius: '0.25rem',
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--text-secondary)',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: isLoading ? 0.5 : 1,
+              transition: 'color 0.15s ease, opacity 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+              <path d="M21 21v-5h-5" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {/* Timeline */}
       <HistoryTimeline

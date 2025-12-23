@@ -203,7 +203,7 @@ export default function HistoryTimeline({
             width: percentToPosition(currentPercent),
             background: 'var(--accent-primary)',
             opacity: 0.3,
-            borderRadius: '12px 0 0 12px',
+            borderRadius: '12px',
           }}
         />
 

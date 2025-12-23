@@ -128,6 +128,11 @@
   --bg-secondary: rgba(232, 251, 255, 0.3);
   --border-color: rgba(255, 255, 255, 0.3);
   
+  /* Accent colors */
+  --accent-primary: #3b82f6;
+  --text-on-accent: #ffffff;
+  --bg-tertiary: rgba(232, 251, 255, 0.5);
+
   /* Table colors */
   --table-header-bg: rgba(232, 251, 255, 0.7);
   --table-header-text: var(--color-ocean-800);
@@ -156,6 +161,11 @@
   --bg-secondary: rgba(51, 65, 85, 0.4);
   --border-color: rgba(71, 85, 105, 0.3);
   
+  /* Accent colors - Dark mode */
+  --accent-primary: #3b82f6;
+  --text-on-accent: #ffffff;
+  --bg-tertiary: rgba(51, 65, 85, 0.6);
+
   /* Table colors - Dark mode */
   --table-header-bg: rgba(51, 65, 85, 0.8);
   --table-header-text: #e2e8f0;

@@ -396,6 +396,46 @@ export default function MapPage() {
     loadWeekSnapshots(date);
   }, [loadWeekSnapshots]);
 
+  // Handle history refresh - re-fetch bounds and load latest data
+  const handleHistoryRefresh = useCallback(async () => {
+    // Stop playback
+    setIsPlaying(false);
+    setIsLoadingHistory(true);
+
+    try {
+      // Re-fetch bounds
+      const boundsResponse = await fetch('/api/map-history/bounds');
+      if (boundsResponse.ok) {
+        const boundsData = await boundsResponse.json();
+        if (boundsData.earliest && boundsData.latest) {
+          setHistoryBounds({
+            earliest: boundsData.earliest,
+            latest: boundsData.latest,
+          });
+
+          // Load week around the new latest timestamp
+          const latestDate = new Date(boundsData.latest);
+          const response = await fetch(`/api/map-history/week?center=${latestDate.toISOString()}`);
+          if (response.ok) {
+            const data = await response.json();
+            const parsed = parseSnapshots(data.snapshots || []);
+            setLoadedSnapshots(parsed);
+            setLoadedWeekCenter(latestDate);
+
+            // Jump to the latest snapshot
+            if (parsed.length > 0) {
+              setHistoryTimestamp(parsed[parsed.length - 1].timestamp);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to refresh history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, []);
+
   // Get current snapshot index
   const currentSnapshotIndex = useMemo(() => {
     if (!historyTimestamp || loadedSnapshots.length === 0) return -1;
@@ -969,7 +1009,7 @@ export default function MapPage() {
             externalsData={externalsData}
           />
           
-          <GuildTerritoryCount territories={territories} onGuildClick={handleGuildZoom} guildColors={guildColors} showLandView={showLandView} />
+          <GuildTerritoryCount territories={displayTerritories} onGuildClick={handleGuildZoom} guildColors={guildColors} showLandView={showLandView} />
 
           {/* Zoom Controls */}
           <div style={{
@@ -1145,6 +1185,7 @@ export default function MapPage() {
                 loadedEnd={loadedRange?.end}
                 isLoading={isLoadingHistory}
                 snapshots={snapshotTimestamps}
+                onRefresh={handleHistoryRefresh}
               />
             </div>
           )}

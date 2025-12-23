@@ -33,7 +33,7 @@ export default function MapModeSelector({
           fontWeight: mode === 'live' ? '600' : '400',
           fontSize: '0.875rem',
           background: mode === 'live' ? 'var(--accent-primary)' : 'transparent',
-          color: mode === 'live' ? '#fff' : 'var(--text-secondary)',
+          color: mode === 'live' ? 'var(--text-on-accent)' : 'var(--text-secondary)',
           transition: 'all 0.15s ease',
         }}
       >
@@ -51,7 +51,7 @@ export default function MapModeSelector({
           fontWeight: mode === 'history' ? '600' : '400',
           fontSize: '0.875rem',
           background: mode === 'history' ? 'var(--accent-primary)' : 'transparent',
-          color: mode === 'history' ? '#fff' : 'var(--text-secondary)',
+          color: mode === 'history' ? 'var(--text-on-accent)' : 'var(--text-secondary)',
           opacity: historyAvailable ? 1 : 0.5,
           transition: 'all 0.15s ease',
         }}
