@@ -288,20 +288,29 @@ export default function TerritoryInfoPanel({
   // Get treasury info
   const treasuryInfo = useMemo(() => getTreasuryTier(timeHeld), [timeHeld]);
 
-  // Get resources
+  // Get resources from verboseData
   const resources = useMemo(() => {
-    if (!selectedTerritory?.territory.resources) return [];
-    const res = selectedTerritory.territory.resources;
+    if (!selectedTerritory || !verboseData) return [];
+    const territoryVerbose = verboseData[selectedTerritory.name];
+    if (!territoryVerbose?.resources) return [];
+
+    const res = territoryVerbose.resources;
     const resourceList: { type: string; amount: string }[] = [];
 
-    if (res.emeralds && res.emeralds !== '0') resourceList.push({ type: 'emeralds', amount: res.emeralds });
+    // Only show emeralds if > 9000
+    const emeraldAmount = parseInt(res.emeralds || '0', 10);
+    if (emeraldAmount > 9000) {
+      resourceList.push({ type: 'emeralds', amount: res.emeralds });
+    }
+
+    // Show other resources if > 0
     if (res.ore && res.ore !== '0') resourceList.push({ type: 'ore', amount: res.ore });
     if (res.wood && res.wood !== '0') resourceList.push({ type: 'wood', amount: res.wood });
     if (res.fish && res.fish !== '0') resourceList.push({ type: 'fish', amount: res.fish });
     if (res.crops && res.crops !== '0') resourceList.push({ type: 'crops', amount: res.crops });
 
     return resourceList;
-  }, [selectedTerritory?.territory.resources]);
+  }, [selectedTerritory, verboseData]);
 
   if (!selectedTerritory) return null;
 

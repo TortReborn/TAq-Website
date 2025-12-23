@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { Territory, coordToPixel } from "@/lib/utils";
+import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
 interface TerritoryOverlayProps {
   name: string;
@@ -13,11 +14,23 @@ interface TerritoryOverlayProps {
   onMouseLeave?: () => void;
   guildColors: Record<string, string>;
   showTimeOutlines?: boolean;
+  showResourceOutlines?: boolean;
+  verboseData?: TerritoryVerboseData | null;
 }
 
 // Stroke width for territory outlines
 const STROKE_WIDTH = 4;
 const STROKE_INSET = STROKE_WIDTH / 2; // Inset to keep stroke inside territory bounds
+
+// Resource colors
+const RESOURCE_COLORS: Record<string, string> = {
+  emeralds: "#4CAF50", // Green
+  ore: "#B0BEC5",      // Gray/white
+  wood: "#8D6E63",     // Brown
+  crops: "#FFEB3B",    // Yellow
+  fish: "#2196F3",     // Blue
+};
+
 
 // Get outline style based on time held
 function getTimeBasedOutline(acquiredTime: string, currentTime: number): {
@@ -63,7 +76,9 @@ export default function TerritoryOverlay({
   onMouseEnter,
   onMouseLeave,
   guildColors,
-  showTimeOutlines = true
+  showTimeOutlines = true,
+  showResourceOutlines = false,
+  verboseData,
 }: TerritoryOverlayProps) {
   // Use scale prop for zoom, define at top
   const zoom = scale;
@@ -113,6 +128,36 @@ export default function TerritoryOverlay({
     return '#FFFFFF';
   }, [territory.guild.name, territory.guild.prefix, guildColors]);
 
+  // Calculate active resources for this territory
+  const activeResources = useMemo(() => {
+    if (!verboseData?.resources) return [];
+
+    const resources: { key: string; color: string }[] = [];
+    const res = verboseData.resources;
+
+    // Only show emeralds if > 9000
+    const emeraldAmount = parseInt(res.emeralds || '0', 10);
+    if (emeraldAmount > 9000) {
+      resources.push({ key: 'emeralds', color: RESOURCE_COLORS.emeralds });
+    }
+
+    // Other resources: show if > 0
+    if (res.ore && parseInt(res.ore, 10) > 0) {
+      resources.push({ key: 'ore', color: RESOURCE_COLORS.ore });
+    }
+    if (res.wood && parseInt(res.wood, 10) > 0) {
+      resources.push({ key: 'wood', color: RESOURCE_COLORS.wood });
+    }
+    if (res.crops && parseInt(res.crops, 10) > 0) {
+      resources.push({ key: 'crops', color: RESOURCE_COLORS.crops });
+    }
+    if (res.fish && parseInt(res.fish, 10) > 0) {
+      resources.push({ key: 'fish', color: RESOURCE_COLORS.fish });
+    }
+
+    return resources;
+  }, [verboseData]);
+
   // Get four corners in pixel coordinates
   const start = coordToPixel(territory.location.start);
   const end = coordToPixel(territory.location.end);
@@ -124,6 +169,87 @@ export default function TerritoryOverlay({
   const bottomLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
 
   const points = [topLeft, topRight, bottomRight, bottomLeft].map(p => p.join(",")).join(" ");
+
+  // Calculate resource fill sections (quadrants/corners)
+  const resourceFillData = useMemo(() => {
+    if (!showResourceOutlines || activeResources.length === 0) return null;
+
+    const inset = STROKE_INSET;
+    const minX = Math.min(start[0], end[0]) + inset;
+    const maxX = Math.max(start[0], end[0]) - inset;
+    const minY = Math.min(start[1], end[1]) + inset;
+    const maxY = Math.max(start[1], end[1]) - inset;
+
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    const sections: { color: string; points: string }[] = [];
+
+    // For single resource, fill the whole territory
+    if (activeResources.length === 1) {
+      const points = `${minX},${minY} ${maxX},${minY} ${maxX},${maxY} ${minX},${maxY}`;
+      return [{ color: activeResources[0].color, points }];
+    }
+
+    // For 2 resources: split into left and right halves
+    if (activeResources.length === 2) {
+      // Left half
+      sections.push({
+        color: activeResources[0].color,
+        points: `${minX},${minY} ${centerX},${minY} ${centerX},${maxY} ${minX},${maxY}`,
+      });
+      // Right half
+      sections.push({
+        color: activeResources[1].color,
+        points: `${centerX},${minY} ${maxX},${minY} ${maxX},${maxY} ${centerX},${maxY}`,
+      });
+      return sections;
+    }
+
+    // For 3 resources: top-left, top-right, bottom (full width)
+    if (activeResources.length === 3) {
+      // Top-left quadrant
+      sections.push({
+        color: activeResources[0].color,
+        points: `${minX},${minY} ${centerX},${minY} ${centerX},${centerY} ${minX},${centerY}`,
+      });
+      // Top-right quadrant
+      sections.push({
+        color: activeResources[1].color,
+        points: `${centerX},${minY} ${maxX},${minY} ${maxX},${centerY} ${centerX},${centerY}`,
+      });
+      // Bottom half (full width)
+      sections.push({
+        color: activeResources[2].color,
+        points: `${minX},${centerY} ${maxX},${centerY} ${maxX},${maxY} ${minX},${maxY}`,
+      });
+      return sections;
+    }
+
+    // For 4+ resources: four quadrants (corners)
+    // Top-left quadrant
+    sections.push({
+      color: activeResources[0].color,
+      points: `${minX},${minY} ${centerX},${minY} ${centerX},${centerY} ${minX},${centerY}`,
+    });
+    // Top-right quadrant
+    sections.push({
+      color: activeResources[1].color,
+      points: `${centerX},${minY} ${maxX},${minY} ${maxX},${centerY} ${centerX},${centerY}`,
+    });
+    // Bottom-right quadrant
+    sections.push({
+      color: activeResources[2].color,
+      points: `${centerX},${centerY} ${maxX},${centerY} ${maxX},${maxY} ${centerX},${maxY}`,
+    });
+    // Bottom-left quadrant
+    sections.push({
+      color: activeResources[3].color,
+      points: `${minX},${centerY} ${centerX},${centerY} ${centerX},${maxY} ${minX},${maxY}`,
+    });
+
+    return sections;
+  }, [showResourceOutlines, activeResources, start, end]);
 
   // SVG overlay positioned absolutely over the map
   // Dynamically size the guild tag so it fits inside the territory box
@@ -256,6 +382,16 @@ export default function TerritoryOverlay({
           </>
         );
       })()}
+      {/* Resource fill sections */}
+      {resourceFillData && resourceFillData.map((section, index) => (
+        <polygon
+          key={`resource-${index}`}
+          points={section.points}
+          fill={section.color + "90"}
+          stroke="none"
+          style={{ pointerEvents: "none" }}
+        />
+      ))}
       {/* Guild tag centered in territory, bold white blocky font with black outline */}
       {territory.guild.prefix && (
         <>

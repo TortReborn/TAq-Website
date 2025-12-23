@@ -54,6 +54,7 @@ export default function MapPage() {
   const [showTerritories, setShowTerritories] = useState(true);
   const [showTimeOutlines, setShowTimeOutlines] = useState(true);
   const [showLandView, setShowLandView] = useState(false);
+  const [showResourceOutlines, setShowResourceOutlines] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
@@ -139,6 +140,10 @@ export default function MapPage() {
     if (cachedShowLandView !== null) {
       setShowLandView(cachedShowLandView === 'true');
     }
+    const cachedShowResourceOutlines = localStorage.getItem('mapShowResourceOutlines');
+    if (cachedShowResourceOutlines !== null) {
+      setShowResourceOutlines(cachedShowResourceOutlines === 'true');
+    }
 
     setIsInitialized(true);
   }, []);
@@ -174,6 +179,12 @@ export default function MapPage() {
       localStorage.setItem('mapShowLandView', String(showLandView));
     }
   }, [showLandView, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowResourceOutlines', String(showResourceOutlines));
+    }
+  }, [showResourceOutlines, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
@@ -664,6 +675,8 @@ export default function MapPage() {
                 onMouseLeave={handleTerritoryLeave}
                 guildColors={guildColors}
                 showTimeOutlines={showTimeOutlines}
+                showResourceOutlines={showResourceOutlines}
+                verboseData={verboseData?.[name] ?? null}
               />
             ))}
             {/* Land View Overlay - merged guild territories */}
@@ -720,6 +733,7 @@ export default function MapPage() {
             <TerritoryHoverPanel
               territory={hoveredTerritory}
               guildColors={guildColors}
+              verboseData={hoveredTerritory ? verboseData?.[hoveredTerritory.name] ?? null : null}
             />
           )}
 
@@ -855,6 +869,8 @@ export default function MapPage() {
             onShowTimeOutlinesChange={setShowTimeOutlines}
             showLandView={showLandView}
             onShowLandViewChange={setShowLandView}
+            showResourceOutlines={showResourceOutlines}
+            onShowResourceOutlinesChange={setShowResourceOutlines}
           />
         </div>
       </div>

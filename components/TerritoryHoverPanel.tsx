@@ -3,10 +3,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { Territory, getContrastColor } from "@/lib/utils";
 import { getTreasuryTier, formatTimeHeld } from "@/lib/tower-stats";
+import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
 interface TerritoryHoverPanelProps {
   territory: { name: string; territory: Territory } | null;
   guildColors: Record<string, string>;
+  verboseData?: TerritoryVerboseData | null;
 }
 
 // Validate hex color format
@@ -15,7 +17,7 @@ function isValidHexColor(color: string | undefined): boolean {
   return /^#[0-9A-Fa-f]{6}$/.test(color);
 }
 
-export default function TerritoryHoverPanel({ territory, guildColors }: TerritoryHoverPanelProps) {
+export default function TerritoryHoverPanel({ territory, guildColors, verboseData }: TerritoryHoverPanelProps) {
   const [timeHeld, setTimeHeld] = useState<number>(0);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
@@ -79,20 +81,26 @@ export default function TerritoryHoverPanel({ territory, guildColors }: Territor
   // Get treasury info
   const treasuryInfo = useMemo(() => getTreasuryTier(timeHeld), [timeHeld]);
 
-  // Get resources
+  // Get resources from verboseData
   const resources = useMemo(() => {
-    if (!territory?.territory.resources) return [];
-    const res = territory.territory.resources;
+    if (!verboseData?.resources) return [];
+    const res = verboseData.resources;
     const resourceList: { type: string; amount: string }[] = [];
 
-    if (res.emeralds && res.emeralds !== '0') resourceList.push({ type: 'emeralds', amount: res.emeralds });
+    // Only show emeralds if > 9000
+    const emeraldAmount = parseInt(res.emeralds || '0', 10);
+    if (emeraldAmount > 9000) {
+      resourceList.push({ type: 'emeralds', amount: res.emeralds });
+    }
+
+    // Show other resources if > 0
     if (res.ore && res.ore !== '0') resourceList.push({ type: 'ore', amount: res.ore });
     if (res.wood && res.wood !== '0') resourceList.push({ type: 'wood', amount: res.wood });
     if (res.fish && res.fish !== '0') resourceList.push({ type: 'fish', amount: res.fish });
     if (res.crops && res.crops !== '0') resourceList.push({ type: 'crops', amount: res.crops });
 
     return resourceList;
-  }, [territory?.territory.resources]);
+  }, [verboseData?.resources]);
 
   if (!territory) return null;
 

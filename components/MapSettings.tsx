@@ -11,6 +11,8 @@ interface MapSettingsProps {
   onShowTimeOutlinesChange: (value: boolean) => void;
   showLandView: boolean;
   onShowLandViewChange: (value: boolean) => void;
+  showResourceOutlines: boolean;
+  onShowResourceOutlinesChange: (value: boolean) => void;
 }
 
 // Compact toggle switch component for grid layout
@@ -87,6 +89,8 @@ export default function MapSettings({
   onShowTimeOutlinesChange,
   showLandView,
   onShowLandViewChange,
+  showResourceOutlines,
+  onShowResourceOutlinesChange,
 }: MapSettingsProps) {
   if (!isOpen) return null;
 
@@ -96,8 +100,9 @@ export default function MapSettings({
     // Column 2 (rightmost)
     [
       { key: "landView", label: "Land View", checked: showLandView, onChange: onShowLandViewChange, disabled: false },
+      { key: "resourceOutlines", label: "Resources", checked: showResourceOutlines, onChange: onShowResourceOutlinesChange, disabled: showLandView },
     ],
-    // Column 1
+    // Column 1 (leftmost)
     [
       { key: "territories", label: "Territories", checked: showTerritories, onChange: onShowTerritoriesChange, disabled: showLandView },
       { key: "timeOutlines", label: "Time Outlines", checked: showTimeOutlines, onChange: onShowTimeOutlinesChange, disabled: showLandView },
