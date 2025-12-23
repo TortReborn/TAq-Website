@@ -619,7 +619,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {children}
         </main>
-        <Analytics />
+        <Analytics
+          beforeSend={(event) => {
+            // Check if developer mode is enabled (set via console or bookmarklet)
+            if (typeof window !== 'undefined' && localStorage.getItem('disableAnalytics') === 'true') {
+              return null; // Don't send the event
+            }
+            return event;
+          }}
+        />
         <BottomBar />
       </body>
     </html>
