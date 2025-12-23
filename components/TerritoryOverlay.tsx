@@ -158,6 +158,18 @@ export default function TerritoryOverlay({
     return resources;
   }, [verboseData]);
 
+  // Check if this is a double production territory (7200+ total non-emerald resources)
+  const isDoubleProduction = useMemo(() => {
+    if (!verboseData?.resources) return false;
+    const res = verboseData.resources;
+    const ore = parseInt(res.ore || '0', 10);
+    const wood = parseInt(res.wood || '0', 10);
+    const crops = parseInt(res.crops || '0', 10);
+    const fish = parseInt(res.fish || '0', 10);
+    const total = ore + wood + crops + fish;
+    return total >= 7200;
+  }, [verboseData]);
+
   // Get four corners in pixel coordinates
   const start = coordToPixel(territory.location.start);
   const end = coordToPixel(territory.location.end);
@@ -395,6 +407,31 @@ export default function TerritoryOverlay({
       {/* Guild tag centered in territory, bold white blocky font with black outline */}
       {territory.guild.prefix && (
         <>
+          {/* Double production icon - double up arrows shown in resource view for territories with 7200+ total non-emerald resources */}
+          {showResourceOutlines && isDoubleProduction && (() => {
+            const iconSize = Math.max(16, fontSize * 0.5);
+            const iconX = topLeft[0] + iconSize / 2 + 6;
+            const iconY = topLeft[1] + iconSize / 2 + 6;
+            const strokeW = Math.max(2, iconSize * 0.15);
+            const arrowW = iconSize * 0.7;
+            const arrowH = iconSize * 0.4;
+            const gap = iconSize * 0.15;
+            // Two chevrons/arrows pointing up
+            const arrow1Y = iconY - gap / 2 - arrowH / 2;
+            const arrow2Y = iconY + gap / 2 + arrowH / 2;
+            const arrowPath = `M${iconX - arrowW / 2},${arrow1Y + arrowH / 2} L${iconX},${arrow1Y - arrowH / 2} L${iconX + arrowW / 2},${arrow1Y + arrowH / 2} M${iconX - arrowW / 2},${arrow2Y + arrowH / 2} L${iconX},${arrow2Y - arrowH / 2} L${iconX + arrowW / 2},${arrow2Y + arrowH / 2}`;
+            return (
+              <path
+                d={arrowPath}
+                fill="none"
+                stroke="#fff"
+                strokeWidth={strokeW}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ pointerEvents: 'none', filter: 'drop-shadow(1px 1px 1px #000) drop-shadow(-1px -1px 1px #000)' }}
+              />
+            );
+          })()}
           <text
             strokeLinejoin="round"
             x={(topLeft[0] + bottomRight[0]) / 2}
