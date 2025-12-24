@@ -2,6 +2,15 @@
 
 import { useState, useMemo, useEffect } from 'react';
 
+interface TimeFrameStats {
+  wars: number;
+  raids: number;
+  shells: number;
+  contributed: number;
+  playtime: number;
+  hasCompleteData: boolean;
+}
+
 interface Member {
   username: string;
   uuid: string;
@@ -20,13 +29,8 @@ interface Member {
   shells: number;
   lastJoin: string | null;
   playtime: number;
-  // Time frame specific values
-  timeFrameWars?: number;
-  timeFrameRaids?: number;
-  timeFrameShells?: number;
-  timeFrameContributed?: number;
-  timeFramePlaytime?: number;
-  hasCompleteData?: boolean;
+  // All time frame stats pre-calculated
+  timeFrames: Record<string, TimeFrameStats>;
 }
 
 interface LeaderboardTableProps {
@@ -96,7 +100,7 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
     return value.toLocaleString();
   };
 
-  // Get the value based on time frame
+  // Get the value based on time frame using pre-calculated timeFrames data
   const getValue = (member: Member, column: SortableColumn): number | string => {
     if (column === 'username') return member.username;
     if (column === 'discordRank') {
@@ -116,23 +120,27 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
       return rankPriority[member.discordRank] || 999;
     }
 
-    // For numeric columns
-    if (timeFrame === 'all') {
-      // Playtime is stored in hours, convert to minutes for display
+    // Get stats from the timeFrames object
+    const stats = member.timeFrames?.[timeFrame];
+    if (!stats) {
+      // Fallback to raw member data if timeFrames not available
       if (column === 'playtime') {
         return (member[column] || 0) * 60;
       }
       return member[column] || 0;
     }
 
-    switch (column) {
-      case 'wars': return member.timeFrameWars || 0;
-      case 'raids': return member.timeFrameRaids || 0;
-      case 'shells': return member.timeFrameShells || 0;
-      case 'contributed': return member.timeFrameContributed || 0;
-      case 'playtime': return (member.timeFramePlaytime || 0) * 60; // Convert hours to minutes
-      default: return 0;
+    // Playtime is stored in hours, convert to minutes for display
+    if (column === 'playtime') {
+      return (stats.playtime || 0) * 60;
     }
+
+    return stats[column] || 0;
+  };
+
+  // Get hasCompleteData for a member based on current timeFrame
+  const getHasCompleteData = (member: Member): boolean => {
+    return member.timeFrames?.[timeFrame]?.hasCompleteData ?? true;
   };
 
   const handleSort = (column: SortableColumn) => {
@@ -449,7 +457,7 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
                         'var(--text-secondary)'
                     }}>
                       #{position}
-                      {!member.hasCompleteData && timeFrame !== 'all' && (
+                      {!getHasCompleteData(member) && timeFrame !== 'all' && (
                         <span
                           style={{
                             marginLeft: '0.25rem',

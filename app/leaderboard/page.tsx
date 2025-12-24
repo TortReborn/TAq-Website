@@ -12,6 +12,15 @@ interface Guild {
   onlineMembers: number;
 }
 
+interface TimeFrameStats {
+  wars: number;
+  raids: number;
+  shells: number;
+  contributed: number;
+  playtime: number;
+  hasCompleteData: boolean;
+}
+
 interface Member {
   username: string;
   uuid: string;
@@ -30,19 +39,14 @@ interface Member {
   shells: number;
   lastJoin: string | null;
   playtime: number;
-  // Time frame specific values
-  timeFrameWars?: number;
-  timeFrameRaids?: number;
-  timeFrameShells?: number;
-  timeFrameContributed?: number;
-  timeFramePlaytime?: number;
-  hasCompleteData?: boolean;
+  // All time frame stats pre-calculated
+  timeFrames: Record<string, TimeFrameStats>;
 }
 
 interface MembersData {
   guild: Guild;
   members: Member[];
-  hasHistoricalData?: boolean;
+  hasHistoricalData: Record<string, boolean>;
 }
 
 export default function LeaderboardPage() {
@@ -52,12 +56,12 @@ export default function LeaderboardPage() {
   const [timeFrame, setTimeFrame] = useState('7'); // Default to 7 days
   const [initialized, setInitialized] = useState(false);
 
-  const fetchMembersData = async (selectedTimeFrame?: string) => {
-    const frame = selectedTimeFrame || timeFrame;
+  const fetchMembersData = async () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/members/activity?timeFrame=${frame}`, {
+      // Fetch all time periods at once - no need to specify timeFrame
+      const response = await fetch('/api/members/activity', {
         cache: 'no-store'
       });
 
@@ -83,24 +87,21 @@ export default function LeaderboardPage() {
 
   const handleTimeFrameChange = (newTimeFrame: string) => {
     setTimeFrame(newTimeFrame);
-    // Save to localStorage
+    // Save to localStorage - no API call needed, data is already loaded
     if (typeof window !== 'undefined') {
       localStorage.setItem('leaderboardTimeFrame', newTimeFrame);
     }
-    fetchMembersData(newTimeFrame);
   };
 
   useEffect(() => {
-    // Load saved time frame from localStorage
+    // Load saved time frame from localStorage and fetch data once
     if (typeof window !== 'undefined' && !initialized) {
       const savedTimeFrame = localStorage.getItem('leaderboardTimeFrame');
       if (savedTimeFrame) {
         setTimeFrame(savedTimeFrame);
-        fetchMembersData(savedTimeFrame);
-      } else {
-        // First time visitor - use default of 7 days
-        fetchMembersData('7');
       }
+      // Fetch all time periods data once
+      fetchMembersData();
       setInitialized(true);
     } else if (initialized) {
       // Only set up interval after initialization
@@ -212,7 +213,7 @@ export default function LeaderboardPage() {
           }}>
             Guild Leaderboard
           </h1>
-          {!membersData.hasHistoricalData && timeFrame !== 'all' && (
+          {!membersData.hasHistoricalData?.[timeFrame] && timeFrame !== 'all' && (
             <p style={{
               color: '#FFA500',
               fontSize: '0.875rem',

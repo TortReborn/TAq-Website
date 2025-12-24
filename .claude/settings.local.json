@@ -4,7 +4,8 @@
       "Bash(curl:*)",
       "Bash(python:*)",
       "Bash(npm run build:*)",
-      "Bash(npx tsc --noEmit)"
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

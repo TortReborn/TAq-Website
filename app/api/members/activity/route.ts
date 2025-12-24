@@ -26,8 +26,6 @@ interface Member {
 }
 
 interface HistoricalMember {
-  name: string;
-  rank: string;
   uuid: string;
   wars: number;
   raids: number;
@@ -36,30 +34,23 @@ interface HistoricalMember {
   contributed: number;
 }
 
-interface TimeFrameData {
-  current: Member[];
-  timeFrameStats: Record<string, {
-    wars: number;
-    raids: number;
-    shells: number;
-    contributed: number;
-    playtime: number;
-    hasCompleteData: boolean;
-  }>;
+interface TimeFrameStats {
+  wars: number;
+  raids: number;
+  shells: number;
+  contributed: number;
+  playtime: number;
+  hasCompleteData: boolean;
 }
+
+const TIME_PERIODS = [1, 7, 14, 30] as const;
 
 // Calculate the difference between current and historical values
 function calculateTimeDelta(
   currentValue: number,
-  historicalValue: number | undefined,
-  timeFrame: string
+  historicalValue: number | undefined
 ): { value: number; hasCompleteData: boolean } {
-  // For all-time, just return current value
-  if (timeFrame === 'all') {
-    return { value: currentValue, hasCompleteData: true };
-  }
-
-  // If no historical data, member is new - return 0 or current based on context
+  // If no historical data, member is new
   if (historicalValue === undefined) {
     return { value: 0, hasCompleteData: false };
   }
@@ -74,11 +65,43 @@ function calculateTimeDelta(
   };
 }
 
-export async function GET(request: NextRequest) {
-  // Get time frame from query params
-  const searchParams = request.nextUrl.searchParams;
-  const timeFrame = searchParams.get('timeFrame') || 'all';
+// Calculate stats for a specific time period
+function calculateTimeFrameStats(
+  member: Member,
+  historical: HistoricalMember | undefined
+): TimeFrameStats {
+  if (!historical) {
+    return {
+      wars: 0,
+      raids: 0,
+      shells: 0,
+      contributed: 0,
+      playtime: 0,
+      hasCompleteData: false
+    };
+  }
 
+  const warsDelta = calculateTimeDelta(member.wars, historical.wars);
+  const raidsDelta = calculateTimeDelta(member.raids, historical.raids);
+  const shellsDelta = calculateTimeDelta(member.shells, historical.shells);
+  const contributedDelta = calculateTimeDelta(member.contributed, historical.contributed);
+  const playtimeDelta = calculateTimeDelta(member.playtime, historical.playtime);
+
+  return {
+    wars: warsDelta.value,
+    raids: raidsDelta.value,
+    shells: shellsDelta.value,
+    contributed: contributedDelta.value,
+    playtime: playtimeDelta.value,
+    hasCompleteData: warsDelta.hasCompleteData &&
+                     raidsDelta.hasCompleteData &&
+                     shellsDelta.hasCompleteData &&
+                     contributedDelta.hasCompleteData &&
+                     playtimeDelta.hasCompleteData
+  };
+}
+
+export async function GET(request: NextRequest) {
   // Check rate limit
   const rateLimitCheck = checkRateLimit(request, 'members');
 
@@ -109,35 +132,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get player activity cache for historical data
-    let historicalData: Record<string, HistoricalMember> = {};
-
-    if (timeFrame !== 'all') {
-      const activityCache = await simpleDatabaseCache.getPlayerActivityCache(clientIP);
-
-      if (activityCache && activityCache.days) {
-        // Map time frame to cache key
-        const cacheKeyMap: Record<string, string> = {
-          '1': 'day_1',
-          '7': 'day_7',
-          '14': 'day_14',
-          '30': 'day_30'
-        };
-
-        const cacheKey = cacheKeyMap[timeFrame];
-        if (cacheKey && activityCache.days[cacheKey]) {
-          const dayData = activityCache.days[cacheKey];
-          if (dayData.members && Array.isArray(dayData.members)) {
-            // Create a map of historical data by UUID
-            dayData.members.forEach((member: HistoricalMember) => {
-              if (member.uuid) {
-                historicalData[member.uuid] = member;
-              }
-            });
-          }
-        }
-      }
-    }
+    // Fetch all time period snapshots in a single query
+    const allSnapshots = await simpleDatabaseCache.getPlayerActivitySnapshots([...TIME_PERIODS], clientIP);
 
     // Process current members
     let allMembers: Member[] = [];
@@ -173,13 +169,20 @@ export async function GET(request: NextRequest) {
         discordLinks[row.uuid] = row;
       });
 
-      // Calculate time-based stats for each member
-      const membersWithTimeStats = allMembers.map(member => {
+      // Calculate time-based stats for ALL time periods for each member
+      const membersWithAllTimeStats = allMembers.map(member => {
         const discord = discordLinks[member.uuid];
-        const historical = historicalData[member.uuid];
 
-        // Calculate deltas for the selected time frame
-        let timeFrameStats = {
+        // Calculate stats for each time period
+        const timeFrames: Record<string, TimeFrameStats> = {};
+        for (const days of TIME_PERIODS) {
+          const historicalData = allSnapshots[days] || {};
+          const historical = historicalData[member.uuid];
+          timeFrames[String(days)] = calculateTimeFrameStats(member, historical);
+        }
+
+        // Add "all" time frame (current values)
+        timeFrames['all'] = {
           wars: member.wars,
           raids: member.raids,
           shells: member.shells,
@@ -188,49 +191,12 @@ export async function GET(request: NextRequest) {
           hasCompleteData: true
         };
 
-        if (timeFrame !== 'all' && historical) {
-          const warsDelta = calculateTimeDelta(member.wars, historical.wars, timeFrame);
-          const raidsDelta = calculateTimeDelta(member.raids, historical.raids, timeFrame);
-          const shellsDelta = calculateTimeDelta(member.shells, historical.shells, timeFrame);
-          const contributedDelta = calculateTimeDelta(member.contributed, historical.contributed, timeFrame);
-          const playtimeDelta = calculateTimeDelta(member.playtime, historical.playtime, timeFrame);
-
-          timeFrameStats = {
-            wars: warsDelta.value,
-            raids: raidsDelta.value,
-            shells: shellsDelta.value,
-            contributed: contributedDelta.value,
-            playtime: playtimeDelta.value,
-            hasCompleteData: warsDelta.hasCompleteData &&
-                           raidsDelta.hasCompleteData &&
-                           shellsDelta.hasCompleteData &&
-                           contributedDelta.hasCompleteData &&
-                           playtimeDelta.hasCompleteData
-          };
-        } else if (timeFrame !== 'all') {
-          // No historical data for this member - they're new
-          timeFrameStats = {
-            wars: 0,
-            raids: 0,
-            shells: 0,
-            contributed: 0,
-            playtime: 0,
-            hasCompleteData: false
-          };
-        }
-
         return {
           ...member,
           discordRank: discord ? discord.rank : '',
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',
-          // Add time frame specific values
-          timeFrameWars: timeFrameStats.wars,
-          timeFrameRaids: timeFrameStats.raids,
-          timeFrameShells: timeFrameStats.shells,
-          timeFrameContributed: timeFrameStats.contributed,
-          timeFramePlaytime: timeFrameStats.playtime,
-          hasCompleteData: timeFrameStats.hasCompleteData
+          timeFrames
         };
       });
 
@@ -248,7 +214,7 @@ export async function GET(request: NextRequest) {
         'Starfish': 10
       };
 
-      membersWithTimeStats.sort((a, b) => {
+      membersWithAllTimeStats.sort((a, b) => {
         const aRankPriority = a.discordRank ? (discordRankPriority[a.discordRank] || 999) : 999;
         const bRankPriority = b.discordRank ? (discordRankPriority[b.discordRank] || 999) : 999;
         if (aRankPriority !== bRankPriority) {
@@ -256,6 +222,13 @@ export async function GET(request: NextRequest) {
         }
         return a.username.localeCompare(b.username);
       });
+
+      // Check which time periods have data
+      const hasHistoricalData: Record<string, boolean> = {};
+      for (const days of TIME_PERIODS) {
+        hasHistoricalData[String(days)] = Object.keys(allSnapshots[days] || {}).length > 0;
+      }
+      hasHistoricalData['all'] = true;
 
       const guildData = guildDataRaw as any;
       const jsonResponse = NextResponse.json({
@@ -267,14 +240,12 @@ export async function GET(request: NextRequest) {
           totalMembers: Array.isArray(guildData.members) ? guildData.members.length : (guildData.members?.total || 0),
           onlineMembers: guildData.online || 0
         },
-        members: membersWithTimeStats,
-        timeFrame: timeFrame,
-        hasHistoricalData: Object.keys(historicalData).length > 0
+        members: membersWithAllTimeStats,
+        hasHistoricalData
       }, {
         headers: {
           'X-Cache': 'HIT',
-          'X-Cache-Timestamp': Date.now().toString(),
-          'X-Time-Frame': timeFrame
+          'X-Cache-Timestamp': Date.now().toString()
         }
       });
 

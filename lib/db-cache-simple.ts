@@ -147,7 +147,6 @@ class SimpleDatabaseCache {
         return null;
       }
 
-      console.log(`✨ Serving ${key} from database cache (external bot managed)`);
       return result.rows[0].data as T;
     } catch (error) {
       console.error(`❌ Failed to get cache for ${key}:`, error);
@@ -329,31 +328,84 @@ class SimpleDatabaseCache {
     }
   }
 
-  // Get player activity cache for time-based leaderboards
-  async getPlayerActivityCache(requestId?: string): Promise<any | null> {
+  // Get player activity snapshots for multiple time periods with fallback
+  // If exact date doesn't exist, tries up to 3 days older (e.g., if 7 days ago missing, tries 8, 9, 10)
+  async getPlayerActivitySnapshots(daysArray: number[], requestId?: string): Promise<Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>>> {
     const rateCheck = this.checkRateLimit('members', requestId);
     if (!rateCheck.allowed) {
-      console.warn('🚫 Rate limit exceeded for player activity cache');
-      return null;
+      console.warn('🚫 Rate limit exceeded for player activity');
+      return {};
     }
 
     const client = await this.pool.connect();
     try {
+      const maxRetries = 3;
+      const maxDays = Math.max(...daysArray) + maxRetries;
+      const minDays = Math.min(...daysArray);
+
+      // Query all snapshots in the possible range (includes fallback dates)
       const result = await client.query(
-        `SELECT data FROM cache_entries WHERE cache_key = $1`,
-        ['player_activity_cache']
+        `SELECT uuid, playtime, contributed, wars, raids, shells, snapshot_date, CURRENT_DATE - snapshot_date as days_ago
+         FROM player_activity
+         WHERE snapshot_date >= CURRENT_DATE - $1::integer
+           AND snapshot_date <= CURRENT_DATE - $2::integer`,
+        [maxDays, minDays]
       );
 
-      if (result.rows.length === 0) {
-        console.log('❌ No player activity cache found');
-        return null;
+      // Group results by days_ago
+      const dataByDaysAgo: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
+
+      for (const row of result.rows) {
+        const daysAgo = row.days_ago;
+        if (!dataByDaysAgo[daysAgo]) {
+          dataByDaysAgo[daysAgo] = {};
+        }
+        dataByDaysAgo[daysAgo][row.uuid] = {
+          uuid: row.uuid,
+          playtime: row.playtime,
+          contributed: row.contributed,
+          wars: row.wars,
+          raids: row.raids,
+          shells: row.shells
+        };
       }
 
-      console.log('✨ Serving player_activity_cache from database');
-      return result.rows[0].data;
+      // For each requested day, find the best available snapshot (with fallback)
+      const snapshots: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
+
+      const logParts: string[] = [];
+
+      for (const targetDays of daysArray) {
+        snapshots[targetDays] = {};
+
+        // Try exact date first, then fallback to older dates (up to 3 retries)
+        for (let offset = 0; offset <= maxRetries; offset++) {
+          const actualDays = targetDays + offset;
+          if (dataByDaysAgo[actualDays] && Object.keys(dataByDaysAgo[actualDays]).length > 0) {
+            snapshots[targetDays] = dataByDaysAgo[actualDays];
+            const count = Object.keys(dataByDaysAgo[actualDays]).length;
+            if (offset > 0) {
+              logParts.push(`${targetDays}d→${actualDays}d(${count})`);
+            } else {
+              logParts.push(`${targetDays}d(${count})`);
+            }
+            break;
+          }
+        }
+
+        // If no data found after all retries
+        if (Object.keys(snapshots[targetDays]).length === 0) {
+          logParts.push(`${targetDays}d(none)`);
+        }
+      }
+
+      console.log(`📊 Player activity: ${logParts.join(', ')}`);
+
+
+      return snapshots;
     } catch (error) {
-      console.error('❌ Failed to get player activity cache:', error);
-      return null;
+      console.error('❌ Failed to get player activity snapshots:', error);
+      return {};
     } finally {
       client.release();
     }
