@@ -186,14 +186,16 @@ export default function MapHistoryControls({
     const delta = e.clientX - resizeStartRef.current.x;
 
     if (isResizing === 'right') {
-      // Right edge: just change width
+      // Right edge: anchor left edge (shift position right by half the width change)
       const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStartRef.current.width + delta));
+      const widthDelta = newWidth - resizeStartRef.current.width;
+      const newPosX = resizeStartRef.current.posX + widthDelta / 2;
       setWidth(newWidth);
+      setPosition(prev => ({ ...prev, x: newPosX }));
     } else {
-      // Left edge: change width and position (to keep right edge stationary)
+      // Left edge: anchor right edge (shift position left by half the width change)
       const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStartRef.current.width - delta));
       const widthDelta = newWidth - resizeStartRef.current.width;
-      // Since panel is centered, moving left edge means shifting position left by half the width change
       const newPosX = resizeStartRef.current.posX - widthDelta / 2;
       setWidth(newWidth);
       setPosition(prev => ({ ...prev, x: newPosX }));

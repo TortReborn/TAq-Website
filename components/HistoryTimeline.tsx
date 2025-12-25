@@ -186,24 +186,23 @@ export default function HistoryTimeline({
               position: 'absolute',
               top: 0,
               bottom: 0,
-              left: percentToPosition(loadedPercents.start),
-              width: `${loadedPercents.end - loadedPercents.start}%`,
+              left: `${loadedPercents.start}%`,
+              right: `${100 - loadedPercents.end}%`,
               background: 'rgba(59, 130, 246, 0.2)',
             }}
           />
         )}
 
-        {/* Progress fill - uses full border-radius, parent overflow:hidden clips right edge */}
+        {/* Progress fill - ends at thumb center */}
         <div
           style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
             left: 0,
-            right: `${100 - currentPercent}%`,
+            width: percentToPosition(currentPercent),
             background: 'var(--accent-primary)',
             opacity: 0.3,
-            borderRadius: 'inherit',
           }}
         />
 
@@ -214,8 +213,8 @@ export default function HistoryTimeline({
             top: '50%',
             left: percentToPosition(currentPercent),
             transform: 'translate(-50%, -50%)',
-            width: '16px',
-            height: '16px',
+            width: '24px',
+            height: '24px',
             background: 'var(--accent-primary)',
             borderRadius: '50%',
             border: '2px solid #fff',
