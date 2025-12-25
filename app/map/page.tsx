@@ -756,16 +756,41 @@ export default function MapPage() {
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    
+
     const newScale = clampScale(scale * 0.8);
     const scaleChange = newScale / scale;
-    
+
     setPosition({
       x: centerX - (centerX - position.x) * scaleChange,
       y: centerY - (centerY - position.y) * scaleChange
     });
     setScale(newScale);
   }, [scale, position, clampScale]);
+
+  const resetView = useCallback(() => {
+    if (!containerRef.current || !mapImageRef.current) return;
+
+    const img = mapImageRef.current;
+    const containerRect = containerRef.current.getBoundingClientRect();
+
+    // Calculate scale to fit entire map
+    const scaleX = containerRect.width / img.naturalWidth;
+    const scaleY = containerRect.height / img.naturalHeight;
+    const fitScale = Math.min(scaleX, scaleY);
+
+    // Center the map
+    const scaledWidth = img.naturalWidth * fitScale;
+    const scaledHeight = img.naturalHeight * fitScale;
+    const newPosition = {
+      x: (containerRect.width - scaledWidth) / 2,
+      y: (containerRect.height - scaledHeight) / 2
+    };
+
+    setScale(clampScale(fitScale));
+    setPosition(newPosition);
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 1000);
+  }, [clampScale]);
 
   // Handle window resize
   useEffect(() => {
@@ -1067,6 +1092,39 @@ export default function MapPage() {
             gap: '0.5rem',
             zIndex: 10
           }}>
+            <button
+              onClick={resetView}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '0.5rem',
+                border: '2px solid var(--border-color)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--bg-secondary)';
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--bg-card)';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              title="Reset View"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            </button>
             <button
               onClick={zoomIn}
               style={{
