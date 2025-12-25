@@ -26,7 +26,12 @@ interface MapHistoryControlsProps {
   isLoading?: boolean;
   snapshots?: Date[];
   onRefresh?: () => void;
+  containerBounds?: { width: number; height: number };
 }
+
+const SPEED_OPTIONS = [0.5, 1, 2, 5, 10];
+const MIN_WIDTH = 280;
+const MAX_WIDTH = 600;
 
 export default function MapHistoryControls({
   earliest,
@@ -49,11 +54,75 @@ export default function MapHistoryControls({
   isLoading,
   snapshots,
   onRefresh,
+  containerBounds,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState<'left' | 'right' | false>(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [width, setWidth] = useState(450);
+  const [isInitialized, setIsInitialized] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  const resizeStartRef = useRef({ x: 0, width: 450, posX: 0 });
+
+  // Layout breakpoints based on component widths:
+  // - Playback buttons (5 buttons): ~180px
+  // - Speed selector (label + dropdown): ~90px
+  // - Date input: ~130px
+  // - Jump button: ~55px
+  // - Gaps between sections: ~30px
+  //
+  // Full row (playback+speed + date+jump): 180+90 + 130+55 + 30 = ~485px minimum
+  // Two rows (playback | speed+date+jump): needs ~290px for bottom row
+  // Three rows (playback | speed | date+jump): needs ~185px for date+jump
+  const showSpeedInPlayback = width >= 520; // Speed in same row as playback buttons
+  const stackDateRow = width < 380; // Date+Jump gets its own row below speed
+
+  // Clamp position to keep panel within container bounds
+  const clampPosition = useCallback((x: number, y: number) => {
+    if (!containerRef.current || !containerBounds) return { x, y };
+    const halfWidth = width / 2;
+    const panelHeight = containerRef.current.offsetHeight;
+    // Panel is centered at bottom, so x=0 means centered
+    const maxX = containerBounds.width / 2 - halfWidth;
+    const minX = -containerBounds.width / 2 + halfWidth;
+    const maxY = 0; // Can't go below starting position (bottom)
+    const minY = -(containerBounds.height - panelHeight - 16); // 16px = 1rem bottom margin
+    return {
+      x: Math.max(minX, Math.min(maxX, x)),
+      y: Math.max(minY, Math.min(maxY, y)),
+    };
+  }, [width, containerBounds]);
+
+  // Load cached position and width on mount
+  useEffect(() => {
+    const cachedPos = localStorage.getItem('historyControlsPosition');
+    const cachedWidth = localStorage.getItem('historyControlsWidth');
+    if (cachedPos) {
+      try {
+        setPosition(JSON.parse(cachedPos));
+      } catch { /* ignore */ }
+    }
+    if (cachedWidth) {
+      const w = parseInt(cachedWidth, 10);
+      if (!isNaN(w)) setWidth(Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, w)));
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save position when it changes
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('historyControlsPosition', JSON.stringify(position));
+    }
+  }, [position, isInitialized]);
+
+  // Save width when it changes
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('historyControlsWidth', String(width));
+    }
+  }, [width, isInitialized]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     // Only start drag if clicking on the panel itself, not on interactive elements
@@ -92,16 +161,46 @@ export default function MapHistoryControls({
     const deltaX = e.clientX - dragStartRef.current.x;
     const deltaY = e.clientY - dragStartRef.current.y;
 
-    setPosition({
-      x: dragStartRef.current.posX + deltaX,
-      y: dragStartRef.current.posY + deltaY,
-    });
-  }, [isDragging]);
+    const newPos = clampPosition(
+      dragStartRef.current.posX + deltaX,
+      dragStartRef.current.posY + deltaY
+    );
+    setPosition(newPos);
+  }, [isDragging, clampPosition]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+    setIsResizing(false);
   }, []);
 
+  // Resize handlers - support both left and right edges
+  const handleResizeMouseDown = useCallback((side: 'left' | 'right') => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(side);
+    resizeStartRef.current = { x: e.clientX, width, posX: position.x };
+  }, [width, position.x]);
+
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    const delta = e.clientX - resizeStartRef.current.x;
+
+    if (isResizing === 'right') {
+      // Right edge: just change width
+      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStartRef.current.width + delta));
+      setWidth(newWidth);
+    } else {
+      // Left edge: change width and position (to keep right edge stationary)
+      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStartRef.current.width - delta));
+      const widthDelta = newWidth - resizeStartRef.current.width;
+      // Since panel is centered, moving left edge means shifting position left by half the width change
+      const newPosX = resizeStartRef.current.posX - widthDelta / 2;
+      setWidth(newWidth);
+      setPosition(prev => ({ ...prev, x: newPosX }));
+    }
+  }, [isResizing]);
+
+  // Window event listeners for dragging
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
@@ -112,6 +211,18 @@ export default function MapHistoryControls({
       };
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  // Window event listeners for resizing
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', handleResizeMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleResizeMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizing, handleResizeMove, handleMouseUp]);
 
   return (
     <div
@@ -124,13 +235,41 @@ export default function MapHistoryControls({
         border: '1px solid var(--border-color)',
         padding: '1rem',
         boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        minWidth: '400px',
-        maxWidth: '600px',
+        width: `${width}px`,
         transform: `translate(${position.x}px, ${position.y}px)`,
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: isDragging ? 'grabbing' : isResizing ? 'ew-resize' : 'grab',
         userSelect: 'none',
+        overflow: 'hidden',
       }}
     >
+      {/* Left edge resize handle */}
+      <div
+        onMouseDown={handleResizeMouseDown('left')}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '8px',
+          cursor: 'ew-resize',
+          background: 'transparent',
+          zIndex: 10,
+        }}
+      />
+      {/* Right edge resize handle */}
+      <div
+        onMouseDown={handleResizeMouseDown('right')}
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '8px',
+          cursor: 'ew-resize',
+          background: 'transparent',
+          zIndex: 10,
+        }}
+      />
       {/* Top right controls - Refresh button and loading indicator */}
       <div style={{
         position: 'absolute',
@@ -225,36 +364,100 @@ export default function MapHistoryControls({
         snapshots={snapshots}
       />
 
-      {/* Controls row */}
+      {/* Controls row - responsive layout */}
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
+        flexDirection: 'column',
         alignItems: 'center',
         marginTop: '0.75rem',
-        flexWrap: 'wrap',
         gap: '0.75rem',
       }}>
-        {/* Playback controls */}
-        <HistoryPlayback
-          isPlaying={isPlaying}
-          speed={speed}
-          onPlayPause={onPlayPause}
-          onSpeedChange={onSpeedChange}
-          onStepForward={onStepForward}
-          onStepBackward={onStepBackward}
-          onGoToFirst={onGoToFirst}
-          onGoToLatest={onGoToLatest}
-          canStepForward={canStepForward}
-          canStepBackward={canStepBackward}
-        />
+        {/* Row 1: Playback controls (with or without speed based on width) */}
+        <div style={{
+          display: 'flex',
+          justifyContent: showSpeedInPlayback ? 'space-between' : 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}>
+          <HistoryPlayback
+            isPlaying={isPlaying}
+            speed={speed}
+            onPlayPause={onPlayPause}
+            onSpeedChange={onSpeedChange}
+            onStepForward={onStepForward}
+            onStepBackward={onStepBackward}
+            onGoToFirst={onGoToFirst}
+            onGoToLatest={onGoToLatest}
+            canStepForward={canStepForward}
+            canStepBackward={canStepBackward}
+            hideSpeed={!showSpeedInPlayback}
+          />
+          {/* Date picker in same row when wide enough */}
+          {showSpeedInPlayback && (
+            <HistoryDatePicker
+              current={current}
+              earliest={earliest}
+              latest={latest}
+              onJump={onJump}
+            />
+          )}
+        </div>
 
-        {/* Date picker */}
-        <HistoryDatePicker
-          current={current}
-          earliest={earliest}
-          latest={latest}
-          onJump={onJump}
-        />
+        {/* Row 2: Speed + Date (when not wide enough for full row) */}
+        {!showSpeedInPlayback && (
+          <div style={{
+            display: 'flex',
+            flexDirection: stackDateRow ? 'column' : 'row',
+            gap: '0.75rem',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+          }}>
+            {/* Speed selector */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+            }}>
+              <span style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-secondary)',
+              }}>
+                Speed:
+              </span>
+              <select
+                value={speed}
+                onChange={(e) => onSpeedChange(Number(e.target.value))}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                style={{
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  appearance: 'auto',
+                  WebkitAppearance: 'menulist',
+                }}
+              >
+                {SPEED_OPTIONS.map((s) => (
+                  <option key={s} value={s} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {s}x
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Date picker */}
+            <HistoryDatePicker
+              current={current}
+              earliest={earliest}
+              latest={latest}
+              onJump={onJump}
+            />
+          </div>
+        )}
       </div>
 
       {/* Keyframes for loading spinner */}

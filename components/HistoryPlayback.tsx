@@ -11,6 +11,7 @@ interface HistoryPlaybackProps {
   onGoToLatest: () => void;
   canStepForward: boolean;
   canStepBackward: boolean;
+  hideSpeed?: boolean;
 }
 
 const SPEED_OPTIONS = [0.5, 1, 2, 5, 10];
@@ -26,6 +27,7 @@ export default function HistoryPlayback({
   onGoToLatest,
   canStepForward,
   canStepBackward,
+  hideSpeed = false,
 }: HistoryPlaybackProps) {
   const buttonStyle: React.CSSProperties = {
     padding: '0.5rem',
@@ -130,43 +132,45 @@ export default function HistoryPlayback({
         </svg>
       </button>
 
-      {/* Speed selector */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.25rem',
-        marginLeft: '0.5rem',
-      }}>
-        <span style={{
-          fontSize: '0.75rem',
-          color: 'var(--text-secondary)',
+      {/* Speed selector - hidden when in compact mode */}
+      {!hideSpeed && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.25rem',
+          marginLeft: '0.5rem',
         }}>
-          Speed:
-        </span>
-        <select
-          value={speed}
-          onChange={(e) => onSpeedChange(Number(e.target.value))}
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          style={{
-            padding: '0.25rem 0.5rem',
-            borderRadius: '0.375rem',
-            border: '1px solid var(--border-color)',
-            background: 'var(--bg-secondary)',
-            color: 'var(--text-primary)',
-            fontSize: '0.875rem',
-            cursor: 'pointer',
-            appearance: 'auto',
-            WebkitAppearance: 'menulist',
-          }}
-        >
-          {SPEED_OPTIONS.map((s) => (
-            <option key={s} value={s} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-              {s}x
-            </option>
-          ))}
-        </select>
-      </div>
+          <span style={{
+            fontSize: '0.75rem',
+            color: 'var(--text-secondary)',
+          }}>
+            Speed:
+          </span>
+          <select
+            value={speed}
+            onChange={(e) => onSpeedChange(Number(e.target.value))}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.375rem',
+              border: '1px solid var(--border-color)',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              appearance: 'auto',
+              WebkitAppearance: 'menulist',
+            }}
+          >
+            {SPEED_OPTIONS.map((s) => (
+              <option key={s} value={s} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                {s}x
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }

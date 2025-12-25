@@ -1292,6 +1292,10 @@ export default function MapPage() {
                 isLoading={isLoadingHistory}
                 snapshots={snapshotTimestamps}
                 onRefresh={handleHistoryRefresh}
+                containerBounds={containerRef.current ? {
+                  width: containerRef.current.clientWidth,
+                  height: containerRef.current.clientHeight
+                } : undefined}
               />
             </div>
           )}
