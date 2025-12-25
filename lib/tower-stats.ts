@@ -30,10 +30,10 @@ export function calculateConnectionBonus(connections: number): number {
 }
 
 // Calculate HQ bonus multiplier
-// Formula: (1.5 + 0.25 × externals) when HQ is enabled
-export function calculateHQBonus(isHQ: boolean, externals: number): number {
+// Formula: (1.5 + 0.25 × (externals + connections)) when HQ is enabled
+export function calculateHQBonus(isHQ: boolean, externals: number, connections: number = 0): number {
   if (!isHQ) return 1.0;
-  return 1.5 + (0.25 * externals);
+  return 1.5 + (0.25 * (externals + connections));
 }
 
 // Calculate effective HP
@@ -48,7 +48,7 @@ export function calculateEffectiveHP(
   const health = TOWER_STATS.health[healthLevel];
   const defense = TOWER_STATS.defense[defenseLevel];
   const connectionBonus = calculateConnectionBonus(connections);
-  const hqBonus = calculateHQBonus(isHQ, externals);
+  const hqBonus = calculateHQBonus(isHQ, externals, connections);
 
   // EHP = health / (1 - defense) × bonuses
   const effectiveHP = (health / (1 - defense)) * connectionBonus * hqBonus;
@@ -68,7 +68,7 @@ export function calculateAvgDPS(
   const damageMax = TOWER_STATS.damageMax[damageLevel];
   const attackSpeed = TOWER_STATS.attackSpeed[attackSpeedLevel];
   const connectionBonus = calculateConnectionBonus(connections);
-  const hqBonus = calculateHQBonus(isHQ, externals);
+  const hqBonus = calculateHQBonus(isHQ, externals, connections);
 
   const avgDamage = (damageMin + damageMax) / 2;
   const dps = avgDamage * attackSpeed * connectionBonus * hqBonus;
@@ -211,7 +211,7 @@ export function calculateTotalHP(
 ): number {
   const health = TOWER_STATS.health[healthLevel];
   const connectionBonus = calculateConnectionBonus(connections);
-  const hqBonus = calculateHQBonus(isHQ, externals);
+  const hqBonus = calculateHQBonus(isHQ, externals, connections);
   return Math.round(health * connectionBonus * hqBonus);
 }
 
@@ -225,7 +225,7 @@ export function calculateTotalDamage(
   const damageMin = TOWER_STATS.damageMin[damageLevel];
   const damageMax = TOWER_STATS.damageMax[damageLevel];
   const connectionBonus = calculateConnectionBonus(connections);
-  const hqBonus = calculateHQBonus(isHQ, externals);
+  const hqBonus = calculateHQBonus(isHQ, externals, connections);
   return {
     min: Math.round(damageMin * connectionBonus * hqBonus),
     max: Math.round(damageMax * connectionBonus * hqBonus)

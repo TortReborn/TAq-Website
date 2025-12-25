@@ -6,7 +6,7 @@ import BottomBar from '@/components/BottomBar';
 import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [showSplash, setShowSplash] = useState(false); // Start with false
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
