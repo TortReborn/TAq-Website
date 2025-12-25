@@ -217,7 +217,7 @@ export default function HistoryTimeline({
             height: '24px',
             background: 'var(--accent-primary)',
             borderRadius: '50%',
-            border: '2px solid #fff',
+            border: '3px solid #fff',
             boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
             transition: isDragging ? 'none' : 'left 0.1s ease',
           }}
