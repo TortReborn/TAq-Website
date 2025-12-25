@@ -42,9 +42,9 @@ export default function HistoryTimeline({
   }, [loadedStart, loadedEnd, earliest, totalRange]);
 
   // Helper to convert percentage to CSS position that keeps thumb within bounds
-  // At 0%: 8px from left, at 100%: 8px from right (for 16px thumb)
+  // At 0%: 12px from left, at 100%: 12px from right (for 24px thumb)
   const percentToPosition = (percent: number) => {
-    const offset = 8 - 0.16 * percent;
+    const offset = 12 - 0.24 * percent;
     return `calc(${percent}% + ${offset}px)`;
   };
 
@@ -76,14 +76,14 @@ export default function HistoryTimeline({
   }, [snapshots]);
 
   // Handle click/drag on the track
-  // Account for 8px padding on each side where the thumb center lives
+  // Account for 12px padding on each side where the thumb center lives (for 24px thumb)
   const handleTrackInteraction = useCallback((clientX: number) => {
     const track = trackRef.current;
     if (!track) return;
 
     const rect = track.getBoundingClientRect();
     const x = clientX - rect.left;
-    const padding = 8;
+    const padding = 12;
     const usableWidth = rect.width - padding * 2;
 
     // Map click position to percentage, accounting for padding
