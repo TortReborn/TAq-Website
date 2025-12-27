@@ -5,7 +5,8 @@
       "Bash(python:*)",
       "Bash(npm run build:*)",
       "Bash(npx tsc --noEmit)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
