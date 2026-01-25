@@ -47,7 +47,7 @@ export default function EventTable({
   };
 
   return (
-    <div className="card" style={{ overflow: 'hidden' }}>
+    <div className="card" style={{ overflow: 'hidden', borderRadius: 0, border: 'none' }}>
       <table style={{
         width: '100%',
         borderCollapse: 'collapse',

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { fmtDate } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 import EventTable from "@/components/EventTable";
-import PageHeader from "@/components/PageHeader";
 
 interface ActiveEvent {
   id: number;
@@ -127,7 +126,7 @@ export default function GraidEventPage() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      paddingTop: '5rem',
+      paddingTop: '2rem',
       paddingLeft: '1rem',
       paddingRight: '1rem'
     }}>
@@ -139,16 +138,12 @@ export default function GraidEventPage() {
         alignItems: 'center',
         gap: '1.5rem'
       }}>
-        {/* Title */}
-        <PageHeader
-          title="Guild Raid Event Leaderboard"
-        />
-
-        {/* Subtitle / event name */}
+        {/* Event Info Card */}
         <div className="card" style={{
           width: '100%',
           padding: '1.5rem',
-          textAlign: 'center'
+          textAlign: 'center',
+          border: '3px solid #240059'
         }}>
           {isFallback && (
             <>
@@ -176,18 +171,23 @@ export default function GraidEventPage() {
           )}
           {showEvent ? (
             <>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: 'var(--text-primary)',
-                margin: 0
+              <h1 style={{
+                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                fontWeight: '800',
+                background: 'linear-gradient(135deg, var(--color-ocean-400), var(--color-ocean-600))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                margin: 0,
+                paddingBottom: '1rem',
+                letterSpacing: '-0.02em',
+                textTransform: 'capitalize'
               }}>
                 {showEvent.title}
-              </h2>
+              </h1>
               <p style={{
-                marginTop: '0.5rem',
                 color: 'var(--text-secondary)',
-                margin: '0.5rem 0 0 0'
+                margin: '0'
               }}>
                 <span style={{ fontWeight: '600' }}>Window:</span>{" "}
                 {fmtDate(showEvent.startTs)} — {fmtDate(showEvent.endTs)}
@@ -196,37 +196,86 @@ export default function GraidEventPage() {
                 color: 'var(--text-secondary)',
                 margin: '0.25rem 0'
               }}>
-                <span style={{ fontWeight: '600' }}>Payouts:</span>{" "}
-                Low rank = {formatPayout(showEvent.low)} • High rank = {formatPayout(showEvent.high)}
+                {showEvent.low === showEvent.high ? (
+                  <>
+                    <span style={{ fontWeight: '600' }}>Payout Per Raid:</span>{" "}
+                    {formatPayout(showEvent.low)}
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontWeight: '600' }}>Payout Per Raid:</span>{" "}
+                    Low rank = {formatPayout(showEvent.low)} • High rank = {formatPayout(showEvent.high)}
+                  </>
+                )}
               </p>
               <p style={{
                 color: 'var(--text-secondary)',
                 margin: '0.25rem 0'
               }}>
-                <span style={{ fontWeight: '600' }}>Minimum completions:</span> {showEvent.minc}
+                <span style={{ fontWeight: '600' }}>Minimum Completions:</span> {showEvent.minc}
               </p>
-              <p style={{
-                marginTop: '1rem',
-                color: 'var(--text-secondary)',
-                margin: '1rem 0 0 0'
-              }}>
-                <span style={{ fontWeight: '600' }}>Note:</span> Rank 1 graider receives a <b>2x</b> payout multiplier, ranks 2–5 receive a <b>1.5x</b> multiplier, and the top graider in each rank group also receives a <b>1.5x</b> multiplier (these bonuses do not stack). Additionally, anyone with <b>100+</b> raids receives a <b>64 LE bonus</b>.
-              </p>
+              <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{
+                  border: '2px solid rgba(100, 116, 139, 0.5)',
+                  borderRadius: '0.5rem',
+                  overflow: 'hidden'
+                }}>
+                <table style={{
+                  borderCollapse: 'collapse',
+                  fontSize: '0.9rem'
+                }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(100, 116, 139, 0.3)' }}>
+                      <th colSpan={2} style={{
+                        padding: '0.5rem 1rem',
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        borderBottom: '2px solid rgba(100, 116, 139, 0.5)'
+                      }}>
+                        Bonuses
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>Rank 1</td>
+                      <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>2x multiplier</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>Ranks 2–5</td>
+                      <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>1.5x multiplier</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>Highest in Rank Group</td>
+                      <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>1.5x multiplier</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)' }}>100+ Raids</td>
+                      <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)' }}>+64 LE bonus</td>
+                    </tr>
+                  </tbody>
+                </table>
+                </div>
+              </div>
             </>
           ) : (
             <>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: 'var(--text-primary)',
-                margin: 0
+              <h1 style={{
+                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                fontWeight: '800',
+                background: 'linear-gradient(135deg, var(--color-ocean-400), var(--color-ocean-600))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                margin: 0,
+                paddingBottom: '1rem',
+                letterSpacing: '-0.02em'
               }}>
                 No Event Data
-              </h2>
+              </h1>
               <p style={{
-                marginTop: '0.5rem',
                 color: 'var(--text-muted)',
-                margin: '0.5rem 0 0 0'
+                margin: '0'
               }}>
                 No event data found in the database.
               </p>
@@ -235,10 +284,15 @@ export default function GraidEventPage() {
         </div>
 
         {/* Table */}
-        <div style={{ width: '100%' }}>
-          <EventTable 
-            rows={showRows} 
-            minc={showEvent?.minc ?? 0} 
+        <div style={{
+          width: '100%',
+          border: '3px solid #240059',
+          borderRadius: '1rem',
+          overflow: 'hidden'
+        }}>
+          <EventTable
+            rows={showRows}
+            minc={showEvent?.minc ?? 0}
             onRefresh={fetchEventData}
           />
         </div>
@@ -254,6 +308,7 @@ export default function GraidEventPage() {
             color: 'var(--text-muted)',
             margin: 0
           }}>
+            Multiplicative bonuses do not stack.<br />
             * Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br />
             Payouts below the minimum completions threshold are shown in gray as hypothetical.<br />
             ★ indicates 100+ raids bonus (+1 stack).

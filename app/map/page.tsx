@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { loadTerritories, Territory } from "@/lib/utils";
+import { loadTerritories, Territory, coordToPixel } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import LandViewOverlay from "@/components/LandViewOverlay";
 import TerritoryInfoPanel from "@/components/TerritoryInfoPanel";
@@ -182,7 +182,7 @@ export default function MapPage() {
     }
 
     setIsInitialized(true);
-  }, []);
+  }, [clampScale]);
 
   // Save position and scale to localStorage whenever they change
   useEffect(() => {
@@ -852,7 +852,6 @@ export default function MapPage() {
     });
 
     // Convert coordinates to pixels
-    const { coordToPixel } = require("@/lib/utils");
     const topLeftPixel = coordToPixel([minX, minY]);
     const bottomRightPixel = coordToPixel([maxX, maxY]);
 

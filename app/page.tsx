@@ -122,13 +122,13 @@ export default function HomePage() {
         <div className="home-section-content">
           <h2 className="home-section-title">Explore</h2>
           <div className="home-links">
-            <Link href="/map" className="home-link">
+            <a href="/map" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Territory Map</span>
                 <span className="home-link-desc">Various views of the Wynncraft map</span>
               </div>
               <span className="home-link-arrow">→</span>
-            </Link>
+            </a>
             <Link href="/members" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Members</span>
