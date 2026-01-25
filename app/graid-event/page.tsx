@@ -309,9 +309,9 @@ export default function GraidEventPage() {
             margin: 0
           }}>
             Multiplicative bonuses do not stack.<br />
-            * Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br />
+            Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br />
             Payouts below the minimum completions threshold are shown in gray as hypothetical.<br />
-            ★ indicates 100+ raids bonus (+1 stack).
+            ★ indicates 100+ raids bonus.
           </p>
         </div>
       </div>
