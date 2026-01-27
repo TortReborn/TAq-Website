@@ -296,7 +296,7 @@ export default function GraidEventPage() {
             onRefresh={fetchEventData}
           />
         </div>
-        
+
         {/* Footer text */}
         <div style={{
           width: '100%',
