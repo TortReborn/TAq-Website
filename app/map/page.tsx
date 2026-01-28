@@ -579,11 +579,15 @@ export default function MapPage() {
     return loadedSnapshots.map(s => s.timestamp);
   }, [loadedSnapshots]);
 
-  // Prevent body scrolling on this page
+  // Prevent body scrolling and overscroll on this page
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
     return () => {
       document.body.style.overflow = 'auto';
+      document.body.style.overscrollBehavior = '';
+      document.documentElement.style.overscrollBehavior = '';
     };
   }, []);
 

@@ -616,9 +616,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           )}
         </nav>
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: '1 0 auto' }}>
           {children}
-        </main>
+        </div>
         <Analytics
           beforeSend={(event) => {
             // Check if developer mode is enabled (set via console or bookmarklet)

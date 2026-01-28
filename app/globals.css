@@ -182,20 +182,19 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overscroll-behavior: none;
   font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html {
-  min-height: 100%;
-  background: var(--bg-gradient);
+  height: 100%;
+  background-color: var(--bg-nav);
+  background-image: var(--bg-gradient);
   overflow-x: hidden; /* Prevent horizontal scrolling */
   font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 body, #__next {
   min-height: 100%;
-  height: auto;
   overflow-x: hidden; /* Prevent horizontal scrolling */
   font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
@@ -727,13 +726,7 @@ body, body *, html, html * {
     display: flex !important;
   }
   
-  /* Mobile Map Enhancements */
-  /* Ensure map takes full viewport on mobile */
-  body {
-    overflow: hidden;
-  }
-  
-  /* Improve touch performance */
+  /* Improve touch performance for map */
   .map-container {
     touch-action: none;
     -webkit-user-select: none;

@@ -44,12 +44,12 @@ export default function BottomBar() {
 
   return (
     <footer style={{
-      background: 'var(--bg-card)',
-      backdropFilter: 'blur(12px)',
+      background: 'var(--bg-nav)',
       borderTop: '1px solid var(--border-card)',
       padding: '0.75rem 1rem',
       fontSize: '0.875rem',
-      marginTop: 'auto'
+      marginTop: 'auto',
+      flexShrink: 0
     }}>
       <div style={{
         maxWidth: '1200px',
