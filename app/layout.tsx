@@ -77,8 +77,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, []);
   
   return (
-    <html lang="en" data-theme={mounted && darkMode ? 'dark' : undefined}>
+    <html lang="en">
       <head>
+        {/* Blocking script to prevent dark mode flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var savedTheme = localStorage.getItem('theme');
+                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <title>The Aquarium</title>
         <meta name="description" content="The Aquarium - Wynncraft guild territory map, leaderboards, and member statistics" />
 
