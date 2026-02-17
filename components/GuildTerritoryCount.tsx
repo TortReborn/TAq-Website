@@ -132,14 +132,7 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
     return stats;
   }, [territories, guildColors, showLandView]);
 
-  // Calculate dynamic font size based on number of guilds
-  const baseFontSize = 0.875; // 0.875rem base
-  const maxGuildsForBaseFontSize = 15;
-  const minFontSize = 0.6; // minimum font size in rem
-
-  const dynamicFontSize = guildStats.length <= maxGuildsForBaseFontSize
-    ? baseFontSize
-    : Math.max(minFontSize, baseFontSize * (maxGuildsForBaseFontSize / guildStats.length));
+  const fontSize = 0.875; // Fixed font size in rem
 
   // Format area for display (e.g., "1.2M m²" or "500K m²")
   const formatArea = (area: number): string => {
@@ -338,7 +331,7 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
                 justifyContent: 'space-between', 
                 alignItems: 'center',
                 marginBottom: '0.25rem', 
-                fontSize: `${dynamicFontSize}rem`,
+                fontSize: `${fontSize}rem`,
                 padding: '0.35rem 0.75rem',
                 borderRadius: '0.5rem',
                 background: 'var(--bg-secondary)',

@@ -21,8 +21,6 @@ interface MapHistoryControlsProps {
   onGoToLatest: () => void;
   canStepForward: boolean;
   canStepBackward: boolean;
-  loadedStart?: Date;
-  loadedEnd?: Date;
   isLoading?: boolean;
   snapshots?: Date[];
   onRefresh?: () => void;
@@ -49,8 +47,6 @@ export default function MapHistoryControls({
   onGoToLatest,
   canStepForward,
   canStepBackward,
-  loadedStart,
-  loadedEnd,
   isLoading,
   snapshots,
   onRefresh,
@@ -361,8 +357,6 @@ export default function MapHistoryControls({
         latest={latest}
         current={current}
         onChange={onTimeChange}
-        loadedStart={loadedStart}
-        loadedEnd={loadedEnd}
         snapshots={snapshots}
       />
 

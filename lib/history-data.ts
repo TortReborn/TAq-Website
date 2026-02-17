@@ -34,15 +34,23 @@ export interface WeekResponse {
   snapshots: HistorySnapshot[];
 }
 
+// WeakMap cache for expanded snapshots — keyed on the snapshot territories
+// object reference for zero-cost lookup. Auto-evicts when snapshots are GC'd.
+const expandWeakCache = new WeakMap<Record<string, SnapshotTerritory>, Record<string, Territory>>();
+
 /**
  * Expand a condensed snapshot into full Territory format.
  * Uses verbose data for location info since snapshots don't store coordinates.
+ * Results are cached by object reference via WeakMap.
  */
 export function expandSnapshot(
   snapshotTerritories: Record<string, SnapshotTerritory>,
   verboseData: Record<string, { Location: { start: [number, number]; end: [number, number] } }> | null,
   guildColors?: Record<string, string>
 ): Record<string, Territory> {
+  const cached = expandWeakCache.get(snapshotTerritories);
+  if (cached) return cached;
+
   const territories: Record<string, Territory> = {};
 
   for (const [abbrev, data] of Object.entries(snapshotTerritories)) {
@@ -68,6 +76,7 @@ export function expandSnapshot(
     };
   }
 
+  expandWeakCache.set(snapshotTerritories, territories);
   return territories;
 }
 
@@ -96,78 +105,132 @@ export function compressToSnapshot(
 }
 
 /**
- * Parse ISO timestamp strings to Date objects for a batch of snapshots
+ * Parse ISO timestamp strings to Date objects for a batch of snapshots.
+ * Returns snapshots sorted ascending by timestamp for binary search.
  */
 export function parseSnapshots(snapshots: HistorySnapshot[]): ParsedSnapshot[] {
-  return snapshots.map(s => ({
-    timestamp: new Date(s.timestamp),
-    territories: s.territories,
-  }));
+  return snapshots
+    .map(s => ({
+      timestamp: new Date(s.timestamp),
+      territories: s.territories,
+    }))
+    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 }
 
 /**
- * Find the nearest snapshot to a target timestamp
+ * Binary search for the index of the nearest snapshot to a target time.
+ * Assumes snapshots are sorted ascending by timestamp.
+ * Returns the index, or -1 if the array is empty.
+ */
+export function binarySearchNearest(
+  snapshots: ParsedSnapshot[],
+  targetMs: number
+): number {
+  if (snapshots.length === 0) return -1;
+
+  let lo = 0;
+  let hi = snapshots.length - 1;
+
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (snapshots[mid].timestamp.getTime() < targetMs) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+
+  // lo is now the first index >= targetMs
+  if (lo === 0) return 0;
+
+  const diffLo = Math.abs(snapshots[lo].timestamp.getTime() - targetMs);
+  const diffPrev = Math.abs(snapshots[lo - 1].timestamp.getTime() - targetMs);
+
+  return diffPrev <= diffLo ? lo - 1 : lo;
+}
+
+/**
+ * Find the nearest snapshot to a target timestamp.
+ * Uses binary search on the pre-sorted array — O(log n).
  */
 export function findNearestSnapshot(
   snapshots: ParsedSnapshot[],
   target: Date
 ): ParsedSnapshot | null {
-  if (snapshots.length === 0) return null;
-
-  let nearest = snapshots[0];
-  let nearestDiff = Math.abs(target.getTime() - nearest.timestamp.getTime());
-
-  for (const snapshot of snapshots) {
-    const diff = Math.abs(target.getTime() - snapshot.timestamp.getTime());
-    if (diff < nearestDiff) {
-      nearestDiff = diff;
-      nearest = snapshot;
-    }
-  }
-
-  return nearest;
+  const idx = binarySearchNearest(snapshots, target.getTime());
+  return idx === -1 ? null : snapshots[idx];
 }
 
 /**
- * Get the next snapshot after the current one
+ * Get the next snapshot after the current timestamp.
+ * Binary search for first element > current — O(log n).
  */
 export function getNextSnapshot(
   snapshots: ParsedSnapshot[],
   current: Date
 ): ParsedSnapshot | null {
-  // Sort by timestamp
-  const sorted = [...snapshots].sort((a, b) =>
-    a.timestamp.getTime() - b.timestamp.getTime()
-  );
-
-  for (const snapshot of sorted) {
-    if (snapshot.timestamp.getTime() > current.getTime()) {
-      return snapshot;
+  const targetMs = current.getTime();
+  let lo = 0, hi = snapshots.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (snapshots[mid].timestamp.getTime() <= targetMs) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
     }
   }
-
-  return null;
+  return lo < snapshots.length ? snapshots[lo] : null;
 }
 
 /**
- * Get the previous snapshot before the current one
+ * Get the previous snapshot before the current timestamp.
+ * Binary search for last element < current — O(log n).
  */
 export function getPrevSnapshot(
   snapshots: ParsedSnapshot[],
   current: Date
 ): ParsedSnapshot | null {
-  // Sort by timestamp descending
-  const sorted = [...snapshots].sort((a, b) =>
-    b.timestamp.getTime() - a.timestamp.getTime()
-  );
-
-  for (const snapshot of sorted) {
-    if (snapshot.timestamp.getTime() < current.getTime()) {
-      return snapshot;
+  const targetMs = current.getTime();
+  let lo = 0, hi = snapshots.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (snapshots[mid].timestamp.getTime() < targetMs) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
     }
   }
+  // lo is the first index >= targetMs, so lo-1 is the last < targetMs
+  return lo > 0 ? snapshots[lo - 1] : null;
+}
 
-  return null;
+/**
+ * Merge new snapshots into an existing sorted array, deduplicating by timestamp.
+ * Both inputs must be sorted ascending by timestamp.
+ * Caps at maxSnapshots if provided.
+ */
+export function mergeSnapshots(
+  existing: ParsedSnapshot[],
+  incoming: ParsedSnapshot[],
+  maxSnapshots?: number
+): ParsedSnapshot[] {
+  if (existing.length === 0) return incoming;
+  if (incoming.length === 0) return existing;
+
+  const existingTimestamps = new Set(existing.map(s => s.timestamp.getTime()));
+  const newOnly = incoming.filter(s => !existingTimestamps.has(s.timestamp.getTime()));
+
+  if (newOnly.length === 0) return existing;
+
+  const merged = [...existing, ...newOnly].sort(
+    (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+  );
+
+  if (maxSnapshots && merged.length > maxSnapshots) {
+    return merged.slice(merged.length - maxSnapshots);
+  }
+
+  return merged;
 }
 
 /**

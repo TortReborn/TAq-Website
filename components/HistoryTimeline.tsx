@@ -7,8 +7,6 @@ interface HistoryTimelineProps {
   latest: Date;
   current: Date;
   onChange: (date: Date) => void;
-  loadedStart?: Date;
-  loadedEnd?: Date;
   snapshots?: Date[]; // Available snapshot timestamps to snap to
 }
 
@@ -17,8 +15,6 @@ export default function HistoryTimeline({
   latest,
   current,
   onChange,
-  loadedStart,
-  loadedEnd,
   snapshots,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -32,14 +28,6 @@ export default function HistoryTimeline({
     if (totalRange === 0) return 0;
     return ((current.getTime() - earliest.getTime()) / totalRange) * 100;
   }, [current, earliest, totalRange]);
-
-  // Calculate loaded range percentages
-  const loadedPercents = useMemo(() => {
-    if (!loadedStart || !loadedEnd || totalRange === 0) return null;
-    const startPercent = ((loadedStart.getTime() - earliest.getTime()) / totalRange) * 100;
-    const endPercent = ((loadedEnd.getTime() - earliest.getTime()) / totalRange) * 100;
-    return { start: Math.max(0, startPercent), end: Math.min(100, endPercent) };
-  }, [loadedStart, loadedEnd, earliest, totalRange]);
 
   // Helper to convert percentage to CSS position that keeps thumb within bounds
   // At 0%: 12px from left, at 100%: 12px from right (for 24px thumb)
@@ -55,29 +43,66 @@ export default function HistoryTimeline({
     return new Date(timestamp);
   }, [earliest, totalRange]);
 
-  // Find the nearest snapshot to a given date
+  // Pre-compute sorted ms values for binary search snapping
+  const sortedSnapshotMs = useMemo(() => {
+    if (!snapshots || snapshots.length === 0) return null;
+    return snapshots.map(s => s.getTime());
+  }, [snapshots]);
+
+  // Find the nearest snapshot using binary search — O(log n).
+  // Returns the raw date if no snapshots are loaded or if the nearest
+  // snapshot is too far away (allows dragging beyond the loaded range).
   const findNearestSnapshot = useCallback((targetDate: Date): Date => {
-    if (!snapshots || snapshots.length === 0) {
+    if (!sortedSnapshotMs || sortedSnapshotMs.length === 0 || !snapshots) {
       return targetDate;
     }
 
-    let nearest = snapshots[0];
-    let nearestDiff = Math.abs(nearest.getTime() - targetDate.getTime());
+    const targetMs = targetDate.getTime();
+    let lo = 0, hi = sortedSnapshotMs.length - 1;
 
-    for (const snapshot of snapshots) {
-      const diff = Math.abs(snapshot.getTime() - targetDate.getTime());
-      if (diff < nearestDiff) {
-        nearestDiff = diff;
-        nearest = snapshot;
+    while (lo < hi) {
+      const mid = (lo + hi) >>> 1;
+      if (sortedSnapshotMs[mid] < targetMs) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
       }
     }
 
-    return nearest;
-  }, [snapshots]);
+    if (lo === 0) {
+      // If the nearest snapshot is far from the target, don't snap
+      if (Math.abs(sortedSnapshotMs[0] - targetMs) > totalRange * 0.02) {
+        return targetDate;
+      }
+      return snapshots[0];
+    }
+
+    const diffLo = Math.abs(sortedSnapshotMs[lo] - targetMs);
+    const diffPrev = Math.abs(sortedSnapshotMs[lo - 1] - targetMs);
+    const nearest = diffPrev <= diffLo ? lo - 1 : lo;
+    const nearestDiff = Math.min(diffLo, diffPrev);
+
+    // Don't snap if the nearest snapshot is more than 2% of the total range away
+    if (nearestDiff > totalRange * 0.02) {
+      return targetDate;
+    }
+
+    return snapshots[nearest];
+  }, [sortedSnapshotMs, snapshots, totalRange]);
+
+  // Throttle ref for drag interactions (16ms = ~60fps)
+  const lastDragUpdateRef = useRef<number>(0);
 
   // Handle click/drag on the track
   // Account for 12px padding on each side where the thumb center lives (for 24px thumb)
-  const handleTrackInteraction = useCallback((clientX: number) => {
+  const handleTrackInteraction = useCallback((clientX: number, force?: boolean) => {
+    // Throttle to ~60fps during drag
+    if (!force) {
+      const now = performance.now();
+      if (now - lastDragUpdateRef.current < 16) return;
+      lastDragUpdateRef.current = now;
+    }
+
     const track = trackRef.current;
     if (!track) return;
 
@@ -100,7 +125,7 @@ export default function HistoryTimeline({
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
-    handleTrackInteraction(e.clientX);
+    handleTrackInteraction(e.clientX, true); // force: skip throttle on initial click
   };
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -179,20 +204,6 @@ export default function HistoryTimeline({
           overflow: 'hidden',
         }}
       >
-        {/* Loaded range indicator */}
-        {loadedPercents && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              left: `${loadedPercents.start}%`,
-              right: `${100 - loadedPercents.end}%`,
-              background: 'rgba(59, 130, 246, 0.2)',
-            }}
-          />
-        )}
-
         {/* Progress fill - ends at thumb center */}
         <div
           style={{

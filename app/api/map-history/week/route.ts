@@ -10,6 +10,8 @@ const HALF_WEEK_MS = 3.5 * 24 * 60 * 60 * 1000;
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const centerParam = searchParams.get('center');
+  const limitParam = searchParams.get('limit');
+  const offsetParam = searchParams.get('offset');
 
   if (!centerParam) {
     return NextResponse.json(
@@ -26,17 +28,28 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const limit = limitParam ? Math.min(Math.max(1, parseInt(limitParam, 10) || 2000), 2000) : null;
+  const offset = offsetParam ? Math.max(0, parseInt(offsetParam, 10) || 0) : 0;
+
   const startDate = new Date(centerDate.getTime() - HALF_WEEK_MS);
   const endDate = new Date(centerDate.getTime() + HALF_WEEK_MS);
 
   // Use test data if enabled
   if (USE_TEST_DATA) {
-    const snapshots = getTestSnapshotsInRange(centerDate, HALF_WEEK_MS * 2);
+    const allSnapshots = getTestSnapshotsInRange(centerDate, HALF_WEEK_MS * 2);
+    const total = allSnapshots.length;
+    const snapshots = limit !== null
+      ? allSnapshots.slice(offset, offset + limit)
+      : allSnapshots;
+
     return NextResponse.json({
       center: centerDate.toISOString(),
       start: startDate.toISOString(),
       end: endDate.toISOString(),
+      total,
+      offset,
       count: snapshots.length,
+      hasMore: limit !== null && offset + snapshots.length < total,
       snapshots,
     }, {
       headers: {
@@ -48,13 +61,30 @@ export async function GET(request: NextRequest) {
   const pool = getPool();
 
   try {
-    // Fetch all snapshots within the week range
-    const result = await pool.query(`
+    // Get total count for pagination metadata
+    const countResult = await pool.query(`
+      SELECT COUNT(*)::int as total
+      FROM territory_snapshots
+      WHERE snapshot_time >= $1 AND snapshot_time <= $2
+    `, [startDate.toISOString(), endDate.toISOString()]);
+
+    const total = countResult.rows[0].total;
+
+    // Fetch snapshots with optional pagination
+    let query = `
       SELECT snapshot_time, territories
       FROM territory_snapshots
       WHERE snapshot_time >= $1 AND snapshot_time <= $2
       ORDER BY snapshot_time ASC
-    `, [startDate.toISOString(), endDate.toISOString()]);
+    `;
+    const params: (string | number)[] = [startDate.toISOString(), endDate.toISOString()];
+
+    if (limit !== null) {
+      query += ` LIMIT $3 OFFSET $4`;
+      params.push(limit, offset);
+    }
+
+    const result = await pool.query(query, params);
 
     const snapshots = result.rows.map(row => ({
       timestamp: row.snapshot_time.toISOString(),
@@ -65,7 +95,10 @@ export async function GET(request: NextRequest) {
       center: centerDate.toISOString(),
       start: startDate.toISOString(),
       end: endDate.toISOString(),
+      total,
+      offset,
       count: snapshots.length,
+      hasMore: limit !== null && offset + snapshots.length < total,
       snapshots,
     }, {
       headers: {
