@@ -386,7 +386,27 @@ class SimpleDatabaseCache {
         [targetDatesArray]
       );
 
-      // 4. Group results by snapshot_date string.
+      // 4. Get the earliest snapshot per member — used as fallback for members
+      //    who joined after a period's target date (e.g. joined 5 days ago but
+      //    we're looking at 30-day leaderboard).
+      const earliestResult = await client.query(
+        `SELECT DISTINCT ON (uuid) uuid, playtime, contributed, wars, raids, shells
+         FROM player_activity
+         ORDER BY uuid, snapshot_date ASC`
+      );
+      const earliestByMember: Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }> = {};
+      for (const row of earliestResult.rows) {
+        earliestByMember[row.uuid] = {
+          uuid: row.uuid,
+          playtime: row.playtime,
+          contributed: row.contributed,
+          wars: row.wars,
+          raids: row.raids,
+          shells: row.shells
+        };
+      }
+
+      // 5. Group results by snapshot_date string.
       const dataByDate: Record<string, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
       for (const row of snapshotResult.rows) {
         const dateKey = row.snapshot_date;
@@ -401,11 +421,21 @@ class SimpleDatabaseCache {
         };
       }
 
-      // 5. Map each period back to its resolved date's data.
+      // 6. Map each period back to its resolved date's data, filling in
+      //    missing members with their earliest available snapshot.
       const snapshots: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
       for (const period of daysArray) {
         const dateKey = periodToDate.get(period)!;
-        snapshots[period] = dataByDate[dateKey] || {};
+        const dateData = { ...(dataByDate[dateKey] || {}) };
+
+        // For members not present at this target date, use their earliest snapshot
+        for (const [uuid, earliest] of Object.entries(earliestByMember)) {
+          if (!dateData[uuid]) {
+            dateData[uuid] = earliest;
+          }
+        }
+
+        snapshots[period] = dateData;
       }
 
       const memberCounts = daysArray.map(p => {
