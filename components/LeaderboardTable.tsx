@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
 interface TimeFrameStats {
   wars: number;
@@ -35,44 +35,26 @@ interface Member {
 
 interface LeaderboardTableProps {
   members: Member[];
-  onRefresh?: () => void;
   timeFrame: string;
-  onTimeFrameChange: (timeFrame: string) => void;
+  searchTerm: string;
 }
 
 type SortableColumn = 'username' | 'discordRank' | 'wars' | 'raids' | 'shells' | 'contributed' | 'playtime';
 type SortDirection = 'asc' | 'desc';
 
-export default function LeaderboardTable({ members, onRefresh, timeFrame, onTimeFrameChange }: LeaderboardTableProps) {
-  const [sortColumn, setSortColumn] = useState<SortableColumn>('raids');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [initialized, setInitialized] = useState(false);
-
-  // Load saved sort preferences from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !initialized) {
-      const savedSortColumn = localStorage.getItem('leaderboardSortColumn') as SortableColumn;
-      const savedSortDirection = localStorage.getItem('leaderboardSortDirection') as SortDirection;
-
-      if (savedSortColumn) {
-        setSortColumn(savedSortColumn);
-      }
-      if (savedSortDirection) {
-        setSortDirection(savedSortDirection);
-      }
-
-      setInitialized(true);
+export default function LeaderboardTable({ members, timeFrame, searchTerm }: LeaderboardTableProps) {
+  const [sortColumn, setSortColumn] = useState<SortableColumn>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('leaderboardSortColumn') as SortableColumn) || 'raids';
     }
-  }, [initialized]);
-
-  const timeFrames = [
-    { value: '1', label: '24 Hours' },
-    { value: '7', label: '7 Days' },
-    { value: '14', label: '14 Days' },
-    { value: '30', label: '30 Days' },
-    { value: 'all', label: 'All Time' }
-  ];
+    return 'raids';
+  });
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('leaderboardSortDirection') as SortDirection) || 'desc';
+    }
+    return 'desc';
+  });
 
   const formatPlaytime = (minutes: number) => {
     const roundedMinutes = Math.round(minutes);
@@ -205,101 +187,6 @@ export default function LeaderboardTable({ members, onRefresh, timeFrame, onTime
       gap: '1.5rem',
       width: '100%'
     }}>
-      {/* Time Frame Selector */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: '0.75rem',
-        border: '1px solid var(--border-card)',
-        padding: '1.5rem'
-      }}>
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <div style={{
-            display: 'flex',
-            gap: '0.5rem',
-            flexWrap: 'wrap'
-          }}>
-            {timeFrames.map(tf => (
-              <button
-                key={tf.value}
-                onClick={() => onTimeFrameChange(tf.value)}
-                style={{
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.5rem',
-                  border: '1px solid',
-                  borderColor: timeFrame === tf.value ? 'var(--color-ocean-500)' : 'var(--border-card)',
-                  background: timeFrame === tf.value ? 'var(--color-ocean-500)' : 'transparent',
-                  color: timeFrame === tf.value ? '#fff' : 'var(--text-primary)',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {tf.label}
-              </button>
-            ))}
-          </div>
-
-          <div style={{
-            display: 'flex',
-            gap: '0.75rem',
-            alignItems: 'center'
-          }}>
-            <input
-              type="text"
-              placeholder="Search member..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                borderRadius: '0.5rem',
-                border: '1px solid var(--border-card)',
-                background: 'var(--bg-primary)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem',
-                width: '200px'
-              }}
-            />
-
-            {onRefresh && (
-              <button
-                onClick={onRefresh}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '0.5rem',
-                  border: '1px solid var(--border-card)',
-                  background: 'transparent',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-secondary)';
-                  e.currentTarget.style.borderColor = 'var(--color-ocean-500)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.borderColor = 'var(--border-card)';
-                }}
-              >
-                Refresh
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Main Table */}
       {filteredAndSortedMembers.length > 0 ? (
         <div style={{

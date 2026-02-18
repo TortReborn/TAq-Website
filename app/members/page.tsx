@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MemberGrid from "@/components/MemberGrid";
 import PageHeader from "@/components/PageHeader";
 import { useMembers } from "@/hooks/useMembers";
@@ -42,16 +42,12 @@ interface MembersData {
 
 export default function MembersPage() {
   const { membersData, loading, error, refresh } = useMembers();
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-
-  useEffect(() => {
+  const [showOnlineOnly, setShowOnlineOnly] = useState(() => {
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('membersOnlineOnly');
-      if (cached !== null) {
-        setShowOnlineOnly(cached === 'true');
-      }
+      return localStorage.getItem('membersOnlineOnly') === 'true';
     }
-  }, []);
+    return false;
+  });
 
   const handleToggleOnlineOnly = () => {
     const newValue = !showOnlineOnly;
