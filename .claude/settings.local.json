@@ -7,7 +7,9 @@
       "Bash(npx tsc --noEmit)",
       "Bash(npx tsc:*)",
       "Bash(cat:*)",
-      "WebFetch(domain:nori.fish)"
+      "WebFetch(domain:nori.fish)",
+      "Bash(npm install:*)",
+      "Bash(npx next build:*)"
     ],
     "deny": [],
     "ask": []

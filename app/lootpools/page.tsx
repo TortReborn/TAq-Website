@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { getImageForItem, raidImageMap, classImageMap } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
 import Image from 'next/image';
 import PageHeader from '@/components/PageHeader';
+import { useLootruns, useAspects } from '@/hooks/useLootpools';
+import LootpoolSkeleton from '@/components/skeletons/LootpoolSkeleton';
 
 interface LootData {
   Timestamp: number;
@@ -26,102 +28,35 @@ interface LootData {
 
 export default function LootpoolsPage() {
   const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('lootruns');
-  const [lootrunsData, setLootrunsData] = useState<LootData | null>(null);
-  const [aspectsData, setAspectsData] = useState<LootData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: lootrunsData, loading: lootrunsLoading, error: lootrunsError } = useLootruns();
+  const { data: aspectsData, loading: aspectsLoading, error: aspectsError } = useAspects();
 
-  // Helper function to handle API responses with rate limiting
-  const handleApiResponse = async (response: Response, apiName: string) => {
-    if (!response.ok) {
-      if (response.status === 429) {
-        // Rate limit exceeded - this should be shown to user
-        const errorData = await response.json();
-        throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
-      } else {
-        // Other errors - return null
-        return null;
-      }
-    }
-    return await response.json();
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Fetch aspects data
-        const aspectsResponse = await fetch('/api/lootpools/aspects');
-        const aspectsData = await handleApiResponse(aspectsResponse, 'Aspects');
-        
-        setAspectsData(aspectsData);
-
-        // Fetch lootruns data
-        const lootrunsResponse = await fetch('/api/lootpools/lootruns');
-        const lootrunsData = await handleApiResponse(lootrunsResponse, 'Lootruns');
-        setLootrunsData(lootrunsData);
-
-      } catch (err) {
-        if (err instanceof Error && err.message.includes('Rate limit exceeded')) {
-          setError(err.message);
-        } else {
-          setError('Failed to load lootpool data. Please try again later.');
-        }
-        // Don't set any data on error
-        setLootrunsData(null);
-        setAspectsData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Initial fetch
-    fetchData();
-  }, []);
-
-  const formatNextRotation = (timestamp: number) => {
-    const nextRotation = new Date((timestamp + 604800) * 1000);
-    return nextRotation.toLocaleString();
-  };
+  const loading = lootrunsLoading || aspectsLoading;
+  const error = lootrunsError || aspectsError;
 
   if (loading) {
-    return (
-      <div style={{ 
-        padding: '2rem', 
-        textAlign: 'center',
-        minHeight: '50vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{ fontSize: '1.125rem', color: 'var(--text-muted)' }}>
-          Loading lootpool data...
-        </div>
-      </div>
-    );
+    return <LootpoolSkeleton />;
   }
 
   if (error) {
     return (
-      <div style={{ 
-        padding: '2rem', 
+      <div style={{
+        padding: '2rem',
         textAlign: 'center',
         minHeight: '50vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <div style={{ 
-          fontSize: '1.125rem', 
+        <div style={{
+          fontSize: '1.125rem',
           color: '#e33232',
           background: 'var(--bg-card)',
           padding: '1.5rem',
           borderRadius: '0.5rem',
           border: '1px solid #e33232'
         }}>
-          ❌ {error}
+          {error}
         </div>
       </div>
     );

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import MemberGrid from "@/components/MemberGrid";
 import PageHeader from "@/components/PageHeader";
+import { useMembers } from "@/hooks/useMembers";
+import MemberGridSkeleton from "@/components/skeletons/MemberGridSkeleton";
 
 interface Guild {
   name: string;
@@ -39,47 +41,16 @@ interface MembersData {
 }
 
 export default function MembersPage() {
-  const [membersData, setMembersData] = useState<MembersData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { membersData, loading, error, refresh } = useMembers();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
-  const fetchMembersData = async () => {
-    try {
-      const response = await fetch('/api/members', {
-        cache: 'no-store'
-      });
-      if (!response.ok) {
-        if (response.status === 429) {
-          const errorData = await response.json();
-          throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
-        } else {
-          throw new Error(`HTTP ${response.status}: Failed to fetch members data`);
-        }
-      }
-      const data = await response.json();
-      
-      // The API now returns members already flattened and with Discord data included
-      setMembersData(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching members data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load members data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // Load cached preference
     if (typeof window !== 'undefined') {
       const cached = localStorage.getItem('membersOnlineOnly');
       if (cached !== null) {
         setShowOnlineOnly(cached === 'true');
       }
     }
-    // Initial fetch
-    fetchMembersData();
   }, []);
 
   const handleToggleOnlineOnly = () => {
@@ -97,11 +68,12 @@ export default function MembersPage() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        paddingTop: '5rem',
-        paddingLeft: '1rem',
-        paddingRight: '1rem'
+        padding: '2rem',
+        minHeight: '100vh'
       }}>
-        <div style={{ color: 'var(--text-primary)' }}>Loading...</div>
+        <div style={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+          <MemberGridSkeleton />
+        </div>
       </main>
     );
   }
@@ -276,7 +248,7 @@ export default function MembersPage() {
           }}>
             <MemberGrid
               members={membersData.members}
-              onRefresh={fetchMembersData}
+              onRefresh={refresh}
               showOnlineOnly={showOnlineOnly}
             />
           </div>

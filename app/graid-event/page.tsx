@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { fmtDate } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
 import EventTable from "@/components/EventTable";
+import { useGraidEvent } from "@/hooks/useGraidEvent";
+import EventSkeleton from "@/components/skeletons/EventSkeleton";
 
 interface ActiveEvent {
   id: number;
@@ -32,54 +33,10 @@ interface EventData {
 }
 
 export default function GraidEventPage() {
-  const [eventData, setEventData] = useState<EventData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchEventData = async () => {
-    try {
-      const response = await fetch('/api/graid-event', {
-        cache: 'no-store'
-      });
-      
-      if (!response.ok) {
-        if (response.status === 429) {
-          // Rate limit exceeded
-          const errorData = await response.json();
-          throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
-        } else {
-          throw new Error(`HTTP ${response.status}: Failed to fetch event data`);
-        }
-      }
-      
-      const data = await response.json();
-      setEventData(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching event data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load event data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEventData();
-  }, []);
+  const { eventData, loading, error, refresh } = useGraidEvent();
 
   if (loading) {
-    return (
-      <main style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: '5rem',
-        paddingLeft: '1rem',
-        paddingRight: '1rem'
-      }}>
-        <div style={{ color: 'var(--text-primary)' }}>Loading...</div>
-      </main>
-    );
+    return <EventSkeleton />;
   }
 
   if (error) {
@@ -293,7 +250,7 @@ export default function GraidEventPage() {
           <EventTable
             rows={showRows}
             minc={showEvent?.minc ?? 0}
-            onRefresh={fetchEventData}
+            onRefresh={refresh}
           />
         </div>
 

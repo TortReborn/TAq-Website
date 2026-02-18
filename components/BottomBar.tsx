@@ -1,46 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-interface GuildData {
-  guild: {
-    name: string;
-    prefix: string;
-    level: number;
-    territories: number;
-    totalMembers: number;
-    onlineMembers: number;
-  };
-}
-
 export default function BottomBar() {
   const pathname = usePathname();
-  const [guildData, setGuildData] = useState<GuildData | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  // Don't render on map page
   if (pathname === '/map') {
     return null;
   }
-
-  useEffect(() => {
-    const fetchGuildData = async () => {
-      try {
-        const response = await fetch('/api/members', { cache: 'no-store' });
-        if (response.ok) {
-          const data = await response.json();
-          setGuildData(data);
-          setLastUpdated(new Date().toLocaleString());
-        }
-      } catch (error) {
-        console.error('Failed to fetch guild data for footer:', error);
-      }
-    };
-
-    fetchGuildData();
-  }, []);
 
   return (
     <footer style={{

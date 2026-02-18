@@ -2,6 +2,8 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
+import Link from 'next/link';
+import NavLink from '@/components/NavLink';
 import BottomBar from '@/components/BottomBar';
 import { Analytics } from "@vercel/analytics/react";
 
@@ -224,9 +226,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         }}>
           {/* Left side - Logo and Navigation Links */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <a 
-              href="/" 
-              style={{ 
+            <Link
+              href="/"
+              style={{
                 textDecoration: 'none',
                 transition: 'all 0.3s ease',
                 display: 'flex',
@@ -247,8 +249,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.1)';
               }}
             >
-              <img 
-                src="/images/guildimages/icontransparent.png" 
+              <img
+                src="/images/guildimages/icontransparent.png"
                 alt="Home"
                 style={{
                   width: '42px',
@@ -257,7 +259,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.2))'
                 }}
               />
-            </a>
+            </Link>
 
             {/* Desktop Navigation Links */}
             <div className="desktop-nav" style={{
@@ -265,7 +267,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               gap: '1.5rem',
               alignItems: 'center'
             }}>
-            <a
+            <NavLink
               href="/members"
               style={{
                 color: 'var(--text-primary)',
@@ -284,8 +286,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-            >Members</a>
-            <a
+            >Members</NavLink>
+            <NavLink
               href="/leaderboard"
               style={{
                 color: 'var(--text-primary)',
@@ -304,8 +306,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-            >Leaderboard</a>
-            <a
+            >Leaderboard</NavLink>
+            <NavLink
               href="/graid-event"
               style={{
                 color: 'var(--text-primary)',
@@ -324,8 +326,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-            >Graid Event</a>
-            <a
+            >Graid Event</NavLink>
+            <Link
               href="/map"
               style={{
                 color: 'var(--text-primary)',
@@ -344,8 +346,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-            >Map</a>
-            <a
+            >Map</Link>
+            <NavLink
               href="/lootpools"
               style={{
                 color: 'var(--text-primary)',
@@ -364,7 +366,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-            >Lootpools</a>
+            >Lootpools</NavLink>
             </div>
           </div>
 
@@ -534,7 +536,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               flexDirection: 'column',
               gap: '0.5rem'
             }}>
-              <a
+              <NavLink
                 href="/members"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
@@ -552,8 +554,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Members</a>
-              <a
+              >Members</NavLink>
+              <NavLink
                 href="/leaderboard"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
@@ -571,8 +573,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Leaderboard</a>
-              <a
+              >Leaderboard</NavLink>
+              <NavLink
                 href="/graid-event"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
@@ -590,8 +592,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Graid Event</a>
-              <a
+              >Graid Event</NavLink>
+              <Link
                 href="/map"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
@@ -609,8 +611,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Map</a>
-              <a
+              >Map</Link>
+              <NavLink
                 href="/lootpools"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
@@ -628,7 +630,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Lootpools</a>
+              >Lootpools</NavLink>
             </div>
           )}
         </nav>

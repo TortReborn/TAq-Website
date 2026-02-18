@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import LeaderboardTable from "@/components/LeaderboardTable";
+import { useLeaderboard } from "@/hooks/useLeaderboard";
+import LeaderboardSkeleton from "@/components/skeletons/LeaderboardSkeleton";
 
 interface Guild {
   name: string;
@@ -50,85 +52,27 @@ interface MembersData {
 }
 
 export default function LeaderboardPage() {
-  const [membersData, setMembersData] = useState<MembersData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [timeFrame, setTimeFrame] = useState('7'); // Default to 7 days
-  const [initialized, setInitialized] = useState(false);
-
-  const fetchMembersData = async () => {
-    setLoading(true);
-
-    try {
-      // Fetch all time periods at once - no need to specify timeFrame
-      const response = await fetch('/api/members/activity', {
-        cache: 'no-store'
-      });
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          const errorData = await response.json();
-          throw new Error(`Rate limit exceeded. ${errorData.message || 'Please try again later.'}`);
-        } else {
-          throw new Error(`HTTP ${response.status}: Failed to fetch members data`);
-        }
-      }
-
-      const data = await response.json();
-      setMembersData(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching members data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load leaderboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { membersData, loading, error, refresh } = useLeaderboard();
+  const [timeFrame, setTimeFrame] = useState('7');
 
   const handleTimeFrameChange = (newTimeFrame: string) => {
     setTimeFrame(newTimeFrame);
-    // Save to localStorage - no API call needed, data is already loaded
     if (typeof window !== 'undefined') {
       localStorage.setItem('leaderboardTimeFrame', newTimeFrame);
     }
   };
 
   useEffect(() => {
-    // Load saved time frame from localStorage and fetch data once
-    if (typeof window !== 'undefined' && !initialized) {
+    if (typeof window !== 'undefined') {
       const savedTimeFrame = localStorage.getItem('leaderboardTimeFrame');
       if (savedTimeFrame) {
         setTimeFrame(savedTimeFrame);
       }
-      // Fetch all time periods data once
-      fetchMembersData();
-      setInitialized(true);
-    } else if (initialized) {
-      // Only set up interval after initialization
-      const interval = setInterval(() => fetchMembersData(), 60000);
-      return () => clearInterval(interval);
     }
-  }, [initialized]);
+  }, []);
 
   if (loading && !membersData) {
-    return (
-      <main style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: '5rem',
-        paddingLeft: '1rem',
-        paddingRight: '1rem',
-        paddingBottom: '2rem'
-      }}>
-        <div style={{
-          color: 'var(--text-primary)',
-          fontSize: '1.125rem'
-        }}>
-          Loading leaderboard...
-        </div>
-      </main>
-    );
+    return <LeaderboardSkeleton />;
   }
 
   if (error && !membersData) {
@@ -230,7 +174,7 @@ export default function LeaderboardPage() {
 
         <LeaderboardTable
           members={membersData.members}
-          onRefresh={() => fetchMembersData()}
+          onRefresh={refresh}
           timeFrame={timeFrame}
           onTimeFrameChange={handleTimeFrameChange}
         />
