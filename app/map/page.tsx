@@ -526,7 +526,7 @@ export default function MapPage() {
   useEffect(() => {
     if (isInitialized && viewMode === 'history' && historyBounds && loadedSnapshots.length === 0) {
       const centerDate = new Date(historyBounds.latest);
-      loadWeekSnapshots(centerDate);
+      loadWeekSnapshots(centerDate, true);
     }
   }, [isInitialized, viewMode, historyBounds, loadedSnapshots.length, loadWeekSnapshots]);
 
