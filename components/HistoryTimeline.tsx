@@ -19,6 +19,8 @@ export default function HistoryTimeline({
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [hoverPercent, setHoverPercent] = useState<number | null>(null);
+  const [hoverX, setHoverX] = useState(0);
 
   // Calculate the total range in milliseconds
   const totalRange = latest.getTime() - earliest.getTime();
@@ -121,10 +123,37 @@ export default function HistoryTimeline({
     onChange(newDate);
   }, [percentToDate, findNearestSnapshot, onChange]);
 
+  // Hover tracking for tooltip
+  const handleTrackHover = useCallback((e: React.MouseEvent) => {
+    const track = trackRef.current;
+    if (!track || isDragging) return;
+    const rect = track.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const padding = 12;
+    const usableWidth = rect.width - padding * 2;
+    const adjustedX = Math.max(0, Math.min(usableWidth, x - padding));
+    const percent = usableWidth > 0 ? (adjustedX / usableWidth) * 100 : 0;
+    setHoverPercent(percent);
+    setHoverX(x);
+  }, [isDragging]);
+
+  const handleTrackLeave = useCallback(() => {
+    if (!isDragging) {
+      setHoverPercent(null);
+    }
+  }, [isDragging]);
+
+  // Compute hovered date from percent
+  const hoverDate = useMemo(() => {
+    if (hoverPercent === null) return null;
+    return percentToDate(hoverPercent);
+  }, [hoverPercent, percentToDate]);
+
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
+    setHoverPercent(null);
     handleTrackInteraction(e.clientX, true); // force: skip throttle on initial click
   };
 
@@ -136,6 +165,7 @@ export default function HistoryTimeline({
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+    setHoverPercent(null);
   }, []);
 
   useEffect(() => {
@@ -194,6 +224,8 @@ export default function HistoryTimeline({
         ref={trackRef}
         data-timeline-track
         onMouseDown={handleMouseDown}
+        onMouseMove={handleTrackHover}
+        onMouseLeave={handleTrackLeave}
         onClick={(e) => e.stopPropagation()}
         style={{
           position: 'relative',
@@ -201,9 +233,37 @@ export default function HistoryTimeline({
           background: 'var(--bg-tertiary)',
           borderRadius: '12px',
           cursor: 'pointer',
-          overflow: 'hidden',
+          overflow: 'visible',
         }}
       >
+        {/* Hover tooltip */}
+        {hoverDate && (
+          <div style={{
+            position: 'absolute',
+            bottom: '100%',
+            left: `${hoverX}px`,
+            transform: 'translateX(-50%)',
+            marginBottom: '6px',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.375rem',
+            background: 'var(--bg-card-solid, var(--bg-card))',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            fontSize: '0.75rem',
+            color: 'var(--text-primary)',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 20,
+          }}>
+            {hoverDate.toLocaleString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </div>
+        )}
         {/* Progress fill - ends at thumb center */}
         <div
           style={{
@@ -214,6 +274,7 @@ export default function HistoryTimeline({
             width: percentToPosition(currentPercent),
             background: 'var(--accent-primary)',
             opacity: 0.3,
+            borderRadius: '12px 0 0 12px',
           }}
         />
 

@@ -7,14 +7,12 @@ interface HistoryPlaybackProps {
   onSpeedChange: (speed: number) => void;
   onStepForward: () => void;
   onStepBackward: () => void;
-  onGoToFirst: () => void;
-  onGoToLatest: () => void;
   canStepForward: boolean;
   canStepBackward: boolean;
   hideSpeed?: boolean;
 }
 
-const SPEED_OPTIONS = [0.5, 1, 2, 5, 10];
+const SPEED_OPTIONS = [0.5, 1, 2, 5, 10, 100];
 
 export default function HistoryPlayback({
   isPlaying,
@@ -23,8 +21,6 @@ export default function HistoryPlayback({
   onSpeedChange,
   onStepForward,
   onStepBackward,
-  onGoToFirst,
-  onGoToLatest,
   canStepForward,
   canStepBackward,
   hideSpeed = false,
@@ -40,6 +36,7 @@ export default function HistoryPlayback({
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'all 0.15s ease',
+    flexShrink: 0,
   };
 
   const disabledStyle: React.CSSProperties = {
@@ -52,22 +49,9 @@ export default function HistoryPlayback({
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: '0.25rem',
+      gap: '0.375rem',
+      flexShrink: 0,
     }}>
-      {/* Go to first */}
-      <button
-        type="button"
-        onClick={onGoToFirst}
-        disabled={!canStepBackward}
-        style={canStepBackward ? buttonStyle : disabledStyle}
-        title="Go to first snapshot"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="11,17 6,12 11,7" />
-          <polyline points="18,17 13,12 18,7" />
-        </svg>
-      </button>
-
       {/* Step backward */}
       <button
         type="button"
@@ -115,20 +99,6 @@ export default function HistoryPlayback({
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="9,17 15,12 9,7" />
-        </svg>
-      </button>
-
-      {/* Go to latest */}
-      <button
-        type="button"
-        onClick={onGoToLatest}
-        disabled={!canStepForward}
-        style={canStepForward ? buttonStyle : disabledStyle}
-        title="Go to latest snapshot"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="6,17 11,12 6,7" />
-          <polyline points="13,17 18,12 13,7" />
         </svg>
       </button>
 

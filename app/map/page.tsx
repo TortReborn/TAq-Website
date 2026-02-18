@@ -1486,8 +1486,6 @@ export default function MapPage() {
                 onSpeedChange={setPlaybackSpeed}
                 onStepForward={handleStepForward}
                 onStepBackward={handleStepBackward}
-                onGoToFirst={handleGoToFirst}
-                onGoToLatest={handleGoToLatest}
                 canStepForward={currentSnapshotIndex < loadedSnapshots.length - 1}
                 canStepBackward={currentSnapshotIndex > 0}
                 isLoading={isLoadingHistory}

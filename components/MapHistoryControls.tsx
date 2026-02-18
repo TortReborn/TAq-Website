@@ -17,8 +17,6 @@ interface MapHistoryControlsProps {
   onSpeedChange: (speed: number) => void;
   onStepForward: () => void;
   onStepBackward: () => void;
-  onGoToFirst: () => void;
-  onGoToLatest: () => void;
   canStepForward: boolean;
   canStepBackward: boolean;
   isLoading?: boolean;
@@ -27,7 +25,7 @@ interface MapHistoryControlsProps {
   containerBounds?: { width: number; height: number };
 }
 
-const SPEED_OPTIONS = [0.5, 1, 2, 5, 10];
+const SPEED_OPTIONS = [0.5, 1, 2, 5, 10, 100];
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 600;
 
@@ -43,8 +41,6 @@ export default function MapHistoryControls({
   onSpeedChange,
   onStepForward,
   onStepBackward,
-  onGoToFirst,
-  onGoToLatest,
   canStepForward,
   canStepBackward,
   isLoading,
@@ -62,17 +58,16 @@ export default function MapHistoryControls({
   const resizeStartRef = useRef({ x: 0, width: 450, posX: 0 });
 
   // Layout breakpoints based on component widths:
-  // - Playback buttons (5 buttons): ~180px
+  // - Playback buttons (3 buttons): ~115px
   // - Speed selector (label + dropdown): ~90px
-  // - Date input: ~130px
-  // - Jump button: ~55px
+  // - Date input: ~130px + Time input: ~88px + Jump button: ~55px = ~273px
   // - Gaps between sections: ~30px
   //
-  // Full row (playback+speed + date+jump): 180+90 + 130+55 + 30 = ~485px minimum
-  // Two rows (playback | speed+date+jump): needs ~290px for bottom row
-  // Three rows (playback | speed | date+jump): needs ~185px for date+jump
-  const showSpeedInPlayback = width >= 520; // Speed in same row as playback buttons
-  const stackDateRow = width < 380; // Date+Jump gets its own row below speed
+  // Full row (playback+speed + date+time+jump): 115+90 + 273 + 30 = ~508px minimum
+  // Two rows (playback | speed+date+time+jump): needs ~390px for bottom row
+  // Three rows (playback | speed | date+time+jump): needs ~273px for date+time+jump
+  const showSpeedInPlayback = width >= 540; // Speed in same row as playback buttons
+  const stackDateRow = width < 420; // Date+Time+Jump gets its own row below speed
 
   // Clamp position to keep panel within container bounds
   const clampPosition = useCallback((x: number, y: number) => {
@@ -366,13 +361,15 @@ export default function MapHistoryControls({
         flexDirection: 'column',
         alignItems: 'center',
         marginTop: '0.75rem',
-        gap: '0.75rem',
+        gap: '0.5rem',
       }}>
         {/* Row 1: Playback controls (with or without speed based on width) */}
         <div style={{
           display: 'flex',
+          flexWrap: 'wrap',
           justifyContent: showSpeedInPlayback ? 'space-between' : 'center',
           alignItems: 'center',
+          gap: '0.5rem',
           width: '100%',
         }}>
           <HistoryPlayback
@@ -382,8 +379,6 @@ export default function MapHistoryControls({
             onSpeedChange={onSpeedChange}
             onStepForward={onStepForward}
             onStepBackward={onStepBackward}
-            onGoToFirst={onGoToFirst}
-            onGoToLatest={onGoToLatest}
             canStepForward={canStepForward}
             canStepBackward={canStepBackward}
             hideSpeed={!showSpeedInPlayback}
@@ -403,8 +398,8 @@ export default function MapHistoryControls({
         {!showSpeedInPlayback && (
           <div style={{
             display: 'flex',
-            flexDirection: stackDateRow ? 'column' : 'row',
-            gap: '0.75rem',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
@@ -414,6 +409,7 @@ export default function MapHistoryControls({
               display: 'flex',
               alignItems: 'center',
               gap: '0.25rem',
+              flexShrink: 0,
             }}>
               <span style={{
                 fontSize: '0.75rem',
@@ -432,7 +428,7 @@ export default function MapHistoryControls({
                   border: '1px solid var(--border-color)',
                   background: 'var(--bg-secondary)',
                   color: 'var(--text-primary)',
-                  fontSize: '0.875rem',
+                  fontSize: '0.8rem',
                   cursor: 'pointer',
                   appearance: 'auto',
                   WebkitAppearance: 'menulist',
