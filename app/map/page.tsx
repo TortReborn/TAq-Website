@@ -23,6 +23,10 @@ import {
   findNearestSnapshot,
   binarySearchNearest,
   mergeSnapshots,
+  ExchangeEventData,
+  ExchangeStore,
+  buildExchangeStore,
+  buildSnapshotsInRange,
 } from "@/lib/history-data";
 
 export default function MapPage() {
@@ -96,6 +100,10 @@ export default function MapPage() {
   const historyTimestampRef = useRef<Date | null>(null);
   const loadedSnapshotsRef = useRef<ParsedSnapshot[]>([]);
   const loadedWeekCenterRef = useRef<Date | null>(null);
+
+  // Bulk exchange data — loaded once on history enter, used for client-side reconstruction
+  const exchangeStoreRef = useRef<ExchangeStore | null>(null);
+  const exchangeLoadingRef = useRef<boolean>(false);
 
   // Precompute land view clusters in background (always running, even when not visible)
   const { landViewClusters } = useTerritoryPrecomputation({
@@ -365,6 +373,7 @@ export default function MapPage() {
             setHistoryBounds({
               earliest: data.earliest,
               latest: data.latest,
+              gaps: data.gaps,
             });
           }
         }
@@ -375,152 +384,112 @@ export default function MapPage() {
     fetchHistoryBounds();
   }, []);
 
-  // Guard: tracks the key of the current in-flight load. A new load with a
-  // different key cancels the old one's background batches.
-  const loadingWeekRef = useRef<string | null>(null);
-  // Debounce timer for loads triggered by scrubbing
-  const loadDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  // -----------------------------------------------------------------------
+  // Exchange data: load once, reconstruct snapshots client-side
+  // -----------------------------------------------------------------------
 
-  // Load a week of snapshots around a center date with progressive loading.
-  // Fetches an initial batch (100 snapshots) for fast interactivity,
-  // then loads the rest in background batches of 200.
-  // replace=true: discard existing snapshots (for mode entry, jumps, refresh)
-  // replace=false: merge with existing (for edge preloading during playback)
-  const loadWeekSnapshots = useCallback(async (centerDate: Date, replace: boolean = false) => {
-    // Cancel any pending debounced load
-    if (loadDebounceRef.current) {
-      clearTimeout(loadDebounceRef.current);
-      loadDebounceRef.current = null;
-    }
-    // Cancel any in-flight ahead-load (new explicit load takes priority)
-    loadAheadRef.current = null;
+  /** Fetch all exchange events if not already loaded. Returns the store. */
+  const ensureExchangeData = useCallback(async (): Promise<ExchangeStore | null> => {
+    if (exchangeStoreRef.current) return exchangeStoreRef.current;
+    if (exchangeLoadingRef.current) return null; // already in-flight
 
-    const key = centerDate.toISOString();
-    // Assign new key — this also cancels background batches from prior loads
-    loadingWeekRef.current = key;
-
-    setIsLoadingHistory(true);
+    exchangeLoadingRef.current = true;
     try {
-      // Load initial batch (100 snapshots) for fast interactivity
-      const response = await fetch(
-        `/api/map-history/week?center=${centerDate.toISOString()}&limit=100&offset=0`
-      );
-      if (!response.ok) return;
-      // If a newer load was started while we were fetching, abort
-      if (loadingWeekRef.current !== key) return;
-
-      const data = await response.json();
-      const parsed = parseSnapshots(data.snapshots || []);
-
-      if (replace) {
-        setLoadedSnapshots(parsed);
-      } else {
-        setLoadedSnapshots(prev => mergeSnapshots(prev, parsed, 3000));
-      }
-      setLoadedWeekCenter(centerDate);
-
-      // Set initial timestamp to center or nearest snapshot (only on replace)
-      if (replace && parsed.length > 0) {
-        const nearest = findNearestSnapshot(parsed, centerDate);
-        if (nearest) {
-          setHistoryTimestamp(nearest.timestamp);
-        }
-      }
-
-      // Clear loading state — UI is now interactive with initial batch
-      setIsLoadingHistory(false);
-
-      // Load remaining snapshots in background batches
-      if (data.hasMore) {
-        let offset = 100;
-        while (offset < data.total && loadingWeekRef.current === key) {
-          const bgResponse = await fetch(
-            `/api/map-history/week?center=${centerDate.toISOString()}&limit=200&offset=${offset}`
-          );
-          if (!bgResponse.ok || loadingWeekRef.current !== key) break;
-
-          const bgData = await bgResponse.json();
-          const bgParsed = parseSnapshots(bgData.snapshots || []);
-          setLoadedSnapshots(prev => mergeSnapshots(prev, bgParsed, 3000));
-
-          offset += 200;
-          if (!bgData.hasMore) break;
-        }
-      }
+      const response = await fetch('/api/map-history/exchanges');
+      if (!response.ok) return null;
+      const data: ExchangeEventData = await response.json();
+      const store = buildExchangeStore(data);
+      exchangeStoreRef.current = store;
+      return store;
     } catch (error) {
-      console.error('Failed to load week snapshots:', error);
-      setIsLoadingHistory(false);
+      console.error('Failed to load exchange data:', error);
+      return null;
     } finally {
-      // Only clear the ref if we're still the active load
-      if (loadingWeekRef.current === key) {
-        loadingWeekRef.current = null;
-      }
+      exchangeLoadingRef.current = false;
     }
   }, []);
 
-  // Debounced version for scrubbing — waits 300ms after user stops moving
-  const loadWeekSnapshotsDebounced = useCallback((centerDate: Date) => {
-    if (loadDebounceRef.current) {
-      clearTimeout(loadDebounceRef.current);
-    }
-    loadDebounceRef.current = setTimeout(() => {
-      loadDebounceRef.current = null;
-      loadWeekSnapshots(centerDate);
-    }, 300);
-  }, [loadWeekSnapshots]);
+  /** Check whether a timestamp falls within the exchange data range */
+  const isInExchangeRange = useCallback((date: Date): boolean => {
+    const store = exchangeStoreRef.current;
+    if (!store) return false;
+    const t = date.getTime();
+    return t >= new Date(store.data.earliest).getTime() &&
+           t <= new Date(store.data.latest).getTime();
+  }, []);
 
-  // Ahead-loading: seamlessly extends loaded data forward during playback.
-  // Uses its own ref to avoid interfering with the main load mechanism.
-  const loadAheadRef = useRef<string | null>(null);
+  // Guard for bot-data (territory_snapshots) week loads
+  const loadingWeekRef = useRef<string | null>(null);
 
-  const loadAhead = useCallback(async () => {
-    const snapshots = loadedSnapshotsRef.current;
-    if (snapshots.length === 0) return;
-
-    // Key on the last loaded timestamp — prevents duplicate loads for the same edge
-    const lastLoaded = snapshots[snapshots.length - 1].timestamp;
-    const key = lastLoaded.toISOString();
-    if (loadAheadRef.current === key) return; // already loading for this edge
-    loadAheadRef.current = key;
-
-    // Center the request 3.5 days ahead of the last loaded snapshot.
-    // The API returns ±3.5 days around center, so this fetches from
-    // lastLoaded to ~7 days beyond it.
-    const HALF_WEEK_MS = 3.5 * 24 * 60 * 60 * 1000;
-    const aheadCenter = new Date(lastLoaded.getTime() + HALF_WEEK_MS);
-
+  /**
+   * Load snapshots around a date — uses client-side reconstruction for
+   * exchange data, falls back to the week API for bot snapshot data.
+   */
+  const loadWeekSnapshots = useCallback(async (centerDate: Date, replace: boolean = false) => {
+    setIsLoadingHistory(true);
     try {
-      let offset = 0;
-      let hasMore = true;
+      const store = await ensureExchangeData();
 
-      while (hasMore && loadAheadRef.current === key) {
+      if (store && isInExchangeRange(centerDate)) {
+        // Client-side reconstruction — instant
+        const HALF_WEEK_MS = 3.5 * 24 * 60 * 60 * 1000;
+        const start = new Date(centerDate.getTime() - HALF_WEEK_MS);
+        const end = new Date(centerDate.getTime() + HALF_WEEK_MS);
+        const snapshots = buildSnapshotsInRange(store, start, end);
+
+        if (replace) {
+          setLoadedSnapshots(snapshots);
+        } else {
+          setLoadedSnapshots(prev => mergeSnapshots(prev, snapshots));
+        }
+        setLoadedWeekCenter(centerDate);
+
+        if (replace && snapshots.length > 0) {
+          const nearest = findNearestSnapshot(snapshots, centerDate);
+          if (nearest) setHistoryTimestamp(nearest.timestamp);
+        }
+      } else {
+        // Bot snapshot data — use week API
+        const key = centerDate.toISOString();
+        loadingWeekRef.current = key;
+
         const response = await fetch(
-          `/api/map-history/week?center=${aheadCenter.toISOString()}&limit=200&offset=${offset}`
+          `/api/map-history/week?center=${centerDate.toISOString()}`
         );
-        if (!response.ok || loadAheadRef.current !== key) break;
+        if (!response.ok || loadingWeekRef.current !== key) return;
 
         const data = await response.json();
         const parsed = parseSnapshots(data.snapshots || []);
-        if (parsed.length > 0) {
-          setLoadedSnapshots(prev => mergeSnapshots(prev, parsed, 5000));
+
+        if (replace) {
+          setLoadedSnapshots(parsed);
+        } else {
+          setLoadedSnapshots(prev => mergeSnapshots(prev, parsed));
+        }
+        setLoadedWeekCenter(centerDate);
+
+        if (replace && parsed.length > 0) {
+          const nearest = findNearestSnapshot(parsed, centerDate);
+          if (nearest) setHistoryTimestamp(nearest.timestamp);
         }
 
-        offset += 200;
-        hasMore = data.hasMore;
+        if (loadingWeekRef.current === key) loadingWeekRef.current = null;
       }
     } catch (error) {
-      console.error('Failed to load ahead:', error);
+      console.error('Failed to load snapshots:', error);
     } finally {
-      if (loadAheadRef.current === key) {
-        loadAheadRef.current = null;
-      }
+      setIsLoadingHistory(false);
     }
-  }, []);
+  }, [ensureExchangeData, isInExchangeRange]);
 
   // Keep refs in sync with state (for stable playback interval)
   useEffect(() => { historyTimestampRef.current = historyTimestamp; }, [historyTimestamp]);
   useEffect(() => { loadedSnapshotsRef.current = loadedSnapshots; }, [loadedSnapshots]);
   useEffect(() => { loadedWeekCenterRef.current = loadedWeekCenter; }, [loadedWeekCenter]);
+
+  // Ref for loadWeekSnapshots so playback interval can call it without dependency churn
+  const loadWeekSnapshotsRef = useRef(loadWeekSnapshots);
+  useEffect(() => { loadWeekSnapshotsRef.current = loadWeekSnapshots; }, [loadWeekSnapshots]);
 
   // Load history data when restoring history mode from cache
   useEffect(() => {
@@ -545,11 +514,11 @@ export default function MapPage() {
       setLoadedSnapshots([]);
       setLoadedWeekCenter(null);
       setIsPlaying(false);
-      loadAheadRef.current = null;
+      exchangeStoreRef.current = null;
     }
   }, [historyBounds, loadWeekSnapshots]);
 
-  // Handle timeline scrubbing — debounces load requests to avoid flooding
+  // Handle timeline scrubbing — loads data when needed
   const handleTimeChange = useCallback((date: Date) => {
     setHistoryTimestamp(date);
 
@@ -557,24 +526,32 @@ export default function MapPage() {
     const snaps = loadedSnapshotsRef.current;
     if (snaps.length > 0) {
       const idx = binarySearchNearest(snaps, date.getTime());
-      const nearestGap = idx >= 0
-        ? Math.abs(snaps[idx].timestamp.getTime() - date.getTime())
-        : Infinity;
-
-      // If no snapshot within 30 minutes, debounce-load data for this region
-      if (nearestGap > 30 * 60 * 1000) {
-        loadWeekSnapshotsDebounced(date);
-        return;
-      }
-
-      // Preload ahead when scrubbing near the end of loaded data
-      const lastLoaded = snaps[snaps.length - 1].timestamp;
-      const DAY_MS = 24 * 60 * 60 * 1000;
-      if (lastLoaded.getTime() - date.getTime() < DAY_MS) {
-        loadAhead();
+      if (idx >= 0) {
+        const nearestGap = Math.abs(snaps[idx].timestamp.getTime() - date.getTime());
+        if (nearestGap <= 30 * 60 * 1000) {
+          // Data is nearby — check if we need to preload ahead
+          const lastLoaded = snaps[snaps.length - 1].timestamp;
+          const DAY_MS = 24 * 60 * 60 * 1000;
+          if (lastLoaded.getTime() - date.getTime() < DAY_MS) {
+            const nextCenter = new Date(lastLoaded.getTime() + 3.5 * DAY_MS);
+            // Don't preload beyond exchange data boundary
+            const store = exchangeStoreRef.current;
+            const exchangeLatestMs = store ? new Date(store.data.latest).getTime() : 0;
+            const currentInExchange = store && date.getTime() <= exchangeLatestMs;
+            if (!currentInExchange || nextCenter.getTime() <= exchangeLatestMs + DAY_MS) {
+              loadWeekSnapshots(nextCenter, false);
+            }
+          }
+          return;
+        }
       }
     }
-  }, [loadWeekSnapshotsDebounced, loadAhead]);
+
+    // No nearby data — replace (not merge) since we're far from existing data.
+    // Merging would create a discontinuous array with a multi-year gap,
+    // causing playback to jump across the gap to a different era.
+    loadWeekSnapshots(date, true);
+  }, [loadWeekSnapshots]);
 
   // Handle date picker jump
   const handleJumpToDate = useCallback((date: Date) => {
@@ -583,11 +560,13 @@ export default function MapPage() {
     loadWeekSnapshots(date, true);
   }, [loadWeekSnapshots]);
 
-  // Handle history refresh - re-fetch bounds and load latest data
+  // Handle history refresh - re-fetch bounds and reload data
   const handleHistoryRefresh = useCallback(async () => {
     // Stop playback
     setIsPlaying(false);
-    setIsLoadingHistory(true);
+
+    // Clear cached exchange data so it re-fetches
+    exchangeStoreRef.current = null;
 
     try {
       // Re-fetch bounds
@@ -598,30 +577,18 @@ export default function MapPage() {
           setHistoryBounds({
             earliest: boundsData.earliest,
             latest: boundsData.latest,
+            gaps: boundsData.gaps,
           });
 
-          // Load week around the new latest timestamp
+          // Load latest data — loadWeekSnapshots handles exchange vs bot range
           const latestDate = new Date(boundsData.latest);
-          const response = await fetch(`/api/map-history/week?center=${latestDate.toISOString()}`);
-          if (response.ok) {
-            const data = await response.json();
-            const parsed = parseSnapshots(data.snapshots || []);
-            setLoadedSnapshots(parsed);
-            setLoadedWeekCenter(latestDate);
-
-            // Jump to the latest snapshot
-            if (parsed.length > 0) {
-              setHistoryTimestamp(parsed[parsed.length - 1].timestamp);
-            }
-          }
+          await loadWeekSnapshots(latestDate, true);
         }
       }
     } catch (error) {
       console.error('Failed to refresh history:', error);
-    } finally {
-      setIsLoadingHistory(false);
     }
-  }, []);
+  }, [loadWeekSnapshots]);
 
   // Unified snapshot lookup — single binary search derives index + expanded territories.
   // Returns null for historyTerritories if the nearest snapshot is too far from the
@@ -651,7 +618,8 @@ export default function MapPage() {
 
   // Step forward/backward handlers
   const handleStepForward = useCallback(() => {
-    const next = getNextSnapshot(loadedSnapshots, historyTimestamp || new Date());
+    const current = historyTimestamp || new Date();
+    const next = getNextSnapshot(loadedSnapshots, current);
     if (next) {
       setHistoryTimestamp(next.timestamp);
 
@@ -660,11 +628,18 @@ export default function MapPage() {
         const lastLoaded = loadedSnapshots[loadedSnapshots.length - 1].timestamp;
         const DAY_MS = 24 * 60 * 60 * 1000;
         if (lastLoaded.getTime() - next.timestamp.getTime() < DAY_MS) {
-          loadAhead();
+          const nextCenter = new Date(lastLoaded.getTime() + 3.5 * DAY_MS);
+          // Don't preload beyond exchange data boundary
+          const store = exchangeStoreRef.current;
+          const exchangeLatestMs = store ? new Date(store.data.latest).getTime() : 0;
+          const currentInExchange = store && next.timestamp.getTime() <= exchangeLatestMs;
+          if (!currentInExchange || nextCenter.getTime() <= exchangeLatestMs + DAY_MS) {
+            loadWeekSnapshots(nextCenter, false);
+          }
         }
       }
     }
-  }, [loadedSnapshots, historyTimestamp, loadAhead]);
+  }, [loadedSnapshots, historyTimestamp, loadWeekSnapshots]);
 
   const handleStepBackward = useCallback(() => {
     const prev = getPrevSnapshot(loadedSnapshots, historyTimestamp || new Date());
@@ -673,31 +648,53 @@ export default function MapPage() {
     }
   }, [loadedSnapshots, historyTimestamp]);
 
-  // Go to first/latest handlers
-  const handleGoToFirst = useCallback(() => {
-    if (loadedSnapshots.length > 0) {
-      setHistoryTimestamp(loadedSnapshots[0].timestamp);
-    }
-  }, [loadedSnapshots]);
+  // Jump to absolute start/end of the slider range
+  const handleJumpToStart = useCallback(() => {
+    if (!historyBounds) return;
+    const start = new Date(historyBounds.earliest);
+    setHistoryTimestamp(start);
+    loadWeekSnapshots(start, true);
+  }, [historyBounds, loadWeekSnapshots]);
 
-  const handleGoToLatest = useCallback(() => {
-    if (loadedSnapshots.length > 0) {
-      setHistoryTimestamp(loadedSnapshots[loadedSnapshots.length - 1].timestamp);
-    }
-  }, [loadedSnapshots]);
+  const handleJumpToEnd = useCallback(() => {
+    if (!historyBounds) return;
+    const end = new Date(historyBounds.latest);
+    setHistoryTimestamp(end);
+    loadWeekSnapshots(end, true);
+  }, [historyBounds, loadWeekSnapshots]);
 
   // Playback logic — stable interval that reads from refs to avoid
   // tearing down and recreating on every tick
   useEffect(() => {
     if (!isPlaying || viewMode !== 'history') return;
 
-    const intervalMs = 1000 / playbackSpeed;
+    const FAST_SPEED = -1;
+    const isFast = playbackSpeed === FAST_SPEED;
+    const intervalMs = isFast ? 100 : 1000 / playbackSpeed;
+    const DAY_MS = 24 * 60 * 60 * 1000;
 
     const tick = () => {
       const currentTs = historyTimestampRef.current;
       const snapshots = loadedSnapshotsRef.current;
 
-      if (!currentTs || snapshots.length === 0) return;
+      if (!currentTs) return;
+
+      if (isFast) {
+        // Fast mode: jump forward 1 day per tick
+        const nextTime = new Date(currentTs.getTime() + DAY_MS);
+        const bounds = historyBounds;
+        if (bounds && nextTime.getTime() > new Date(bounds.latest).getTime()) {
+          setHistoryTimestamp(new Date(bounds.latest));
+          setIsPlaying(false);
+          return;
+        }
+        setHistoryTimestamp(nextTime);
+        // Trigger snapshot loading around the new time
+        loadWeekSnapshotsRef.current(nextTime, false);
+        return;
+      }
+
+      if (snapshots.length === 0) return;
 
       const next = getNextSnapshot(snapshots, currentTs);
       if (next) {
@@ -705,9 +702,15 @@ export default function MapPage() {
 
         // Preload ahead when within 1 day of the end of loaded data
         const lastLoaded = snapshots[snapshots.length - 1].timestamp;
-        const DAY_MS = 24 * 60 * 60 * 1000;
         if (lastLoaded.getTime() - next.timestamp.getTime() < DAY_MS) {
-          loadAhead();
+          const nextCenter = new Date(lastLoaded.getTime() + 3.5 * DAY_MS);
+          // Don't preload beyond exchange data boundary into bot data range
+          const store = exchangeStoreRef.current;
+          const exchangeLatestMs = store ? new Date(store.data.latest).getTime() : 0;
+          const currentInExchange = store && next.timestamp.getTime() <= exchangeLatestMs;
+          if (!currentInExchange || nextCenter.getTime() <= exchangeLatestMs + DAY_MS) {
+            loadWeekSnapshotsRef.current(nextCenter, false);
+          }
         }
       } else {
         setIsPlaying(false);
@@ -721,7 +724,7 @@ export default function MapPage() {
         clearInterval(playbackIntervalRef.current);
       }
     };
-  }, [isPlaying, playbackSpeed, viewMode, loadAhead]);
+  }, [isPlaying, playbackSpeed, viewMode, historyBounds]);
 
   // Determine which territories to display
   const displayTerritories = viewMode === 'history' && historyTerritories
@@ -1462,43 +1465,50 @@ export default function MapPage() {
             )}
           </div>
 
-          {/* History Controls - Bottom center, aligned with mode selector */}
-          {viewMode === 'history' && historyBounds && historyTimestamp && (
-            <div
-              onMouseDown={(e) => e.stopPropagation()}
-              style={{
-                position: 'absolute',
-                bottom: '1rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 15,
-              }}
-            >
-              <MapHistoryControls
-                earliest={new Date(historyBounds.earliest)}
-                latest={new Date(historyBounds.latest)}
-                current={historyTimestamp}
-                onTimeChange={handleTimeChange}
-                onJump={handleJumpToDate}
-                isPlaying={isPlaying}
-                speed={playbackSpeed}
-                onPlayPause={() => setIsPlaying(prev => !prev)}
-                onSpeedChange={setPlaybackSpeed}
-                onStepForward={handleStepForward}
-                onStepBackward={handleStepBackward}
-                canStepForward={currentSnapshotIndex < loadedSnapshots.length - 1}
-                canStepBackward={currentSnapshotIndex > 0}
-                isLoading={isLoadingHistory}
-                snapshots={snapshotTimestamps}
-                onRefresh={handleHistoryRefresh}
-                containerBounds={containerRef.current ? {
-                  width: containerRef.current.clientWidth,
-                  height: containerRef.current.clientHeight
-                } : undefined}
-              />
-            </div>
-          )}
         </div>
+
+        {/* History Controls - Outside the overflow:hidden map container so tooltip isn't clipped */}
+        {viewMode === 'history' && historyBounds && historyTimestamp && (
+          <div
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute',
+              bottom: '1.25rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 15,
+            }}
+          >
+            <MapHistoryControls
+              earliest={new Date(historyBounds.earliest)}
+              latest={new Date(historyBounds.latest)}
+              current={historyTimestamp}
+              onTimeChange={handleTimeChange}
+              onJump={handleJumpToDate}
+              isPlaying={isPlaying}
+              speed={playbackSpeed}
+              onPlayPause={() => setIsPlaying(prev => !prev)}
+              onSpeedChange={setPlaybackSpeed}
+              onStepForward={handleStepForward}
+              onStepBackward={handleStepBackward}
+              onJumpToStart={handleJumpToStart}
+              onJumpToEnd={handleJumpToEnd}
+              canStepForward={currentSnapshotIndex < loadedSnapshots.length - 1}
+              canStepBackward={currentSnapshotIndex > 0}
+              isLoading={isLoadingHistory}
+              snapshots={snapshotTimestamps}
+              onRefresh={handleHistoryRefresh}
+              containerBounds={containerRef.current ? {
+                width: containerRef.current.clientWidth,
+                height: containerRef.current.clientHeight
+              } : undefined}
+              gaps={historyBounds.gaps?.map(g => ({
+                start: new Date(g.start),
+                end: new Date(g.end),
+              }))}
+            />
+          </div>
+        )}
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { USE_TEST_DATA, getTestSnapshotsInRange } from '@/lib/test-history-data';
+import { reconstructSnapshotsFromExchanges } from '@/lib/exchange-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,35 +62,55 @@ export async function GET(request: NextRequest) {
   const pool = getPool();
 
   try {
-    // Get total count for pagination metadata
+    // Try the snapshot table first
     const countResult = await pool.query(`
       SELECT COUNT(*)::int as total
       FROM territory_snapshots
       WHERE snapshot_time >= $1 AND snapshot_time <= $2
     `, [startDate.toISOString(), endDate.toISOString()]);
 
-    const total = countResult.rows[0].total;
+    let total = countResult.rows[0].total;
+    let snapshots: Array<{ timestamp: string; territories: Record<string, unknown> }>;
 
-    // Fetch snapshots with optional pagination
-    let query = `
-      SELECT snapshot_time, territories
-      FROM territory_snapshots
-      WHERE snapshot_time >= $1 AND snapshot_time <= $2
-      ORDER BY snapshot_time ASC
-    `;
-    const params: (string | number)[] = [startDate.toISOString(), endDate.toISOString()];
+    if (total > 0) {
+      // Snapshot table has data for this range — use it
+      let query = `
+        SELECT snapshot_time, territories
+        FROM territory_snapshots
+        WHERE snapshot_time >= $1 AND snapshot_time <= $2
+        ORDER BY snapshot_time ASC
+      `;
+      const params: (string | number)[] = [startDate.toISOString(), endDate.toISOString()];
 
-    if (limit !== null) {
-      query += ` LIMIT $3 OFFSET $4`;
-      params.push(limit, offset);
+      if (limit !== null) {
+        query += ` LIMIT $3 OFFSET $4`;
+        params.push(limit, offset);
+      }
+
+      const result = await pool.query(query, params);
+
+      snapshots = result.rows.map(row => ({
+        timestamp: row.snapshot_time.toISOString(),
+        territories: row.territories,
+      }));
+    } else {
+      // No snapshot data — reconstruct from exchange events
+      const exchangeSnapshots = await reconstructSnapshotsFromExchanges(
+        pool,
+        startDate,
+        endDate,
+      );
+
+      if (exchangeSnapshots.length > 0) {
+        total = exchangeSnapshots.length;
+        snapshots = limit !== null
+          ? exchangeSnapshots.slice(offset, offset + limit)
+          : exchangeSnapshots;
+      } else {
+        total = 0;
+        snapshots = [];
+      }
     }
-
-    const result = await pool.query(query, params);
-
-    const snapshots = result.rows.map(row => ({
-      timestamp: row.snapshot_time.toISOString(),
-      territories: row.territories,
-    }));
 
     return NextResponse.json({
       center: centerDate.toISOString(),

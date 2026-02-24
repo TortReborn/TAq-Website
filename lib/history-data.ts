@@ -27,6 +27,7 @@ export interface ParsedSnapshot {
 export interface HistoryBounds {
   earliest: string;
   latest: string;
+  gaps?: Array<{ start: string; end: string }>;
 }
 
 // Week response from API
@@ -295,4 +296,193 @@ export function formatShortTimestamp(date: Date): string {
  */
 export function getAllTerritoryNames(): string[] {
   return Object.values(ABBREV_TO_TERRITORY);
+}
+
+// ---------------------------------------------------------------------------
+// Client-side exchange data reconstruction
+// ---------------------------------------------------------------------------
+
+/** Compact exchange data returned by /api/map-history/exchanges */
+export interface ExchangeEventData {
+  territories: string[];     // index → territory full name
+  guilds: string[];          // index → guild name
+  prefixes: string[];        // index → guild prefix (matches guilds order)
+  events: number[][];        // [unixSec, terrIdx, guildIdx][]
+  earliest: string;          // ISO
+  latest: string;            // ISO
+}
+
+/**
+ * Pre-processed exchange data for fast client-side lookups.
+ * Groups events by territory so we can binary-search each territory's
+ * history independently.
+ */
+export interface ExchangeStore {
+  data: ExchangeEventData;
+  /** terrIdx → sorted array of [unixSec, guildIdx] pairs */
+  territoryEvents: Array<[number, number]>[];
+}
+
+/** Build an ExchangeStore from raw API data. One-time cost on load. */
+export function buildExchangeStore(data: ExchangeEventData): ExchangeStore {
+  // Pre-allocate arrays per territory
+  const territoryEvents: Array<[number, number]>[] = new Array(data.territories.length);
+  for (let i = 0; i < data.territories.length; i++) {
+    territoryEvents[i] = [];
+  }
+
+  for (const evt of data.events) {
+    const [unixSec, tIdx, gIdx] = evt;
+    territoryEvents[tIdx].push([unixSec, gIdx]);
+  }
+
+  // Events are already sorted by time from the API, but each territory's
+  // sub-array may need sorting since the global sort interleaves territories.
+  // The per-territory arrays ARE in order because we iterated the globally-
+  // sorted events array — so no extra sort needed.
+
+  return { data, territoryEvents };
+}
+
+/**
+ * Binary search for the last event at or before `targetSec` in a
+ * sorted [unixSec, guildIdx][] array.  Returns the guild index,
+ * or -1 if no event exists at or before targetSec.
+ */
+function lastEventBefore(
+  events: Array<[number, number]>,
+  targetSec: number,
+): number {
+  if (events.length === 0) return -1;
+
+  let lo = 0;
+  let hi = events.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (events[mid][0] <= targetSec) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  // lo is now the first index > targetSec, so lo-1 is the last ≤ targetSec
+  return lo > 0 ? events[lo - 1][1] : -1;
+}
+
+/**
+ * Reconstruct a single snapshot at any timestamp — client-side equivalent
+ * of the server's `reconstructSingleSnapshot()`.
+ *
+ * For each territory, binary-searches its event history for the latest
+ * owner at or before the requested time.  ~650 × log2(2500) ≈ 8K
+ * comparisons — effectively instant.
+ */
+export function buildSnapshotAt(
+  store: ExchangeStore,
+  timestamp: Date,
+): ParsedSnapshot | null {
+  const targetSec = Math.floor(timestamp.getTime() / 1000);
+  const { data, territoryEvents } = store;
+  const territories: Record<string, SnapshotTerritory> = {};
+  let count = 0;
+
+  for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
+    const gIdx = lastEventBefore(territoryEvents[tIdx], targetSec);
+    if (gIdx === -1) continue;
+
+    const guildName = data.guilds[gIdx];
+    if (guildName === 'None') continue;
+
+    const abbrev = toAbbrev(data.territories[tIdx]);
+    territories[abbrev] = {
+      g: data.prefixes[gIdx],
+      n: guildName,
+    };
+    count++;
+  }
+
+  if (count === 0) return null;
+  return { timestamp, territories };
+}
+
+const SNAPSHOT_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+
+/** Floor a timestamp to the nearest 10-minute clock boundary */
+function floorTo10Min(ms: number): number {
+  return ms - (ms % SNAPSHOT_INTERVAL_MS);
+}
+
+/**
+ * Reconstruct snapshots at 10-minute intervals over a time range —
+ * client-side equivalent of the server's `reconstructSnapshotsFromExchanges()`.
+ *
+ * Uses the same walk-forward algorithm: build initial state at startDate,
+ * then step through 10-minute ticks applying exchanges as they occur.
+ */
+export function buildSnapshotsInRange(
+  store: ExchangeStore,
+  startDate: Date,
+  endDate: Date,
+): ParsedSnapshot[] {
+  const { data, territoryEvents } = store;
+  const startSec = Math.floor(startDate.getTime() / 1000);
+  const endMs = endDate.getTime();
+
+  // Build initial state: latest guild per territory at startDate
+  const state = new Map<number, number>(); // terrIdx → guildIdx
+  for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
+    const gIdx = lastEventBefore(territoryEvents[tIdx], startSec);
+    if (gIdx !== -1) {
+      state.set(tIdx, gIdx);
+    }
+  }
+
+  // Collect all exchanges in the range into a flat sorted array
+  // for efficient walk-forward.
+  const rangeEvents: Array<[number, number, number]> = []; // [unixSec, terrIdx, guildIdx]
+  const endSec = Math.floor(endDate.getTime() / 1000);
+  for (const evt of data.events) {
+    const [sec, tIdx, gIdx] = evt;
+    if (sec > startSec && sec <= endSec) {
+      rangeEvents.push([sec, tIdx, gIdx]);
+    }
+    if (sec > endSec) break; // events are sorted, can stop early
+  }
+
+  // If no state and no events, nothing to show
+  if (state.size === 0 && rangeEvents.length === 0) {
+    return [];
+  }
+
+  // Walk forward in 10-minute clock-aligned steps
+  const snapshots: ParsedSnapshot[] = [];
+  let exchIdx = 0;
+  const startTick = floorTo10Min(startDate.getTime());
+
+  for (let t = startTick; t <= endMs; t += SNAPSHOT_INTERVAL_MS) {
+    const tickSec = Math.floor(t / 1000);
+
+    // Apply exchanges up to this tick
+    while (exchIdx < rangeEvents.length && rangeEvents[exchIdx][0] <= tickSec) {
+      state.set(rangeEvents[exchIdx][1], rangeEvents[exchIdx][2]);
+      exchIdx++;
+    }
+
+    // Only emit once we have territory state
+    if (state.size > 0) {
+      const territories: Record<string, SnapshotTerritory> = {};
+      for (const [tIdx, gIdx] of state) {
+        const guildName = data.guilds[gIdx];
+        if (guildName === 'None') continue;
+        const abbrev = toAbbrev(data.territories[tIdx]);
+        territories[abbrev] = {
+          g: data.prefixes[gIdx],
+          n: guildName,
+        };
+      }
+      snapshots.push({ timestamp: new Date(t), territories });
+    }
+  }
+
+  return snapshots;
 }

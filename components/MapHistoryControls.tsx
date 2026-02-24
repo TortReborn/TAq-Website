@@ -17,17 +17,25 @@ interface MapHistoryControlsProps {
   onSpeedChange: (speed: number) => void;
   onStepForward: () => void;
   onStepBackward: () => void;
+  onJumpToStart: () => void;
+  onJumpToEnd: () => void;
   canStepForward: boolean;
   canStepBackward: boolean;
   isLoading?: boolean;
   snapshots?: Date[];
   onRefresh?: () => void;
   containerBounds?: { width: number; height: number };
+  gaps?: Array<{ start: Date; end: Date }>;
 }
 
-const SPEED_OPTIONS = [0.5, 1, 2, 5, 10, 100];
+const SPEED_OPTIONS = [1, 2, 10, 50];
+const FAST_SPEED = -1;
+
+function speedLabel(s: number): string {
+  return s === FAST_SPEED ? 'Fast' : `${s}x`;
+}
 const MIN_WIDTH = 280;
-const MAX_WIDTH = 600;
+const MAX_WIDTH = 1800;
 
 export default function MapHistoryControls({
   earliest,
@@ -41,21 +49,26 @@ export default function MapHistoryControls({
   onSpeedChange,
   onStepForward,
   onStepBackward,
+  onJumpToStart,
+  onJumpToEnd,
   canStepForward,
   canStepBackward,
   isLoading,
   snapshots,
   onRefresh,
   containerBounds,
+  gaps,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState<'left' | 'right' | false>(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [width, setWidth] = useState(450);
+  const [width, setWidth] = useState(1200);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [speedOpen, setSpeedOpen] = useState(false);
+  const speedRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
-  const resizeStartRef = useRef({ x: 0, width: 450, posX: 0 });
+  const resizeStartRef = useRef({ x: 0, width: 1200, posX: 0 });
 
   // Layout breakpoints based on component widths:
   // - Playback buttons (3 buttons): ~115px
@@ -86,6 +99,18 @@ export default function MapHistoryControls({
   }, [width, containerBounds]);
 
   // Load cached position and width on mount
+  // Close speed dropdown on outside click
+  useEffect(() => {
+    if (!speedOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (speedRef.current && !speedRef.current.contains(e.target as Node)) {
+        setSpeedOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [speedOpen]);
+
   useEffect(() => {
     const cachedPos = localStorage.getItem('historyControlsPosition');
     const cachedWidth = localStorage.getItem('historyControlsWidth');
@@ -232,7 +257,7 @@ export default function MapHistoryControls({
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : isResizing ? 'ew-resize' : 'grab',
         userSelect: 'none',
-        overflow: 'hidden',
+        overflow: 'visible',
       }}
     >
       {/* Left edge resize handle */}
@@ -353,6 +378,7 @@ export default function MapHistoryControls({
         current={current}
         onChange={onTimeChange}
         snapshots={snapshots}
+        gaps={gaps}
       />
 
       {/* Controls row - responsive layout */}
@@ -379,6 +405,8 @@ export default function MapHistoryControls({
             onSpeedChange={onSpeedChange}
             onStepForward={onStepForward}
             onStepBackward={onStepBackward}
+            onJumpToStart={onJumpToStart}
+            onJumpToEnd={onJumpToEnd}
             canStepForward={canStepForward}
             canStepBackward={canStepBackward}
             hideSpeed={!showSpeedInPlayback}
@@ -405,41 +433,91 @@ export default function MapHistoryControls({
             width: '100%',
           }}>
             {/* Speed selector */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              flexShrink: 0,
-            }}>
+            <div
+              ref={speedRef}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                flexShrink: 0,
+              }}
+            >
               <span style={{
                 fontSize: '0.75rem',
                 color: 'var(--text-secondary)',
               }}>
                 Speed:
               </span>
-              <select
-                value={speed}
-                onChange={(e) => onSpeedChange(Number(e.target.value))}
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '0.375rem',
-                  border: '1px solid var(--border-color)',
-                  background: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  appearance: 'auto',
-                  WebkitAppearance: 'menulist',
-                }}
-              >
-                {SPEED_OPTIONS.map((s) => (
-                  <option key={s} value={s} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                    {s}x
-                  </option>
-                ))}
-              </select>
+              <div style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setSpeedOpen(prev => !prev); }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '0.375rem',
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    minWidth: '3.5rem',
+                  }}
+                >
+                  {speedLabel(speed)}
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6,9 12,15 18,9" />
+                  </svg>
+                </button>
+                {speedOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '100%',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      marginBottom: '0.25rem',
+                      background: 'var(--bg-card-solid)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '0.375rem',
+                      overflow: 'hidden',
+                      zIndex: 50,
+                      minWidth: '3.5rem',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    }}
+                  >
+                    {[...SPEED_OPTIONS, FAST_SPEED].map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSpeedChange(s);
+                          setSpeedOpen(false);
+                        }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '0.375rem 0.625rem',
+                          border: 'none',
+                          background: s === speed ? 'var(--accent-primary)' : 'var(--bg-card-solid)',
+                          color: s === speed ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {speedLabel(s)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             {/* Date picker */}
             <HistoryDatePicker

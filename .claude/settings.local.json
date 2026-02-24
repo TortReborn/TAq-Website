@@ -9,7 +9,12 @@
       "Bash(cat:*)",
       "WebFetch(domain:nori.fish)",
       "Bash(npm install:*)",
-      "Bash(npx next build:*)"
+      "Bash(npx next build:*)",
+      "Bash(npx vitest run)",
+      "Bash(node -e \" const m = require\\(''./lib/territory-abbreviations.ts''.replace\\(''.ts'',''''\\)\\); // Actually let me just extract the keys from the TS file directly \")",
+      "Bash(node scripts/generate-snapshots.js:*)",
+      "Bash(node -e:*)",
+      "Bash(node scripts/dump-guild-prefixes.js:*)"
     ],
     "deny": [],
     "ask": []

@@ -8,6 +8,7 @@ interface HistoryTimelineProps {
   current: Date;
   onChange: (date: Date) => void;
   snapshots?: Date[]; // Available snapshot timestamps to snap to
+  gaps?: Array<{ start: Date; end: Date }>; // Time ranges with no data
 }
 
 export default function HistoryTimeline({
@@ -16,6 +17,7 @@ export default function HistoryTimeline({
   current,
   onChange,
   snapshots,
+  gaps,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -24,6 +26,16 @@ export default function HistoryTimeline({
 
   // Calculate the total range in milliseconds
   const totalRange = latest.getTime() - earliest.getTime();
+
+  // Precompute gap positions as percentages of the total range
+  const gapRegions = useMemo(() => {
+    if (!gaps || gaps.length === 0 || totalRange === 0) return [];
+    return gaps.map(gap => {
+      const startPct = Math.max(0, ((gap.start.getTime() - earliest.getTime()) / totalRange) * 100);
+      const endPct = Math.min(100, ((gap.end.getTime() - earliest.getTime()) / totalRange) * 100);
+      return { startPct, endPct };
+    });
+  }, [gaps, earliest, totalRange]);
 
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
@@ -95,6 +107,14 @@ export default function HistoryTimeline({
   // Throttle ref for drag interactions (16ms = ~60fps)
   const lastDragUpdateRef = useRef<number>(0);
 
+  // Check if a percentage falls within a gap region
+  const isInGap = useCallback((percent: number): boolean => {
+    for (const gap of gapRegions) {
+      if (percent >= gap.startPct && percent <= gap.endPct) return true;
+    }
+    return false;
+  }, [gapRegions]);
+
   // Handle click/drag on the track
   // Account for 12px padding on each side where the thumb center lives (for 24px thumb)
   const handleTrackInteraction = useCallback((clientX: number, force?: boolean) => {
@@ -117,11 +137,14 @@ export default function HistoryTimeline({
     const adjustedX = Math.max(0, Math.min(usableWidth, x - padding));
     const percent = usableWidth > 0 ? (adjustedX / usableWidth) * 100 : 0;
 
+    // Don't allow selecting within gap regions
+    if (isInGap(percent)) return;
+
     const rawDate = percentToDate(percent);
     // Snap to nearest snapshot if available
     const newDate = findNearestSnapshot(rawDate);
     onChange(newDate);
-  }, [percentToDate, findNearestSnapshot, onChange]);
+  }, [percentToDate, findNearestSnapshot, onChange, isInGap]);
 
   // Hover tracking for tooltip
   const handleTrackHover = useCallback((e: React.MouseEvent) => {
@@ -142,6 +165,12 @@ export default function HistoryTimeline({
       setHoverPercent(null);
     }
   }, [isDragging]);
+
+  // Whether the hover is over a gap
+  const hoverInGap = useMemo(() => {
+    if (hoverPercent === null) return false;
+    return isInGap(hoverPercent);
+  }, [hoverPercent, isInGap]);
 
   // Compute hovered date from percent
   const hoverDate = useMemo(() => {
@@ -232,7 +261,7 @@ export default function HistoryTimeline({
           height: '24px',
           background: 'var(--bg-tertiary)',
           borderRadius: '12px',
-          cursor: 'pointer',
+          cursor: hoverInGap ? 'not-allowed' : 'pointer',
           overflow: 'visible',
         }}
       >
@@ -255,7 +284,7 @@ export default function HistoryTimeline({
             pointerEvents: 'none',
             zIndex: 20,
           }}>
-            {hoverDate.toLocaleString(undefined, {
+            {hoverInGap ? 'No data available' : hoverDate.toLocaleString(undefined, {
               month: 'short',
               day: 'numeric',
               year: 'numeric',
@@ -277,6 +306,24 @@ export default function HistoryTimeline({
             borderRadius: '12px 0 0 12px',
           }}
         />
+
+        {/* Gap regions — dark red overlay for periods with no data */}
+        {gapRegions.map((gap, i) => (
+          <div
+            key={i}
+            title="No data available"
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: `${gap.startPct}%`,
+              width: `${gap.endPct - gap.startPct}%`,
+              background: 'rgba(139, 0, 0, 0.55)',
+              pointerEvents: 'none',
+              zIndex: 1,
+            }}
+          />
+        ))}
 
         {/* Thumb - constrained to stay within track bounds */}
         <div

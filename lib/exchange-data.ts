@@ -1,0 +1,300 @@
+/**
+ * Reconstruct territory snapshots from the territory_exchanges table.
+ *
+ * The exchanges table stores individual ownership-change events:
+ *   (exchange_time, territory, attacker_name, defender_name)
+ *
+ * To produce the same HistorySnapshot format the frontend expects, we:
+ *   1. Compute the full territory state at a given point in time
+ *   2. Walk forward through exchanges, emitting a snapshot per change-event
+ *
+ * Guild prefixes come from the guild_prefixes lookup table (populated by the
+ * import script). Results are cached in-module to avoid repeated DB reads.
+ */
+
+import { Pool } from "pg";
+import { toAbbrev } from "./territory-abbreviations";
+import type { HistorySnapshot, SnapshotTerritory } from "./history-data";
+
+// ---------------------------------------------------------------------------
+// Guild prefix cache  (small table – load once, refresh hourly)
+// ---------------------------------------------------------------------------
+let prefixCache: Map<string, string> | null = null;
+let prefixCacheTime = 0;
+const PREFIX_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+// ---------------------------------------------------------------------------
+// Full-coverage time cache — the point where every territory that will ever
+// appear in exchange data has had at least one exchange.  This is used as the
+// effective "earliest" bound so the slider starts with a fully-populated map.
+// ---------------------------------------------------------------------------
+let coverageTimeCache: Date | null | undefined = undefined; // undefined = not yet queried
+
+/** Reset caches (used by tests). */
+export function _resetPrefixCache() {
+  prefixCache = null;
+  prefixCacheTime = 0;
+  coverageTimeCache = undefined;
+}
+
+async function getGuildPrefixes(pool: Pool): Promise<Map<string, string>> {
+  if (prefixCache && Date.now() - prefixCacheTime < PREFIX_CACHE_TTL) {
+    return prefixCache;
+  }
+
+  try {
+    const result = await pool.query("SELECT guild_name, guild_prefix FROM guild_prefixes");
+    const map = new Map<string, string>();
+    for (const row of result.rows) {
+      map.set(row.guild_name, row.guild_prefix);
+    }
+    prefixCache = map;
+    prefixCacheTime = Date.now();
+    return map;
+  } catch {
+    // Table might not exist yet — return empty map
+    return prefixCache ?? new Map();
+  }
+}
+
+function guildPrefix(prefixes: Map<string, string>, guildName: string): string {
+  return prefixes.get(guildName) ?? guildName.substring(0, 3).toUpperCase();
+}
+
+// ---------------------------------------------------------------------------
+// Full-coverage time — the earliest moment where every old-map territory has
+// been claimed at least once (has a non-None exchange).  This is the slider's
+// start so the map begins fully populated.
+//
+// Computed as: MAX of (first non-None exchange per territory) across all
+// territories in the pre-Rekindled World data (before Sep 2024).
+// ---------------------------------------------------------------------------
+
+export async function getFullCoverageTime(pool: Pool): Promise<Date | null> {
+  if (coverageTimeCache !== undefined) return coverageTimeCache;
+
+  try {
+    const result = await pool.query(`
+      SELECT MAX(first_claimed) AS coverage_time
+      FROM (
+        SELECT MIN(exchange_time) AS first_claimed
+        FROM territory_exchanges
+        WHERE attacker_name != 'None'
+          AND exchange_time < '2024-09-01'
+        GROUP BY territory
+      ) sub
+    `);
+    const row = result.rows[0];
+    if (!row?.coverage_time) {
+      coverageTimeCache = null;
+      return null;
+    }
+    coverageTimeCache = new Date(row.coverage_time);
+    return coverageTimeCache;
+  } catch {
+    coverageTimeCache = null;
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Build a snapshot territories object from current state
+// ---------------------------------------------------------------------------
+function stateToTerritories(
+  state: Map<string, string>,          // territory full name → guild name
+  prefixes: Map<string, string>,       // guild name → prefix
+): Record<string, SnapshotTerritory> {
+  const territories: Record<string, SnapshotTerritory> = {};
+  for (const [territory, guild] of state) {
+    if (guild === "None") continue;    // unclaimed
+    const abbrev = toAbbrev(territory);
+    territories[abbrev] = {
+      g: guildPrefix(prefixes, guild),
+      n: guild,
+    };
+  }
+  return territories;
+}
+
+// ---------------------------------------------------------------------------
+// Check whether the exchanges table has data covering a timestamp
+// ---------------------------------------------------------------------------
+export async function exchangesHaveDataNear(
+  pool: Pool,
+  timestamp: Date,
+  toleranceMs = 7 * 24 * 60 * 60 * 1000, // 1 week
+): Promise<boolean> {
+  try {
+    const result = await pool.query(
+      `SELECT 1 FROM territory_exchanges
+       WHERE exchange_time BETWEEN $1 AND $2
+       LIMIT 1`,
+      [
+        new Date(timestamp.getTime() - toleranceMs).toISOString(),
+        new Date(timestamp.getTime() + toleranceMs).toISOString(),
+      ]
+    );
+    return result.rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reconstruct a single snapshot at a specific timestamp
+// ---------------------------------------------------------------------------
+export async function reconstructSingleSnapshot(
+  pool: Pool,
+  timestamp: Date,
+): Promise<HistorySnapshot | null> {
+  const prefixes = await getGuildPrefixes(pool);
+
+  // Build state ONLY from exchanges that actually occurred at or before this
+  // timestamp. Territories only appear once their first exchange happens.
+  const state = new Map<string, string>();
+
+  // When multiple exchanges share the same timestamp for a territory
+  // (a "None" entry for the old owner + a guild entry for the new owner),
+  // the CASE tiebreaker ensures DISTINCT ON picks the non-None entry.
+  const result = await pool.query(
+    `SELECT DISTINCT ON (territory) territory, attacker_name
+     FROM territory_exchanges
+     WHERE exchange_time <= $1
+     ORDER BY territory, exchange_time DESC,
+              CASE WHEN attacker_name = 'None' THEN 1 ELSE 0 END`,
+    [timestamp.toISOString()]
+  );
+
+  for (const row of result.rows) {
+    state.set(row.territory, row.attacker_name);
+  }
+
+  if (state.size === 0) return null;
+
+  return {
+    timestamp: timestamp.toISOString(),
+    territories: stateToTerritories(state, prefixes),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Reconstruct snapshots at regular 10-minute intervals within a time range.
+//
+// Produces the same dense snapshot stream as the bot (one per 10 min),
+// carrying forward the last known territory state and applying exchanges
+// as they occur. This ensures the frontend's 30-minute gap threshold is
+// always satisfied.
+// ---------------------------------------------------------------------------
+const SNAPSHOT_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+
+/** Floor a timestamp to the nearest 10-minute clock boundary */
+function floorTo10Min(ms: number): number {
+  return ms - (ms % SNAPSHOT_INTERVAL_MS);
+}
+
+export async function reconstructSnapshotsFromExchanges(
+  pool: Pool,
+  startDate: Date,
+  endDate: Date,
+): Promise<HistorySnapshot[]> {
+  const prefixes = await getGuildPrefixes(pool);
+
+  // 1. Start with EMPTY state — territories appear only when first exchanged
+  const state = new Map<string, string>();
+
+  // 2. Populate with latest state at startDate for territories
+  //    that have exchanged at or before startDate
+  // CASE tiebreaker: prefer non-None when multiple exchanges share a timestamp
+  const initialResult = await pool.query(
+    `SELECT DISTINCT ON (territory) territory, attacker_name
+     FROM territory_exchanges
+     WHERE exchange_time <= $1
+     ORDER BY territory, exchange_time DESC,
+              CASE WHEN attacker_name = 'None' THEN 1 ELSE 0 END`,
+    [startDate.toISOString()]
+  );
+
+  for (const row of initialResult.rows) {
+    state.set(row.territory, row.attacker_name);
+  }
+
+  // 3. All exchanges within the range, ordered chronologically.
+  //    Sort None BEFORE non-None at the same timestamp so that
+  //    state.set() overwrites None with the real guild (last write wins).
+  const exchangesResult = await pool.query(
+    `SELECT exchange_time, territory, attacker_name
+     FROM territory_exchanges
+     WHERE exchange_time > $1 AND exchange_time <= $2
+     ORDER BY exchange_time ASC, territory,
+              CASE WHEN attacker_name = 'None' THEN 0 ELSE 1 END`,
+    [startDate.toISOString(), endDate.toISOString()]
+  );
+
+  // If no territory state at all (empty database), nothing to show
+  if (state.size === 0 && exchangesResult.rows.length === 0) {
+    return [];
+  }
+
+  // 4. Walk forward in 10-minute steps aligned to clock boundaries,
+  //    applying exchanges as we go
+  const snapshots: HistorySnapshot[] = [];
+  const exchanges = exchangesResult.rows;
+  let exchIdx = 0;
+
+  const startTick = floorTo10Min(startDate.getTime());
+
+  for (
+    let t = startTick;
+    t <= endDate.getTime();
+    t += SNAPSHOT_INTERVAL_MS
+  ) {
+    // Apply every exchange that occurred up to (and including) this tick
+    while (
+      exchIdx < exchanges.length &&
+      exchanges[exchIdx].exchange_time.getTime() <= t
+    ) {
+      state.set(
+        exchanges[exchIdx].territory,
+        exchanges[exchIdx].attacker_name,
+      );
+      exchIdx++;
+    }
+
+    // Only emit once we have at least some territory state
+    if (state.size > 0) {
+      snapshots.push({
+        timestamp: new Date(t).toISOString(),
+        territories: stateToTerritories(state, prefixes),
+      });
+    }
+  }
+
+  return snapshots;
+}
+
+// ---------------------------------------------------------------------------
+// Get the time bounds of the exchanges table.
+// `earliest` is the full-coverage time (all territories populated) so the
+// slider starts with a complete map rather than an empty one.
+// ---------------------------------------------------------------------------
+export async function getExchangeBounds(
+  pool: Pool,
+): Promise<{ earliest: Date; latest: Date } | null> {
+  try {
+    const result = await pool.query(
+      `SELECT MIN(exchange_time) AS earliest, MAX(exchange_time) AS latest
+       FROM territory_exchanges`
+    );
+    const row = result.rows[0];
+    if (!row?.earliest || !row?.latest) return null;
+
+    // Use the full-coverage timestamp as "earliest" — this is the first point
+    // where every territory has been exchanged at least once.
+    const coverageTime = await getFullCoverageTime(pool);
+    const earliest = coverageTime ?? new Date(row.earliest);
+
+    return { earliest, latest: new Date(row.latest) };
+  } catch {
+    return null;
+  }
+}
