@@ -30,11 +30,6 @@ export interface HistoryBounds {
   gaps?: Array<{ start: string; end: string }>;
 }
 
-// Week response from API
-export interface WeekResponse {
-  snapshots: HistorySnapshot[];
-}
-
 // WeakMap cache for expanded snapshots — keyed on the snapshot territories
 // object reference for zero-cost lookup. Auto-evicts when snapshots are GC'd.
 const expandWeakCache = new WeakMap<Record<string, SnapshotTerritory>, Record<string, Territory>>();
@@ -49,8 +44,12 @@ export function expandSnapshot(
   verboseData: Record<string, { Location: { start: [number, number]; end: [number, number] } }> | null,
   guildColors?: Record<string, string>
 ): Record<string, Territory> {
-  const cached = expandWeakCache.get(snapshotTerritories);
-  if (cached) return cached;
+  // Only use cache when verboseData is available — without it, all territories
+  // are skipped and caching the empty result would be permanently stale.
+  if (verboseData) {
+    const cached = expandWeakCache.get(snapshotTerritories);
+    if (cached) return cached;
+  }
 
   const territories: Record<string, Territory> = {};
 
@@ -77,7 +76,9 @@ export function expandSnapshot(
     };
   }
 
-  expandWeakCache.set(snapshotTerritories, territories);
+  if (verboseData) {
+    expandWeakCache.set(snapshotTerritories, territories);
+  }
   return territories;
 }
 
@@ -232,38 +233,6 @@ export function mergeSnapshots(
   }
 
   return merged;
-}
-
-/**
- * Check if a timestamp is within a week of the center
- */
-export function isWithinWeek(timestamp: Date, center: Date): boolean {
-  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const diff = Math.abs(timestamp.getTime() - center.getTime());
-  return diff <= WEEK_MS / 2;
-}
-
-/**
- * Check if we need to load more snapshots based on current position
- * Returns the direction to load: 'forward', 'backward', or null
- */
-export function checkNeedMoreSnapshots(
-  currentTimestamp: Date,
-  loadedWeekCenter: Date,
-  playDirection: 'forward' | 'backward'
-): 'forward' | 'backward' | null {
-  const DAY_MS = 24 * 60 * 60 * 1000;
-  const diff = currentTimestamp.getTime() - loadedWeekCenter.getTime();
-
-  // If within 1 day of the edge in the play direction, preload
-  if (playDirection === 'forward' && diff > 2.5 * DAY_MS) {
-    return 'forward';
-  }
-  if (playDirection === 'backward' && diff < -2.5 * DAY_MS) {
-    return 'backward';
-  }
-
-  return null;
 }
 
 /**

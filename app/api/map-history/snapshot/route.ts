@@ -5,9 +5,6 @@ import { reconstructSingleSnapshot } from '@/lib/exchange-data';
 
 export const dynamic = 'force-dynamic';
 
-// If the nearest snapshot is more than 1 day away, also check file data
-const SNAPSHOT_FALLBACK_THRESHOLD_SEC = 24 * 60 * 60;
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const timestampParam = searchParams.get('timestamp');
@@ -56,33 +53,6 @@ export async function GET(request: NextRequest) {
   const pool = getPool();
 
   try {
-    // Find the nearest snapshot to the requested timestamp
-    const result = await pool.query(`
-      SELECT snapshot_time, territories,
-             ABS(EXTRACT(EPOCH FROM (snapshot_time - $1::timestamptz))) as time_diff
-      FROM territory_snapshots
-      ORDER BY time_diff ASC
-      LIMIT 1
-    `, [targetDate.toISOString()]);
-
-    const snapRow = result.rows[0];
-    const snapDiff = snapRow ? Math.round(snapRow.time_diff) : Infinity;
-
-    // If snapshot is close enough, return it directly
-    if (snapRow && snapDiff <= SNAPSHOT_FALLBACK_THRESHOLD_SEC) {
-      return NextResponse.json({
-        timestamp: snapRow.snapshot_time.toISOString(),
-        territories: snapRow.territories,
-        requestedTimestamp: targetDate.toISOString(),
-        timeDiffSeconds: snapDiff,
-      }, {
-        headers: {
-          'Cache-Control': 'public, max-age=300, s-maxage=300',
-        },
-      });
-    }
-
-    // Snapshot too far away or missing — reconstruct from exchange data
     const exchangeSnapshot = await reconstructSingleSnapshot(pool, targetDate);
 
     if (exchangeSnapshot) {
@@ -90,21 +60,7 @@ export async function GET(request: NextRequest) {
         timestamp: exchangeSnapshot.timestamp,
         territories: exchangeSnapshot.territories,
         requestedTimestamp: targetDate.toISOString(),
-        timeDiffSeconds: 0, // Reconstructed at exact requested time
-      }, {
-        headers: {
-          'Cache-Control': 'public, max-age=300, s-maxage=300',
-        },
-      });
-    }
-
-    // Fall back to the distant snapshot if we have one
-    if (snapRow) {
-      return NextResponse.json({
-        timestamp: snapRow.snapshot_time.toISOString(),
-        territories: snapRow.territories,
-        requestedTimestamp: targetDate.toISOString(),
-        timeDiffSeconds: snapDiff,
+        timeDiffSeconds: 0,
       }, {
         headers: {
           'Cache-Control': 'public, max-age=300, s-maxage=300',

@@ -16,7 +16,6 @@ import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
 import {
   HistoryBounds,
   expandSnapshot,
-  parseSnapshots,
   ParsedSnapshot,
   getNextSnapshot,
   getPrevSnapshot,
@@ -103,7 +102,7 @@ export default function MapPage() {
 
   // Bulk exchange data — loaded once on history enter, used for client-side reconstruction
   const exchangeStoreRef = useRef<ExchangeStore | null>(null);
-  const exchangeLoadingRef = useRef<boolean>(false);
+  const exchangePromiseRef = useRef<Promise<ExchangeStore | null> | null>(null);
 
   // Precompute land view clusters in background (always running, even when not visible)
   const { landViewClusters } = useTerritoryPrecomputation({
@@ -391,96 +390,63 @@ export default function MapPage() {
   /** Fetch all exchange events if not already loaded. Returns the store. */
   const ensureExchangeData = useCallback(async (): Promise<ExchangeStore | null> => {
     if (exchangeStoreRef.current) return exchangeStoreRef.current;
-    if (exchangeLoadingRef.current) return null; // already in-flight
+    if (exchangePromiseRef.current) return exchangePromiseRef.current; // wait for in-flight
 
-    exchangeLoadingRef.current = true;
-    try {
-      const response = await fetch('/api/map-history/exchanges');
-      if (!response.ok) return null;
-      const data: ExchangeEventData = await response.json();
-      const store = buildExchangeStore(data);
-      exchangeStoreRef.current = store;
-      return store;
-    } catch (error) {
-      console.error('Failed to load exchange data:', error);
-      return null;
-    } finally {
-      exchangeLoadingRef.current = false;
-    }
+    const promise = (async () => {
+      try {
+        const response = await fetch('/api/map-history/exchanges');
+        if (!response.ok) return null;
+        const data: ExchangeEventData = await response.json();
+        const store = buildExchangeStore(data);
+        exchangeStoreRef.current = store;
+        return store;
+      } catch (error) {
+        console.error('Failed to load exchange data:', error);
+        return null;
+      } finally {
+        exchangePromiseRef.current = null;
+      }
+    })();
+
+    exchangePromiseRef.current = promise;
+    return promise;
   }, []);
-
-  /** Check whether a timestamp falls within the exchange data range */
-  const isInExchangeRange = useCallback((date: Date): boolean => {
-    const store = exchangeStoreRef.current;
-    if (!store) return false;
-    const t = date.getTime();
-    return t >= new Date(store.data.earliest).getTime() &&
-           t <= new Date(store.data.latest).getTime();
-  }, []);
-
-  // Guard for bot-data (territory_snapshots) week loads
-  const loadingWeekRef = useRef<string | null>(null);
 
   /**
-   * Load snapshots around a date — uses client-side reconstruction for
-   * exchange data, falls back to the week API for bot snapshot data.
+   * Load snapshots around a date using client-side reconstruction
+   * from the exchange data store.
    */
   const loadWeekSnapshots = useCallback(async (centerDate: Date, replace: boolean = false) => {
     setIsLoadingHistory(true);
     try {
       const store = await ensureExchangeData();
+      if (!store) {
+        console.error('Failed to load exchange data');
+        return;
+      }
 
-      if (store && isInExchangeRange(centerDate)) {
-        // Client-side reconstruction — instant
-        const HALF_WEEK_MS = 3.5 * 24 * 60 * 60 * 1000;
-        const start = new Date(centerDate.getTime() - HALF_WEEK_MS);
-        const end = new Date(centerDate.getTime() + HALF_WEEK_MS);
-        const snapshots = buildSnapshotsInRange(store, start, end);
+      const HALF_WEEK_MS = 3.5 * 24 * 60 * 60 * 1000;
+      const start = new Date(centerDate.getTime() - HALF_WEEK_MS);
+      const end = new Date(centerDate.getTime() + HALF_WEEK_MS);
+      const snapshots = buildSnapshotsInRange(store, start, end);
 
-        if (replace) {
-          setLoadedSnapshots(snapshots);
-        } else {
-          setLoadedSnapshots(prev => mergeSnapshots(prev, snapshots));
-        }
-        setLoadedWeekCenter(centerDate);
-
-        if (replace && snapshots.length > 0) {
-          const nearest = findNearestSnapshot(snapshots, centerDate);
-          if (nearest) setHistoryTimestamp(nearest.timestamp);
-        }
+      if (replace) {
+        setLoadedSnapshots(snapshots);
       } else {
-        // Bot snapshot data — use week API
-        const key = centerDate.toISOString();
-        loadingWeekRef.current = key;
+        setLoadedSnapshots(prev => mergeSnapshots(prev, snapshots));
+      }
+      setLoadedWeekCenter(centerDate);
 
-        const response = await fetch(
-          `/api/map-history/week?center=${centerDate.toISOString()}`
-        );
-        if (!response.ok || loadingWeekRef.current !== key) return;
-
-        const data = await response.json();
-        const parsed = parseSnapshots(data.snapshots || []);
-
-        if (replace) {
-          setLoadedSnapshots(parsed);
-        } else {
-          setLoadedSnapshots(prev => mergeSnapshots(prev, parsed));
-        }
-        setLoadedWeekCenter(centerDate);
-
-        if (replace && parsed.length > 0) {
-          const nearest = findNearestSnapshot(parsed, centerDate);
-          if (nearest) setHistoryTimestamp(nearest.timestamp);
-        }
-
-        if (loadingWeekRef.current === key) loadingWeekRef.current = null;
+      if (replace && snapshots.length > 0) {
+        const nearest = findNearestSnapshot(snapshots, centerDate);
+        if (nearest) setHistoryTimestamp(nearest.timestamp);
       }
     } catch (error) {
       console.error('Failed to load snapshots:', error);
     } finally {
       setIsLoadingHistory(false);
     }
-  }, [ensureExchangeData, isInExchangeRange]);
+  }, [ensureExchangeData]);
 
   // Keep refs in sync with state (for stable playback interval)
   useEffect(() => { historyTimestampRef.current = historyTimestamp; }, [historyTimestamp]);
@@ -534,13 +500,7 @@ export default function MapPage() {
           const DAY_MS = 24 * 60 * 60 * 1000;
           if (lastLoaded.getTime() - date.getTime() < DAY_MS) {
             const nextCenter = new Date(lastLoaded.getTime() + 3.5 * DAY_MS);
-            // Don't preload beyond exchange data boundary
-            const store = exchangeStoreRef.current;
-            const exchangeLatestMs = store ? new Date(store.data.latest).getTime() : 0;
-            const currentInExchange = store && date.getTime() <= exchangeLatestMs;
-            if (!currentInExchange || nextCenter.getTime() <= exchangeLatestMs + DAY_MS) {
-              loadWeekSnapshots(nextCenter, false);
-            }
+            loadWeekSnapshots(nextCenter, false);
           }
           return;
         }
@@ -629,13 +589,7 @@ export default function MapPage() {
         const DAY_MS = 24 * 60 * 60 * 1000;
         if (lastLoaded.getTime() - next.timestamp.getTime() < DAY_MS) {
           const nextCenter = new Date(lastLoaded.getTime() + 3.5 * DAY_MS);
-          // Don't preload beyond exchange data boundary
-          const store = exchangeStoreRef.current;
-          const exchangeLatestMs = store ? new Date(store.data.latest).getTime() : 0;
-          const currentInExchange = store && next.timestamp.getTime() <= exchangeLatestMs;
-          if (!currentInExchange || nextCenter.getTime() <= exchangeLatestMs + DAY_MS) {
-            loadWeekSnapshots(nextCenter, false);
-          }
+          loadWeekSnapshots(nextCenter, false);
         }
       }
     }
@@ -663,6 +617,37 @@ export default function MapPage() {
     loadWeekSnapshots(end, true);
   }, [historyBounds, loadWeekSnapshots]);
 
+  // Skip a timestamp forward past any gap it falls inside.
+  // Returns the gap's end if inside a gap, or the original time if not.
+  const skipGapForward = useCallback((time: Date): Date => {
+    const gaps = historyBounds?.gaps;
+    if (!gaps || gaps.length === 0) return time;
+    const ms = time.getTime();
+    for (const gap of gaps) {
+      const gapStart = new Date(gap.start).getTime();
+      const gapEnd = new Date(gap.end).getTime();
+      if (ms >= gapStart && ms <= gapEnd) {
+        return new Date(gapEnd);
+      }
+    }
+    return time;
+  }, [historyBounds]);
+
+  // Skip a timestamp backward past any gap it falls inside.
+  const skipGapBackward = useCallback((time: Date): Date => {
+    const gaps = historyBounds?.gaps;
+    if (!gaps || gaps.length === 0) return time;
+    const ms = time.getTime();
+    for (const gap of gaps) {
+      const gapStart = new Date(gap.start).getTime();
+      const gapEnd = new Date(gap.end).getTime();
+      if (ms >= gapStart && ms <= gapEnd) {
+        return new Date(gapStart);
+      }
+    }
+    return time;
+  }, [historyBounds]);
+
   // Playback logic — stable interval that reads from refs to avoid
   // tearing down and recreating on every tick
   useEffect(() => {
@@ -680,8 +665,9 @@ export default function MapPage() {
       if (!currentTs) return;
 
       if (isFast) {
-        // Fast mode: jump forward 1 day per tick
-        const nextTime = new Date(currentTs.getTime() + DAY_MS);
+        // Fast mode: jump forward 1 day per tick, skipping gaps
+        let nextTime = new Date(currentTs.getTime() + DAY_MS);
+        nextTime = skipGapForward(nextTime);
         const bounds = historyBounds;
         if (bounds && nextTime.getTime() > new Date(bounds.latest).getTime()) {
           setHistoryTimestamp(new Date(bounds.latest));
@@ -704,13 +690,7 @@ export default function MapPage() {
         const lastLoaded = snapshots[snapshots.length - 1].timestamp;
         if (lastLoaded.getTime() - next.timestamp.getTime() < DAY_MS) {
           const nextCenter = new Date(lastLoaded.getTime() + 3.5 * DAY_MS);
-          // Don't preload beyond exchange data boundary into bot data range
-          const store = exchangeStoreRef.current;
-          const exchangeLatestMs = store ? new Date(store.data.latest).getTime() : 0;
-          const currentInExchange = store && next.timestamp.getTime() <= exchangeLatestMs;
-          if (!currentInExchange || nextCenter.getTime() <= exchangeLatestMs + DAY_MS) {
-            loadWeekSnapshotsRef.current(nextCenter, false);
-          }
+          loadWeekSnapshotsRef.current(nextCenter, false);
         }
       } else {
         setIsPlaying(false);
@@ -724,7 +704,7 @@ export default function MapPage() {
         clearInterval(playbackIntervalRef.current);
       }
     };
-  }, [isPlaying, playbackSpeed, viewMode, historyBounds]);
+  }, [isPlaying, playbackSpeed, viewMode, historyBounds, skipGapForward]);
 
   // Determine which territories to display
   const displayTerritories = viewMode === 'history' && historyTerritories
@@ -1186,8 +1166,8 @@ export default function MapPage() {
             {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay />}
           </div>
 
-          {/* History loading overlay - shown when scrubbing to an area without loaded data */}
-          {viewMode === 'history' && !historyTerritories && historyTimestamp && (
+          {/* History loading overlay - shown when loading history data (initial restore or scrubbing) */}
+          {viewMode === 'history' && (!historyTerritories || Object.keys(historyTerritories).length === 0) && (isLoadingHistory || historyTimestamp) && (
             <div style={{
               position: 'absolute',
               inset: 0,

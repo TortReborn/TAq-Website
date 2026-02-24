@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest) {
     }
 
     // Fetch all unique exchange events, ordered by time.
-    // DISTINCT ON deduplicates the ~332K duplicate rows.
+    // DISTINCT ON removes duplicate rows (same time+territory+attacker).
     const result = await pool.query(`
       SELECT DISTINCT ON (exchange_time, territory, attacker_name)
              exchange_time, territory, attacker_name

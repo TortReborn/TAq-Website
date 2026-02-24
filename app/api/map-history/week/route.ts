@@ -62,55 +62,16 @@ export async function GET(request: NextRequest) {
   const pool = getPool();
 
   try {
-    // Try the snapshot table first
-    const countResult = await pool.query(`
-      SELECT COUNT(*)::int as total
-      FROM territory_snapshots
-      WHERE snapshot_time >= $1 AND snapshot_time <= $2
-    `, [startDate.toISOString(), endDate.toISOString()]);
+    const exchangeSnapshots = await reconstructSnapshotsFromExchanges(
+      pool,
+      startDate,
+      endDate,
+    );
 
-    let total = countResult.rows[0].total;
-    let snapshots: Array<{ timestamp: string; territories: Record<string, unknown> }>;
-
-    if (total > 0) {
-      // Snapshot table has data for this range — use it
-      let query = `
-        SELECT snapshot_time, territories
-        FROM territory_snapshots
-        WHERE snapshot_time >= $1 AND snapshot_time <= $2
-        ORDER BY snapshot_time ASC
-      `;
-      const params: (string | number)[] = [startDate.toISOString(), endDate.toISOString()];
-
-      if (limit !== null) {
-        query += ` LIMIT $3 OFFSET $4`;
-        params.push(limit, offset);
-      }
-
-      const result = await pool.query(query, params);
-
-      snapshots = result.rows.map(row => ({
-        timestamp: row.snapshot_time.toISOString(),
-        territories: row.territories,
-      }));
-    } else {
-      // No snapshot data — reconstruct from exchange events
-      const exchangeSnapshots = await reconstructSnapshotsFromExchanges(
-        pool,
-        startDate,
-        endDate,
-      );
-
-      if (exchangeSnapshots.length > 0) {
-        total = exchangeSnapshots.length;
-        snapshots = limit !== null
-          ? exchangeSnapshots.slice(offset, offset + limit)
-          : exchangeSnapshots;
-      } else {
-        total = 0;
-        snapshots = [];
-      }
-    }
+    const total = exchangeSnapshots.length;
+    const snapshots = limit !== null
+      ? exchangeSnapshots.slice(offset, offset + limit)
+      : exchangeSnapshots;
 
     return NextResponse.json({
       center: centerDate.toISOString(),

@@ -30,11 +30,19 @@ const PREFIX_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 // ---------------------------------------------------------------------------
 let coverageTimeCache: Date | null | undefined = undefined; // undefined = not yet queried
 
+// ---------------------------------------------------------------------------
+// Gap cache — periods longer than 1 week with no exchange data.
+// ---------------------------------------------------------------------------
+let gapCache: Array<{ start: Date; end: Date }> | null = null;
+let gapCacheTime = 0;
+
 /** Reset caches (used by tests). */
 export function _resetPrefixCache() {
   prefixCache = null;
   prefixCacheTime = 0;
   coverageTimeCache = undefined;
+  gapCache = null;
+  gapCacheTime = 0;
 }
 
 async function getGuildPrefixes(pool: Pool): Promise<Map<string, string>> {
@@ -94,6 +102,44 @@ export async function getFullCoverageTime(pool: Pool): Promise<Date | null> {
   } catch {
     coverageTimeCache = null;
     return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Gap detection — find periods > 7 days with no exchange data.
+// ---------------------------------------------------------------------------
+
+const GAP_THRESHOLD_DAYS = 7;
+
+export async function getExchangeGaps(
+  pool: Pool,
+): Promise<Array<{ start: Date; end: Date }>> {
+  if (gapCache && Date.now() - gapCacheTime < PREFIX_CACHE_TTL) {
+    return gapCache;
+  }
+
+  try {
+    const result = await pool.query(`
+      WITH daily AS (
+        SELECT DISTINCT DATE_TRUNC('day', exchange_time)::date AS d
+        FROM territory_exchanges
+      ), with_next AS (
+        SELECT d, LEAD(d) OVER (ORDER BY d) AS next_d
+        FROM daily
+      )
+      SELECT d AS gap_start, next_d AS gap_end
+      FROM with_next
+      WHERE next_d - d > $1
+    `, [GAP_THRESHOLD_DAYS]);
+
+    gapCache = result.rows.map((row: { gap_start: Date; gap_end: Date }) => ({
+      start: new Date(row.gap_start),
+      end: new Date(row.gap_end),
+    }));
+    gapCacheTime = Date.now();
+    return gapCache;
+  } catch {
+    return gapCache ?? [];
   }
 }
 
