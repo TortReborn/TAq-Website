@@ -81,6 +81,7 @@ export default function MapPage() {
   const [externalsData, setExternalsData] = useState<TerritoryExternalsData | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showRegionMenu, setShowRegionMenu] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
 
@@ -959,8 +960,9 @@ export default function MapPage() {
 
   // Territory interaction handlers
   const handleTerritoryClick = useCallback((name: string, territory: Territory) => {
+    if (viewMode === 'history') return;
     setSelectedTerritory({ name, territory });
-  }, []);
+  }, [viewMode]);
 
   const handleTerritoryHover = useCallback((name: string, territory: Territory) => {
     setHoveredTerritory({ name, territory });
@@ -1025,6 +1027,47 @@ export default function MapPage() {
     }, 2000); // Slightly longer than transition duration to avoid jerky end
   }, [territories, clampScale]);
 
+  // Region zoom presets (game coordinates: [minX, minZ, maxX, maxZ])
+  // Region zoom presets — game coords [X, Z] where more negative Z = further north on map
+  const REGION_BOUNDS: Record<string, { minX: number; minZ: number; maxX: number; maxZ: number }> = {
+    Wynn:  { minX: -800, minZ: -2225, maxX: 1400, maxZ: -75 },
+    // Scorpion Nest top-left (-2173,-5603) → Raiders' Airbase bottom-right (1558,-4253) + padding
+    Gavel: { minX: -2275, minZ: -5700, maxX: 1660, maxZ: -4150 },
+    // Barren Sands bottom-right (1450,-2170) → Entrance to Gavel top-left (-2048,-4403) + wide L/R margins
+    Ocean: { minX: -2250, minZ: -4500, maxX: 1650, maxZ: -2100 },
+  };
+
+  const zoomToRegion = useCallback((regionName: string) => {
+    if (!containerRef.current) return;
+    const bounds = REGION_BOUNDS[regionName];
+    if (!bounds) return;
+
+    const topLeftPixel = coordToPixel([bounds.minX, bounds.minZ]);
+    const bottomRightPixel = coordToPixel([bounds.maxX, bounds.maxZ]);
+
+    const boundingWidth = Math.abs(bottomRightPixel[0] - topLeftPixel[0]);
+    const boundingHeight = Math.abs(bottomRightPixel[1] - topLeftPixel[1]);
+    const boundingCenterX = (topLeftPixel[0] + bottomRightPixel[0]) / 2;
+    const boundingCenterY = (topLeftPixel[1] + bottomRightPixel[1]) / 2;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const padding = 100;
+    const scaleX = (containerRect.width - padding * 2) / boundingWidth;
+    const scaleY = (containerRect.height - padding * 2) / boundingHeight;
+    const newScale = clampScale(Math.min(scaleX, scaleY));
+
+    const newPosition = {
+      x: containerRect.width / 2 - boundingCenterX * newScale,
+      y: containerRect.height / 2 - boundingCenterY * newScale,
+    };
+
+    setScale(newScale);
+    setPosition(newPosition);
+    setIsAnimating(true);
+    setShowRegionMenu(false);
+    setTimeout(() => setIsAnimating(false), 2000);
+  }, [clampScale]);
+
   return (
     <main style={{
       position: 'fixed',
@@ -1032,7 +1075,10 @@ export default function MapPage() {
       left: 0,
       width: '100vw',
       height: 'calc(100vh - 5.5rem)',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      userSelect: 'none',
+      WebkitUserSelect: 'none',
+      cursor: isDragging ? 'grabbing' : 'grab',
     }}>
       <div style={{
         width: '100%',
@@ -1114,6 +1160,7 @@ export default function MapPage() {
               width: mapDimensions.width,
               height: mapDimensions.height,
               transition: isAnimating ? 'transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none',
+              cursor: isDragging ? 'grabbing' : 'grab',
             }}
           >
             <img
@@ -1246,8 +1293,40 @@ export default function MapPage() {
             </div>
           )}
 
-          {/* Territory Hover Panel - shown when hovering and no territory is selected */}
-          {!selectedTerritory && (
+          {/* Territory Hover Panel - simplified in history mode, full in live mode */}
+          {viewMode === 'history' && hoveredTerritory && (
+            <div style={{
+              position: 'absolute',
+              top: '1rem',
+              left: '1rem',
+              minWidth: '160px',
+              maxWidth: '240px',
+              backgroundColor: 'var(--bg-card-solid)',
+              border: '2px solid var(--border-color)',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem',
+              zIndex: 1000,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+              pointerEvents: 'none',
+            }}>
+              <div style={{
+                fontWeight: 'bold',
+                fontSize: '1.1rem',
+                color: 'var(--text-primary)',
+                marginBottom: '0.25rem',
+              }}>
+                {hoveredTerritory.name}
+              </div>
+              <div style={{
+                fontSize: '0.9rem',
+                color: 'var(--text-secondary)',
+              }}>
+                {hoveredTerritory.territory.guild.name || 'Unclaimed'}
+                {hoveredTerritory.territory.guild.prefix && ` [${hoveredTerritory.territory.guild.prefix}]`}
+              </div>
+            </div>
+          )}
+          {viewMode !== 'history' && !selectedTerritory && (
             <TerritoryHoverPanel
               territory={hoveredTerritory}
               guildColors={guildColors}
@@ -1278,6 +1357,83 @@ export default function MapPage() {
             gap: '0.5rem',
             zIndex: 10
           }}>
+            {/* Region Zoom Button */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowRegionMenu(prev => !prev)}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.5rem',
+                  border: '2px solid var(--border-color)',
+                  background: showRegionMenu ? 'var(--bg-secondary)' : 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!showRegionMenu) e.currentTarget.style.background = 'var(--bg-card)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+                title="Zoom to region"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+              </button>
+              {showRegionMenu && (
+                <div style={{
+                  position: 'absolute',
+                  left: 'calc(100% + 0.5rem)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  gap: '0.375rem',
+                }}>
+                  {['Wynn', 'Gavel', 'Ocean'].map((region) => (
+                    <button
+                      key={region}
+                      onClick={() => zoomToRegion(region)}
+                      style={{
+                        padding: '0.375rem 0.625rem',
+                        borderRadius: '0.375rem',
+                        border: '2px solid var(--border-color)',
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-secondary)';
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-card)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    >
+                      {region}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               onClick={resetView}
               style={{

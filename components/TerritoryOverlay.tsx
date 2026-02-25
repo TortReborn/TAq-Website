@@ -85,7 +85,7 @@ export default function TerritoryOverlay({
   // Use scale prop for zoom, define at top
   const zoom = scale;
   // Local drag detection
-  const dragState = React.useRef({ down: false, moved: false });
+  const dragState = React.useRef({ down: false, moved: false, startX: 0, startY: 0 });
 
   // Continuous time updates for accurate timer display
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -350,13 +350,21 @@ export default function TerritoryOverlay({
         fill={guildColor + "40"}
         stroke={guildColor}
         strokeWidth={STROKE_WIDTH}
-        style={{ pointerEvents: "auto", cursor: "pointer" }}
+        style={{ pointerEvents: "auto", cursor: isDragging ? "grabbing" : "grab" }}
         onPointerDown={e => {
           dragState.current.down = true;
           dragState.current.moved = false;
+          dragState.current.startX = e.clientX;
+          dragState.current.startY = e.clientY;
         }}
         onPointerMove={e => {
-          if (dragState.current.down) dragState.current.moved = true;
+          if (dragState.current.down) {
+            const dx = e.clientX - dragState.current.startX;
+            const dy = e.clientY - dragState.current.startY;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+              dragState.current.moved = true;
+            }
+          }
         }}
         onPointerUp={e => {
           dragState.current.down = false;
