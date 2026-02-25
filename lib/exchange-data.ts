@@ -24,11 +24,10 @@ let prefixCacheTime = 0;
 const PREFIX_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 // ---------------------------------------------------------------------------
-// Full-coverage time cache — the point where every territory that will ever
-// appear in exchange data has had at least one exchange.  This is used as the
-// effective "earliest" bound so the slider starts with a fully-populated map.
+// (Removed) Full-coverage time cache — previously used to delay the timeline
+// start until every territory had been exchanged at least once.  This hid
+// sparse early data (2018-2020).  Now we use the raw MIN(exchange_time).
 // ---------------------------------------------------------------------------
-let coverageTimeCache: Date | null | undefined = undefined; // undefined = not yet queried
 
 // ---------------------------------------------------------------------------
 // Gap cache — periods longer than 1 week with no exchange data.
@@ -40,7 +39,6 @@ let gapCacheTime = 0;
 export function _resetPrefixCache() {
   prefixCache = null;
   prefixCacheTime = 0;
-  coverageTimeCache = undefined;
   gapCache = null;
   gapCacheTime = 0;
 }
@@ -70,40 +68,11 @@ function guildPrefix(prefixes: Map<string, string>, guildName: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Full-coverage time — the earliest moment where every old-map territory has
-// been claimed at least once (has a non-None exchange).  This is the slider's
-// start so the map begins fully populated.
-//
-// Computed as: MAX of (first non-None exchange per territory) across all
-// territories in the pre-Rekindled World data (before Sep 2024).
+// (Removed) getFullCoverageTime — previously delayed the timeline start until
+// every territory had at least one exchange.  This pushed the start to April
+// 2021 when 2018-2020 data existed in the DB.  Now getExchangeBounds() uses
+// the raw MIN(exchange_time) directly.
 // ---------------------------------------------------------------------------
-
-export async function getFullCoverageTime(pool: Pool): Promise<Date | null> {
-  if (coverageTimeCache !== undefined) return coverageTimeCache;
-
-  try {
-    const result = await pool.query(`
-      SELECT MAX(first_claimed) AS coverage_time
-      FROM (
-        SELECT MIN(exchange_time) AS first_claimed
-        FROM territory_exchanges
-        WHERE attacker_name != 'None'
-          AND exchange_time < '2024-09-01'
-        GROUP BY territory
-      ) sub
-    `);
-    const row = result.rows[0];
-    if (!row?.coverage_time) {
-      coverageTimeCache = null;
-      return null;
-    }
-    coverageTimeCache = new Date(row.coverage_time);
-    return coverageTimeCache;
-  } catch {
-    coverageTimeCache = null;
-    return null;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Gap detection — find periods > 7 days with no exchange data.
@@ -323,8 +292,8 @@ export async function reconstructSnapshotsFromExchanges(
 
 // ---------------------------------------------------------------------------
 // Get the time bounds of the exchanges table.
-// `earliest` is the full-coverage time (all territories populated) so the
-// slider starts with a complete map rather than an empty one.
+// `earliest` is the raw MIN(exchange_time) so the timeline starts at the
+// actual first data point — even if many territories are empty early on.
 // ---------------------------------------------------------------------------
 export async function getExchangeBounds(
   pool: Pool,
@@ -337,12 +306,10 @@ export async function getExchangeBounds(
     const row = result.rows[0];
     if (!row?.earliest || !row?.latest) return null;
 
-    // Use the full-coverage timestamp as "earliest" — this is the first point
-    // where every territory has been exchanged at least once.
-    const coverageTime = await getFullCoverageTime(pool);
-    const earliest = coverageTime ?? new Date(row.earliest);
-
-    return { earliest, latest: new Date(row.latest) };
+    return {
+      earliest: new Date(row.earliest),
+      latest: new Date(row.latest),
+    };
   } catch {
     return null;
   }

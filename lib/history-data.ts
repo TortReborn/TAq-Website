@@ -34,6 +34,10 @@ export interface HistoryBounds {
 // object reference for zero-cost lookup. Auto-evicts when snapshots are GC'd.
 const expandWeakCache = new WeakMap<Record<string, SnapshotTerritory>, Record<string, Territory>>();
 
+// Dev-only: track which "missing location" warnings we've already logged
+// so we only log each territory name once per session.
+const _warnedTerritories = new Set<string>();
+
 /**
  * Expand a condensed snapshot into full Territory format.
  * Uses verbose data for location info since snapshots don't store coordinates.
@@ -58,7 +62,14 @@ export function expandSnapshot(
     const verbose = verboseData?.[fullName];
 
     if (!verbose?.Location) {
-      // Skip territories without location data
+      // Skip territories without location data.
+      // Log in dev so we can identify missing territory coordinates.
+      if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+        if (!_warnedTerritories.has(fullName)) {
+          _warnedTerritories.add(fullName);
+          console.warn(`[expandSnapshot] No location data for "${fullName}" (abbrev: ${abbrev})`);
+        }
+      }
       continue;
     }
 

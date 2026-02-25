@@ -165,11 +165,21 @@ export default function HistoryTimeline({
     }
   }, [isDragging]);
 
-  // Whether the hover is over a gap
+  // Whether the hover is over a gap, and which gap
   const hoverInGap = useMemo(() => {
     if (hoverPercent === null) return false;
     return isInGap(hoverPercent);
   }, [hoverPercent, isInGap]);
+
+  const hoverGap = useMemo(() => {
+    if (hoverPercent === null || !gaps) return null;
+    for (let i = 0; i < gapRegions.length; i++) {
+      if (hoverPercent >= gapRegions[i].startPct && hoverPercent <= gapRegions[i].endPct) {
+        return gaps[i];
+      }
+    }
+    return null;
+  }, [hoverPercent, gapRegions, gaps]);
 
   // Compute hovered date from percent
   const hoverDate = useMemo(() => {
@@ -228,9 +238,11 @@ export default function HistoryTimeline({
 
   // ── Shared sub-elements ──────────────────────────────────────────────
 
-  const tooltipContent = hoverInGap
-    ? 'No data available'
-    : hoverDate ? formatDateTime(hoverDate) : '';
+  const tooltipContent = hoverDate
+    ? (hoverInGap && hoverGap
+      ? <>{formatDate(hoverGap.start)} – {formatDate(hoverGap.end)}<br /><span style={{ opacity: 0.7 }}>No data available</span></>
+      : formatDateTime(hoverDate))
+    : '';
 
   const thumbStyle: React.CSSProperties = {
     position: 'absolute',

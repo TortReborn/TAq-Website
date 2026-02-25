@@ -713,6 +713,51 @@ const OLD_TERRITORY_TO_ABBREV: Record<string, string> = {
   "Path To Military Base": "PTM",
   "Thanos Valley West": "TVW",
   "Viscera Pits West": "VPW",
+
+  // 2018-era territories (predating even the pre-Rekindled names).
+  // These territories were renamed or removed before the Rekindled World
+  // update.  They appear in the 2018-2021 Discord war-log import.
+  // Location data is not yet available — they won't render on the map
+  // until old_territories_verbose.json is added.
+  "Abandoned Church": "ABCH",
+  "Abandoned Tower": "ABTW",
+  "Angry Village": "AGV",
+  "Animal Bridge": "ANB",
+  "Arachnida Cave": "ARCC",
+  "Banshees Cave": "BNC",
+  "Battle Tower": "BTT",
+  "Black Camp": "BKC",
+  "Black Magic": "BKM",
+  "Bucie North East": "BNE",
+  "Bucie North West": "BNW",
+  "Bucie South East": "BCSE",
+  "Bucie South West": "BCSW",
+  "Corkus Abandoned Tower": "CKAT",
+  "Corrupted Hand": "CRH",
+  "Corrupted Impact": "CRI",
+  "Corrupted Village": "CVG",
+  "Farmers Valley": "FMV",
+  "Graveyard North": "GYN",
+  "Graveyard South": "GYS",
+  "Gray Zone": "GRZ",
+  "Green Camp": "GRNC",
+  "Gromblins Hideout": "GMH",
+  "Imperial Gate": "IMT",
+  "Light Realm East": "LRE",
+  "Light Realm East Mid-Upper": "LRMU",
+  "Light Realm Entrance Upper": "LREN",
+  "Light Realm Mushrooms": "LRM",
+  "Mt. Wynn": "MTW",
+  "Orphion\u2019s Seal": "OPS",
+  "Orphion\u2019s Seal Upper": "OPSU",
+  "Path To Prison": "PTPR",
+  "Potato Laboratory": "PLB",
+  "Qira\u2019s Battle Room": "QBR",
+  "Red Camp": "RDC",
+  "Sacrifice": "SACR",
+  "Shanjugin\u2019s River": "SJR",
+  "Spiraling Trees": "SPT",
+  "Statue": "STT",
 };
 
 // Merge old names into the combined mapping so all lookups still work
@@ -739,9 +784,40 @@ for (const [name, abbrev] of Object.entries(TERRITORY_TO_ABBREV)) {
   NORMALIZED_LOOKUP[normalizeApostrophes(name)] = abbrev;
 }
 
-// Known typos/aliases in historical exchange data → canonical name
+// Known typos/aliases in historical exchange data → canonical name.
+// Maps 2018-era territory names and typos to their canonical equivalents
+// in TERRITORY_TO_ABBREV / OLD_TERRITORY_TO_ABBREV.
 const DB_NAME_ALIASES: Record<string, string> = {
   "Otherwordly Monolith": "Otherworldly Monolith",
+
+  // Nivla Forest → Nivla Woods renames (happened pre-Rekindled)
+  "Nivla Forest": "Nivla Woods",
+  "Nivla Forest Edge": "Nivla Woods Edge",
+  "Nivla Forest Entrance": "Nivla Woods Entrance",
+  "Nivla Forest Exit": "Nivla Woods Exit",
+  "North Nivla Forest": "North Nivla Woods",
+  "South Nivla Forest": "South Nivla Woods",
+
+  // Light Realm → Light Forest renames (happened pre-Rekindled)
+  "Light Realm East Lower": "Light Forest East Lower",
+  "Light Realm East Mid": "Light Forest East Mid",
+  "Light Realm East Upper": "Light Forest East Upper",
+  "Light Realm Entrance": "Light Forest South Entrance",
+  "Light Realm Corruption": "Light Forest Canyon",
+
+  // Road to Corruption → Road To Light Forest
+  "Road to Corruption": "Road To Light Forest",
+
+  // Dernal → Dernel spelling (2018-era)
+  "Dernal Jungle Lower": "Dernel Jungle Lower",
+  "Dernal Jungle Mid": "Dernel Jungle Mid",
+  "Dernal Jungle Upper": "Dernel Jungle Upper",
+
+  // Efelim → Efilim spelling (2018-era)
+  "Efelim East Plains": "Efilim East Plains",
+  "Efelim South East Plains": "Efilim South East Plains",
+  "Efelim South Plains": "Efilim South Plains",
+  "Efelim Village": "Efilim Village",
 };
 
 /**

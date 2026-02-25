@@ -3,7 +3,6 @@ import {
   reconstructSingleSnapshot,
   reconstructSnapshotsFromExchanges,
   getExchangeBounds,
-  getFullCoverageTime,
   exchangesHaveDataNear,
   _resetPrefixCache,
 } from './exchange-data';
@@ -490,65 +489,14 @@ describe('playback simulation', () => {
 });
 
 // ---------------------------------------------------------------------------
-// getFullCoverageTime  (MAX of first non-None exchange per territory)
-// ---------------------------------------------------------------------------
-describe('getFullCoverageTime', () => {
-  it('returns the time when all territories have been claimed', async () => {
-    const coverageTime = new Date('2021-11-08T00:37:32Z');
-    const pool = createMockPool([
-      { rows: [{ coverage_time: coverageTime }] },
-    ]);
-
-    const result = await getFullCoverageTime(pool);
-    expect(result).toEqual(coverageTime);
-  });
-
-  it('returns null when table is empty', async () => {
-    const pool = createMockPool([
-      { rows: [{ coverage_time: null }] },
-    ]);
-
-    const result = await getFullCoverageTime(pool);
-    expect(result).toBeNull();
-  });
-
-  it('returns null on query error', async () => {
-    const pool = {
-      query: vi.fn(async () => { throw new Error('relation does not exist'); }),
-    } as unknown as Pool;
-
-    const result = await getFullCoverageTime(pool);
-    expect(result).toBeNull();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// getExchangeBounds
-//
-// Query order: 1) MIN/MAX exchange_time  2) getFullCoverageTime
+// getExchangeBounds — returns raw MIN/MAX exchange_time
 // ---------------------------------------------------------------------------
 describe('getExchangeBounds', () => {
-  it('returns coverage time as earliest', async () => {
-    const rawEarliest = new Date('2021-09-25T00:04:32Z');
-    const latest = new Date('2025-05-13T00:00:00Z');
-    const coverageTime = new Date('2021-11-08T00:37:32Z');
-    const pool = createMockPool([
-      // 1) MIN/MAX
-      { rows: [{ earliest: rawEarliest, latest }] },
-      // 2) getFullCoverageTime
-      { rows: [{ coverage_time: coverageTime }] },
-    ]);
-
-    const result = await getExchangeBounds(pool);
-    expect(result).toEqual({ earliest: coverageTime, latest });
-  });
-
-  it('falls back to raw MIN when coverage query returns null', async () => {
-    const earliest = new Date('2021-09-25T00:00:00Z');
+  it('returns raw MIN as earliest', async () => {
+    const earliest = new Date('2018-06-15T00:04:32Z');
     const latest = new Date('2025-05-13T00:00:00Z');
     const pool = createMockPool([
       { rows: [{ earliest, latest }] },
-      { rows: [{ coverage_time: null }] },
     ]);
 
     const result = await getExchangeBounds(pool);

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { USE_TEST_DATA, getTestExchangeEvents } from '@/lib/test-history-data';
-import { getFullCoverageTime } from '@/lib/exchange-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,13 +112,11 @@ export async function GET(_request: NextRequest) {
     }
     flushBuffer();
 
-    // Compute bounds
-    const coverageTime = await getFullCoverageTime(pool);
-    const earliest = coverageTime
-      ? coverageTime.toISOString()
-      : events.length > 0
-        ? new Date(events[0][0] * 1000).toISOString()
-        : new Date().toISOString();
+    // Compute bounds — use raw first/last event timestamps so the timeline
+    // starts at the actual earliest data (even if sparse).
+    const earliest = events.length > 0
+      ? new Date(events[0][0] * 1000).toISOString()
+      : new Date().toISOString();
     const latest = events.length > 0
       ? new Date(events[events.length - 1][0] * 1000).toISOString()
       : new Date().toISOString();
