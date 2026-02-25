@@ -15,7 +15,11 @@
       "Bash(node scripts/generate-snapshots.js:*)",
       "Bash(node -e:*)",
       "Bash(node scripts/dump-guild-prefixes.js:*)",
-      "Bash(npx tsc@latest --noEmit --project tsconfig.json)"
+      "Bash(npx tsc@latest --noEmit --project tsconfig.json)",
+      "Bash(node scripts/check-dupes.js)",
+      "Bash(sed 's/\"\"//g')",
+      "Bash(sed 's/\"\": \\\\[//')",
+      "Bash(npx next lint --file lib/conflict-detection.ts --file components/ConflictFinder.tsx)"
     ],
     "deny": [],
     "ask": []

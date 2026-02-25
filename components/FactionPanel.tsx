@@ -40,8 +40,9 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-const GUILDS_PER_COLUMN = 10;
-const GUILD_ROW_HEIGHT = 22; // px per guild row
+const DEFAULT_HEIGHT = 440;
+const MIN_HEIGHT = 200;
+const MAX_HEIGHT = 900;
 
 export default function FactionPanel({
   isOpen,
@@ -59,6 +60,11 @@ export default function FactionPanel({
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+
+  // Resize state
+  const [panelHeight, setPanelHeight] = useState(DEFAULT_HEIGHT);
+  const isResizing = useRef<"top" | "bottom" | false>(false);
+  const resizeStart = useRef({ y: 0, height: DEFAULT_HEIGHT, posY: 0 });
 
   // Initialize position on first open
   useEffect(() => {
@@ -87,25 +93,43 @@ export default function FactionPanel({
   // Clamp position within viewport
   const clampPosition = useCallback((x: number, y: number) => {
     const panelW = panelRef.current?.offsetWidth || 400;
-    const panelH = panelRef.current?.offsetHeight || 400;
+    const panelH = panelRef.current?.offsetHeight || panelHeight;
     return {
       x: Math.max(0, Math.min(x, window.innerWidth - panelW)),
       y: Math.max(0, Math.min(y, window.innerHeight - panelH)),
     };
-  }, []);
+  }, [panelHeight]);
 
-  // Drag handlers on document
+  // Drag + resize handlers on document
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      const clamped = clampPosition(
-        e.clientX - dragOffset.current.x,
-        e.clientY - dragOffset.current.y
-      );
-      setPosition(clamped);
+      if (isDragging.current) {
+        const clamped = clampPosition(
+          e.clientX - dragOffset.current.x,
+          e.clientY - dragOffset.current.y
+        );
+        setPosition(clamped);
+        return;
+      }
+
+      if (isResizing.current) {
+        const delta = e.clientY - resizeStart.current.y;
+        if (isResizing.current === "bottom") {
+          const maxH = Math.min(MAX_HEIGHT, window.innerHeight - (resizeStart.current.posY + 16));
+          const newHeight = Math.max(MIN_HEIGHT, Math.min(maxH, resizeStart.current.height + delta));
+          setPanelHeight(newHeight);
+        } else {
+          const maxH = Math.min(MAX_HEIGHT, resizeStart.current.posY + resizeStart.current.height - 16);
+          const newHeight = Math.max(MIN_HEIGHT, Math.min(maxH, resizeStart.current.height - delta));
+          const heightDiff = newHeight - resizeStart.current.height;
+          setPanelHeight(newHeight);
+          setPosition(prev => prev ? { ...prev, y: resizeStart.current.posY - heightDiff } : prev);
+        }
+      }
     };
     const onMouseUp = () => {
       isDragging.current = false;
+      isResizing.current = false;
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
@@ -130,6 +154,19 @@ export default function FactionPanel({
     e.stopPropagation();
   };
 
+  const onResizeMouseDown = (side: "top" | "bottom") => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isResizing.current = side;
+    resizeStart.current = {
+      y: e.clientY,
+      height: panelHeight,
+      posY: position?.y || 0,
+    };
+    document.body.style.cursor = "ns-resize";
+    document.body.style.userSelect = "none";
+  };
+
   // Build a map of guild -> faction id for quick lookup
   const guildToFaction = useMemo(() => {
     const map: Record<string, string> = {};
@@ -140,6 +177,15 @@ export default function FactionPanel({
     }
     return map;
   }, [factions]);
+
+  // Build a lookup from guild name to prefix for consistent display
+  const guildPrefixMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const g of availableGuilds) {
+      map[g.name] = g.prefix;
+    }
+    return map;
+  }, [availableGuilds]);
 
   // Filter guilds by search (only when searching)
   const filteredGuilds = useMemo(() => {
@@ -221,6 +267,13 @@ export default function FactionPanel({
     });
   }
 
+  /** Consistent guild display: always show name, with [PREFIX] if known */
+  function getGuildDisplay(guildName: string): string {
+    const prefix = guildPrefixMap[guildName];
+    if (prefix) return `[${prefix}] ${guildName}`;
+    return guildName;
+  }
+
   const stopPropagation = (e: React.SyntheticEvent) => e.stopPropagation();
 
   // Check if the search term is a custom guild (not on map)
@@ -239,7 +292,7 @@ export default function FactionPanel({
         top: position ? `${position.y}px` : "auto",
         minWidth: "340px",
         maxWidth: "90vw",
-        maxHeight: "80vh",
+        height: `${panelHeight}px`,
         backgroundColor: "var(--bg-card-solid)",
         border: "2px solid var(--border-color)",
         borderRadius: "0.75rem",
@@ -257,6 +310,21 @@ export default function FactionPanel({
       onTouchMove={stopPropagation}
       onTouchEnd={stopPropagation}
     >
+      {/* Top resize handle */}
+      <div
+        onMouseDown={onResizeMouseDown("top")}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "6px",
+          cursor: "ns-resize",
+          zIndex: 10,
+          borderRadius: "0.75rem 0.75rem 0 0",
+        }}
+      />
+
       {/* Header — drag handle */}
       <div
         onMouseDown={onHeaderMouseDown}
@@ -336,11 +404,12 @@ export default function FactionPanel({
           display: "flex",
           flexDirection: "column",
           gap: "0.5rem",
+          minHeight: 0,
         }}
         className="faction-panel-scroll"
       >
         {/* Search bar */}
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", flexShrink: 0 }}>
           <input
             type="text"
             placeholder="Search guilds to add..."
@@ -360,8 +429,6 @@ export default function FactionPanel({
             onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent-primary)"; }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = "var(--border-color)";
-              // Delay hiding suggestions so clicks register
-              setTimeout(() => {}, 200);
             }}
           />
 
@@ -488,202 +555,198 @@ export default function FactionPanel({
           )}
         </div>
 
-        {/* Faction columns */}
+        {/* Faction columns — single column each, scrollable */}
         {factionEntries.length > 0 && (
           <div style={{
             display: "flex",
             gap: "0.5rem",
-            alignItems: "flex-start",
+            alignItems: "stretch",
+            flex: 1,
+            minHeight: 0,
           }}>
-            {factionEntries.map(([factionId, faction]) => {
-              const colCount = Math.max(1, Math.ceil(faction.guilds.length / GUILDS_PER_COLUMN));
-              return (
-                <div
-                  key={factionId}
-                  style={{
-                    flex: 1,
-                    minWidth: `${Math.max(120, colCount * 100)}px`,
-                    background: "var(--bg-secondary)",
-                    borderRadius: "0.5rem",
-                    border: "1px solid var(--border-color)",
-                    overflow: "hidden",
-                  }}
-                >
-                  {/* Faction header */}
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.375rem",
-                    padding: "0.4rem 0.5rem",
-                    borderBottom: "1px solid var(--border-color)",
-                    background: faction.color + "15",
-                  }}>
+            {factionEntries.map(([factionId, faction]) => (
+              <div
+                key={factionId}
+                style={{
+                  flex: 1,
+                  minWidth: "120px",
+                  background: "var(--bg-secondary)",
+                  borderRadius: "0.5rem",
+                  border: "1px solid var(--border-color)",
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Faction header */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.375rem",
+                  padding: "0.4rem 0.5rem",
+                  borderBottom: "1px solid var(--border-color)",
+                  background: faction.color + "15",
+                  flexShrink: 0,
+                }}>
+                  <input
+                    type="color"
+                    value={faction.color}
+                    onChange={(e) => changeFactionColor(factionId, e.target.value)}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      border: "2px solid var(--border-color)",
+                      borderRadius: "3px",
+                      padding: 0,
+                      cursor: "pointer",
+                      flexShrink: 0,
+                      background: "none",
+                    }}
+                  />
+                  {editingFactionId === factionId ? (
                     <input
-                      type="color"
-                      value={faction.color}
-                      onChange={(e) => changeFactionColor(factionId, e.target.value)}
+                      autoFocus
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={() => renameFaction(factionId, editingName)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") renameFaction(factionId, editingName);
+                        if (e.key === "Escape") setEditingFactionId(null);
+                      }}
                       style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "2px solid var(--border-color)",
-                        borderRadius: "3px",
-                        padding: 0,
-                        cursor: "pointer",
-                        flexShrink: 0,
-                        background: "none",
+                        flex: 1,
+                        minWidth: 0,
+                        background: "var(--bg-primary)",
+                        border: "1px solid var(--accent-primary)",
+                        borderRadius: "0.25rem",
+                        color: "var(--text-primary)",
+                        fontSize: "0.8rem",
+                        fontWeight: "600",
+                        padding: "0.1rem 0.3rem",
+                        outline: "none",
                       }}
                     />
-                    {editingFactionId === factionId ? (
-                      <input
-                        autoFocus
-                        value={editingName}
-                        onChange={(e) => setEditingName(e.target.value)}
-                        onBlur={() => renameFaction(factionId, editingName)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") renameFaction(factionId, editingName);
-                          if (e.key === "Escape") setEditingFactionId(null);
-                        }}
-                        style={{
-                          flex: 1,
-                          minWidth: 0,
-                          background: "var(--bg-primary)",
-                          border: "1px solid var(--accent-primary)",
-                          borderRadius: "0.25rem",
-                          color: "var(--text-primary)",
-                          fontSize: "0.8rem",
-                          fontWeight: "600",
-                          padding: "0.1rem 0.3rem",
-                          outline: "none",
-                        }}
-                      />
-                    ) : (
-                      <span
-                        style={{
-                          flex: 1,
-                          fontSize: "0.8rem",
-                          fontWeight: "600",
-                          color: "var(--text-primary)",
-                          cursor: "pointer",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          minWidth: 0,
-                        }}
-                        onDoubleClick={() => {
-                          setEditingFactionId(factionId);
-                          setEditingName(faction.name);
-                        }}
-                        title="Double-click to rename"
-                      >
-                        {faction.name}
-                        <span style={{ color: "var(--text-secondary)", fontWeight: "400", fontSize: "0.7rem", marginLeft: "0.25rem" }}>
-                          ({faction.guilds.length})
-                        </span>
-                      </span>
-                    )}
-                    <button
-                      onClick={() => deleteFaction(factionId)}
+                  ) : (
+                    <span
                       style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "var(--text-secondary)",
+                        flex: 1,
+                        fontSize: "0.8rem",
+                        fontWeight: "600",
+                        color: "var(--text-primary)",
                         cursor: "pointer",
-                        padding: "2px",
-                        borderRadius: "3px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        minWidth: 0,
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = "#e53935"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
-                      title="Delete faction"
+                      onDoubleClick={() => {
+                        setEditingFactionId(factionId);
+                        setEditingName(faction.name);
+                      }}
+                      title="Double-click to rename"
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Guild list — flows in columns of GUILDS_PER_COLUMN */}
-                  <div style={{
-                    padding: "0.375rem 0.5rem",
-                    minHeight: "2rem",
-                  }}>
-                    {faction.guilds.length === 0 ? (
-                      <p style={{
-                        fontSize: "0.7rem",
-                        color: "var(--text-secondary)",
-                        margin: 0,
-                        textAlign: "center",
-                        fontStyle: "italic",
-                      }}>
-                        Search above to add guilds
-                      </p>
-                    ) : (
-                      <div style={{
-                        columnCount: colCount,
-                        columnGap: "0.5rem",
-                      }}>
-                        {faction.guilds.map((guildName) => {
-                          const guild = availableGuilds.find((g) => g.name === guildName);
-                          const displayName = guild?.prefix ? `[${guild.prefix}]` : guildName;
-                          return (
-                            <div
-                              key={guildName}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0.2rem",
-                                padding: "0.1rem 0",
-                                breakInside: "avoid",
-                                height: `${GUILD_ROW_HEIGHT}px`,
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: "0.72rem",
-                                  color: "var(--text-primary)",
-                                  flex: 1,
-                                  minWidth: 0,
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
-                                }}
-                                title={guild ? `${guild.name} [${guild.prefix}]` : guildName}
-                              >
-                                {displayName}
-                              </span>
-                              <button
-                                onClick={() => removeGuildFromFaction(factionId, guildName)}
-                                style={{
-                                  background: "transparent",
-                                  border: "none",
-                                  color: "var(--text-secondary)",
-                                  cursor: "pointer",
-                                  padding: "0",
-                                  fontSize: "0.75rem",
-                                  lineHeight: 1,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  flexShrink: 0,
-                                  opacity: 0.6,
-                                }}
-                                onMouseEnter={(e) => { e.currentTarget.style.color = "#e53935"; e.currentTarget.style.opacity = "1"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.opacity = "0.6"; }}
-                              >
-                                ×
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                      {faction.name}
+                      <span style={{ color: "var(--text-secondary)", fontWeight: "400", fontSize: "0.7rem", marginLeft: "0.25rem" }}>
+                        ({faction.guilds.length})
+                      </span>
+                    </span>
+                  )}
+                  <button
+                    onClick={() => deleteFaction(factionId)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "var(--text-secondary)",
+                      cursor: "pointer",
+                      padding: "2px",
+                      borderRadius: "3px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "#e53935"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
+                    title="Delete faction"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
                 </div>
-              );
-            })}
+
+                {/* Guild list — single column, scrollable */}
+                <div
+                  style={{
+                    flex: 1,
+                    overflowY: "auto",
+                    padding: "0.375rem 0.5rem",
+                    minHeight: 0,
+                  }}
+                  className="faction-panel-scroll"
+                >
+                  {faction.guilds.length === 0 ? (
+                    <p style={{
+                      fontSize: "0.7rem",
+                      color: "var(--text-secondary)",
+                      margin: 0,
+                      textAlign: "center",
+                      fontStyle: "italic",
+                    }}>
+                      Search above to add guilds
+                    </p>
+                  ) : (
+                    faction.guilds.map((guildName) => (
+                      <div
+                        key={guildName}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.2rem",
+                          padding: "0.15rem 0",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "0.72rem",
+                            color: "var(--text-primary)",
+                            flex: 1,
+                            minWidth: 0,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={getGuildDisplay(guildName)}
+                        >
+                          {getGuildDisplay(guildName)}
+                        </span>
+                        <button
+                          onClick={() => removeGuildFromFaction(factionId, guildName)}
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            color: "var(--text-secondary)",
+                            cursor: "pointer",
+                            padding: "0",
+                            fontSize: "0.75rem",
+                            lineHeight: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            flexShrink: 0,
+                            opacity: 0.6,
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = "#e53935"; e.currentTarget.style.opacity = "1"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.opacity = "0.6"; }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -693,6 +756,21 @@ export default function FactionPanel({
           </p>
         )}
       </div>
+
+      {/* Bottom resize handle */}
+      <div
+        onMouseDown={onResizeMouseDown("bottom")}
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "6px",
+          cursor: "ns-resize",
+          zIndex: 10,
+          borderRadius: "0 0 0.75rem 0.75rem",
+        }}
+      />
 
       <style jsx>{`
         .faction-panel-scroll::-webkit-scrollbar {

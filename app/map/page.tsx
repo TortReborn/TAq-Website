@@ -12,6 +12,7 @@ import MapSettings from "@/components/MapSettings";
 import MapModeSelector from "@/components/MapModeSelector";
 import MapHistoryControls from "@/components/MapHistoryControls";
 import FactionPanel from "@/components/FactionPanel";
+import ConflictFinder from "@/components/ConflictFinder";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
 import {
@@ -77,6 +78,7 @@ export default function MapPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [opaqueFill, setOpaqueFill] = useState(false);
   const [showFactions, setShowFactions] = useState(false);
+  const [showConflictFinder, setShowConflictFinder] = useState(false);
   const [factions, setFactions] = useState<Record<string, { name: string; color: string; guilds: string[] }>>({});
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
@@ -108,8 +110,6 @@ export default function MapPage() {
   // Bulk exchange data — loaded once on history enter, used for client-side reconstruction
   const exchangeStoreRef = useRef<ExchangeStore | null>(null);
   const exchangePromiseRef = useRef<Promise<ExchangeStore | null> | null>(null);
-
-  // NOTE: landViewClusters precomputation is below effectiveGuildColors (line ~620+)
 
   // Track hovered guild for land view tooltip
   const [hoveredGuildInfo, setHoveredGuildInfo] = useState<{ name: string; area: number } | null>(null);
@@ -553,6 +553,16 @@ export default function MapPage() {
     loadWeekSnapshots(date, true);
   }, [loadWeekSnapshots]);
 
+  // Handle conflict finder jump — switches to history mode if needed
+  const handleConflictJump = useCallback((date: Date) => {
+    if (viewMode !== 'history') {
+      setViewMode('history');
+    }
+    setIsPlaying(false);
+    setHistoryTimestamp(date);
+    loadWeekSnapshots(date, true);
+  }, [viewMode, loadWeekSnapshots]);
+
   // Handle history refresh - re-fetch bounds and reload data
   const handleHistoryRefresh = useCallback(async () => {
     // Stop playback
@@ -592,10 +602,18 @@ export default function MapPage() {
       }
     }
     // Also include guilds already in factions (they may have lost territory)
+    // Look up prefixes from exchange store for historical guilds
+    const store = exchangeStoreRef.current;
+    const exchangePrefixMap = new Map<string, string>();
+    if (store?.data) {
+      for (let i = 0; i < store.data.guilds.length; i++) {
+        exchangePrefixMap.set(store.data.guilds[i], store.data.prefixes[i]);
+      }
+    }
     for (const faction of Object.values(factions)) {
       for (const guildName of faction.guilds) {
         if (!seen.has(guildName)) {
-          seen.set(guildName, '');
+          seen.set(guildName, exchangePrefixMap.get(guildName) || '');
         }
       }
     }
@@ -617,14 +635,25 @@ export default function MapPage() {
       overridden[key] = "#808080";
     }
 
+    // Build a name→prefix map from exchange store for historical guilds
+    // that may not be in the live availableGuilds list
+    const store = exchangeStoreRef.current;
+    const exchangePrefixMap = new Map<string, string>();
+    if (store?.data) {
+      for (let i = 0; i < store.data.guilds.length; i++) {
+        exchangePrefixMap.set(store.data.guilds[i], store.data.prefixes[i]);
+      }
+    }
+
     // Override faction guilds with their faction color
     for (const faction of Object.values(factions)) {
       for (const guildName of faction.guilds) {
         overridden[guildName] = faction.color;
-        // Also set by prefix if we can find it
+        // Find prefix from live data or exchange store history
         const guild = availableGuilds.find(g => g.name === guildName);
-        if (guild?.prefix) {
-          overridden[guild.prefix] = faction.color;
+        const prefix = guild?.prefix || exchangePrefixMap.get(guildName) || '';
+        if (prefix) {
+          overridden[prefix] = faction.color;
         }
       }
     }
@@ -1631,6 +1660,25 @@ export default function MapPage() {
             availableGuilds={availableGuilds}
           />
 
+          {/* Conflict Finder Panel */}
+          <ConflictFinder
+            isOpen={showConflictFinder}
+            onClose={() => setShowConflictFinder(false)}
+            exchangeStore={exchangeStoreRef.current}
+            ensureExchangeData={ensureExchangeData}
+            onJumpToTime={handleConflictJump}
+            onCreateFactions={(side1Guilds, side2Guilds) => {
+              const id1 = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+              const id2 = id1 + "b";
+              const newFactions: Record<string, { name: string; color: string; guilds: string[] }> = {
+                [id1]: { name: "Side 1", color: "#1e88e5", guilds: side1Guilds },
+                [id2]: { name: "Side 2", color: "#e53935", guilds: side2Guilds },
+              };
+              setFactions(newFactions);
+              setShowFactions(true);
+            }}
+          />
+
           {/* Bottom Right Controls Container - Mode selector + Factions + Settings */}
           <div style={{
             position: 'absolute',
@@ -1685,6 +1733,48 @@ export default function MapPage() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
                 <line x1="4" y1="22" x2="4" y2="15" />
+              </svg>
+            </button>
+
+            {/* Conflict Finder Button */}
+            <button
+              onClick={() => setShowConflictFinder(prev => !prev)}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '0.5rem',
+                border: `2px solid ${showConflictFinder ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                background: showConflictFinder ? 'var(--accent-primary)' : 'var(--bg-card)',
+                color: showConflictFinder ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+              onMouseEnter={(e) => {
+                if (!showConflictFinder) {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!showConflictFinder) {
+                  e.currentTarget.style.background = 'var(--bg-card)';
+                }
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              title="Conflict Finder"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="22" y1="12" x2="18" y2="12" />
+                <line x1="6" y1="12" x2="2" y2="12" />
+                <line x1="12" y1="6" x2="12" y2="2" />
+                <line x1="12" y1="22" x2="12" y2="18" />
               </svg>
             </button>
 
