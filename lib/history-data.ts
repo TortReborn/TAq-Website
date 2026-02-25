@@ -472,3 +472,115 @@ export function buildSnapshotsInRange(
 
   return snapshots;
 }
+
+// ---------------------------------------------------------------------------
+// Ranged exchange data — for incremental loading from /api/map-history/events
+// ---------------------------------------------------------------------------
+
+/** Compact ranged exchange data returned by /api/map-history/events */
+export interface RangedExchangeEventData {
+  territories: string[];     // index → territory full name
+  guilds: string[];          // index → guild name
+  prefixes: string[];        // index → guild prefix (matches guilds order)
+  events: number[][];        // [unixSec, terrIdx, guildIdx][]
+  initialState: number[][];  // [terrIdx, guildIdx][] — ownership at range start
+  earliest: string;          // ISO
+  latest: string;            // ISO
+}
+
+/**
+ * Build an ExchangeStore from ranged API data.
+ *
+ * Converts `initialState` entries into synthetic events at `(earliest - 1s)`
+ * so that `lastEventBefore()` picks them up for any timestamp within the range.
+ * Then delegates to the existing `buildExchangeStore()`.
+ */
+export function buildExchangeStoreFromRanged(data: RangedExchangeEventData): ExchangeStore {
+  const startSec = Math.floor(new Date(data.earliest).getTime() / 1000) - 1;
+
+  // Synthetic events from initial state (ownership at range start)
+  const syntheticEvents: number[][] = data.initialState.map(
+    ([tIdx, gIdx]) => [startSec, tIdx, gIdx]
+  );
+
+  const combinedData: ExchangeEventData = {
+    territories: data.territories,
+    guilds: data.guilds,
+    prefixes: data.prefixes,
+    events: [...syntheticEvents, ...data.events],
+    earliest: data.earliest,
+    latest: data.latest,
+  };
+
+  return buildExchangeStore(combinedData);
+}
+
+/**
+ * Merge a new ranged response into an existing ExchangeStore.
+ *
+ * Handles index remapping: incoming data may use different indices for the
+ * same territory/guild names. We build a mapping, translate all events,
+ * then rebuild the store from the merged event list.
+ *
+ * Runs in ~50ms for 100K events — only called on background chunk completion.
+ */
+export function mergeExchangeStores(
+  existing: ExchangeStore,
+  incoming: RangedExchangeEventData,
+): ExchangeStore {
+  // Clone existing data arrays
+  const territories = [...existing.data.territories];
+  const guilds = [...existing.data.guilds];
+  const prefixes = [...existing.data.prefixes];
+  const events = [...existing.data.events]; // shallow copy of outer array
+
+  // Build index maps: incoming index → merged index
+  const terrMap: number[] = incoming.territories.map(name => {
+    const idx = territories.indexOf(name);
+    if (idx !== -1) return idx;
+    const newIdx = territories.length;
+    territories.push(name);
+    return newIdx;
+  });
+
+  const guildMap: number[] = incoming.guilds.map((name, i) => {
+    const idx = guilds.indexOf(name);
+    if (idx !== -1) return idx;
+    const newIdx = guilds.length;
+    guilds.push(name);
+    prefixes.push(incoming.prefixes[i]);
+    return newIdx;
+  });
+
+  // Add synthetic initial-state events (ownership at range start)
+  const startSec = Math.floor(new Date(incoming.earliest).getTime() / 1000) - 1;
+  for (const [tIdx, gIdx] of incoming.initialState) {
+    events.push([startSec, terrMap[tIdx], guildMap[gIdx]]);
+  }
+
+  // Add translated real events
+  for (const [sec, tIdx, gIdx] of incoming.events) {
+    events.push([sec, terrMap[tIdx], guildMap[gIdx]]);
+  }
+
+  // Re-sort by time (merging two sorted ranges)
+  events.sort((a, b) => a[0] - b[0]);
+
+  // Update bounds
+  const mergedData: ExchangeEventData = {
+    territories,
+    guilds,
+    prefixes,
+    events,
+    earliest: new Date(Math.min(
+      new Date(existing.data.earliest).getTime(),
+      new Date(incoming.earliest).getTime(),
+    )).toISOString(),
+    latest: new Date(Math.max(
+      new Date(existing.data.latest).getTime(),
+      new Date(incoming.latest).getTime(),
+    )).toISOString(),
+  };
+
+  return buildExchangeStore(mergedData);
+}

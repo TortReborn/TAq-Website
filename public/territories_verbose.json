@@ -15206,5 +15206,811 @@
         -5508
       ]
     }
+  },
+  "Agricultural Sector": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2291,
+        -934
+      ],
+      "end": [
+        -1976,
+        -768
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Alder Understory": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1250,
+        -936
+      ],
+      "end": [
+        -1043,
+        -795
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Aldwell": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1356,
+        -758
+      ],
+      "end": [
+        -1202,
+        -646
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Citadel's Shadow": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1599,
+        -1108
+      ],
+      "end": [
+        -1341,
+        -945
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Contested District": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1624,
+        -834
+      ],
+      "end": [
+        -1471,
+        -712
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Deforested Ecotone": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1576,
+        -649
+      ],
+      "end": [
+        -1316,
+        -515
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Espren": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2143,
+        -1136
+      ],
+      "end": [
+        -1979,
+        -937
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Festival Grounds": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2275,
+        -1300
+      ],
+      "end": [
+        -2154,
+        -969
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Feuding Houses": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1153,
+        -1249
+      ],
+      "end": [
+        -946,
+        -1035
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Fort Hegea": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1194,
+        -791
+      ],
+      "end": [
+        -1054,
+        -579
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Fort Tericen": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1330,
+        -1160
+      ],
+      "end": [
+        -1178,
+        -948
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Fort Torann": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2000,
+        -1675
+      ],
+      "end": [
+        -855,
+        -1500
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Forts in Fall": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2039,
+        -1476
+      ],
+      "end": [
+        -1817,
+        -1134
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Frosty Outpost": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1153,
+        -1481
+      ],
+      "end": [
+        -971,
+        -1250
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Gates to Aelumia": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1624,
+        -1004
+      ],
+      "end": [
+        -1471,
+        -835
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Highlands Gate": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1431,
+        -939
+      ],
+      "end": [
+        -1251,
+        -846
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Hyloch": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1483,
+        -1334
+      ],
+      "end": [
+        -1272,
+        -1176
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Industrial Sector": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2113,
+        -752
+      ],
+      "end": [
+        -1896,
+        -515
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Lake Gitephe": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1580,
+        -1446
+      ],
+      "end": [
+        -1485,
+        -1123
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Lake Rieke": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1270,
+        -1460
+      ],
+      "end": [
+        -1153,
+        -1181
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Residence Sector": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1966,
+        -917
+      ],
+      "end": [
+        -1805,
+        -737
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Royal Barracks": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1780,
+        -1004
+      ],
+      "end": [
+        -1625,
+        -835
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Royal Dam": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1780,
+        -1474
+      ],
+      "end": [
+        -1610,
+        -1015
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "The Frog Bog": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2225,
+        -1493
+      ],
+      "end": [
+        -2078,
+        -1337
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "The Lumbermill": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1905,
+        -1082
+      ],
+      "end": [
+        -1806,
+        -920
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Timasca": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1856,
+        -747
+      ],
+      "end": [
+        -1631,
+        -433
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "University Campus": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1780,
+        -834
+      ],
+      "end": [
+        -1625,
+        -712
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Verdant Grove": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1481,
+        -727
+      ],
+      "end": [
+        -1370,
+        -646
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Water Processing Sector": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2277,
+        -752
+      ],
+      "end": [
+        -2114,
+        -501
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Wellspring of Eternity": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -2291,
+        -1752
+      ],
+      "end": [
+        -2020,
+        -1556
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
+  },
+  "Xima Valley": {
+    "resources": {
+      "emeralds": "0",
+      "ore": "0",
+      "crops": "0",
+      "fish": "0",
+      "wood": "0"
+    },
+    "Trading Routes": [],
+    "Location": {
+      "start": [
+        -1825,
+        -1750
+      ],
+      "end": [
+        -1635,
+        -1519
+      ]
+    },
+    "Guild": {
+      "uuid": "",
+      "name": "",
+      "prefix": ""
+    },
+    "Acquired": ""
   }
 }

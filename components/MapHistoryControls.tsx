@@ -22,7 +22,6 @@ interface MapHistoryControlsProps {
   canStepForward: boolean;
   canStepBackward: boolean;
   isLoading?: boolean;
-  snapshots?: Date[];
   onRefresh?: () => void;
   containerBounds?: { width: number; height: number };
   gaps?: Array<{ start: Date; end: Date }>;
@@ -78,7 +77,6 @@ export default function MapHistoryControls({
   canStepForward,
   canStepBackward,
   isLoading,
-  snapshots,
   onRefresh,
   containerBounds,
   gaps,
@@ -704,7 +702,6 @@ export default function MapHistoryControls({
                 latest={latest}
                 current={current}
                 onChange={onTimeChange}
-                snapshots={snapshots}
                 gaps={gaps}
                 vertical
                 hideCurrentTime
@@ -1032,7 +1029,6 @@ export default function MapHistoryControls({
             latest={latest}
             current={current}
             onChange={onTimeChange}
-            snapshots={snapshots}
             gaps={gaps}
           />
           {controlsSection}

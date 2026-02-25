@@ -7,7 +7,6 @@ interface HistoryTimelineProps {
   latest: Date;
   current: Date;
   onChange: (date: Date) => void;
-  snapshots?: Date[]; // Available snapshot timestamps to snap to
   gaps?: Array<{ start: Date; end: Date }>; // Time ranges with no data
   vertical?: boolean;
   hideCurrentTime?: boolean; // Hide the current time display (shown externally)
@@ -18,7 +17,6 @@ export default function HistoryTimeline({
   latest,
   current,
   onChange,
-  snapshots,
   gaps,
   vertical,
   hideCurrentTime,
@@ -61,48 +59,13 @@ export default function HistoryTimeline({
     return new Date(timestamp);
   }, [earliest, totalRange]);
 
-  // Pre-compute sorted ms values for binary search snapping
-  const sortedSnapshotMs = useMemo(() => {
-    if (!snapshots || snapshots.length === 0) return null;
-    return snapshots.map(s => s.getTime());
-  }, [snapshots]);
-
-  // Find the nearest snapshot using binary search — O(log n).
-  const findNearestSnapshot = useCallback((targetDate: Date): Date => {
-    if (!sortedSnapshotMs || sortedSnapshotMs.length === 0 || !snapshots) {
-      return targetDate;
-    }
-
-    const targetMs = targetDate.getTime();
-    let lo = 0, hi = sortedSnapshotMs.length - 1;
-
-    while (lo < hi) {
-      const mid = (lo + hi) >>> 1;
-      if (sortedSnapshotMs[mid] < targetMs) {
-        lo = mid + 1;
-      } else {
-        hi = mid;
-      }
-    }
-
-    if (lo === 0) {
-      if (Math.abs(sortedSnapshotMs[0] - targetMs) > totalRange * 0.02) {
-        return targetDate;
-      }
-      return snapshots[0];
-    }
-
-    const diffLo = Math.abs(sortedSnapshotMs[lo] - targetMs);
-    const diffPrev = Math.abs(sortedSnapshotMs[lo - 1] - targetMs);
-    const nearest = diffPrev <= diffLo ? lo - 1 : lo;
-    const nearestDiff = Math.min(diffLo, diffPrev);
-
-    if (nearestDiff > totalRange * 0.02) {
-      return targetDate;
-    }
-
-    return snapshots[nearest];
-  }, [sortedSnapshotMs, snapshots, totalRange]);
+  // Snap to nearest 10-minute boundary (matching server snapshot interval)
+  const SNAP_INTERVAL_MS = 10 * 60 * 1000;
+  const snapTo10Min = useCallback((targetDate: Date): Date => {
+    const ms = targetDate.getTime();
+    const snapped = ms - (ms % SNAP_INTERVAL_MS);
+    return new Date(snapped);
+  }, []);
 
   // Throttle ref for drag interactions (16ms = ~60fps)
   const lastDragUpdateRef = useRef<number>(0);
@@ -138,9 +101,9 @@ export default function HistoryTimeline({
     if (isInGap(percent)) return;
 
     const rawDate = percentToDate(percent);
-    const newDate = findNearestSnapshot(rawDate);
+    const newDate = snapTo10Min(rawDate);
     onChange(newDate);
-  }, [vertical, percentToDate, findNearestSnapshot, onChange, isInGap]);
+  }, [vertical, percentToDate, snapTo10Min, onChange, isInGap]);
 
   // Hover tracking for tooltip
   const handleTrackHover = useCallback((e: React.MouseEvent) => {

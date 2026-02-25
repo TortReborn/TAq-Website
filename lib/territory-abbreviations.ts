@@ -13,14 +13,17 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Abandoned Pass": "ABP",
   "Accursed Dunes": "ACD",
   "Aerial Descent": "ARD",
+  "Agricultural Sector": "AGS",
   "Ahmsord": "AHM",
   "Ahmsord Outskirts": "AHO",
   "Akias Ruins": "AKR",
+  "Alder Understory": "ALU",
   "Aldorei Cliffside Waterfalls": "ACW",
   "Aldorei River": "ALR",
   "Aldorei Springs": "ALS",
   "Aldorei Valley": "ALV",
   "Aldorei Valley Outskirts": "AVO",
+  "Aldwell": "ALD",
   "Alekin": "ALK",
   "Almuj": "ALM",
   "Almuj Slums": "AMS",
@@ -63,6 +66,8 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Canyon Dropoff": "CDO",
   "Canyon High Path": "CHP",
   "Canyon Walkway": "CWY",
+  "Citadel's Shadow": "CTS",
+  "Contested District": "CTD",
   "Caritat Mansion": "CRM",
   "Cascading Basins": "CSB",
   "Cascading Oasis": "CSO",
@@ -101,6 +106,7 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Cyclospordial Hazard": "CYH",
 
   // D
+  "Deforested Ecotone": "DFE",
   "Dark Forest Village": "DFV",
   "Decayed Basin": "DCB",
   "Delnar Manor": "DLM",
@@ -140,6 +146,7 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Entrance to Kander": "ETK",
   "Entrance to Molten Heights": "EMH",
   "Entrance to Nivla Woods": "ENW",
+  "Espren": "EPR",
   "Entrance to Olux": "ETO",
   "Entrance to Thesead": "ETT",
   "Essren's Hut": "ESH",
@@ -153,6 +160,8 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Farmers Settlement": "FMS",
   "Featherfall Cliffs": "FFC",
   "Felroc Fields": "FRF",
+  "Festival Grounds": "FGD",
+  "Feuding Houses": "FDH",
   "Field of Life": "FOL",
   "Final Step": "FNS",
   "Fleris Cranny": "FLC",
@@ -160,6 +169,10 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Floral Peaks": "FLP",
   "Florist's Hut": "FLH",
   "Forest of Eyes": "FOE",
+  "Fort Hegea": "FHG",
+  "Fort Tericen": "FTC",
+  "Fort Torann": "FTR",
+  "Forts in Fall": "FIF",
   "Forgotten Burrows": "FGB",
   "Forgotten Path": "FGP",
   "Forgotten Town": "FGT",
@@ -167,12 +180,14 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Fountain of Youth": "FOY",
   "Freezing Heights": "FZH",
   "Frigid Crossroads": "FCR",
+  "Frosty Outpost": "FSO",
   "Frosty Spikes": "FSP",
   "Frozen Fort": "FFT",
   "Frozen Homestead": "FHS",
   "Fungal Grove": "FNG",
 
   // G
+  "Gates to Aelumia": "GTA",
   "Gateway to Nothing": "GTN",
   "Gelibord": "GLB",
   "Gelibord Watermill": "GWM",
@@ -191,6 +206,7 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
 
   // H
   "Half Moon Island": "HMI",
+  "Highlands Gate": "HLG",
   "Harnort Compound": "HNC",
   "Harpy's Haunt North": "HHN",
   "Harpy's Haunt South": "HHS",
@@ -199,6 +215,7 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Herb Cave": "HBC",
   "Hobgoblin's Hoard": "HGH",
   "Housing Crisis": "HCR",
+  "Hyloch": "HYL",
 
   // I
   "Iboju Village": "IBV",
@@ -207,6 +224,7 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Icy Vigil": "ICV",
   "Illuminant Path": "ILP",
   "Industrial Clearing": "INC",
+  "Industrial Sector": "INS",
   "Infested Sinkhole": "ISH",
   "Inhospitable Mountain": "IHM",
   "Invaded Barracks": "INB",
@@ -231,6 +249,8 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Krolton's Cave": "KRC",
 
   // L
+  "Lake Gitephe": "LGT",
+  "Lake Rieke": "LRK",
   "Lava Lakes": "LVL",
   "Lava Springs": "LVS",
   "Legendary Island": "LGI",
@@ -335,6 +355,7 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Pyroclastic Flow": "PCF",
 
   // R
+  "Residence Sector": "RSD",
   "Ragni": "RAG",
   "Ragni Countryside North": "RCN",
   "Ragni Countryside South": "RCS",
@@ -358,6 +379,8 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Rodoroc": "RDR",
   "Rooster Island": "RSI",
   "Roots of Corruption": "ROC",
+  "Royal Barracks": "RYB",
+  "Royal Dam": "RYD",
   "Royal Gate": "RYG",
   "Ruined Houses": "RNH",
   "Ruined Prospect": "RNP",
@@ -405,12 +428,15 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Thanos Exit": "THE",
   "Thanos Underpass": "THU",
   "The Forgery": "TFG",
+  "The Frog Bog": "TFB",
   "The Gate": "TGT",
   "The Hive": "THV",
+  "The Lumbermill": "TLM",
   "The Shiar": "TSH",
   "Thesead": "TSD",
   "Thesead Suburbs": "TSS",
   "Thesead Underpass": "TSU",
+  "Timasca": "TMS",
   "Time Valley": "TMV",
   "Timeworn Arch": "TWA",
   "Tower of Ascension": "TOA",
@@ -430,9 +456,11 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
 
   // U
   "Unicorn Trail": "UNT",
+  "University Campus": "UNC",
   "Upper Thanos": "UTH",
 
   // V
+  "Verdant Grove": "VDG",
   "Viscera Pits": "VCP",
   "Void Valley": "VDV",
   "Volcanic Excavation": "VLE",
@@ -440,10 +468,12 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
 
   // W
   "Wanderer's Way": "WDW",
+  "Water Processing Sector": "WPS",
   "Waterfall Cave": "WFC",
   "Wayward Split": "WWS",
   "Webbed Fracture": "WBF",
   "Weird Clearing": "WRC",
+  "Wellspring of Eternity": "WOE",
   "Winding Waters": "WWW",
   "Witching Road": "WTR",
   "Wizard Tower": "WZT",
@@ -453,6 +483,9 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Workshop Glade": "WKG",
   "Worm Tunnel": "WMT",
   "Wybel Island": "WBI",
+
+  // X
+  "Xima Valley": "XMV",
 
   // Z
   "Zhight Island": "ZHI",
