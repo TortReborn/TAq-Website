@@ -7,6 +7,7 @@ interface HistoryDatePickerProps {
   earliest: Date;
   latest: Date;
   onJump: (date: Date) => void;
+  vertical?: boolean;
 }
 
 export default function HistoryDatePicker({
@@ -14,6 +15,7 @@ export default function HistoryDatePicker({
   earliest,
   latest,
   onJump,
+  vertical,
 }: HistoryDatePickerProps) {
   // Format date for date input (YYYY-MM-DD)
   const formatDateInput = (date: Date) => {
@@ -47,9 +49,10 @@ export default function HistoryDatePicker({
   return (
     <div style={{
       display: 'flex',
-      alignItems: 'center',
+      flexDirection: vertical ? 'column' : 'row',
+      alignItems: vertical ? 'stretch' : 'center',
       gap: '0.375rem',
-      flexWrap: 'wrap',
+      flexWrap: vertical ? 'nowrap' : 'wrap',
       justifyContent: 'center',
     }}>
       <style>{`

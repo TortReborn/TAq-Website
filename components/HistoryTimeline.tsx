@@ -9,6 +9,8 @@ interface HistoryTimelineProps {
   onChange: (date: Date) => void;
   snapshots?: Date[]; // Available snapshot timestamps to snap to
   gaps?: Array<{ start: Date; end: Date }>; // Time ranges with no data
+  vertical?: boolean;
+  hideCurrentTime?: boolean; // Hide the current time display (shown externally)
 }
 
 export default function HistoryTimeline({
@@ -18,11 +20,13 @@ export default function HistoryTimeline({
   onChange,
   snapshots,
   gaps,
+  vertical,
+  hideCurrentTime,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
-  const [hoverX, setHoverX] = useState(0);
+  const [hoverPos, setHoverPos] = useState(0); // X position (horizontal) or Y position (vertical)
 
   // Calculate the total range in milliseconds
   const totalRange = latest.getTime() - earliest.getTime();
@@ -44,7 +48,7 @@ export default function HistoryTimeline({
   }, [current, earliest, totalRange]);
 
   // Helper to convert percentage to CSS position that keeps thumb within bounds
-  // At 0%: 12px from left, at 100%: 12px from right (for 24px thumb)
+  // At 0%: 12px from start, at 100%: 12px from end (for 24px thumb)
   const percentToPosition = (percent: number) => {
     const offset = 12 - 0.24 * percent;
     return `calc(${percent}% + ${offset}px)`;
@@ -64,8 +68,6 @@ export default function HistoryTimeline({
   }, [snapshots]);
 
   // Find the nearest snapshot using binary search — O(log n).
-  // Returns the raw date if no snapshots are loaded or if the nearest
-  // snapshot is too far away (allows dragging beyond the loaded range).
   const findNearestSnapshot = useCallback((targetDate: Date): Date => {
     if (!sortedSnapshotMs || sortedSnapshotMs.length === 0 || !snapshots) {
       return targetDate;
@@ -84,7 +86,6 @@ export default function HistoryTimeline({
     }
 
     if (lo === 0) {
-      // If the nearest snapshot is far from the target, don't snap
       if (Math.abs(sortedSnapshotMs[0] - targetMs) > totalRange * 0.02) {
         return targetDate;
       }
@@ -96,7 +97,6 @@ export default function HistoryTimeline({
     const nearest = diffPrev <= diffLo ? lo - 1 : lo;
     const nearestDiff = Math.min(diffLo, diffPrev);
 
-    // Don't snap if the nearest snapshot is more than 2% of the total range away
     if (nearestDiff > totalRange * 0.02) {
       return targetDate;
     }
@@ -115,10 +115,8 @@ export default function HistoryTimeline({
     return false;
   }, [gapRegions]);
 
-  // Handle click/drag on the track
-  // Account for 12px padding on each side where the thumb center lives (for 24px thumb)
-  const handleTrackInteraction = useCallback((clientX: number, force?: boolean) => {
-    // Throttle to ~60fps during drag
+  // Handle click/drag on the track — works for both horizontal and vertical
+  const handleTrackInteraction = useCallback((clientX: number, clientY: number, force?: boolean) => {
     if (!force) {
       const now = performance.now();
       if (now - lastDragUpdateRef.current < 16) return;
@@ -129,36 +127,37 @@ export default function HistoryTimeline({
     if (!track) return;
 
     const rect = track.getBoundingClientRect();
-    const x = clientX - rect.left;
     const padding = 12;
-    const usableWidth = rect.width - padding * 2;
 
-    // Map click position to percentage, accounting for padding
-    const adjustedX = Math.max(0, Math.min(usableWidth, x - padding));
-    const percent = usableWidth > 0 ? (adjustedX / usableWidth) * 100 : 0;
+    const pos = vertical ? clientY - rect.top : clientX - rect.left;
+    const trackSize = vertical ? rect.height : rect.width;
+    const usableSize = trackSize - padding * 2;
+    const adjustedPos = Math.max(0, Math.min(usableSize, pos - padding));
+    const percent = usableSize > 0 ? (adjustedPos / usableSize) * 100 : 0;
 
-    // Don't allow selecting within gap regions
     if (isInGap(percent)) return;
 
     const rawDate = percentToDate(percent);
-    // Snap to nearest snapshot if available
     const newDate = findNearestSnapshot(rawDate);
     onChange(newDate);
-  }, [percentToDate, findNearestSnapshot, onChange, isInGap]);
+  }, [vertical, percentToDate, findNearestSnapshot, onChange, isInGap]);
 
   // Hover tracking for tooltip
   const handleTrackHover = useCallback((e: React.MouseEvent) => {
     const track = trackRef.current;
     if (!track || isDragging) return;
     const rect = track.getBoundingClientRect();
-    const x = e.clientX - rect.left;
     const padding = 12;
-    const usableWidth = rect.width - padding * 2;
-    const adjustedX = Math.max(0, Math.min(usableWidth, x - padding));
-    const percent = usableWidth > 0 ? (adjustedX / usableWidth) * 100 : 0;
+
+    const pos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
+    const trackSize = vertical ? rect.height : rect.width;
+    const usableSize = trackSize - padding * 2;
+    const adjustedPos = Math.max(0, Math.min(usableSize, pos - padding));
+    const percent = usableSize > 0 ? (adjustedPos / usableSize) * 100 : 0;
+
     setHoverPercent(percent);
-    setHoverX(x);
-  }, [isDragging]);
+    setHoverPos(pos);
+  }, [isDragging, vertical]);
 
   const handleTrackLeave = useCallback(() => {
     if (!isDragging) {
@@ -183,12 +182,12 @@ export default function HistoryTimeline({
     e.stopPropagation();
     setIsDragging(true);
     setHoverPercent(null);
-    handleTrackInteraction(e.clientX, true); // force: skip throttle on initial click
+    handleTrackInteraction(e.clientX, e.clientY, true);
   };
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
-      handleTrackInteraction(e.clientX);
+      handleTrackInteraction(e.clientX, e.clientY);
     }
   }, [isDragging, handleTrackInteraction]);
 
@@ -217,6 +216,173 @@ export default function HistoryTimeline({
     });
   };
 
+  const formatDateTime = (date: Date) => {
+    return date.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  // ── Shared sub-elements ──────────────────────────────────────────────
+
+  const tooltipContent = hoverInGap
+    ? 'No data available'
+    : hoverDate ? formatDateTime(hoverDate) : '';
+
+  const thumbStyle: React.CSSProperties = {
+    position: 'absolute',
+    width: '24px',
+    height: '24px',
+    background: 'var(--accent-primary)',
+    borderRadius: '50%',
+    border: '3px solid #fff',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+    ...(vertical
+      ? {
+          left: '50%',
+          top: percentToPosition(currentPercent),
+          transform: 'translate(-50%, -50%)',
+          transition: isDragging ? 'none' : 'top 0.1s ease',
+        }
+      : {
+          top: '50%',
+          left: percentToPosition(currentPercent),
+          transform: 'translate(-50%, -50%)',
+          transition: isDragging ? 'none' : 'left 0.1s ease',
+        }),
+  };
+
+  // ── Vertical layout ──────────────────────────────────────────────────
+
+  if (vertical) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '100%',
+        padding: '0 0.25rem',
+      }}>
+        {/* Current time display (hidden when shown externally) */}
+        {!hideCurrentTime && (
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '0.375rem',
+            fontSize: '0.8rem',
+            fontWeight: '500',
+            color: 'var(--text-primary)',
+            whiteSpace: 'nowrap',
+          }}>
+            {formatDateTime(current)}
+          </div>
+        )}
+
+        {/* Earliest date label */}
+        <div style={{
+          fontSize: '0.7rem',
+          color: 'var(--text-secondary)',
+          marginBottom: '0.25rem',
+          whiteSpace: 'nowrap',
+        }}>
+          {formatDate(earliest)}
+        </div>
+
+        {/* Vertical timeline track */}
+        <div
+          ref={trackRef}
+          data-timeline-track
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleTrackHover}
+          onMouseLeave={handleTrackLeave}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'relative',
+            width: '24px',
+            flex: 1,
+            minHeight: '100px',
+            background: 'var(--bg-tertiary)',
+            borderRadius: '12px',
+            cursor: hoverInGap ? 'not-allowed' : 'pointer',
+            overflow: 'visible',
+          }}
+        >
+          {/* Hover tooltip — to the right of the track */}
+          {hoverDate && (
+            <div style={{
+              position: 'absolute',
+              left: '100%',
+              top: `${hoverPos}px`,
+              transform: 'translateY(-50%)',
+              marginLeft: '8px',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.375rem',
+              background: 'var(--bg-card-solid, var(--bg-card))',
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              fontSize: '0.75rem',
+              color: 'var(--text-primary)',
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              zIndex: 20,
+            }}>
+              {tooltipContent}
+            </div>
+          )}
+
+          {/* Progress fill — from top down to thumb */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: percentToPosition(currentPercent),
+              background: 'var(--accent-primary)',
+              opacity: 0.3,
+              borderRadius: '12px 12px 0 0',
+            }}
+          />
+
+          {/* Gap regions */}
+          {gapRegions.map((gap, i) => (
+            <div
+              key={i}
+              title="No data available"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: `${gap.startPct}%`,
+                height: `${gap.endPct - gap.startPct}%`,
+                background: 'rgba(139, 0, 0, 0.55)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+          ))}
+
+          {/* Thumb */}
+          <div style={thumbStyle} />
+        </div>
+
+        {/* Latest date label */}
+        <div style={{
+          fontSize: '0.7rem',
+          color: 'var(--text-secondary)',
+          marginTop: '0.25rem',
+          whiteSpace: 'nowrap',
+        }}>
+          {formatDate(latest)}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Horizontal layout (default) ──────────────────────────────────────
+
   return (
     <div style={{ width: '100%', padding: '0.25rem 0' }}>
       {/* Current time display - above the slider */}
@@ -227,13 +393,7 @@ export default function HistoryTimeline({
         fontWeight: '500',
         color: 'var(--text-primary)',
       }}>
-        {current.toLocaleString(undefined, {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        })}
+        {formatDateTime(current)}
       </div>
 
       {/* Date labels */}
@@ -270,7 +430,7 @@ export default function HistoryTimeline({
           <div style={{
             position: 'absolute',
             bottom: '100%',
-            left: `${hoverX}px`,
+            left: `${hoverPos}px`,
             transform: 'translateX(-50%)',
             marginBottom: '6px',
             padding: '0.25rem 0.5rem',
@@ -284,13 +444,7 @@ export default function HistoryTimeline({
             pointerEvents: 'none',
             zIndex: 20,
           }}>
-            {hoverInGap ? 'No data available' : hoverDate.toLocaleString(undefined, {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {tooltipContent}
           </div>
         )}
         {/* Progress fill - ends at thumb center */}
@@ -325,22 +479,8 @@ export default function HistoryTimeline({
           />
         ))}
 
-        {/* Thumb - constrained to stay within track bounds */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: percentToPosition(currentPercent),
-            transform: 'translate(-50%, -50%)',
-            width: '24px',
-            height: '24px',
-            background: 'var(--accent-primary)',
-            borderRadius: '50%',
-            border: '3px solid #fff',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            transition: isDragging ? 'none' : 'left 0.1s ease',
-          }}
-        />
+        {/* Thumb */}
+        <div style={thumbStyle} />
       </div>
     </div>
   );
