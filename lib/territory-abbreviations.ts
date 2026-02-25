@@ -456,8 +456,15 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
 
   // Z
   "Zhight Island": "ZHI",
+};
 
-  // Old territory names (pre-2.1 Rekindled World)
+// Cutoff: territories below only existed before the Rekindled World update.
+// The 2.1 Rekindled World update went live on August 10, 2024.
+export const REKINDLED_WORLD_CUTOFF_MS = new Date("2024-08-10T00:00:00Z").getTime();
+
+// Old territory names that were REMOVED in the 2.1 Rekindled World update.
+// These should not appear on the map for timestamps after REKINDLED_WORLD_CUTOFF_MS.
+const OLD_TERRITORY_TO_ABBREV: Record<string, string> = {
   "Abandoned Manor": "AMA",
   "Active Volcano": "ACV",
   "Air Temple Lower": "ATL",
@@ -707,6 +714,13 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Thanos Valley West": "TVW",
   "Viscera Pits West": "VPW",
 };
+
+// Merge old names into the combined mapping so all lookups still work
+Object.assign(TERRITORY_TO_ABBREV, OLD_TERRITORY_TO_ABBREV);
+
+// Sets for fast era-filtering during snapshot reconstruction
+export const OLD_TERRITORY_NAMES = new Set(Object.keys(OLD_TERRITORY_TO_ABBREV));
+export const OLD_TERRITORY_ABBREVS = new Set(Object.values(OLD_TERRITORY_TO_ABBREV));
 
 // Abbreviation → Full name mapping (reverse lookup)
 export const ABBREV_TO_TERRITORY: Record<string, string> = Object.fromEntries(

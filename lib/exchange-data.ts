@@ -13,7 +13,7 @@
  */
 
 import { Pool } from "pg";
-import { toAbbrev } from "./territory-abbreviations";
+import { toAbbrev, OLD_TERRITORY_NAMES, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
 import type { HistorySnapshot, SnapshotTerritory } from "./history-data";
 
 // ---------------------------------------------------------------------------
@@ -149,10 +149,13 @@ export async function getExchangeGaps(
 function stateToTerritories(
   state: Map<string, string>,          // territory full name → guild name
   prefixes: Map<string, string>,       // guild name → prefix
+  timestampMs?: number,                // filter old territories for post-Rekindled timestamps
 ): Record<string, SnapshotTerritory> {
+  const isPostRekindled = timestampMs !== undefined && timestampMs >= REKINDLED_WORLD_CUTOFF_MS;
   const territories: Record<string, SnapshotTerritory> = {};
   for (const [territory, guild] of state) {
     if (guild === "None") continue;    // unclaimed
+    if (isPostRekindled && OLD_TERRITORY_NAMES.has(territory)) continue;
     const abbrev = toAbbrev(territory);
     territories[abbrev] = {
       g: guildPrefix(prefixes, guild),
@@ -219,7 +222,7 @@ export async function reconstructSingleSnapshot(
 
   return {
     timestamp: timestamp.toISOString(),
-    territories: stateToTerritories(state, prefixes),
+    territories: stateToTerritories(state, prefixes, timestamp.getTime()),
   };
 }
 
@@ -310,7 +313,7 @@ export async function reconstructSnapshotsFromExchanges(
     if (state.size > 0) {
       snapshots.push({
         timestamp: new Date(t).toISOString(),
-        territories: stateToTerritories(state, prefixes),
+        territories: stateToTerritories(state, prefixes, t),
       });
     }
   }

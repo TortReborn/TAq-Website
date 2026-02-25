@@ -3,7 +3,7 @@
  */
 
 import { Territory } from "./utils";
-import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY } from "./territory-abbreviations";
+import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, OLD_TERRITORY_ABBREVS, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
 
 // Condensed snapshot format for database storage
 export interface SnapshotTerritory {
@@ -351,6 +351,7 @@ export function buildSnapshotAt(
   timestamp: Date,
 ): ParsedSnapshot | null {
   const targetSec = Math.floor(timestamp.getTime() / 1000);
+  const isPostRekindled = timestamp.getTime() >= REKINDLED_WORLD_CUTOFF_MS;
   const { data, territoryEvents } = store;
   const territories: Record<string, SnapshotTerritory> = {};
   let count = 0;
@@ -363,6 +364,9 @@ export function buildSnapshotAt(
     if (guildName === 'None') continue;
 
     const abbrev = toAbbrev(data.territories[tIdx]);
+    // Skip old territories for post-Rekindled World timestamps
+    if (isPostRekindled && OLD_TERRITORY_ABBREVS.has(abbrev)) continue;
+
     territories[abbrev] = {
       g: data.prefixes[gIdx],
       n: guildName,
@@ -439,11 +443,13 @@ export function buildSnapshotsInRange(
 
     // Only emit once we have territory state
     if (state.size > 0) {
+      const isPostRekindled = t >= REKINDLED_WORLD_CUTOFF_MS;
       const territories: Record<string, SnapshotTerritory> = {};
       for (const [tIdx, gIdx] of state) {
         const guildName = data.guilds[gIdx];
         if (guildName === 'None') continue;
         const abbrev = toAbbrev(data.territories[tIdx]);
+        if (isPostRekindled && OLD_TERRITORY_ABBREVS.has(abbrev)) continue;
         territories[abbrev] = {
           g: data.prefixes[gIdx],
           n: guildName,
