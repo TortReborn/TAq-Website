@@ -17,6 +17,8 @@ interface TerritoryOverlayProps {
   showResourceOutlines?: boolean;
   showGuildNames?: boolean;
   verboseData?: TerritoryVerboseData | null;
+  opaqueFill?: boolean;
+  fallbackColor?: string;
 }
 
 // Stroke width for territory outlines
@@ -81,6 +83,8 @@ export default function TerritoryOverlay({
   showResourceOutlines = false,
   showGuildNames = true,
   verboseData,
+  opaqueFill = false,
+  fallbackColor = '#FFFFFF',
 }: TerritoryOverlayProps) {
   // Use scale prop for zoom, define at top
   const zoom = scale;
@@ -127,8 +131,8 @@ export default function TerritoryOverlay({
       }
     }
 
-    return '#FFFFFF';
-  }, [territory.guild.name, territory.guild.prefix, guildColors]);
+    return fallbackColor;
+  }, [territory.guild.name, territory.guild.prefix, guildColors, fallbackColor]);
 
   // Calculate active resources for this territory
   const activeResources = useMemo(() => {
@@ -347,7 +351,7 @@ export default function TerritoryOverlay({
     >
       <polygon
         points={points}
-        fill={guildColor + "40"}
+        fill={guildColor + (opaqueFill ? "FF" : "40")}
         stroke={guildColor}
         strokeWidth={STROKE_WIDTH}
         style={{ pointerEvents: "auto", cursor: isDragging ? "grabbing" : "grab" }}

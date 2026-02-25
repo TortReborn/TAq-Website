@@ -16,6 +16,7 @@ interface LandViewOverlayProps {
   scale?: number;
   precomputedClusters?: TerritoryCluster[] | null;
   onHoverGuild?: (guildName: string | null, landArea: number) => void;
+  opaqueFill?: boolean;
 }
 
 const LandViewOverlay = React.memo(function LandViewOverlay({
@@ -25,6 +26,7 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
   scale = 1,
   precomputedClusters,
   onHoverGuild,
+  opaqueFill = false,
 }: LandViewOverlayProps) {
   // Fallback: load verbose data directly if not provided
   const [localVerboseData, setLocalVerboseData] = useState<Record<string, TerritoryVerboseData> | null>(null);
@@ -303,7 +305,7 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
               className="land-polygon"
               data-guild={cluster.guildName}
               d={cluster.unionPath}
-              fill={cluster.guildColor + "40"}
+              fill={cluster.guildColor + (opaqueFill ? "FF" : "40")}
               stroke={cluster.guildColor}
               strokeWidth={STROKE_WIDTH}
               strokeLinejoin="miter"

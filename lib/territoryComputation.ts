@@ -36,7 +36,8 @@ export function isValidHexColor(color: string | undefined): boolean {
 export function getGuildColor(
   guildName: string,
   guildPrefix: string,
-  guildColors: Record<string, string>
+  guildColors: Record<string, string>,
+  fallbackColor: string = "#FFFFFF"
 ): string {
   if (!guildName || guildName === "Unclaimed") {
     return "#808080";
@@ -55,7 +56,7 @@ export function getGuildColor(
     }
   }
 
-  return "#FFFFFF";
+  return fallbackColor;
 }
 
 // Get territory rectangle in pixel coordinates
@@ -644,7 +645,8 @@ export function computeRectilinearUnionPath(
 export function computeLandViewClusters(
   territories: Record<string, Territory>,
   verboseData: Record<string, TerritoryVerboseData> | null,
-  guildColors: Record<string, string>
+  guildColors: Record<string, string>,
+  fallbackColor: string = "#FFFFFF"
 ): TerritoryCluster[] {
   // Group territories by guild
   const guildTerritories: Record<string, { names: string[]; prefix: string }> = {};
@@ -718,7 +720,7 @@ export function computeLandViewClusters(
         }
       }
 
-      const guildColor = getGuildColor(guildName, data.prefix, guildColors);
+      const guildColor = getGuildColor(guildName, data.prefix, guildColors, fallbackColor);
       const clusterCentroid: [number, number] = [(minX + maxX) / 2, (minY + maxY) / 2];
 
       const boxWidth = maxX - minX;

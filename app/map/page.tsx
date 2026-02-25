@@ -11,6 +11,7 @@ import GuildTerritoryCount from "@/components/GuildTerritoryCount";
 import MapSettings from "@/components/MapSettings";
 import MapModeSelector from "@/components/MapModeSelector";
 import MapHistoryControls from "@/components/MapHistoryControls";
+import FactionPanel from "@/components/FactionPanel";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
 import {
@@ -74,6 +75,9 @@ export default function MapPage() {
   const [showGuildNames, setShowGuildNames] = useState(true);
   const [showTradeRoutes, setShowTradeRoutes] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [opaqueFill, setOpaqueFill] = useState(false);
+  const [showFactions, setShowFactions] = useState(false);
+  const [factions, setFactions] = useState<Record<string, { name: string; color: string; guilds: string[] }>>({});
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
   const [guildColors, setGuildColors] = useState<Record<string, string>>({});
@@ -105,13 +109,7 @@ export default function MapPage() {
   const exchangeStoreRef = useRef<ExchangeStore | null>(null);
   const exchangePromiseRef = useRef<Promise<ExchangeStore | null> | null>(null);
 
-  // Precompute land view clusters in background (always running, even when not visible)
-  const { landViewClusters } = useTerritoryPrecomputation({
-    territories,
-    verboseData,
-    guildColors,
-    enabled: true, // Always precompute for instant toggle
-  });
+  // NOTE: landViewClusters precomputation is below effectiveGuildColors (line ~620+)
 
   // Track hovered guild for land view tooltip
   const [hoveredGuildInfo, setHoveredGuildInfo] = useState<{ name: string; area: number } | null>(null);
@@ -195,6 +193,22 @@ export default function MapPage() {
     if (cachedViewMode === 'live' || cachedViewMode === 'history') {
       setViewMode(cachedViewMode);
     }
+    const cachedOpaqueFill = localStorage.getItem('mapOpaqueFill');
+    if (cachedOpaqueFill !== null) {
+      setOpaqueFill(cachedOpaqueFill === 'true');
+    }
+    const cachedShowFactions = localStorage.getItem('mapShowFactions');
+    if (cachedShowFactions !== null) {
+      setShowFactions(cachedShowFactions === 'true');
+    }
+    const cachedFactions = localStorage.getItem('mapFactions');
+    if (cachedFactions) {
+      try {
+        setFactions(JSON.parse(cachedFactions));
+      } catch (error) {
+        console.error('Failed to parse cached factions:', error);
+      }
+    }
 
     setIsInitialized(true);
   }, [clampScale]);
@@ -254,6 +268,24 @@ export default function MapPage() {
       localStorage.setItem('mapViewMode', viewMode);
     }
   }, [viewMode, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapOpaqueFill', String(opaqueFill));
+    }
+  }, [opaqueFill, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowFactions', String(showFactions));
+    }
+  }, [showFactions, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapFactions', JSON.stringify(factions));
+    }
+  }, [factions, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
@@ -551,6 +583,63 @@ export default function MapPage() {
     }
   }, [loadWeekSnapshots]);
 
+  // Build list of available guilds from territories (for factions panel)
+  const availableGuilds = useMemo(() => {
+    const seen = new Map<string, string>(); // name -> prefix
+    for (const t of Object.values(territories)) {
+      if (t.guild?.name && t.guild.name !== 'Unclaimed') {
+        seen.set(t.guild.name, t.guild.prefix || '');
+      }
+    }
+    // Also include guilds already in factions (they may have lost territory)
+    for (const faction of Object.values(factions)) {
+      for (const guildName of faction.guilds) {
+        if (!seen.has(guildName)) {
+          seen.set(guildName, '');
+        }
+      }
+    }
+    return Array.from(seen.entries())
+      .map(([name, prefix]) => ({ name, prefix }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [territories, factions]);
+
+  // Compute effective guild colors (overridden by faction colors when active)
+  // Unaffiliated guilds become gray when factions mode is on
+  const effectiveGuildColors = useMemo(() => {
+    if (!showFactions || Object.keys(factions).length === 0) return guildColors;
+
+    // Start by setting ALL known guild color entries to gray.
+    // This covers guilds in both live AND history mode snapshots,
+    // since guildColors contains every guild from the Wynntils cache.
+    const overridden: Record<string, string> = {};
+    for (const key of Object.keys(guildColors)) {
+      overridden[key] = "#808080";
+    }
+
+    // Override faction guilds with their faction color
+    for (const faction of Object.values(factions)) {
+      for (const guildName of faction.guilds) {
+        overridden[guildName] = faction.color;
+        // Also set by prefix if we can find it
+        const guild = availableGuilds.find(g => g.name === guildName);
+        if (guild?.prefix) {
+          overridden[guild.prefix] = faction.color;
+        }
+      }
+    }
+    return overridden;
+  }, [showFactions, factions, guildColors, availableGuilds]);
+
+  // Precompute land view clusters in background (always running, even when not visible)
+  // Uses effectiveGuildColors so faction overrides apply to land view
+  const { landViewClusters } = useTerritoryPrecomputation({
+    territories,
+    verboseData,
+    guildColors: effectiveGuildColors,
+    enabled: true, // Always precompute for instant toggle
+  });
+
   // Unified snapshot lookup — single binary search derives index + expanded territories.
   // Returns null for historyTerritories if the nearest snapshot is too far from the
   // requested timestamp (data not yet loaded for that time range).
@@ -573,9 +662,9 @@ export default function MapPage() {
       return { currentSnapshotIndex: -1, historyTerritories: null };
     }
 
-    const expanded = expandSnapshot(snapshot.territories, verboseData, guildColors);
+    const expanded = expandSnapshot(snapshot.territories, verboseData, effectiveGuildColors);
     return { currentSnapshotIndex: idx, historyTerritories: expanded };
-  }, [viewMode, historyTimestamp, loadedSnapshots, verboseData, guildColors]);
+  }, [viewMode, historyTimestamp, loadedSnapshots, verboseData, effectiveGuildColors]);
 
   // Step forward/backward handlers
   const handleStepForward = useCallback(() => {
@@ -1191,11 +1280,13 @@ export default function MapPage() {
                 onClick={handleTerritoryClick}
                 onMouseEnter={handleTerritoryHover}
                 onMouseLeave={handleTerritoryLeave}
-                guildColors={guildColors}
+                guildColors={effectiveGuildColors}
                 showTimeOutlines={viewMode === 'live' && showTimeOutlines}
                 showResourceOutlines={viewMode === 'live' && showResourceOutlines}
                 showGuildNames={viewMode === 'live' || showGuildNames}
                 verboseData={verboseData?.[name] ?? null}
+                opaqueFill={opaqueFill}
+                fallbackColor={showFactions ? '#808080' : '#FFFFFF'}
               />
             ))}
             {/* Land View Overlay - merged guild territories */}
@@ -1203,10 +1294,11 @@ export default function MapPage() {
               <LandViewOverlay
                 territories={displayTerritories}
                 verboseData={verboseData}
-                guildColors={guildColors}
+                guildColors={effectiveGuildColors}
                 scale={scale}
                 precomputedClusters={landViewClusters}
                 onHoverGuild={handleGuildHover}
+                opaqueFill={opaqueFill}
               />
             )}
             {/* Trade routes - only show when enabled, territories are visible, and Land View is off */}
@@ -1329,7 +1421,7 @@ export default function MapPage() {
           {viewMode !== 'history' && !selectedTerritory && (
             <TerritoryHoverPanel
               territory={hoveredTerritory}
-              guildColors={guildColors}
+              guildColors={effectiveGuildColors}
               verboseData={hoveredTerritory ? verboseData?.[hoveredTerritory.name] ?? null : null}
             />
           )}
@@ -1339,13 +1431,13 @@ export default function MapPage() {
             selectedTerritory={selectedTerritory}
             onClose={() => setSelectedTerritory(null)}
             panelId="territory-info-panel"
-            guildColors={guildColors}
+            guildColors={effectiveGuildColors}
             territories={territories}
             verboseData={verboseData}
             externalsData={externalsData}
           />
           
-          <GuildTerritoryCount territories={displayTerritories} onGuildClick={handleGuildZoom} guildColors={guildColors} showLandView={showLandView} />
+          <GuildTerritoryCount territories={displayTerritories} onGuildClick={handleGuildZoom} guildColors={effectiveGuildColors} showLandView={showLandView} />
 
           {/* Zoom Controls */}
           <div style={{
@@ -1530,7 +1622,16 @@ export default function MapPage() {
             
           </div>
 
-          {/* Bottom Right Controls Container - Mode selector + Settings */}
+          {/* Factions Panel - positioned above bottom-right controls */}
+          <FactionPanel
+            isOpen={showFactions}
+            onClose={() => setShowFactions(false)}
+            factions={factions}
+            onFactionsChange={setFactions}
+            availableGuilds={availableGuilds}
+          />
+
+          {/* Bottom Right Controls Container - Mode selector + Factions + Settings */}
           <div style={{
             position: 'absolute',
             bottom: '1rem',
@@ -1547,6 +1648,45 @@ export default function MapPage() {
               onModeChange={handleModeChange}
               historyAvailable={!!historyBounds}
             />
+
+            {/* Factions Button */}
+            <button
+              onClick={() => setShowFactions(prev => !prev)}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '0.5rem',
+                border: `2px solid ${showFactions ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                background: showFactions ? 'var(--accent-primary)' : 'var(--bg-card)',
+                color: showFactions ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                fontSize: '1.25rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+              onMouseEnter={(e) => {
+                if (!showFactions) {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!showFactions) {
+                  e.currentTarget.style.background = 'var(--bg-card)';
+                }
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              title="Factions"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                <line x1="4" y1="22" x2="4" y2="15" />
+              </svg>
+            </button>
 
             {/* Settings Button or Panel */}
             {showSettings ? (
@@ -1566,6 +1706,8 @@ export default function MapPage() {
                 onShowGuildNamesChange={setShowGuildNames}
                 showTradeRoutes={showTradeRoutes}
                 onShowTradeRoutesChange={setShowTradeRoutes}
+                opaqueFill={opaqueFill}
+                onOpaqueFillChange={setOpaqueFill}
               />
             ) : (
               <button

@@ -21,6 +21,8 @@ interface MapSettingsProps {
   // Shared settings (both modes)
   showTradeRoutes: boolean;
   onShowTradeRoutesChange: (value: boolean) => void;
+  opaqueFill: boolean;
+  onOpaqueFillChange: (value: boolean) => void;
 }
 
 // Compact toggle switch component for grid layout
@@ -104,6 +106,8 @@ export default function MapSettings({
   onShowGuildNamesChange,
   showTradeRoutes,
   onShowTradeRoutesChange,
+  opaqueFill,
+  onOpaqueFillChange,
 }: MapSettingsProps) {
   if (!isOpen) return null;
 
@@ -123,12 +127,16 @@ export default function MapSettings({
     // Column 0 (far left)
     [
       { key: "tradeRoutes", label: "Trade Routes", checked: showTradeRoutes, onChange: onShowTradeRoutesChange, disabled: showLandView },
+      { key: "opaqueFill", label: "Opaque Fill", checked: opaqueFill, onChange: onOpaqueFillChange, disabled: false },
     ],
   ] : [
     // History mode: Guild names and trade routes toggles
     [
       { key: "guildNames", label: "Guild Names", checked: showGuildNames, onChange: onShowGuildNamesChange, disabled: false },
       { key: "tradeRoutes", label: "Trade Routes", checked: showTradeRoutes, onChange: onShowTradeRoutesChange, disabled: false },
+    ],
+    [
+      { key: "opaqueFill", label: "Opaque Fill", checked: opaqueFill, onChange: onOpaqueFillChange, disabled: false },
     ],
   ];
 
