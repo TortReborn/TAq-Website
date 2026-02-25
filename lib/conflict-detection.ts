@@ -540,8 +540,9 @@ function buildSides(
       lost: guildLost.get(gIdx) || 0,
     }));
 
-    // Sort by total involvement
+    // Sort by total involvement, keep top 10
     guilds.sort((a, b) => (b.taken + b.lost) - (a.taken + a.lost));
+    guilds.length = Math.min(guilds.length, 10);
 
     return {
       guilds,

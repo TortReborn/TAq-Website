@@ -79,6 +79,8 @@ export default function MapPage() {
   const [opaqueFill, setOpaqueFill] = useState(false);
   const [showFactions, setShowFactions] = useState(false);
   const [showConflictFinder, setShowConflictFinder] = useState(false);
+  const [conflictBounds, setConflictBounds] = useState<{ start: Date; end: Date } | null>(null);
+  const [isConflictFocused, setIsConflictFocused] = useState(false);
   const [factions, setFactions] = useState<Record<string, { name: string; color: string; guilds: string[] }>>({});
   const [territories, setTerritories] = useState<Record<string, Territory>>({});
   const [isLoadingTerritories, setIsLoadingTerritories] = useState(true);
@@ -514,6 +516,8 @@ export default function MapPage() {
       setLoadedWeekCenter(null);
       setIsPlaying(false);
       exchangeStoreRef.current = null;
+      setConflictBounds(null);
+      setIsConflictFocused(false);
     }
   }, [historyBounds, loadWeekSnapshots]);
 
@@ -554,13 +558,15 @@ export default function MapPage() {
   }, [loadWeekSnapshots]);
 
   // Handle conflict finder jump — switches to history mode if needed
-  const handleConflictJump = useCallback((date: Date) => {
+  const handleConflictJump = useCallback((start: Date, end: Date) => {
     if (viewMode !== 'history') {
       setViewMode('history');
     }
     setIsPlaying(false);
-    setHistoryTimestamp(date);
-    loadWeekSnapshots(date, true);
+    setHistoryTimestamp(start);
+    setConflictBounds({ start, end });
+    setIsConflictFocused(true);
+    loadWeekSnapshots(start, true);
   }, [viewMode, loadWeekSnapshots]);
 
   // Handle history refresh - re-fetch bounds and reload data
@@ -1848,8 +1854,8 @@ export default function MapPage() {
             }}
           >
             <MapHistoryControls
-              earliest={new Date(historyBounds.earliest)}
-              latest={new Date(historyBounds.latest)}
+              earliest={isConflictFocused && conflictBounds ? conflictBounds.start : new Date(historyBounds.earliest)}
+              latest={isConflictFocused && conflictBounds ? conflictBounds.end : new Date(historyBounds.latest)}
               current={historyTimestamp}
               onTimeChange={handleTimeChange}
               onJump={handleJumpToDate}
@@ -1870,10 +1876,13 @@ export default function MapPage() {
                 width: containerRef.current.clientWidth,
                 height: containerRef.current.clientHeight
               } : undefined}
-              gaps={historyBounds.gaps?.map(g => ({
+              gaps={isConflictFocused && conflictBounds ? undefined : historyBounds.gaps?.map(g => ({
                 start: new Date(g.start),
                 end: new Date(g.end),
               }))}
+              conflictBounds={conflictBounds}
+              isConflictFocused={isConflictFocused}
+              onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}
             />
           </div>
         )}

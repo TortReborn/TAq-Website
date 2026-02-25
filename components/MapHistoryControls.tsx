@@ -26,6 +26,9 @@ interface MapHistoryControlsProps {
   onRefresh?: () => void;
   containerBounds?: { width: number; height: number };
   gaps?: Array<{ start: Date; end: Date }>;
+  conflictBounds?: { start: Date; end: Date } | null;
+  isConflictFocused?: boolean;
+  onConflictFocusToggle?: () => void;
 }
 
 const SPEED_OPTIONS = [1, 2, 10, 50];
@@ -79,6 +82,9 @@ export default function MapHistoryControls({
   onRefresh,
   containerBounds,
   gaps,
+  conflictBounds,
+  isConflictFocused,
+  onConflictFocusToggle,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -398,6 +404,40 @@ export default function MapHistoryControls({
           />
           Loading...
         </div>
+      )}
+      {conflictBounds && onConflictFocusToggle && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onConflictFocusToggle();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          title={isConflictFocused ? "Show full timeline" : "Focus on conflict"}
+          style={{
+            height: '22px',
+            padding: '0 0.4rem',
+            borderRadius: '0.25rem',
+            border: `1px solid ${isConflictFocused ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+            background: isConflictFocused ? 'var(--accent-primary)' : 'transparent',
+            color: isConflictFocused ? '#fff' : 'var(--text-secondary)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+            fontSize: '0.65rem',
+            fontWeight: 600,
+            transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="6" />
+            <circle cx="12" cy="12" r="2" />
+          </svg>
+          Conflict
+        </button>
       )}
       {orientationButton}
       {onRefresh && (

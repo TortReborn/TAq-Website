@@ -9,7 +9,7 @@ interface ConflictFinderProps {
   onClose: () => void;
   exchangeStore: ExchangeStore | null;
   ensureExchangeData: () => Promise<ExchangeStore | null>;
-  onJumpToTime: (date: Date) => void;
+  onJumpToTime: (start: Date, end: Date) => void;
   onCreateFactions: (side1Guilds: string[], side2Guilds: string[]) => void;
 }
 
@@ -445,7 +445,7 @@ function ConflictCard({
   onCreateFactions,
 }: {
   conflict: ConflictEvent;
-  onJump: (date: Date) => void;
+  onJump: (start: Date, end: Date) => void;
   onCreateFactions: (side1Guilds: string[], side2Guilds: string[]) => void;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -470,7 +470,7 @@ function ConflictCard({
 
   return (
     <div
-      onClick={() => onJump(conflict.startTime)}
+      onClick={() => onJump(conflict.startTime, conflict.endTime)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
