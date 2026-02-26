@@ -396,8 +396,7 @@ interface Bucket {
   guilds: Set<number>;
 }
 
-const BUCKET_SECS = 900; // 15 minutes
-const BUCKETS_PER_HOUR = 4;
+const BUCKET_SECS = 3600; // 1 hour
 
 /** Find the first event index at or after `targetSec` in sorted events array. */
 function lowerBound(events: number[][], targetSec: number): number {
@@ -421,206 +420,120 @@ function median(sorted: number[]): number {
 /**
  * Detect conflicts from exchange data.
  *
- * Algorithm overview:
- * 1. Bucket events into 15-minute windows (prevents boundary-splitting of short bursts)
- * 2. Compute hourly rates via sliding windows (4 adjacent 15-min buckets)
- * 3. Use rolling 7-day adaptive threshold (median + 2*MAD) to find conflict periods
- * 4. Smart gap merging: merge runs that share >50% of guilds, or are within 2 hours
- * 5. Characterize each conflict: region breakdown, guild interaction graph
- * 6. Detect factions via label propagation community detection (supports N factions)
- * 7. Score confidence and auto-name each conflict
- * 8. Group related conflicts into wars
+ * Algorithm:
+ * 1. Bucket guild-vs-guild exchanges into 1-hour windows
+ * 2. Global adaptive threshold (median + 2·MAD) to identify active periods
+ * 3. Merge adjacent active hours within a 3-hour gap into conflict runs
+ * 4. Characterize each conflict: region breakdown, guild attack pairs, factions
+ * 5. Score confidence and auto-name
  */
 export function detectConflicts(store: ExchangeStore): ConflictEvent[] {
   const { data, territoryEvents } = store;
   if (data.events.length === 0) return [];
 
-  // --- Phase 1: Bucket events into 15-minute windows ---
-  const currentOwner = new Map<number, number>();
-  const buckets = new Map<number, Bucket>(); // floor(unixSec / BUCKET_SECS) → bucket
+  // Cap input to avoid excessive computation on very large datasets
+  const MAX_EVENTS = 600_000;
+  const events = data.events.length > MAX_EVENTS
+    ? data.events.slice(-MAX_EVENTS)
+    : data.events;
 
-  for (const evt of data.events) {
+  // --- Phase 1: Bucket guild-vs-guild exchanges into 1-hour windows ---
+  const currentOwner = new Map<number, number>();
+  const buckets = new Map<number, Bucket>();
+
+  for (const evt of events) {
     const [unixSec, tIdx, gIdx] = evt;
-    const prevOwnerIdx = currentOwner.get(tIdx) ?? -1;
+    const prevOwner = currentOwner.get(tIdx) ?? -1;
     currentOwner.set(tIdx, gIdx);
 
-    const attackerName = data.guilds[gIdx];
-    const defenderName = prevOwnerIdx >= 0 ? data.guilds[prevOwnerIdx] : "None";
-    if (attackerName === "None" || defenderName === "None") continue;
-    if (attackerName === defenderName) continue;
+    if (data.guilds[gIdx] === "None") continue;
+    if (prevOwner < 0 || data.guilds[prevOwner] === "None") continue;
+    if (gIdx === prevOwner) continue;
 
-    const bucketKey = Math.floor(unixSec / BUCKET_SECS);
+    const bk = Math.floor(unixSec / BUCKET_SECS);
     const region = getRegion(data.territories[tIdx]);
-
-    let bucket = buckets.get(bucketKey);
-    if (!bucket) {
-      bucket = { total: 0, byRegion: {}, territories: new Set(), guilds: new Set() };
-      buckets.set(bucketKey, bucket);
+    let b = buckets.get(bk);
+    if (!b) {
+      b = { total: 0, byRegion: {}, territories: new Set(), guilds: new Set() };
+      buckets.set(bk, b);
     }
-    bucket.total++;
-    bucket.byRegion[region] = (bucket.byRegion[region] || 0) + 1;
-    bucket.territories.add(tIdx);
-    bucket.guilds.add(gIdx);
-    if (prevOwnerIdx >= 0) bucket.guilds.add(prevOwnerIdx);
+    b.total++;
+    b.byRegion[region] = (b.byRegion[region] || 0) + 1;
+    b.territories.add(tIdx);
+    b.guilds.add(gIdx);
+    b.guilds.add(prevOwner);
   }
 
   if (buckets.size === 0) return [];
 
-  // --- Phase 2: Compute hourly rates via sliding 1-hour windows ---
-  // Each "hour window" is centered on 4 consecutive 15-min buckets
+  // --- Phase 2: Global adaptive threshold (exchanges per hour) ---
   const sortedBucketKeys = Array.from(buckets.keys()).sort((a, b) => a - b);
-  const hourlyRates = new Map<number, { rate: number; guilds: Set<number> }>();
-
-  for (const bk of sortedBucketKeys) {
-    // Sum this bucket and adjacent 3 (1-hour window starting at bk)
-    let total = 0;
-    const windowGuilds = new Set<number>();
-    for (let offset = 0; offset < BUCKETS_PER_HOUR; offset++) {
-      const b = buckets.get(bk + offset);
-      if (b) {
-        total += b.total;
-        for (const g of b.guilds) windowGuilds.add(g);
-      }
-    }
-    hourlyRates.set(bk, { rate: total, guilds: windowGuilds });
-  }
-
-  // --- Phase 3: Rolling adaptive threshold ---
-  // Use a 7-day rolling window for median+MAD to adapt to seasonal patterns.
-  // Fall back to global threshold if data span < 14 days.
-  const ROLLING_WINDOW_BUCKETS = Math.floor((7 * 24 * 3600) / BUCKET_SECS); // 7 days of 15-min buckets
-  const allRates = Array.from(hourlyRates.values()).map(v => v.rate);
+  const allRates = Array.from(buckets.values()).map(b => b.total);
   const globalSorted = [...allRates].sort((a, b) => a - b);
   const globalMedian = median(globalSorted);
   const globalMAD = median(globalSorted.map(v => Math.abs(v - globalMedian)).sort((a, b) => a - b));
-  const globalThreshold = Math.max(8, globalMedian + 2 * globalMAD);
+  const threshold = Math.max(6, globalMedian + 2 * globalMAD);
 
-  const dataSpanBuckets = sortedBucketKeys.length > 1
-    ? sortedBucketKeys[sortedBucketKeys.length - 1] - sortedBucketKeys[0]
-    : 0;
-  const useRolling = dataSpanBuckets > ROLLING_WINDOW_BUCKETS * 2;
-
-  function getThreshold(bucketKey: number): number {
-    if (!useRolling) return globalThreshold;
-
-    // Collect rates within ±3.5 days of this bucket
-    const halfWindow = Math.floor(ROLLING_WINDOW_BUCKETS / 2);
-    const windowRates: number[] = [];
-    for (const [bk, val] of hourlyRates) {
-      if (Math.abs(bk - bucketKey) <= halfWindow) {
-        windowRates.push(val.rate);
-      }
-    }
-    if (windowRates.length < 20) return globalThreshold; // Too few samples
-
-    windowRates.sort((a, b) => a - b);
-    const med = median(windowRates);
-    const madVal = median(windowRates.map(v => Math.abs(v - med)).sort((a, b) => a - b));
-    return Math.max(8, med + 2 * madVal);
-  }
-
-  // --- Phase 4: Find conflict runs with smart gap merging ---
+  // --- Phase 3: Find conflict runs (merge gaps ≤ 3 hours) ---
   interface RawConflict {
     startBucket: number;
     endBucket: number;
     activeBuckets: number[];
-    guilds: Set<number>;
   }
 
   const rawConflicts: RawConflict[] = [];
   let currentRun: RawConflict | null = null;
-  const TIME_GAP_BUCKETS = 8; // 2 hours in 15-min buckets (fallback time-only merge)
-  const GUILD_GAP_BUCKETS = 12; // 3 hours — merge if guild overlap >50%
+  const GAP_HOURS = 3;
 
   for (const bk of sortedBucketKeys) {
-    const hr = hourlyRates.get(bk)!;
-    const threshold = getThreshold(bk);
-    if (hr.rate < threshold) continue;
-
-    if (currentRun) {
-      const gap = bk - currentRun.endBucket;
-
-      if (gap <= TIME_GAP_BUCKETS) {
-        // Always merge within 2-hour gap
-        currentRun.endBucket = bk;
-        currentRun.activeBuckets.push(bk);
-        for (const g of hr.guilds) currentRun.guilds.add(g);
-      } else if (gap <= GUILD_GAP_BUCKETS) {
-        // Merge within 3-hour gap only if >50% guild overlap
-        const overlap = [...hr.guilds].filter(g => currentRun!.guilds.has(g)).length;
-        const overlapRatio = hr.guilds.size > 0 ? overlap / hr.guilds.size : 0;
-        if (overlapRatio > 0.5) {
-          currentRun.endBucket = bk;
-          currentRun.activeBuckets.push(bk);
-          for (const g of hr.guilds) currentRun.guilds.add(g);
-        } else {
-          rawConflicts.push(currentRun);
-          currentRun = { startBucket: bk, endBucket: bk, activeBuckets: [bk], guilds: new Set(hr.guilds) };
-        }
-      } else {
-        rawConflicts.push(currentRun);
-        currentRun = { startBucket: bk, endBucket: bk, activeBuckets: [bk], guilds: new Set(hr.guilds) };
-      }
+    if (buckets.get(bk)!.total < threshold) continue;
+    if (currentRun && bk - currentRun.endBucket <= GAP_HOURS) {
+      currentRun.endBucket = bk;
+      currentRun.activeBuckets.push(bk);
     } else {
-      currentRun = { startBucket: bk, endBucket: bk, activeBuckets: [bk], guilds: new Set(hr.guilds) };
+      if (currentRun) rawConflicts.push(currentRun);
+      currentRun = { startBucket: bk, endBucket: bk, activeBuckets: [bk] };
     }
   }
   if (currentRun) rawConflicts.push(currentRun);
 
-  // --- Phase 5: Characterize each conflict ---
+  // --- Phase 4: Characterize each conflict ---
   const conflicts: ConflictEvent[] = [];
 
   for (let i = 0; i < rawConflicts.length; i++) {
     const raw = rawConflicts[i];
     const startSec = raw.startBucket * BUCKET_SECS;
-    const endSec = (raw.endBucket + BUCKETS_PER_HOUR) * BUCKET_SECS; // include full last window
+    const endSec = (raw.endBucket + 1) * BUCKET_SECS;
 
-    // Sum bucket stats (use actual 15-min buckets, not sliding windows)
     let totalExchanges = 0;
     let peakHourly = 0;
     const regionBreakdown: Record<string, number> = {};
     const allTerritories = new Set<number>();
 
-    // Compute peak from sliding hourly windows within this conflict
     for (const bk of raw.activeBuckets) {
-      const hr = hourlyRates.get(bk)!;
-      if (hr.rate > peakHourly) peakHourly = hr.rate;
-    }
-
-    // Sum raw 15-min bucket totals for exchange count
-    const minBk = raw.startBucket;
-    const maxBk = raw.endBucket + BUCKETS_PER_HOUR;
-    for (let bk = minBk; bk < maxBk; bk++) {
-      const b = buckets.get(bk);
-      if (!b) continue;
+      const b = buckets.get(bk)!;
+      if (b.total > peakHourly) peakHourly = b.total;
       totalExchanges += b.total;
-      for (const [reg, count] of Object.entries(b.byRegion)) {
-        regionBreakdown[reg] = (regionBreakdown[reg] || 0) + count;
+      for (const [r, c] of Object.entries(b.byRegion)) {
+        regionBreakdown[r] = (regionBreakdown[r] || 0) + c;
       }
       for (const t of b.territories) allTerritories.add(t);
     }
 
     if (totalExchanges === 0) continue;
 
-    // Find primary region
-    let primaryRegion = "Global";
     const regionEntries = Object.entries(regionBreakdown).sort((a, b) => b[1] - a[1]);
-    if (regionEntries.length > 0) {
-      const topRegionPct = regionEntries[0][1] / totalExchanges;
-      primaryRegion = topRegionPct >= 0.6 ? regionEntries[0][0] : "Global";
-    }
-
-    // Multi-front detection: count regions contributing >15%
-    const significantRegions = regionEntries.filter(([, count]) => count / totalExchanges > 0.15);
+    const topRegionPct = regionEntries.length > 0 ? regionEntries[0][1] / totalExchanges : 0;
+    const primaryRegion = topRegionPct >= 0.6 ? regionEntries[0][0] : "Global";
+    const significantRegions = regionEntries.filter(([, c]) => c / totalExchanges > 0.15);
     const isMultiFront = significantRegions.length >= 3;
 
-    // Build guild interaction matrix from events in this time range
+    // Initialize territory owners via binary search, then walk events in window
     const guildTaken = new Map<number, number>();
     const guildLost = new Map<number, number>();
     const pairAttacks = new Map<string, number>();
     const owner = new Map<number, number>();
 
-    // Initialize owners from events before this conflict
     for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
       const tevts = territoryEvents[tIdx];
       let lo = 0, hi = tevts.length;
@@ -629,46 +542,29 @@ export function detectConflicts(store: ExchangeStore): ConflictEvent[] {
         if (tevts[mid][0] < startSec) lo = mid + 1;
         else hi = mid;
       }
-      if (lo > 0) {
-        owner.set(tIdx, tevts[lo - 1][1]);
-      }
+      if (lo > 0) owner.set(tIdx, tevts[lo - 1][1]);
     }
 
-    // Walk events in the conflict window
     let weightedExchanges = 0;
-    const evtStart = lowerBound(data.events, startSec);
-    for (let ei = evtStart; ei < data.events.length; ei++) {
-      const [sec, tIdx, gIdx] = data.events[ei];
+    const evtStart = lowerBound(events, startSec);
+    for (let ei = evtStart; ei < events.length; ei++) {
+      const [sec, tIdx, gIdx] = events[ei];
       if (sec >= endSec) break;
-
       const prevIdx = owner.get(tIdx) ?? -1;
       owner.set(tIdx, gIdx);
-
-      const attacker = data.guilds[gIdx];
-      const defender = prevIdx >= 0 ? data.guilds[prevIdx] : "None";
-      if (attacker === "None" || defender === "None") continue;
-      if (attacker === defender) continue;
-
+      if (prevIdx < 0) continue;
+      if (data.guilds[gIdx] === "None" || data.guilds[prevIdx] === "None") continue;
+      if (gIdx === prevIdx) continue;
       guildTaken.set(gIdx, (guildTaken.get(gIdx) || 0) + 1);
       guildLost.set(prevIdx, (guildLost.get(prevIdx) || 0) + 1);
       pairAttacks.set(`${gIdx}_${prevIdx}`, (pairAttacks.get(`${gIdx}_${prevIdx}`) || 0) + 1);
-
-      // Accumulate resource-weighted exchange value
-      const terrValue = getTerritoryValue(data.territories[tIdx]);
-      weightedExchanges += 1 + terrValue; // base 1 + resource bonus
+      weightedExchanges += 1 + getTerritoryValue(data.territories[tIdx]);
     }
 
-    // --- Phase 6: Faction detection via label propagation ---
     const factions = detectFactions(data, guildTaken, guildLost, pairAttacks);
 
-    // Duration in hours
     const durationHours = (endSec - startSec) / 3600;
-
-    // --- Phase 7: Confidence scoring ---
-    const involvedGuilds = new Set<number>();
-    for (const g of guildTaken.keys()) involvedGuilds.add(g);
-    for (const g of guildLost.keys()) involvedGuilds.add(g);
-
+    const involvedGuilds = new Set([...guildTaken.keys(), ...guildLost.keys()]);
     let confidence = 0;
     if (involvedGuilds.size >= 4) confidence += 0.3;
     else if (involvedGuilds.size >= 2) confidence += 0.15;
@@ -678,14 +574,9 @@ export function detectConflicts(store: ExchangeStore): ConflictEvent[] {
     else if (peakHourly >= 10) confidence += 0.1;
     if (allTerritories.size >= 10) confidence += 0.15;
     else if (allTerritories.size >= 5) confidence += 0.07;
-    // Bipartite structure quality: ratio of inter-faction to intra-faction attacks
-    if (factions.length >= 2) {
-      const bipartiteScore = computeBipartiteScore(factions, pairAttacks);
-      confidence += bipartiteScore * 0.15;
-    }
+    if (factions.length >= 2) confidence += computeBipartiteScore(factions, pairAttacks) * 0.15;
     confidence = Math.min(1, confidence);
 
-    // Auto-naming
     const name = generateConflictName(primaryRegion, isMultiFront, significantRegions, factions);
 
     conflicts.push({
@@ -715,13 +606,13 @@ export function detectConflicts(store: ExchangeStore): ConflictEvent[] {
 }
 
 // ---------------------------------------------------------------------------
-// Label Propagation Community Detection
+// Faction Detection (simple two-side split)
 // ---------------------------------------------------------------------------
 
 /**
- * Detect factions using label propagation on the guild hostility graph.
- * Naturally discovers N communities without assuming bipartite structure.
- * Guilds with no interactions are excluded (not dumped onto a random side).
+ * Assign guilds to two sides based on who attacks whom.
+ * 1. Find the top hostile pair (most mutual attacks) → seed sides A and B.
+ * 2. Assign each remaining guild to the side it attacks more.
  */
 function detectFactions(
   data: { guilds: string[]; prefixes: string[] },
@@ -729,222 +620,53 @@ function detectFactions(
   guildLost: Map<number, number>,
   pairAttacks: Map<string, number>,
 ): ConflictSide[] {
-  // Build undirected hostility graph: edge weight = total attacks in both directions
   const involvedGuilds = new Set<number>();
   for (const g of guildTaken.keys()) involvedGuilds.add(g);
   for (const g of guildLost.keys()) involvedGuilds.add(g);
-
   if (involvedGuilds.size === 0) return [];
 
-  // Build adjacency list with hostility weights
-  const adj = new Map<number, Map<number, number>>(); // guild → (neighbor → weight)
+  // Find the top hostile pair to seed the two sides
+  let seedA = -1, seedB = -1, bestMutual = 0;
   for (const [pair, count] of pairAttacks) {
-    const [a, b] = pair.split("_").map(Number);
-    if (!adj.has(a)) adj.set(a, new Map());
-    if (!adj.has(b)) adj.set(b, new Map());
-    adj.get(a)!.set(b, (adj.get(a)!.get(b) || 0) + count);
-    adj.get(b)!.set(a, (adj.get(b)!.get(a) || 0) + count);
+    const sep = pair.indexOf("_");
+    const a = Number(pair.slice(0, sep));
+    const b = Number(pair.slice(sep + 1));
+    const mutual = count + (pairAttacks.get(`${b}_${a}`) || 0);
+    if (mutual > bestMutual) { bestMutual = mutual; seedA = a; seedB = b; }
   }
 
-  // Initialize labels: each guild starts as its own community
-  const labels = new Map<number, number>();
-  const guildList = [...involvedGuilds];
-  for (const g of guildList) {
-    labels.set(g, g);
+  if (seedA < 0) {
+    return [buildFactionSide(data, guildTaken, guildLost, [...involvedGuilds])];
   }
 
-  // Label propagation: iteratively assign each node to the most common label
-  // among its neighbors (weighted by hostility). In a conflict graph, guilds
-  // fighting the same enemies converge to the same label.
-  //
-  // Key insight: we use ANTI-labels. A guild adopts the OPPOSITE label of whoever
-  // attacks it most. This creates the bipartite-like structure we want while
-  // allowing 3+ communities when the graph isn't cleanly bipartite.
+  const side0 = new Set<number>([seedA]);
+  const side1 = new Set<number>([seedB]);
 
-  // Actually, for conflict detection we want guilds that fight EACH OTHER to be
-  // on DIFFERENT sides. Standard label propagation groups connected nodes together.
-  // We need a signed-graph approach: guilds connected by hostility should be in
-  // different communities.
-  //
-  // Approach: Two-coloring with relaxation.
-  // 1. Find the strongest pair → assign them to different initial groups.
-  // 2. For each remaining guild, assign to the group that OPPOSES its strongest
-  //    enemies (i.e., the group containing the guilds it fights least).
-  // 3. Guilds with no strong connections to any group are "unaffiliated".
-
-  // Find strongest mutual hostility pair for seeding
-  let bestPairKey = "";
-  let bestMutual = 0;
-  for (const [pair, count] of pairAttacks) {
-    const [a, b] = pair.split("_").map(Number);
-    const reverse = pairAttacks.get(`${b}_${a}`) || 0;
-    const mutual = count + reverse;
-    if (mutual > bestMutual) {
-      bestMutual = mutual;
-      bestPairKey = pair;
+  // Assign remaining guilds to the side they attack more
+  for (const g of involvedGuilds) {
+    if (g === seedA || g === seedB) continue;
+    let attackSide0 = 0, attackSide1 = 0;
+    for (const [pair, count] of pairAttacks) {
+      const sep = pair.indexOf("_");
+      if (Number(pair.slice(0, sep)) !== g) continue;
+      const target = Number(pair.slice(sep + 1));
+      if (side0.has(target)) attackSide0 += count;
+      if (side1.has(target)) attackSide1 += count;
     }
+    if (attackSide1 > attackSide0) side1.add(g); else side0.add(g);
   }
 
-  if (!bestPairKey) {
-    // No pair attacks at all — return single faction with all guilds
-    return [buildFactionSide(data, guildTaken, guildLost, guildList)];
+  const factions = [
+    buildFactionSide(data, guildTaken, guildLost, [...side0]),
+    buildFactionSide(data, guildTaken, guildLost, [...side1]),
+  ].filter(f => f.guilds.length > 0);
+
+  // Aggressor (most taken) goes first
+  if (factions.length >= 2 && factions[1].totalTaken > factions[0].totalTaken) {
+    [factions[0], factions[1]] = [factions[1], factions[0]];
   }
 
-  // Initialize communities from seed pair
-  const [seedA, seedB] = bestPairKey.split("_").map(Number);
-  const communities = new Map<number, number>(); // guild → community label
-  communities.set(seedA, 0);
-  communities.set(seedB, 1);
-  let nextLabel = 2;
-
-  // Sort remaining guilds by involvement (most involved first for stability)
-  const remaining = guildList
-    .filter(g => g !== seedA && g !== seedB)
-    .sort((a, b) => {
-      const aTotal = (guildTaken.get(a) || 0) + (guildLost.get(a) || 0);
-      const bTotal = (guildTaken.get(b) || 0) + (guildLost.get(b) || 0);
-      return bTotal - aTotal;
-    });
-
-  // Assign each guild based on hostility patterns
-  const MIN_INTERACTION_THRESHOLD = 2; // Need at least 2 interactions to be assigned
-  const unaffiliated: number[] = [];
-
-  for (const guild of remaining) {
-    const neighbors = adj.get(guild);
-    if (!neighbors) {
-      unaffiliated.push(guild);
-      continue;
-    }
-
-    // Compute total hostility toward each existing community
-    const hostilityByCommunity = new Map<number, number>();
-    let totalInteractions = 0;
-    for (const [neighbor, weight] of neighbors) {
-      const comm = communities.get(neighbor);
-      if (comm !== undefined) {
-        hostilityByCommunity.set(comm, (hostilityByCommunity.get(comm) || 0) + weight);
-        totalInteractions += weight;
-      }
-    }
-
-    if (totalInteractions < MIN_INTERACTION_THRESHOLD) {
-      unaffiliated.push(guild);
-      continue;
-    }
-
-    // Join the community that this guild fights LEAST (i.e., is allied with)
-    // If it fights all communities roughly equally, it might be a new faction
-    const communityHostilities = [...hostilityByCommunity.entries()].sort((a, b) => a[1] - b[1]);
-
-    if (communityHostilities.length === 0) {
-      unaffiliated.push(guild);
-      continue;
-    }
-
-    const leastHostile = communityHostilities[0];
-    const mostHostile = communityHostilities[communityHostilities.length - 1];
-
-    // If hostility is roughly equal toward all communities (within 30%), this guild
-    // might be an independent 3rd party. Create a new community.
-    if (communityHostilities.length >= 2 && mostHostile[1] > 0) {
-      const ratio = leastHostile[1] / mostHostile[1];
-      if (ratio > 0.7 && totalInteractions >= 5) {
-        // Fights everyone roughly equally — new faction
-        communities.set(guild, nextLabel++);
-        continue;
-      }
-    }
-
-    // Otherwise, join the community it fights least (its allies)
-    communities.set(guild, leastHostile[0]);
-  }
-
-  // Group guilds by community
-  const communityMembers = new Map<number, number[]>();
-  for (const [guild, comm] of communities) {
-    if (!communityMembers.has(comm)) communityMembers.set(comm, []);
-    communityMembers.get(comm)!.push(guild);
-  }
-
-  // Merge tiny communities (< 2 members) into the community they're most hostile toward
-  // (since tiny "independent factions" are usually just noise)
-  for (const [comm, members] of communityMembers) {
-    if (members.length >= 2) continue;
-    const guild = members[0];
-    const neighbors = adj.get(guild);
-    if (!neighbors) continue;
-
-    let bestComm = -1;
-    let bestHostility = 0;
-    for (const [neighbor, weight] of neighbors) {
-      const neighborComm = communities.get(neighbor);
-      if (neighborComm !== undefined && neighborComm !== comm) {
-        // Find the community this guild fights most → it should be on the opposing side
-        if (weight > bestHostility) {
-          bestHostility = weight;
-          bestComm = neighborComm;
-        }
-      }
-    }
-
-    if (bestComm >= 0) {
-      // Find a community that OPPOSES bestComm
-      // Look at which community bestComm's members fight most
-      const opposingComms = new Map<number, number>();
-      for (const member of (communityMembers.get(bestComm) || [])) {
-        const memberNeighbors = adj.get(member);
-        if (!memberNeighbors) continue;
-        for (const [n, w] of memberNeighbors) {
-          const nComm = communities.get(n);
-          if (nComm !== undefined && nComm !== bestComm && nComm !== comm) {
-            opposingComms.set(nComm, (opposingComms.get(nComm) || 0) + w);
-          }
-        }
-      }
-
-      if (opposingComms.size > 0) {
-        // Join the community that opposes our enemy (ally of our enemy's enemy)
-        const allyComm = [...opposingComms.entries()].sort((a, b) => b[1] - a[1])[0][0];
-        communities.set(guild, allyComm);
-        communityMembers.get(comm)!.splice(communityMembers.get(comm)!.indexOf(guild), 1);
-        communityMembers.get(allyComm)!.push(guild);
-      }
-    }
-  }
-
-  // Build faction sides, sorted by total involvement (largest first)
-  const factionList: ConflictSide[] = [];
-  const validCommunities = [...communityMembers.entries()]
-    .filter(([, members]) => members.length > 0)
-    .sort((a, b) => {
-      const aTotal = a[1].reduce((s, g) => s + (guildTaken.get(g) || 0) + (guildLost.get(g) || 0), 0);
-      const bTotal = b[1].reduce((s, g) => s + (guildTaken.get(g) || 0) + (guildLost.get(g) || 0), 0);
-      return bTotal - aTotal;
-    });
-
-  for (const [, members] of validCommunities) {
-    if (members.length === 0) continue;
-    factionList.push(buildFactionSide(data, guildTaken, guildLost, members));
-  }
-
-  // Cap at 4 factions — merge smallest into nearest ally
-  while (factionList.length > 4) {
-    // Remove last (smallest) and merge into second-to-last
-    const smallest = factionList.pop()!;
-    const target = factionList[factionList.length - 1];
-    target.guilds.push(...smallest.guilds);
-    target.totalTaken += smallest.totalTaken;
-    target.totalLost += smallest.totalLost;
-    target.guilds.sort((a, b) => (b.taken + b.lost) - (a.taken + a.lost));
-  }
-
-  // Ensure the faction with most taken territories is first (aggressors)
-  if (factionList.length >= 2 && factionList[1].totalTaken > factionList[0].totalTaken) {
-    [factionList[0], factionList[1]] = [factionList[1], factionList[0]];
-  }
-
-  return factionList;
+  return factions;
 }
 
 /** Build a ConflictSide from a list of guild indices. */

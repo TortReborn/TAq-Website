@@ -101,7 +101,9 @@ export default function ConflictFinder({
   const [sortBy, setSortBy] = useState<"size" | "date" | "strategic">("size");
   const [guildSearch, setGuildSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(false);
   const [store, setStore] = useState<ExchangeStore | null>(exchangeStore);
+  const [allConflicts, setAllConflicts] = useState<ConflictEvent[]>([]);
   const [expandedWars, setExpandedWars] = useState<Set<string>>(new Set());
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -226,10 +228,23 @@ export default function ConflictFinder({
     document.body.style.userSelect = "none";
   };
 
-  // Detect conflicts (memoized on store reference)
-  const allConflicts = useMemo(() => {
-    if (!store) return [];
-    return detectConflicts(store);
+  // Detect conflicts asynchronously to avoid blocking the main thread
+  useEffect(() => {
+    if (!store) { setAllConflicts([]); return; }
+    let cancelled = false;
+    setIsDetecting(true);
+    const handle = setTimeout(() => {
+      try {
+        const result = detectConflicts(store);
+        if (!cancelled) {
+          setAllConflicts(result);
+          setIsDetecting(false);
+        }
+      } catch {
+        if (!cancelled) setIsDetecting(false);
+      }
+    }, 0);
+    return () => { cancelled = true; clearTimeout(handle); };
   }, [store]);
 
   // Group into wars
@@ -292,15 +307,6 @@ export default function ConflictFinder({
     return wars.filter(w => w.conflicts.some(c => filteredIds.has(c.id)));
   }, [wars, filteredConflicts]);
 
-  // Timeline data for sparkline
-  const timelineData = useMemo(() => {
-    if (allConflicts.length === 0) return null;
-    const minTime = Math.min(...allConflicts.map(c => c.startTime.getTime()));
-    const maxTime = Math.max(...allConflicts.map(c => c.endTime.getTime()));
-    const span = maxTime - minTime;
-    if (span <= 0) return null;
-    return { minTime, maxTime, span, conflicts: allConflicts };
-  }, [allConflicts]);
 
   if (!isOpen) return null;
 
@@ -472,14 +478,6 @@ export default function ConflictFinder({
         />
       </div>
 
-      {/* Timeline sparkline */}
-      {timelineData && !loading && (
-        <TimelineSparkline
-          data={timelineData}
-          filteredIds={new Set(filteredConflicts.map(c => c.id))}
-        />
-      )}
-
       {/* Content area */}
       <div
         style={{
@@ -489,7 +487,7 @@ export default function ConflictFinder({
           minHeight: 0,
         }}
       >
-        {loading && (
+        {(loading || isDetecting) && (
           <div style={{
             display: "flex",
             alignItems: "center",
@@ -498,11 +496,11 @@ export default function ConflictFinder({
             color: "var(--text-secondary)",
             fontSize: "0.8rem",
           }}>
-            Loading exchange data...
+            {loading ? "Loading exchange data..." : "Analyzing conflicts..."}
           </div>
         )}
 
-        {!loading && store && allConflicts.length === 0 && (
+        {!loading && !isDetecting && store && allConflicts.length === 0 && (
           <div style={{
             display: "flex",
             alignItems: "center",
@@ -515,7 +513,7 @@ export default function ConflictFinder({
           </div>
         )}
 
-        {!loading && filteredConflicts.length === 0 && allConflicts.length > 0 && (
+        {!loading && !isDetecting && filteredConflicts.length === 0 && allConflicts.length > 0 && (
           <div style={{
             display: "flex",
             alignItems: "center",
