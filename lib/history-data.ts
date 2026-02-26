@@ -390,9 +390,6 @@ export function buildInitialOwnerMap(
   return map;
 }
 
-// Duration of the backfill window from the data start (3 months)
-const BACKFILL_WINDOW_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
-
 /**
  * Reconstruct a single snapshot at any timestamp — client-side equivalent
  * of the server's `reconstructSingleSnapshot()`.
@@ -402,8 +399,10 @@ const BACKFILL_WINDOW_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
  * comparisons — effectively instant.
  *
  * `initialOwners` — optional map of territory → {guild, prefix} for
- * territories that haven't been exchanged yet.  Used within the first
- * 3 months of the data range to backfill from the first exchange's defender.
+ * territories that haven't been exchanged yet.  If a territory of the
+ * correct era has no exchange before the requested time, we backfill
+ * from the defender of its first future exchange (meaning it was held
+ * continuously until that point).
  */
 export function buildSnapshotAt(
   store: ExchangeStore,
@@ -417,10 +416,6 @@ export function buildSnapshotAt(
   const territories: Record<string, SnapshotTerritory> = {};
   let count = 0;
 
-  // Check if we're within the backfill window (first 3 months of data)
-  const earliestMs = new Date(data.earliest).getTime();
-  const inBackfillWindow = initialOwners && targetMs < earliestMs + BACKFILL_WINDOW_MS;
-
   for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
     const gIdx = lastEventBefore(territoryEvents[tIdx], targetSec);
 
@@ -430,10 +425,12 @@ export function buildSnapshotAt(
     if (!isPostRekindled && era === 'new') continue;
 
     if (gIdx === -1) {
-      // No exchange before this time — try backfill from initial owners
-      if (inBackfillWindow) {
+      // No exchange before this time — backfill from initial owners
+      // (the defender of this territory's first exchange, meaning they
+      // held it continuously until that point)
+      if (initialOwners) {
         const terrName = data.territories[tIdx];
-        const owner = initialOwners!.get(terrName);
+        const owner = initialOwners.get(terrName);
         if (owner) {
           const abbrev = toAbbrev(terrName);
           territories[abbrev] = { g: owner.prefix, n: owner.guild };
