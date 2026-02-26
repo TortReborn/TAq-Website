@@ -388,6 +388,16 @@ const BACKFILL_WINDOW_MS = 3 * 30 * 24 * 60 * 60 * 1000;
  * territories that haven't been exchanged yet.  Used within the first
  * 3 months of the data range to backfill from the first exchange's defender.
  */
+/**
+ * Check if a territory abbreviation belongs to the wrong era for the given timestamp.
+ * Old territories only render pre-Rekindled; new territories only render post-Rekindled.
+ */
+function isWrongEra(abbrev: string, isPostRekindled: boolean): boolean {
+  const isOld = OLD_TERRITORY_ABBREVS.has(abbrev);
+  // Old territory in post-Rekindled era, or new territory in pre-Rekindled era
+  return isPostRekindled ? isOld : !isOld;
+}
+
 export function buildSnapshotAt(
   store: ExchangeStore,
   timestamp: Date,
@@ -414,7 +424,7 @@ export function buildSnapshotAt(
         const owner = initialOwners!.get(terrName);
         if (owner) {
           const abbrev = toAbbrev(terrName);
-          if (!(isPostRekindled && OLD_TERRITORY_ABBREVS.has(abbrev))) {
+          if (!isWrongEra(abbrev, isPostRekindled)) {
             territories[abbrev] = { g: owner.prefix, n: owner.guild };
             count++;
           }
@@ -427,8 +437,8 @@ export function buildSnapshotAt(
     if (guildName === 'None') continue;
 
     const abbrev = toAbbrev(data.territories[tIdx]);
-    // Skip old territories for post-Rekindled World timestamps
-    if (isPostRekindled && OLD_TERRITORY_ABBREVS.has(abbrev)) continue;
+    // Skip territories from the wrong era
+    if (isWrongEra(abbrev, isPostRekindled)) continue;
 
     territories[abbrev] = {
       g: data.prefixes[gIdx],
@@ -512,7 +522,7 @@ export function buildSnapshotsInRange(
         const guildName = data.guilds[gIdx];
         if (guildName === 'None') continue;
         const abbrev = toAbbrev(data.territories[tIdx]);
-        if (isPostRekindled && OLD_TERRITORY_ABBREVS.has(abbrev)) continue;
+        if (isWrongEra(abbrev, isPostRekindled)) continue;
         territories[abbrev] = {
           g: data.prefixes[gIdx],
           n: guildName,

@@ -150,13 +150,16 @@ export async function getInitialOwners(
 function stateToTerritories(
   state: Map<string, string>,          // territory full name → guild name
   prefixes: Map<string, string>,       // guild name → prefix
-  timestampMs?: number,                // filter old territories for post-Rekindled timestamps
+  timestampMs?: number,                // filter territories by era
 ): Record<string, SnapshotTerritory> {
   const isPostRekindled = timestampMs !== undefined && timestampMs >= REKINDLED_WORLD_CUTOFF_MS;
   const territories: Record<string, SnapshotTerritory> = {};
   for (const [territory, guild] of state) {
     if (guild === "None") continue;    // unclaimed
-    if (isPostRekindled && OLD_TERRITORY_NAMES.has(territory)) continue;
+    // Only render territories from the correct era
+    const isOldTerritory = OLD_TERRITORY_NAMES.has(territory);
+    if (isPostRekindled && isOldTerritory) continue;
+    if (timestampMs !== undefined && !isPostRekindled && !isOldTerritory) continue;
     const abbrev = toAbbrev(territory);
     territories[abbrev] = {
       g: guildPrefix(prefixes, guild),
