@@ -10,6 +10,7 @@ interface HistoryTimelineProps {
   gaps?: Array<{ start: Date; end: Date }>; // Time ranges with no data
   vertical?: boolean;
   hideCurrentTime?: boolean; // Hide the current time display (shown externally)
+  loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
 }
 
 export default function HistoryTimeline({
@@ -20,6 +21,7 @@ export default function HistoryTimeline({
   gaps,
   vertical,
   hideCurrentTime,
+  loadedRanges,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -39,6 +41,52 @@ export default function HistoryTimeline({
     });
   }, [gaps, earliest, totalRange]);
 
+  // Precompute loaded-range positions as percentages of the total range
+  const loadedRegions = useMemo(() => {
+    if (!loadedRanges || loadedRanges.length === 0 || totalRange === 0) return [];
+    const earliestMs = earliest.getTime();
+    const latestMs = latest.getTime();
+    return loadedRanges
+      .map(([startMs, endMs]) => {
+        const clampedStart = Math.max(earliestMs, startMs);
+        const clampedEnd = Math.min(latestMs, endMs);
+        if (clampedStart >= clampedEnd) return null;
+        const startPct = ((clampedStart - earliestMs) / totalRange) * 100;
+        const endPct = ((clampedEnd - earliestMs) / totalRange) * 100;
+        return { startPct, endPct };
+      })
+      .filter((r): r is { startPct: number; endPct: number } => r !== null);
+  }, [loadedRanges, earliest, latest, totalRange]);
+
+  // Green regions = loaded regions with gap regions subtracted (has real data)
+  const loadedGreenRegions = useMemo(() => {
+    if (loadedRegions.length === 0) return [];
+    if (gapRegions.length === 0) return loadedRegions;
+
+    const result: Array<{ startPct: number; endPct: number }> = [];
+    for (const loaded of loadedRegions) {
+      let remaining: Array<{ startPct: number; endPct: number }> = [{ ...loaded }];
+      for (const gap of gapRegions) {
+        const next: Array<{ startPct: number; endPct: number }> = [];
+        for (const seg of remaining) {
+          if (gap.endPct <= seg.startPct || gap.startPct >= seg.endPct) {
+            next.push(seg);
+            continue;
+          }
+          if (gap.startPct > seg.startPct) {
+            next.push({ startPct: seg.startPct, endPct: gap.startPct });
+          }
+          if (gap.endPct < seg.endPct) {
+            next.push({ startPct: gap.endPct, endPct: seg.endPct });
+          }
+        }
+        remaining = next;
+      }
+      result.push(...remaining);
+    }
+    return result;
+  }, [loadedRegions, gapRegions]);
+
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
     if (totalRange === 0) return 0;
@@ -50,6 +98,15 @@ export default function HistoryTimeline({
   const percentToPosition = (percent: number) => {
     const offset = 12 - 0.24 * percent;
     return `calc(${percent}% + ${offset}px)`;
+  };
+
+  // Convert a percentage to a padded CSS position (accounting for 12px track padding)
+  // Used for gap bars and other overlay elements so they align with the thumb
+  const percentToPaddedStart = (percent: number) => {
+    return `calc(12px + ${percent} * (100% - 24px) / 100)`;
+  };
+  const percentToPaddedWidth = (startPct: number, endPct: number) => {
+    return `calc(${endPct - startPct} * (100% - 24px) / 100)`;
   };
 
   // Convert a percentage position to a date
@@ -230,6 +287,110 @@ export default function HistoryTimeline({
         }),
   };
 
+  // ── Loaded-data indicator bar ────────────────────────────────────────
+  // Shows a thin bar next to the slider: green = data loaded, red = not loaded.
+  // In vertical mode it sits to the left; in horizontal mode it sits below.
+
+  const loadedIndicatorBar = (isVert: boolean) => {
+    // Determine cap colors: match the nearest segment's color at each edge
+    const RED = 'rgba(180, 40, 40, 0.5)';
+    const GRAY = 'rgb(100, 100, 100)';
+    const GREEN = 'rgb(40, 167, 69)';
+
+    const capColor = (edge: 'start' | 'end') => {
+      const threshold = 0.5; // within 0.5% of edge
+      if (edge === 'start') {
+        if (loadedGreenRegions.some(r => r.startPct <= threshold)) return GREEN;
+        if (loadedRegions.some(r => r.startPct <= threshold)) return GRAY;
+        return RED;
+      } else {
+        if (loadedGreenRegions.some(r => r.endPct >= 100 - threshold)) return GREEN;
+        if (loadedRegions.some(r => r.endPct >= 100 - threshold)) return GRAY;
+        return RED;
+      }
+    };
+
+    const startColor = capColor('start');
+    const endColor = capColor('end');
+
+    return (
+      <div
+        title="Data loading status"
+        style={{
+          position: 'relative',
+          ...(isVert
+            ? { width: '6px', borderRadius: '3px', flex: 1, minHeight: '100px' }
+            : { height: '6px', borderRadius: '3px', width: '100%', marginTop: '4px' }),
+          background: RED,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Start cap — matches nearest segment color */}
+        <div style={{
+          position: 'absolute',
+          ...(isVert
+            ? { left: 0, right: 0, top: 0, height: '12px' }
+            : { top: 0, bottom: 0, left: 0, width: '12px' }),
+          background: startColor,
+        }} />
+        {/* End cap — matches nearest segment color */}
+        <div style={{
+          position: 'absolute',
+          ...(isVert
+            ? { left: 0, right: 0, bottom: 0, height: '12px' }
+            : { top: 0, bottom: 0, right: 0, width: '12px' }),
+          background: endColor,
+        }} />
+        {/* Gray segments for loaded-but-empty ranges (loaded region that overlaps gaps) */}
+        {loadedRegions.map((region, i) => (
+          <div
+            key={`gray-${i}`}
+            style={{
+              position: 'absolute',
+              ...(isVert
+                ? {
+                    left: 0,
+                    right: 0,
+                    top: percentToPaddedStart(region.startPct),
+                    height: percentToPaddedWidth(region.startPct, region.endPct),
+                  }
+                : {
+                    top: 0,
+                    bottom: 0,
+                    left: percentToPaddedStart(region.startPct),
+                    width: percentToPaddedWidth(region.startPct, region.endPct),
+                  }),
+              background: GRAY,
+            }}
+          />
+        ))}
+        {/* Green segments for loaded ranges with actual data (gaps subtracted) */}
+        {loadedGreenRegions.map((region, i) => (
+          <div
+            key={`green-${i}`}
+            style={{
+              position: 'absolute',
+              ...(isVert
+                ? {
+                    left: 0,
+                    right: 0,
+                    top: percentToPaddedStart(region.startPct),
+                    height: percentToPaddedWidth(region.startPct, region.endPct),
+                  }
+                : {
+                    top: 0,
+                    bottom: 0,
+                    left: percentToPaddedStart(region.startPct),
+                    width: percentToPaddedWidth(region.startPct, region.endPct),
+                  }),
+              background: GREEN,
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
+
   // ── Vertical layout ──────────────────────────────────────────────────
 
   if (vertical) {
@@ -265,82 +426,94 @@ export default function HistoryTimeline({
           {formatDate(earliest)}
         </div>
 
-        {/* Vertical timeline track */}
-        <div
-          ref={trackRef}
-          data-timeline-track
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleTrackHover}
-          onMouseLeave={handleTrackLeave}
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: 'relative',
-            width: '24px',
-            flex: 1,
-            minHeight: '100px',
-            background: 'var(--bg-tertiary)',
-            borderRadius: '12px',
-            cursor: hoverInGap ? 'not-allowed' : 'pointer',
-            overflow: 'visible',
-          }}
-        >
-          {/* Hover tooltip — to the right of the track */}
-          {hoverDate && (
-            <div style={{
-              position: 'absolute',
-              left: '100%',
-              top: `${hoverPos}px`,
-              transform: 'translateY(-50%)',
-              marginLeft: '8px',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.375rem',
-              background: 'var(--bg-card-solid, var(--bg-card))',
-              border: '1px solid var(--border-color)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-              fontSize: '0.75rem',
-              color: 'var(--text-primary)',
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
-              zIndex: 20,
-            }}>
-              {tooltipContent}
-            </div>
-          )}
+        {/* Track + loaded indicator side by side */}
+        <div style={{
+          display: 'flex',
+          gap: '4px',
+          flex: 1,
+          minHeight: '100px',
+          alignItems: 'stretch',
+        }}>
+          {/* Loaded-data indicator bar (left of track) */}
+          {loadedRanges && loadedIndicatorBar(true)}
 
-          {/* Progress fill — from top down to thumb */}
+          {/* Vertical timeline track */}
           <div
+            ref={trackRef}
+            data-timeline-track
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleTrackHover}
+            onMouseLeave={handleTrackLeave}
+            onClick={(e) => e.stopPropagation()}
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: percentToPosition(currentPercent),
-              background: 'var(--accent-primary)',
-              opacity: 0.3,
-              borderRadius: '12px 12px 0 0',
+              position: 'relative',
+              width: '24px',
+              height: '100%',
+              background: 'var(--bg-tertiary)',
+              borderRadius: '12px',
+              cursor: hoverInGap ? 'not-allowed' : 'pointer',
+              overflow: 'visible',
             }}
-          />
+          >
+            {/* Hover tooltip — to the right of the track */}
+            {hoverDate && (
+              <div style={{
+                position: 'absolute',
+                left: '100%',
+                top: `${hoverPos}px`,
+                transform: 'translateY(-50%)',
+                marginLeft: '8px',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '0.375rem',
+                background: 'var(--bg-card-solid, var(--bg-card))',
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                fontSize: '0.75rem',
+                color: 'var(--text-primary)',
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+                zIndex: 20,
+              }}>
+                {tooltipContent}
+              </div>
+            )}
 
-          {/* Gap regions */}
-          {gapRegions.map((gap, i) => (
+            {/* Progress fill — from top down to thumb */}
             <div
-              key={i}
-              title="No data available"
               style={{
                 position: 'absolute',
+                top: 0,
                 left: 0,
                 right: 0,
-                top: `${gap.startPct}%`,
-                height: `${gap.endPct - gap.startPct}%`,
-                background: 'rgba(139, 0, 0, 0.55)',
-                pointerEvents: 'none',
-                zIndex: 1,
+                height: percentToPosition(currentPercent),
+                background: 'var(--accent-primary)',
+                opacity: 0.3,
+                borderRadius: '12px 12px 0 0',
               }}
             />
-          ))}
 
-          {/* Thumb */}
-          <div style={thumbStyle} />
+            {/* Gap regions */}
+            {gapRegions.map((gap, i) => (
+              <div
+                key={i}
+                title="No data available"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: percentToPaddedStart(gap.startPct),
+                  height: percentToPaddedWidth(gap.startPct, gap.endPct),
+                  background: 'rgba(139, 0, 0, 0.55)',
+                  borderRadius: gap.startPct <= 0 ? '12px 12px 0 0' : gap.endPct >= 100 ? '0 0 12px 12px' : '0',
+                  pointerEvents: 'none',
+                  zIndex: 1,
+                }}
+              />
+            ))}
+
+            {/* Thumb */}
+            <div style={thumbStyle} />
+          </div>
         </div>
 
         {/* Latest date label */}
@@ -445,9 +618,10 @@ export default function HistoryTimeline({
               position: 'absolute',
               top: 0,
               bottom: 0,
-              left: `${gap.startPct}%`,
-              width: `${gap.endPct - gap.startPct}%`,
+              left: percentToPaddedStart(gap.startPct),
+              width: percentToPaddedWidth(gap.startPct, gap.endPct),
               background: 'rgba(139, 0, 0, 0.55)',
+              borderRadius: gap.startPct <= 0 ? '12px 0 0 12px' : gap.endPct >= 100 ? '0 12px 12px 0' : '0',
               pointerEvents: 'none',
               zIndex: 1,
             }}
@@ -457,6 +631,9 @@ export default function HistoryTimeline({
         {/* Thumb */}
         <div style={thumbStyle} />
       </div>
+
+      {/* Loaded-data indicator bar (below track) */}
+      {loadedRanges && loadedIndicatorBar(false)}
     </div>
   );
 }

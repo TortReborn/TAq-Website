@@ -28,6 +28,7 @@ interface MapHistoryControlsProps {
   conflictBounds?: { start: Date; end: Date } | null;
   isConflictFocused?: boolean;
   onConflictFocusToggle?: () => void;
+  loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
 }
 
 const SPEED_OPTIONS = [1, 2, 10, 50];
@@ -83,6 +84,7 @@ export default function MapHistoryControls({
   conflictBounds,
   isConflictFocused,
   onConflictFocusToggle,
+  loadedRanges,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -705,6 +707,7 @@ export default function MapHistoryControls({
                 gaps={gaps}
                 vertical
                 hideCurrentTime
+                loadedRanges={loadedRanges}
               />
             </div>
 
@@ -1030,6 +1033,7 @@ export default function MapHistoryControls({
             current={current}
             onChange={onTimeChange}
             gaps={gaps}
+            loadedRanges={loadedRanges}
           />
           {controlsSection}
         </>

@@ -78,7 +78,7 @@ function guildPrefix(prefixes: Map<string, string>, guildName: string): string {
 // Gap detection — find periods > 7 days with no exchange data.
 // ---------------------------------------------------------------------------
 
-const GAP_THRESHOLD_DAYS = 7;
+const GAP_THRESHOLD_DAYS = 1;
 
 export async function getExchangeGaps(
   pool: Pool,

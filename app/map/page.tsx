@@ -27,6 +27,7 @@ import {
   buildExchangeStoreFromRanged,
   mergeExchangeStores,
 } from "@/lib/history-data";
+import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 
 export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'history' } = {}) {
   // Store minimum scale in a ref
@@ -114,6 +115,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
   // Background fetching — tracks loaded event ranges
   const eventRangesRef = useRef<Array<[number, number]>>([]); // [startMs, endMs][]
+  const [loadedRanges, setLoadedRanges] = useState<Array<[number, number]>>([]);
   const bgAbortRef = useRef<AbortController | null>(null);
 
   // Track hovered guild for land view tooltip
@@ -460,6 +462,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const HALF_CHUNK_MS = CHUNK_MS / 2;
   const STEP_MS = 10 * 60 * 1000; // 10 minutes — snapshot interval
 
+  // Track whether we've attempted cache restoration this session
+  const cacheRestoredRef = useRef(false);
+
   /** Check if a date range is already fully covered by loaded event ranges */
   const isRangeCovered = useCallback((startMs: number, endMs: number): boolean => {
     for (const [rStart, rEnd] of eventRangesRef.current) {
@@ -483,6 +488,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       }
     }
     eventRangesRef.current = merged;
+    setLoadedRanges([...merged]);
   }, []);
 
   /** Fetch exchange events for a date range from /api/map-history/events */
@@ -499,7 +505,45 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     return response.json();
   }, []);
 
-  /** Background-fetch event chunks to progressively cache the full timeline */
+  /**
+   * Find all uncovered gaps within [boundsStart, boundsEnd] given the
+   * current loaded ranges.  Returns an array of [start, end] gaps sorted
+   * by start time.
+   */
+  const findUncoveredGaps = useCallback((boundsStart: number, boundsEnd: number): Array<[number, number]> => {
+    const ranges = eventRangesRef.current;
+    if (ranges.length === 0) return [[boundsStart, boundsEnd]];
+
+    const gaps: Array<[number, number]> = [];
+
+    // Gap before the first loaded range
+    if (ranges[0][0] > boundsStart) {
+      gaps.push([boundsStart, ranges[0][0]]);
+    }
+
+    // Gaps between loaded ranges
+    for (let i = 0; i < ranges.length - 1; i++) {
+      const gapStart = ranges[i][1];
+      const gapEnd = ranges[i + 1][0];
+      if (gapEnd > gapStart) {
+        gaps.push([gapStart, gapEnd]);
+      }
+    }
+
+    // Gap after the last loaded range
+    if (ranges[ranges.length - 1][1] < boundsEnd) {
+      gaps.push([ranges[ranges.length - 1][1], boundsEnd]);
+    }
+
+    return gaps;
+  }, []);
+
+  /**
+   * Background-fetch event chunks to progressively fill the entire timeline.
+   * Expands outward from the current cursor position, alternating between
+   * the nearest gap forward and the nearest gap backward so data loads
+   * evenly in both directions from where the user is looking.
+   */
   const startBackgroundFetch = useCallback(() => {
     bgAbortRef.current?.abort();
     const abort = new AbortController();
@@ -511,33 +555,60 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       const boundsStart = new Date(bounds.earliest).getTime();
       const boundsEnd = new Date(bounds.latest).getTime();
 
+      // Alternate: true = try forward first, false = try backward first
+      let preferForward = true;
+
       while (!abort.signal.aborted) {
-        const ranges = eventRangesRef.current;
-        if (ranges.length === 0) break;
+        const cursorMs = historyTimestampRef.current?.getTime() ?? (boundsStart + boundsEnd) / 2;
+        const gaps = findUncoveredGaps(boundsStart, boundsEnd);
+        if (gaps.length === 0) break; // fully loaded
 
-        const loadedStart = ranges[0][0];
-        const loadedEnd = ranges[ranges.length - 1][1];
-        if (loadedStart <= boundsStart && loadedEnd >= boundsEnd) break;
+        // Split gaps into forward (start >= cursor) and backward (end <= cursor),
+        // plus any gap that straddles the cursor
+        let forwardGap: [number, number] | null = null;
+        let backwardGap: [number, number] | null = null;
 
+        // Find nearest gap forward from cursor
+        for (const gap of gaps) {
+          if (gap[1] > cursorMs) {
+            forwardGap = gap;
+            break;
+          }
+        }
+        // Find nearest gap backward from cursor
+        for (let i = gaps.length - 1; i >= 0; i--) {
+          if (gaps[i][0] < cursorMs) {
+            backwardGap = gaps[i];
+            break;
+          }
+        }
+
+        // Pick which direction to fetch, alternating
+        let chosenGap: [number, number] | null = null;
+        if (preferForward && forwardGap) {
+          chosenGap = forwardGap;
+        } else if (!preferForward && backwardGap) {
+          chosenGap = backwardGap;
+        } else {
+          // Fallback to whichever exists
+          chosenGap = forwardGap ?? backwardGap;
+        }
+
+        if (!chosenGap) break;
+        preferForward = !preferForward; // alternate next iteration
+
+        // For forward gaps, fetch from the start of the gap.
+        // For backward gaps, fetch the end of the gap (working backward).
+        const isForward = chosenGap[0] >= cursorMs || (chosenGap === forwardGap);
         let chunkStart: number;
         let chunkEnd: number;
 
-        if (loadedEnd < boundsEnd) {
-          chunkStart = loadedEnd;
-          chunkEnd = Math.min(loadedEnd + CHUNK_MS, boundsEnd);
+        if (isForward) {
+          chunkStart = chosenGap[0];
+          chunkEnd = Math.min(chosenGap[0] + CHUNK_MS, chosenGap[1]);
         } else {
-          chunkEnd = loadedStart;
-          chunkStart = Math.max(loadedStart - CHUNK_MS, boundsStart);
-        }
-
-        if (isRangeCovered(chunkStart, chunkEnd)) {
-          if (loadedStart > boundsStart) {
-            chunkEnd = loadedStart;
-            chunkStart = Math.max(loadedStart - CHUNK_MS, boundsStart);
-          } else {
-            break;
-          }
-          if (isRangeCovered(chunkStart, chunkEnd)) break;
+          chunkEnd = chosenGap[1];
+          chunkStart = Math.max(chosenGap[1] - CHUNK_MS, chosenGap[0]);
         }
 
         try {
@@ -553,6 +624,15 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             exchangeStoreRef.current = buildExchangeStoreFromRanged(data);
           }
           setStoreVersion(v => v + 1);
+
+          // Persist to cache after each chunk
+          if (exchangeStoreRef.current) {
+            saveHistoryCache(
+              exchangeStoreRef.current.data,
+              eventRangesRef.current,
+              bounds.gaps,
+            );
+          }
         } catch (err: unknown) {
           if (err instanceof Error && err.name === 'AbortError') break;
           console.error('Background event fetch failed:', err);
@@ -560,7 +640,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         }
       }
     })();
-  }, [historyBounds, isRangeCovered, recordRange, fetchEventRange]);
+  }, [historyBounds, findUncoveredGaps, recordRange, fetchEventRange]);
 
   /**
    * Load exchange events around a center date. Fetches a 3-month window,
@@ -568,10 +648,39 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
    * Never touches historyTimestamp — that's only set by explicit user actions.
    */
   const loadEvents = useCallback(async (centerDate: Date) => {
+    // Try restoring from persistent cache on first call
+    if (!cacheRestoredRef.current) {
+      cacheRestoredRef.current = true;
+      try {
+        const cached = await loadCachedHistory();
+        if (cached) {
+          // Restore the store from cached data (non-empty segments)
+          const store = buildExchangeStore(cached.exchangeData);
+          exchangeStoreRef.current = store;
+
+          // Mark non-empty ranges as covered (these never need re-fetching)
+          for (const [s, e] of cached.dataRanges) {
+            recordRange(s, e);
+          }
+          setStoreVersion(v => v + 1);
+
+          // Note: empty ranges are NOT recorded — they'll be re-fetched
+          // by the background fetcher, which checks for uncovered ranges.
+        }
+      } catch (e) {
+        console.error('Failed to restore history cache:', e);
+      }
+    }
+
     const startMs = centerDate.getTime() - HALF_CHUNK_MS;
     const endMs = centerDate.getTime() + HALF_CHUNK_MS;
 
-    if (isRangeCovered(startMs, endMs)) return;
+    if (isRangeCovered(startMs, endMs)) {
+      // Range is covered, but still start background fetch
+      // to fill in any remaining gaps (including re-checking empty ranges)
+      setTimeout(() => startBackgroundFetch(), 0);
+      return;
+    }
 
     setIsLoadingHistory(true);
     try {
@@ -586,13 +695,22 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       }
       setStoreVersion(v => v + 1);
 
+      // Save to persistent cache
+      if (exchangeStoreRef.current && historyBounds) {
+        saveHistoryCache(
+          exchangeStoreRef.current.data,
+          eventRangesRef.current,
+          historyBounds.gaps,
+        );
+      }
+
       setTimeout(() => startBackgroundFetch(), 0);
     } catch (error) {
       console.error('Failed to load events:', error);
     } finally {
       setIsLoadingHistory(false);
     }
-  }, [isRangeCovered, fetchEventRange, recordRange, startBackgroundFetch]);
+  }, [isRangeCovered, fetchEventRange, recordRange, startBackgroundFetch, historyBounds]);
 
   // Keep timestamp ref in sync (for playback interval)
   useEffect(() => { historyTimestampRef.current = historyTimestamp; }, [historyTimestamp]);
@@ -649,6 +767,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       exchangeStoreRef.current = null;
       setStoreVersion(0);
       eventRangesRef.current = [];
+      setLoadedRanges([]);
       bgAbortRef.current?.abort();
       setIsPlaying(false);
       setConflictBounds(null);
@@ -686,7 +805,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     exchangeStoreRef.current = null;
     setStoreVersion(0);
     eventRangesRef.current = [];
+    setLoadedRanges([]);
+    cacheRestoredRef.current = false;
     bgAbortRef.current?.abort();
+    clearHistoryCache();
 
     try {
       const boundsResponse = await fetch('/api/map-history/bounds');
@@ -1972,6 +2094,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               conflictBounds={conflictBounds}
               isConflictFocused={isConflictFocused}
               onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}
+              loadedRanges={loadedRanges}
             />
           </div>
         )}

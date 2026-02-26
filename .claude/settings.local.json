@@ -19,7 +19,8 @@
       "Bash(node scripts/check-dupes.js)",
       "Bash(sed 's/\"\"//g')",
       "Bash(sed 's/\"\": \\\\[//')",
-      "Bash(npx next lint --file lib/conflict-detection.ts --file components/ConflictFinder.tsx)"
+      "Bash(npx next lint --file lib/conflict-detection.ts --file components/ConflictFinder.tsx)",
+      "Bash(python3 -m json.tool)"
     ],
     "deny": [],
     "ask": []
