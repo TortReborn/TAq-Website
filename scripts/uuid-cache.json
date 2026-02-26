@@ -1,0 +1,3342 @@
+{
+  "b250f587-ab5e-48cd-bf90-71e65d6dc9e7": {
+    "name": "Idiot Co",
+    "prefix": "ICo"
+  },
+  "083919a0-9b24-406e-8336-a95e521637eb": {
+    "name": "ForsakenLaws",
+    "prefix": "FKL"
+  },
+  "1199115c-780f-459f-8ffd-6acef91ba8a1": {
+    "name": "The Simple Ones",
+    "prefix": "ILQ"
+  },
+  "74c65ea5-9095-4709-bacd-be336b6b84fd": {
+    "name": "Empire of TKW",
+    "prefix": "ETKW"
+  },
+  "266c9cf8-df07-41b0-b927-ce3402b88abe": {
+    "name": "KongoBoys",
+    "prefix": "DUDE"
+  },
+  "cef53bae-dc42-46aa-8ccf-1b10d282b420": {
+    "name": "Titans Valor",
+    "prefix": "ANO"
+  },
+  "00ccf9d3-6670-4cd7-a447-f7fec684129d": {
+    "name": "Avicia",
+    "prefix": "AVO"
+  },
+  "adaf65a8-95db-4349-97b2-5c10753b1575": {
+    "name": "Profession Heaven",
+    "prefix": "PROF"
+  },
+  "0663657f-43e0-4255-af1b-e33fffcd8eae": {
+    "name": "Jasmine Dragon",
+    "prefix": "LEAF"
+  },
+  "194cfad7-4cca-4fde-8760-e42760f9c3d9": {
+    "name": "Empire of Sindria",
+    "prefix": "ESI"
+  },
+  "ee860b7c-9a1d-49cf-9f19-ab673ba0f23b": {
+    "name": "Sequoia",
+    "prefix": "SEQ"
+  },
+  "8748c576-7afd-4dc9-ad47-0cf6ee50ed54": {
+    "name": "Infurnace",
+    "prefix": "FURN"
+  },
+  "0dd24dcc-370c-4e27-a1b4-2dfa92e76667": {
+    "name": "Aequitas",
+    "prefix": "Aeq"
+  },
+  "ddbdac33-9f3c-4e25-af92-2071d127a246": {
+    "name": "The Rat Colony",
+    "prefix": "RATC"
+  },
+  "f6e6ce24-c818-4ccc-8b8e-94f45fe1eb69": {
+    "name": "Black Fangs",
+    "prefix": "BFS"
+  },
+  "0917114c-7dd4-434a-94dc-08074e4f0c75": {
+    "name": "Montes",
+    "prefix": "Mons"
+  },
+  "d30ed6c3-10cd-4745-9981-aa3f8ba21577": {
+    "name": "Fruman Bee",
+    "prefix": "FUB"
+  },
+  "f488016a-3b89-4844-a5dd-42746843e201": {
+    "name": "NexusRolly Love",
+    "prefix": "ikun"
+  },
+  "749c4943-0335-459c-85b3-43c0113cde50": {
+    "name": "YuChaYuan",
+    "prefix": "YCY"
+  },
+  "705c25a5-7fb3-4977-be26-099e43798a4c": {
+    "name": "Chiefs Of Corkus",
+    "prefix": "HOC"
+  },
+  "b715e57f-3ca9-4e92-bcf1-0d3ca3dbc0e7": {
+    "name": "The Villagers",
+    "prefix": "VILL"
+  },
+  "d4b114c8-09c1-4467-ad48-fd81f00a8e80": {
+    "name": "Germany",
+    "prefix": "DEU"
+  },
+  "e9dccf27-7082-4ca6-8d07-e06e3edd9b61": {
+    "name": "Yogurt Gang",
+    "prefix": "YOG"
+  },
+  "207cb368-bf32-4355-835d-080888775b28": {
+    "name": "Eternal Eclipse",
+    "prefix": "ECI"
+  },
+  "5f33df86-ab1e-43fc-93fe-74a565ac95f4": {
+    "name": "Walrus HQ",
+    "prefix": "WHQ"
+  },
+  "a2d55476-bd81-4b41-9312-3ee7c5ad5864": {
+    "name": "Vanerian Order",
+    "prefix": "VaOr"
+  },
+  "5794ca7a-6445-433a-85dc-206ec7a63940": {
+    "name": "Annihlation Corporation",
+    "prefix": "ANNH"
+  },
+  "2b72c14b-a7c3-4bc2-9e83-92465f1375fd": {
+    "name": "Taberna Hispana",
+    "prefix": "Hisp"
+  },
+  "ffef9632-be4d-4695-825e-9bfd5b7c635f": {
+    "name": "Extort Vortex",
+    "prefix": "ExV"
+  },
+  "2e5eda90-d9ca-49d3-b5f2-7301316bedf2": {
+    "name": "TheBovemistSociety",
+    "prefix": "BSoB"
+  },
+  "be976605-2b5c-4c65-8a86-a269366e6a27": {
+    "name": "Forgotten Library",
+    "prefix": "FGL"
+  },
+  "b20bc478-019a-4989-8847-9766485a2fb0": {
+    "name": "Cest La Gare",
+    "prefix": "gare"
+  },
+  "772c28e2-c02d-460f-8fed-4a222ed249db": {
+    "name": "Moca on Top",
+    "prefix": "Lovu"
+  },
+  "f1b9c1a8-1fdb-4faf-9840-db684107e94f": {
+    "name": "Somniphobia",
+    "prefix": "snoz"
+  },
+  "54b9f830-495c-42bc-a74f-ad89773f0255": {
+    "name": "Alchemysthicalia",
+    "prefix": "ALCH"
+  },
+  "2f5671c7-0fc8-4503-87fd-651d25db996a": {
+    "name": "The Aquarium",
+    "prefix": "TAq"
+  },
+  "34948b4d-9a9b-4c32-a4c8-2db2989f46f6": {
+    "name": "theabearclan",
+    "prefix": "HEB"
+  },
+  "7adcd09d-23a7-4fd4-a582-4be4f0e35dd4": {
+    "name": "IT Department",
+    "prefix": "DENY"
+  },
+  "ca55489b-eaf0-4305-a8b3-1ec950ab536a": {
+    "name": "Light Within",
+    "prefix": "LIWI"
+  },
+  "3500d9b1-8013-4dc9-bc1d-4d0e2acf91e1": {
+    "name": "guild of best",
+    "prefix": "GofB"
+  },
+  "eba84f7d-c9f8-45f9-91d4-0d080e6bb3cd": {
+    "name": "Galaxy Knights",
+    "prefix": "GNI"
+  },
+  "3343b290-d910-4de9-bd2a-ac89b9711cc2": {
+    "name": "Chemdah",
+    "prefix": "CHEM"
+  },
+  "c39a4636-1646-4b5a-88cc-a9a28b915c6a": {
+    "name": "Avaritia",
+    "prefix": "AVTA"
+  },
+  "e6aa0ba8-713c-4107-9492-861e2ba4814c": {
+    "name": "Tome Seeker",
+    "prefix": "WASD"
+  },
+  "1a8de0ee-9eef-42c3-9238-c6c5147370f5": {
+    "name": "Heavy Metal Viking",
+    "prefix": "RDR"
+  },
+  "02d32ee5-0ee7-465b-96eb-ccf68176e5dc": {
+    "name": "Paladins United",
+    "prefix": "PUN"
+  },
+  "407c30f0-93e9-46de-9b12-69266704ef66": {
+    "name": "The Solar Dawn",
+    "prefix": "SOLD"
+  },
+  "262b7e37-27d8-41e2-8703-6deaa29d0ab0": {
+    "name": "Remedy",
+    "prefix": "RDY"
+  },
+  "f4a7c258-1175-4312-b03c-55f4f80ef0ad": {
+    "name": "pinegouine",
+    "prefix": "ping"
+  },
+  "4119ea8b-1b55-4ffe-8ad9-3eadd3bdb50f": {
+    "name": "Emperial Legion",
+    "prefix": "LGI"
+  },
+  "4c29b9cb-574e-4689-a382-83d056bec5f6": {
+    "name": "laput",
+    "prefix": "LPT"
+  },
+  "30d5ac5a-33b8-417d-841b-ba138fe1efb3": {
+    "name": "Who is",
+    "prefix": "Blud"
+  },
+  "45ed125f-05cf-4756-aeef-a9838b178d91": {
+    "name": "RedRoses",
+    "prefix": "RRo"
+  },
+  "4439f200-e6e1-40f8-aa39-fbde88807683": {
+    "name": "Gamer",
+    "prefix": "ZTG"
+  },
+  "75e76b66-e889-42c7-8c6e-63fff35f8e1a": {
+    "name": "Yorozuya",
+    "prefix": "YRZY"
+  },
+  "c0010c96-4c53-4ae4-beb2-e01ec15c654a": {
+    "name": "TheBestGuildEver",
+    "prefix": "NEJ"
+  },
+  "228e6ec8-9b53-48e0-ac2f-8ed1bffe0a33": {
+    "name": "Dark Brotherhood",
+    "prefix": "DbH"
+  },
+  "af9464b5-e278-4c32-8a09-891ad9c5cfcd": {
+    "name": "Fried Delights",
+    "prefix": "DLF"
+  },
+  "14ae675b-555b-4c1e-bed1-970c6fc3faed": {
+    "name": "Bagels of Hope",
+    "prefix": "BoH"
+  },
+  "e20e1ad3-7a22-4fd4-9af1-27220cd52d44": {
+    "name": "Fruit",
+    "prefix": "Bskt"
+  },
+  "23424448-34c1-4dfd-9862-1166916f5b7e": {
+    "name": "TW guild",
+    "prefix": "RFV"
+  },
+  "33491fd3-7ba4-4e4a-add5-b71fb571f778": {
+    "name": "Die Kluft",
+    "prefix": "Klft"
+  },
+  "a0fb6f87-6cc0-4eae-a480-8f6107353b66": {
+    "name": "Scolopax Rusticola",
+    "prefix": "UUNO"
+  },
+  "8ed63481-3c00-4570-a84f-91965f5a11f6": {
+    "name": "TheButteryWarriors",
+    "prefix": "TBUH"
+  },
+  "d6e84b26-10f5-4d5e-ba72-f7a2028197ef": {
+    "name": "TheBeeteryWarriors",
+    "prefix": "TBUZ"
+  },
+  "0212a583-0ebe-4c61-960f-708eb5c3c0fd": {
+    "name": "REROL",
+    "prefix": "ROL"
+  },
+  "e61ff2a1-5bca-4c68-98c1-674e63c80389": {
+    "name": "Empire of The Eclipse",
+    "prefix": "EOTC"
+  },
+  "66bb5aa3-8406-4c50-974e-d01b63fad33e": {
+    "name": "Having Fun",
+    "prefix": "sDew"
+  },
+  "c019d096-c7dd-43d2-8c20-3da88d2ca303": {
+    "name": "The Nameless Samurai",
+    "prefix": "TNSR"
+  },
+  "4f434df0-87b0-4a31-8bd4-83a6b5cd02f7": {
+    "name": "TruthSworD",
+    "prefix": "Tsd"
+  },
+  "0dabae1b-5e38-42b4-a66d-67ff620fb22a": {
+    "name": "WynnFurs",
+    "prefix": "furi"
+  },
+  "0f7b1c01-4bb2-44c1-9662-a8178382f7df": {
+    "name": "Shikanokers",
+    "prefix": "NKT"
+  },
+  "691ded27-4996-4f52-b47e-0b7a389abbad": {
+    "name": "Kivotos",
+    "prefix": "KVTS"
+  },
+  "42e3829b-f2dd-4a1d-9632-cfabb2250305": {
+    "name": "Oceans Respite",
+    "prefix": "Lull"
+  },
+  "6a73d117-f93a-44f2-8e72-7093355b26d4": {
+    "name": "inoritaku",
+    "prefix": "pray"
+  },
+  "a544673d-6692-4bb6-b39f-e37f24d32caa": {
+    "name": "Skibidi",
+    "prefix": "SKBD"
+  },
+  "6173bddd-4b56-4fc6-a2d9-52d2dd69e43a": {
+    "name": "Crafteria",
+    "prefix": "CRFT"
+  },
+  "e9058d35-9e4c-4a75-b5cd-1a495631829b": {
+    "name": "Gone Fishin",
+    "prefix": "Tuna"
+  },
+  "ec5d2e5c-abec-41c3-a21f-2f159c446b77": {
+    "name": "Moongus Village",
+    "prefix": "MGV"
+  },
+  "494bff4f-3e3e-47c1-87d8-65521cf2d2a0": {
+    "name": "Imperial",
+    "prefix": "Imp"
+  },
+  "acbf7268-4708-4b67-897f-de6957b4fb18": {
+    "name": "The Akuma",
+    "prefix": "dest"
+  },
+  "4171df5f-2621-4146-b754-c9328ef4e4c7": {
+    "name": "Cat Cafe",
+    "prefix": "MEWO"
+  },
+  "77f5493a-261e-4e7c-9a89-96ce8b71b2af": {
+    "name": "Quality Assurance",
+    "prefix": "Bugs"
+  },
+  "0868eb68-1a8a-4364-bfcb-ca878fd4fba5": {
+    "name": "Golden Legion",
+    "prefix": "GLN"
+  },
+  "a4eba65b-7398-4a21-82c6-5d35eac07315": {
+    "name": "Meltan Guild",
+    "prefix": "MELT"
+  },
+  "e5fce60b-3b30-47cd-916b-770471429425": {
+    "name": "Wybels Order",
+    "prefix": "WSO"
+  },
+  "9ebda980-5551-4cc3-8bf7-85608aa49965": {
+    "name": "moss LLC",
+    "prefix": "moss"
+  },
+  "ebef9965-c2d1-44ad-825c-0427d79bc1d4": {
+    "name": "Astral Divinity",
+    "prefix": "Vidi"
+  },
+  "6424ca09-11d7-43cc-aba2-3057aa21fed6": {
+    "name": "Opus Maximus",
+    "prefix": "OpM"
+  },
+  "a02944c7-2ade-40ae-abce-d435a59236ae": {
+    "name": "OnPaperItWorks",
+    "prefix": "Hypo"
+  },
+  "02c40852-8e3c-4dcd-a9ab-c5bc233281e0": {
+    "name": "Bosnian Hitmen",
+    "prefix": "BoHm"
+  },
+  "f767a9d0-9ebc-46d8-9c72-8ab50d5897aa": {
+    "name": "Plebjes League",
+    "prefix": "JKV"
+  },
+  "cb92dfe8-939d-4ee5-8358-abadaabb8f30": {
+    "name": "LittleBunny Land",
+    "prefix": "LBL"
+  },
+  "0101f083-1278-49bb-a442-1fcf8a472d3b": {
+    "name": "Amazonia",
+    "prefix": "AMZA"
+  },
+  "f43e4209-f039-4883-994d-2a34c1ad720f": {
+    "name": "Clear Skies",
+    "prefix": "Skye"
+  },
+  "bd1c33c2-af0c-43a7-b7fe-2cc8a4fe0349": {
+    "name": "Cryo Stasis",
+    "prefix": "CrS"
+  },
+  "7e7e172d-d87d-4bd8-9d59-d013a9be5b4e": {
+    "name": "The Mystic Void",
+    "prefix": "TMV"
+  },
+  "d6812ea4-2461-4309-a2cb-e167d784c3d6": {
+    "name": "BWOMP",
+    "prefix": "BWMP"
+  },
+  "f490913a-b348-415e-9431-a9316e201994": {
+    "name": "RabbitHouse",
+    "prefix": "Maya"
+  },
+  "9c544432-af25-4e7d-9962-5c39c1f8f0a8": {
+    "name": "Brick Nation",
+    "prefix": "BRCK"
+  },
+  "d1acee6d-fec3-48a1-8179-b200ace1b755": {
+    "name": "Thyrsus",
+    "prefix": "Tyrs"
+  },
+  "8865d2e3-5333-445a-99fb-658aa0ec2f99": {
+    "name": "Piltover",
+    "prefix": "PILT"
+  },
+  "2cf2e37f-660e-4109-97c1-702d12935ebc": {
+    "name": "Unemployed Insurance Benefits",
+    "prefix": "UIB"
+  },
+  "a85ce314-5f98-4cb7-bfaf-0f66fa8e6026": {
+    "name": "Doggc",
+    "prefix": "DOGC"
+  },
+  "130f19ba-807c-413c-8a1d-2a6a96c448b1": {
+    "name": "Empire Of Crimson",
+    "prefix": "EOCR"
+  },
+  "80cddda3-89da-41b8-bcee-ba98c194548d": {
+    "name": "StarWalkers",
+    "prefix": "SWK"
+  },
+  "a216623b-9d9c-4df0-a6f0-3fd57bc508d6": {
+    "name": "Ottoman Empire",
+    "prefix": "OTTO"
+  },
+  "8b438efe-ac6c-4160-87d3-5748fc3f871a": {
+    "name": "Thalion Alliance",
+    "prefix": "THMA"
+  },
+  "14a08447-285f-43d3-b7d6-7fda23d47e78": {
+    "name": "Wynncraft Knight",
+    "prefix": "WHK"
+  },
+  "7b56007a-04a1-4d22-b0e7-3d7ddbfa1ef1": {
+    "name": "HellDivers",
+    "prefix": "HDI"
+  },
+  "774ed3c0-8f05-4d59-97bc-857800d060b4": {
+    "name": "Never Settle",
+    "prefix": "NVRS"
+  },
+  "68282d51-fe83-40d7-ba83-33d6286a7669": {
+    "name": "Dropped Soap",
+    "prefix": "SOAP"
+  },
+  "765849a5-4f85-4dd8-98b0-237cfaaf1213": {
+    "name": "gugure kasu",
+    "prefix": "GGL"
+  },
+  "4f6565a5-245d-42d6-a824-0c002d75de61": {
+    "name": "dumb",
+    "prefix": "dumb"
+  },
+  "204195a2-9ec7-406b-93f1-d0e0be4a0c04": {
+    "name": "hawkers",
+    "prefix": "HWKR"
+  },
+  "6041427d-f592-4e83-aefc-cc8ad279a147": {
+    "name": "Ecliptic Awakening",
+    "prefix": "ECP"
+  },
+  "c11b203f-1700-4195-9d95-959a0156c048": {
+    "name": "Major lovers",
+    "prefix": "IOYR"
+  },
+  "e9e2386f-3293-4770-946c-88047e83252c": {
+    "name": "AARGH",
+    "prefix": "ARGH"
+  },
+  "629daa1e-a9f6-4aed-ac03-b91b23f73687": {
+    "name": "BED Clan",
+    "prefix": "BEDC"
+  },
+  "360fe2ba-6333-45f2-ab3c-479b8bced6e6": {
+    "name": "Big Money Ballin",
+    "prefix": "MULA"
+  },
+  "984879c6-ac2f-4e16-a6f3-2ce225fbaa96": {
+    "name": "Yukinomori",
+    "prefix": "YKN"
+  },
+  "9ec99e81-6a2a-4bb5-9ac6-b886bde18c90": {
+    "name": "Imbecis",
+    "prefix": "imbc"
+  },
+  "7ea26493-09c9-43ec-983a-de07e316a92a": {
+    "name": "The Royal Army",
+    "prefix": "ZETA"
+  },
+  "fb212aa8-0943-446b-931a-a0b104ab25c1": {
+    "name": "Sigmaloids",
+    "prefix": "Gvid"
+  },
+  "c49e65ad-230f-4121-814f-87094c18518d": {
+    "name": "Torment of Mutes",
+    "prefix": "ToMu"
+  },
+  "5f723f11-10dc-4328-bb60-b30dae20bfdf": {
+    "name": "The Resonance",
+    "prefix": "REG"
+  },
+  "10de4eb0-4daa-47ff-baab-1c8598255785": {
+    "name": "African Soldiers",
+    "prefix": "BLAK"
+  },
+  "7027173f-43e1-47cd-a6c2-1ac3092e72ba": {
+    "name": "Dumpster",
+    "prefix": "Dump"
+  },
+  "a22c51f6-3b96-4d74-aa0b-b39c58f1ccf7": {
+    "name": "Woodpeckers",
+    "prefix": "Ped"
+  },
+  "32e950f2-d2f4-41c3-8565-cff7692baef8": {
+    "name": "Arachnid",
+    "prefix": "kumo"
+  },
+  "8fb81779-2af4-492f-aae8-c6971840d0df": {
+    "name": "Talismans",
+    "prefix": "TALS"
+  },
+  "c6ff32b2-3b31-40c9-9238-7da649a75042": {
+    "name": "DawnEater Serpents",
+    "prefix": "DaSp"
+  },
+  "8607f97b-b96d-4867-b55a-863574588888": {
+    "name": "Embers of destiny",
+    "prefix": "DSTY"
+  },
+  "a7af2bf5-4299-47f9-a9ff-19e7c1297122": {
+    "name": "Overseer of Wynn",
+    "prefix": "TEye"
+  },
+  "07e122ea-1874-4595-9010-4b09cbc9a40a": {
+    "name": "OffiCrew",
+    "prefix": "ALEX"
+  },
+  "ca2319cb-6638-45df-ac87-be6bebb87a4d": {
+    "name": "The Roman Empire",
+    "prefix": "Mars"
+  },
+  "19c6a0ee-80d9-4b63-b3f2-b3343c94d6fb": {
+    "name": "Dolphin Emulator",
+    "prefix": "DEMU"
+  },
+  "b86178ae-6ddb-4e19-803c-d87042380296": {
+    "name": "The Jam Factory",
+    "prefix": "JAMF"
+  },
+  "2a9fc9e1-d8d6-4f6d-9a0e-7c96c628c9e6": {
+    "name": "Anime Lovers",
+    "prefix": "Zamn"
+  },
+  "04921e66-5491-4317-ac56-8555ce29de0f": {
+    "name": "WeAreInfer",
+    "prefix": "MAMS"
+  },
+  "d0fc59c4-68d0-45a1-a26f-f792deed0413": {
+    "name": "Ragni",
+    "prefix": "RGD"
+  },
+  "520b252f-04c0-4a51-94ef-d8e1bf6677ef": {
+    "name": "The Architects",
+    "prefix": "aIMs"
+  },
+  "e95da31f-bd6a-416d-802b-0355724c1b22": {
+    "name": "Ower Sponge",
+    "prefix": "OWP"
+  },
+  "41bb4795-f7ea-46eb-8c45-058a905aa610": {
+    "name": "Japanese Gangz",
+    "prefix": "JAGZ"
+  },
+  "d96e1ae2-f0d0-45bc-8b92-e88139b93c88": {
+    "name": "TheDuskExplorers",
+    "prefix": "TDEs"
+  },
+  "0580bcf2-c974-4787-99e2-d05711858b9c": {
+    "name": "Hyper Studios",
+    "prefix": "HySt"
+  },
+  "9ba9539e-d3c5-46a5-8531-531bf701f03c": {
+    "name": "Renaissance",
+    "prefix": "ITLY"
+  },
+  "9da52aa0-266c-4ce4-880c-5d8c78b2a9e6": {
+    "name": "BOBA",
+    "prefix": "BOBA"
+  },
+  "936a9322-9b4d-4f6e-a145-173cafb57ca4": {
+    "name": "Hesperides",
+    "prefix": "HSP"
+  },
+  "8fd9a553-45bc-4b8d-ab1c-788d9182f7b3": {
+    "name": "Living in a society cats cute",
+    "prefix": "Ruwr"
+  },
+  "0b6cc5b6-f511-4527-94b6-7379a1675460": {
+    "name": "banana empire",
+    "prefix": "mleb"
+  },
+  "94e445a7-1a1e-4b63-9eba-6cf67b0214aa": {
+    "name": "oWHGo",
+    "prefix": "WHGs"
+  },
+  "1cdb7084-c721-4727-bda8-95cbefc08a62": {
+    "name": "TimeCity",
+    "prefix": "tmxt"
+  },
+  "6f1e973b-5f2e-49f2-9203-977983ec991d": {
+    "name": "BuggCraft",
+    "prefix": "BUGG"
+  },
+  "eac29c7a-1eb3-4bf2-8fd9-5d65c9925486": {
+    "name": "Apocalypse",
+    "prefix": "APX"
+  },
+  "8eedb694-e0ae-4196-9ceb-4d93ad80502f": {
+    "name": "International Union",
+    "prefix": "IURU"
+  },
+  "36ff5dff-c193-48d6-b747-3461a6fe309e": {
+    "name": "Squishmallow",
+    "prefix": "Sqm"
+  },
+  "72cdd728-18fb-4e97-82ec-b3746ef32c80": {
+    "name": "ImStrikingMyStaff",
+    "prefix": "ISMS"
+  },
+  "975ee0ad-6e50-4760-80c3-dfd3b162fe1e": {
+    "name": "NewEridu",
+    "prefix": "SSNE"
+  },
+  "175c16d9-fbb5-42b7-ade5-3ad45397e81d": {
+    "name": "Shadestepper btw",
+    "prefix": "BUFF"
+  },
+  "95303de8-74ec-4463-9214-b96e60cc2c3e": {
+    "name": "Silliness",
+    "prefix": "SILY"
+  },
+  "dc7a38fa-f7cb-47e4-a2bb-6c1384632622": {
+    "name": "Sins of Seedia",
+    "prefix": "SDU"
+  },
+  "0c38e0a7-8a01-40c1-bed4-28c5a0e545a8": {
+    "name": "The Void Syndicate",
+    "prefix": "VSI"
+  },
+  "c2cb97e5-5970-4d4d-8489-18a9c0d255a6": {
+    "name": "Kanaka",
+    "prefix": "Knck"
+  },
+  "8ad162d9-3bd4-4dbf-b188-33122130f99b": {
+    "name": "The Dawnbreak Dynasty",
+    "prefix": "TDbD"
+  },
+  "f0bb77db-688e-4ea3-923d-74a144baf1a4": {
+    "name": "Volcanism",
+    "prefix": "Volc"
+  },
+  "04592f37-c5e5-4807-a96f-bf190b97f6c9": {
+    "name": "Ave Mujica",
+    "prefix": "Doll"
+  },
+  "0d591221-7a0e-45f5-bc77-7af04e542d1e": {
+    "name": "The Guild",
+    "prefix": "TGLD"
+  },
+  "ab8361bd-23b6-4583-857c-c82300843df7": {
+    "name": "RtoVI",
+    "prefix": "RTVI"
+  },
+  "221efb28-7f93-4d5d-b219-9ddf43f7418b": {
+    "name": "Eden",
+    "prefix": "EDN"
+  },
+  "409d411d-80bb-43a1-a2a2-4ee513a271ee": {
+    "name": "Rebellion of Wybels",
+    "prefix": "RoWs"
+  },
+  "cc1157d0-cd70-4d5c-8a68-0cc6ff75e51c": {
+    "name": "The Whimsical Warlords",
+    "prefix": "TWHW"
+  },
+  "86a3fdde-9dec-414e-a3f8-3da660b64cc6": {
+    "name": "Coven of Fire",
+    "prefix": "SASW"
+  },
+  "d7b4f8a4-502f-413a-a422-ce37a5055d59": {
+    "name": "Orcadia",
+    "prefix": "ORCS"
+  },
+  "e82143ae-31a2-4588-9504-0e0eeb12e394": {
+    "name": "The Frog Council",
+    "prefix": "FrgC"
+  },
+  "b6b9e75f-32aa-48e0-9560-ee5172513224": {
+    "name": "Wars Learning Experiment",
+    "prefix": "WALE"
+  },
+  "ce438aa8-2228-42eb-9284-f18f667fb585": {
+    "name": "Toon Platoon",
+    "prefix": "TOON"
+  },
+  "3a1782a7-21ac-4825-a315-7e64c3894f30": {
+    "name": "Cow",
+    "prefix": "Cow"
+  },
+  "02e9bb8e-ec02-40e8-b35e-19425ba8f917": {
+    "name": "I didnt know I didnt want to",
+    "prefix": "ECPU"
+  },
+  "77fe2851-1e3b-4b78-9a95-6295f1ead642": {
+    "name": "Polish Hussars",
+    "prefix": "PLHR"
+  },
+  "92a8e623-1437-4be2-b098-aae1516ebec4": {
+    "name": "Shy Guys",
+    "prefix": "SHYG"
+  },
+  "4bef7912-5323-4360-8370-6829038e0e09": {
+    "name": "oh god my ping",
+    "prefix": "NOPG"
+  },
+  "2234ffb2-7b84-45dc-b416-909cda935e08": {
+    "name": "Fellowship of Wynn",
+    "prefix": "FoWN"
+  },
+  "0c5f6d49-ebcb-47b2-80bc-90d32ec3167b": {
+    "name": "The Emperors New Guild",
+    "prefix": "PAWN"
+  },
+  "11bd7b14-6d93-4f42-9020-2b806bac0e06": {
+    "name": "Caffeine",
+    "prefix": "IzI"
+  },
+  "8bc20f49-068e-4283-bc92-eabb648c82a3": {
+    "name": "Waffletonia",
+    "prefix": "WAFL"
+  },
+  "3ba84923-9c89-4fa2-b708-1474320f5d57": {
+    "name": "Carnifex",
+    "prefix": "CFX"
+  },
+  "321e89a2-55bd-408f-bc7b-609caf175abe": {
+    "name": "Band of Jolly Immortal Raiders",
+    "prefix": "BJIR"
+  },
+  "2e693566-f10f-49d1-9fbf-6cfb9f8c4d8a": {
+    "name": "Delete Skyblock",
+    "prefix": "DLSB"
+  },
+  "a88f6702-ade4-42ea-802e-f084257e0bf9": {
+    "name": "TerraLune",
+    "prefix": "UTL"
+  },
+  "e3995988-dcac-4fd9-bd71-65361f760c13": {
+    "name": "Fighterr",
+    "prefix": "FGTR"
+  },
+  "e2799c86-c6db-489c-a24a-a362a628dadc": {
+    "name": "JagerMeisters",
+    "prefix": "DEER"
+  },
+  "dd6622d6-2e5b-4745-9b8c-0edee0963c6a": {
+    "name": "TVietNam",
+    "prefix": "VNP"
+  },
+  "7575b64c-5d0d-4185-82c5-1e6932bc48fa": {
+    "name": "RingeKris",
+    "prefix": "RiKr"
+  },
+  "1f22199f-5af8-492c-be54-4a8014d829b9": {
+    "name": "Templeoflegend",
+    "prefix": "TPL"
+  },
+  "f3dc2021-6b77-4da1-9808-318c275b13f2": {
+    "name": "kripaars",
+    "prefix": "krip"
+  },
+  "08b4559a-a4c4-4f50-832d-58f017feb2bf": {
+    "name": "Binkus",
+    "prefix": "BINK"
+  },
+  "4ed77b38-7652-43df-a2f8-6ba7af8e1da8": {
+    "name": "KOSENwc",
+    "prefix": "KOSN"
+  },
+  "91e58f2e-b824-42c6-953b-91896673912d": {
+    "name": "Quetzalcoatl",
+    "prefix": "QTZ"
+  },
+  "dcc8949b-e0b1-4e83-ba0c-e6ec1f356c25": {
+    "name": "Interrupted",
+    "prefix": "Intt"
+  },
+  "6b647710-f740-4bd4-988f-b29029c57542": {
+    "name": "Xenaris",
+    "prefix": "XNS"
+  },
+  "f708c8bb-7a06-4141-a6a7-0cd19a3e250f": {
+    "name": "Avos Ascendants",
+    "prefix": "AVOz"
+  },
+  "d97a62c4-b9bd-4d55-a265-ea0e656acc90": {
+    "name": "CasualEnterprise",
+    "prefix": "CEN"
+  },
+  "e8b03783-73e7-4786-9d6c-b0d6af7cfe83": {
+    "name": "enjoy your presence",
+    "prefix": "EYP"
+  },
+  "98911c56-a4f3-40f1-a55c-c63586759511": {
+    "name": "gu disband",
+    "prefix": "CFFG"
+  },
+  "2b717c60-ae61-4073-9d4f-c9c4583afed5": {
+    "name": "less than three",
+    "prefix": "lxve"
+  },
+  "be91f1b0-746b-4d86-ac0f-abe9b8b0e63c": {
+    "name": "DaddyPlease",
+    "prefix": "Papi"
+  },
+  "30bcaf4f-9244-4c80-8a5d-67f42a931d83": {
+    "name": "Angels Of Eternal",
+    "prefix": "AoE"
+  },
+  "4e993771-7fa1-4bf0-a92e-4f14fcb72a34": {
+    "name": "YoloTeamBandits",
+    "prefix": "YTB"
+  },
+  "7f630e2d-a34e-40d7-98ea-ba270d4859ff": {
+    "name": "optima",
+    "prefix": "BEST"
+  },
+  "f414c189-c46c-4672-aa5b-b89c70223155": {
+    "name": "Senbonzakura",
+    "prefix": "Senb"
+  },
+  "b023c355-09fd-4fbe-85de-d41815b8d20a": {
+    "name": "Mythril Requiem",
+    "prefix": "MYRE"
+  },
+  "4c4988bb-4c60-4b2a-831a-acf4314125d4": {
+    "name": "sorry im bored",
+    "prefix": "SNKR"
+  },
+  "7d427e39-b1cd-41b9-859d-e72bf5e96225": {
+    "name": "Angry Cat Noises",
+    "prefix": "CatN"
+  },
+  "da4a39af-0e15-495c-9a30-4828459c4c12": {
+    "name": "Curry Chicken Balls",
+    "prefix": "CCBs"
+  },
+  "0f1b7854-53ef-45a4-b735-c24d1dde25ec": {
+    "name": "Ditto",
+    "prefix": "Dito"
+  },
+  "c51db976-dffd-4539-b5e6-3f511bb6babe": {
+    "name": "KantyrCats Alliance",
+    "prefix": "KISA"
+  },
+  "14078bca-1b04-4879-a94d-21c61451c2f7": {
+    "name": "John Wick",
+    "prefix": "WICK"
+  },
+  "f4230667-6c50-4c31-8eb9-60be92000c34": {
+    "name": "The Hi Republic",
+    "prefix": "WLLE"
+  },
+  "6ce0edb1-de50-4c5f-9a74-8d02d3475ce5": {
+    "name": "Based Department",
+    "prefix": "COOL"
+  },
+  "03575314-6607-49de-b129-a7d36a68b309": {
+    "name": "The Goatherd",
+    "prefix": "gthd"
+  },
+  "1757e143-f912-44e9-9b9d-855ef1f71c99": {
+    "name": "SICA Team",
+    "prefix": "FEU"
+  },
+  "bb5dacca-9ed4-4018-8b17-70a931ee6ddb": {
+    "name": "The Gambling Addicts",
+    "prefix": "TGAS"
+  },
+  "3d4e41b1-78d0-4138-99ef-699e3cf274ef": {
+    "name": "The Visceral Farmers",
+    "prefix": "TVF"
+  },
+  "2affb4fa-4c7d-4c54-9fd1-e4468bfb7cfc": {
+    "name": "baby bears home",
+    "prefix": "BCX"
+  },
+  "77a907e9-c39c-4b41-aba2-5b597a477185": {
+    "name": "Country Roads",
+    "prefix": "CYS"
+  },
+  "111e95b9-f9f3-4012-8308-0a3b0f8ced4e": {
+    "name": "TWAG",
+    "prefix": "WPH"
+  },
+  "2923abd0-4325-4571-9d77-28a4c758fbf8": {
+    "name": "Hallowed",
+    "prefix": "LLX"
+  },
+  "f7f7ac07-ac8e-4a35-8b3e-c92ce6f4a652": {
+    "name": "Shoebox",
+    "prefix": "Shoe"
+  },
+  "dae461ee-306e-40de-82f9-7b0ea73b0c06": {
+    "name": "New Dawn",
+    "prefix": "SDCY"
+  },
+  "556c62ee-b821-4118-a5e2-d60d88ba72c2": {
+    "name": "RubyChan Nani ga suki",
+    "prefix": "HAII"
+  },
+  "94b0e01a-f57d-4002-99a5-3eeee1fc68ae": {
+    "name": "RadiantMothAllBindings",
+    "prefix": "RMAB"
+  },
+  "8fb43209-7daf-431b-8e98-0479ba5c113e": {
+    "name": "The Empire Of Shir",
+    "prefix": "TEOS"
+  },
+  "98010792-540e-426c-bd40-4300c7191529": {
+    "name": "Live In Scrap",
+    "prefix": "LISC"
+  },
+  "2d4aa35b-85c8-4c0f-9c37-bc5232fe5fc0": {
+    "name": "The Orbs Turned Dark",
+    "prefix": "TOTD"
+  },
+  "c51b06c8-410d-4ba2-bdb2-c8c360b3a0a8": {
+    "name": "Platypus Empire",
+    "prefix": "PEM"
+  },
+  "24c190f0-288b-49da-afcd-fd0133c17cb7": {
+    "name": "REDSTARDS",
+    "prefix": "PULA"
+  },
+  "c8a250cb-612e-44af-8339-cdc46aa1913a": {
+    "name": "Locally Located Locals",
+    "prefix": "Locl"
+  },
+  "459bd9a1-e6a8-4466-9f32-73bc04cb8caf": {
+    "name": "Japan North Eastern Army",
+    "prefix": "JNEA"
+  },
+  "26f113f6-5f9f-45a5-9133-511ccc93b451": {
+    "name": "autismCorp",
+    "prefix": "auco"
+  },
+  "9cff79a4-5ff6-4389-936f-1253503691e1": {
+    "name": "ITI Corporation",
+    "prefix": "ISIT"
+  },
+  "6cdcfe61-d740-40a9-bef7-16fa035752c6": {
+    "name": "House of the Crimson Phoenix",
+    "prefix": "HCRP"
+  },
+  "2667701f-36d7-4be2-a42a-2ca7bac279e6": {
+    "name": null,
+    "prefix": null
+  },
+  "c8dd0a5f-f982-483e-891a-278822db1dda": {
+    "name": null,
+    "prefix": null
+  },
+  "5ce98531-627b-4181-93ee-8a9ebe560ad0": {
+    "name": "fr fr no cap",
+    "prefix": "QZZ"
+  },
+  "17d6c19e-da0b-4af9-85c7-6162516cb8a1": {
+    "name": "Flames of Fear",
+    "prefix": "Link"
+  },
+  "75ba3bb7-d220-42a8-abd5-abad0b6a7def": {
+    "name": "Tea The Party",
+    "prefix": "TTPT"
+  },
+  "15192250-9f7b-49b0-86d9-4146c940b775": {
+    "name": "Quantization",
+    "prefix": "QUAN"
+  },
+  "b50ba54c-c97d-436d-9e81-9e596a3e1377": {
+    "name": "Legion of Rumble",
+    "prefix": "LFR"
+  },
+  "f92ec173-0440-4845-ae4a-3bd80bdbd7a7": {
+    "name": "Tempest Legion",
+    "prefix": "TLX"
+  },
+  "81616aaa-6393-4411-b964-a1ba09a82500": {
+    "name": "Akumas Paradise",
+    "prefix": "IYO"
+  },
+  "7f8380ed-6688-4f63-a412-46bab25a83d8": {
+    "name": "i luv snic",
+    "prefix": "kers"
+  },
+  "30d14dff-480b-4e86-a579-b9087990d352": {
+    "name": "joint",
+    "prefix": "join"
+  },
+  "4d1b8c8e-ce51-4eaf-868f-39471f7668c8": {
+    "name": "Dungeons and Dragons",
+    "prefix": "DNDW"
+  },
+  "56f7d3d2-04eb-4492-a0d3-bf2f50458be7": {
+    "name": "dinkle winks",
+    "prefix": "zeb"
+  },
+  "b9308f5f-6d85-4d70-8420-8c1673b0526b": {
+    "name": "The Clowns",
+    "prefix": "MALD"
+  },
+  "d9d1f3e2-1f4c-482a-8894-74c0ff7b8dac": {
+    "name": "Boat Gang",
+    "prefix": "BoGa"
+  },
+  "8e8cb70e-dff6-4b14-b4f5-3287578c7dff": {
+    "name": "Seekers of Sylva",
+    "prefix": "Sylv"
+  },
+  "05354061-4288-4904-921c-512a84dc5c40": {
+    "name": "IceBlue Team",
+    "prefix": "IBT"
+  },
+  "5e419136-558f-4e91-931a-c15e86c889e8": {
+    "name": "Die Zigeuner",
+    "prefix": "Roma"
+  },
+  "54322e72-4201-452a-83d9-c57aa4354a12": {
+    "name": "Lemon Ice",
+    "prefix": "Lic"
+  },
+  "59122c6f-cc5e-4941-b1fe-b50f0dab3510": {
+    "name": "JFZN JAPAN",
+    "prefix": "JFZN"
+  },
+  "dfc33fe9-e31c-4dce-86b3-e83f0e12bcf2": {
+    "name": null,
+    "prefix": null
+  },
+  "3743a54c-f013-4e5c-92c8-a936eb8c55c0": {
+    "name": "Pirates of the Black Scourge",
+    "prefix": "SCRG"
+  },
+  "99e314b5-5310-4ccf-8951-2b47a42caa68": {
+    "name": "Kool Kid Guild",
+    "prefix": "KKS"
+  },
+  "3feb93ed-5c54-4dd3-9099-31fb29d01ce4": {
+    "name": "Wynnian Order",
+    "prefix": "WYOR"
+  },
+  "33a3b9e5-e992-4906-9357-95e0e6523abe": {
+    "name": "Wynn Brasil",
+    "prefix": "WnBR"
+  },
+  "219360cb-bd6a-416d-981e-cf35c2582901": {
+    "name": "The Lexus",
+    "prefix": "Germ"
+  },
+  "519b8d0d-b487-4b60-b58d-f3a97ac2bfa5": {
+    "name": "Calvish",
+    "prefix": "bean"
+  },
+  "cf1c148f-f635-41f0-b6e9-b8e256c6748b": {
+    "name": "The Neskus",
+    "prefix": "NESK"
+  },
+  "ff8f2ead-00a1-4fee-b6bb-7440dd61c784": {
+    "name": "Mandible",
+    "prefix": "Boar"
+  },
+  "0d512ca7-02e3-4d22-817a-8c49f5b5a851": {
+    "name": "busted moments",
+    "prefix": "fuy"
+  },
+  "ce035122-411a-4b64-b772-a58b3531f089": {
+    "name": "Abyssals",
+    "prefix": "XSY"
+  },
+  "06b57fd2-978a-43a7-b9ee-be8813635d8b": {
+    "name": "The Memers",
+    "prefix": "DAM"
+  },
+  "ac2c5311-af94-4cc9-b998-066644ae2052": {
+    "name": "OrangeCube",
+    "prefix": "CBO"
+  },
+  "edb733c6-97e4-4b3f-8434-1608e2d78f37": {
+    "name": "Nest of Grootslangs",
+    "prefix": "GROT"
+  },
+  "25eab4e6-52d5-4ae7-9234-da9278f5d010": {
+    "name": "Order of the Scrunklies",
+    "prefix": "SCRK"
+  },
+  "237f6b8a-2fb4-4c8a-8425-c6d66e8f25b0": {
+    "name": "Starlight Sanctum",
+    "prefix": "Vega"
+  },
+  "22bbeb0e-6043-407f-9385-0203c1e0bfad": {
+    "name": "Nerfuria",
+    "prefix": "Nia"
+  },
+  "7f6d03ea-9946-4313-96f8-abae5a7a57a3": {
+    "name": "TangledSnake",
+    "prefix": "TdS"
+  },
+  "5c27a9ac-baaf-46be-b266-8ed1b13a81b9": {
+    "name": "Pixl Monday",
+    "prefix": "PXM"
+  },
+  "9e1c56bd-2e98-4733-a194-922e9b461ee1": {
+    "name": "Celestial Cartels",
+    "prefix": "CART"
+  },
+  "5c253294-d0b0-4f43-a9f7-de1aa393bc66": {
+    "name": "La Maison Acura",
+    "prefix": "Lama"
+  },
+  "4886c50e-8153-4db6-9d7e-2645f6914a66": {
+    "name": "Kombajn",
+    "prefix": "KOMB"
+  },
+  "2bf996ec-e008-4c62-9aaa-3cdc7da935dd": {
+    "name": null,
+    "prefix": null
+  },
+  "be37848e-aa65-4d2b-b7fe-d7c41012c45e": {
+    "name": "Zalleria",
+    "prefix": "ZLLR"
+  },
+  "c7559ba4-9cba-409d-8adc-415358611e3c": {
+    "name": "Meow Squad",
+    "prefix": "Cafe"
+  },
+  "6232ae9b-4c54-4a3a-ad36-13efd920542e": {
+    "name": null,
+    "prefix": null
+  },
+  "954a9d41-9e4f-4a18-afa2-e91023af99fd": {
+    "name": null,
+    "prefix": null
+  },
+  "c17d71f9-6fe9-427f-9f5d-68a60f15c0c7": {
+    "name": null,
+    "prefix": null
+  },
+  "2a9bbcc9-1da8-476a-9f8e-7991a8d5548a": {
+    "name": null,
+    "prefix": null
+  },
+  "5e2a4a3f-467b-4a0a-8d4f-b724b0c09125": {
+    "name": "Isekai Addicts",
+    "prefix": "ISE"
+  },
+  "d05353de-369f-48a1-950a-dfc254117fcb": {
+    "name": "LaMafiaDeRagni",
+    "prefix": "LMDR"
+  },
+  "227d3937-247e-4cd9-a2e2-f256efc0412c": {
+    "name": "sexy gods",
+    "prefix": "joel"
+  },
+  "21d7592e-64c2-41e9-b3de-d78fe2aacd79": {
+    "name": "Haven",
+    "prefix": "HAVN"
+  },
+  "4ab7c3a9-06c2-4c5d-ad48-ad1f35e1a4f2": {
+    "name": "i dont know",
+    "prefix": "kdi"
+  },
+  "d8b71106-85b8-430e-9f98-2e39a826ea8c": {
+    "name": "Vitalem",
+    "prefix": "Vita"
+  },
+  "6175ef18-2a03-43e3-92a4-e246c1b73c1f": {
+    "name": "The Broken Gasmask",
+    "prefix": "TBGM"
+  },
+  "f7569920-ff54-4b97-8037-afa9cec3bdcb": {
+    "name": "Shadow Dragons",
+    "prefix": "THSD"
+  },
+  "2c7e3d14-4690-47b6-a90d-1228a60665aa": {
+    "name": "HackForums",
+    "prefix": "Hax"
+  },
+  "2d9cfe72-6a9d-466f-ae23-7cd95e6b861f": {
+    "name": "CaliforNYA",
+    "prefix": "mrow"
+  },
+  "cafc105d-d6c6-49d5-80d7-b5befff962b8": {
+    "name": "The People Of Bloons Society",
+    "prefix": "TPBS"
+  },
+  "c521fe31-ea9e-4742-9370-0f28b7ec3caa": {
+    "name": "Average Hypixel Enjoyer",
+    "prefix": "Pipe"
+  },
+  "f08ba9b7-ab52-4218-8334-db6a2c2533ba": {
+    "name": "The Guard",
+    "prefix": "TGRD"
+  },
+  "24e60f7f-b223-4438-9141-f5269a64c1f9": {
+    "name": "Caelestis Iustitia",
+    "prefix": "CAES"
+  },
+  "e11f324b-644c-47ac-972f-4282501401ee": {
+    "name": "Some Dudes",
+    "prefix": "SDs"
+  },
+  "d5ff1715-495a-4ac1-993f-331530791a88": {
+    "name": "Paralya",
+    "prefix": "PRLY"
+  },
+  "4d5410b1-31f9-4326-856e-839e70eff286": {
+    "name": "Deep Rock Galactic",
+    "prefix": "KARL"
+  },
+  "8f5f4961-888c-490a-87d0-661d6b133347": {
+    "name": "DivineTroublemakers",
+    "prefix": "DiTm"
+  },
+  "787927f7-63fc-4c39-959b-968ff083779a": {
+    "name": "Immortal Light",
+    "prefix": "ILF"
+  },
+  "6109f062-645f-4ce2-9fac-7b39c87cd76c": {
+    "name": "Osu Nerds",
+    "prefix": "OSUS"
+  },
+  "d047243f-ca33-4c5c-9e81-1b83092bafc9": {
+    "name": "Sternum Maoists",
+    "prefix": "SNM"
+  },
+  "dd386421-a30b-45d8-bc45-014d974ae676": {
+    "name": "Teddy Bear Troop",
+    "prefix": "TTBT"
+  },
+  "f7e7cc4e-212d-422f-a3e6-744a8689b108": {
+    "name": "Guardians of Wynn",
+    "prefix": "GsW"
+  },
+  "cfa4d19a-bea1-41be-9c5a-aa88d59905bc": {
+    "name": "stupid ass guild",
+    "prefix": "HEMP"
+  },
+  "8997d6e7-83da-4e24-a6d5-df3c9e74523e": {
+    "name": "Fluffy Fools",
+    "prefix": "FFoo"
+  },
+  "ca1a9afa-7021-42a5-9027-49e52fd142c4": {
+    "name": "DivineDarkDragon",
+    "prefix": "SXX"
+  },
+  "beebcdf8-63e5-47a0-92b3-c5951bdb1a1b": {
+    "name": "The Mushroom Mobsters",
+    "prefix": "FUNG"
+  },
+  "4bae423e-0782-43ad-a2fb-0250c2da5e0b": {
+    "name": "Rodoroc",
+    "prefix": "EOR"
+  },
+  "db2467d0-78b0-4db2-9b1f-4b9bcd3c48bb": {
+    "name": "Archon",
+    "prefix": "ACON"
+  },
+  "da5208d8-9e0b-4d36-923a-991bc6e90c92": {
+    "name": "Gang of Fools",
+    "prefix": "FOOL"
+  },
+  "e508ada6-96d4-441e-afce-a81617c6abc9": {
+    "name": "leastfavorite",
+    "prefix": "lfav"
+  },
+  "28d343fa-0e3f-4fb5-a8fd-6f04ff806186": {
+    "name": "The World Government",
+    "prefix": "WGov"
+  },
+  "7aac34c3-7042-4bbc-8d5b-4fce43978b79": {
+    "name": "Franks Guild",
+    "prefix": "FRNK"
+  },
+  "887271b3-1d84-490c-86e7-1682b970d44b": {
+    "name": "Bullet Of Gods",
+    "prefix": "BOGs"
+  },
+  "fc064b79-0527-4334-9f6f-0015eaa37fa1": {
+    "name": null,
+    "prefix": null
+  },
+  "5e6122bf-2288-4e17-8cac-37f807e5d845": {
+    "name": "carzy",
+    "prefix": "crzy"
+  },
+  "95955064-5217-41f9-8893-37d840b18ada": {
+    "name": "Gabameno",
+    "prefix": "GBE"
+  },
+  "24af73b7-59e6-40d4-ae35-ca624c180862": {
+    "name": "Fruman Emissaries",
+    "prefix": "FRM"
+  },
+  "2b0389b3-4761-45f1-b3eb-ff562d8a4851": {
+    "name": "NERV",
+    "prefix": "NERV"
+  },
+  "75e9fb32-c389-4051-b79a-d4499d7c434d": {
+    "name": "Twisted Treeline",
+    "prefix": "ARAM"
+  },
+  "0cde4109-14c0-4c27-b74c-f43c42ad08bb": {
+    "name": null,
+    "prefix": null
+  },
+  "85afffb2-d7fe-4f71-bd77-f81c0d1ce629": {
+    "name": "Outlores",
+    "prefix": "OLAW"
+  },
+  "9101ab29-d61f-4f7b-933a-5a3f0786a5f2": {
+    "name": "Simple Life",
+    "prefix": "SLIF"
+  },
+  "268423ee-8a12-4006-8f2b-f878d1d24a19": {
+    "name": "Adwynnturers",
+    "prefix": "AWT"
+  },
+  "6e99293e-57c2-49a7-bfa3-aec0e56a8740": {
+    "name": "Hell Inhabitants",
+    "prefix": "HLIH"
+  },
+  "1c4cb747-a717-4b43-822b-b4036c7aaf1a": {
+    "name": null,
+    "prefix": null
+  },
+  "d2086de8-81a6-47ef-85e6-db8e405b5a02": {
+    "name": null,
+    "prefix": null
+  },
+  "044f6cd8-685d-407a-8d97-5a95b3ff0a1c": {
+    "name": null,
+    "prefix": null
+  },
+  "4d95cd2f-549c-4f55-89d0-2f2026e80091": {
+    "name": null,
+    "prefix": null
+  },
+  "71417dd9-481f-45b1-8482-16d036a2d4a0": {
+    "name": null,
+    "prefix": null
+  },
+  "fca6654c-f8ff-4586-a5cd-3de20fac0e7d": {
+    "name": null,
+    "prefix": null
+  },
+  "1cbe63a1-becb-4359-a145-ca39a4897308": {
+    "name": null,
+    "prefix": null
+  },
+  "8d568ceb-a5f9-4be5-bfb5-751d760161c0": {
+    "name": null,
+    "prefix": null
+  },
+  "0ac7675b-63e1-4387-9248-c58ff213f4b3": {
+    "name": null,
+    "prefix": null
+  },
+  "953f76ad-24ca-49b7-b84c-1ecf8b397f09": {
+    "name": null,
+    "prefix": null
+  },
+  "40d11146-bed1-4c3e-bef2-6ac11d9f50ca": {
+    "name": "Ether",
+    "prefix": "ETHR"
+  },
+  "649721e8-3027-4bf8-a58c-4ebcf2a4d729": {
+    "name": "Owob",
+    "prefix": "Owob"
+  },
+  "ab833490-2fe2-4c15-9fd7-6781fd0ab5ad": {
+    "name": "The Committee",
+    "prefix": "CMM"
+  },
+  "e494a3bc-111d-4557-9771-d98b6d39dcd6": {
+    "name": "Blacklisted",
+    "prefix": "BLA"
+  },
+  "f18e5209-136e-4454-8d71-ec4ac0523279": {
+    "name": "banana milkshake",
+    "prefix": "bleb"
+  },
+  "a26444b6-c75e-44a2-8330-abfb3c1c564f": {
+    "name": "Nicle",
+    "prefix": "ibd"
+  },
+  "8acce59e-488a-4b5f-b744-fc11e82d1193": {
+    "name": "ironman btw",
+    "prefix": "HICH"
+  },
+  "3cbe0e44-fbf4-45c2-b10f-c8710a58d3d4": {
+    "name": "The Almighty Lime",
+    "prefix": "tall"
+  },
+  "27ffa6d2-5608-48c0-b100-2ae5884a8429": {
+    "name": "Azure Blades",
+    "prefix": "BLJK"
+  },
+  "b3bb146a-20be-499b-b428-e129f556a3eb": {
+    "name": "specialist",
+    "prefix": "psna"
+  },
+  "a0785824-c24e-4bb0-980a-6059e30b57ee": {
+    "name": "Lost Noir",
+    "prefix": "Noir"
+  },
+  "43de65c9-417c-4496-9f72-5d438924ddd4": {
+    "name": "TreeMaple",
+    "prefix": "Bofu"
+  },
+  "47d809a7-92be-4d5b-b07a-51dca438d706": {
+    "name": "The Zambonies",
+    "prefix": "ZAM"
+  },
+  "d3f0927e-fb8a-48e5-8dfe-387d5ede5cde": {
+    "name": "Antarctica",
+    "prefix": "Snow"
+  },
+  "406cfd05-3c7e-49d5-b934-0a816646181e": {
+    "name": "Fox Meow UwU",
+    "prefix": "FoxS"
+  },
+  "4c6e7702-523d-4f8c-9113-d0c3044bf13a": {
+    "name": "Discoverers",
+    "prefix": "DVS"
+  },
+  "0d16c71a-4752-4419-9988-d22ca63baf8f": {
+    "name": null,
+    "prefix": null
+  },
+  "fbb7bf74-af5d-4d36-87cc-da48de004c2f": {
+    "name": "FeeshNCheeps",
+    "prefix": "FNCS"
+  },
+  "7909ab7d-7e56-4749-a2af-243ff9bc0b77": {
+    "name": "Magnolia",
+    "prefix": "Mags"
+  },
+  "1de1ac52-f849-4d72-b389-5905247fa78d": {
+    "name": "FreeTheNelston",
+    "prefix": "FTNS"
+  },
+  "e328fa0a-ef34-4d88-a37c-48e01ac4bbe7": {
+    "name": "FuneralParlour",
+    "prefix": "FPR"
+  },
+  "ac4855ff-3b28-4a7f-b8d2-b69fe75642c8": {
+    "name": "F in den Chat",
+    "prefix": "USBC"
+  },
+  "8eb9261e-1dbd-482e-8d09-8c15e7f972f5": {
+    "name": "MOONCYCOCOCU",
+    "prefix": "Amao"
+  },
+  "20418d01-b40b-40bf-be66-49f6ebb661de": {
+    "name": "Gods Strongest Morph Users",
+    "prefix": "GSMU"
+  },
+  "ed655bb7-7ab4-4fc9-9ec6-4fb9e55c6499": {
+    "name": "Fu Xuan Alliance",
+    "prefix": "Xuan"
+  },
+  "a037fed7-9c9b-449d-a101-e1f459e8a8ba": {
+    "name": "sixteen le",
+    "prefix": "bbld"
+  },
+  "6028ac9b-df0e-484a-bea1-7d03e5d89e06": {
+    "name": "Ensemble",
+    "prefix": "Trum"
+  },
+  "13988880-b2aa-417b-9bb5-222550a38a1d": {
+    "name": "The Glass Cannon Colossus",
+    "prefix": "TGCC"
+  },
+  "4d9978a9-6908-4524-92e0-7dd14f1f3f15": {
+    "name": "Dark Peony",
+    "prefix": "DAP"
+  },
+  "7b5460e4-57d9-4332-afc5-d87f14c3e6ef": {
+    "name": "Atchangel",
+    "prefix": "ATNG"
+  },
+  "01b9df52-1f50-495c-9356-60da18783a59": {
+    "name": "Dragons Den",
+    "prefix": "Dgz"
+  },
+  "c1ce9f40-c013-4946-ae95-5fbf82ade880": {
+    "name": "The Broken Road",
+    "prefix": "THBR"
+  },
+  "e9a2bbab-71da-44e5-8e78-69d3b1a335f2": {
+    "name": "Rapid Quake ASN",
+    "prefix": "RAQ"
+  },
+  "4a454cc7-40dd-4155-9116-27bd901a9ec4": {
+    "name": "Sleepless",
+    "prefix": "DOZE"
+  },
+  "d8469bd1-ad70-4e26-ba24-2c739b7e86cf": {
+    "name": "Jesse we need to cook",
+    "prefix": "CKSW"
+  },
+  "f0ed73ad-0de6-4250-84cb-3055a45166eb": {
+    "name": "Luminosity",
+    "prefix": "Lmi"
+  },
+  "cf7c45e3-c84c-400d-800c-e594f575edb8": {
+    "name": "DarkVeil",
+    "prefix": "Dvl"
+  },
+  "226bba42-00b8-4b86-920f-2ea00fb641dd": {
+    "name": "Cant Touch",
+    "prefix": "This"
+  },
+  "62e33319-5490-4ce0-ac79-944db814e5c4": {
+    "name": "StokbroodDemoontjes",
+    "prefix": "SbDn"
+  },
+  "55b1ea8b-b5a1-44b7-9f99-6251f75762cc": {
+    "name": "Lobotomy Incorporated",
+    "prefix": "LINC"
+  },
+  "91f6e517-af22-45ad-af21-4f7e83b2edce": {
+    "name": "CringeConglomeratePact",
+    "prefix": "CCPP"
+  },
+  "de2db8e4-1581-4d14-aa82-4c1484441c35": {
+    "name": "Gemini",
+    "prefix": "GEMI"
+  },
+  "0bf74176-1016-4b34-91e1-efaefaf25804": {
+    "name": "Axolittles",
+    "prefix": "Axol"
+  },
+  "d1457825-134b-4caa-bc1b-135e2af12ea2": {
+    "name": "merp",
+    "prefix": "merp"
+  },
+  "981363d3-db11-4f84-805c-4f1855eeffc4": {
+    "name": "ValiantMc",
+    "prefix": "VMC"
+  },
+  "0e6638e3-16ca-42df-b9ce-e8293da46219": {
+    "name": null,
+    "prefix": null
+  },
+  "9f23c005-9e9a-44d9-b159-fd334cd87802": {
+    "name": "Portable detlas",
+    "prefix": "Pdet"
+  },
+  "bf01cc36-d2c2-4738-ad9b-877096231d2d": {
+    "name": null,
+    "prefix": null
+  },
+  "4aef57a9-7316-4132-9fce-d6b43f44d6f8": {
+    "name": "Sakura Bloom",
+    "prefix": "SAKU"
+  },
+  "514ca23a-bb79-4473-b5f3-7331b94ce763": {
+    "name": null,
+    "prefix": null
+  },
+  "89bea1e3-af8e-4eb8-9937-fe881858f77f": {
+    "name": null,
+    "prefix": null
+  },
+  "dbed6c50-f6e4-4fac-a439-c3a8f5e3eef1": {
+    "name": "The Pasta",
+    "prefix": "PYA"
+  },
+  "80f4c5c2-cfb5-4ca0-9cdd-eaa486aed33e": {
+    "name": "Victoria Housekeeping Co",
+    "prefix": "VHC"
+  },
+  "e8dc2629-ff29-4ab6-9210-bf6eb18e9a79": {
+    "name": "girlkittens",
+    "prefix": "NYAS"
+  },
+  "719f3322-cc4b-4109-9326-0f997bcf1622": {
+    "name": "ArticsSun",
+    "prefix": "ATCS"
+  },
+  "41112c82-2093-46e6-83eb-9696e920f472": {
+    "name": null,
+    "prefix": null
+  },
+  "523270df-33c4-4859-88b0-70bdbb8e1fcd": {
+    "name": "MakesYourDeath",
+    "prefix": "BKyC"
+  },
+  "7274da55-ded3-40a5-9cdf-4aa4a08f5345": {
+    "name": "New Moon",
+    "prefix": "NewM"
+  },
+  "eaaae30a-0af9-4d63-927b-f2b140eeb2a3": {
+    "name": "Catskull",
+    "prefix": "CTSK"
+  },
+  "d5d1a4ec-628f-4ce2-9959-ea7dce7c841e": {
+    "name": null,
+    "prefix": null
+  },
+  "d41b2e1e-d542-4015-abe5-57f05a6a6bb9": {
+    "name": "Wanderers",
+    "prefix": "oooo"
+  },
+  "3fa261c7-9124-49bd-aeed-8f704c115a03": {
+    "name": "Gamers Requiem",
+    "prefix": "GRQ"
+  },
+  "b72cf5e8-6682-44c6-9fb2-c721a90bece7": {
+    "name": "Kivotos Battlegrounds",
+    "prefix": "KBCQ"
+  },
+  "ce142bbe-efb6-4ad7-9139-df4cd9462bf6": {
+    "name": "Potassium Syndicate",
+    "prefix": "PTSS"
+  },
+  "d884e5a6-aab7-4fcc-80d1-316c461f73c9": {
+    "name": "Followers of Capybara",
+    "prefix": "CAPY"
+  },
+  "0067039e-05d2-4c0e-bfdc-53c3deedefd4": {
+    "name": "Sorciers",
+    "prefix": "SOC"
+  },
+  "97bdd94e-3e50-43eb-a23a-986eb5ff9f80": {
+    "name": "Gmail",
+    "prefix": "mail"
+  },
+  "59073257-4e7c-4cb1-98eb-bc65a005bec1": {
+    "name": "Pavilion",
+    "prefix": "PAV"
+  },
+  "c3c7816d-5a9a-4dbc-9b05-7f83d86b92f6": {
+    "name": "Redhawks",
+    "prefix": "RDHK"
+  },
+  "0e9f5a88-b646-46f6-8e9c-3ea90cdc16b4": {
+    "name": "Feasting Fools",
+    "prefix": "FQQL"
+  },
+  "7c8f19d9-bf2d-4a6e-83dd-48ff5e315dd5": {
+    "name": "Seth",
+    "prefix": "RITO"
+  },
+  "6d847440-7417-4fe8-a8c0-368ede6d1560": {
+    "name": "Turnips Unite",
+    "prefix": "Turn"
+  },
+  "9359fb13-fc5c-45ef-a0d0-f4812361c6a6": {
+    "name": "Albatross",
+    "prefix": "AbHc"
+  },
+  "56302a2c-7ffa-4bf6-b0b8-fed27497c51f": {
+    "name": "Cursed Dungeon Dwellers",
+    "prefix": "Dive"
+  },
+  "4def11fb-47f1-441c-b1da-8c6f638cedcc": {
+    "name": "Ghastly Hallows",
+    "prefix": "Halo"
+  },
+  "4e9c5ece-be95-4022-83b2-8566d8b8e06e": {
+    "name": "CenterTap",
+    "prefix": "CTAP"
+  },
+  "d40d49b6-8ee8-42cf-bd33-be837f058a7b": {
+    "name": "Orryx Warden",
+    "prefix": "ORWD"
+  },
+  "62e1dc3b-bbf2-40a1-a7b6-56d141e22585": {
+    "name": "Flying Rats",
+    "prefix": "Olux"
+  },
+  "69239d24-75f4-47c5-9af6-d80b06ddd983": {
+    "name": "Pikachu",
+    "prefix": "rrat"
+  },
+  "a36bd64c-c053-4727-872d-b0d0729f474a": {
+    "name": "Returners",
+    "prefix": "VETS"
+  },
+  "cecb04ef-c4a4-4d38-8a2e-f69a1ba3f5e8": {
+    "name": "Poison Ivy",
+    "prefix": "POIS"
+  },
+  "d353a990-d260-4c0c-b50a-45ebd3a2d3a3": {
+    "name": "Unidentified",
+    "prefix": "UIF"
+  },
+  "6ede1366-a419-456e-9463-0e163c1436b0": {
+    "name": "EDaters",
+    "prefix": "DATE"
+  },
+  "c5404b60-3980-46fe-972e-566e536bfc2c": {
+    "name": null,
+    "prefix": null
+  },
+  "8441042a-b7d9-456f-b5a2-3a36a1563a58": {
+    "name": "WynncraftRU",
+    "prefix": "WCRU"
+  },
+  "d9a31809-c435-4d70-996f-024be7cfecc3": {
+    "name": "the Avos",
+    "prefix": "Avos"
+  },
+  "7ec70673-3ae6-4c78-b80e-be10881dec60": {
+    "name": "Cipher Pol",
+    "prefix": "CPO"
+  },
+  "18417d5f-0f74-4f43-9905-2154f9ad6dea": {
+    "name": "GroundPound",
+    "prefix": "GPO"
+  },
+  "33346ca1-2be3-4456-a7c8-7b01a6b1ab93": {
+    "name": "IDKSquad",
+    "prefix": "DiE"
+  },
+  "b57dbd18-7607-4db0-93d3-c8b1309dd915": {
+    "name": "TheVikings",
+    "prefix": "TVK"
+  },
+  "c7db9c2e-ba68-44be-816f-0f5ecb43d992": {
+    "name": null,
+    "prefix": null
+  },
+  "19e39417-5318-47c2-9c01-83907f012e44": {
+    "name": null,
+    "prefix": null
+  },
+  "a9a7842a-c6ec-4002-b15c-3d3a32fc4ba5": {
+    "name": null,
+    "prefix": null
+  },
+  "e3d3efd7-3eee-4171-a137-a6a42af7882e": {
+    "name": "Luminarium",
+    "prefix": "LUMN"
+  },
+  "bf2a1eb6-f4a5-47d0-8692-2c801c6441bc": {
+    "name": "Maple Dollhouse",
+    "prefix": "MEDH"
+  },
+  "0803029e-86a4-495e-8507-2d169e1f21d7": {
+    "name": "Bamboo Palace",
+    "prefix": "BOPE"
+  },
+  "bda70738-1ab8-4d7f-9a53-f62d1492f2c8": {
+    "name": null,
+    "prefix": null
+  },
+  "7c023dfb-017c-4ada-8237-7c18fa12e74d": {
+    "name": null,
+    "prefix": null
+  },
+  "a4aae9f8-1b42-4de3-9f0c-3d3167214897": {
+    "name": "Order of the Red Sun",
+    "prefix": "OTRS"
+  },
+  "60001b02-4b31-45a4-8900-7029cf99028d": {
+    "name": null,
+    "prefix": null
+  },
+  "8a2d141f-9200-4555-bdcf-dfee14b8e7ee": {
+    "name": "ShadowedSerenity",
+    "prefix": "SDY"
+  },
+  "1b46f82e-8cd7-4a80-9c51-7fe16958c905": {
+    "name": "Canard",
+    "prefix": "Ducc"
+  },
+  "1561d83e-f0eb-40b8-afae-1c92d5d0ffef": {
+    "name": "RgO",
+    "prefix": "RgO"
+  },
+  "369cbbbf-a10c-4261-b4e0-3b86e8e6bee8": {
+    "name": null,
+    "prefix": null
+  },
+  "5ddcfb98-efbe-4c99-809c-73a82ce1a97d": {
+    "name": "Death Army",
+    "prefix": "DMND"
+  },
+  "0e6e8a9f-3971-4d88-b55a-aea48564b706": {
+    "name": "Chestkaze",
+    "prefix": "KZE"
+  },
+  "e08d02e7-69b4-48f7-b7ad-a0f575a4085d": {
+    "name": "The Liquid",
+    "prefix": "TLQz"
+  },
+  "ea9a3e7e-5506-4498-91e0-31d5779039ed": {
+    "name": "New Horizons",
+    "prefix": "NHZ"
+  },
+  "0531ac3c-dceb-401b-b12c-d900b38b8cc8": {
+    "name": "TeamAirStrike",
+    "prefix": "TAS"
+  },
+  "e05351c4-7693-44ee-a06f-a00f9a9b35a8": {
+    "name": "SilverForge",
+    "prefix": "DNKY"
+  },
+  "3417e1f2-2a8b-4400-acde-9231b85ee926": {
+    "name": "FRANCE",
+    "prefix": "FRA"
+  },
+  "d5f4c111-eb78-4285-a49e-7e274fe0d207": {
+    "name": "Uchouten Tea House",
+    "prefix": "THTS"
+  },
+  "6dfb01a2-b568-4993-9d25-e66003f7d39d": {
+    "name": "Mephisto",
+    "prefix": "DEVL"
+  },
+  "140be255-915b-4397-8820-bbf1c89e303a": {
+    "name": "Virose Lab",
+    "prefix": "VIRO"
+  },
+  "8427953e-d29a-492e-8707-715d75041cd6": {
+    "name": null,
+    "prefix": null
+  },
+  "6e2acdc9-8b18-46c7-abd2-37753701e0fd": {
+    "name": "Yee Family",
+    "prefix": "YEEE"
+  },
+  "ba6fa271-5a39-4ad0-85a6-0d6356808e5f": {
+    "name": "Society of Honld",
+    "prefix": "HNLD"
+  },
+  "e789ae90-87c6-4ce2-8802-8295868e3d00": {
+    "name": "The Farplane",
+    "prefix": "Yin"
+  },
+  "3f962cd8-db4b-4834-ab62-580cea14c1cd": {
+    "name": "Geology Rocks",
+    "prefix": "Phys"
+  },
+  "5d0e70b1-374d-45e4-ae8e-da4ca818c238": {
+    "name": "MITROPOLIT",
+    "prefix": "WVS"
+  },
+  "4cdc5bd5-4429-4f39-a6b2-38f462f7a93c": {
+    "name": "Non Invitational Union",
+    "prefix": "NIU"
+  },
+  "c86203dc-2284-42b2-828a-1aaf2310780b": {
+    "name": "The Mage Legacy",
+    "prefix": "Mag"
+  },
+  "6cb066b8-2e62-467c-a010-fb9ebbfae50d": {
+    "name": "The Wynnic Adventurers",
+    "prefix": "WyNA"
+  },
+  "8a70e428-0719-44ba-a8d6-38487558980c": {
+    "name": "Hellbound",
+    "prefix": "HEU"
+  },
+  "8a523022-e0f9-424e-a906-6c86cad4b175": {
+    "name": "Disco Boots",
+    "prefix": "ZUK"
+  },
+  "21c4e3aa-adbe-4526-942d-129dbc5a489b": {
+    "name": "Makiba",
+    "prefix": "MKBA"
+  },
+  "d20c0414-5e09-48c0-af28-7db109292e0b": {
+    "name": "Damage Farmers",
+    "prefix": "Frmr"
+  },
+  "9967671f-ca65-486c-9ce2-03889abc96f2": {
+    "name": "Lawful Good",
+    "prefix": "BANG"
+  },
+  "ec9b58c0-316c-409c-9f0c-c4ea40e1bef8": {
+    "name": "OverUsed",
+    "prefix": "KARP"
+  },
+  "03b11565-69e7-4c75-9312-13bc55a063b4": {
+    "name": "Death Star",
+    "prefix": "LIVE"
+  },
+  "45a957d9-f163-41bc-a52d-4122962eebf8": {
+    "name": "Ivory Tusk",
+    "prefix": "IVT"
+  },
+  "61664efc-cc4e-4f5c-96a8-1db25b6fb9b2": {
+    "name": "REAL nick sean guild",
+    "prefix": "Rnsg"
+  },
+  "3d9cf4b4-5a45-43f6-886a-cc2fd1e851ff": {
+    "name": "Raphtalia SIMPS",
+    "prefix": "Raph"
+  },
+  "9bb4face-b58f-496d-ae66-30923ed65447": {
+    "name": "The Four Dusks",
+    "prefix": "Duuh"
+  },
+  "0eb5c6dc-b4fc-46d5-b418-8f6ec28e58a3": {
+    "name": "Shattering Realm",
+    "prefix": "SSRM"
+  },
+  "5a809cd5-0969-4847-84d3-c12b1a7be561": {
+    "name": null,
+    "prefix": null
+  },
+  "c6e040b5-be6c-449d-95c6-b592bce6f432": {
+    "name": "lelstas",
+    "prefix": "firm"
+  },
+  "0722215f-c51b-4891-8b7c-fc6a5b5c51fc": {
+    "name": "Just Jump",
+    "prefix": "JuJu"
+  },
+  "090dfaee-2529-4ed7-8696-aa07af7ec02a": {
+    "name": "ppfart",
+    "prefix": "fart"
+  },
+  "45303dd5-4616-4377-8495-890ec0aff9cf": {
+    "name": "Prats Idlis",
+    "prefix": "PRAT"
+  },
+  "f3350940-6322-423e-be96-0e52d679c8b7": {
+    "name": "Tower Bombers",
+    "prefix": "OsBL"
+  },
+  "fea8f8a9-d5d6-4141-a5a4-6f9455a26f0d": {
+    "name": "Rieri The Familia",
+    "prefix": "RTF"
+  },
+  "1a1c7264-625f-4e13-b19c-2c834d1a9a03": {
+    "name": "Stinkis",
+    "prefix": "pfui"
+  },
+  "f97e6639-d6f6-438b-bb8a-d43f6e68c84a": {
+    "name": "olny Amphibies",
+    "prefix": "MrF"
+  },
+  "c3c37235-1f40-4a99-a864-ddfd32fa40b1": {
+    "name": "WipeThem",
+    "prefix": "WPTH"
+  },
+  "53f8d39e-8ffe-4d1d-b23e-4302e706b491": {
+    "name": "HyperText Markup Language",
+    "prefix": "HTML"
+  },
+  "11373479-9405-495e-bd61-6621826a41ad": {
+    "name": "lolol",
+    "prefix": "kurw"
+  },
+  "75a7bbf3-cf6e-47d9-8847-09b942f8cc14": {
+    "name": "Siegfried",
+    "prefix": "YkE"
+  },
+  "24528c55-793c-4a90-82a8-59a048154f26": {
+    "name": "HedgehogTrope",
+    "prefix": "HHTs"
+  },
+  "09dca51e-53d1-4a9b-a26a-efa22ea65595": {
+    "name": "Just Here After Work",
+    "prefix": "SKJ"
+  },
+  "78d1d704-37c8-4f14-b130-558578eafc85": {
+    "name": "Fireings",
+    "prefix": "frcf"
+  },
+  "24a9aec5-ce6b-4e06-93e6-c8ca5dd18548": {
+    "name": "Sink the Seaskipper",
+    "prefix": "STSF"
+  },
+  "fa693967-05d1-4475-80b5-2f258edd25ec": {
+    "name": "Evans Guild",
+    "prefix": "EVAN"
+  },
+  "b95372e4-554c-4255-9434-6c63fcf1b663": {
+    "name": "The Kingdom of Gubs",
+    "prefix": "GUBS"
+  },
+  "91ebfad5-f0de-46d1-820f-e831b9d2b3d2": {
+    "name": "Knights Code",
+    "prefix": "VKC"
+  },
+  "ba2ddca7-fc5b-4040-930d-b8637b68b089": {
+    "name": null,
+    "prefix": null
+  },
+  "73447f1a-add7-45cd-95dc-843dfbcc09b4": {
+    "name": "SoulSociety",
+    "prefix": "SOCI"
+  },
+  "6fc0d31b-47cb-4944-b629-d08bdb108d7d": {
+    "name": "AsianPopperZ",
+    "prefix": "APZ"
+  },
+  "0ad9e393-02b6-4286-b177-06eb565861a3": {
+    "name": "ekittens",
+    "prefix": "KITT"
+  },
+  "5ac04002-ee29-4f22-9792-206757b77be8": {
+    "name": "Everland",
+    "prefix": "Evad"
+  },
+  "1795f2d0-4ce3-4084-8864-887afef93b25": {
+    "name": "TheKings",
+    "prefix": "TKP"
+  },
+  "2cc74429-f613-4a2e-8db1-ea3d57b7680d": {
+    "name": "Nanner",
+    "prefix": "NANR"
+  },
+  "6bfa9f0e-0ec0-4b6f-a0e6-d37873200380": {
+    "name": "Guild Force",
+    "prefix": "XZI"
+  },
+  "e7445278-8e41-4ece-92fb-f2e7089bd80a": {
+    "name": "kitten",
+    "prefix": "purr"
+  },
+  "52e25e0e-8459-4dc2-92f2-e0a6b9e66e11": {
+    "name": "Pagoni",
+    "prefix": "PBT"
+  },
+  "47595394-efb2-4d79-920d-96fa0a5d13de": {
+    "name": "Weekenders",
+    "prefix": "WKND"
+  },
+  "9cafcc38-38c2-430a-b455-c53225018076": {
+    "name": "Borsod",
+    "prefix": "Cigo"
+  },
+  "0b8a36a1-1079-4820-8bb8-735f22cdd3e8": {
+    "name": "Normal Monkey Fan Club",
+    "prefix": "NMFC"
+  },
+  "5289ecce-9696-4b40-86d9-0bf3815320e1": {
+    "name": "list",
+    "prefix": "list"
+  },
+  "d414d5ae-33c9-43bb-943a-490bc4e7a1fa": {
+    "name": null,
+    "prefix": null
+  },
+  "b9d5980c-22dd-4d1e-8c85-fa2174b560f5": {
+    "name": "Academic Victims",
+    "prefix": "ACVI"
+  },
+  "cc34c1b9-991b-4a17-bac6-3fa3cbe983e8": {
+    "name": "Capybara Lover",
+    "prefix": "Clov"
+  },
+  "fb3f9814-e3df-424e-8345-c9510cc4576f": {
+    "name": "Aberrant",
+    "prefix": "ABRT"
+  },
+  "f25f75b5-e9fa-46e2-9be9-442382105271": {
+    "name": "Atlas Inc",
+    "prefix": "AIn"
+  },
+  "d825f5ce-5bda-4fb3-81ef-f6b4d77e8fcc": {
+    "name": "Dargon Gaming",
+    "prefix": "DARG"
+  },
+  "f51bef27-524f-4c4c-a6a0-36fe14333cd8": {
+    "name": "Powder Keg",
+    "prefix": "Powd"
+  },
+  "9adae84c-a374-47be-9cf8-f6f9e9daf732": {
+    "name": "Megami",
+    "prefix": "MAW"
+  },
+  "432d6bc3-e2d3-48f5-92f3-47df86372ddd": {
+    "name": "furries are way too cute",
+    "prefix": "NOWO"
+  },
+  "b2fac75a-bdda-4816-8b64-aef2d78a6c76": {
+    "name": "Frozen Shadows",
+    "prefix": "SFZ"
+  },
+  "c4c186de-a18f-4e47-95ea-bc7f66a3cd7b": {
+    "name": "Soviet Socialist Frogs",
+    "prefix": "USSF"
+  },
+  "597e4452-75ae-426a-afe5-d10936d0791c": {
+    "name": "Box Elder Kestrels",
+    "prefix": "KSTR"
+  },
+  "6cb1a701-9b8b-4006-94d1-8ab060115c7c": {
+    "name": null,
+    "prefix": null
+  },
+  "85693fec-2e2e-4e49-a53b-9079dd433ac7": {
+    "name": "Stylax Guards",
+    "prefix": "SGj"
+  },
+  "d378ab32-5633-438b-b489-8c5a3c896548": {
+    "name": "Dragtopia",
+    "prefix": "HERE"
+  },
+  "a0d17af1-2b71-4ec4-9a5c-71e14232711b": {
+    "name": "Emorians",
+    "prefix": "ERN"
+  },
+  "e5cd8e3b-51f8-4454-ac7f-ca0c6b9840df": {
+    "name": "Sea urchin toiunano Sea urchin",
+    "prefix": "inu"
+  },
+  "f3cae4ba-0706-42cf-b071-6abbffbb691b": {
+    "name": "Arp company",
+    "prefix": "ArpC"
+  },
+  "0e9a1c77-acfc-43d7-bfe8-3a941070639b": {
+    "name": "KISSED",
+    "prefix": "KISS"
+  },
+  "552ca6b0-f9a9-402d-b625-dfe52f3dc60c": {
+    "name": null,
+    "prefix": null
+  },
+  "07871ac4-0377-4213-afcb-f17dc4361ef5": {
+    "name": "The Goons",
+    "prefix": "ERMS"
+  },
+  "5aca3b09-b1b0-4051-9caa-551c75bcd988": {
+    "name": "Atychiphobia",
+    "prefix": "RUIN"
+  },
+  "3801bdc5-6e5e-4eff-bf01-e8b4d71f8155": {
+    "name": "RNG Carried",
+    "prefix": "RNGC"
+  },
+  "b23a3166-c8ce-47e9-99ab-5637b776ac6b": {
+    "name": "Terminator",
+    "prefix": "TERM"
+  },
+  "e83a8cc4-083d-4fa9-aa3f-3c2b92cf32c1": {
+    "name": "Gensokyo",
+    "prefix": "ZUN"
+  },
+  "3de69471-1f16-4c02-a0ca-64744b98a167": {
+    "name": "Wanytails",
+    "prefix": "WANY"
+  },
+  "2553df73-5e97-443d-807f-4b56686e8000": {
+    "name": "Aetherseekers",
+    "prefix": "AeSe"
+  },
+  "a4c732b4-3a0f-4bad-ada9-1cb91dc4ccbf": {
+    "name": "The Silent Court",
+    "prefix": "TSLT"
+  },
+  "0a4b30d3-9a65-4236-b8aa-8c6beae6edef": {
+    "name": "GleepyGloopes",
+    "prefix": "geep"
+  },
+  "4da0fc34-15e6-4e8a-bfde-a96f33a7eef2": {
+    "name": "Rokomoko C",
+    "prefix": "Roko"
+  },
+  "242c8019-55e8-4979-814d-3bac17d282a8": {
+    "name": "Monolith",
+    "prefix": "MONO"
+  },
+  "61e0d70f-f961-4ad8-b4fa-4396637383ad": {
+    "name": "IneedToiletPaper",
+    "prefix": "INTP"
+  },
+  "416fc6e0-8341-40c5-9e22-c5d435061fb5": {
+    "name": "LegendZ",
+    "prefix": "CCF"
+  },
+  "0b3cfed8-f540-41e4-aa41-a31963f5de68": {
+    "name": "The Very Boring Guild",
+    "prefix": "TVBG"
+  },
+  "8b6b9627-b36e-4328-9560-61aae9c38cbc": {
+    "name": "Thunderstorm",
+    "prefix": "THDR"
+  },
+  "9fe83864-4312-4069-8032-6de8de1b97e0": {
+    "name": "Hanime",
+    "prefix": "Taco"
+  },
+  "18f297a3-c7bf-40b9-8a65-c76c43682396": {
+    "name": null,
+    "prefix": null
+  },
+  "465c54d0-105b-431e-b38d-caef9aa48ae3": {
+    "name": "ts is",
+    "prefix": "pmo"
+  },
+  "aad6cf0c-74d3-4d64-8a4b-a0be32cbc788": {
+    "name": "Tavern",
+    "prefix": "TAVN"
+  },
+  "590988e1-1b0e-41aa-a217-85ba3d93f24e": {
+    "name": null,
+    "prefix": null
+  },
+  "97d42df9-1eba-4e84-935d-e255508d4f8d": {
+    "name": "Quicksilver Sash",
+    "prefix": "QSS"
+  },
+  "d2955f5a-4183-4d5e-a9ac-004af3767fcc": {
+    "name": "Liberty",
+    "prefix": "vote"
+  },
+  "df207481-82cd-43a3-b064-2745b4a9a59f": {
+    "name": "RatNest",
+    "prefix": "ratn"
+  },
+  "754c99c6-274f-4434-af09-c1dd9c0c159d": {
+    "name": "Mystic Woods",
+    "prefix": "MYC"
+  },
+  "a79b92db-8544-4350-be2f-93abac2fc468": {
+    "name": "Lu Dynasty",
+    "prefix": "LUD"
+  },
+  "67a3cc48-9ea5-450b-84ee-a644263c46df": {
+    "name": "Smart Ass Dog",
+    "prefix": "SMAD"
+  },
+  "56d1a39a-f7d4-49ce-809e-3d21bf57855b": {
+    "name": "Lightning McQueen",
+    "prefix": "Cars"
+  },
+  "e8f68aa6-7c09-439e-8ba8-35c3a8b48661": {
+    "name": "PikaSquad",
+    "prefix": "Pik"
+  },
+  "247c1951-1b45-4c77-a0b0-07f34f084165": {
+    "name": "Zaqra",
+    "prefix": "ZAQR"
+  },
+  "9f875fc4-5132-4b58-b485-ba80c3a8f0ba": {
+    "name": "those who cant breathe button",
+    "prefix": "zaza"
+  },
+  "90bb476c-9ae7-484d-bd3b-22aab38d6718": {
+    "name": "afk sim",
+    "prefix": "gone"
+  },
+  "d75313d6-2a80-4a3c-956f-51abdc3f73bb": {
+    "name": "pat fusty",
+    "prefix": "awwa"
+  },
+  "0b591b62-4068-4f35-a3bb-caf51734efb6": {
+    "name": "Imperium Tavern",
+    "prefix": "IMPT"
+  },
+  "bfeb7d85-6193-4f3d-b91d-70cc13e74e5f": {
+    "name": "Focus Me",
+    "prefix": "Focs"
+  },
+  "439a5c97-0a13-4743-874b-751beccf84ee": {
+    "name": "Kingdom of Mochi",
+    "prefix": "KOMC"
+  },
+  "d0b407c1-b225-406d-97df-5990ee8ab74c": {
+    "name": "Psarnia",
+    "prefix": "PCO"
+  },
+  "25232e5b-1581-4036-86e3-fed8b9e00484": {
+    "name": "Podpivas",
+    "prefix": "PVO"
+  },
+  "6f02a987-2635-44cc-8a8a-d3db78b465bc": {
+    "name": "DominacjaKwiatka",
+    "prefix": "DNAA"
+  },
+  "5c1eac1e-ea23-4026-8b4e-a5f649a2f088": {
+    "name": "Wailord",
+    "prefix": "gyat"
+  },
+  "df3ef910-dd94-44a4-9eaf-05e719a222b7": {
+    "name": "NickesPungRynkel",
+    "prefix": "Grag"
+  },
+  "744bba89-8412-48b6-acfd-1be0a35c63cc": {
+    "name": "Die Blutgeschworenen",
+    "prefix": "DBLS"
+  },
+  "77a3250a-1403-4e0c-beb4-8959364424ec": {
+    "name": "Absolute Syndicate",
+    "prefix": "Asyn"
+  },
+  "f340dfc5-ebee-48c4-ac6f-616857a404d3": {
+    "name": "Mangroove",
+    "prefix": "hard"
+  },
+  "d587f538-9611-4257-b50b-4ff1f57a8fd5": {
+    "name": null,
+    "prefix": null
+  },
+  "f7b88ecf-3eee-427e-9e03-afd6e80f5b18": {
+    "name": "The Niche Legion",
+    "prefix": "TNiL"
+  },
+  "db44d702-2eaa-48cd-a240-d8875596eb02": {
+    "name": "The Milky Empire",
+    "prefix": "TMLK"
+  },
+  "5695688b-12aa-4385-ae84-966a7ba1ea6b": {
+    "name": "Ironblooded Orphans",
+    "prefix": "Saya"
+  },
+  "e8f583e0-aed1-4a25-ac1d-e21aea5ebcde": {
+    "name": "Manatee Bros",
+    "prefix": "MntB"
+  },
+  "9afa1452-7fa2-4294-a4cf-ca4ee0a3e358": {
+    "name": "Allegiance",
+    "prefix": "ALGC"
+  },
+  "3a81feb8-c26f-4fb4-a067-31f1d0087492": {
+    "name": "Jeus",
+    "prefix": "Jeus"
+  },
+  "1c14f479-a867-4edb-b058-c74c0cfcaa6c": {
+    "name": "Astral Nail",
+    "prefix": "Nail"
+  },
+  "88a1d46c-ac3b-49a4-9eff-e23a2f4f2dc2": {
+    "name": "Temporis",
+    "prefix": "TMPO"
+  },
+  "b12a9bb0-fc24-473e-bdec-0a6109bec03c": {
+    "name": "SRGGZ",
+    "prefix": "OwOp"
+  },
+  "ff95ac7b-b9ae-4369-9beb-7a4cc419c7c2": {
+    "name": "The Emerald Winds",
+    "prefix": "EmrW"
+  },
+  "c4f3670c-68e1-4162-a7b5-430f0cfcb691": {
+    "name": "Team Rats",
+    "prefix": "TRat"
+  },
+  "ef0f217e-6151-4993-8df4-37511de0dfc4": {
+    "name": "Orbit Equinox",
+    "prefix": "OrEq"
+  },
+  "ba9dcee6-f4e0-492d-8faa-5b20e50cd34f": {
+    "name": "just me",
+    "prefix": "Lana"
+  },
+  "cb40b7e9-71a6-4a06-922a-54830fd368ee": {
+    "name": "BladeSoul",
+    "prefix": "BdS"
+  },
+  "d0d45e73-5220-4bca-a85f-02c094c9cfdf": {
+    "name": "JoJos",
+    "prefix": "JOJS"
+  },
+  "2267470c-4f67-4afe-b10a-c95683866f59": {
+    "name": "Beast Compendiary",
+    "prefix": "BLFC"
+  },
+  "9f93da1c-e0c5-4d29-9c99-35b055c33126": {
+    "name": "The Mythics",
+    "prefix": "Mye"
+  },
+  "b5814725-10de-40f9-906f-46652dad175e": {
+    "name": null,
+    "prefix": null
+  },
+  "847fef05-081c-4337-b424-1be13bf4fb2b": {
+    "name": null,
+    "prefix": null
+  },
+  "ac9fc392-8757-4922-bc7c-b782418157c3": {
+    "name": null,
+    "prefix": null
+  },
+  "41ef0b9e-d19f-4a92-ad74-948c941c7338": {
+    "name": null,
+    "prefix": null
+  },
+  "8fefd4d3-7593-4460-8958-578d8028d4f9": {
+    "name": "Excaliburs",
+    "prefix": "EXCL"
+  },
+  "3e71199e-5972-47cb-a182-65a638357e8c": {
+    "name": "Overlanders",
+    "prefix": "OVLA"
+  },
+  "92afb823-5a91-4224-9d83-ea301dec509e": {
+    "name": "reborn as an unemployed snaker",
+    "prefix": "snke"
+  },
+  "7b4333d6-6763-4cee-b1a0-8695eb95bfc9": {
+    "name": "MewyPaws Alliance",
+    "prefix": "Mewy"
+  },
+  "c589a33b-79c0-4da2-8a40-4e59b53f0d0c": {
+    "name": "Ernte und Stein",
+    "prefix": "EuS"
+  },
+  "f50e6076-b85c-43b7-a59e-3ed371be7745": {
+    "name": "Minr",
+    "prefix": "MINR"
+  },
+  "34d7bd22-7670-45b4-9aee-824303bab3d8": {
+    "name": "Bat Wyngs",
+    "prefix": "BATW"
+  },
+  "ba731c9e-e55d-4c00-8f96-c58246e5685d": {
+    "name": "Ninja",
+    "prefix": "NINJ"
+  },
+  "d520af81-e523-4bcb-ad34-cb84f1c6508c": {
+    "name": "TradeFederation",
+    "prefix": "BISS"
+  },
+  "efdaaa5a-f3e6-4ffe-b024-df305660e091": {
+    "name": null,
+    "prefix": null
+  },
+  "ba0b858d-0100-4877-bf52-91722dde995f": {
+    "name": null,
+    "prefix": null
+  },
+  "6a08aabe-d274-43b5-bfac-104d58446692": {
+    "name": "Cult of Stardust",
+    "prefix": "CoST"
+  },
+  "a9710289-7098-4755-99e5-4c766bc0a4b2": {
+    "name": "Knocky Nekos",
+    "prefix": "KoNe"
+  },
+  "3c6331d2-9f75-4644-9c95-aa40e831cb95": {
+    "name": "blub blub blub",
+    "prefix": "bblu"
+  },
+  "00971218-0ff6-42b3-93ce-814f270e4185": {
+    "name": "Star Burst Revenge Ghost",
+    "prefix": "SBRG"
+  },
+  "8e85c351-8461-4104-997d-9e341f472b53": {
+    "name": "Proxima",
+    "prefix": "Pxa"
+  },
+  "60e8538b-69cf-4a1c-8579-84663b82a499": {
+    "name": "Liquid OVERFLOW",
+    "prefix": "LQOW"
+  },
+  "b4bd5e77-5639-42b4-9027-95461550ccfa": {
+    "name": null,
+    "prefix": null
+  },
+  "b3fd067d-123a-4701-9d0d-482912f0d088": {
+    "name": "Terraconia",
+    "prefix": "bcd"
+  },
+  "283b92d2-804e-4d55-9e6a-62999ac93212": {
+    "name": "Health Potion",
+    "prefix": "HPot"
+  },
+  "9ffdf5e5-fae4-4d1b-b1c1-1e7d4c69eb1f": {
+    "name": "The Livaskia Coalition",
+    "prefix": "ENSA"
+  },
+  "a6f967ae-cab8-47cf-bd57-0072520ec671": {
+    "name": "glass cannon legion",
+    "prefix": "divz"
+  },
+  "43c98a4d-2a87-4037-8878-179a56412868": {
+    "name": "Nuhuhh",
+    "prefix": "Nuh"
+  },
+  "068ea185-f914-44e5-8a84-5930bdbdb952": {
+    "name": "Arctic Tempest",
+    "prefix": "ARCT"
+  },
+  "0d277279-3cd1-423a-a04e-179e0a8dd452": {
+    "name": "Ranger Commando",
+    "prefix": "RCs"
+  },
+  "4674afbd-b7aa-4719-ad00-76d21d701166": {
+    "name": "silly swag gang",
+    "prefix": "SiSw"
+  },
+  "04a24f22-1c94-4142-a6bd-8e4c811ec48b": {
+    "name": "daClan",
+    "prefix": "daCl"
+  },
+  "09c44351-7782-4d4c-8a41-191a15b98825": {
+    "name": "Stormwing",
+    "prefix": "Nrat"
+  },
+  "6913549f-b65b-4f82-9fa1-87a3fa58da97": {
+    "name": "PapaJohns",
+    "prefix": "PZZA"
+  },
+  "fd1c4d1a-7631-40eb-86a3-1a76afe11c03": {
+    "name": "Wither Lords Empire",
+    "prefix": "WLEM"
+  },
+  "f24ad871-7e0f-4da2-993d-2dc5320c4077": {
+    "name": "Lumberjack",
+    "prefix": "LBJK"
+  },
+  "0e6b463a-3ce1-4f14-ba17-594901960c5e": {
+    "name": "Obake Singularity",
+    "prefix": "Gost"
+  },
+  "2ced7c4e-f066-45a2-af8f-959fc6f31d65": {
+    "name": "nocco",
+    "prefix": "frys"
+  },
+  "3d02b59f-b70e-4637-9e29-3e4d13d84012": {
+    "name": "Lnine",
+    "prefix": "DRVN"
+  },
+  "67e981c5-08ce-4df1-a321-bef42f161668": {
+    "name": "Robotic",
+    "prefix": "RBT"
+  },
+  "be899a80-1dfd-40c9-8248-f3ed4ba145d3": {
+    "name": "Radiant Roses",
+    "prefix": "RARO"
+  },
+  "9955a404-7af3-49ec-a23d-91422332bc83": {
+    "name": null,
+    "prefix": null
+  },
+  "6c386fff-57a6-4c32-a9f4-c4f569ff05e1": {
+    "name": "Hourglass",
+    "prefix": "HGS"
+  },
+  "7a301717-867a-4b8c-9b13-4ed8664c0731": {
+    "name": null,
+    "prefix": null
+  },
+  "bc6789b9-17f2-4ac8-b47e-8a5fc6e8d379": {
+    "name": "Elysian Phoenix",
+    "prefix": "CNDR"
+  },
+  "4a7852b8-68bb-46da-8e53-4ac4f00a5615": {
+    "name": "Vindicator",
+    "prefix": "VMZ"
+  },
+  "6dbbb30d-5227-4d65-ae98-d97897653993": {
+    "name": "TheHomiesLounge",
+    "prefix": "SCBK"
+  },
+  "853aba31-9a36-4e9c-ab9d-c949af847ca5": {
+    "name": "FleetingMoment",
+    "prefix": "Flot"
+  },
+  "16499832-cd26-4905-b9bb-7afe97fc7c1b": {
+    "name": "aiue",
+    "prefix": "aiue"
+  },
+  "0eeeb7d8-be66-4516-b534-15e83ad84fdf": {
+    "name": "hespalusTFirst",
+    "prefix": "RMK"
+  },
+  "5d554067-3738-4be2-99a1-9813c21971e9": {
+    "name": "Ascent of the Blood rune",
+    "prefix": "AtBR"
+  },
+  "513c37ef-76a2-4aa1-a425-bc869898e900": {
+    "name": "ICcraft ",
+    "prefix": "ICC"
+  },
+  "b909e49a-e383-4141-9912-3db9b4785d19": {
+    "name": "Potato Aim",
+    "prefix": "POPE"
+  },
+  "59ec256a-afe0-42d9-9dce-9addc4725455": {
+    "name": "Trail",
+    "prefix": "trai"
+  },
+  "bbb571cc-3850-446e-b9c4-d7d86cc95ccb": {
+    "name": null,
+    "prefix": null
+  },
+  "7288f562-a8e2-4079-9a53-3625b20a40f4": {
+    "name": "Me when beans",
+    "prefix": "Rick"
+  },
+  "1fabae7c-36db-4441-8ce1-f50a8c9442db": {
+    "name": "Bruhters",
+    "prefix": "feto"
+  },
+  "69af0842-69b0-405c-8add-f4708baaf0f1": {
+    "name": "CaveMen",
+    "prefix": "CaMe"
+  },
+  "b934c861-7c8e-4b34-9ed6-c217ec301a16": {
+    "name": "TheKiwiFruit",
+    "prefix": "TKF"
+  },
+  "4e8b31b0-e546-4b07-8e9e-ebb7bbbb0735": {
+    "name": "PumpkinBloom",
+    "prefix": "PkBl"
+  },
+  "ad03448a-5939-4043-9d76-a365214452aa": {
+    "name": "Back Street Boys",
+    "prefix": "BUI"
+  },
+  "a82242f5-beb1-4dd2-8cd3-fd5cb6ac6778": {
+    "name": "Corporate Demand",
+    "prefix": "CDT"
+  },
+  "19096748-57fd-4f08-ba54-d2409840bd0a": {
+    "name": "Atheist",
+    "prefix": "Athe"
+  },
+  "3723b4c2-8284-4102-9431-2821c8c93db5": {
+    "name": "TokebakIcitte",
+    "prefix": "TBNK"
+  },
+  "85dc043b-f644-4cfc-a377-3014385b0c62": {
+    "name": "Green Souls",
+    "prefix": "GSP"
+  },
+  "086f577f-f6b5-47d8-8ae8-cf7a84b1ba98": {
+    "name": "Tenten",
+    "prefix": "TENS"
+  },
+  "27dd122a-a880-4f50-b8bb-ec524cbc8a51": {
+    "name": "Acoustics",
+    "prefix": "TICS"
+  },
+  "8f5c3b1d-c432-4a03-8d6f-f0511c73dbed": {
+    "name": "DumThenDumer",
+    "prefix": "bmud"
+  },
+  "8f284ed8-fb92-4479-8fc9-380ef4813fe3": {
+    "name": "The Crowz",
+    "prefix": "CRWZ"
+  },
+  "c2178a99-d3b8-45a0-817d-a9356830c85c": {
+    "name": "Wispveil",
+    "prefix": "Wspv"
+  },
+  "7c05223d-f06b-4aa8-99c6-41fc7059ec73": {
+    "name": null,
+    "prefix": null
+  },
+  "a712a5dc-fc6f-4144-bd4c-1fead4c5d1b0": {
+    "name": "Gambling Cartel",
+    "prefix": "GMGC"
+  },
+  "af0d549b-0aaf-481b-9b4a-cf584cc1f710": {
+    "name": "Lone Wolf",
+    "prefix": "Tmpl"
+  },
+  "d13b04e7-d294-401e-be4e-a5b2ffe634c9": {
+    "name": null,
+    "prefix": null
+  },
+  "80049440-1544-4ea3-9c26-a18cb34b24dd": {
+    "name": "Dreamers Den",
+    "prefix": "DRMR"
+  },
+  "149c92d8-8a11-44df-9468-ed2647e211fb": {
+    "name": "Remnant of Truth",
+    "prefix": "RoTs"
+  },
+  "15b437a9-8cf4-4a4f-b4d5-32f0541e7590": {
+    "name": "Not Our Decision",
+    "prefix": "NODS"
+  },
+  "b25563da-227d-431b-a2a2-6fd7627ac795": {
+    "name": null,
+    "prefix": null
+  },
+  "0b3afb00-e832-48a6-b099-e037326663a8": {
+    "name": "Gay Sewer Rats",
+    "prefix": "GLBT"
+  },
+  "bba8510e-c16c-4605-b4ef-6bde2a208f37": {
+    "name": "DevotedAlcoholics",
+    "prefix": "BEER"
+  },
+  "54315f56-2820-4447-9d13-bf05e9e6669c": {
+    "name": "GREEDxISLAND",
+    "prefix": "HxH"
+  },
+  "75d109ce-84f4-46cb-b107-0acf9f5a4f82": {
+    "name": "ilovespring",
+    "prefix": "SPRI"
+  },
+  "c1137d92-2917-4b4a-8d49-5fb698a621c9": {
+    "name": "La Garde de Wynncraft",
+    "prefix": "LGDW"
+  },
+  "3bde061b-7e8b-44fb-8811-33e0960fd410": {
+    "name": "Asian Farmer",
+    "prefix": "Famr"
+  },
+  "61013b3c-87fe-48c4-bc46-833b89eb74f9": {
+    "name": "SevenSinsMU",
+    "prefix": "SevM"
+  },
+  "47c38cf6-f429-48f6-a9bf-ded1a07e8978": {
+    "name": "Sylvan",
+    "prefix": "Faye"
+  },
+  "e8dc282e-620d-4836-8461-4a35eea4767e": {
+    "name": "obama care",
+    "prefix": "obmc"
+  },
+  "34673375-6af7-42ff-ab04-63df32de434d": {
+    "name": "Meowdred",
+    "prefix": "MISF"
+  },
+  "386114cb-0e19-48fd-a3be-3628033cb73c": {
+    "name": "CET Celestial Engine Inc",
+    "prefix": "CEI"
+  },
+  "62fcdf6b-5604-4e8d-8224-2a041f787367": {
+    "name": "wasting consumables",
+    "prefix": "cons"
+  },
+  "9c11edc7-adf0-4d90-9d45-3606c6e0c32f": {
+    "name": null,
+    "prefix": null
+  },
+  "00348b84-5201-4987-8e69-a84572a5f8a5": {
+    "name": "UnderHorizon",
+    "prefix": "UDHZ"
+  },
+  "2f575d9b-5a6b-4df2-8b6a-8c0ba765e3da": {
+    "name": "mimimimi",
+    "prefix": "FUMO"
+  },
+  "26475786-4813-441e-ad51-3643e0d145c2": {
+    "name": "The Empire of Sindria",
+    "prefix": "EMSI"
+  },
+  "33e807da-459a-457c-9255-2d5dc237ea53": {
+    "name": "This Badge Sucks",
+    "prefix": "Slap"
+  },
+  "0ffb6c78-6f52-4aff-b6eb-5d213a11222b": {
+    "name": "HylianShield",
+    "prefix": "HYL"
+  },
+  "158ce8fc-24a6-47e7-acb7-c8ee0e5c92c0": {
+    "name": "ERECTOES",
+    "prefix": "ERCT"
+  },
+  "346399bb-3cd5-4cac-82c9-3215658458ad": {
+    "name": "GoonSquad",
+    "prefix": "Dume"
+  },
+  "a04805a4-6c79-49ec-8322-564b6fffc4a7": {
+    "name": "CrashOverGaming Community",
+    "prefix": "COGC"
+  },
+  "ed616e5c-213b-4214-9927-bd753564b571": {
+    "name": "Violet Phoenix",
+    "prefix": "VPHX"
+  },
+  "da920f5e-23b0-4eef-889f-d32b76f2f2aa": {
+    "name": null,
+    "prefix": null
+  },
+  "602d1fd3-2dc1-4c2d-b8db-cfca63711e9b": {
+    "name": "Fortuna favet stultis",
+    "prefix": "LCKY"
+  },
+  "c7ac9599-6143-4eb5-b750-daec2ecd14a0": {
+    "name": "Guild Omega",
+    "prefix": "omga"
+  },
+  "b2846f9d-d493-44e4-af04-308f1719247d": {
+    "name": "Verpa Crumina",
+    "prefix": "VCA"
+  },
+  "60871e43-d1b2-4eec-a8f6-0d287f2b5513": {
+    "name": "The Profens",
+    "prefix": "Prfn"
+  },
+  "20a8586e-dd2c-45b9-8a1e-51aa602af368": {
+    "name": "Adrift",
+    "prefix": "LGE"
+  },
+  "fe7716fb-c52a-466a-8bc7-c00dde2c5fd5": {
+    "name": "The Grooks",
+    "prefix": "Grks"
+  },
+  "a687824b-07b0-4a10-a191-3a7ce0ff741b": {
+    "name": "The Gamer Club Club",
+    "prefix": "GAMC"
+  },
+  "ec5f0220-e375-49a4-a74e-9267a0cf4291": {
+    "name": "Hangout Spot",
+    "prefix": "HaSp"
+  },
+  "7bc3e75c-c524-44bb-8e3a-497e13417917": {
+    "name": "Passione gang",
+    "prefix": "chop"
+  },
+  "2780a347-7cca-4a73-be03-d1ef4a7b471b": {
+    "name": null,
+    "prefix": null
+  },
+  "e0c6d814-c6d9-4592-8817-dd7a4473f21e": {
+    "name": "Path To The League",
+    "prefix": "PaTL"
+  },
+  "ad811a87-9bd9-4a1c-9e6c-33babf605af0": {
+    "name": "Kung Pao Chicken",
+    "prefix": "KPCK"
+  },
+  "11bfd1aa-4cc2-4a24-9cae-12ac8d1205bd": {
+    "name": "NoLimits",
+    "prefix": "NoLi"
+  },
+  "f510a7e6-048c-4b19-98db-e16a1c1a60aa": {
+    "name": "Arcane Order",
+    "prefix": "ARKO"
+  },
+  "055a61ad-7177-447d-8670-a44c0365e097": {
+    "name": "Nefarious Dilcks",
+    "prefix": "DLCK"
+  },
+  "e4b2e140-8c90-456e-8692-f9094124b88b": {
+    "name": "Super Hyper Yakumichans",
+    "prefix": "SHYs"
+  },
+  "c3ec9f50-416f-4925-8a9b-2bf2bf4c0e1a": {
+    "name": "Order of the gloop",
+    "prefix": "OotG"
+  },
+  "0b6d065a-a274-406d-a5b6-c2582ddb1138": {
+    "name": "LiYin Trading Inc",
+    "prefix": "LiYi"
+  },
+  "ead9e5d4-1b4b-40fd-a7b9-a84a8ad1491d": {
+    "name": "The Holy Dragons",
+    "prefix": "Drag"
+  },
+  "de082d94-1835-49fd-a192-a38dc5aad374": {
+    "name": "JOHNMILLER",
+    "prefix": "JONM"
+  },
+  "e1fcfbe9-7cca-4ac9-85c5-b0458a76c2f9": {
+    "name": "Wanderers of Wynn",
+    "prefix": "Wndr"
+  },
+  "176f4041-73d2-4bc2-8a5f-1c5c68858ec9": {
+    "name": "Magic Cake",
+    "prefix": "MMMC"
+  },
+  "bf95136e-9242-4b5e-8d95-43bf9da0005f": {
+    "name": "Mountain View",
+    "prefix": "MTV"
+  },
+  "06796a75-5b18-4d18-981e-f04a6629468c": {
+    "name": null,
+    "prefix": null
+  },
+  "c0b24cdb-1c03-48ce-8b04-235d654329b1": {
+    "name": "MeguWynn",
+    "prefix": "MWYN"
+  },
+  "1041c182-d688-452a-b5a0-60604c47e8eb": {
+    "name": null,
+    "prefix": null
+  },
+  "52ac5dd4-32ee-47d6-bf7a-afc199539f0b": {
+    "name": "Eater of Worlds",
+    "prefix": "EOWS"
+  },
+  "1d8acb13-f566-462e-8863-5d33e3ab586c": {
+    "name": "Raven Nest",
+    "prefix": "RVNN"
+  },
+  "c6478c6d-0df4-4e22-8c0f-bdc33c4b37aa": {
+    "name": "The Retirement Home",
+    "prefix": "ELDR"
+  },
+  "6244ed52-e877-426c-be2e-72441a2123fa": {
+    "name": null,
+    "prefix": null
+  },
+  "38b4739e-b677-4c9e-8bc4-c2541556824f": {
+    "name": "Sydneysiders",
+    "prefix": "SYDN"
+  },
+  "6354769b-413a-4e2e-ad76-d8157f7adde8": {
+    "name": "Animal",
+    "prefix": "GLAL"
+  },
+  "817c13a0-825a-4c6d-bae2-59a2840dba7d": {
+    "name": "Skyblock Hideout Incorporated",
+    "prefix": "BORE"
+  },
+  "4a65e577-62ed-407a-b72f-c8e112d1d22c": {
+    "name": "The Forest",
+    "prefix": "Wood"
+  },
+  "4027a2c9-1c2c-4d41-acbf-b0cef1f583fa": {
+    "name": "Iron Oath",
+    "prefix": "IOTH"
+  },
+  "355f64bb-8546-4a60-b1cf-fd139782def7": {
+    "name": "Great is the Nima",
+    "prefix": "Nima"
+  },
+  "8df7569d-04ee-4b54-8a6c-d6f22ce0b1bd": {
+    "name": "Raspberry",
+    "prefix": "Rspb"
+  },
+  "a7a1e0b1-f361-4b97-a737-618828a61f9b": {
+    "name": "Bonus",
+    "prefix": "TSMC"
+  },
+  "a63b32f4-9ca2-4b8b-80fa-8cb3b6f1e3eb": {
+    "name": null,
+    "prefix": null
+  },
+  "f3968b27-3682-43ef-88af-70231bbef990": {
+    "name": "Aureous",
+    "prefix": "RISE"
+  },
+  "61d2fbca-f28e-4635-b531-e9255c0c5f9f": {
+    "name": "Paradoxx",
+    "prefix": "DOXX"
+  },
+  "526e9d4e-74fc-4ee6-9ca5-f1b7add1a83f": {
+    "name": "awoohgee geonyeob",
+    "prefix": "wuge"
+  },
+  "4444af9d-a395-41b0-93fe-0e3012a67c19": {
+    "name": "Loot Big Wars",
+    "prefix": "LBWG"
+  },
+  "4e2bf550-17b8-46c4-9e72-92361cd7fb12": {
+    "name": null,
+    "prefix": null
+  },
+  "3395d552-e747-4bf3-a2b4-1cc7a6f8d880": {
+    "name": "Achte Shadow",
+    "prefix": "ASh"
+  },
+  "8087c3ea-fc01-41a6-bf76-7ba19879960c": {
+    "name": "Place of Rest and Relaxation",
+    "prefix": "IKNB"
+  },
+  "3b2965fa-7ffd-4bfa-b5c8-09d9f6129cef": {
+    "name": "The Roman Legion",
+    "prefix": "SPQR"
+  },
+  "38be4ff7-09d7-4df0-8ebe-f84639b6cf03": {
+    "name": "MONOLITUA",
+    "prefix": "MNUA"
+  },
+  "d09fde5b-4fdd-4c20-950b-13bcc2529d8b": {
+    "name": "RealArmageddon",
+    "prefix": "ARMA"
+  },
+  "dffe2262-213e-4aa4-ae95-9aa890e381df": {
+    "name": "Blod",
+    "prefix": "blod"
+  },
+  "9ce17879-00fe-4cd9-8946-ae52eb619c5f": {
+    "name": "Selek Squad",
+    "prefix": "SELK"
+  },
+  "31bd2683-0130-4bd8-990c-3fa12c4f44e4": {
+    "name": "Yorkshire Tea Drinkers",
+    "prefix": "YTD"
+  },
+  "55347d62-863a-4cd0-b445-b226162d03af": {
+    "name": "The Black Bulls",
+    "prefix": "tbbb"
+  },
+  "9b6c8230-1f7e-4a19-9add-742d5e854222": {
+    "name": "Alone Innmortal",
+    "prefix": "SWAT"
+  },
+  "88cf4f6b-b2b1-4a88-9e29-84fb6e04a6a6": {
+    "name": "SchapenKoppen",
+    "prefix": "LIER"
+  },
+  "eff036dc-26ab-4d8f-b209-7f0dd3a2eb1a": {
+    "name": "RussianFrost",
+    "prefix": "RUSq"
+  },
+  "a07d5db5-0642-43cc-b638-de2a8172986f": {
+    "name": "Something Alright",
+    "prefix": "Some"
+  },
+  "c5a34c83-4c94-4cdc-a7d2-ba629e169bd8": {
+    "name": "Mygoldkobben",
+    "prefix": "MGFM"
+  },
+  "7889ebfe-3e9d-4651-b1a9-7a2574e78b91": {
+    "name": "Veladorn",
+    "prefix": "VLDN"
+  },
+  "559f16d7-fae5-4faa-a9dd-b93adc14212e": {
+    "name": "Five Gay Rats",
+    "prefix": "SQEK"
+  },
+  "baf92945-7cdc-4bfd-936a-a41a7b9b5db6": {
+    "name": "Uma New World",
+    "prefix": "UMAS"
+  },
+  "44f37853-c9a7-4e91-b8d3-d2117647ad29": {
+    "name": "Dango Dynasty",
+    "prefix": "MOCH"
+  },
+  "a2c0e90c-18a5-4413-b29e-82edce8e0686": {
+    "name": "Gloria",
+    "prefix": "GLRA"
+  },
+  "b0d493b9-17a2-4e0a-aa87-3dd7131a182b": {
+    "name": "birbs",
+    "prefix": "brbs"
+  },
+  "f293137b-2c7f-4ea5-8030-0b0cc16ef965": {
+    "name": null,
+    "prefix": null
+  },
+  "66c7dca3-5957-4ebb-a470-6beac8889a68": {
+    "name": "Adventure of the bear",
+    "prefix": "Bav"
+  },
+  "d61875f4-66c6-42e2-b150-b87c9841baf7": {
+    "name": "New Tel Aviv",
+    "prefix": "NeTA"
+  },
+  "8ce63fce-c942-44d5-b232-cb42d2c21013": {
+    "name": "Crimson Clan",
+    "prefix": "CCU"
+  },
+  "b96ba0ef-666e-43d5-a434-b16959a5ade1": {
+    "name": "Hallowed Sanctum",
+    "prefix": "SNCM"
+  },
+  "2b46a4c1-e989-4477-91bc-55b1c2d4d595": {
+    "name": "Eden Bakery",
+    "prefix": "bidi"
+  },
+  "32f55f75-7fc5-460a-bd2c-71c4a04e7168": {
+    "name": "The Bananas Of Wynn",
+    "prefix": "TBOW"
+  },
+  "8fcc4fc9-fd39-4994-850f-7c09087e3355": {
+    "name": "DubWynn",
+    "prefix": "DUBW"
+  },
+  "d4554445-ff8a-44ec-811f-e9845b3dfb7f": {
+    "name": "The Jasmine Dragon",
+    "prefix": "OWCA"
+  },
+  "1284b24e-e8df-45a0-95df-c74e749eabb9": {
+    "name": "Ragnars Approved Heroes",
+    "prefix": "RAHE"
+  },
+  "40646e8a-b6de-49c9-9bbe-1b53b83d27b8": {
+    "name": "FREAKA DEAKS",
+    "prefix": "ORKS"
+  },
+  "5096abf9-bed8-4dd5-9c9b-b9fc78758650": {
+    "name": "Lasting Peace Nine",
+    "prefix": "PEAC"
+  },
+  "dbebc18c-00d0-4f5b-b96b-af78227a3537": {
+    "name": "The Skull of Poseidon",
+    "prefix": "TSOP"
+  },
+  "ba1bfc55-9544-4a35-b876-2e581980f54a": {
+    "name": "corona weedus",
+    "prefix": "wedu"
+  },
+  "4e419ae5-da78-43f0-96f0-6c6b04aa884e": {
+    "name": "Horthy Miklos Hadserege",
+    "prefix": "HMH"
+  },
+  "91850e11-fd92-48f5-93af-ca7bf714b36e": {
+    "name": "Shurimanos",
+    "prefix": "SHMN"
+  },
+  "ac098a77-8a2a-402b-a276-da5e9737c119": {
+    "name": "Soul Soldier",
+    "prefix": "MMHB"
+  },
+  "cab08aa7-73f4-4627-a284-288d4f66855d": {
+    "name": "GhostlyPants",
+    "prefix": "DMFP"
+  },
+  "227bded4-a10d-4d2f-a837-10252361a746": {
+    "name": null,
+    "prefix": null
+  },
+  "0860abae-d727-457e-b401-280536201cf4": {
+    "name": "SNO Crew",
+    "prefix": "XMR"
+  },
+  "a0a231c8-7c8e-4363-94e0-f00340dcdfcf": {
+    "name": "LOVE COUO EVER",
+    "prefix": "COUO"
+  },
+  "93b563db-369c-4ae2-95e3-0639822449fd": {
+    "name": "Lunaris",
+    "prefix": "Lume"
+  },
+  "5b15950d-a2f8-4a59-9cd4-a5ffb4af0861": {
+    "name": "TAXI",
+    "prefix": "TAXI"
+  },
+  "d48ddf42-d3f4-4133-b4ce-c5768b2db225": {
+    "name": "we are free",
+    "prefix": "eew"
+  },
+  "555f3444-a324-4dda-87ba-53f57f2a646e": {
+    "name": "furry island",
+    "prefix": "uwuw"
+  },
+  "b1e3bbb2-a891-4eb6-b3c8-a3df218546a9": {
+    "name": "EU Fourteen Hangout",
+    "prefix": "EUFT"
+  },
+  "4c5e21aa-c8d7-4448-8d92-95c75d229677": {
+    "name": "Tachyon",
+    "prefix": "TCYN"
+  },
+  "6d120302-6cbe-4a5b-a246-c71df20c7497": {
+    "name": "Flikkira",
+    "prefix": "FIK"
+  },
+  "55272f23-9a0e-4de6-8f21-5b8d5227d78b": {
+    "name": "Shades",
+    "prefix": "Mood"
+  },
+  "dfc10031-ae79-48a2-bc02-84f3f3af2e6f": {
+    "name": "TheGhost",
+    "prefix": "GWN"
+  },
+  "bd0061e2-3f70-48f4-8631-cc7f4a669de7": {
+    "name": "Uma Musume",
+    "prefix": "Haru"
+  },
+  "cdd1970b-ac1a-4eaa-9399-af1dffbd833c": {
+    "name": "rat kings horde",
+    "prefix": "roni"
+  },
+  "dea991c1-ca9d-4623-a95a-7d9367c3918d": {
+    "name": "Pengu Squad",
+    "prefix": "pal"
+  },
+  "2bce38ce-1f9b-4081-afa7-85877bec531c": {
+    "name": "Goblin Hut",
+    "prefix": "FFIS"
+  },
+  "06ec5025-6846-465f-b9fc-bc1ae4691381": {
+    "name": "GloryToFumo",
+    "prefix": "GtF"
+  },
+  "b5698829-a3d3-4ac2-a8e9-9245e26a3fe0": {
+    "name": "Gaysi",
+    "prefix": "gayy"
+  },
+  "bdd4fb15-320f-44ec-accc-393a578daec2": {
+    "name": "Attarra",
+    "prefix": "ATR"
+  },
+  "0cee7088-a45e-403e-9e1b-9771d324a9ba": {
+    "name": "Charizardia",
+    "prefix": "CZD"
+  },
+  "fe5ef002-baa0-48d1-b61a-0bd0624c7d46": {
+    "name": "LEGENDSGG",
+    "prefix": "LGEN"
+  },
+  "b4f27fe3-0d7a-4c8f-a45d-e7bc5a231c05": {
+    "name": "Bus peoples",
+    "prefix": "FOAM"
+  },
+  "880732f4-1332-4359-8a65-6fc46d2c4dcb": {
+    "name": "Greenmojis",
+    "prefix": "GREQ"
+  },
+  "773e0a6c-0cb1-4583-804b-a15cb96763d7": {
+    "name": "Strawberry ChiChi",
+    "prefix": "jJap"
+  },
+  "ba5d39d7-d9c0-4e88-9fad-9b01b18cfb1d": {
+    "name": "Menagerie",
+    "prefix": "CCCC"
+  },
+  "79747718-7df1-4f92-9c8a-c124cee13349": {
+    "name": "Money Hack",
+    "prefix": "TMH"
+  },
+  "4af7b283-7689-46b6-a249-52f6604be3a7": {
+    "name": null,
+    "prefix": null
+  },
+  "1d0dcdde-a4a3-4e6e-bbd8-a224f4455eaf": {
+    "name": "Korea Starlit Haven",
+    "prefix": "KOSH"
+  },
+  "25a677eb-5511-47aa-9351-ffb2d18a39ca": {
+    "name": "Godly",
+    "prefix": "grey"
+  },
+  "504e32aa-1c20-4124-a6fd-4e0510774065": {
+    "name": "The Winding Fate",
+    "prefix": "WndF"
+  },
+  "09b53bc3-f066-4fa1-9bcc-ae50879cd26c": {
+    "name": "Allegory of the End",
+    "prefix": "AYED"
+  },
+  "6a2dd1f9-f158-4c41-a5ce-341b62593f2b": {
+    "name": "Katharsis Efimera",
+    "prefix": "KTHS"
+  },
+  "49a54911-7710-45fc-a685-4fd4463062b4": {
+    "name": "Peskeis Server",
+    "prefix": "pesu"
+  },
+  "3461b30f-d8fb-43a4-85af-4a6a98bc1497": {
+    "name": "Themrxcraft",
+    "prefix": "Fake"
+  },
+  "4d053921-0eae-478d-821c-4b813c536545": {
+    "name": "hmpf i am not a tsundere",
+    "prefix": "tsdr"
+  },
+  "25da5b73-480a-4713-8727-46255e8e987b": {
+    "name": "The Mucky boys",
+    "prefix": "MKB"
+  },
+  "f9ef2343-3c14-4fef-bdfc-b6be4bc2ccac": {
+    "name": "DSBLarpers",
+    "prefix": "Larp"
+  },
+  "be22b0e1-2e84-4df5-a610-c4de096bee41": {
+    "name": "Cirrus",
+    "prefix": "Crrs"
+  },
+  "64866331-1521-4642-bf4f-6f8d3eae3ccb": {
+    "name": "Somekyr",
+    "prefix": "OMK"
+  },
+  "ef8d6001-6acd-4ed6-9f4b-198f41636d84": {
+    "name": "The axolotl",
+    "prefix": "seas"
+  },
+  "2301f2dc-cdbe-4a55-b0b7-8969fcd6ac99": {
+    "name": "Poignant Echoes",
+    "prefix": "POEC"
+  },
+  "78180d5f-200a-4c77-9cea-d3e58f373bed": {
+    "name": "co co co co co co co",
+    "prefix": "cooo"
+  },
+  "00dad2ac-3f9f-4da5-8ea2-febd920b60e4": {
+    "name": "Solidify",
+    "prefix": "SDFY"
+  },
+  "89b90a72-3f77-4bb3-81ea-60f8f602ed3e": {
+    "name": "GoMeUnicorn",
+    "prefix": "UNIC"
+  },
+  "ca60ea65-7542-422c-a1d1-57bf9e7a3a24": {
+    "name": "Wrath Of Poseidon",
+    "prefix": "Oce"
+  },
+  "0201e85d-e1fe-47dd-9794-75f5f98b731a": {
+    "name": "Ashen",
+    "prefix": "Ashn"
+  },
+  "15b61778-0b72-4413-8630-a7ccd69102b1": {
+    "name": "The Author Alliance",
+    "prefix": "Heal"
+  },
+  "cc87e969-2e8b-47d8-97bf-40910a5a5d83": {
+    "name": "empire of japan",
+    "prefix": "EOJP"
+  },
+  "54bdc383-08c6-44b4-98ec-3b071011bed3": {
+    "name": "Chosen of Orphion",
+    "prefix": "Orph"
+  },
+  "0d8ac8c8-10ec-4a2a-a47a-43549900e58a": {
+    "name": "Adversary",
+    "prefix": "ADVR"
+  },
+  "a181a8a9-0c34-47e8-a348-f393a9312fd0": {
+    "name": "Miscellaneous",
+    "prefix": "MISC"
+  },
+  "e97dc730-38e0-48bd-b6ae-0c1a31e1b7b3": {
+    "name": null,
+    "prefix": null
+  },
+  "27972bd1-9d50-4009-8e3f-09dea543aef0": {
+    "name": "Trifolium",
+    "prefix": "TriF"
+  },
+  "d023fc8b-e61c-41d4-b5fe-09e29b18587e": {
+    "name": "menn",
+    "prefix": "menn"
+  },
+  "a931fede-5286-4843-ad49-619a12cc5b2a": {
+    "name": "Dragons Chaos",
+    "prefix": "Dra"
+  },
+  "f2987d21-d100-49d7-ab29-2d91fc9b7ea0": {
+    "name": "EoVy",
+    "prefix": "EoVy"
+  },
+  "d883a33e-8865-437f-a704-cf12df95c5a0": {
+    "name": "Femboys United",
+    "prefix": "fems"
+  }
+}
