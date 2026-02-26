@@ -304,6 +304,8 @@ export interface ExchangeStore {
   territoryEvents: Array<[number, number]>[];
   /** Per-territory era classification derived from actual exchange timestamps */
   territoryEras: Array<'old' | 'new' | 'both'>;
+  /** Unix seconds of the earliest exchange across all territories */
+  dataStartSec: number;
 }
 
 /** Build an ExchangeStore from raw API data. One-time cost on load. */
@@ -365,7 +367,14 @@ export function buildExchangeStore(data: ExchangeEventData): ExchangeStore {
     }
   }
 
-  return { data, territoryEvents, territoryEras };
+  // Compute the earliest exchange timestamp across all territories
+  let dataStartSec = Infinity;
+  for (const evt of data.events) {
+    if (evt[0] < dataStartSec) dataStartSec = evt[0];
+  }
+  if (!isFinite(dataStartSec)) dataStartSec = 0;
+
+  return { data, territoryEvents, territoryEras, dataStartSec };
 }
 
 /**
@@ -469,6 +478,16 @@ export function buildSnapshotAt(
       // No exchange before this time — forward-looking backfill.
       // Find the first exchange for this territory in the correct era
       // and use its guild as the owner (they held it up to that point).
+
+      // Guard: only backfill territories that existed from the start.
+      // If a territory's first exchange is more than 1 year after data
+      // collection began, it was added in a later game update and should
+      // never be backfilled — it simply didn't exist yet.
+      if (events.length > 0) {
+        const ONE_YEAR_SEC = 365 * 24 * 60 * 60;
+        if (events[0][0] - store.dataStartSec > ONE_YEAR_SEC) continue;
+      }
+
       let backfillGIdx = -1;
 
       // Search forward through events to find the first one in the correct era

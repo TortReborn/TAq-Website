@@ -33,7 +33,17 @@
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(sort:*)",
-      "Bash(uniq:*)"
+      "Bash(uniq:*)",
+      "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402].csv\")",
+      "Bash(npx jest --forceExit)",
+      "Bash(npx vitest run --reporter verbose)",
+      "Bash(node scripts/find_overlaps.js)",
+      "Bash(node --input-type=module -e \":*)",
+      "Bash(node analyze_overlaps.js)",
+      "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-05-03 to 2020-06-07\\).csv\")",
+      "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-06-22 to 2020-06-26\\).csv\")",
+      "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-07-18 to 2020-08-02\\).csv\")",
+      "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-08-18 to 2020-09-02\\).csv\")"
     ],
     "deny": [],
     "ask": []

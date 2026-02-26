@@ -491,8 +491,11 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
   "Zhight Island": "ZHI",
 };
 
-// Cutoff: territories below only existed before the Rekindled World update.
-// The 2.1 Rekindled World update went live on August 10, 2024.
+// ---------------------------------------------------------------------------
+// Game-update cutoff dates.
+// ---------------------------------------------------------------------------
+
+/** 2.1 Rekindled World — August 10, 2024 */
 export const REKINDLED_WORLD_CUTOFF_MS = new Date("2024-08-10T00:00:00Z").getTime();
 
 // Old territory names that were REMOVED in the 2.1 Rekindled World update.
