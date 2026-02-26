@@ -230,19 +230,6 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     if (cachedOpaqueFill !== null) {
       setOpaqueFill(cachedOpaqueFill === 'true');
     }
-    const cachedShowFactions = localStorage.getItem('mapShowFactions');
-    if (cachedShowFactions !== null) {
-      setShowFactions(cachedShowFactions === 'true');
-    }
-    const cachedFactions = localStorage.getItem('mapFactions');
-    if (cachedFactions) {
-      try {
-        setFactions(JSON.parse(cachedFactions));
-      } catch (error) {
-        console.error('Failed to parse cached factions:', error);
-      }
-    }
-
     setIsInitialized(true);
   }, [clampScale]);
 
@@ -308,17 +295,6 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, [opaqueFill, isInitialized]);
 
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('mapShowFactions', String(showFactions));
-    }
-  }, [showFactions, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('mapFactions', JSON.stringify(factions));
-    }
-  }, [factions, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
