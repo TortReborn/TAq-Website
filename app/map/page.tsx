@@ -1551,7 +1551,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
           >
             <img
               ref={mapImageRef}
-              src="/images/map/wynncraft_map.png"
+              src="/images/map/fruma_map.png"
               alt="Wynncraft Map"
               style={{
                 position: 'absolute',

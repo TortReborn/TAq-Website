@@ -87,24 +87,25 @@ export async function loadTerritories(): Promise<Record<string, Territory>> {
 }
 
 // Coordinate conversion utility - maps game coordinates to pixel coordinates
+// Calibrated for fruma_map.png (4262x6644) using Detlas as reference.
 export function coordToPixel(coord: [number, number]): [number, number] {
   // Using Detlas as reference point:
-  // Game coordinate [402, -1657] should map to pixel [2872, 4990]
+  // Game coordinate [402, -1657] maps to pixel [3049, 5052] on fruma_map.png
   const refGameCoord = [402, -1657];
-  const refPixelCoord = [2872, 4990];
-  
+  const refPixelCoord = [3049, 5052];
+
   // Calculate offset from reference point
   const deltaX = coord[0] - refGameCoord[0];
   const deltaY = coord[1] - refGameCoord[1];
-  
+
   // Adjusted scale factors
   const scaleX = 1.0;
-  const scaleY = 1.0; // fix: Y axis now matches map image orientation
-  
+  const scaleY = 1.0;
+
   // Apply small offset to shift overlays left and higher
   const pixelX = refPixelCoord[0] + deltaX * scaleX - 85;
   const pixelY = refPixelCoord[1] + deltaY * scaleY - 75;
-  
+
   return [pixelX, pixelY];
 }
 
