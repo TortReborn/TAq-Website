@@ -28,6 +28,7 @@ export interface HistoryBounds {
   earliest: string;
   latest: string;
   gaps?: Array<{ start: string; end: string }>;
+  initialOwners?: Array<{ territory: string; guild: string }>;
 }
 
 // WeakMap cache for expanded snapshots — keyed on the snapshot territories
@@ -349,6 +350,32 @@ function lastEventBefore(
   return lo > 0 ? events[lo - 1][1] : -1;
 }
 
+/** Pre-built lookup for initial owners (territory name → {guild, prefix}). */
+export type InitialOwnerMap = Map<string, { guild: string; prefix: string }>;
+
+/** Build an InitialOwnerMap from bounds data + guild prefix lookup in the store. */
+export function buildInitialOwnerMap(
+  initialOwners: Array<{ territory: string; guild: string }>,
+  store: ExchangeStore,
+): InitialOwnerMap {
+  // Build guild → prefix from the store's data
+  const prefixByGuild = new Map<string, string>();
+  for (let i = 0; i < store.data.guilds.length; i++) {
+    prefixByGuild.set(store.data.guilds[i], store.data.prefixes[i]);
+  }
+  const map: InitialOwnerMap = new Map();
+  for (const { territory, guild } of initialOwners) {
+    map.set(territory, {
+      guild,
+      prefix: prefixByGuild.get(guild) ?? guild.substring(0, 3).toUpperCase(),
+    });
+  }
+  return map;
+}
+
+// Duration of the backfill window from the data start (3 months)
+const BACKFILL_WINDOW_MS = 3 * 30 * 24 * 60 * 60 * 1000;
+
 /**
  * Reconstruct a single snapshot at any timestamp — client-side equivalent
  * of the server's `reconstructSingleSnapshot()`.
@@ -356,20 +383,45 @@ function lastEventBefore(
  * For each territory, binary-searches its event history for the latest
  * owner at or before the requested time.  ~650 × log2(2500) ≈ 8K
  * comparisons — effectively instant.
+ *
+ * `initialOwners` — optional map of territory → {guild, prefix} for
+ * territories that haven't been exchanged yet.  Used within the first
+ * 3 months of the data range to backfill from the first exchange's defender.
  */
 export function buildSnapshotAt(
   store: ExchangeStore,
   timestamp: Date,
+  initialOwners?: InitialOwnerMap,
 ): ParsedSnapshot | null {
   const targetSec = Math.floor(timestamp.getTime() / 1000);
-  const isPostRekindled = timestamp.getTime() >= REKINDLED_WORLD_CUTOFF_MS;
+  const targetMs = timestamp.getTime();
+  const isPostRekindled = targetMs >= REKINDLED_WORLD_CUTOFF_MS;
   const { data, territoryEvents } = store;
   const territories: Record<string, SnapshotTerritory> = {};
   let count = 0;
 
+  // Check if we're within the backfill window (first 3 months of data)
+  const earliestMs = new Date(data.earliest).getTime();
+  const inBackfillWindow = initialOwners && targetMs < earliestMs + BACKFILL_WINDOW_MS;
+
   for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
     const gIdx = lastEventBefore(territoryEvents[tIdx], targetSec);
-    if (gIdx === -1) continue;
+
+    if (gIdx === -1) {
+      // No exchange before this time — try backfill from initial owners
+      if (inBackfillWindow) {
+        const terrName = data.territories[tIdx];
+        const owner = initialOwners!.get(terrName);
+        if (owner) {
+          const abbrev = toAbbrev(terrName);
+          if (!(isPostRekindled && OLD_TERRITORY_ABBREVS.has(abbrev))) {
+            territories[abbrev] = { g: owner.prefix, n: owner.guild };
+            count++;
+          }
+        }
+      }
+      continue;
+    }
 
     const guildName = data.guilds[gIdx];
     if (guildName === 'None') continue;

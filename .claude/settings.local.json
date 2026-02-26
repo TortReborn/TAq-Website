@@ -20,7 +20,8 @@
       "Bash(sed 's/\"\"//g')",
       "Bash(sed 's/\"\": \\\\[//')",
       "Bash(npx next lint --file lib/conflict-detection.ts --file components/ConflictFinder.tsx)",
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); owners=d.get\\(''initialOwners'',[]\\); print\\(f''Total initial owners: {len\\(owners\\)}''\\); [print\\(f''  {o[\"\"territory\"\"]:40s} → {o[\"\"guild\"\"]}''\\) for o in owners[:15]]; print\\(f''  ... and {len\\(owners\\)-15} more''\\) if len\\(owners\\)>15 else None\")"
     ],
     "deny": [],
     "ask": []

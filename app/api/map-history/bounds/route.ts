@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { USE_TEST_DATA, getTestBounds } from '@/lib/test-history-data';
-import { getExchangeBounds, getExchangeGaps } from '@/lib/exchange-data';
+import { getExchangeBounds, getExchangeGaps, getInitialOwners } from '@/lib/exchange-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     const gaps = await getExchangeGaps(pool);
+    const initialOwners = await getInitialOwners(pool);
 
     return NextResponse.json({
       earliest: exchangeBounds.earliest.toISOString(),
@@ -36,6 +37,10 @@ export async function GET(request: NextRequest) {
       gaps: gaps.map(g => ({
         start: g.start.toISOString(),
         end: g.end.toISOString(),
+      })),
+      initialOwners: initialOwners.map(o => ({
+        territory: o.territory,
+        guild: o.guild,
       })),
     }, {
       headers: {

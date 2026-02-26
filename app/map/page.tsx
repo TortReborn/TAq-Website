@@ -26,6 +26,8 @@ import {
   RangedExchangeEventData,
   buildExchangeStoreFromRanged,
   mergeExchangeStores,
+  InitialOwnerMap,
+  buildInitialOwnerMap,
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 
@@ -106,6 +108,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const exchangeStoreRef = useRef<ExchangeStore | null>(null);
   const [storeVersion, setStoreVersion] = useState(0); // bumped when store changes to trigger useMemo
   const exchangePromiseRef = useRef<Promise<ExchangeStore | null> | null>(null);
+  // Initial owner map — defenders from each territory's first exchange (backfill early data)
+  const initialOwnerMapRef = useRef<InitialOwnerMap | null>(null);
 
   // Initial snapshot for instant first paint (before event store is ready)
   const [initialSnapshot, setInitialSnapshot] = useState<ParsedSnapshot | null>(null);
@@ -416,6 +420,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               earliest: data.earliest,
               latest: data.latest,
               gaps: data.gaps,
+              initialOwners: data.initialOwners,
             });
           }
         }
@@ -765,6 +770,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       setHistoryTimestamp(null);
       setInitialSnapshot(null);
       exchangeStoreRef.current = null;
+      initialOwnerMapRef.current = null;
       setStoreVersion(0);
       eventRangesRef.current = [];
       setLoadedRanges([]);
@@ -803,6 +809,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const handleHistoryRefresh = useCallback(async () => {
     setIsPlaying(false);
     exchangeStoreRef.current = null;
+    initialOwnerMapRef.current = null;
     setStoreVersion(0);
     eventRangesRef.current = [];
     setLoadedRanges([]);
@@ -819,6 +826,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             earliest: boundsData.earliest,
             latest: boundsData.latest,
             gaps: boundsData.gaps,
+            initialOwners: boundsData.initialOwners,
           });
           const latestDate = new Date(boundsData.latest);
           setHistoryTimestamp(latestDate);
@@ -917,10 +925,17 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     // Prefer exchange store — instant reconstruction at any timestamp
     const store = exchangeStoreRef.current;
     if (store) {
-      const snapshot = buildSnapshotAt(store, historyTimestamp);
+      // Build initial owner map lazily (first 3 months backfill from defenders)
+      if (!initialOwnerMapRef.current && historyBounds?.initialOwners) {
+        initialOwnerMapRef.current = buildInitialOwnerMap(historyBounds.initialOwners, store);
+      }
+      const snapshot = buildSnapshotAt(store, historyTimestamp, initialOwnerMapRef.current ?? undefined);
       if (snapshot) {
         return expandSnapshot(snapshot.territories, verboseData, effectiveGuildColors);
       }
+      // Store exists but no snapshot (e.g. timestamp is before all exchange events).
+      // Return empty territories instead of null to avoid a false "loading" state.
+      return {};
     }
 
     // Fall back to initial snapshot (before events have loaded)
@@ -931,7 +946,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     return null;
   // storeVersion triggers recompute when the exchange store is updated
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode, historyTimestamp, storeVersion, initialSnapshot, verboseData, effectiveGuildColors]);
+  }, [viewMode, historyTimestamp, storeVersion, initialSnapshot, verboseData, effectiveGuildColors, historyBounds]);
 
   // Step forward/backward handlers — time-based stepping (10 minutes)
   const handleStepForward = useCallback(() => {

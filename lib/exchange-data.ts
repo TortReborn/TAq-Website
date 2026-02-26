@@ -113,6 +113,38 @@ export async function getExchangeGaps(
 }
 
 // ---------------------------------------------------------------------------
+// Initial owners — for each territory, the defender from its first exchange.
+// Used to backfill early timestamps where territories haven't been exchanged yet.
+// ---------------------------------------------------------------------------
+let initialOwnersCache: Array<{ territory: string; guild: string }> | null = null;
+let initialOwnersCacheTime = 0;
+
+export async function getInitialOwners(
+  pool: Pool,
+): Promise<Array<{ territory: string; guild: string }>> {
+  if (initialOwnersCache && Date.now() - initialOwnersCacheTime < PREFIX_CACHE_TTL) {
+    return initialOwnersCache;
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT DISTINCT ON (territory) territory, defender_name
+      FROM territory_exchanges
+      WHERE defender_name != 'None'
+      ORDER BY territory, exchange_time ASC
+    `);
+    initialOwnersCache = result.rows.map((row: { territory: string; defender_name: string }) => ({
+      territory: row.territory,
+      guild: row.defender_name,
+    }));
+    initialOwnersCacheTime = Date.now();
+    return initialOwnersCache;
+  } catch {
+    return initialOwnersCache ?? [];
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Build a snapshot territories object from current state
 // ---------------------------------------------------------------------------
 function stateToTerritories(
