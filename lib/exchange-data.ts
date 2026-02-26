@@ -13,7 +13,7 @@
  */
 
 import { Pool } from "pg";
-import { toAbbrev, OLD_TERRITORY_NAMES, BOTH_ERA_TERRITORY_NAMES, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
+import { toAbbrev, OLD_TERRITORY_NAMES, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
 import type { HistorySnapshot, SnapshotTerritory } from "./history-data";
 
 // ---------------------------------------------------------------------------
@@ -156,12 +156,10 @@ function stateToTerritories(
   const territories: Record<string, SnapshotTerritory> = {};
   for (const [territory, guild] of state) {
     if (guild === "None") continue;    // unclaimed
-    // Only render territories from the correct era (both-era territories always render)
-    if (!BOTH_ERA_TERRITORY_NAMES.has(territory)) {
-      const isOldTerritory = OLD_TERRITORY_NAMES.has(territory);
-      if (isPostRekindled && isOldTerritory) continue;
-      if (timestampMs !== undefined && !isPostRekindled && !isOldTerritory) continue;
-    }
+    // Post-Rekindled: hide old-era territories to prevent spatial overlaps.
+    // Pre-Rekindled: show ALL territories — expandSnapshot on the client will
+    // naturally skip any without location data in verboseData.
+    if (isPostRekindled && OLD_TERRITORY_NAMES.has(territory)) continue;
     const abbrev = toAbbrev(territory);
     territories[abbrev] = {
       g: guildPrefix(prefixes, guild),

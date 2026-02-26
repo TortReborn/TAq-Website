@@ -3,7 +3,7 @@
  */
 
 import { Territory } from "./utils";
-import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, OLD_TERRITORY_ABBREVS, BOTH_ERA_TERRITORY_ABBREVS, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
+import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
 
 // Condensed snapshot format for database storage
 export interface SnapshotTerritory {
@@ -302,6 +302,8 @@ export interface ExchangeStore {
   data: ExchangeEventData;
   /** terrIdx → sorted array of [unixSec, guildIdx] pairs */
   territoryEvents: Array<[number, number]>[];
+  /** Per-territory era classification derived from actual exchange timestamps */
+  territoryEras: Array<'old' | 'new' | 'both'>;
 }
 
 /** Build an ExchangeStore from raw API data. One-time cost on load. */
@@ -322,7 +324,22 @@ export function buildExchangeStore(data: ExchangeEventData): ExchangeStore {
   // The per-territory arrays ARE in order because we iterated the globally-
   // sorted events array — so no extra sort needed.
 
-  return { data, territoryEvents };
+  // Classify each territory's era from its actual exchange timestamps.
+  // This is data-driven: a territory is 'both' if it has exchanges on
+  // both sides of the Rekindled World cutoff, regardless of its name.
+  const REKINDLED_CUTOFF_SEC = Math.floor(REKINDLED_WORLD_CUTOFF_MS / 1000);
+  const territoryEras: Array<'old' | 'new' | 'both'> = new Array(data.territories.length);
+  for (let i = 0; i < territoryEvents.length; i++) {
+    let hasOld = false, hasNew = false;
+    for (const [sec] of territoryEvents[i]) {
+      if (sec < REKINDLED_CUTOFF_SEC) hasOld = true;
+      else hasNew = true;
+      if (hasOld && hasNew) break;
+    }
+    territoryEras[i] = hasOld && hasNew ? 'both' : hasOld ? 'old' : 'new';
+  }
+
+  return { data, territoryEvents, territoryEras };
 }
 
 /**
@@ -388,20 +405,6 @@ const BACKFILL_WINDOW_MS = 3 * 30 * 24 * 60 * 60 * 1000;
  * territories that haven't been exchanged yet.  Used within the first
  * 3 months of the data range to backfill from the first exchange's defender.
  */
-/**
- * Check if a territory abbreviation belongs to the wrong era for the given timestamp.
- * - Old-only territories: render only pre-Rekindled
- * - New-only territories: render only post-Rekindled
- * - Both-era territories: render always
- */
-function isWrongEra(abbrev: string, isPostRekindled: boolean): boolean {
-  // Territories that exist in both eras always render
-  if (BOTH_ERA_TERRITORY_ABBREVS.has(abbrev)) return false;
-  const isOld = OLD_TERRITORY_ABBREVS.has(abbrev);
-  // Old-only in post-Rekindled era, or new-only in pre-Rekindled era
-  return isPostRekindled ? isOld : !isOld;
-}
-
 export function buildSnapshotAt(
   store: ExchangeStore,
   timestamp: Date,
@@ -421,6 +424,11 @@ export function buildSnapshotAt(
   for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
     const gIdx = lastEventBefore(territoryEvents[tIdx], targetSec);
 
+    // Skip territories from the wrong era (data-driven from exchange timestamps)
+    const era = store.territoryEras[tIdx];
+    if (isPostRekindled && era === 'old') continue;
+    if (!isPostRekindled && era === 'new') continue;
+
     if (gIdx === -1) {
       // No exchange before this time — try backfill from initial owners
       if (inBackfillWindow) {
@@ -428,10 +436,8 @@ export function buildSnapshotAt(
         const owner = initialOwners!.get(terrName);
         if (owner) {
           const abbrev = toAbbrev(terrName);
-          if (!isWrongEra(abbrev, isPostRekindled)) {
-            territories[abbrev] = { g: owner.prefix, n: owner.guild };
-            count++;
-          }
+          territories[abbrev] = { g: owner.prefix, n: owner.guild };
+          count++;
         }
       }
       continue;
@@ -441,8 +447,6 @@ export function buildSnapshotAt(
     if (guildName === 'None') continue;
 
     const abbrev = toAbbrev(data.territories[tIdx]);
-    // Skip territories from the wrong era
-    if (isWrongEra(abbrev, isPostRekindled)) continue;
 
     territories[abbrev] = {
       g: data.prefixes[gIdx],
@@ -525,8 +529,11 @@ export function buildSnapshotsInRange(
       for (const [tIdx, gIdx] of state) {
         const guildName = data.guilds[gIdx];
         if (guildName === 'None') continue;
+        // Data-driven era filter
+        const era = store.territoryEras[tIdx];
+        if (isPostRekindled && era === 'old') continue;
+        if (!isPostRekindled && era === 'new') continue;
         const abbrev = toAbbrev(data.territories[tIdx]);
-        if (isWrongEra(abbrev, isPostRekindled)) continue;
         territories[abbrev] = {
           g: data.prefixes[gIdx],
           n: guildName,

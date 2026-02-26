@@ -717,8 +717,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, [isRangeCovered, fetchEventRange, recordRange, startBackgroundFetch, historyBounds]);
 
-  // Keep timestamp ref in sync (for playback interval)
-  useEffect(() => { historyTimestampRef.current = historyTimestamp; }, [historyTimestamp]);
+  // Keep timestamp ref in sync (for playback interval) and cache to sessionStorage
+  useEffect(() => {
+    historyTimestampRef.current = historyTimestamp;
+    if (historyTimestamp) {
+      sessionStorage.setItem('history-slider-position', historyTimestamp.toISOString());
+    }
+  }, [historyTimestamp]);
 
   // Stable ref for loadEvents (playback interval uses it)
   const loadEventsRef = useRef(loadEvents);
@@ -732,9 +737,23 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // Restore history mode from cached viewMode — fires exactly once
   useEffect(() => {
     if (isInitialized && viewMode === 'history' && historyBounds && !exchangeStoreRef.current && !historyTimestamp) {
-      const latest = new Date(historyBounds.latest);
-      setHistoryTimestamp(latest);
-      loadEvents(latest);
+      // Restore cached slider position if available
+      const cachedPos = sessionStorage.getItem('history-slider-position');
+      let targetDate: Date;
+      if (cachedPos) {
+        const parsed = new Date(cachedPos);
+        const earliest = new Date(historyBounds.earliest).getTime();
+        const latest = new Date(historyBounds.latest).getTime();
+        if (!isNaN(parsed.getTime()) && parsed.getTime() >= earliest && parsed.getTime() <= latest) {
+          targetDate = parsed;
+        } else {
+          targetDate = new Date(historyBounds.latest);
+        }
+      } else {
+        targetDate = new Date(historyBounds.latest);
+      }
+      setHistoryTimestamp(targetDate);
+      loadEvents(targetDate);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, viewMode, historyBounds]);
@@ -744,7 +763,22 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     setViewMode(mode);
     if (mode === 'history') {
       setIsPlaying(false);
-      const targetDate = historyBounds?.latest ? new Date(historyBounds.latest) : new Date();
+      // Restore cached slider position if available, otherwise use latest
+      const cachedPos = sessionStorage.getItem('history-slider-position');
+      let targetDate: Date;
+      if (cachedPos) {
+        const parsed = new Date(cachedPos);
+        const earliest = historyBounds?.earliest ? new Date(historyBounds.earliest).getTime() : 0;
+        const latest = historyBounds?.latest ? new Date(historyBounds.latest).getTime() : Infinity;
+        // Only use cached position if it falls within current bounds
+        if (!isNaN(parsed.getTime()) && parsed.getTime() >= earliest && parsed.getTime() <= latest) {
+          targetDate = parsed;
+        } else {
+          targetDate = historyBounds?.latest ? new Date(historyBounds.latest) : new Date();
+        }
+      } else {
+        targetDate = historyBounds?.latest ? new Date(historyBounds.latest) : new Date();
+      }
       setHistoryTimestamp(targetDate); // set ONCE, synchronously
 
       // Instant first paint: fetch a single snapshot from the server
