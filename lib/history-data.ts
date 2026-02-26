@@ -3,7 +3,7 @@
  */
 
 import { Territory } from "./utils";
-import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, OLD_TERRITORY_ABBREVS, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
+import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, OLD_TERRITORY_ABBREVS, BOTH_ERA_TERRITORY_ABBREVS, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
 
 // Condensed snapshot format for database storage
 export interface SnapshotTerritory {
@@ -390,11 +390,15 @@ const BACKFILL_WINDOW_MS = 3 * 30 * 24 * 60 * 60 * 1000;
  */
 /**
  * Check if a territory abbreviation belongs to the wrong era for the given timestamp.
- * Old territories only render pre-Rekindled; new territories only render post-Rekindled.
+ * - Old-only territories: render only pre-Rekindled
+ * - New-only territories: render only post-Rekindled
+ * - Both-era territories: render always
  */
 function isWrongEra(abbrev: string, isPostRekindled: boolean): boolean {
+  // Territories that exist in both eras always render
+  if (BOTH_ERA_TERRITORY_ABBREVS.has(abbrev)) return false;
   const isOld = OLD_TERRITORY_ABBREVS.has(abbrev);
-  // Old territory in post-Rekindled era, or new territory in pre-Rekindled era
+  // Old-only in post-Rekindled era, or new-only in pre-Rekindled era
   return isPostRekindled ? isOld : !isOld;
 }
 
