@@ -16012,5 +16012,461 @@
       "prefix": ""
     },
     "Acquired": ""
+  },
+  "Abandoned Church": {
+    "Location": {
+      "start": [
+        -896,
+        -5232
+      ],
+      "end": [
+        -802,
+        -5102
+      ]
+    }
+  },
+  "Abandoned Tower": {
+    "Location": {
+      "start": [
+        -288,
+        -5411
+      ],
+      "end": [
+        -392,
+        -5601
+      ]
+    }
+  },
+  "Angry Village": {
+    "Location": {
+      "start": [
+        330,
+        -1040
+      ],
+      "end": [
+        450,
+        -1170
+      ]
+    }
+  },
+  "Animal Bridge": {
+    "Location": {
+      "start": [
+        -324,
+        -1130
+      ],
+      "end": [
+        -192,
+        -993
+      ]
+    }
+  },
+  "Arachnida Cave": {
+    "Location": {
+      "start": [
+        -489,
+        -5279
+      ],
+      "end": [
+        -549,
+        -5398
+      ]
+    }
+  },
+  "Banshees Cave": {
+    "Location": {
+      "start": [
+        -653,
+        -5231
+      ],
+      "end": [
+        -785,
+        -5401
+      ]
+    }
+  },
+  "Battle Tower": {
+    "Location": {
+      "start": [
+        -400,
+        -450
+      ],
+      "end": [
+        -315,
+        -330
+      ]
+    }
+  },
+  "Black Camp": {
+    "Location": {
+      "start": [
+        -1800,
+        -4962
+      ],
+      "end": [
+        -1695,
+        -4854
+      ]
+    }
+  },
+  "Black Magic": {
+    "Location": {
+      "start": [
+        -471,
+        -5405
+      ],
+      "end": [
+        -549,
+        -5512
+      ]
+    }
+  },
+  "Bucie North East": {
+    "Location": {
+      "start": [
+        -1603,
+        -4969
+      ],
+      "end": [
+        -1529,
+        -5100
+      ]
+    }
+  },
+  "Bucie North West": {
+    "Location": {
+      "start": [
+        -1688,
+        -5099
+      ],
+      "end": [
+        -1608,
+        -4969
+      ]
+    }
+  },
+  "Bucie South East": {
+    "Location": {
+      "start": [
+        -1603,
+        -4963
+      ],
+      "end": [
+        -1527,
+        -4853
+      ]
+    }
+  },
+  "Bucie South West": {
+    "Location": {
+      "start": [
+        -1688,
+        -4962
+      ],
+      "end": [
+        -1611,
+        -4854
+      ]
+    }
+  },
+  "Corkus Abandoned Tower": {
+    "Location": {
+      "start": [
+        -1681,
+        -3178
+      ],
+      "end": [
+        -1888,
+        -3375
+      ]
+    }
+  },
+  "Corrupted Hand": {
+    "Location": {
+      "start": [
+        -598,
+        -5580
+      ],
+      "end": [
+        -454,
+        -5518
+      ]
+    }
+  },
+  "Corrupted Impact": {
+    "Location": {
+      "start": [
+        -785,
+        -5229
+      ],
+      "end": [
+        -725,
+        -5102
+      ]
+    }
+  },
+  "Corrupted Village": {
+    "Location": {
+      "start": [
+        -288,
+        -5409
+      ],
+      "end": [
+        -392,
+        -5294
+      ]
+    }
+  },
+  "Farmers Valley": {
+    "Location": {
+      "start": [
+        -474,
+        -1884
+      ],
+      "end": [
+        -332,
+        -1945
+      ]
+    }
+  },
+  "Graveyard North": {
+    "Location": {
+      "start": [
+        -648,
+        -5314
+      ],
+      "end": [
+        -567,
+        -5400
+      ]
+    }
+  },
+  "Graveyard South": {
+    "Location": {
+      "start": [
+        -648,
+        -5311
+      ],
+      "end": [
+        -567,
+        -5234
+      ]
+    }
+  },
+  "Gray Zone": {
+    "Location": {
+      "start": [
+        683,
+        -619
+      ],
+      "end": [
+        477,
+        -515
+      ]
+    }
+  },
+  "Green Camp": {
+    "Location": {
+      "start": [
+        -1930,
+        -5099
+      ],
+      "end": [
+        -1816,
+        -4968
+      ]
+    }
+  },
+  "Gromblins Hideout": {
+    "Location": {
+      "start": [
+        -896,
+        -5408
+      ],
+      "end": [
+        -792,
+        -5233
+      ]
+    }
+  },
+  "Imperial Gate": {
+    "Location": {
+      "start": [
+        -1822,
+        -1995
+      ],
+      "end": [
+        -2015,
+        -1725
+      ]
+    }
+  },
+  "Light Realm East": {
+    "Location": {
+      "start": [
+        -240,
+        -6855
+      ],
+      "end": [
+        -45,
+        -6984
+      ]
+    }
+  },
+  "Light Realm East Mid-Upper": {
+    "Location": {
+      "start": [
+        -871,
+        -6986
+      ],
+      "end": [
+        -1076,
+        -6855
+      ]
+    }
+  },
+  "Light Realm Entrance Upper": {
+    "Location": {
+      "start": [
+        -1076,
+        -6848
+      ],
+      "end": [
+        -836,
+        -6634
+      ]
+    }
+  },
+  "Light Realm Mushrooms": {
+    "Location": {
+      "start": [
+        -249,
+        -6630
+      ],
+      "end": [
+        -539,
+        -6462
+      ]
+    }
+  },
+  "Mt. Wynn": {
+    "Location": {
+      "start": [
+        -250,
+        -2069
+      ],
+      "end": [
+        20,
+        -1960
+      ]
+    }
+  },
+  "Orphion's Seal": {
+    "Location": {
+      "start": [
+        -249,
+        -6854
+      ],
+      "end": [
+        -539,
+        -6633
+      ]
+    }
+  },
+  "Orphion's Seal Upper": {
+    "Location": {
+      "start": [
+        -542,
+        -6854
+      ],
+      "end": [
+        -826,
+        -6633
+      ]
+    }
+  },
+  "Path To Prison": {
+    "Location": {
+      "start": [
+        -771,
+        -5504
+      ],
+      "end": [
+        -899,
+        -5412
+      ]
+    }
+  },
+  "Qira's Battle Room": {
+    "Location": {
+      "start": [
+        1037,
+        -7046
+      ],
+      "end": [
+        1102,
+        -6981
+      ]
+    }
+  },
+  "Red Camp": {
+    "Location": {
+      "start": [
+        -1800,
+        -4852
+      ],
+      "end": [
+        -1670,
+        -4684
+      ]
+    }
+  },
+  "Sacrifice": {
+    "Location": {
+      "start": [
+        1388,
+        -869
+      ],
+      "end": [
+        1254,
+        -932
+      ]
+    }
+  },
+  "Shanjugin's River": {
+    "Location": {
+      "start": [
+        -659,
+        -5424
+      ],
+      "end": [
+        -766,
+        -5508
+      ]
+    }
+  },
+  "Spiraling Trees": {
+    "Location": {
+      "start": [
+        -1079,
+        -6630
+      ],
+      "end": [
+        -1345,
+        -6461
+      ]
+    }
+  },
+  "Statue": {
+    "Location": {
+      "start": [
+        -1322,
+        -2917
+      ],
+      "end": [
+        -1393,
+        -2836
+      ]
+    }
   }
 }
