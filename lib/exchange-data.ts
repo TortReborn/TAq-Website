@@ -63,8 +63,19 @@ async function getGuildPrefixes(pool: Pool): Promise<Map<string, string>> {
   }
 }
 
+/** Sanitize a guild prefix: must be 3+ alphabetic characters. */
+function sanitizePrefix(prefix: string, guildName: string): string {
+  // Already valid: 3+ alpha-only characters
+  if (prefix.length >= 3 && /^[A-Za-z]+$/.test(prefix)) return prefix;
+  // Strip non-alpha, pad if needed, take first 3
+  const alpha = guildName.replace(/[^A-Za-z]/g, '');
+  return (alpha.length >= 3 ? alpha.substring(0, 3) : (alpha + 'XXX').substring(0, 3)).toUpperCase();
+}
+
 function guildPrefix(prefixes: Map<string, string>, guildName: string): string {
-  return prefixes.get(guildName) ?? guildName.substring(0, 3).toUpperCase();
+  const stored = prefixes.get(guildName);
+  if (stored) return sanitizePrefix(stored, guildName);
+  return sanitizePrefix('', guildName);
 }
 
 // ---------------------------------------------------------------------------
@@ -113,7 +124,10 @@ export async function getExchangeGaps(
 }
 
 // ---------------------------------------------------------------------------
-// Initial owners — for each territory, the defender from its first exchange.
+// Initial owners — for each territory, the guild that held it before the
+// first recorded exchange.  Uses the defender of the first exchange when
+// available; falls back to the attacker (first guild to take ownership)
+// when the defender is 'None' (territory was unclaimed before first exchange).
 // Used to backfill early timestamps where territories haven't been exchanged yet.
 // ---------------------------------------------------------------------------
 let initialOwnersCache: Array<{ territory: string; guild: string }> | null = null;
@@ -127,16 +141,26 @@ export async function getInitialOwners(
   }
 
   try {
+    // For each territory, get its first exchange.  Use the defender if they're
+    // a real guild (they held the territory before data collection started).
+    // If the defender is 'None', use the attacker (first guild to claim it).
     const result = await pool.query(`
-      SELECT DISTINCT ON (territory) territory, defender_name
+      SELECT DISTINCT ON (territory)
+        territory,
+        CASE
+          WHEN defender_name != 'None' THEN defender_name
+          ELSE attacker_name
+        END AS initial_guild
       FROM territory_exchanges
-      WHERE defender_name != 'None'
+      WHERE attacker_name != 'None' OR defender_name != 'None'
       ORDER BY territory, exchange_time ASC
     `);
-    initialOwnersCache = result.rows.map((row: { territory: string; defender_name: string }) => ({
-      territory: row.territory,
-      guild: row.defender_name,
-    }));
+    initialOwnersCache = result.rows
+      .filter((row: { territory: string; initial_guild: string }) => row.initial_guild !== 'None')
+      .map((row: { territory: string; initial_guild: string }) => ({
+        territory: row.territory,
+        guild: row.initial_guild,
+      }));
     initialOwnersCacheTime = Date.now();
     return initialOwnersCache;
   } catch {

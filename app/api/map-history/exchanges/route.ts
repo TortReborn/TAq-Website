@@ -71,15 +71,21 @@ export async function GET(_request: NextRequest) {
       return tIdx;
     }
 
+    /** Sanitize a prefix: must be 3+ alphabetic characters. */
+    function sanitizePrefix(prefix: string, guildName: string): string {
+      if (prefix.length >= 3 && /^[A-Za-z]+$/.test(prefix)) return prefix;
+      const alpha = guildName.replace(/[^A-Za-z]/g, '');
+      return (alpha.length >= 3 ? alpha.substring(0, 3) : (alpha + 'XXX').substring(0, 3)).toUpperCase();
+    }
+
     function getOrCreateGuildIdx(guild: string): number {
       let gIdx = guildIndex.get(guild);
       if (gIdx === undefined) {
         gIdx = guilds.length;
         guildIndex.set(guild, gIdx);
         guilds.push(guild);
-        prefixes.push(
-          guildPrefixMap.get(guild) ?? guild.substring(0, 3).toUpperCase()
-        );
+        const rawPrefix = guildPrefixMap.get(guild) ?? '';
+        prefixes.push(sanitizePrefix(rawPrefix, guild));
       }
       return gIdx;
     }

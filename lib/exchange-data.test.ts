@@ -103,7 +103,7 @@ describe('reconstructSingleSnapshot', () => {
     // Only Detlas has an exchange before the timestamp.
     const pool = createMockPool([
       { rows: [
-        { guild_name: 'Guild A', guild_prefix: 'GA' },
+        { guild_name: 'Guild A', guild_prefix: 'GDA' },
       ]},
       // DISTINCT ON: only Detlas has an exchange before the timestamp
       { rows: [
@@ -115,7 +115,7 @@ describe('reconstructSingleSnapshot', () => {
     expect(result).not.toBeNull();
 
     // Detlas: appears from DISTINCT ON result
-    expect(result!.territories['DET']).toEqual({ g: 'GA', n: 'Guild A' });
+    expect(result!.territories['DET']).toEqual({ g: 'GDA', n: 'Guild A' });
     // Ragni and Almuj: no exchange before timestamp, should NOT appear
     expect(result!.territories['RAG']).toBeUndefined();
     expect(result!.territories['ALM']).toBeUndefined();
@@ -158,7 +158,7 @@ describe('reconstructSnapshotsFromExchanges', () => {
   it('produces regular 10-minute interval snapshots over the range', async () => {
     // 1-hour range → should produce 7 snapshots (at 0, 10, 20, 30, 40, 50, 60 min)
     const pool = createMockPool([
-      { rows: [{ guild_name: 'Guild A', guild_prefix: 'GA' }] },
+      { rows: [{ guild_name: 'Guild A', guild_prefix: 'GDA' }] },
       { rows: [{ territory: 'Detlas', attacker_name: 'Guild A' }] },
       { rows: [] }, // no exchanges
     ]);
@@ -169,7 +169,7 @@ describe('reconstructSnapshotsFromExchanges', () => {
 
     expect(result).toHaveLength(7);
     for (const snap of result) {
-      expect(snap.territories['DET']).toEqual({ g: 'GA', n: 'Guild A' });
+      expect(snap.territories['DET']).toEqual({ g: 'GDA', n: 'Guild A' });
     }
     expect(result[0].timestamp).toBe('2023-06-01T00:00:00.000Z');
     expect(result[1].timestamp).toBe('2023-06-01T00:10:00.000Z');
@@ -181,8 +181,8 @@ describe('reconstructSnapshotsFromExchanges', () => {
 
     const pool = createMockPool([
       { rows: [
-        { guild_name: 'Guild A', guild_prefix: 'GA' },
-        { guild_name: 'Guild B', guild_prefix: 'GB' },
+        { guild_name: 'Guild A', guild_prefix: 'GDA' },
+        { guild_name: 'Guild B', guild_prefix: 'GDB' },
       ]},
       { rows: [{ territory: 'Detlas', attacker_name: 'Guild A' }] },
       { rows: [
@@ -246,8 +246,8 @@ describe('reconstructSnapshotsFromExchanges', () => {
     // Start with empty state. Territories appear only when first exchanged.
     const pool = createMockPool([
       { rows: [
-        { guild_name: 'Guild A', guild_prefix: 'GA' },
-        { guild_name: 'Guild B', guild_prefix: 'GB' },
+        { guild_name: 'Guild A', guild_prefix: 'GDA' },
+        { guild_name: 'Guild B', guild_prefix: 'GDB' },
       ]},
       // DISTINCT ON: no exchanges before startDate
       { rows: [] },
@@ -310,7 +310,7 @@ describe('full territory snapshot reconstruction', () => {
 
     const pool = createMockPool([
       // guild_prefixes
-      { rows: [{ guild_name: guildName, guild_prefix: 'TG' }] },
+      { rows: [{ guild_name: guildName, guild_prefix: 'TES' }] },
       // Every territory owned by the same guild
       { rows: allTerritories.map(name => ({
         territory: name,
@@ -323,7 +323,7 @@ describe('full territory snapshot reconstruction', () => {
 
     for (const [fullName, abbrev] of Object.entries(TERRITORY_TO_ABBREV)) {
       expect(result!.territories[abbrev]).toBeDefined();
-      expect(result!.territories[abbrev]).toEqual({ g: 'TG', n: guildName });
+      expect(result!.territories[abbrev]).toEqual({ g: 'TES', n: guildName });
     }
 
     const snapshotCount = Object.keys(result!.territories).length;
@@ -368,9 +368,9 @@ describe('playback simulation', () => {
 
     const pool = createMockPool([
       { rows: [
-        { guild_name: 'Guild A', guild_prefix: 'GA' },
-        { guild_name: 'Guild B', guild_prefix: 'GB' },
-        { guild_name: 'Guild C', guild_prefix: 'GC' },
+        { guild_name: 'Guild A', guild_prefix: 'GDA' },
+        { guild_name: 'Guild B', guild_prefix: 'GDB' },
+        { guild_name: 'Guild C', guild_prefix: 'GDC' },
       ]},
       // Initial state
       { rows: [
@@ -462,29 +462,29 @@ describe('playback simulation', () => {
 
     const pool = createMockPool([
       { rows: [
-        { guild_name: 'G1', guild_prefix: 'G1' },
-        { guild_name: 'G2', guild_prefix: 'G2' },
+        { guild_name: 'Foxes', guild_prefix: 'FOX' },
+        { guild_name: 'Hawks', guild_prefix: 'HWK' },
       ]},
-      { rows: [{ territory: 'Detlas', attacker_name: 'G1' }] },
+      { rows: [{ territory: 'Detlas', attacker_name: 'Foxes' }] },
       { rows: [
-        { exchange_time: new Date('2023-06-01T00:25:00Z'), territory: 'Detlas', attacker_name: 'G2' },
+        { exchange_time: new Date('2023-06-01T00:25:00Z'), territory: 'Detlas', attacker_name: 'Hawks' },
       ]},
     ]);
 
     const snapshots = await reconstructSnapshotsFromExchanges(pool, start, end);
 
     let idx = 0;
-    expect(snapshots[idx].territories['DET'].n).toBe('G1');
+    expect(snapshots[idx].territories['DET'].n).toBe('Foxes');
     idx = 1;
-    expect(snapshots[idx].territories['DET'].n).toBe('G1');
+    expect(snapshots[idx].territories['DET'].n).toBe('Foxes');
     idx = 2;
-    expect(snapshots[idx].territories['DET'].n).toBe('G1');
+    expect(snapshots[idx].territories['DET'].n).toBe('Foxes');
     idx = 3;
-    expect(snapshots[idx].territories['DET'].n).toBe('G2');
+    expect(snapshots[idx].territories['DET'].n).toBe('Hawks');
     idx = 2;
-    expect(snapshots[idx].territories['DET'].n).toBe('G1');
+    expect(snapshots[idx].territories['DET'].n).toBe('Foxes');
     idx = 3;
-    expect(snapshots[idx].territories['DET'].n).toBe('G2');
+    expect(snapshots[idx].territories['DET'].n).toBe('Hawks');
   });
 });
 

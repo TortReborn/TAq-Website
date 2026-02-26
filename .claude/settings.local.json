@@ -25,7 +25,15 @@
       "Bash(\"/c/Users/Aiden Smith/AppData/Local/Programs/Python/Python312/python.exe\" -c \"print\\(''hello''\\); from PIL import Image; print\\(''PIL OK''\\); import numpy; print\\(''numpy OK''\\)\")",
       "Bash(\"/c/Users/Aiden Smith/AppData/Local/Programs/Python/Python312/python.exe\" -m pip install Pillow numpy)",
       "Bash(\"/c/Users/Aiden Smith/AppData/Local/Programs/Python/Python312/python.exe\" -c \":*)",
-      "Bash(node scripts/analyze-war-log.js)"
+      "Bash(node scripts/analyze-war-log.js)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)"
     ],
     "deny": [],
     "ask": []

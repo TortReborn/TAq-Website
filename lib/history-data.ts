@@ -3,7 +3,7 @@
  */
 
 import { Territory } from "./utils";
-import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
+import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, REKINDLED_WORLD_CUTOFF_MS, OLD_TERRITORY_NAMES } from "./territory-abbreviations";
 
 // Condensed snapshot format for database storage
 export interface SnapshotTerritory {
@@ -324,19 +324,45 @@ export function buildExchangeStore(data: ExchangeEventData): ExchangeStore {
   // The per-territory arrays ARE in order because we iterated the globally-
   // sorted events array — so no extra sort needed.
 
-  // Classify each territory's era from its actual exchange timestamps.
-  // This is data-driven: a territory is 'both' if it has exchanges on
-  // both sides of the Rekindled World cutoff, regardless of its name.
+  // Classify each territory's era using both name-based knowledge and
+  // exchange timestamps.  Name-based rules take priority:
+  //   - Territories in OLD_TERRITORY_NAMES were removed in Rekindled World → 'old'
+  //   - Remaining territories: data-driven from exchange timestamps, but
+  //     if classified as 'both', verify the old-era data is substantial
+  //     (not just a few stray events from bad backfill data).
   const REKINDLED_CUTOFF_SEC = Math.floor(REKINDLED_WORLD_CUTOFF_MS / 1000);
   const territoryEras: Array<'old' | 'new' | 'both'> = new Array(data.territories.length);
   for (let i = 0; i < territoryEvents.length; i++) {
-    let hasOld = false, hasNew = false;
-    for (const [sec] of territoryEvents[i]) {
-      if (sec < REKINDLED_CUTOFF_SEC) hasOld = true;
-      else hasNew = true;
-      if (hasOld && hasNew) break;
+    const terrName = data.territories[i];
+
+    // Name-based override: territories explicitly removed in Rekindled World
+    if (OLD_TERRITORY_NAMES.has(terrName)) {
+      territoryEras[i] = 'old';
+      continue;
     }
-    territoryEras[i] = hasOld && hasNew ? 'both' : hasOld ? 'old' : 'new';
+
+    // Data-driven classification for current-era territory names
+    let oldCount = 0, newCount = 0;
+    for (const [sec] of territoryEvents[i]) {
+      if (sec < REKINDLED_CUTOFF_SEC) oldCount++;
+      else newCount++;
+    }
+
+    if (oldCount > 0 && newCount > 0) {
+      // Has exchanges on both sides.  If the old-era count is very small
+      // relative to total (< 5% and fewer than 5 events), it's likely from
+      // bad backfill data — treat as new-era-only.
+      const total = oldCount + newCount;
+      if (oldCount < 5 && oldCount / total < 0.05) {
+        territoryEras[i] = 'new';
+      } else {
+        territoryEras[i] = 'both';
+      }
+    } else if (oldCount > 0) {
+      territoryEras[i] = 'old';
+    } else {
+      territoryEras[i] = 'new';
+    }
   }
 
   return { data, territoryEvents, territoryEras };
@@ -370,6 +396,13 @@ function lastEventBefore(
 /** Pre-built lookup for initial owners (territory name → {guild, prefix}). */
 export type InitialOwnerMap = Map<string, { guild: string; prefix: string }>;
 
+/** Sanitize a guild prefix: must be 3+ alphabetic characters. */
+function sanitizePrefix(prefix: string, guildName: string): string {
+  if (prefix.length >= 3 && /^[A-Za-z]+$/.test(prefix)) return prefix;
+  const alpha = guildName.replace(/[^A-Za-z]/g, '');
+  return (alpha.length >= 3 ? alpha.substring(0, 3) : (alpha + 'XXX').substring(0, 3)).toUpperCase();
+}
+
 /** Build an InitialOwnerMap from bounds data + guild prefix lookup in the store. */
 export function buildInitialOwnerMap(
   initialOwners: Array<{ territory: string; guild: string }>,
@@ -382,9 +415,10 @@ export function buildInitialOwnerMap(
   }
   const map: InitialOwnerMap = new Map();
   for (const { territory, guild } of initialOwners) {
+    const rawPrefix = prefixByGuild.get(guild) ?? '';
     map.set(territory, {
       guild,
-      prefix: prefixByGuild.get(guild) ?? guild.substring(0, 3).toUpperCase(),
+      prefix: sanitizePrefix(rawPrefix, guild),
     });
   }
   return map;
@@ -398,11 +432,16 @@ export function buildInitialOwnerMap(
  * owner at or before the requested time.  ~650 × log2(2500) ≈ 8K
  * comparisons — effectively instant.
  *
+ * Forward-looking backfill: when a territory has no exchange before the
+ * requested time, we look forward to its first exchange in the correct
+ * era and use that guild as the owner.  This handles territories that
+ * were held continuously from before data collection started.
+ *
  * `initialOwners` — optional map of territory → {guild, prefix} for
- * territories that haven't been exchanged yet.  If a territory of the
- * correct era has no exchange before the requested time, we backfill
- * from the defender of its first future exchange (meaning it was held
- * continuously until that point).
+ * territories whose first exchange has defender != 'None' (the guild
+ * that held the territory before any recorded data).  Used as a
+ * fallback; the forward-looking approach from the exchange store is
+ * preferred.
  */
 export function buildSnapshotAt(
   store: ExchangeStore,
@@ -412,23 +451,52 @@ export function buildSnapshotAt(
   const targetSec = Math.floor(timestamp.getTime() / 1000);
   const targetMs = timestamp.getTime();
   const isPostRekindled = targetMs >= REKINDLED_WORLD_CUTOFF_MS;
+  const REKINDLED_CUTOFF_SEC = Math.floor(REKINDLED_WORLD_CUTOFF_MS / 1000);
   const { data, territoryEvents } = store;
   const territories: Record<string, SnapshotTerritory> = {};
   let count = 0;
 
   for (let tIdx = 0; tIdx < territoryEvents.length; tIdx++) {
-    const gIdx = lastEventBefore(territoryEvents[tIdx], targetSec);
+    const events = territoryEvents[tIdx];
+    const gIdx = lastEventBefore(events, targetSec);
 
-    // Skip territories from the wrong era (data-driven from exchange timestamps)
+    // Skip territories from the wrong era
     const era = store.territoryEras[tIdx];
     if (isPostRekindled && era === 'old') continue;
     if (!isPostRekindled && era === 'new') continue;
 
     if (gIdx === -1) {
-      // No exchange before this time — backfill from initial owners
-      // (the defender of this territory's first exchange, meaning they
-      // held it continuously until that point)
-      if (initialOwners) {
+      // No exchange before this time — forward-looking backfill.
+      // Find the first exchange for this territory in the correct era
+      // and use its guild as the owner (they held it up to that point).
+      let backfillGIdx = -1;
+
+      // Search forward through events to find the first one in the correct era
+      for (const [sec, guildIdx] of events) {
+        if (sec <= targetSec) continue; // skip events before target (shouldn't exist since gIdx === -1, but be safe)
+        // For pre-Rekindled: only use events from the old era
+        if (!isPostRekindled && sec >= REKINDLED_CUTOFF_SEC) break; // past cutoff, stop
+        // For post-Rekindled: only use events from the new era
+        if (isPostRekindled && sec < REKINDLED_CUTOFF_SEC) continue; // skip old-era events
+
+        // Found the first event in the correct era
+        // Skip 'None' — find the first real guild
+        if (data.guilds[guildIdx] !== 'None') {
+          backfillGIdx = guildIdx;
+          break;
+        }
+      }
+
+      if (backfillGIdx !== -1) {
+        const terrName = data.territories[tIdx];
+        const abbrev = toAbbrev(terrName);
+        territories[abbrev] = {
+          g: data.prefixes[backfillGIdx],
+          n: data.guilds[backfillGIdx],
+        };
+        count++;
+      } else if (initialOwners) {
+        // Fallback to initialOwners (defender from first exchange in DB)
         const terrName = data.territories[tIdx];
         const owner = initialOwners.get(terrName);
         if (owner) {
