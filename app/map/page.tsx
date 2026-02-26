@@ -1026,14 +1026,15 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         // Ensure events are loaded around this time
         loadEventsRef.current(nextTime);
       } else {
-        // Normal: step forward 10 minutes
-        const nextMs = currentTs.getTime() + STEP_MS;
-        if (nextMs > latestMs) {
+        // Normal: step forward 10 minutes, skipping gaps
+        let nextTime = new Date(currentTs.getTime() + STEP_MS);
+        nextTime = skipGapForward(nextTime);
+        if (nextTime.getTime() > latestMs) {
           setHistoryTimestamp(new Date(latestMs));
           setIsPlaying(false);
           return;
         }
-        setHistoryTimestamp(new Date(nextMs));
+        setHistoryTimestamp(nextTime);
       }
     };
 

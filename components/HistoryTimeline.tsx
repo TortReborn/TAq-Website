@@ -293,7 +293,7 @@ export default function HistoryTimeline({
 
   const loadedIndicatorBar = (isVert: boolean) => {
     // Determine cap colors: match the nearest segment's color at each edge
-    const RED = 'rgba(180, 40, 40, 0.5)';
+    const RED = 'rgb(130, 30, 30)';
     const GRAY = 'rgb(100, 100, 100)';
     const GREEN = 'rgb(40, 167, 69)';
 
