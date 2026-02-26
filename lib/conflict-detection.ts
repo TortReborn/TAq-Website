@@ -765,8 +765,9 @@ export function groupConflictsIntoWars(conflicts: ConflictEvent[]): War[] {
   // Sort by start time
   const sorted = [...conflicts].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 
-  const MAX_GAP_MS = 48 * 60 * 60 * 1000; // 48 hours
-  const MIN_GUILD_OVERLAP = 0.4; // 40% of top guilds must overlap
+  const MAX_GAP_MS = 12 * 60 * 60 * 1000;  // 12 hours between consecutive battles
+  const MAX_WAR_MS = 7 * 24 * 60 * 60 * 1000; // 7 days total war duration cap
+  const MIN_GUILD_OVERLAP = 0.5; // 50% of top guilds must overlap
 
   /** Get the set of top guild names from a conflict's first 2 factions. */
   function getTopGuilds(c: ConflictEvent): Set<string> {
@@ -798,12 +799,17 @@ export function groupConflictsIntoWars(conflicts: ConflictEvent[]): War[] {
     const warGuilds = getTopGuilds(sorted[i]);
     assigned.add(sorted[i].id);
 
-    // Greedily add subsequent conflicts within time window + guild overlap
+    // Greedily add subsequent conflicts within gap + guild overlap, capped by total duration
+    const warStart = warConflicts[0].startTime.getTime();
     for (let j = i + 1; j < sorted.length; j++) {
       if (assigned.has(sorted[j].id)) continue;
 
-      const timeDiff = sorted[j].startTime.getTime() - warConflicts[warConflicts.length - 1].endTime.getTime();
-      if (timeDiff > MAX_GAP_MS) break; // Too far away in time
+      // Stop if this conflict is too far from the previous one
+      const gapFromLast = sorted[j].startTime.getTime() - warConflicts[warConflicts.length - 1].endTime.getTime();
+      if (gapFromLast > MAX_GAP_MS) break;
+
+      // Stop if war would exceed max duration
+      if (sorted[j].endTime.getTime() - warStart > MAX_WAR_MS) break;
 
       const candidateGuilds = getTopGuilds(sorted[j]);
       if (guildOverlap(warGuilds, candidateGuilds) >= MIN_GUILD_OVERLAP) {

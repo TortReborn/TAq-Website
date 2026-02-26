@@ -480,6 +480,7 @@ export default function ConflictFinder({
 
       {/* Content area */}
       <div
+        className="themed-scrollbar"
         style={{
           flex: 1,
           overflowY: "auto",
