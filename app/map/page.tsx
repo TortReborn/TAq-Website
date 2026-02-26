@@ -1962,13 +1962,17 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             exchangeStore={exchangeStoreRef.current}
             ensureExchangeData={ensureExchangeData}
             onJumpToTime={handleConflictJump}
-            onCreateFactions={(side1Guilds, side2Guilds) => {
-              const id1 = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-              const id2 = id1 + "b";
-              const newFactions: Record<string, { name: string; color: string; guilds: string[] }> = {
-                [id1]: { name: "Side 1", color: "#1e88e5", guilds: side1Guilds },
-                [id2]: { name: "Side 2", color: "#e53935", guilds: side2Guilds },
-              };
+            onCreateFactions={(factionGuilds) => {
+              const factionColors = ["#1e88e5", "#e53935", "#43a047", "#fb8c00"];
+              const newFactions: Record<string, { name: string; color: string; guilds: string[] }> = {};
+              factionGuilds.forEach((guilds, idx) => {
+                const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + idx;
+                newFactions[id] = {
+                  name: `Side ${idx + 1}`,
+                  color: factionColors[idx % factionColors.length],
+                  guilds,
+                };
+              });
               setFactions(newFactions);
               setShowFactions(true);
             }}

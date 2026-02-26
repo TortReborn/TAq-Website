@@ -2,7 +2,13 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { ExchangeStore } from "@/lib/history-data";
-import { detectConflicts, ConflictEvent, ALL_REGIONS } from "@/lib/conflict-detection";
+import {
+  detectConflicts,
+  groupConflictsIntoWars,
+  ConflictEvent,
+  War,
+  ALL_REGIONS,
+} from "@/lib/conflict-detection";
 
 interface ConflictFinderProps {
   isOpen: boolean;
@@ -10,12 +16,15 @@ interface ConflictFinderProps {
   exchangeStore: ExchangeStore | null;
   ensureExchangeData: () => Promise<ExchangeStore | null>;
   onJumpToTime: (start: Date, end: Date) => void;
-  onCreateFactions: (side1Guilds: string[], side2Guilds: string[]) => void;
+  onCreateFactions: (factionGuilds: string[][]) => void;
 }
 
 const DEFAULT_HEIGHT = 480;
 const MIN_HEIGHT = 200;
 const MAX_HEIGHT = 900;
+
+// Faction colors palette (up to 4)
+const FACTION_COLORS = ["#ef5350", "#42a5f5", "#66bb6a", "#ffa726"];
 
 // Custom themed select dropdown arrow (SVG data URI)
 const SELECT_ARROW = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`;
@@ -32,6 +41,18 @@ const selectStyle: React.CSSProperties = {
   WebkitAppearance: "none",
   outline: "none",
   colorScheme: "dark",
+};
+
+const inputStyle: React.CSSProperties = {
+  padding: "0.3rem 0.5rem",
+  borderRadius: "0.35rem",
+  border: "1px solid var(--border-color)",
+  background: "var(--bg-card)",
+  color: "var(--text-primary)",
+  fontSize: "0.75rem",
+  outline: "none",
+  colorScheme: "dark",
+  width: "100%",
 };
 
 function formatDuration(start: Date, end: Date): string {
@@ -61,6 +82,13 @@ function formatDateTime(date: Date): string {
   });
 }
 
+/** Confidence label and color */
+function confidenceLabel(c: number): { text: string; color: string } {
+  if (c >= 0.7) return { text: "High", color: "#66bb6a" };
+  if (c >= 0.4) return { text: "Med", color: "#ffa726" };
+  return { text: "Low", color: "#ef5350" };
+}
+
 export default function ConflictFinder({
   isOpen,
   onClose,
@@ -70,9 +98,11 @@ export default function ConflictFinder({
   onCreateFactions,
 }: ConflictFinderProps) {
   const [regionFilter, setRegionFilter] = useState("All");
-  const [sortBy, setSortBy] = useState<"size" | "date">("size");
+  const [sortBy, setSortBy] = useState<"size" | "date" | "strategic">("size");
+  const [guildSearch, setGuildSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [store, setStore] = useState<ExchangeStore | null>(exchangeStore);
+  const [expandedWars, setExpandedWars] = useState<Set<string>>(new Set());
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Drag state
@@ -142,12 +172,10 @@ export default function ConflictFinder({
         const delta = e.clientY - resizeStart.current.y;
 
         if (isResizing.current === "bottom") {
-          // Bottom handle: grow/shrink downward
           const maxH = Math.min(MAX_HEIGHT, window.innerHeight - (resizeStart.current.posY + 16));
           const newHeight = Math.max(MIN_HEIGHT, Math.min(maxH, resizeStart.current.height + delta));
           setPanelHeight(newHeight);
         } else {
-          // Top handle: grow/shrink upward — move position.y accordingly
           const maxH = Math.min(MAX_HEIGHT, resizeStart.current.posY + resizeStart.current.height - 16);
           const newHeight = Math.max(MIN_HEIGHT, Math.min(maxH, resizeStart.current.height - delta));
           const heightDiff = newHeight - resizeStart.current.height;
@@ -173,7 +201,7 @@ export default function ConflictFinder({
   }, [clampPosition]);
 
   const onHeaderMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest("button, select")) return;
+    if ((e.target as HTMLElement).closest("button, select, input")) return;
     isDragging.current = true;
     dragOffset.current = {
       x: e.clientX - (position?.x || 0),
@@ -204,6 +232,22 @@ export default function ConflictFinder({
     return detectConflicts(store);
   }, [store]);
 
+  // Group into wars
+  const wars = useMemo(() => {
+    return groupConflictsIntoWars(allConflicts);
+  }, [allConflicts]);
+
+  // Get set of conflict IDs that belong to a war (for deduplication)
+  const warConflictIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const war of wars) {
+      for (const c of war.conflicts) {
+        ids.add(c.id);
+      }
+    }
+    return ids;
+  }, [wars]);
+
   // Filter and sort
   const filteredConflicts = useMemo(() => {
     let result = allConflicts;
@@ -216,16 +260,60 @@ export default function ConflictFinder({
       });
     }
 
+    if (guildSearch.trim()) {
+      const search = guildSearch.trim().toLowerCase();
+      result = result.filter(c =>
+        c.factions.some(f =>
+          f.guilds.some(g =>
+            g.name.toLowerCase().includes(search) ||
+            g.prefix.toLowerCase().includes(search)
+          )
+        )
+      );
+    }
+
     if (sortBy === "date") {
       result = [...result].sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+    } else if (sortBy === "strategic") {
+      result = [...result].sort((a, b) => b.weightedExchanges - a.weightedExchanges);
     }
 
     return result;
-  }, [allConflicts, regionFilter, sortBy]);
+  }, [allConflicts, regionFilter, guildSearch, sortBy]);
+
+  // Standalone conflicts (not part of any war)
+  const standaloneConflicts = useMemo(() => {
+    return filteredConflicts.filter(c => !warConflictIds.has(c.id));
+  }, [filteredConflicts, warConflictIds]);
+
+  // Filtered wars (keep wars that have at least one conflict in filteredConflicts)
+  const filteredWars = useMemo(() => {
+    const filteredIds = new Set(filteredConflicts.map(c => c.id));
+    return wars.filter(w => w.conflicts.some(c => filteredIds.has(c.id)));
+  }, [wars, filteredConflicts]);
+
+  // Timeline data for sparkline
+  const timelineData = useMemo(() => {
+    if (allConflicts.length === 0) return null;
+    const minTime = Math.min(...allConflicts.map(c => c.startTime.getTime()));
+    const maxTime = Math.max(...allConflicts.map(c => c.endTime.getTime()));
+    const span = maxTime - minTime;
+    if (span <= 0) return null;
+    return { minTime, maxTime, span, conflicts: allConflicts };
+  }, [allConflicts]);
 
   if (!isOpen) return null;
 
   const stopPropagation = (e: React.SyntheticEvent) => e.stopPropagation();
+
+  const toggleWar = (warId: string) => {
+    setExpandedWars(prev => {
+      const next = new Set(prev);
+      if (next.has(warId)) next.delete(warId);
+      else next.add(warId);
+      return next;
+    });
+  };
 
   return (
     <div
@@ -329,6 +417,7 @@ export default function ConflictFinder({
           borderBottom: "1px solid var(--border-color)",
           flexShrink: 0,
           alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
         <label style={{ color: "var(--text-secondary)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>
@@ -337,7 +426,7 @@ export default function ConflictFinder({
         <select
           value={regionFilter}
           onChange={e => setRegionFilter(e.target.value)}
-          style={{ ...selectStyle, flex: 1 }}
+          style={{ ...selectStyle, flex: 1, minWidth: "80px" }}
         >
           <option value="All">All</option>
           <option value="Global">Global (multi-region)</option>
@@ -351,13 +440,45 @@ export default function ConflictFinder({
         </label>
         <select
           value={sortBy}
-          onChange={e => setSortBy(e.target.value as "size" | "date")}
+          onChange={e => setSortBy(e.target.value as "size" | "date" | "strategic")}
           style={selectStyle}
         >
           <option value="size">Activity</option>
           <option value="date">Recent</option>
+          <option value="strategic">Strategic</option>
         </select>
       </div>
+
+      {/* Guild search row */}
+      <div
+        style={{
+          display: "flex",
+          gap: "0.5rem",
+          padding: "0.35rem 0.75rem",
+          borderBottom: "1px solid var(--border-color)",
+          flexShrink: 0,
+          alignItems: "center",
+        }}
+      >
+        <label style={{ color: "var(--text-secondary)", fontSize: "0.75rem", whiteSpace: "nowrap" }}>
+          Guild:
+        </label>
+        <input
+          type="text"
+          value={guildSearch}
+          onChange={e => setGuildSearch(e.target.value)}
+          placeholder="Search guild name or prefix..."
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Timeline sparkline */}
+      {timelineData && !loading && (
+        <TimelineSparkline
+          data={timelineData}
+          filteredIds={new Set(filteredConflicts.map(c => c.id))}
+        />
+      )}
 
       {/* Content area */}
       <div
@@ -403,11 +524,24 @@ export default function ConflictFinder({
             color: "var(--text-secondary)",
             fontSize: "0.8rem",
           }}>
-            No conflicts in this region.
+            No conflicts match filters.
           </div>
         )}
 
-        {filteredConflicts.map(conflict => (
+        {/* Wars (collapsible groups) */}
+        {filteredWars.map(war => (
+          <WarGroup
+            key={war.id}
+            war={war}
+            expanded={expandedWars.has(war.id)}
+            onToggle={() => toggleWar(war.id)}
+            onJump={onJumpToTime}
+            onCreateFactions={onCreateFactions}
+          />
+        ))}
+
+        {/* Standalone conflicts (not part of any war) */}
+        {standaloneConflicts.map(conflict => (
           <ConflictCard
             key={conflict.id}
             conflict={conflict}
@@ -436,6 +570,125 @@ export default function ConflictFinder({
 }
 
 // ---------------------------------------------------------------------------
+// Timeline Sparkline
+// ---------------------------------------------------------------------------
+
+function TimelineSparkline({
+  data,
+  filteredIds,
+}: {
+  data: { minTime: number; maxTime: number; span: number; conflicts: ConflictEvent[] };
+  filteredIds: Set<string>;
+}) {
+  const WIDTH = 380;
+  const HEIGHT = 24;
+
+  return (
+    <div style={{
+      padding: "0.25rem 0.75rem",
+      borderBottom: "1px solid var(--border-color)",
+      flexShrink: 0,
+    }}>
+      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none">
+        {data.conflicts.map(c => {
+          const x = ((c.startTime.getTime() - data.minTime) / data.span) * WIDTH;
+          const w = Math.max(2, ((c.endTime.getTime() - c.startTime.getTime()) / data.span) * WIDTH);
+          const intensity = Math.min(1, c.peakHourly / 80);
+          const isFiltered = filteredIds.has(c.id);
+          return (
+            <rect
+              key={c.id}
+              x={x}
+              y={2}
+              width={w}
+              height={HEIGHT - 4}
+              rx={2}
+              fill={isFiltered ? `rgba(245, 124, 0, ${0.3 + intensity * 0.7})` : "rgba(128,128,128,0.15)"}
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// War group (collapsible)
+// ---------------------------------------------------------------------------
+
+function WarGroup({
+  war,
+  expanded,
+  onToggle,
+  onJump,
+  onCreateFactions,
+}: {
+  war: War;
+  expanded: boolean;
+  onToggle: () => void;
+  onJump: (start: Date, end: Date) => void;
+  onCreateFactions: (factionGuilds: string[][]) => void;
+}) {
+  return (
+    <div style={{
+      marginBottom: "0.5rem",
+      border: "1px solid var(--border-color)",
+      borderRadius: "0.5rem",
+      overflow: "hidden",
+    }}>
+      {/* War header */}
+      <div
+        onClick={onToggle}
+        style={{
+          padding: "0.5rem 0.7rem",
+          background: "var(--bg-secondary)",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <span style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: "0.78rem" }}>
+            {war.name}
+          </span>
+          <span style={{ color: "var(--text-secondary)", fontSize: "0.68rem", marginLeft: "0.4rem" }}>
+            {war.conflicts.length} battles · {war.totalExchanges} exchanges
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+          <span style={{ color: "var(--text-secondary)", fontSize: "0.65rem" }}>
+            {formatDate(war.startTime)} — {formatDate(war.endTime)}
+          </span>
+          <span style={{
+            color: "var(--text-secondary)",
+            fontSize: "0.8rem",
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.15s ease",
+          }}>
+            ▾
+          </span>
+        </div>
+      </div>
+
+      {/* Expanded: show constituent conflicts */}
+      {expanded && (
+        <div style={{ padding: "0.3rem" }}>
+          {war.conflicts.map(conflict => (
+            <ConflictCard
+              key={conflict.id}
+              conflict={conflict}
+              onJump={onJump}
+              onCreateFactions={onCreateFactions}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Conflict card
 // ---------------------------------------------------------------------------
 
@@ -446,11 +699,12 @@ function ConflictCard({
 }: {
   conflict: ConflictEvent;
   onJump: (start: Date, end: Date) => void;
-  onCreateFactions: (side1Guilds: string[], side2Guilds: string[]) => void;
+  onCreateFactions: (factionGuilds: string[][]) => void;
 }) {
   const [hovered, setHovered] = useState(false);
 
   const duration = formatDuration(conflict.startTime, conflict.endTime);
+  const conf = confidenceLabel(conflict.confidence);
 
   // Build region summary
   const regionSummary = Object.entries(conflict.regionBreakdown)
@@ -458,12 +712,6 @@ function ConflictCard({
     .slice(0, 3)
     .map(([region, count]) => `${region} (${count})`)
     .join(" + ");
-
-  // Build sides summary (top 4 prefixes per side)
-  const side1 = conflict.sides[0].guilds.slice(0, 4).map(g => g.prefix).join(", ");
-  const side2 = conflict.sides[1].guilds.slice(0, 4).map(g => g.prefix).join(", ");
-  const hasMoreSide1 = conflict.sides[0].guilds.length > 4;
-  const hasMoreSide2 = conflict.sides[1].guilds.length > 4;
 
   // Intensity indicator
   const intensity = conflict.peakHourly >= 80 ? 3 : conflict.peakHourly >= 40 ? 2 : 1;
@@ -483,35 +731,66 @@ function ConflictCard({
         transition: "all 0.15s ease",
       }}
     >
-      {/* Top row: date + stats + factions button */}
+      {/* Top row: name + stats + buttons */}
       <div style={{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: "0.3rem",
       }}>
-        <span style={{
-          color: "var(--text-primary)",
-          fontWeight: 600,
-          fontSize: "0.8rem",
-        }}>
-          {formatDate(conflict.startTime)}
-        </span>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", minWidth: 0, flex: 1 }}>
+          <span style={{
+            color: "var(--text-primary)",
+            fontWeight: 600,
+            fontSize: "0.78rem",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}>
+            {conflict.name}
+          </span>
+          {/* Confidence badge */}
+          <span style={{
+            fontSize: "0.55rem",
+            fontWeight: 600,
+            color: conf.color,
+            border: `1px solid ${conf.color}`,
+            borderRadius: "0.2rem",
+            padding: "0 0.2rem",
+            lineHeight: "1.4",
+            flexShrink: 0,
+          }}>
+            {conf.text}
+          </span>
+          {conflict.isMultiFront && (
+            <span style={{
+              fontSize: "0.55rem",
+              fontWeight: 600,
+              color: "#ce93d8",
+              border: "1px solid #ce93d8",
+              borderRadius: "0.2rem",
+              padding: "0 0.2rem",
+              lineHeight: "1.4",
+              flexShrink: 0,
+            }}>
+              Multi
+            </span>
+          )}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexShrink: 0 }}>
           <span style={{
             color: "var(--text-secondary)",
-            fontSize: "0.7rem",
+            fontSize: "0.65rem",
           }}>
-            {conflict.totalExchanges} exchanges · {duration}
+            {conflict.totalExchanges} · {duration}
           </span>
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const side1 = conflict.sides[0].guilds.map(g => g.name);
-              const side2 = conflict.sides[1].guilds.map(g => g.name);
-              onCreateFactions(side1, side2);
+              const factionGuilds = conflict.factions.map(f => f.guilds.map(g => g.name));
+              onCreateFactions(factionGuilds);
             }}
-            title="Load sides as factions"
+            title="Load factions for visualization"
             style={{
               width: "22px",
               height: "22px",
@@ -543,6 +822,11 @@ function ConflictCard({
         </div>
       </div>
 
+      {/* Date line */}
+      <div style={{ color: "var(--text-secondary)", fontSize: "0.65rem", marginBottom: "0.2rem" }}>
+        {formatDate(conflict.startTime)}
+      </div>
+
       {/* Region breakdown */}
       <div style={{
         color: "var(--text-secondary)",
@@ -569,8 +853,8 @@ function ConflictCard({
         <span>{regionSummary}</span>
       </div>
 
-      {/* Sides */}
-      {(side1 || side2) && (
+      {/* Factions display (up to 4 with distinct colors) */}
+      {conflict.factions.length > 0 && (
         <div style={{
           fontSize: "0.72rem",
           color: "var(--text-primary)",
@@ -579,13 +863,21 @@ function ConflictCard({
           gap: "0.3rem",
           flexWrap: "wrap",
         }}>
-          <span style={{ color: "#ef5350", fontWeight: 500 }}>
-            {side1 || "??"}{hasMoreSide1 ? "..." : ""}
-          </span>
-          <span style={{ color: "var(--text-secondary)", fontSize: "0.65rem" }}>vs</span>
-          <span style={{ color: "#42a5f5", fontWeight: 500 }}>
-            {side2 || "??"}{hasMoreSide2 ? "..." : ""}
-          </span>
+          {conflict.factions.slice(0, 4).map((faction, idx) => {
+            const prefixes = faction.guilds.slice(0, 4).map(g => g.prefix).join(", ");
+            const hasMore = faction.guilds.length > 4;
+            const color = FACTION_COLORS[idx] || "var(--text-secondary)";
+            return (
+              <React.Fragment key={idx}>
+                {idx > 0 && (
+                  <span style={{ color: "var(--text-secondary)", fontSize: "0.6rem" }}>vs</span>
+                )}
+                <span style={{ color, fontWeight: 500 }}>
+                  {prefixes || "??"}{hasMore ? "..." : ""}
+                </span>
+              </React.Fragment>
+            );
+          })}
         </div>
       )}
 
@@ -599,7 +891,10 @@ function ConflictCard({
           color: "var(--text-secondary)",
         }}>
           <div>{formatDateTime(conflict.startTime)} — {formatDateTime(conflict.endTime)}</div>
-          <div>Peak: {conflict.peakHourly}/hr · {conflict.territoriesInvolved} territories</div>
+          <div>Peak: {conflict.peakHourly}/hr · {conflict.territoriesInvolved} territories · Confidence: {(conflict.confidence * 100).toFixed(0)}%</div>
+          {conflict.factions.length > 2 && (
+            <div style={{ color: "#ce93d8" }}>{conflict.factions.length} factions detected</div>
+          )}
           <div style={{ marginTop: "0.15rem", color: "var(--text-primary)", fontSize: "0.65rem" }}>
             Click to jump to this conflict
           </div>
