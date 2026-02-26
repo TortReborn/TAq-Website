@@ -122,6 +122,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const [loadedRanges, setLoadedRanges] = useState<Array<[number, number]>>([]);
   const bgAbortRef = useRef<AbortController | null>(null);
 
+  // All known guilds from guild_prefixes table (fetched once on mount)
+  const [allKnownGuilds, setAllKnownGuilds] = useState<{ name: string; prefix: string }[]>([]);
+
   // Track hovered guild for land view tooltip
   const [hoveredGuildInfo, setHoveredGuildInfo] = useState<{ name: string; area: number } | null>(null);
 
@@ -148,6 +151,22 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const clampScale = useCallback((value: number): number => {
     const minScale = minScaleRef.current;
     return Math.max(minScale, Math.min(213, value));
+  }, []);
+
+  // Fetch all known guilds from guild_prefixes table (once on mount)
+  useEffect(() => {
+    fetch('/api/guilds/list')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.guilds) {
+          const list: { name: string; prefix: string }[] = [];
+          for (let i = 0; i < data.guilds.length; i++) {
+            list.push({ name: data.guilds[i], prefix: data.prefixes[i] || '' });
+          }
+          setAllKnownGuilds(list);
+        }
+      })
+      .catch((err) => console.error('Failed to fetch guild list:', err));
   }, []);
 
   // Load cached position and scale from localStorage
@@ -872,16 +891,23 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, [loadEvents]);
 
-  // Build list of available guilds from territories (for factions panel)
+  // Build list of available guilds from ALL sources (for factions panel)
   const availableGuilds = useMemo(() => {
     const seen = new Map<string, string>(); // name -> prefix
+
+    // Source 1: All known guilds from guild_prefixes table
+    for (const g of allKnownGuilds) {
+      seen.set(g.name, g.prefix);
+    }
+
+    // Source 2: Current live territories (may have guilds not yet in guild_prefixes)
     for (const t of Object.values(territories)) {
       if (t.guild?.name && t.guild.name !== 'Unclaimed') {
-        seen.set(t.guild.name, t.guild.prefix || '');
+        seen.set(t.guild.name, t.guild.prefix || seen.get(t.guild.name) || '');
       }
     }
-    // Also include guilds already in factions (they may have lost territory)
-    // Look up prefixes from exchange store for historical guilds
+
+    // Source 3: Guilds already in factions (may have been manually added)
     const store = exchangeStoreRef.current;
     const exchangePrefixMap = new Map<string, string>();
     if (store?.data) {
@@ -896,10 +922,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         }
       }
     }
+
     return Array.from(seen.entries())
       .map(([name, prefix]) => ({ name, prefix }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [territories, factions]);
+  }, [territories, factions, allKnownGuilds]);
 
   // Compute effective guild colors (overridden by faction colors when active)
   // Unaffiliated guilds become gray when factions mode is on
