@@ -793,24 +793,11 @@ const OLD_TERRITORY_TO_ABBREV: Record<string, string> = {
   "Statue": "STT",
 };
 
-// Snapshot new territory names/abbrevs BEFORE the merge so we can detect overlaps
-const NEW_TERRITORY_NAMES_PRE_MERGE = new Set(Object.keys(TERRITORY_TO_ABBREV));
-const NEW_TERRITORY_ABBREVS_PRE_MERGE = new Set(Object.values(TERRITORY_TO_ABBREV));
-
 // Merge old names into the combined mapping so all lookups still work
 Object.assign(TERRITORY_TO_ABBREV, OLD_TERRITORY_TO_ABBREV);
 
-// Sets for fast era-filtering during snapshot reconstruction
+// Set for server-side era filtering (hide old territories in post-Rekindled snapshots)
 export const OLD_TERRITORY_NAMES = new Set(Object.keys(OLD_TERRITORY_TO_ABBREV));
-export const OLD_TERRITORY_ABBREVS = new Set(Object.values(OLD_TERRITORY_TO_ABBREV));
-
-// Territories that exist in BOTH eras (name appears in old AND new maps) — render always
-export const BOTH_ERA_TERRITORY_NAMES = new Set(
-  [...OLD_TERRITORY_NAMES].filter(n => NEW_TERRITORY_NAMES_PRE_MERGE.has(n))
-);
-export const BOTH_ERA_TERRITORY_ABBREVS = new Set(
-  [...OLD_TERRITORY_ABBREVS].filter(a => NEW_TERRITORY_ABBREVS_PRE_MERGE.has(a))
-);
 
 // Abbreviation → Full name mapping (reverse lookup)
 export const ABBREV_TO_TERRITORY: Record<string, string> = Object.fromEntries(

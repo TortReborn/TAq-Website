@@ -391,7 +391,7 @@ export function buildInitialOwnerMap(
 }
 
 // Duration of the backfill window from the data start (3 months)
-const BACKFILL_WINDOW_MS = 3 * 30 * 24 * 60 * 60 * 1000;
+const BACKFILL_WINDOW_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
 
 /**
  * Reconstruct a single snapshot at any timestamp — client-side equivalent
