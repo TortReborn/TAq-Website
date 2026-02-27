@@ -15272,7 +15272,7 @@
   },
   "Aldwell": {
     "resources": {
-      "emeralds": "9000",
+      "emeralds": "18000",
       "ore": "0",
       "crops": "3600",
       "fish": "0",
@@ -15389,7 +15389,7 @@
   },
   "Espren": {
     "resources": {
-      "emeralds": "9000",
+      "emeralds": "18000",
       "ore": "0",
       "crops": "0",
       "fish": "0",
@@ -15689,7 +15689,7 @@
   },
   "Hyloch": {
     "resources": {
-      "emeralds": "9000",
+      "emeralds": "18000",
       "ore": "0",
       "crops": "3600",
       "fish": "0",
