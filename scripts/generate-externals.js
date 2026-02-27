@@ -3,6 +3,8 @@
  * This precomputes the potential external territories for each territory
  * Externals are territories at depth 2-3 from the HQ (depth 1 connections don't count)
  * Pattern: HQ -> conn (NOT ext) -> ext -> ext -> no effect
+ *
+ * Only territories present in the live Wynncraft snapshot are included.
  */
 
 import fs from 'fs';
@@ -16,9 +18,21 @@ const __dirname = path.dirname(__filename);
 const verbosePath = path.join(__dirname, '../public/territories_verbose.json');
 const verboseData = JSON.parse(fs.readFileSync(verbosePath, 'utf8'));
 
+// Fetch live territory list from the Wynncraft API
+console.log('Fetching live territory snapshot from Wynncraft API...');
+const response = await fetch('https://beta-api.wynncraft.com/v3/guild/list/territory');
+if (!response.ok) {
+  throw new Error(`Failed to fetch live territories: ${response.status} ${response.statusText}`);
+}
+const liveSnapshot = await response.json();
+const liveTerritoryNames = new Set(Object.keys(liveSnapshot));
+
+console.log(`Live snapshot contains ${liveTerritoryNames.size} territories.`);
+
 /**
  * Get all territories at depth 2-3 from a given territory (potential externals)
- * These are the territories that would count as externals if the territory was an HQ
+ * These are the territories that would count as externals if the territory was an HQ.
+ * BFS traversal is restricted to live territories only.
  */
 function getExternals(territoryName, maxDepth = 3) {
   const visited = new Set();
@@ -28,7 +42,8 @@ function getExternals(territoryName, maxDepth = 3) {
   const getTradingRoutes = (name) => {
     const territory = verboseData[name];
     if (territory && territory["Trading Routes"]) {
-      return territory["Trading Routes"];
+      // Only follow routes to territories that exist in the live snapshot
+      return territory["Trading Routes"].filter(r => liveTerritoryNames.has(r));
     }
     return [];
   };
@@ -58,11 +73,11 @@ function getExternals(territoryName, maxDepth = 3) {
   return externals;
 }
 
-// Generate externals for all territories
+// Generate externals only for live territories
 const result = {};
-const territoryNames = Object.keys(verboseData);
+const territoryNames = [...liveTerritoryNames].filter(name => verboseData[name]);
 
-console.log(`Processing ${territoryNames.length} territories...`);
+console.log(`Processing ${territoryNames.length} live territories...`);
 
 for (const name of territoryNames) {
   const externals = getExternals(name);
