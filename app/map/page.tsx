@@ -1605,9 +1605,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
                   onMouseLeave={handleTerritoryLeave}
                   guildColors={{}}
                   showTimeOutlines={false}
-                  showResourceOutlines={false}
+                  showResourceOutlines={showResourceOutlines}
                   showGuildNames={showGuildNames}
-                  verboseData={null}
+                  verboseData={verboseData?.[name] ?? null}
                   opaqueFill={opaqueFill}
                   fallbackColor="#FFFFFF"
                 />
