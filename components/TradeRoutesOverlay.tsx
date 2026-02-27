@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { coordToPixel } from '@/lib/utils';
+import { coordToPixel, Territory } from '@/lib/utils';
+import { shouldRenderTradeRoute } from '@/lib/retired-territories';
 
 interface TerritoryVerbose {
   "Trading Routes": string[];
@@ -20,7 +21,11 @@ interface TradeRoute {
   to: [number, number];
 }
 
-const TradeRoutesOverlay = () => {
+interface TradeRoutesOverlayProps {
+  territories: Record<string, Territory>;
+}
+
+const TradeRoutesOverlay = ({ territories }: TradeRoutesOverlayProps) => {
   const [tradeRoutes, setTradeRoutes] = useState<TradeRoute[]>([]);
 
   useEffect(() => {
@@ -31,6 +36,8 @@ const TradeRoutesOverlay = () => {
         const routes: TradeRoute[] = [];
 
         for (const territoryName in territoriesData) {
+          if (!shouldRenderTradeRoute(territoryName, territoryName, territories)) continue;
+
           const territory = territoriesData[territoryName];
           if (territory["Trading Routes"]) {
             const fromCoord = [
@@ -40,6 +47,8 @@ const TradeRoutesOverlay = () => {
             const fromPixel = coordToPixel(fromCoord);
 
             territory["Trading Routes"].forEach(partnerName => {
+              if (!shouldRenderTradeRoute(territoryName, partnerName, territories)) return;
+
               const partner = territoriesData[partnerName];
               if (partner) {
                 const toCoord = [
@@ -47,9 +56,9 @@ const TradeRoutesOverlay = () => {
                   (partner.Location.start[1] + partner.Location.end[1]) / 2
                 ] as [number, number];
                 const toPixel = coordToPixel(toCoord);
-                
+
                 // Avoid duplicate lines by only adding one for each pair
-                if (!routes.some(r => 
+                if (!routes.some(r =>
                     (r.from[0] === toPixel[0] && r.from[1] === toPixel[1] && r.to[0] === fromPixel[0] && r.to[1] === fromPixel[1])
                 )) {
                     routes.push({ from: fromPixel, to: toPixel });
@@ -65,7 +74,7 @@ const TradeRoutesOverlay = () => {
     };
 
     fetchAndProcessTradeRoutes();
-  }, []);
+  }, [territories]);
 
   return (
     <svg
@@ -76,7 +85,7 @@ const TradeRoutesOverlay = () => {
         width: '100%',
         height: '100%',
         pointerEvents: 'none',
-        zIndex: 3, 
+        zIndex: 3,
       }}
     >
       <g>

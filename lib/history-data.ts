@@ -530,7 +530,9 @@ export function buildSnapshotAt(
     const guildName = data.guilds[gIdx];
     if (guildName === 'None') continue;
 
-    const abbrev = toAbbrev(data.territories[tIdx]);
+    const terrName = data.territories[tIdx];
+
+    const abbrev = toAbbrev(terrName);
 
     territories[abbrev] = {
       g: data.prefixes[gIdx],

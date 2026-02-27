@@ -31,6 +31,7 @@ import {
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 import { FRUMA_TBD_TERRITORIES } from "@/lib/fruma-territories";
+import { shouldRenderTerritory, shouldRenderTradeRoute } from "@/lib/retired-territories";
 
 export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'history' } = {}) {
   // Store minimum scale in a ref
@@ -1571,7 +1572,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               draggable={false}
             />
             {/* Territory Overlays - positioned in map pixel coordinates */}
-            {showTerritories && !showLandView && Object.entries(displayTerritories).map(([name, territory]) => (
+            {showTerritories && !showLandView && Object.entries(displayTerritories).filter(([name]) => shouldRenderTerritory(name, viewMode)).map(([name, territory]) => (
               <TerritoryOverlay
                 key={name}
                 name={name}
@@ -1592,7 +1593,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             ))}
             {/* Fruma TBD territories - static white overlays for unreleased territories */}
             {viewMode === 'live' && showTerritories && !showLandView && Object.entries(FRUMA_TBD_TERRITORIES)
-              .filter(([name]) => !territories[name])
+              .filter(([name]) => !territories[name] && shouldRenderTerritory(name, viewMode))
               .map(([name, territory]) => (
                 <TerritoryOverlay
                   key={`fruma-tbd-${name}`}
@@ -1625,7 +1626,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               />
             )}
             {/* Trade routes - only show when enabled, territories are visible, and Land View is off */}
-            {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay />}
+            {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay territories={territories} />}
           </div>
 
           {/* History loading overlay - shown when loading history data (initial restore or scrubbing) */}

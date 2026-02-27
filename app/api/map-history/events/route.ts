@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
+import { canonicalTerrName } from '@/lib/territory-abbreviations';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,9 +63,10 @@ export async function GET(request: NextRequest) {
       guildPrefixMap.set(row.guild_name, row.guild_prefix);
     }
 
-    // 1. Initial state: latest owner per territory at or before startDate
+    // 1. Initial state: latest owner per territory at or before startDate.
+    //    Select exchange_time so we can deduplicate after apostrophe normalisation.
     const initialResult = await pool.query(
-      `SELECT DISTINCT ON (territory) territory, attacker_name
+      `SELECT DISTINCT ON (territory) territory, attacker_name, exchange_time
        FROM territory_exchanges
        WHERE exchange_time <= $1
        ORDER BY territory, exchange_time DESC,
@@ -89,11 +91,12 @@ export async function GET(request: NextRequest) {
     const prefixes: string[] = [];
 
     function getOrCreateTerrIdx(territory: string): number {
-      let tIdx = territoryIndex.get(territory);
+      const norm = canonicalTerrName(territory);
+      let tIdx = territoryIndex.get(norm);
       if (tIdx === undefined) {
         tIdx = territories.length;
-        territoryIndex.set(territory, tIdx);
-        territories.push(territory);
+        territoryIndex.set(norm, tIdx);
+        territories.push(norm);
       }
       return tIdx;
     }
@@ -111,13 +114,24 @@ export async function GET(request: NextRequest) {
       return gIdx;
     }
 
-    // Encode initial state
-    const initialState: number[][] = [];
+    // Encode initial state.
+    // After apostrophe normalisation, multiple raw territory name variants (e.g. old
+    // Unicode "Krolton\u2019s Cave" and new-era ASCII "Krolton's Cave") collapse to the
+    // same tIdx.  Keep only the entry with the MOST RECENT exchange_time so that a
+    // stale 2021 Fox entry can never overwrite a 2026 Polish Hussars entry — the ghost
+    // territory is simply discarded and never renders again.
+    const initialStateByTIdx = new Map<number, { gIdx: number; time: Date }>();
     for (const row of initialResult.rows) {
-      initialState.push([
-        getOrCreateTerrIdx(row.territory),
-        getOrCreateGuildIdx(row.attacker_name),
-      ]);
+      const tIdx = getOrCreateTerrIdx(row.territory);
+      const gIdx = getOrCreateGuildIdx(row.attacker_name);
+      const existing = initialStateByTIdx.get(tIdx);
+      if (!existing || row.exchange_time > existing.time) {
+        initialStateByTIdx.set(tIdx, { gIdx, time: row.exchange_time });
+      }
+    }
+    const initialState: number[][] = [];
+    for (const [tIdx, { gIdx }] of initialStateByTIdx) {
+      initialState.push([tIdx, gIdx]);
     }
 
     // Encode events with buffer/flush None-dedup (same pattern as /exchanges)
@@ -140,7 +154,7 @@ export async function GET(request: NextRequest) {
       const unixSec = Math.floor(row.exchange_time.getTime() / 1000);
       const bufSec = buffer.length > 0 ? Math.floor(buffer[0].exchange_time.getTime() / 1000) : -1;
 
-      if (buffer.length > 0 && (unixSec !== bufSec || row.territory !== buffer[0].territory)) {
+      if (buffer.length > 0 && (unixSec !== bufSec || canonicalTerrName(row.territory) !== canonicalTerrName(buffer[0].territory))) {
         flushBuffer();
       }
       buffer.push(row);
