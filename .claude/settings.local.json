@@ -44,7 +44,9 @@
       "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-06-22 to 2020-06-26\\).csv\")",
       "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-07-18 to 2020-08-02\\).csv\")",
       "Bash(node scripts/import-motobot-wars.js \"C:\\\\Users\\\\Aiden Smith\\\\Downloads\\\\Nerfuria - ✧ _ Archive 1-50 - territory-tracker-091023 [643403708620603402] \\(2020-08-18 to 2020-09-02\\).csv\")",
-      "Bash(node scripts/find_missing_coords.js)"
+      "Bash(node scripts/find_missing_coords.js)",
+      "Bash(node scripts/diagnose-dec2020.js --input-type=commonjs)",
+      "Bash(node scripts/diagnose-dec2020.cjs)"
     ],
     "deny": [],
     "ask": []

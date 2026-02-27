@@ -30,6 +30,7 @@ import {
   buildInitialOwnerMap,
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
+import { FRUMA_TBD_TERRITORIES } from "@/lib/fruma-territories";
 
 export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'history' } = {}) {
   // Store minimum scale in a ref
@@ -1589,6 +1590,28 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
                 fallbackColor={showFactions ? '#808080' : '#FFFFFF'}
               />
             ))}
+            {/* Fruma TBD territories - static white overlays for unreleased territories */}
+            {viewMode === 'live' && showTerritories && !showLandView && Object.entries(FRUMA_TBD_TERRITORIES)
+              .filter(([name]) => !territories[name])
+              .map(([name, territory]) => (
+                <TerritoryOverlay
+                  key={`fruma-tbd-${name}`}
+                  name={name}
+                  territory={territory}
+                  scale={scale}
+                  isDragging={isDragging}
+                  onClick={handleTerritoryClick}
+                  onMouseEnter={handleTerritoryHover}
+                  onMouseLeave={handleTerritoryLeave}
+                  guildColors={{}}
+                  showTimeOutlines={false}
+                  showResourceOutlines={false}
+                  showGuildNames={showGuildNames}
+                  verboseData={null}
+                  opaqueFill={opaqueFill}
+                  fallbackColor="#FFFFFF"
+                />
+              ))}
             {/* Land View Overlay - merged guild territories */}
             {showTerritories && showLandView && viewMode === 'live' && (
               <LandViewOverlay
