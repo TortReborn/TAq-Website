@@ -30,7 +30,7 @@ const FRUMA_LOCATIONS: Record<string, { start: [number, number]; end: [number, n
   "Timasca":                { start: [-1856, -747],  end: [-1631, -433]  },
   "Fort Hegea":             { start: [-1194, -791],  end: [-1054, -579]  },
   "Fort Tericen":           { start: [-1330, -1160], end: [-1178, -948]  },
-  "Fort Torann":            { start: [-2000, -1675], end: [-855,  -1500] },
+  "Fort Torann":            { start: [-2112, -1763], end: [-1826, -1588] },
   "Feuding Houses":         { start: [-1153, -1249], end: [-946,  -1035] },
   "Frosty Outpost":         { start: [-1153, -1481], end: [-971,  -1250] },
 };
