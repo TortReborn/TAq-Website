@@ -12,7 +12,22 @@ export async function GET(request: NextRequest) {
 
   try {
     const pool = getPool();
-    const [result, lastUpdatedResult, pendingJoinResult, memberCountResult] = await Promise.all([
+
+    // Fetch guild member UUIDs and auto-remove kicked players from the kick list
+    const guildDataResult = await pool.query(
+      `SELECT data->'members' as members FROM cache_entries WHERE cache_key = 'guildData'`
+    );
+    const guildMembers: { uuid: string }[] = guildDataResult.rows[0]?.members ?? [];
+    const guildUUIDs = new Set(guildMembers.map(m => m.uuid));
+
+    if (guildUUIDs.size > 0) {
+      await pool.query(
+        `DELETE FROM kick_list WHERE uuid != ALL($1::varchar[])`,
+        [Array.from(guildUUIDs)]
+      );
+    }
+
+    const [result, lastUpdatedResult, pendingJoinResult] = await Promise.all([
       pool.query(
         `SELECT uuid, ign, tier, added_by, created_at
          FROM kick_list
@@ -28,16 +43,11 @@ export async function GET(request: NextRequest) {
            AND a.application_type = 'guild'
            AND dl.linked = FALSE`
       ),
-      pool.query(
-        `SELECT jsonb_array_length(data->'members') as count
-         FROM cache_entries
-         WHERE cache_key = 'guildData'`
-      ),
     ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
     const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
-    const memberCount = parseInt(memberCountResult.rows[0]?.count || '0', 10);
+    const memberCount = guildUUIDs.size;
 
     return NextResponse.json({
       entries: result.rows.map(row => ({

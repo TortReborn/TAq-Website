@@ -257,7 +257,16 @@ export default function KickListPanel({
                     }}>
                       {tierEntries.length}
                     </span>
-                    <span style={{ fontSize: '0.65rem' }}>{collapsed ? '▶' : '▼'}</span>
+                    <span style={{
+                      display: 'inline-block',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '4px solid transparent',
+                      borderRight: '4px solid transparent',
+                      borderTop: '6px solid currentColor',
+                      transition: 'transform 0.15s ease',
+                      transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+                    }} />
                   </span>
                 </button>
 
