@@ -3,7 +3,20 @@
 import { useState, useMemo } from 'react';
 import type { ExecMember } from '@/hooks/useExecActivity';
 
-type SortKey = 'username' | 'discordRank' | 'playtime' | 'wars' | 'raids' | 'inactiveDays' | 'kickScore' | 'weeklyPlaytime';
+type SortKey = 'username' | 'discordRank' | 'playtime' | 'wars' | 'raids' | 'inactiveDays' | 'kickScore' | 'daysInGuild';
+
+// 5h/week = 5/7 h/day; threshold for N days = N * 5/7
+const WEEKLY_HOURS = 5;
+function getThreshold(days: number): number {
+  return days * WEEKLY_HOURS / 7;
+}
+
+function isBelowThreshold(member: { isNewMember: boolean; timeFrames: Record<string, { playtime: number; hasCompleteData: boolean }> }, timeFrame: string): boolean {
+  if (member.isNewMember) return false;
+  const tf = member.timeFrames[timeFrame];
+  if (!tf?.hasCompleteData) return false;
+  return tf.playtime < getThreshold(Number(timeFrame));
+}
 type SortDirection = 'asc' | 'desc';
 
 const RANK_ORDER: Record<string, number> = {
@@ -60,10 +73,12 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
     return [...filtered].sort((a, b) => {
       if (sortMode === 'kick') {
         // Kick suitability: new members at bottom, then sort by threshold/rank/playtime
+        const aBT = isBelowThreshold(a, timeFrame);
+        const bBT = isBelowThreshold(b, timeFrame);
         if (a.isNewMember !== b.isNewMember) return a.isNewMember ? 1 : -1;
-        if (a.belowThreshold !== b.belowThreshold) return a.belowThreshold ? -1 : 1;
+        if (aBT !== bBT) return aBT ? -1 : 1;
         if (a.kickRankScore !== b.kickRankScore) return a.kickRankScore - b.kickRankScore;
-        return a.weeklyPlaytime - b.weeklyPlaytime;
+        return (a.timeFrames[timeFrame]?.playtime ?? 0) - (b.timeFrames[timeFrame]?.playtime ?? 0);
       }
 
       let valA: number | string = 0;
@@ -94,9 +109,9 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
           valA = a.inactiveDays ?? 0;
           valB = b.inactiveDays ?? 0;
           break;
-        case 'weeklyPlaytime':
-          valA = a.weeklyPlaytime;
-          valB = b.weeklyPlaytime;
+        case 'daysInGuild':
+          valA = a.daysInGuild;
+          valB = b.daysInGuild;
           break;
         case 'kickScore':
           valA = a.kickRankScore;
@@ -150,10 +165,10 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
             <SortHeader label="Player" sortKeyName="username" width="160px" />
             <SortHeader label="Rank" sortKeyName="discordRank" width="100px" />
             <SortHeader label={`Playtime (${timeFrame}d)`} sortKeyName="playtime" />
-            <SortHeader label="Wkly Avg" sortKeyName="weeklyPlaytime" />
             <SortHeader label={`Wars (${timeFrame}d)`} sortKeyName="wars" />
             <SortHeader label={`Raids (${timeFrame}d)`} sortKeyName="raids" />
             <SortHeader label="Last Seen" sortKeyName="inactiveDays" />
+            <SortHeader label="Member For" sortKeyName="daysInGuild" />
             <th style={{
               padding: '0.75rem 0.5rem',
               textAlign: 'left',
@@ -186,10 +201,11 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
           {sortedMembers.map(member => {
             const tf = member.timeFrames[timeFrame];
             const rankColor = RANK_COLORS[member.discordRank] || 'var(--text-secondary)';
+            const belowThreshold = isBelowThreshold(member, timeFrame);
 
             let rowBg = 'transparent';
             if (sortMode === 'kick' && !member.isNewMember) {
-              rowBg = member.belowThreshold ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.05)';
+              rowBg = belowThreshold ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.05)';
             }
 
             return (
@@ -225,17 +241,10 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                 <td style={{
                   padding: '0.625rem 0.5rem',
                   borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: 'var(--text-primary)',
+                  color: belowThreshold ? '#ef4444' : 'var(--text-primary)',
+                  fontWeight: belowThreshold ? '600' : '400',
                 }}>
                   {tf?.hasCompleteData ? `${tf.playtime.toFixed(1)}h` : '-'}
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: member.belowThreshold ? '#ef4444' : '#22c55e',
-                  fontWeight: '600',
-                }}>
-                  {member.weeklyPlaytime.toFixed(1)}h
                 </td>
                 <td style={{
                   padding: '0.625rem 0.5rem',
@@ -266,6 +275,14 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                 <td style={{
                   padding: '0.625rem 0.5rem',
                   borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  color: member.isNewMember ? '#a855f7' : 'var(--text-secondary)',
+                  fontWeight: member.isNewMember ? '600' : '400',
+                }}>
+                  {member.daysInGuild}d
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
                 }}>
                   {member.isNewMember ? (
                     <span style={{
@@ -273,7 +290,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                       padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
                       background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7',
                     }}>NEW</span>
-                  ) : member.belowThreshold ? (
+                  ) : belowThreshold ? (
                     <span style={{
                       fontSize: '0.7rem', fontWeight: '600',
                       padding: '0.15rem 0.4rem', borderRadius: '0.25rem',

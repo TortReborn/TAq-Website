@@ -23,9 +23,8 @@ export interface ExecMember {
     contributed: number;
     hasCompleteData: boolean;
   }>;
-  weeklyPlaytime: number;
-  belowThreshold: boolean;
   isNewMember: boolean;
+  daysInGuild: number;
   kickRankScore: number;
 }
 

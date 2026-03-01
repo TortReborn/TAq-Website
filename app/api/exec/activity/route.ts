@@ -141,11 +141,8 @@ export async function GET(request: NextRequest) {
           : 999;
         const isNewMember = daysSinceJoin < 7;
 
-        // Calculate weekly playtime rate from 14-day window
-        const pt14 = timeFrames['14']?.playtime ?? 0;
-        const weeklyPlaytime = pt14 / 2; // 14 days = 2 weeks
-
-        const belowThreshold = !isNewMember && weeklyPlaytime < WEEKLY_REQUIREMENT;
+        // Below threshold is calculated per-timeframe on the frontend
+        // using proportional threshold: 5h/week = 5/7 h/day * N days
         const kickRankScore = KICK_RANK_ORDER[discordRank] ?? 5;
 
         // Last seen calculation
@@ -170,9 +167,8 @@ export async function GET(request: NextRequest) {
           inactiveDays,
           timeFrames,
           // Kick suitability data
-          weeklyPlaytime: Math.round(weeklyPlaytime * 100) / 100,
-          belowThreshold,
           isNewMember,
+          daysInGuild: Math.floor(daysSinceJoin),
           kickRankScore,
         };
       });

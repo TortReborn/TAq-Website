@@ -10,8 +10,8 @@ export default function ExecActivityPage() {
   const { data, loading, error, refresh } = useExecActivity();
   const kickList = useKickList();
   const [timeFrame, setTimeFrame] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('exec_activity_timeframe') || '14';
-    return '14';
+    if (typeof window !== 'undefined') return localStorage.getItem('exec_activity_timeframe') || '7';
+    return '7';
   });
   const [sortMode, setSortMode] = useState<'activity' | 'kick'>(() => {
     if (typeof window !== 'undefined') {
@@ -87,7 +87,12 @@ export default function ExecActivityPage() {
     { value: '30', label: '30 Days' },
   ];
 
-  const belowCount = data.members.filter(m => m.belowThreshold).length;
+  const threshold = Number(timeFrame) * 5 / 7;
+  const belowCount = data.members.filter(m => {
+    if (m.isNewMember) return false;
+    const tf = m.timeFrames[timeFrame];
+    return tf?.hasCompleteData && tf.playtime < threshold;
+  }).length;
   const newCount = data.members.filter(m => m.isNewMember).length;
 
   return (
@@ -106,7 +111,7 @@ export default function ExecActivityPage() {
         marginBottom: '1.5rem',
       }}>
         {data.members.length} members &middot; {belowCount} below threshold &middot; {newCount} new (&lt;7d)
-        &middot; Threshold: {data.weeklyRequirement}h/week
+        &middot; Threshold: {threshold.toFixed(1)}h/{timeFrame}d (5h/week)
       </p>
 
       <div style={{
