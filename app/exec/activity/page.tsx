@@ -18,7 +18,7 @@ export default function ExecActivityPage() {
       const saved = localStorage.getItem('exec_activity_sortmode');
       if (saved === 'activity' || saved === 'kick') return saved;
     }
-    return 'activity';
+    return 'kick';
   });
   const [searchTerm, setSearchTerm] = useState('');
 

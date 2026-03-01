@@ -25,6 +25,9 @@ const RANK_ORDER: Record<string, number> = {
   'Manatee': 9, 'Starfish': 10,
 };
 
+// Players pinned to the very bottom of kick suitability (exempt from kicks)
+const PINNED_BOTTOM = new Set(['WeaponMerchant', 'GordLonner', 'Woealer']);
+
 const RANK_COLORS: Record<string, string> = {
   'Hydra': '#ac034c', 'Narwhal': '#eb2279', 'Dolphin': '#9d68ff',
   'Sailfish': '#396aff', 'Hammerhead': '#04b0eb', 'Angler': '#00e2db',
@@ -50,8 +53,10 @@ const TIER_BUTTONS = [
 export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, onAddToKickList, kickListUuids }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>(sortMode === 'kick' ? 'kickScore' : 'playtime');
   const [sortDir, setSortDir] = useState<SortDirection>(sortMode === 'kick' ? 'asc' : 'desc');
+  const [hoveredUuid, setHoveredUuid] = useState<string | null>(null);
 
   const handleSort = (key: SortKey) => {
+    if (sortMode === 'kick') return;
     if (sortKey === key) {
       setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
@@ -72,10 +77,13 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
 
     return [...filtered].sort((a, b) => {
       if (sortMode === 'kick') {
-        // Kick suitability: new members at bottom, then sort by threshold/rank/playtime
+        // Kick suitability: pinned players at very bottom, then new members, then sort by threshold/rank/playtime
+        const aPinned = PINNED_BOTTOM.has(a.username);
+        const bPinned = PINNED_BOTTOM.has(b.username);
+        if (aPinned !== bPinned) return aPinned ? 1 : -1;
+        if (a.isNewMember !== b.isNewMember) return a.isNewMember ? 1 : -1;
         const aBT = isBelowThreshold(a, timeFrame);
         const bBT = isBelowThreshold(b, timeFrame);
-        if (a.isNewMember !== b.isNewMember) return a.isNewMember ? 1 : -1;
         if (aBT !== bBT) return aBT ? -1 : 1;
         if (a.kickRankScore !== b.kickRankScore) return a.kickRankScore - b.kickRankScore;
         return (a.timeFrames[timeFrame]?.playtime ?? 0) - (b.timeFrames[timeFrame]?.playtime ?? 0);
@@ -126,6 +134,8 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
     });
   }, [members, searchTerm, sortKey, sortDir, timeFrame, sortMode]);
 
+  const isKickMode = sortMode === 'kick';
+
   const SortHeader = ({ label, sortKeyName, width }: { label: string; sortKeyName: SortKey; width?: string }) => (
     <th
       onClick={() => handleSort(sortKeyName)}
@@ -134,19 +144,32 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
         textAlign: 'left',
         fontSize: '0.75rem',
         fontWeight: '600',
-        color: sortKey === sortKeyName ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
+        color: !isKickMode && sortKey === sortKeyName ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
-        cursor: 'pointer',
+        cursor: isKickMode ? 'default' : 'pointer',
         userSelect: 'none',
         width: width || 'auto',
         whiteSpace: 'nowrap',
         borderBottom: '1px solid var(--border-card)',
       }}
     >
-      {label} {sortKey === sortKeyName ? (sortDir === 'asc' ? '\u25B2' : '\u25BC') : ''}
+      {label} {!isKickMode && sortKey === sortKeyName ? (sortDir === 'asc' ? '\u25B2' : '\u25BC') : ''}
     </th>
   );
+
+  const thStyle: React.CSSProperties = {
+    padding: '0.75rem 0.5rem',
+    textAlign: 'left',
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    color: 'var(--text-secondary)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    borderBottom: '1px solid var(--border-card)',
+  };
+
+  const cellBorder = '1px solid rgba(255,255,255,0.05)';
 
   return (
     <div style={{
@@ -162,6 +185,11 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
       }}>
         <thead>
           <tr>
+            {onAddToKickList && (
+              <th style={{ ...thStyle, textAlign: 'center', width: '80px' }}>
+                Kick List
+              </th>
+            )}
             <SortHeader label="Player" sortKeyName="username" width="160px" />
             <SortHeader label="Rank" sortKeyName="discordRank" width="100px" />
             <SortHeader label={`Playtime (${timeFrame}d)`} sortKeyName="playtime" />
@@ -169,145 +197,43 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
             <SortHeader label={`Raids (${timeFrame}d)`} sortKeyName="raids" />
             <SortHeader label="Last Seen" sortKeyName="inactiveDays" />
             <SortHeader label="Member For" sortKeyName="daysInGuild" />
-            <th style={{
-              padding: '0.75rem 0.5rem',
-              textAlign: 'left',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              color: 'var(--text-secondary)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              borderBottom: '1px solid var(--border-card)',
-            }}>
+            <th style={thStyle}>
               Status
             </th>
-            {onAddToKickList && (
-              <th style={{
-                padding: '0.75rem 0.5rem',
-                textAlign: 'center',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                color: 'var(--text-secondary)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                borderBottom: '1px solid var(--border-card)',
-              }}>
-                Kick List
-              </th>
-            )}
           </tr>
         </thead>
         <tbody>
-          {sortedMembers.map(member => {
+          {sortedMembers.map((member, idx) => {
             const tf = member.timeFrames[timeFrame];
             const rankColor = RANK_COLORS[member.discordRank] || 'var(--text-secondary)';
             const belowThreshold = isBelowThreshold(member, timeFrame);
+            const isHovered = hoveredUuid === member.uuid;
+            const isOdd = idx % 2 === 1;
 
-            let rowBg = 'transparent';
-            if (sortMode === 'kick' && !member.isNewMember) {
-              rowBg = belowThreshold ? 'rgba(239, 68, 68, 0.08)' : 'rgba(59, 130, 246, 0.05)';
+            let rowBg: string;
+            if (isHovered) {
+              rowBg = 'rgba(255, 255, 255, 0.08)';
+            } else if (isKickMode) {
+              if (belowThreshold) {
+                rowBg = isOdd ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)';
+              } else {
+                rowBg = isOdd ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.03)';
+              }
+            } else {
+              rowBg = isOdd ? 'rgba(255, 255, 255, 0.025)' : 'transparent';
             }
 
             return (
-              <tr key={member.uuid} style={{ background: rowBg }}>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  fontWeight: '600',
-                  color: 'var(--text-primary)',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {member.online && (
-                      <div style={{
-                        width: '6px', height: '6px', borderRadius: '50%',
-                        background: '#22c55e', flexShrink: 0,
-                      }} title={`Online: ${member.server || 'unknown'}`} />
-                    )}
-                    {member.username}
-                  </div>
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                }}>
-                  <span style={{
-                    color: rankColor,
-                    fontWeight: '600',
-                    fontSize: '0.8rem',
-                  }}>
-                    {member.discordRank || 'Unlinked'}
-                  </span>
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: belowThreshold ? '#ef4444' : 'var(--text-primary)',
-                  fontWeight: belowThreshold ? '600' : '400',
-                }}>
-                  {tf?.hasCompleteData ? `${tf.playtime.toFixed(1)}h` : '-'}
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: 'var(--text-primary)',
-                }}>
-                  {tf?.hasCompleteData ? tf.wars : '-'}
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: 'var(--text-primary)',
-                }}>
-                  {tf?.hasCompleteData ? tf.raids : '-'}
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: member.inactiveDays !== null && member.inactiveDays > 7 ? '#f59e0b' : 'var(--text-secondary)',
-                }}>
-                  {member.online
-                    ? 'Now'
-                    : member.inactiveDays !== null
-                      ? `${member.inactiveDays}d ago`
-                      : 'Unknown'
-                  }
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: member.isNewMember ? '#a855f7' : 'var(--text-secondary)',
-                  fontWeight: member.isNewMember ? '600' : '400',
-                }}>
-                  {member.daysInGuild}d
-                </td>
-                <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                }}>
-                  {member.isNewMember ? (
-                    <span style={{
-                      fontSize: '0.7rem', fontWeight: '600',
-                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
-                      background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7',
-                    }}>NEW</span>
-                  ) : belowThreshold ? (
-                    <span style={{
-                      fontSize: '0.7rem', fontWeight: '600',
-                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
-                      background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444',
-                    }}>Danger</span>
-                  ) : (
-                    <span style={{
-                      fontSize: '0.7rem', fontWeight: '600',
-                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
-                      background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e',
-                    }}>Safe</span>
-                  )}
-                </td>
+              <tr
+                key={member.uuid}
+                style={{ background: rowBg, transition: 'background 0.15s ease' }}
+                onMouseEnter={() => setHoveredUuid(member.uuid)}
+                onMouseLeave={() => setHoveredUuid(null)}
+              >
                 {onAddToKickList && (
                   <td style={{
                     padding: '0.625rem 0.5rem',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: cellBorder,
                     textAlign: 'center',
                   }}>
                     {kickListUuids?.has(member.uuid) ? (
@@ -344,6 +270,106 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                     )}
                   </td>
                 )}
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                  fontWeight: '600',
+                  color: 'var(--text-primary)',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {member.online && (
+                      <div style={{
+                        width: '6px', height: '6px', borderRadius: '50%',
+                        background: '#22c55e', flexShrink: 0,
+                      }} title={`Online: ${member.server || 'unknown'}`} />
+                    )}
+                    {member.username}
+                  </div>
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                }}>
+                  <span style={{
+                    color: rankColor,
+                    fontWeight: '600',
+                    fontSize: '0.8rem',
+                  }}>
+                    {member.discordRank || 'Unlinked'}
+                  </span>
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                  color: belowThreshold ? '#ef4444' : 'var(--text-primary)',
+                  fontWeight: belowThreshold ? '600' : '400',
+                }}>
+                  {tf?.hasCompleteData ? `${tf.playtime.toFixed(1)}h` : '-'}
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                  color: 'var(--text-primary)',
+                }}>
+                  {tf?.hasCompleteData ? tf.wars : '-'}
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                  color: 'var(--text-primary)',
+                }}>
+                  {tf?.hasCompleteData ? tf.raids : '-'}
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                  color: member.inactiveDays !== null && member.inactiveDays > 7 ? '#f59e0b' : 'var(--text-secondary)',
+                }}>
+                  {member.online
+                    ? 'Now'
+                    : member.inactiveDays !== null
+                      ? `${member.inactiveDays}d ago`
+                      : 'Unknown'
+                  }
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                  color: member.isNewMember ? '#a855f7' : 'var(--text-secondary)',
+                  fontWeight: member.isNewMember ? '600' : '400',
+                }}>
+                  {member.daysInGuild}d
+                </td>
+                <td style={{
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
+                }}>
+                  {PINNED_BOTTOM.has(member.username) ? (
+                    <span style={{
+                      fontSize: '0.7rem', fontWeight: '600',
+                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
+                      background: 'rgba(255, 215, 0, 0.15)', color: '#ffd700',
+                    }}>Eternal</span>
+                  ) : member.isNewMember ? (
+                    <span style={{
+                      fontSize: '0.7rem', fontWeight: '600',
+                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
+                      background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7',
+                    }}>NEW</span>
+                  ) : belowThreshold ? (
+                    <span style={{
+                      fontSize: '0.7rem', fontWeight: '600',
+                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
+                      background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444',
+                    }}>Danger</span>
+                  ) : (
+                    <span style={{
+                      fontSize: '0.7rem', fontWeight: '600',
+                      padding: '0.15rem 0.4rem', borderRadius: '0.25rem',
+                      background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e',
+                    }}>Safe</span>
+                  )}
+                </td>
               </tr>
             );
           })}
