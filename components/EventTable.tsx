@@ -144,17 +144,17 @@ export default function EventTable({
             const showRankCutoff = rows.length > 5 && hasRank6Plus && lastRank5OrLessIdx !== -1 && lastRank5OrLessIdx !== rows.length - 1;
             return rows.map((r, i) => (
               <React.Fragment key={`row-group-${r.username}-${i}`}>
-                <tr 
-                  key={`${r.username}-${i}`} 
-                  style={{ 
-                    background: 'var(--table-row-bg)',
+                <tr
+                  key={`${r.username}-${i}`}
+                  style={{
+                    background: i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'var(--table-row-bg)',
                     borderBottom: '1px solid var(--table-border)'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'var(--table-row-hover)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'var(--table-row-bg)';
+                    e.currentTarget.style.background = i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'var(--table-row-bg)';
                   }}
                 >
                   <td

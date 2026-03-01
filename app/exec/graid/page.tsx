@@ -329,22 +329,22 @@ export default function ExecGraidPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
-                        {['#', 'Player', 'Rank', 'Raids', 'Payout', ''].map(h => (
+                        {['#', 'Player', 'Rank', 'Raids', 'Payout'].map(h => (
                           <th key={h} style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {leaderboard.rows.map((row, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid var(--border-card)', opacity: row.meetsMin ? 1 : 0.5 }}>
+                        <tr key={i} style={{ borderBottom: '1px solid var(--border-card)', opacity: row.meetsMin ? 1 : 0.5, background: i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', fontWeight: '700', color: row.rankNum <= 3 ? '#f59e0b' : 'var(--text-secondary)' }}>{row.rankNum}</td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>{row.username}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(row.rank), fontWeight: '600' }}>{row.rank || '—'}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(row.rank), fontWeight: '600' }}>
+                            {row.rank || '—'}
+                            {row.isRankLeader && <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', fontWeight: '600', fontSize: '0.7rem', marginLeft: '0.4rem' }}>Leader</span>}
+                          </td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.total}</td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: row.meetsMin ? '#22c55e' : 'var(--text-secondary)' }}>{row.meetsMin ? formatPayout(row.payout) : '—'}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.7rem' }}>
-                            {row.isRankLeader && <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', fontWeight: '600' }}>Leader</span>}
-                          </td>
                         </tr>
                       ))}
                     </tbody>

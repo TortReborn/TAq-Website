@@ -158,8 +158,8 @@ export default function ExecBlacklistPage() {
                 </td>
               </tr>
             )}
-            {entries.map(entry => (
-              <tr key={entry.ign} style={{ borderBottom: '1px solid var(--border-card)' }}>
+            {entries.map((entry, idx) => (
+              <tr key={entry.ign} style={{ borderBottom: '1px solid var(--border-card)', background: idx % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
                 <td style={{ padding: '0.75rem 1rem', color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: '500' }}>
                   {entry.ign}
                 </td>

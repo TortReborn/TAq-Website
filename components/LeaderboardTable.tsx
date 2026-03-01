@@ -330,10 +330,11 @@ export default function LeaderboardTable({ members, timeFrame, searchTerm }: Lea
                     key={member.uuid}
                     style={{
                       borderBottom: index < filteredAndSortedMembers.length - 1 ? '1px solid var(--border-card)' : 'none',
-                      transition: 'background 0.2s ease'
+                      transition: 'background 0.2s ease',
+                      background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = index % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent'}
                   >
                     <td style={{
                       padding: '0.75rem',
