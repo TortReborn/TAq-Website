@@ -4,23 +4,7 @@ import React, { useState } from "react";
 import type { Row } from "@/lib/graid";
 import { fmtInt } from "@/lib/utils";
 import { formatPayout } from "@/lib/currency";
-
-// Rank color helper function
-const getRankColor = (rank: string) => {
-  switch (rank) {
-    case 'Hydra': return '#ac034c';
-    case 'Narwhal': return '#eb2279';
-    case 'Dolphin': return '#9d68ff';
-    case 'Sailfish': return '#396aff';
-    case 'Hammerhead': return '#04b0eb';
-    case 'Angler': return '#00e2db';
-    case 'Barracuda': return '#79e64a';
-    case 'Piranha': return '#c8ff00';
-    case 'Manatee': return '#ffe226';
-    case 'Starfish': return '#e8a41c';
-    default: return 'var(--text-muted)';
-  }
-};
+import { getRankColor } from "@/lib/rank-constants";
 
 export default function EventTable({
   rows,

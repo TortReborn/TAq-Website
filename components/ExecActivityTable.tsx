@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { ExecMember } from '@/hooks/useExecActivity';
+import { RANK_ORDER, RANK_COLORS } from '@/lib/rank-constants';
 
 type SortKey = 'username' | 'discordRank' | 'playtime' | 'wars' | 'raids' | 'inactiveDays' | 'kickScore' | 'daysInGuild';
 
@@ -19,21 +20,8 @@ function isBelowThreshold(member: { isNewMember: boolean; timeFrames: Record<str
 }
 type SortDirection = 'asc' | 'desc';
 
-const RANK_ORDER: Record<string, number> = {
-  'Hydra': 1, 'Narwhal': 2, 'Dolphin': 3, 'Sailfish': 4,
-  'Hammerhead': 5, 'Angler': 6, 'Barracuda': 7, 'Piranha': 8,
-  'Manatee': 9, 'Starfish': 10,
-};
-
 // Players pinned to the very bottom of kick suitability (exempt from kicks)
 const PINNED_BOTTOM = new Set(['WeaponMerchant', 'GordLonner', 'Woealer']);
-
-const RANK_COLORS: Record<string, string> = {
-  'Hydra': '#ac034c', 'Narwhal': '#eb2279', 'Dolphin': '#9d68ff',
-  'Sailfish': '#396aff', 'Hammerhead': '#04b0eb', 'Angler': '#00e2db',
-  'Barracuda': '#79e64a', 'Piranha': '#c8ff00', 'Manatee': '#ffe226',
-  'Starfish': '#e8a41c',
-};
 
 interface Props {
   members: ExecMember[];

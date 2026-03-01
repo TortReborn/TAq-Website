@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useExecSession } from '@/hooks/useExecSession';
+import { getRankColor } from '@/lib/rank-constants';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
@@ -9,6 +10,10 @@ const NAV_ITEMS = [
   { href: '/exec', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1' },
   { href: '/exec/activity', label: 'Activity', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
   { href: '/exec/applications', label: 'Applications', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { href: '/exec/promotions', label: 'Promotions', icon: 'M5 10l7-7m0 0l7 7m-7-7v18' },
+  { href: '/exec/blacklist', label: 'Blacklist', icon: 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' },
+  { href: '/exec/graid', label: 'Graid Events', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
+  { href: '/exec/agenda', label: 'Agenda', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
 ];
 
 // Auth-required pages (login and unauthorized are public)
@@ -103,13 +108,14 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}>
-                {user.discord_username}
+                {user.ign || user.discord_username}
               </div>
               <div style={{
                 fontSize: '0.7rem',
-                color: 'var(--text-secondary)',
+                fontWeight: '600',
+                color: user.rank ? getRankColor(user.rank) : 'var(--text-secondary)',
               }}>
-                Executive
+                {user.rank || 'Executive'}
               </div>
             </div>
           </div>
