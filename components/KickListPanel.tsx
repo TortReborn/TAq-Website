@@ -26,6 +26,7 @@ interface KickListPanelProps {
   lastUpdatedBy: string | null;
   loading: boolean;
   members?: { username: string; uuid: string; discordRank: string }[];
+  pendingJoins?: number;
   onAdd?: (uuid: string, ign: string, tier: number) => void;
   onRemove: (uuid: string) => void;
   onChangeTier: (uuid: string, tier: number) => void;
@@ -37,6 +38,7 @@ export default function KickListPanel({
   lastUpdatedBy,
   loading,
   members,
+  pendingJoins = 0,
   onAdd,
   onRemove,
   onChangeTier,
@@ -80,6 +82,25 @@ export default function KickListPanel({
           color: 'var(--text-secondary)',
           marginTop: '0.25rem',
         }}>
+          {members && (() => {
+            const effectiveCount = members.length + pendingJoins;
+            const openSlots = 150 - effectiveCount;
+            return (
+              <div style={{ marginBottom: '0.15rem' }}>
+                <span style={{
+                  color: openSlots <= 0 ? '#ef4444' : openSlots <= 5 ? '#f59e0b' : 'var(--text-secondary)',
+                  fontWeight: openSlots <= 5 ? '600' : '400',
+                }}>
+                  {openSlots} open slot{openSlots !== 1 ? 's' : ''}
+                </span>
+                {pendingJoins > 0 && (
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    {' '}({pendingJoins} accepted, pending join)
+                  </span>
+                )}
+              </div>
+            );
+          })()}
           Last updated: {lastUpdated ? `${timeAgo(lastUpdated)} by ${lastUpdatedBy}` : 'Never'}
         </div>
       </div>

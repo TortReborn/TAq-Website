@@ -173,9 +173,16 @@ export async function GET(request: NextRequest) {
         };
       });
 
+      // Count accepted applicants who haven't joined the guild yet
+      const pendingJoinResult = await client.query(
+        `SELECT COUNT(*) as count FROM discord_links WHERE linked = FALSE`
+      );
+      const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
+
       return NextResponse.json({
         members: enrichedMembers,
         weeklyRequirement: WEEKLY_REQUIREMENT,
+        pendingJoins,
       });
     } finally {
       client.release();

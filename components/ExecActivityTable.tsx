@@ -214,7 +214,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
             if (isHovered) {
               rowBg = 'rgba(255, 255, 255, 0.08)';
             } else if (isKickMode) {
-              if (belowThreshold) {
+              if (belowThreshold && !PINNED_BOTTOM.has(member.username)) {
                 rowBg = isOdd ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)';
               } else {
                 rowBg = isOdd ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.03)';

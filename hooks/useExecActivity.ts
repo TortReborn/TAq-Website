@@ -31,6 +31,7 @@ export interface ExecMember {
 interface ExecActivityData {
   members: ExecMember[];
   weeklyRequirement: number;
+  pendingJoins: number;
 }
 
 export function useExecActivity() {
