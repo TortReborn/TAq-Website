@@ -173,9 +173,13 @@ export async function GET(request: NextRequest) {
         };
       });
 
-      // Count accepted applicants who haven't joined the guild yet
+      // Count accepted guild applicants who haven't joined yet
       const pendingJoinResult = await client.query(
-        `SELECT COUNT(*) as count FROM discord_links WHERE linked = FALSE`
+        `SELECT COUNT(*) as count FROM applications a
+         JOIN discord_links dl ON dl.discord_id = CAST(a.discord_id AS BIGINT)
+         WHERE a.status = 'accepted'
+           AND a.application_type = 'guild'
+           AND dl.linked = FALSE`
       );
       const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
 
