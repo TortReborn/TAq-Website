@@ -54,7 +54,7 @@ function calculateDelta(current: number, historical: number | undefined): { valu
 }
 
 export async function GET(request: NextRequest) {
-  const session = requireExecSession(request);
+  const session = await requireExecSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

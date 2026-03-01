@@ -114,10 +114,19 @@ export function clearExecSessionCookie(response: NextResponse): void {
 
 /**
  * Helper for protected exec API routes.
+ * Verifies the session cookie, then re-checks the user's rank from
+ * discord_links to ensure they haven't been demoted since login.
  * Returns the session data or null. If null, the caller should return a 401 response.
  */
-export function requireExecSession(request: NextRequest): ExecSessionData | null {
-  return getExecSession(request);
+export async function requireExecSession(request: NextRequest): Promise<ExecSessionData | null> {
+  const session = getExecSession(request);
+  if (!session) return null;
+
+  // Re-verify rank from database on every request
+  const linkData = await checkDiscordLinkRank(session.discord_id);
+  if (!linkData) return null;
+
+  return session;
 }
 
 /**
@@ -235,13 +244,12 @@ export async function checkGuildMembership(uuid: string): Promise<boolean> {
     );
 
     if (result.rows.length === 0) {
-      // No cached data available — don't lock people out
-      return true;
+      return false;
     }
 
     const guildData = result.rows[0].data;
     const members = guildData?.members;
-    if (!members) return true;
+    if (!members) return false;
 
     const normalizedUuid = uuid.replace(/-/g, '');
 
@@ -262,7 +270,6 @@ export async function checkGuildMembership(uuid: string): Promise<boolean> {
 
     return false;
   } catch {
-    // If anything fails, don't lock people out
-    return true;
+    return false;
   }
 }
