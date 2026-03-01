@@ -22,13 +22,17 @@ const getRankColor = (rank: string) => {
   }
 };
 
-export default function EventTable({ 
-  rows, 
-  minc, 
-  onRefresh 
-}: { 
-  rows: Row[]; 
-  minc: number; 
+export default function EventTable({
+  rows,
+  minc,
+  bonusThreshold,
+  bonusAmount,
+  onRefresh
+}: {
+  rows: Row[];
+  minc: number;
+  bonusThreshold: number | null;
+  bonusAmount: number | null;
   onRefresh?: () => Promise<void>;
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -200,14 +204,14 @@ export default function EventTable({
                     gap: '0.25rem'
                   }}>
                     {fmtInt(r.total)}
-                    {r.total >= 100 && (
-                      <span 
+                    {bonusThreshold != null && bonusAmount != null && r.total >= bonusThreshold && (
+                      <span
                         style={{
                           fontSize: '0.7rem',
                           color: '#10b981',
                           fontWeight: '600'
                         }}
-                        title="100+ raids bonus: +262,144 emeralds (64 LE)"
+                        title={`${bonusThreshold}+ raids bonus: +${(bonusAmount * 4096).toLocaleString()} emeralds (${bonusAmount} LE)`}
                       >
                         ★
                       </span>

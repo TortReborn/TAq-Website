@@ -12,7 +12,7 @@ export async function fetchMostRecentEvent(): Promise<{
   const client = await pool.connect();
   try {
     const evRes = await client.query(
-      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions
+      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions, bonus_threshold, bonus_amount
        FROM graid_events
        WHERE end_ts IS NOT NULL
        ORDER BY end_ts DESC
@@ -29,7 +29,9 @@ export async function fetchMostRecentEvent(): Promise<{
       endTs: ev.end_ts ? (ev.end_ts.toISOString?.() ?? new Date(ev.end_ts).toISOString()) : null,
       low: Number(ev.low_rank_reward),
       high: Number(ev.high_rank_reward),
-      minc: Number(ev.min_completions)
+      minc: Number(ev.min_completions),
+      bonusThreshold: ev.bonus_threshold != null ? Number(ev.bonus_threshold) : null,
+      bonusAmount: ev.bonus_amount != null ? Number(ev.bonus_amount) : null
     };
     const rowsRes = await client.query(
       `SELECT dl.ign AS username, dl.rank AS rank, get.total AS total
@@ -69,6 +71,8 @@ export type ActiveEvent = {
   low: number;
   high: number;
   minc: number;
+  bonusThreshold: number | null;
+  bonusAmount: number | null;
 };
 
 export type Row = {
@@ -141,9 +145,9 @@ function processRowsWithMultipliers(baseRows: any[], event: ActiveEvent): Row[] 
       payout = payout * 1.5;
     }
     
-    // Add 100+ raids bonus (64 stacks LE = 262,144)
-    if (row.total >= 100) {
-      payout = payout + 262144;
+    // Add bonus if threshold and amount are configured for this event
+    if (event.bonusThreshold != null && event.bonusAmount != null && row.total >= event.bonusThreshold) {
+      payout = payout + event.bonusAmount * 4096;
     }
     
     return { 
@@ -165,7 +169,7 @@ export async function fetchActiveEvent(): Promise<{
   const client = await pool.connect();
   try {
     const evRes = await client.query(
-      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions, active
+      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions, bonus_threshold, bonus_amount, active
        FROM graid_events WHERE active = TRUE LIMIT 1`
     );
     if (evRes.rowCount === 0) {
@@ -180,7 +184,9 @@ export async function fetchActiveEvent(): Promise<{
       endTs: ev.end_ts ? (ev.end_ts.toISOString?.() ?? new Date(ev.end_ts).toISOString()) : null,
       low: Number(ev.low_rank_reward),
       high: Number(ev.high_rank_reward),
-      minc: Number(ev.min_completions)
+      minc: Number(ev.min_completions),
+      bonusThreshold: ev.bonus_threshold != null ? Number(ev.bonus_threshold) : null,
+      bonusAmount: ev.bonus_amount != null ? Number(ev.bonus_amount) : null
     };
 
     // Join totals with discord_links to get IGN + rank.

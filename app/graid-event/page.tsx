@@ -14,6 +14,8 @@ interface ActiveEvent {
   low: number;
   high: number;
   minc: number;
+  bonusThreshold: number | null;
+  bonusAmount: number | null;
 }
 
 interface Row {
@@ -206,10 +208,12 @@ export default function GraidEventPage() {
                       <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>Highest in Rank Group</td>
                       <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)', borderBottom: '1px solid rgba(100, 116, 139, 0.3)' }}>1.5x multiplier</td>
                     </tr>
+                    {showEvent?.bonusThreshold != null && showEvent?.bonusAmount != null && (
                     <tr>
-                      <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)' }}>100+ Raids</td>
-                      <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)' }}>+64 LE bonus</td>
+                      <td style={{ padding: '0.35rem 1rem', color: 'var(--text-secondary)' }}>{showEvent.bonusThreshold}+ Raids</td>
+                      <td style={{ padding: '0.35rem 1rem', fontWeight: '600', color: 'var(--text-primary)' }}>+{showEvent.bonusAmount} LE bonus</td>
                     </tr>
+                    )}
                   </tbody>
                 </table>
                 </div>
@@ -250,6 +254,8 @@ export default function GraidEventPage() {
           <EventTable
             rows={showRows}
             minc={showEvent?.minc ?? 0}
+            bonusThreshold={showEvent?.bonusThreshold ?? null}
+            bonusAmount={showEvent?.bonusAmount ?? null}
             onRefresh={refresh}
           />
         </div>
@@ -266,9 +272,13 @@ export default function GraidEventPage() {
             margin: 0
           }}>
             Multiplicative bonuses do not stack.<br />
-            Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br />
-            Payouts below the minimum completions threshold are shown in gray as hypothetical.<br />
-            ★ indicates 100+ raids bonus.
+            {showEvent && showEvent.low !== showEvent.high && (
+              <>Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br /></>
+            )}
+            Payouts below the minimum completions threshold are shown in gray as hypothetical.
+            {showEvent?.bonusThreshold != null && showEvent?.bonusAmount != null && (
+              <><br />★ indicates {showEvent.bonusThreshold}+ raids bonus.</>
+            )}
           </p>
         </div>
       </div>
