@@ -13,6 +13,8 @@ interface KickListData {
   entries: KickListEntry[];
   lastUpdated: string | null;
   lastUpdatedBy: string | null;
+  memberCount: number;
+  pendingJoins: number;
 }
 
 export function useKickList() {
@@ -57,6 +59,8 @@ export function useKickList() {
     entries: data?.entries ?? [],
     lastUpdated: data?.lastUpdated ?? null,
     lastUpdatedBy: data?.lastUpdatedBy ?? null,
+    memberCount: data?.memberCount ?? 0,
+    pendingJoins: data?.pendingJoins ?? 0,
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),

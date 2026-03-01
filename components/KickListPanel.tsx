@@ -26,6 +26,7 @@ interface KickListPanelProps {
   lastUpdatedBy: string | null;
   loading: boolean;
   members?: { username: string; uuid: string; discordRank: string }[];
+  memberCount?: number;
   pendingJoins?: number;
   onAdd?: (uuid: string, ign: string, tier: number) => void;
   onRemove: (uuid: string) => void;
@@ -38,6 +39,7 @@ export default function KickListPanel({
   lastUpdatedBy,
   loading,
   members,
+  memberCount: memberCountProp,
   pendingJoins = 0,
   onAdd,
   onRemove,
@@ -82,8 +84,10 @@ export default function KickListPanel({
           color: 'var(--text-secondary)',
           marginTop: '0.25rem',
         }}>
-          {members && (() => {
-            const effectiveCount = members.length + pendingJoins;
+          {(() => {
+            const count = members ? members.length : memberCountProp;
+            if (!count) return null;
+            const effectiveCount = count + pendingJoins;
             const openSlots = 150 - effectiveCount;
             return (
               <div style={{ marginBottom: '0.15rem' }}>

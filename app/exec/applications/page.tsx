@@ -203,6 +203,8 @@ export default function ExecApplicationsPage() {
             lastUpdated={kickList.lastUpdated}
             lastUpdatedBy={kickList.lastUpdatedBy}
             loading={kickList.loading}
+            memberCount={kickList.memberCount}
+            pendingJoins={kickList.pendingJoins}
             onRemove={kickList.removeFromKickList}
             onChangeTier={kickList.changeTier}
           />

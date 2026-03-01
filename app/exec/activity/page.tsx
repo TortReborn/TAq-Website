@@ -256,7 +256,8 @@ export default function ExecActivityPage() {
             lastUpdatedBy={kickList.lastUpdatedBy}
             loading={kickList.loading}
             members={data.members}
-            pendingJoins={data.pendingJoins}
+            memberCount={kickList.memberCount}
+            pendingJoins={kickList.pendingJoins}
             onAdd={kickList.addToKickList}
             onRemove={kickList.removeFromKickList}
             onChangeTier={kickList.changeTier}

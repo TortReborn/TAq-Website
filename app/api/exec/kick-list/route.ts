@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,17 +13,33 @@ export async function GET(request: NextRequest) {
 
   try {
     const pool = getPool();
-    const result = await pool.query(
-      `SELECT uuid, ign, tier, added_by, created_at
-       FROM kick_list
-       ORDER BY tier ASC, created_at ASC`
-    );
-
-    const lastUpdatedResult = await pool.query(
-      `SELECT created_at, added_by FROM kick_list ORDER BY created_at DESC LIMIT 1`
-    );
+    const [result, lastUpdatedResult, pendingJoinResult] = await Promise.all([
+      pool.query(
+        `SELECT uuid, ign, tier, added_by, created_at
+         FROM kick_list
+         ORDER BY tier ASC, created_at ASC`
+      ),
+      pool.query(
+        `SELECT created_at, added_by FROM kick_list ORDER BY created_at DESC LIMIT 1`
+      ),
+      pool.query(
+        `SELECT COUNT(*) as count FROM applications a
+         JOIN discord_links dl ON dl.discord_id = CAST(a.discord_id AS BIGINT)
+         WHERE a.status = 'accepted'
+           AND a.application_type = 'guild'
+           AND dl.linked = FALSE`
+      ),
+    ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
+    const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
+
+    // Get member count from cached guild data
+    const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
+    const guildDataRaw = await simpleDatabaseCache.getGuildData(clientIP);
+    const memberCount = Array.isArray((guildDataRaw as any)?.members)
+      ? (guildDataRaw as any).members.length
+      : 0;
 
     return NextResponse.json({
       entries: result.rows.map(row => ({
@@ -34,6 +51,8 @@ export async function GET(request: NextRequest) {
       })),
       lastUpdated: lastRow?.created_at || null,
       lastUpdatedBy: lastRow?.added_by || null,
+      memberCount,
+      pendingJoins,
     });
   } catch (error) {
     console.error('Kick list fetch error:', error);
