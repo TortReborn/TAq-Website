@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
     const guildMembers: { uuid: string }[] = guildDataResult.rows[0]?.members ?? [];
     const guildUUIDs = new Set(guildMembers.map(m => m.uuid));
 
-    if (guildUUIDs.size > 0) {
+    // Only auto-remove if we have a reasonably complete member list (120+)
+    // to prevent mass-deletion when cached data is stale/incomplete
+    if (guildUUIDs.size >= 120) {
       await pool.query(
         `DELETE FROM kick_list WHERE uuid != ALL($1::varchar[])`,
         [Array.from(guildUUIDs)]
