@@ -30,6 +30,8 @@ export default function ExecPromotionsPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [sortCol, setSortCol] = useState<'ign' | 'rank' | 'playtime' | 'wars' | 'raids'>('rank');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const userRankIdx = user ? RANK_HIERARCHY.indexOf(user.rank) : -1;
 
@@ -58,13 +60,31 @@ export default function ExecPromotionsPage() {
       const lower = searchTerm.toLowerCase();
       list = list.filter(m => m.ign.toLowerCase().includes(lower));
     }
+    const dir = sortDir === 'asc' ? 1 : -1;
     return [...list].sort((a, b) => {
-      const ra = RANK_ORDER[a.rank] ?? 99;
-      const rb = RANK_ORDER[b.rank] ?? 99;
-      if (ra !== rb) return ra - rb;
+      let cmp = 0;
+      switch (sortCol) {
+        case 'ign': cmp = a.ign.localeCompare(b.ign); break;
+        case 'rank': cmp = (RANK_ORDER[a.rank] ?? 99) - (RANK_ORDER[b.rank] ?? 99); break;
+        case 'playtime': cmp = a.playtime7d - b.playtime7d; break;
+        case 'wars': cmp = a.wars7d - b.wars7d; break;
+        case 'raids': cmp = a.raids7d - b.raids7d; break;
+      }
+      if (cmp !== 0) return cmp * dir;
       return a.ign.localeCompare(b.ign);
     });
-  }, [managableMembers, rankFilter, searchTerm]);
+  }, [managableMembers, rankFilter, searchTerm, sortCol, sortDir]);
+
+  const handleSort = (col: typeof sortCol) => {
+    if (sortCol === col) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortCol(col);
+      setSortDir(col === 'ign' ? 'asc' : 'desc');
+    }
+  };
+
+  const sortArrow = (col: typeof sortCol) => sortCol === col ? (sortDir === 'asc' ? ' \u25B2' : ' \u25BC') : '';
 
   // Unique ranks present in managable members for filter buttons
   const memberRanks = useMemo(() => {
@@ -251,22 +271,44 @@ export default function ExecPromotionsPage() {
                       style={{ cursor: 'pointer' }}
                     />
                   </th>
-                  {['Player', 'Rank', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{h}</th>
+                  {([
+                    { key: 'ign' as const, label: 'Player' },
+                    { key: 'rank' as const, label: 'Rank' },
+                    { key: 'playtime' as const, label: 'Playtime (7d)' },
+                    { key: 'wars' as const, label: 'Wars (7d)' },
+                    { key: 'raids' as const, label: 'Raids (7d)' },
+                  ]).map(col => (
+                    <th
+                      key={col.key}
+                      onClick={() => handleSort(col.key)}
+                      style={{
+                        padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600',
+                        color: sortCol === col.key ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
+                        textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {col.label}{sortArrow(col.key)}
+                    </th>
                   ))}
+                  <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredMembers.length === 0 && (
-                  <tr><td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
+                  <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
                 )}
-                {filteredMembers.map(member => {
+                {filteredMembers.map((member, idx) => {
                   const isPending = pendingUuids.has(member.uuid);
                   const isStaged = stagedUuids.has(member.uuid);
                   const currentIdx = RANK_HIERARCHY.indexOf(member.rank);
-                  const maxPromoteIdx = userRankIdx - 1; // can't promote to own rank
+                  const maxPromoteIdx = userRankIdx - 1;
+                  const isOdd = idx % 2 === 1;
                   return (
-                    <tr key={member.uuid} style={{ borderBottom: '1px solid var(--border-card)', opacity: isPending ? 0.4 : 1 }}>
+                    <tr key={member.uuid} style={{
+                      borderBottom: '1px solid var(--border-card)',
+                      opacity: isPending ? 0.4 : 1,
+                      background: isOdd ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
+                    }}>
                       <td style={{ padding: '0.5rem 0.75rem' }}>
                         <input
                           type="checkbox"
@@ -283,6 +325,15 @@ export default function ExecPromotionsPage() {
                       </td>
                       <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(member.rank), fontWeight: '600' }}>
                         {member.rank || '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {member.hasStats ? `${member.playtime7d.toFixed(1)}h` : '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {member.hasStats ? member.wars7d : '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {member.hasStats ? member.raids7d : '\u2014'}
                       </td>
                       <td style={{ padding: '0.5rem 0.75rem' }}>
                         {!isPending && !isStaged && member.rank && (

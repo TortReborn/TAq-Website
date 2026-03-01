@@ -5,6 +5,10 @@ export interface GuildMember {
   uuid: string;
   ign: string;
   rank: string;
+  playtime7d: number;
+  wars7d: number;
+  raids7d: number;
+  hasStats: boolean;
 }
 
 export interface QueueEntry {

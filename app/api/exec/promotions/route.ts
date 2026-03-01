@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
+import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,8 +14,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const pool = getPool();
+    const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
 
-    const [guildDataResult, pendingResult, historyResult] = await Promise.all([
+    const [guildDataResult, pendingResult, historyResult, allSnapshots] = await Promise.all([
       // Guild members with discord rank
       pool.query(
         `SELECT data->'members' as members FROM cache_entries WHERE cache_key = 'guildData'`
@@ -36,11 +38,16 @@ export async function GET(request: NextRequest) {
          ORDER BY completed_at DESC
          LIMIT 50`
       ),
+      // 7-day activity snapshots
+      simpleDatabaseCache.getPlayerActivitySnapshots([7], clientIP),
     ]);
 
     // Get guild member UUIDs and enrich with discord rank
-    const guildMembers: { name: string; uuid: string }[] = guildDataResult.rows[0]?.members ?? [];
+    const guildMembers: { name: string; uuid: string; playtime?: number; wars?: number; raids?: number }[] = guildDataResult.rows[0]?.members ?? [];
     const memberUuids = guildMembers.map(m => m.uuid);
+
+    // Historical data for 7-day deltas
+    const hist7 = allSnapshots[7] || {};
 
     // Batch lookup discord_links for all guild members
     let memberRanks: Record<string, string> = {};
@@ -54,11 +61,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const members = guildMembers.map(m => ({
-      uuid: m.uuid,
-      ign: m.name,
-      rank: memberRanks[m.uuid] || '',
-    }));
+    const members = guildMembers.map(m => {
+      const h = hist7[m.uuid] as { playtime: number; wars: number; raids: number } | undefined;
+      const playtime = (m.playtime || 0);
+      const wars = (m.wars || 0);
+      const raids = (m.raids || 0);
+      return {
+        uuid: m.uuid,
+        ign: m.name,
+        rank: memberRanks[m.uuid] || '',
+        playtime7d: h ? Math.max(0, playtime - h.playtime) : 0,
+        wars7d: h ? Math.max(0, wars - h.wars) : 0,
+        raids7d: h ? Math.max(0, raids - h.raids) : 0,
+        hasStats: !!h,
+      };
+    });
 
     const mapQueueRow = (row: any) => ({
       id: row.id,
