@@ -328,9 +328,9 @@ class SimpleDatabaseCache {
     }
   }
 
-  // Get player activity baselines for multiple time periods using index-based
-  // snapshot lookup (matches the Discord bot's approach). Period N resolves to
-  // the Nth most recent distinct snapshot date, not calendar-day arithmetic.
+  // Get player activity baselines for multiple time periods using datetime-based
+  // snapshot lookup (matches the Discord bot's Helpers/database.py approach).
+  // Period N finds the most recent snapshot on or before CURRENT_DATE - N days.
   async getPlayerActivitySnapshots(daysArray: number[], requestId?: string): Promise<Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>>> {
     const rateCheck = this.checkRateLimit('members', requestId);
     if (!rateCheck.allowed) {
@@ -340,44 +340,54 @@ class SimpleDatabaseCache {
 
     const client = await this.pool.connect();
     try {
-      // 1. Get all distinct snapshot dates, newest first.
-      //    Cast to text to avoid pg driver timezone quirks with DATE columns.
-      const datesResult = await client.query(
-        `SELECT DISTINCT snapshot_date::text as snapshot_date
-         FROM player_activity
-         ORDER BY snapshot_date DESC`
-      );
-      const allDates: string[] = datesResult.rows.map((r: any) => r.snapshot_date);
+      // 1. Resolve each period to the most recent snapshot date on or before
+      //    CURRENT_DATE - N days. This handles gaps (missing days) correctly.
+      const periodToDate = new Map<number, string>();
+      const targetDatesSet = new Set<string>();
+      const logParts: string[] = [];
 
-      if (allDates.length === 0) {
+      for (const period of daysArray) {
+        const dateResult = await client.query(
+          `SELECT DISTINCT snapshot_date::text as snapshot_date
+           FROM player_activity
+           WHERE snapshot_date <= CURRENT_DATE - $1::integer
+           ORDER BY snapshot_date DESC
+           LIMIT 1`,
+          [period]
+        );
+
+        let targetDate: string | null = dateResult.rows[0]?.snapshot_date ?? null;
+
+        if (!targetDate) {
+          // No snapshot that far back — use the oldest available
+          const oldestResult = await client.query(
+            `SELECT DISTINCT snapshot_date::text as snapshot_date
+             FROM player_activity
+             ORDER BY snapshot_date ASC
+             LIMIT 1`
+          );
+          targetDate = oldestResult.rows[0]?.snapshot_date ?? null;
+          if (targetDate) {
+            logParts.push(`${period}d→oldest(${targetDate})`);
+          }
+        } else {
+          logParts.push(`${period}d→${targetDate}`);
+        }
+
+        if (targetDate) {
+          periodToDate.set(period, targetDate);
+          targetDatesSet.add(targetDate);
+        }
+      }
+
+      if (targetDatesSet.size === 0) {
         console.log('📊 Player activity: no snapshots available');
         const empty: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
         for (const d of daysArray) empty[d] = {};
         return empty;
       }
 
-      // 2. Resolve each requested period to a target date via array index.
-      //    Period N → allDates[N] (0-indexed, so offset N gives the Nth most recent).
-      //    If N >= available snapshots, fall back to the oldest snapshot.
-      const periodToDate = new Map<number, string>();
-      const targetDatesSet = new Set<string>();
-      const logParts: string[] = [];
-
-      for (const period of daysArray) {
-        let targetDate: string;
-        if (period < allDates.length) {
-          targetDate = allDates[period];
-          logParts.push(`${period}d→${targetDate}`);
-        } else {
-          // Not enough snapshots — use oldest available
-          targetDate = allDates[allDates.length - 1];
-          logParts.push(`${period}d→oldest(${targetDate})`);
-        }
-        periodToDate.set(period, targetDate);
-        targetDatesSet.add(targetDate);
-      }
-
-      // 3. Bulk-fetch all member data for the resolved target dates.
+      // 2. Bulk-fetch all member data for the resolved target dates.
       const targetDatesArray = Array.from(targetDatesSet);
       const snapshotResult = await client.query(
         `SELECT uuid, playtime, contributed, wars, raids, shells, snapshot_date::text as snapshot_date
@@ -386,7 +396,7 @@ class SimpleDatabaseCache {
         [targetDatesArray]
       );
 
-      // 4. Get the earliest snapshot per member — used as fallback for members
+      // 3. Get the earliest snapshot per member — used as fallback for members
       //    who joined after a period's target date (e.g. joined 5 days ago but
       //    we're looking at 30-day leaderboard).
       const earliestResult = await client.query(
@@ -406,7 +416,7 @@ class SimpleDatabaseCache {
         };
       }
 
-      // 5. Group results by snapshot_date string.
+      // 4. Group results by snapshot_date string.
       const dataByDate: Record<string, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
       for (const row of snapshotResult.rows) {
         const dateKey = row.snapshot_date;
@@ -421,11 +431,15 @@ class SimpleDatabaseCache {
         };
       }
 
-      // 6. Map each period back to its resolved date's data, filling in
+      // 5. Map each period back to its resolved date's data, filling in
       //    missing members with their earliest available snapshot.
       const snapshots: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
       for (const period of daysArray) {
-        const dateKey = periodToDate.get(period)!;
+        const dateKey = periodToDate.get(period);
+        if (!dateKey) {
+          snapshots[period] = {};
+          continue;
+        }
         const dateData = { ...(dataByDate[dateKey] || {}) };
 
         // For members not present at this target date, use their earliest snapshot
@@ -442,7 +456,7 @@ class SimpleDatabaseCache {
         const count = Object.keys(snapshots[p]).length;
         return `${count} members`;
       });
-      console.log(`📊 Player activity (index-based): ${logParts.map((l, i) => `${l}(${memberCounts[i]})`).join(', ')}`);
+      console.log(`📊 Player activity (datetime-based): ${logParts.map((l, i) => `${l}(${memberCounts[i]})`).join(', ')}`);
 
       return snapshots;
     } catch (error) {
