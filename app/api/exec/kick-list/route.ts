@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
-import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const pool = getPool();
-    const [result, lastUpdatedResult, pendingJoinResult] = await Promise.all([
+    const [result, lastUpdatedResult, pendingJoinResult, memberCountResult] = await Promise.all([
       pool.query(
         `SELECT uuid, ign, tier, added_by, created_at
          FROM kick_list
@@ -29,17 +28,16 @@ export async function GET(request: NextRequest) {
            AND a.application_type = 'guild'
            AND dl.linked = FALSE`
       ),
+      pool.query(
+        `SELECT jsonb_array_length(data->'members') as count
+         FROM cache_entries
+         WHERE cache_key = 'guildData'`
+      ),
     ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
     const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
-
-    // Get member count from cached guild data
-    const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
-    const guildDataRaw = await simpleDatabaseCache.getGuildData(clientIP);
-    const memberCount = Array.isArray((guildDataRaw as any)?.members)
-      ? (guildDataRaw as any).members.length
-      : 0;
+    const memberCount = parseInt(memberCountResult.rows[0]?.count || '0', 10);
 
     return NextResponse.json({
       entries: result.rows.map(row => ({
