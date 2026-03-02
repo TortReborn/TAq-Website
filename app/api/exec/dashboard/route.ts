@@ -55,9 +55,10 @@ export async function GET(request: NextRequest) {
 
       if (guildDataRaw) {
         const gd = guildDataRaw as any;
+        const membersArray = Array.isArray(gd.members) ? gd.members : [];
         guildStats = {
-          totalMembers: Array.isArray(gd.members) ? gd.members.length : (gd.members?.total || 0),
-          onlineMembers: gd.online || 0,
+          totalMembers: membersArray.length || (gd.members?.total || 0),
+          onlineMembers: membersArray.filter((m: any) => m.online === true).length,
           name: gd.name || 'The Aquarium',
         };
       }
