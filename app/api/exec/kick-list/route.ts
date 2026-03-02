@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       `INSERT INTO kick_list (uuid, ign, tier, added_by)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (uuid) DO UPDATE SET tier = $3, ign = $2, added_by = $4, created_at = NOW()`,
-      [uuid, ign, tier, session.discord_username]
+      [uuid, ign, tier, session.ign]
     );
 
     return NextResponse.json({ success: true });
