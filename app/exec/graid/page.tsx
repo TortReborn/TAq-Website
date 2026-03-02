@@ -337,7 +337,7 @@ export default function ExecGraidPage() {
                     <tbody>
                       {leaderboard.rows.map((row, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid var(--border-card)', opacity: row.meetsMin ? 1 : 0.5, background: i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', fontWeight: '700', color: row.rankNum <= 3 ? '#f59e0b' : 'var(--text-secondary)' }}>{row.rankNum}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', fontWeight: '700', color: row.rankNum === 1 ? '#eab308' : row.rankNum === 2 ? '#9ca3af' : row.rankNum <= 5 ? '#b45309' : 'var(--text-secondary)' }}>{row.rankNum}</td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>{row.username}</td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(row.rank), fontWeight: '600' }}>
                             {row.rank || '—'}
