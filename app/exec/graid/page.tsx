@@ -344,7 +344,7 @@ export default function ExecGraidPage() {
                             {row.isRankLeader && <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', fontWeight: '600', fontSize: '0.7rem', marginLeft: '0.4rem' }}>Leader</span>}
                           </td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.total}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: row.meetsMin ? '#22c55e' : 'var(--text-secondary)' }}>{row.meetsMin ? formatPayout(row.payout) : '—'}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: row.meetsMin ? '#22c55e' : 'var(--text-secondary)' }}>{row.meetsMin ? `${Math.ceil(row.payout / 4096)} LE` : '—'}</td>
                         </tr>
                       ))}
                     </tbody>
