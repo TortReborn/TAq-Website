@@ -387,66 +387,39 @@ class SimpleDatabaseCache {
         return empty;
       }
 
-      // 2. Bulk-fetch all member data for the resolved target dates.
-      const targetDatesArray = Array.from(targetDatesSet);
-      const snapshotResult = await client.query(
-        `SELECT uuid, playtime, contributed, wars, raids, shells, snapshot_date::text as snapshot_date
-         FROM player_activity
-         WHERE snapshot_date = ANY($1::date[])`,
-        [targetDatesArray]
-      );
+      // 2. For each target date, get the most recent snapshot per member on or
+      //    before that date. This handles members with gaps in their snapshot
+      //    history correctly (uses closest available baseline, not earliest ever).
+      //    For members who joined AFTER the target date (no snapshot on/before it),
+      //    fall back to their earliest snapshot (represents when they joined).
+      type SnapshotRow = { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number };
+      const snapshots: Record<number, Record<string, SnapshotRow>> = {};
 
-      // 3. Get the earliest snapshot per member — used as fallback for members
-      //    who joined after a period's target date (e.g. joined 5 days ago but
-      //    we're looking at 30-day leaderboard).
-      const earliestResult = await client.query(
-        `SELECT DISTINCT ON (uuid) uuid, playtime, contributed, wars, raids, shells
-         FROM player_activity
-         ORDER BY uuid, snapshot_date ASC`
-      );
-      const earliestByMember: Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }> = {};
-      for (const row of earliestResult.rows) {
-        earliestByMember[row.uuid] = {
-          uuid: row.uuid,
-          playtime: row.playtime,
-          contributed: row.contributed,
-          wars: row.wars,
-          raids: row.raids,
-          shells: row.shells
-        };
-      }
-
-      // 4. Group results by snapshot_date string.
-      const dataByDate: Record<string, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
-      for (const row of snapshotResult.rows) {
-        const dateKey = row.snapshot_date;
-        if (!dataByDate[dateKey]) dataByDate[dateKey] = {};
-        dataByDate[dateKey][row.uuid] = {
-          uuid: row.uuid,
-          playtime: row.playtime,
-          contributed: row.contributed,
-          wars: row.wars,
-          raids: row.raids,
-          shells: row.shells
-        };
-      }
-
-      // 5. Map each period back to its resolved date's data, filling in
-      //    missing members with their earliest available snapshot.
-      const snapshots: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
       for (const period of daysArray) {
         const dateKey = periodToDate.get(period);
         if (!dateKey) {
           snapshots[period] = {};
           continue;
         }
-        const dateData = { ...(dataByDate[dateKey] || {}) };
 
-        // For members not present at this target date, use their earliest snapshot
-        for (const [uuid, earliest] of Object.entries(earliestByMember)) {
-          if (!dateData[uuid]) {
-            dateData[uuid] = earliest;
-          }
+        // Get the closest snapshot to the target date per member (either direction)
+        const result = await client.query(
+          `SELECT DISTINCT ON (uuid) uuid, playtime, contributed, wars, raids, shells
+           FROM player_activity
+           ORDER BY uuid, ABS(snapshot_date - $1::date) ASC`,
+          [dateKey]
+        );
+
+        const dateData: Record<string, SnapshotRow> = {};
+        for (const row of result.rows) {
+          dateData[row.uuid] = {
+            uuid: row.uuid,
+            playtime: row.playtime,
+            contributed: row.contributed,
+            wars: row.wars,
+            raids: row.raids,
+            shells: row.shells
+          };
         }
 
         snapshots[period] = dateData;
