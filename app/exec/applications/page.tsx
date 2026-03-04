@@ -124,6 +124,7 @@ export default function ExecApplicationsPage() {
                     fontWeight: '600',
                     outline: 'none',
                     WebkitAppearance: 'none',
+                    transition: 'background 0.15s ease, border-color 0.15s ease, color 0.15s ease',
                   }}
                 >
                   {f.label}
