@@ -53,6 +53,18 @@ export default function ExecApplicationsPage() {
     }, false);
   };
 
+  const handleDecision = (appId: number, status: string, reviewedAt: string, reviewedBy: string) => {
+    mutate((current: any) => {
+      if (!current) return current;
+      return {
+        applications: current.applications.map((app: any) => {
+          if (app.id !== appId) return app;
+          return { ...app, status, reviewedAt, reviewedBy };
+        }),
+      };
+    }, false);
+  };
+
   const filters = [
     { value: 'pending', label: 'Pending' },
     { value: 'accepted', label: 'Accepted' },
@@ -75,7 +87,7 @@ export default function ExecApplicationsPage() {
         fontSize: '0.85rem',
         marginBottom: '1.5rem',
       }}>
-        Review and vote on guild and community applications. Votes are advisory -- HR still makes the final call via Discord.
+        Review and vote on guild and community applications. Use the HR Decision panel at the bottom of each application to accept or deny.
       </p>
 
       <div style={{
@@ -191,6 +203,7 @@ export default function ExecApplicationsPage() {
                 key={app.id}
                 app={app}
                 onVoteChange={handleVoteChange}
+                onDecision={handleDecision}
               />
             ))}
           </div>

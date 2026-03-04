@@ -50,12 +50,37 @@ export async function GET(request: NextRequest) {
 
     try {
       // Build query with optional status filter
+      // For 'pending', also fetch accepted apps (we'll post-filter by guild membership)
+      // For 'accepted', also fetch accepted apps (we'll post-filter to only in-guild)
       let whereClause = '';
       const params: string[] = [];
 
-      if (statusFilter !== 'all') {
+      if (statusFilter === 'pending') {
+        whereClause = "WHERE a.status IN ('pending', 'accepted')";
+      } else if (statusFilter !== 'all') {
         whereClause = 'WHERE a.status = $1';
         params.push(statusFilter);
+      }
+
+      // Fetch guild data once for membership checks
+      const guildDataResult = await client.query(
+        `SELECT data FROM cache_entries WHERE cache_key = 'guildData'`
+      );
+      const guildMembers = guildDataResult.rows[0]?.data?.members;
+
+      function isUuidInGuild(uuid: string | null): boolean {
+        if (!guildMembers || !uuid) return false;
+        const normalized = uuid.replace(/-/g, '');
+        if (Array.isArray(guildMembers)) {
+          return guildMembers.some((m: any) => m.uuid && m.uuid.replace(/-/g, '') === normalized);
+        }
+        for (const rankGroup of Object.values(guildMembers)) {
+          if (typeof rankGroup !== 'object' || rankGroup === null) continue;
+          for (const memberData of Object.values(rankGroup as Record<string, any>)) {
+            if (memberData?.uuid && memberData.uuid.replace(/-/g, '') === normalized) return true;
+          }
+        }
+        return false;
       }
 
       const result = await client.query(
@@ -72,6 +97,7 @@ export async function GET(request: NextRequest) {
           a.reviewed_by,
           a.guild_leave_pending,
           a.poll_status,
+          dl_app.uuid as applicant_uuid,
           COALESCE(
             (SELECT json_agg(json_build_object(
               'voter_discord_id', v.voter_discord_id,
@@ -86,6 +112,7 @@ export async function GET(request: NextRequest) {
             '[]'::json
           ) as votes
         FROM applications a
+        LEFT JOIN discord_links dl_app ON dl_app.discord_id = a.discord_id::bigint
         ${whereClause}
         ORDER BY
           CASE a.status WHEN 'pending' THEN 0 WHEN 'accepted' THEN 1 WHEN 'denied' THEN 2 END,
@@ -117,6 +144,10 @@ export async function GET(request: NextRequest) {
           discordAvatar = await fetchDiscordAvatar(row.discord_id);
         }
 
+        const inGuild = row.application_type === 'guild'
+          ? isUuidInGuild(row.applicant_uuid)
+          : null; // not applicable for community apps
+
         return {
           id: row.id,
           type: row.application_type,
@@ -130,13 +161,29 @@ export async function GET(request: NextRequest) {
           reviewedBy: row.reviewed_by,
           guildLeavePending: row.guild_leave_pending,
           pollStatus: row.poll_status,
+          inGuild,
           votes,
           voteSummary,
           userVote: userVote?.vote || null,
         };
       }));
 
-      return NextResponse.json({ applications });
+      // Post-filter based on guild membership for accepted guild apps
+      let filtered = applications;
+      if (statusFilter === 'pending') {
+        // Keep pending apps + accepted guild apps NOT yet in guild
+        filtered = applications.filter(app =>
+          app.status === 'pending' ||
+          (app.status === 'accepted' && app.type === 'guild' && !app.inGuild)
+        );
+      } else if (statusFilter === 'accepted') {
+        // Only show accepted guild apps that ARE in guild, plus all accepted community apps
+        filtered = applications.filter(app =>
+          app.type !== 'guild' || app.inGuild
+        );
+      }
+
+      return NextResponse.json({ applications: filtered });
     } finally {
       client.release();
     }

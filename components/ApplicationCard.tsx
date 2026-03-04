@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import VoteButtons from './VoteButtons';
+import DecisionPanel from './DecisionPanel';
 import type { ExecApplication } from '@/hooks/useExecApplications';
 
 // Question labels matching the bot's check_website_apps.py
@@ -41,13 +42,18 @@ const COMMUNITY_ORDER = [
 interface Props {
   app: ExecApplication;
   onVoteChange: (appId: number, newVote: string | null, newSummary: { accept: number; deny: number; abstain: number }) => void;
+  onDecision: (appId: number, status: string, reviewedAt: string, reviewedBy: string) => void;
 }
 
-export default function ApplicationCard({ app, onVoteChange }: Props) {
+export default function ApplicationCard({ app, onVoteChange, onDecision }: Props) {
   const [expanded, setExpanded] = useState(false);
 
   const labels = app.type === 'guild' ? GUILD_QUESTION_LABELS : COMMUNITY_QUESTION_LABELS;
   const order = app.type === 'guild' ? GUILD_ORDER : COMMUNITY_ORDER;
+
+  const isAcceptedNotInGuild = app.status === 'accepted' && app.type === 'guild' && app.inGuild === false;
+  const isAwaitingGuildLeave = isAcceptedNotInGuild && app.guildLeavePending;
+  const isAwaitingJoin = isAcceptedNotInGuild && !app.guildLeavePending;
 
   const statusColors: Record<string, string> = {
     pending: '#f59e0b',
@@ -55,7 +61,7 @@ export default function ApplicationCard({ app, onVoteChange }: Props) {
     denied: '#ef4444',
   };
 
-  const statusColor = statusColors[app.status] || '#6b7280';
+  const statusColor = isAwaitingGuildLeave ? '#f97316' : isAwaitingJoin ? '#3b82f6' : (statusColors[app.status] || '#6b7280');
   const avatarUrl = app.discordAvatar || `https://cdn.discordapp.com/embed/avatars/0.png`;
   const submittedDate = new Date(app.submittedAt);
   const ign = app.answers?.ign || 'Unknown';
@@ -178,7 +184,7 @@ export default function ApplicationCard({ app, onVoteChange }: Props) {
             color: statusColor,
             textTransform: 'capitalize',
           }}>
-            {app.status}
+            {isAwaitingGuildLeave ? 'Awaiting Guild Leave' : isAwaitingJoin ? 'Awaiting Join' : app.status}
           </span>
 
           {/* Expand arrow */}
@@ -328,6 +334,15 @@ export default function ApplicationCard({ app, onVoteChange }: Props) {
                 );
               })}
           </div>
+
+          {app.status === 'pending' && (
+            <DecisionPanel
+              applicationId={app.id}
+              applicantIgn={ign}
+              applicationType={app.type}
+              onDecision={(status, reviewedAt, reviewedBy) => onDecision(app.id, status, reviewedAt, reviewedBy)}
+            />
+          )}
         </div>
       )}
     </div>

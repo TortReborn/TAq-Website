@@ -28,6 +28,7 @@ export interface ExecApplication {
   reviewedBy: string | null;
   guildLeavePending: boolean;
   pollStatus: string | null;
+  inGuild: boolean | null; // null for community apps
   votes: Vote[];
   voteSummary: VoteSummary;
   userVote: 'accept' | 'deny' | 'abstain' | null;
