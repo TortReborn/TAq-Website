@@ -53,15 +53,32 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
 
   const isGuildAccept = confirming === 'accepted' && applicationType === 'guild';
 
-  // Close modal on Escape
+  // Close modal on Escape + clipboard paste for images
   useEffect(() => {
     if (!confirming) return;
-    const handler = (e: KeyboardEvent) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !submitting) closeModal();
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [confirming, submitting]);
+    const handlePaste = (e: ClipboardEvent) => {
+      if (!isGuildAccept) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) handleImageFile(file);
+          return;
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, [confirming, submitting, isGuildAccept]);
 
   const closeModal = () => {
     if (submitting) return;
@@ -292,11 +309,11 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
                       <path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       <path d="M20 16.7V19C20 20.1 19.1 21 18 21H6C4.9 21 4 20.1 4 19V16.7" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
-                      Drop image here or click to browse
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Ctrl+V</span> to paste from clipboard
                     </p>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6, margin: '0.25rem 0 0' }}>
-                      Max 3MB
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', opacity: 0.5, margin: '0.35rem 0 0' }}>
+                      or drop / click to browse &middot; Max 3MB
                     </p>
                   </div>
                 ) : (
