@@ -298,7 +298,9 @@ export default function ApplicationCard({ app, onVoteChange, onDecision }: Props
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                   }}>
-                    {value}
+                    {key === 'stats_link' && typeof value === 'string' && value.startsWith('http') ? (
+                      <a href={value} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline' }}>{value}</a>
+                    ) : value}
                   </div>
                 </div>
               );
