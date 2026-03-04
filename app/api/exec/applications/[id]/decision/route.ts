@@ -4,6 +4,11 @@ import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+// Allow up to 4MB for invite image uploads
+export const maxDuration = 30;
+
+const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB in base64 chars (roughly 3MB binary)
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -26,7 +31,7 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { decision } = body;
+  const { decision, inviteImage } = body;
   if (!decision || !['accepted', 'denied'].includes(decision)) {
     return NextResponse.json(
       { error: 'Invalid decision. Must be: accepted or denied' },
@@ -34,14 +39,25 @@ export async function POST(
     );
   }
 
+  // Validate invite image if provided
+  if (inviteImage) {
+    if (typeof inviteImage !== 'string') {
+      return NextResponse.json({ error: 'Invalid invite image format' }, { status: 400 });
+    }
+    if (inviteImage.length > MAX_IMAGE_SIZE) {
+      return NextResponse.json({ error: 'Invite image too large (max ~3MB)' }, { status: 400 });
+    }
+  }
+
   try {
     const pool = getPool();
     const result = await pool.query(
       `UPDATE applications
-       SET status = $1, reviewed_at = NOW(), reviewed_by = $2
-       WHERE id = $3 AND status = 'pending'
+       SET status = $1, reviewed_at = NOW(), reviewed_by = $2,
+           invite_image = $3, bot_processed = FALSE
+       WHERE id = $4 AND status = 'pending'
        RETURNING id, status, reviewed_at, reviewed_by`,
-      [decision, session.ign, applicationId]
+      [decision, session.ign, inviteImage || null, applicationId]
     );
 
     if (result.rowCount === 0) {

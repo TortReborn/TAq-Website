@@ -1,8 +1,25 @@
 "use client";
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function UnauthorizedPage() {
+function UnauthorizedContent() {
+  const searchParams = useSearchParams();
+  const reason = searchParams.get('reason');
+  const discordName = searchParams.get('discord_name');
+  const ign = searchParams.get('ign');
+  const rank = searchParams.get('rank');
+
+  let message: string;
+  if (reason === 'not_linked') {
+    message = `Discord account "${discordName || 'unknown'}" is not linked to any Minecraft account in the database. Make sure your Discord is linked via the bot.`;
+  } else if (reason === 'rank_not_allowed') {
+    message = `Account "${ign || discordName || 'unknown'}" has rank "${rank || 'unknown'}" which does not have exec panel access. Hammerhead or higher is required.`;
+  } else {
+    message = 'Your Discord account does not have the Executive role required to access this panel. If you believe this is an error, contact a guild leader.';
+  }
+
   return (
     <main style={{
       display: 'flex',
@@ -44,7 +61,7 @@ export default function UnauthorizedPage() {
           margin: '0 0 2rem',
           lineHeight: '1.5',
         }}>
-          Your Discord account does not have the Executive role required to access this panel. If you believe this is an error, contact a guild leader.
+          {message}
         </p>
 
         <Link
@@ -71,5 +88,13 @@ export default function UnauthorizedPage() {
         </Link>
       </div>
     </main>
+  );
+}
+
+export default function UnauthorizedPage() {
+  return (
+    <Suspense>
+      <UnauthorizedContent />
+    </Suspense>
   );
 }

@@ -37,10 +37,19 @@ export async function GET(request: NextRequest) {
     const discordUser = await getDiscordUser(accessToken);
 
     // Check if user has a qualifying rank in discord_links (Hammerhead or higher)
-    const linkData = await checkDiscordLinkRank(discordUser.id);
+    const rankCheck = await checkDiscordLinkRank(discordUser.id);
 
-    if (!linkData) {
-      const response = NextResponse.redirect(new URL('/exec/unauthorized', baseUrl));
+    if (!rankCheck.ok) {
+      const params = new URLSearchParams({ reason: rankCheck.reason });
+      if (rankCheck.reason === 'not_linked') {
+        params.set('discord_id', rankCheck.discord_id);
+        params.set('discord_name', discordUser.username);
+      } else {
+        params.set('ign', rankCheck.ign);
+        params.set('rank', rankCheck.rank);
+        params.set('discord_name', discordUser.username);
+      }
+      const response = NextResponse.redirect(new URL(`/exec/unauthorized?${params.toString()}`, baseUrl));
       response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
       return response;
     }
@@ -56,9 +65,9 @@ export async function GET(request: NextRequest) {
       discord_id: discordUser.id,
       discord_username: discordUser.username,
       discord_avatar: avatarUrl,
-      uuid: linkData.uuid,
-      ign: linkData.ign,
-      rank: linkData.rank,
+      uuid: rankCheck.uuid,
+      ign: rankCheck.ign,
+      rank: rankCheck.rank,
     });
 
     // Clear OAuth state cookie

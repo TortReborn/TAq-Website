@@ -123,8 +123,8 @@ export async function requireExecSession(request: NextRequest): Promise<ExecSess
   if (!session) return null;
 
   // Re-verify rank from database on every request
-  const linkData = await checkDiscordLinkRank(session.discord_id);
-  if (!linkData) return null;
+  const rankCheck = await checkDiscordLinkRank(session.discord_id);
+  if (!rankCheck.ok) return null;
 
   return session;
 }
@@ -210,11 +210,16 @@ export async function getDiscordUser(accessToken: string): Promise<{
   return response.json();
 }
 
+export type RankCheckResult =
+  | { ok: true; uuid: string; ign: string; rank: string }
+  | { ok: false; reason: 'not_linked'; discord_id: string }
+  | { ok: false; reason: 'rank_not_allowed'; discord_id: string; ign: string; rank: string; allowed: string[] };
+
 /**
  * Check if a Discord user has a qualifying rank in discord_links (Hammerhead or higher).
- * Returns the user's row data if authorized, or null if not.
+ * Returns detailed result explaining success or specific failure reason.
  */
-export async function checkDiscordLinkRank(discordId: string): Promise<{ uuid: string; ign: string; rank: string } | null> {
+export async function checkDiscordLinkRank(discordId: string): Promise<RankCheckResult> {
   const { getPool } = await import('@/lib/db');
   const pool = getPool();
 
@@ -223,12 +228,16 @@ export async function checkDiscordLinkRank(discordId: string): Promise<{ uuid: s
     [discordId]
   );
 
-  if (result.rows.length === 0) return null;
+  if (result.rows.length === 0) {
+    return { ok: false, reason: 'not_linked', discord_id: discordId };
+  }
 
   const row = result.rows[0];
-  if (!ALLOWED_RANKS.includes(row.rank)) return null;
+  if (!ALLOWED_RANKS.includes(row.rank)) {
+    return { ok: false, reason: 'rank_not_allowed', discord_id: discordId, ign: row.ign, rank: row.rank, allowed: ALLOWED_RANKS };
+  }
 
-  return { uuid: row.uuid, ign: row.ign, rank: row.rank };
+  return { ok: true, uuid: row.uuid, ign: row.ign, rank: row.rank };
 }
 
 /**

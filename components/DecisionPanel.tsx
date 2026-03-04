@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface DecisionPanelProps {
   applicationId: number;
@@ -28,6 +28,17 @@ const DECISION_CONFIG = {
 
 type Decision = keyof typeof DECISION_CONFIG;
 
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function DecisionPanel({ applicationId, applicantIgn, applicationType, onDecision }: DecisionPanelProps) {
   const [confirming, setConfirming] = useState<Decision | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -35,16 +46,50 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
   const [hoveredBtn, setHoveredBtn] = useState<Decision | null>(null);
   const [hoveredConfirm, setHoveredConfirm] = useState(false);
   const [hoveredCancel, setHoveredCancel] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isGuildAccept = confirming === 'accepted' && applicationType === 'guild';
 
   // Close modal on Escape
   useEffect(() => {
     if (!confirming) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !submitting) setConfirming(null);
+      if (e.key === 'Escape' && !submitting) closeModal();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [confirming, submitting]);
+
+  const closeModal = () => {
+    if (submitting) return;
+    setConfirming(null);
+    setImagePreview(null);
+    setImageError(null);
+  };
+
+  const handleImageFile = async (file: File) => {
+    setImageError(null);
+    if (!file.type.startsWith('image/')) {
+      setImageError('Please select an image file.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      setImageError('Image too large (max 3MB).');
+      return;
+    }
+    const base64 = await fileToBase64(file);
+    setImagePreview(base64);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageFile(file);
+  };
 
   const handleConfirm = async () => {
     if (!confirming || submitting) return;
@@ -52,10 +97,15 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
     setError(null);
 
     try {
+      const payload: Record<string, string> = { decision: confirming };
+      if (isGuildAccept && imagePreview) {
+        payload.inviteImage = imagePreview;
+      }
+
       const res = await fetch(`/api/exec/applications/${applicationId}/decision`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decision: confirming }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -67,6 +117,7 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
 
       onDecision(data.status, data.reviewedAt, data.reviewedBy);
       setConfirming(null);
+      setImagePreview(null);
     } catch {
       setError('Network error. Please try again.');
     } finally {
@@ -98,7 +149,6 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
             gap: '0.5rem',
             marginBottom: '0.5rem',
           }}>
-            {/* Shield icon */}
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
               <path d="M8 1L2 3.5V7.5C2 11.1 4.5 14.4 8 15.5C11.5 14.4 14 11.1 14 7.5V3.5L8 1Z" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
               <path d="M6 8L7.5 9.5L10 6.5" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -157,7 +207,7 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
       {/* Confirmation modal */}
       {confirming && (
         <div
-          onClick={() => !submitting && setConfirming(null)}
+          onClick={closeModal}
           style={{
             position: 'fixed',
             inset: 0,
@@ -175,11 +225,11 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
               border: '1px solid var(--border-card)',
               borderRadius: '0.75rem',
               padding: '1.75rem',
-              maxWidth: '420px',
+              maxWidth: '460px',
               width: '90%',
             }}
           >
-            {/* Warning icon */}
+            {/* Warning icon + title */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -209,6 +259,110 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
               {confirmMessage}
             </p>
 
+            {/* Image upload — guild accepts only */}
+            {isGuildAccept && (
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  color: 'var(--text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                }}>
+                  Attach Invite Screenshot (optional)
+                </label>
+
+                {!imagePreview ? (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={handleDrop}
+                    style={{
+                      border: `2px dashed ${dragOver ? '#15803d' : 'rgba(255, 255, 255, 0.12)'}`,
+                      borderRadius: '0.5rem',
+                      padding: '1.25rem',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: dragOver ? 'rgba(21, 128, 61, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                      transition: 'border-color 0.15s ease, background 0.15s ease',
+                    }}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto 0.5rem', display: 'block' }}>
+                      <path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M20 16.7V19C20 20.1 19.1 21 18 21H6C4.9 21 4 20.1 4 19V16.7" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
+                      Drop image here or click to browse
+                    </p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6, margin: '0.25rem 0 0' }}>
+                      Max 3MB
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{
+                    position: 'relative',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    overflow: 'hidden',
+                  }}>
+                    <img
+                      src={imagePreview}
+                      alt="Invite screenshot"
+                      style={{
+                        display: 'block',
+                        maxWidth: '100%',
+                        maxHeight: '200px',
+                        objectFit: 'contain',
+                        margin: '0 auto',
+                        background: 'rgba(0,0,0,0.2)',
+                      }}
+                    />
+                    <button
+                      onClick={() => { setImagePreview(null); setImageError(null); }}
+                      style={{
+                        position: 'absolute',
+                        top: '0.4rem',
+                        right: '0.4rem',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        border: 'none',
+                        background: 'rgba(0, 0, 0, 0.7)',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageFile(file);
+                    e.target.value = '';
+                  }}
+                />
+
+                {imageError && (
+                  <p style={{ fontSize: '0.75rem', color: '#ef4444', marginTop: '0.4rem' }}>
+                    {imageError}
+                  </p>
+                )}
+              </div>
+            )}
+
             {error && (
               <p style={{
                 fontSize: '0.8rem',
@@ -224,7 +378,7 @@ export default function DecisionPanel({ applicationId, applicantIgn, application
 
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
               <button
-                onClick={() => setConfirming(null)}
+                onClick={closeModal}
                 disabled={submitting}
                 onMouseEnter={() => setHoveredCancel(true)}
                 onMouseLeave={() => setHoveredCancel(false)}

@@ -11,10 +11,13 @@ export async function GET(request: NextRequest) {
   }
 
   // Verify the user still has a qualifying rank
-  const linkData = await checkDiscordLinkRank(session.discord_id);
-  if (!linkData) {
+  const rankCheck = await checkDiscordLinkRank(session.discord_id);
+  if (!rankCheck.ok) {
+    const detail = rankCheck.reason === 'not_linked'
+      ? { reason: 'not_linked', detail: `Discord ID ${rankCheck.discord_id} has no linked account in discord_links` }
+      : { reason: 'rank_not_allowed', detail: `${rankCheck.ign} has rank "${rankCheck.rank}" which is not in the allowed list`, ign: rankCheck.ign, rank: rankCheck.rank };
     const response = NextResponse.json(
-      { authenticated: false, reason: 'rank_insufficient' },
+      { authenticated: false, ...detail },
       { status: 401 }
     );
     clearExecSessionCookie(response);
@@ -25,7 +28,7 @@ export async function GET(request: NextRequest) {
   const inGuild = await checkGuildMembership(session.uuid);
   if (!inGuild) {
     const response = NextResponse.json(
-      { authenticated: false, reason: 'no_longer_in_guild' },
+      { authenticated: false, reason: 'no_longer_in_guild', detail: `UUID ${session.uuid} (${rankCheck.ign}) not found in cached guild data` },
       { status: 401 }
     );
     clearExecSessionCookie(response);
@@ -38,8 +41,8 @@ export async function GET(request: NextRequest) {
       discord_id: session.discord_id,
       discord_username: session.discord_username,
       discord_avatar: session.discord_avatar,
-      ign: linkData.ign,
-      rank: linkData.rank,
+      ign: rankCheck.ign,
+      rank: rankCheck.rank,
     },
   });
 }
