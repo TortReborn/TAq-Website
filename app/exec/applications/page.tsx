@@ -122,6 +122,8 @@ export default function ExecApplicationsPage() {
                     cursor: 'pointer',
                     fontSize: '0.8rem',
                     fontWeight: '600',
+                    outline: 'none',
+                    WebkitAppearance: 'none',
                   }}
                 >
                   {f.label}
