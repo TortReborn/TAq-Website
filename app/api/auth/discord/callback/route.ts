@@ -40,6 +40,11 @@ export async function GET(request: NextRequest) {
     const rankCheck = await checkDiscordLinkRank(discordUser.id);
 
     if (!rankCheck.ok) {
+      if (rankCheck.reason === 'not_linked') {
+        console.warn(`[exec-auth] Login denied: Discord user ${discordUser.username} (${rankCheck.discord_id}) not found in discord_links`);
+      } else {
+        console.warn(`[exec-auth] Login denied: ${rankCheck.ign} (${discordUser.username}) has rank "${rankCheck.rank}" — needs one of: ${rankCheck.allowed.join(', ')}`);
+      }
       const params = new URLSearchParams({ reason: rankCheck.reason });
       if (rankCheck.reason === 'not_linked') {
         params.set('discord_id', rankCheck.discord_id);
