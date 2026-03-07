@@ -25,10 +25,20 @@ export interface QueueEntry {
   errorMessage: string | null;
 }
 
+export interface PromoSuggestion {
+  id: number;
+  uuid: string;
+  ign: string;
+  currentRank: string;
+  suggestedByIgn: string;
+  createdAt: string;
+}
+
 interface PromotionsData {
   members: GuildMember[];
   pendingQueue: QueueEntry[];
   recentHistory: QueueEntry[];
+  promoSuggestions: PromoSuggestion[];
 }
 
 export function useExecPromotions() {
@@ -79,15 +89,38 @@ export function useExecPromotions() {
     mutate();
   };
 
+  const suggestPromotion = async (uuid: string, ign: string, currentRank: string) => {
+    const res = await fetch('/api/exec/promotions/suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uuid, ign, currentRank }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to suggest promotion');
+    mutate();
+    return data;
+  };
+
+  const removeSuggestion = async (id: number) => {
+    const res = await fetch(`/api/exec/promotions/suggest?id=${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to remove suggestion');
+    mutate();
+    return data;
+  };
+
   return {
     members: data?.members ?? [],
     pendingQueue: data?.pendingQueue ?? [],
     recentHistory: data?.recentHistory ?? [],
+    promoSuggestions: data?.promoSuggestions ?? [],
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),
     queuePromotion,
     queueBulkPromotions,
     cancelQueueEntry,
+    suggestPromotion,
+    removeSuggestion,
   };
 }

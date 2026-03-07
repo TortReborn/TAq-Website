@@ -16,9 +16,10 @@ interface StagedAction {
 export default function ExecPromotionsPage() {
   const { user } = useExecSession();
   const {
-    members, pendingQueue, recentHistory,
+    members, pendingQueue, recentHistory, promoSuggestions,
     loading, error, refresh,
     queueBulkPromotions, cancelQueueEntry,
+    suggestPromotion, removeSuggestion,
   } = useExecPromotions();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,6 +41,9 @@ export default function ExecPromotionsPage() {
 
   // Staged UUIDs for showing staged status
   const stagedUuids = useMemo(() => new Set(stagedActions.map(a => a.uuid)), [stagedActions]);
+
+  // Suggested UUIDs for showing suggested status
+  const suggestedUuids = useMemo(() => new Set(promoSuggestions.map(s => s.uuid)), [promoSuggestions]);
 
   // Only show members with a rank lower than the user's
   const managableMembers = useMemo(() => {
@@ -256,9 +260,49 @@ export default function ExecPromotionsPage() {
               style={{ ...inputStyle, width: '100%' }}
               placeholder="Search by IGN..."
             />
+
+            {/* Bulk action bar */}
+            {selected.size > 0 && (
+              <div style={{
+                borderTop: '1px solid var(--border-card)',
+                paddingTop: '0.75rem', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap',
+              }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600' }}>
+                  {selected.size} selected
+                </span>
+                <select
+                  value={bulkAction}
+                  onChange={e => { setBulkAction(e.target.value as any); setBulkTargetRank(''); }}
+                  style={{ ...inputStyle, width: 'auto' }}
+                >
+                  <option value="promote">Promote to</option>
+                  <option value="demote">Demote to</option>
+                  <option value="remove">Remove Role</option>
+                </select>
+                {bulkAction !== 'remove' && (
+                  <select
+                    value={bulkTargetRank}
+                    onChange={e => setBulkTargetRank(e.target.value)}
+                    style={{ ...inputStyle, width: 'auto' }}
+                  >
+                    <option value="">Select rank...</option>
+                    {availableTargetRanks.map(r => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                )}
+                <button onClick={handleBulkStage} style={{ ...btnStyle, background: 'var(--color-ocean-400)', color: '#fff' }}>
+                  Stage {selected.size} Actions
+                </button>
+                <button onClick={() => setSelected(new Set())} style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>
+                  Clear
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Member table */}
+          <style>{`.promo-row:hover { background: rgba(255, 255, 255, 0.06) !important; }`}</style>
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -271,6 +315,7 @@ export default function ExecPromotionsPage() {
                       style={{ cursor: 'pointer' }}
                     />
                   </th>
+                  <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', width: '1%', whiteSpace: 'nowrap' }}>Actions</th>
                   {([
                     { key: 'ign' as const, label: 'Player' },
                     { key: 'rank' as const, label: 'Rank' },
@@ -290,7 +335,6 @@ export default function ExecPromotionsPage() {
                       {col.label}{sortArrow(col.key)}
                     </th>
                   ))}
-                  <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -300,14 +344,16 @@ export default function ExecPromotionsPage() {
                 {filteredMembers.map((member, idx) => {
                   const isPending = pendingUuids.has(member.uuid);
                   const isStaged = stagedUuids.has(member.uuid);
+                  const isSuggested = suggestedUuids.has(member.uuid);
                   const currentIdx = RANK_HIERARCHY.indexOf(member.rank);
                   const maxPromoteIdx = userRankIdx - 1;
                   const isOdd = idx % 2 === 1;
                   return (
-                    <tr key={member.uuid} style={{
+                    <tr key={member.uuid} className="promo-row" style={{
                       borderBottom: '1px solid var(--border-card)',
                       opacity: isPending ? 0.4 : 1,
                       background: isOdd ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
+                      transition: 'background 0.1s',
                     }}>
                       <td style={{ padding: '0.5rem 0.75rem' }}>
                         <input
@@ -318,24 +364,7 @@ export default function ExecPromotionsPage() {
                           style={{ cursor: isPending || isStaged ? 'not-allowed' : 'pointer' }}
                         />
                       </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>
-                        {member.ign}
-                        {isPending && <span style={{ fontSize: '0.7rem', color: '#f59e0b', marginLeft: '0.5rem' }}>Queued</span>}
-                        {isStaged && <span style={{ fontSize: '0.7rem', color: 'var(--color-ocean-400)', marginLeft: '0.5rem' }}>Staged</span>}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(member.rank), fontWeight: '600' }}>
-                        {member.rank || '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {member.hasStats ? `${member.playtime7d.toFixed(1)}h` : '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {member.hasStats ? member.wars7d : '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {member.hasStats ? member.raids7d : '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem' }}>
+                      <td style={{ padding: '0.5rem 0.75rem', whiteSpace: 'nowrap' }}>
                         {!isPending && !isStaged && member.rank && (
                           <div style={{ display: 'flex', gap: '0.25rem' }}>
                             {currentIdx < maxPromoteIdx && (
@@ -363,8 +392,35 @@ export default function ExecPromotionsPage() {
                             >
                               Remove
                             </button>
+                            {!isSuggested && (
+                              <button
+                                onClick={() => suggestPromotion(member.uuid, member.ign, member.rank)}
+                                title="Add to promo list"
+                                style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                              >
+                                Suggest
+                              </button>
+                            )}
                           </div>
                         )}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>
+                        {member.ign}
+                        {isPending && <span style={{ fontSize: '0.7rem', color: '#f59e0b', marginLeft: '0.5rem' }}>Queued</span>}
+                        {isStaged && <span style={{ fontSize: '0.7rem', color: 'var(--color-ocean-400)', marginLeft: '0.5rem' }}>Staged</span>}
+                        {isSuggested && <span style={{ fontSize: '0.7rem', color: '#a855f7', marginLeft: '0.5rem' }}>Suggested</span>}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(member.rank), fontWeight: '600' }}>
+                        {member.rank || '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {member.hasStats ? `${member.playtime7d.toFixed(1)}h` : '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {member.hasStats ? member.wars7d : '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {member.hasStats ? member.raids7d : '\u2014'}
                       </td>
                     </tr>
                   );
@@ -372,45 +428,6 @@ export default function ExecPromotionsPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Bulk action bar */}
-          {selected.size > 0 && (
-            <div style={{
-              background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--color-ocean-400)',
-              padding: '1rem', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap',
-            }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600' }}>
-                {selected.size} selected
-              </span>
-              <select
-                value={bulkAction}
-                onChange={e => { setBulkAction(e.target.value as any); setBulkTargetRank(''); }}
-                style={{ ...inputStyle, width: 'auto' }}
-              >
-                <option value="promote">Promote to</option>
-                <option value="demote">Demote to</option>
-                <option value="remove">Remove Role</option>
-              </select>
-              {bulkAction !== 'remove' && (
-                <select
-                  value={bulkTargetRank}
-                  onChange={e => setBulkTargetRank(e.target.value)}
-                  style={{ ...inputStyle, width: 'auto' }}
-                >
-                  <option value="">Select rank...</option>
-                  {availableTargetRanks.map(r => (
-                    <option key={r} value={r}>{r}</option>
-                  ))}
-                </select>
-              )}
-              <button onClick={handleBulkStage} style={{ ...btnStyle, background: 'var(--color-ocean-400)', color: '#fff' }}>
-                Stage {selected.size} Actions
-              </button>
-              <button onClick={() => setSelected(new Set())} style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>
-                Clear
-              </button>
-            </div>
-          )}
 
           {actionError && (
             <div style={{ marginTop: '0.75rem', color: '#ef4444', fontSize: '0.85rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem' }}>
@@ -421,6 +438,72 @@ export default function ExecPromotionsPage() {
 
         {/* Right panel: Queue sidebar */}
         <div style={{ flex: '0 0 320px' }}>
+          {/* Promo List (shared suggestions for promotion) */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>
+              Promo List
+              {promoSuggestions.length > 0 && (
+                <span style={{
+                  fontSize: '0.75rem', fontWeight: '600', background: '#a855f7', color: '#fff',
+                  padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
+                }}>
+                  {promoSuggestions.length}
+                </span>
+              )}
+            </h2>
+
+            {promoSuggestions.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+                No suggestions yet. Use the Suggest button on members to add them here.
+              </p>
+            ) : (
+              promoSuggestions.map(suggestion => {
+                const nextRankIdx = RANK_HIERARCHY.indexOf(suggestion.currentRank) + 1;
+                const nextRank = nextRankIdx < RANK_HIERARCHY.length ? RANK_HIERARCHY[nextRankIdx] : null;
+                return (
+                <div key={suggestion.id} style={{
+                  padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
+                  marginBottom: '0.5rem', fontSize: '0.85rem',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{suggestion.ign}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '0.125rem' }}>
+                        <span style={{ color: getRankColor(suggestion.currentRank) }}>{suggestion.currentRank}</span>
+                        {nextRank && (
+                          <>
+                            {' \u2192 '}
+                            <span style={{ color: getRankColor(nextRank) }}>{nextRank}</span>
+                          </>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                        suggested by {suggestion.suggestedByIgn}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      {nextRank && !stagedUuids.has(suggestion.uuid) && !pendingUuids.has(suggestion.uuid) && (
+                        <button
+                          onClick={() => handleSingleStage(suggestion.uuid, suggestion.ign, suggestion.currentRank, nextRank, 'promote')}
+                          style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                        >
+                          Stage
+                        </button>
+                      )}
+                      <button
+                        onClick={() => removeSuggestion(suggestion.id)}
+                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                );
+              })
+            )}
+          </div>
+
           {/* Staged actions (local, not yet submitted) */}
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>

@@ -1,0 +1,64 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { requireExecSession } from '@/lib/exec-auth';
+import { getPool } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+
+export async function POST(request: NextRequest) {
+  const session = await requireExecSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { uuid, ign, currentRank } = await request.json();
+
+    if (!uuid || !ign || !currentRank) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const pool = getPool();
+    await pool.query(
+      `INSERT INTO promo_suggestions (uuid, ign, current_rank, suggested_by_discord_id, suggested_by_ign)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (uuid) DO NOTHING`,
+      [uuid, ign, currentRank, session.discord_id, session.ign]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Promo suggestion error:', error);
+    return NextResponse.json({ error: 'Failed to add suggestion' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await requireExecSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing suggestion id' }, { status: 400 });
+    }
+
+    const pool = getPool();
+    const result = await pool.query(
+      `DELETE FROM promo_suggestions WHERE id = $1`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: 'Suggestion not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Remove suggestion error:', error);
+    return NextResponse.json({ error: 'Failed to remove suggestion' }, { status: 500 });
+  }
+}
