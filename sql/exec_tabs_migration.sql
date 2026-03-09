@@ -19,3 +19,14 @@ CREATE TABLE IF NOT EXISTS promotion_queue (
 );
 
 CREATE INDEX IF NOT EXISTS idx_promo_queue_status ON promotion_queue(status);
+
+-- Create promo suggestions table (shared list of players suggested for promotion)
+CREATE TABLE IF NOT EXISTS promo_suggestions (
+  id SERIAL PRIMARY KEY,
+  uuid UUID NOT NULL UNIQUE,
+  ign VARCHAR(64) NOT NULL,
+  current_rank VARCHAR(32) NOT NULL,
+  suggested_by_discord_id BIGINT NOT NULL,
+  suggested_by_ign VARCHAR(64) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

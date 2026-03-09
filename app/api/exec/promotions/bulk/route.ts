@@ -86,6 +86,17 @@ export async function POST(request: NextRequest) {
         inserted++;
       }
 
+      // Auto-remove queued players from promo suggestions
+      const insertedUuids = entries
+        .filter((e: any) => !existingUuids.has(e.uuid))
+        .map((e: any) => e.uuid);
+      if (insertedUuids.length > 0) {
+        await client.query(
+          `DELETE FROM promo_suggestions WHERE uuid = ANY($1::uuid[])`,
+          [insertedUuids]
+        );
+      }
+
       await client.query('COMMIT');
       return NextResponse.json({ success: true, inserted, skipped });
     } catch (err) {

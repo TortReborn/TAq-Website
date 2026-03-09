@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const pool = getPool();
     const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
 
-    const [guildDataResult, pendingResult, historyResult, allSnapshots] = await Promise.all([
+    const [guildDataResult, pendingResult, historyResult, suggestionsResult, allSnapshots] = await Promise.all([
       // Guild members with discord rank
       pool.query(
         `SELECT data->'members' as members FROM cache_entries WHERE cache_key = 'guildData'`
@@ -37,6 +37,12 @@ export async function GET(request: NextRequest) {
          WHERE status IN ('completed', 'failed')
          ORDER BY completed_at DESC
          LIMIT 50`
+      ),
+      // Promo suggestions
+      pool.query(
+        `SELECT id, uuid, ign, current_rank, suggested_by_ign, created_at
+         FROM promo_suggestions
+         ORDER BY created_at DESC`
       ),
       // 7-day activity snapshots
       simpleDatabaseCache.getPlayerActivitySnapshots([7], clientIP),
@@ -91,10 +97,20 @@ export async function GET(request: NextRequest) {
       errorMessage: row.error_message,
     });
 
+    const promoSuggestions = suggestionsResult.rows.map((row: any) => ({
+      id: row.id,
+      uuid: row.uuid,
+      ign: row.ign,
+      currentRank: row.current_rank,
+      suggestedByIgn: row.suggested_by_ign,
+      createdAt: row.created_at,
+    }));
+
     return NextResponse.json({
       members,
       pendingQueue: pendingResult.rows.map(mapQueueRow),
       recentHistory: historyResult.rows.map(mapQueueRow),
+      promoSuggestions,
     });
   } catch (error) {
     console.error('Promotions fetch error:', error);
@@ -160,6 +176,9 @@ export async function POST(request: NextRequest) {
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [uuid, ign, currentRank, newRank || null, actionType, session.discord_id, session.ign]
     );
+
+    // Auto-remove from promo suggestions if present
+    await pool.query(`DELETE FROM promo_suggestions WHERE uuid = $1`, [uuid]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
