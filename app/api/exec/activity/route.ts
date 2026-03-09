@@ -19,8 +19,8 @@ const KICK_RANK_ORDER: Record<string, number> = {
   'Hydra': 10,
 };
 
-// 4 hours per week threshold
-const WEEKLY_REQUIREMENT = 4.0;
+// Default fallback; actual value read from cache_entries 'weekly_threshold'
+const DEFAULT_WEEKLY_REQUIREMENT = 4.0;
 
 interface Member {
   username: string;
@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
+    const WEEKLY_REQUIREMENT = await simpleDatabaseCache.getSetting<number>('weekly_threshold', DEFAULT_WEEKLY_REQUIREMENT);
     const guildDataRaw = await simpleDatabaseCache.getGuildData(clientIP);
 
     if (!guildDataRaw) {
@@ -142,7 +143,7 @@ export async function GET(request: NextRequest) {
         const isNewMember = daysSinceJoin < 7;
 
         // Below threshold is calculated per-timeframe on the frontend
-        // using proportional threshold: 4h/week = 4/7 h/day * N days
+        // using proportional threshold: Xh/week = X/7 h/day * N days
         const kickRankScore = KICK_RANK_ORDER[discordRank] ?? 5;
 
         // Last seen calculation

@@ -87,13 +87,31 @@ export default function ExecActivityPage() {
     { value: '30', label: '30 Days' },
   ];
 
-  const threshold = Number(timeFrame) * 5 / 7;
+  const weeklyHours = data.weeklyRequirement;
+  const threshold = Number(timeFrame) * weeklyHours / 7;
   const belowCount = data.members.filter(m => {
     if (m.isNewMember) return false;
     const tf = m.timeFrames[timeFrame];
     return tf?.hasCompleteData && tf.playtime < threshold;
   }).length;
   const newCount = data.members.filter(m => m.isNewMember).length;
+
+  const [savingThreshold, setSavingThreshold] = useState(false);
+  const handleThresholdChange = async (newValue: number) => {
+    setSavingThreshold(true);
+    try {
+      const res = await fetch('/api/exec/activity/threshold', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: newValue }),
+      });
+      if (res.ok) refresh();
+    } catch (e) {
+      console.error('Failed to update threshold:', e);
+    } finally {
+      setSavingThreshold(false);
+    }
+  };
 
   return (
     <div>
@@ -111,7 +129,26 @@ export default function ExecActivityPage() {
         marginBottom: '1.5rem',
       }}>
         {data.members.length} members &middot; {belowCount} below threshold &middot; {newCount} new (&lt;7d)
-        &middot; Threshold: {threshold.toFixed(1)}h/{timeFrame}d (4h/week)
+        &middot; Threshold: {threshold.toFixed(1)}h/{timeFrame}d ({weeklyHours}h/week)
+        &middot; Min:&nbsp;
+        <select
+          value={weeklyHours}
+          onChange={(e) => handleThresholdChange(Number(e.target.value))}
+          disabled={savingThreshold}
+          style={{
+            background: 'var(--bg-card)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-card)',
+            borderRadius: '0.25rem',
+            padding: '0.1rem 0.3rem',
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+          }}
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+            <option key={n} value={n}>{n}h/week</option>
+          ))}
+        </select>
       </p>
 
       <div style={{
@@ -243,6 +280,7 @@ export default function ExecActivityPage() {
           timeFrame={timeFrame}
           searchTerm={searchTerm}
           sortMode={sortMode}
+          weeklyHours={weeklyHours}
           onAddToKickList={kickList.addToKickList}
           kickListUuids={new Set(kickList.entries.map(e => e.uuid))}
         />

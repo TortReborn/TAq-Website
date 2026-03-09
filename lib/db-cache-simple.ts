@@ -440,6 +440,42 @@ class SimpleDatabaseCache {
     }
   }
 
+  // Simple config/settings stored as cache_entries with far-future expiry
+  async getSetting<T>(key: string, fallback: T): Promise<T> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        `SELECT data FROM cache_entries WHERE cache_key = $1`,
+        [key]
+      );
+      if (result.rows.length === 0) return fallback;
+      return (result.rows[0].data as any)?.value ?? fallback;
+    } catch (error) {
+      console.error(`❌ Failed to get setting ${key}:`, error);
+      return fallback;
+    } finally {
+      client.release();
+    }
+  }
+
+  async setSetting<T>(key: string, value: T): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query(
+        `INSERT INTO cache_entries (cache_key, data, expires_at)
+         VALUES ($1, $2, '2099-12-31T23:59:59Z')
+         ON CONFLICT (cache_key)
+         DO UPDATE SET data = $2`,
+        [key, JSON.stringify({ value })]
+      );
+    } catch (error) {
+      console.error(`❌ Failed to set setting ${key}:`, error);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   async setGuildColors(guilds: any[], clientIP: string): Promise<void> {
     try {
       await this.initializeTable();

@@ -6,17 +6,15 @@ import { RANK_ORDER, RANK_COLORS } from '@/lib/rank-constants';
 
 type SortKey = 'username' | 'discordRank' | 'playtime' | 'wars' | 'raids' | 'inactiveDays' | 'kickScore' | 'daysInGuild';
 
-// 4h/week = 4/7 h/day; threshold for N days = N * 4/7
-const WEEKLY_HOURS = 4;
-function getThreshold(days: number): number {
-  return days * WEEKLY_HOURS / 7;
+function getThreshold(days: number, weeklyHours: number): number {
+  return days * weeklyHours / 7;
 }
 
-function isBelowThreshold(member: { isNewMember: boolean; timeFrames: Record<string, { playtime: number; hasCompleteData: boolean }> }, timeFrame: string): boolean {
+function isBelowThreshold(member: { isNewMember: boolean; timeFrames: Record<string, { playtime: number; hasCompleteData: boolean }> }, timeFrame: string, weeklyHours: number): boolean {
   if (member.isNewMember) return false;
   const tf = member.timeFrames[timeFrame];
   if (!tf?.hasCompleteData) return false;
-  return tf.playtime < getThreshold(Number(timeFrame));
+  return tf.playtime < getThreshold(Number(timeFrame), weeklyHours);
 }
 type SortDirection = 'asc' | 'desc';
 
@@ -28,6 +26,7 @@ interface Props {
   timeFrame: string;
   searchTerm: string;
   sortMode: 'activity' | 'kick';
+  weeklyHours: number;
   onAddToKickList?: (uuid: string, ign: string, tier: number) => void;
   kickListUuids?: Set<string>;
 }
@@ -38,7 +37,7 @@ const TIER_BUTTONS = [
   { tier: 3, label: 'T3', color: '#3b82f6' },
 ];
 
-export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, onAddToKickList, kickListUuids }: Props) {
+export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, weeklyHours, onAddToKickList, kickListUuids }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>(sortMode === 'kick' ? 'kickScore' : 'playtime');
   const [sortDir, setSortDir] = useState<SortDirection>(sortMode === 'kick' ? 'asc' : 'desc');
   const [hoveredUuid, setHoveredUuid] = useState<string | null>(null);
@@ -70,8 +69,8 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
         const bPinned = PINNED_BOTTOM.has(b.username);
         if (aPinned !== bPinned) return aPinned ? 1 : -1;
         if (a.isNewMember !== b.isNewMember) return a.isNewMember ? 1 : -1;
-        const aBT = isBelowThreshold(a, timeFrame);
-        const bBT = isBelowThreshold(b, timeFrame);
+        const aBT = isBelowThreshold(a, timeFrame, weeklyHours);
+        const bBT = isBelowThreshold(b, timeFrame, weeklyHours);
         if (aBT !== bBT) return aBT ? -1 : 1;
         if (a.kickRankScore !== b.kickRankScore) return a.kickRankScore - b.kickRankScore;
         return (a.timeFrames[timeFrame]?.playtime ?? 0) - (b.timeFrames[timeFrame]?.playtime ?? 0);
@@ -120,7 +119,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
       }
       return sortDir === 'asc' ? (valA as number) - (valB as number) : (valB as number) - (valA as number);
     });
-  }, [members, searchTerm, sortKey, sortDir, timeFrame, sortMode]);
+  }, [members, searchTerm, sortKey, sortDir, timeFrame, sortMode, weeklyHours]);
 
   const isKickMode = sortMode === 'kick';
 
@@ -194,7 +193,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
           {sortedMembers.map((member, idx) => {
             const tf = member.timeFrames[timeFrame];
             const rankColor = RANK_COLORS[member.discordRank] || 'var(--text-secondary)';
-            const belowThreshold = isBelowThreshold(member, timeFrame);
+            const belowThreshold = isBelowThreshold(member, timeFrame, weeklyHours);
             const isHovered = hoveredUuid === member.uuid;
             const isOdd = idx % 2 === 1;
 
