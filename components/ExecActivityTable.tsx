@@ -6,8 +6,8 @@ import { RANK_ORDER, RANK_COLORS } from '@/lib/rank-constants';
 
 type SortKey = 'username' | 'discordRank' | 'playtime' | 'wars' | 'raids' | 'inactiveDays' | 'kickScore' | 'daysInGuild';
 
-// 5h/week = 5/7 h/day; threshold for N days = N * 5/7
-const WEEKLY_HOURS = 5;
+// 4h/week = 4/7 h/day; threshold for N days = N * 4/7
+const WEEKLY_HOURS = 4;
 function getThreshold(days: number): number {
   return days * WEEKLY_HOURS / 7;
 }

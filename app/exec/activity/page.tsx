@@ -111,7 +111,7 @@ export default function ExecActivityPage() {
         marginBottom: '1.5rem',
       }}>
         {data.members.length} members &middot; {belowCount} below threshold &middot; {newCount} new (&lt;7d)
-        &middot; Threshold: {threshold.toFixed(1)}h/{timeFrame}d (5h/week)
+        &middot; Threshold: {threshold.toFixed(1)}h/{timeFrame}d (4h/week)
       </p>
 
       <div style={{

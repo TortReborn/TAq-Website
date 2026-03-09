@@ -19,8 +19,8 @@ const KICK_RANK_ORDER: Record<string, number> = {
   'Hydra': 10,
 };
 
-// 5 hours per week threshold
-const WEEKLY_REQUIREMENT = 5.0;
+// 4 hours per week threshold
+const WEEKLY_REQUIREMENT = 4.0;
 
 interface Member {
   username: string;
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
         const isNewMember = daysSinceJoin < 7;
 
         // Below threshold is calculated per-timeframe on the frontend
-        // using proportional threshold: 5h/week = 5/7 h/day * N days
+        // using proportional threshold: 4h/week = 4/7 h/day * N days
         const kickRankScore = KICK_RANK_ORDER[discordRank] ?? 5;
 
         // Last seen calculation

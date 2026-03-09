@@ -94,6 +94,30 @@ export async function POST(request: NextRequest) {
     const pool = getPool();
     const client = await pool.connect();
 
+    // Check 30-minute per-user cooldown
+    const cooldownResult = await client.query(
+      `SELECT submitted_at FROM applications
+       WHERE discord_id = $1
+       ORDER BY submitted_at DESC LIMIT 1`,
+      [session.discord_id]
+    );
+
+    if (cooldownResult.rows.length > 0) {
+      const lastSubmitted = new Date(cooldownResult.rows[0].submitted_at);
+      const msSinceLastApp = Date.now() - lastSubmitted.getTime();
+      const cooldownMs = 30 * 60 * 1000; // 30 minutes
+
+      if (msSinceLastApp < cooldownMs) {
+        const remainingMs = cooldownMs - msSinceLastApp;
+        const remainingMin = Math.ceil(remainingMs / 60000);
+        client.release();
+        return NextResponse.json(
+          { error: `You can only submit one application every 30 minutes. Please try again in ${remainingMin} minute${remainingMin === 1 ? '' : 's'}.` },
+          { status: 429 }
+        );
+      }
+    }
+
     try {
       const result = await client.query(
         `INSERT INTO applications (application_type, discord_id, discord_username, discord_avatar, answers)
