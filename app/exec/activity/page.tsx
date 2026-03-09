@@ -21,6 +21,7 @@ export default function ExecActivityPage() {
     return 'kick';
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [savingThreshold, setSavingThreshold] = useState(false);
 
   const handleTimeFrame = (value: string) => {
     setTimeFrame(value);
@@ -96,7 +97,6 @@ export default function ExecActivityPage() {
   }).length;
   const newCount = data.members.filter(m => m.isNewMember).length;
 
-  const [savingThreshold, setSavingThreshold] = useState(false);
   const handleThresholdChange = async (newValue: number) => {
     setSavingThreshold(true);
     try {
