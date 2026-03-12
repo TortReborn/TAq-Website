@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Get guild member UUIDs and enrich with discord rank
-    const guildMembers: { name: string; uuid: string; playtime?: number; wars?: number; raids?: number }[] = guildDataResult.rows[0]?.members ?? [];
+    const guildMembers: { name: string; uuid: string; playtime?: number; wars?: number; raids?: number; joined?: string }[] = guildDataResult.rows[0]?.members ?? [];
     const memberUuids = guildMembers.map(m => m.uuid);
 
     // Historical data for 7-day deltas
@@ -80,6 +80,7 @@ export async function GET(request: NextRequest) {
         wars7d: h ? Math.max(0, wars - h.wars) : 0,
         raids7d: h ? Math.max(0, raids - h.raids) : 0,
         hasStats: !!h,
+        joined: m.joined || null,
       };
     });
 
