@@ -89,6 +89,13 @@ export default function ExecActivityPage() {
   ];
 
   const weeklyHours = data.weeklyRequirement;
+  const threshold = Number(timeFrame) * weeklyHours / 7;
+  const belowCount = data.members.filter(m => {
+    if (m.isNewMember) return false;
+    const tf = m.timeFrames[timeFrame];
+    return tf?.hasCompleteData && tf.playtime < threshold;
+  }).length;
+  const newCount = data.members.filter(m => m.isNewMember).length;
 
   const handleThresholdChange = async (newValue: number) => {
     setSavingThreshold(true);
@@ -124,7 +131,8 @@ export default function ExecActivityPage() {
         alignItems: 'center',
         gap: '0.35rem',
       }}>
-        Minimum Playtime:
+        {data.members.length} members &middot; {belowCount} below threshold &middot; {newCount} new (&lt;7d)
+        &middot; Minimum Playtime:
         <select
           value={weeklyHours}
           onChange={(e) => handleThresholdChange(Number(e.target.value))}
