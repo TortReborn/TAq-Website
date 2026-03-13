@@ -218,13 +218,13 @@ export default function ProfilePage() {
   const daysInGuild = daysSince(stats.joined);
   const rankColor = getRankColor(user.rank);
   const [gradColor1, gradColor2] = parseGradient(customization?.gradient);
-  const edgeColors = getEdgeGradientColors(rankColor);
   const cleanUuid = user.uuid.replace(/-/g, '');
 
-  // Wynncraft rank info (VIP, CHAMPION, etc.)
+  // Wynncraft rank info (VIP, CHAMPION, etc.) — used for edge outline color
   const wynnInfo = getWynnRankInfo(wynnRank);
   const wynnRankDisplay = wynnInfo?.display || 'PLAYER';
   const wynnRankColor = wynnInfo?.color || '#66ccff';
+  const edgeColors = getEdgeGradientColors(wynnRankColor);
 
   // Build stat entries matching bot's 2-column layout
   const tf7 = timeFrames['7'];
@@ -330,13 +330,9 @@ export default function ProfilePage() {
               justifyContent: 'center',
               overflow: 'hidden',
               position: 'relative',
-              ...(customization?.backgroundId >= 2 ? {
-                backgroundImage: `url(/images/profile_backgrounds/${customization.backgroundId}.png)`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              } : {
-                background: 'rgba(0,0,0,0.15)',
-              }),
+              backgroundImage: `url(/api/profile-background/${customization?.backgroundId || 1})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}>
               <img
                 src={`https://visage.surgeplay.com/bust/480/${cleanUuid}`}
