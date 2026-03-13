@@ -7,6 +7,7 @@ interface ExecUser {
   discord_avatar: string;
   ign: string;
   rank: string;
+  role: 'exec' | 'member';
 }
 
 interface ExecSessionResponse {
@@ -30,6 +31,8 @@ export function useExecSession() {
   return {
     user: data?.user ?? null,
     authenticated: data?.authenticated ?? false,
+    role: (data?.user?.role as 'exec' | 'member') ?? null,
+    isExec: data?.user?.role === 'exec',
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),

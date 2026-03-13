@@ -209,6 +209,11 @@ body, body *, html, html * {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
+/* Profile card uses its own fonts (5x5.ttf pixel font + game.ttf) */
+.profile-card, .profile-card * {
+  font-family: inherit !important;
+}
+
 /* Soft card glass effect */
 .card {
   background: var(--bg-card);
@@ -352,8 +357,8 @@ body, body *, html, html * {
   }
 }
 
-/* Force Roboto font everywhere except navigation */
-* :not(.nav-font):not(.nav-font *) {
+/* Force Roboto font everywhere except navigation and profile card */
+* :not(.nav-font):not(.nav-font *):not(.profile-card):not(.profile-card *) {
   font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
@@ -808,5 +813,93 @@ body, body *, html, html * {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ========== PROFILE CARD FONTS ========== */
+@font-face {
+  font-family: 'PixelFont5x5';
+  src: url('/images/profile/5x5.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GameFont';
+  src: url('/images/profile/game.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========== PROFILE CARD STYLES ========== */
+
+/* 3D beveled pixel-art badge (matching bot's generate_badge()) */
+.profile-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  font-family: 'PixelFont5x5', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+  image-rendering: pixelated;
+  border-width: 3px;
+  border-style: solid;
+}
+
+/* Player name - game font with drop shadow */
+.profile-card-name {
+  font-family: 'GameFont', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+}
+
+/* Shells balance */
+.profile-card-balance {
+  font-family: 'GameFont', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+}
+
+/* Stat label - pixel font, gold color */
+.profile-stat-label {
+  font-family: 'PixelFont5x5', monospace;
+  font-size: 11px;
+  color: #fad51e;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Stat value - game font, white, right-aligned */
+.profile-stat-value {
+  font-family: 'GameFont', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: right;
+}
+
+/* Profile card mobile responsive */
+@media (max-width: 500px) {
+  .profile-badge {
+    font-size: 9px;
+    padding: 3px 10px;
+    border-width: 2px;
+  }
+  .profile-card-name {
+    font-size: 1.4rem;
+  }
+  .profile-stat-label {
+    font-size: 9px;
+  }
+  .profile-stat-value {
+    font-size: 0.85rem;
   }
 }

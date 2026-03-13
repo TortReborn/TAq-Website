@@ -24,15 +24,19 @@ const PUBLIC_PATHS = ['/exec/login', '/exec/unauthorized'];
 export default function ExecLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, authenticated, loading } = useExecSession();
+  const { user, authenticated, isExec, loading } = useExecSession();
 
   const isPublicPage = PUBLIC_PATHS.includes(pathname);
 
   useEffect(() => {
-    if (!loading && !authenticated && !isPublicPage) {
-      router.push('/exec/login');
+    if (!loading && !isPublicPage) {
+      if (!authenticated) {
+        router.push('/login');
+      } else if (!isExec) {
+        router.push('/profile');
+      }
     }
-  }, [loading, authenticated, isPublicPage, router]);
+  }, [loading, authenticated, isExec, isPublicPage, router]);
 
   // Public pages render without the sidebar
   if (isPublicPage) {
@@ -61,8 +65,8 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
-  // Not authenticated - redirect will happen via useEffect
-  if (!authenticated) {
+  // Not authenticated or not exec - redirect will happen via useEffect
+  if (!authenticated || !isExec) {
     return null;
   }
 

@@ -10,6 +10,7 @@ export interface ExecSessionData {
   uuid: string;
   ign: string;
   rank: string;
+  role: 'exec' | 'member';
   exp: number;
 }
 
@@ -39,7 +40,7 @@ function signPayload(payload: string, secret: string): string {
 
 export function setExecSessionCookie(
   response: NextResponse,
-  user: { discord_id: string; discord_username: string; discord_avatar: string; uuid: string; ign: string; rank: string }
+  user: { discord_id: string; discord_username: string; discord_avatar: string; uuid: string; ign: string; rank: string; role: 'exec' | 'member' }
 ): void {
   const secret = getSecret();
 
@@ -50,6 +51,7 @@ export function setExecSessionCookie(
     uuid: user.uuid,
     ign: user.ign,
     rank: user.rank,
+    role: user.role,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL,
   };
 
@@ -145,7 +147,8 @@ export function getBaseUrl(): string {
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 
 // Ranks that are allowed to access the exec dashboard (Hammerhead or higher)
-const ALLOWED_RANKS = ['Hammerhead', 'Sailfish', 'Dolphin', 'Trial-Narwhal', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
+export const EXEC_RANKS = ['Hammerhead', 'Sailfish', 'Dolphin', 'Trial-Narwhal', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
+const ALLOWED_RANKS = EXEC_RANKS;
 
 export function getDiscordOAuthUrl(state: string): string {
   const clientId = pickEnv('DISCORD_CLIENT_ID', 'TEST_DISCORD_CLIENT_ID');
@@ -238,6 +241,49 @@ export async function checkDiscordLinkRank(discordId: string): Promise<RankCheck
   }
 
   return { ok: true, uuid: row.uuid, ign: row.ign, rank: row.rank };
+}
+
+export type GuildMemberCheckResult =
+  | { ok: true; uuid: string; ign: string; rank: string; role: 'exec' | 'member' }
+  | { ok: false; reason: 'not_linked'; discord_id: string };
+
+/**
+ * Check if a Discord user exists in discord_links (any rank).
+ * Returns user data with role derived from rank.
+ */
+export async function checkDiscordLink(discordId: string): Promise<GuildMemberCheckResult> {
+  const { getPool } = await import('@/lib/db');
+  const pool = getPool();
+
+  const result = await pool.query(
+    `SELECT uuid, ign, rank FROM discord_links WHERE discord_id = $1`,
+    [discordId]
+  );
+
+  if (result.rows.length === 0) {
+    return { ok: false, reason: 'not_linked', discord_id: discordId };
+  }
+
+  const row = result.rows[0];
+  const role = EXEC_RANKS.includes(row.rank) ? 'exec' : 'member';
+  return { ok: true, uuid: row.uuid, ign: row.ign, rank: row.rank, role };
+}
+
+/**
+ * Guard for any guild member (exec or regular).
+ * Verifies session cookie, re-checks discord_links and guild membership.
+ */
+export async function requireGuildSession(request: NextRequest): Promise<ExecSessionData | null> {
+  const session = getExecSession(request);
+  if (!session) return null;
+
+  const linkCheck = await checkDiscordLink(session.discord_id);
+  if (!linkCheck.ok) return null;
+
+  const inGuild = await checkGuildMembership(session.uuid);
+  if (!inGuild) return null;
+
+  return { ...session, role: linkCheck.role, rank: linkCheck.rank };
 }
 
 /**

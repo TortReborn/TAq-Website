@@ -20,6 +20,6 @@ export async function GET() {
     return response;
   } catch (error) {
     console.error('OAuth2 initiation error:', error);
-    return NextResponse.redirect(new URL('/exec/login?error=config', getBaseUrl()));
+    return NextResponse.redirect(new URL('/login?error=config', getBaseUrl()));
   }
 }

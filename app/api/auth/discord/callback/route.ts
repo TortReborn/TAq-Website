@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   exchangeCodeForToken,
   getDiscordUser,
-  checkDiscordLinkRank,
+  checkDiscordLink,
   setExecSessionCookie,
   getBaseUrl,
 } from '@/lib/exec-auth';
@@ -16,17 +16,17 @@ export async function GET(request: NextRequest) {
 
   // Discord returned an error (e.g. user denied)
   if (error) {
-    return NextResponse.redirect(new URL('/exec/login?error=denied', baseUrl));
+    return NextResponse.redirect(new URL('/login?error=denied', baseUrl));
   }
 
   if (!code || !state) {
-    return NextResponse.redirect(new URL('/exec/login?error=missing_params', baseUrl));
+    return NextResponse.redirect(new URL('/login?error=missing_params', baseUrl));
   }
 
   // Verify state matches
   const storedState = request.cookies.get('oauth_state')?.value;
   if (!storedState || storedState !== state) {
-    return NextResponse.redirect(new URL('/exec/login?error=invalid_state', baseUrl));
+    return NextResponse.redirect(new URL('/login?error=invalid_state', baseUrl));
   }
 
   try {
@@ -36,25 +36,13 @@ export async function GET(request: NextRequest) {
     // Fetch Discord user info
     const discordUser = await getDiscordUser(accessToken);
 
-    // Check if user has a qualifying rank in discord_links (Hammerhead or higher)
-    const rankCheck = await checkDiscordLinkRank(discordUser.id);
+    // Check if user exists in discord_links (any guild member can log in)
+    const linkCheck = await checkDiscordLink(discordUser.id);
 
-    if (!rankCheck.ok) {
-      if (rankCheck.reason === 'not_linked') {
-        console.warn(`[exec-auth] Login denied: Discord user ${discordUser.username} (${rankCheck.discord_id}) not found in discord_links`);
-      } else {
-        console.warn(`[exec-auth] Login denied: ${rankCheck.ign} (${discordUser.username}) has rank "${rankCheck.rank}" — needs one of: ${rankCheck.allowed.join(', ')}`);
-      }
-      const params = new URLSearchParams({ reason: rankCheck.reason });
-      if (rankCheck.reason === 'not_linked') {
-        params.set('discord_id', rankCheck.discord_id);
-        params.set('discord_name', discordUser.username);
-      } else {
-        params.set('ign', rankCheck.ign);
-        params.set('rank', rankCheck.rank);
-        params.set('discord_name', discordUser.username);
-      }
-      const response = NextResponse.redirect(new URL(`/exec/unauthorized?${params.toString()}`, baseUrl));
+    if (!linkCheck.ok) {
+      console.warn(`[auth] Login denied: Discord user ${discordUser.username} (${linkCheck.discord_id}) not found in discord_links`);
+      const params = new URLSearchParams({ reason: 'not_linked', discord_id: linkCheck.discord_id, discord_name: discordUser.username });
+      const response = NextResponse.redirect(new URL(`/unauthorized?${params.toString()}`, baseUrl));
       response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
       return response;
     }
@@ -64,15 +52,17 @@ export async function GET(request: NextRequest) {
       ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
       : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(discordUser.id) >> 22n) % 6}.png`;
 
-    // Set exec session cookie
-    const response = NextResponse.redirect(new URL('/exec', baseUrl));
+    // Redirect based on role: execs to dashboard, members to profile
+    const redirectPath = linkCheck.role === 'exec' ? '/exec' : '/profile';
+    const response = NextResponse.redirect(new URL(redirectPath, baseUrl));
     setExecSessionCookie(response, {
       discord_id: discordUser.id,
       discord_username: discordUser.username,
       discord_avatar: avatarUrl,
-      uuid: rankCheck.uuid,
-      ign: rankCheck.ign,
-      rank: rankCheck.rank,
+      uuid: linkCheck.uuid,
+      ign: linkCheck.ign,
+      rank: linkCheck.rank,
+      role: linkCheck.role,
     });
 
     // Clear OAuth state cookie
@@ -81,6 +71,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (err) {
     console.error('OAuth2 callback error:', err);
-    return NextResponse.redirect(new URL('/exec/login?error=auth_failed', baseUrl));
+    return NextResponse.redirect(new URL('/login?error=auth_failed', baseUrl));
   }
 }

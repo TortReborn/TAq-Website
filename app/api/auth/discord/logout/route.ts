@@ -9,7 +9,7 @@ export async function POST() {
 
 export async function GET() {
   const baseUrl = getBaseUrl();
-  const response = NextResponse.redirect(new URL('/exec/login', baseUrl));
+  const response = NextResponse.redirect(new URL('/login', baseUrl));
   clearExecSessionCookie(response);
   return response;
 }
