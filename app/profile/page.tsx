@@ -257,6 +257,7 @@ export default function ProfilePage() {
   } else {
     statEntries.push({ label: 'Last Seen', value: stats.lastJoin ? formatDate(stats.lastJoin) : 'Unknown' });
   }
+  statEntries.push({ label: 'Shells', value: String(shellsBalance) });
   statEntries.push({ label: 'Playtime', value: `${Math.round(stats.playtime)} hrs` });
   if (selectedTf?.hasCompleteData) {
     statEntries.push({ label: `Playtime / ${selectedDays}D`, value: `${Math.round(selectedTf.playtime)} hrs` });
@@ -272,9 +273,6 @@ export default function ProfilePage() {
   statEntries.push({ label: 'Guild Raids', value: String(stats.raids) });
   if (selectedTf?.hasCompleteData) {
     statEntries.push({ label: `Guild Raids / ${selectedDays}D`, value: String(selectedTf.raids) });
-  }
-  if (statEntries.length < 10) {
-    statEntries.push({ label: 'Shells', value: String(stats.shells) });
   }
 
   // Build time preset buttons
