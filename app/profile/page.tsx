@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getRankColor, getWynnRankInfo } from '@/lib/rank-constants';
 import { toPng } from 'html-to-image';
+import BackgroundShopModal from '@/components/BackgroundShopModal';
 
 // --- HSV color utilities (porting bot's Color class from Helpers/functions.py) ---
 
@@ -155,6 +156,7 @@ export default function ProfilePage() {
   const [daysInput, setDaysInput] = useState('7');
   const [periodCache, setPeriodCache] = useState<Record<string, { playtime: number; wars: number; raids: number; contributed: number; hasCompleteData: boolean }>>({});
   const [periodLoading, setPeriodLoading] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !authenticated) {
@@ -520,8 +522,8 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Controls: Copy as PNG + Time frame selector */}
-        <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+        {/* Controls: Copy as PNG + Backgrounds + Time frame selector */}
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '0.5rem' }}>
           {/* Copy as PNG button */}
           <button
             onClick={handleCopyPng}
@@ -539,6 +541,23 @@ export default function ProfilePage() {
             }}
           >
             {copyStatus || 'Copy as PNG'}
+          </button>
+          {/* Backgrounds button */}
+          <button
+            onClick={() => setShopOpen(true)}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-card)',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1.25rem',
+              color: 'var(--text-secondary)',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              fontFamily: "'MinecraftFont', monospace",
+              letterSpacing: '0.5px',
+            }}
+          >
+            Backgrounds
           </button>
         </div>
 
@@ -644,6 +663,8 @@ export default function ProfilePage() {
           Logout
         </a>
       </div>
+
+      <BackgroundShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
     </main>
   );
 }

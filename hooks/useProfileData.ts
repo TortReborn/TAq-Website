@@ -48,7 +48,7 @@ interface ProfileData {
 }
 
 export function useProfileData() {
-  const { data, error, isLoading } = useSWR<ProfileData>(
+  const { data, error, isLoading, mutate } = useSWR<ProfileData>(
     '/api/profile',
     fetcher,
     {
@@ -62,5 +62,6 @@ export function useProfileData() {
     data: data ?? null,
     loading: isLoading,
     error: error?.message ?? null,
+    mutate,
   };
 }

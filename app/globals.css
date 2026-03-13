@@ -1032,3 +1032,116 @@ body, body *, html, html * {
   color: var(--text-muted);
   letter-spacing: 0.3px;
 }
+
+/* ========== BACKGROUND SHOP MODAL ========== */
+.bg-shop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.bg-shop-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 0.75rem;
+  max-width: 720px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1.25rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.bg-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.bg-shop-card {
+  background: var(--bg-secondary);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bg-shop-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.bg-shop-btn {
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.65rem;
+  font-family: 'MinecraftFont', monospace;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: opacity 0.15s ease;
+}
+
+.bg-shop-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.bg-shop-btn-set {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.bg-shop-btn-set:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.bg-shop-btn-buy {
+  background: rgba(245, 200, 66, 0.15);
+  color: #f5c842;
+  border: 1px solid rgba(245, 200, 66, 0.3);
+}
+
+.bg-shop-btn-buy:hover:not(:disabled) {
+  background: rgba(245, 200, 66, 0.25);
+}
+
+.bg-shop-btn-confirm {
+  background: #22c55e;
+  color: #fff;
+}
+
+.bg-shop-btn-confirm:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.bg-shop-btn-cancel {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-card);
+}
+
+.bg-shop-btn-cancel:hover:not(:disabled) {
+  background: var(--bg-secondary);
+}
+
+@media (max-width: 640px) {
+  .bg-shop-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bg-shop-modal {
+    max-height: 90vh;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .bg-shop-grid {
+    grid-template-columns: 1fr;
+  }
+}
