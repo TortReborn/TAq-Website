@@ -151,9 +151,10 @@ export default function ProfilePage() {
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
-  const [customDays, setCustomDays] = useState<string>('');
-  const [customData, setCustomData] = useState<{ playtime: number; wars: number; raids: number; contributed: number; hasCompleteData: boolean } | null>(null);
-  const [customLoading, setCustomLoading] = useState(false);
+  const [selectedDays, setSelectedDays] = useState(7);
+  const [daysInput, setDaysInput] = useState('7');
+  const [periodCache, setPeriodCache] = useState<Record<string, { playtime: number; wars: number; raids: number; contributed: number; hasCompleteData: boolean }>>({});
+  const [periodLoading, setPeriodLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !authenticated) {
@@ -176,22 +177,40 @@ export default function ProfilePage() {
     setTimeout(() => setCopyStatus(null), 2000);
   }, []);
 
-  const fetchCustomPeriod = useCallback(async () => {
-    const days = parseInt(customDays, 10);
-    if (!days || days < 1) return;
-    setCustomLoading(true);
-    try {
-      const res = await fetch(`/api/profile?days=${days}`);
-      if (res.ok) {
-        const json = await res.json();
-        const tf = json.timeFrames?.[String(days)];
-        if (tf) {
-          setCustomData(tf);
+  // Auto-fetch period data when selectedDays changes
+  useEffect(() => {
+    if (!data) return;
+    const key = String(selectedDays);
+    if (data.timeFrames[key] || periodCache[key]) return;
+
+    let cancelled = false;
+    setPeriodLoading(true);
+
+    fetch(`/api/profile?days=${selectedDays}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        if (!cancelled && json?.timeFrames?.[key]) {
+          setPeriodCache(prev => ({ ...prev, [key]: json.timeFrames[key] }));
         }
-      }
-    } catch { /* ignore */ }
-    setCustomLoading(false);
-  }, [customDays]);
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setPeriodLoading(false); });
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDays, data]);
+
+  const handleSelectDays = useCallback((days: number) => {
+    setSelectedDays(days);
+    setDaysInput(String(days));
+  }, []);
+
+  const handleDaysInputSubmit = useCallback(() => {
+    const val = parseInt(daysInput, 10);
+    if (val && val >= 1) {
+      setSelectedDays(val);
+    }
+  }, [daysInput]);
 
   if (authLoading || loading) {
     return (
@@ -226,8 +245,11 @@ export default function ProfilePage() {
   const wynnRankColor = wynnInfo?.color || '#66ccff';
   const edgeColors = getEdgeGradientColors(wynnRankColor);
 
-  // Build stat entries matching bot's 2-column layout
-  const tf7 = timeFrames['7'];
+  // Get selected time frame data
+  const selectedKey = String(selectedDays);
+  const selectedTf = timeFrames[selectedKey] || periodCache[selectedKey] || null;
+
+  // Build stat entries using selected time frame
   const statEntries: { label: string; value: string }[] = [];
 
   if (stats.online) {
@@ -236,375 +258,389 @@ export default function ProfilePage() {
     statEntries.push({ label: 'Last Seen', value: stats.lastJoin ? formatDate(stats.lastJoin) : 'Unknown' });
   }
   statEntries.push({ label: 'Playtime', value: `${Math.round(stats.playtime)} hrs` });
-  if (tf7?.hasCompleteData) {
-    statEntries.push({ label: 'Playtime / 7D', value: `${Math.round(tf7.playtime)} hrs` });
+  if (selectedTf?.hasCompleteData) {
+    statEntries.push({ label: `Playtime / ${selectedDays}D`, value: `${Math.round(selectedTf.playtime)} hrs` });
   }
   statEntries.push({ label: 'Wars', value: String(stats.wars) });
-  if (tf7?.hasCompleteData) {
-    statEntries.push({ label: 'Wars / 7D', value: String(tf7.wars) });
+  if (selectedTf?.hasCompleteData) {
+    statEntries.push({ label: `Wars / ${selectedDays}D`, value: String(selectedTf.wars) });
   }
   statEntries.push({ label: 'Guild XP', value: formatNumber(stats.contributed) });
-  if (tf7?.hasCompleteData) {
-    statEntries.push({ label: 'Guild XP / 7D', value: formatNumber(tf7.contributed) });
+  if (selectedTf?.hasCompleteData) {
+    statEntries.push({ label: `Guild XP / ${selectedDays}D`, value: formatNumber(selectedTf.contributed) });
   }
   statEntries.push({ label: 'Guild Raids', value: String(stats.raids) });
-  if (tf7?.hasCompleteData) {
-    statEntries.push({ label: 'Guild Raids / 7D', value: String(tf7.raids) });
+  if (selectedTf?.hasCompleteData) {
+    statEntries.push({ label: `Guild Raids / ${selectedDays}D`, value: String(selectedTf.raids) });
   }
   if (statEntries.length < 10) {
     statEntries.push({ label: 'Shells', value: String(stats.shells) });
   }
 
+  // Build time preset buttons
+  const maxDays = daysInGuild ?? 365;
+  const presets: { label: string; days: number }[] = [
+    { label: '1d', days: 1 },
+    { label: '7d', days: 7 },
+    { label: '14d', days: 14 },
+    { label: '30d', days: 30 },
+  ];
+  if (maxDays > 90) presets.push({ label: '90d', days: 90 });
+  if (maxDays > 30) presets.push({ label: 'All', days: maxDays });
+
   return (
-    <main style={{ maxWidth: '560px', margin: '0 auto', padding: '2rem 1rem' }}>
-      {/* ===== PROFILE CARD (bot-style) ===== */}
-      {/* Layer 1: Edge gradient (bot's vertical_gradient(tag_color) → light→shadow) */}
-      <div
-        ref={cardRef}
-        className="profile-card"
-        style={{
-          background: `linear-gradient(180deg, ${edgeColors.light}, ${edgeColors.shadow})`,
-          padding: '14px',
-          borderRadius: '20px',
-          marginBottom: '0.75rem',
-        }}
-      >
-        {/* Layer 2: Card gradient (custom or default blue) */}
-        <div style={{
-          background: `linear-gradient(180deg, ${gradColor1}, ${gradColor2})`,
-          borderRadius: '12px',
-          padding: '20px 25px 30px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          {/* Header: Player name (left) + Shells balance (right) */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '8px',
-          }}>
-            <h1 className="profile-card-name" style={{ margin: 0 }}>
-              {user.ign}
-            </h1>
-            {shellsBalance > 0 && (
-              <div className="profile-card-balance" style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}>
-                {shellsBalance}
-                <img
-                  src="/images/profile/shells.png"
-                  alt="shells"
-                  style={{ width: 22, height: 22, imageRendering: 'pixelated' }}
-                />
-              </div>
-            )}
-          </div>
+    <main className="profile-layout">
+      {/* ===== LEFT: ACTIVITY TRENDS ===== */}
+      <div className="profile-left">
+        <div className="profile-panel">
+          <div className="profile-panel-header">Activity Trends</div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
+                  <th style={{ textAlign: 'left' }}>Period</th>
+                  <th style={{ textAlign: 'right' }}>Playtime</th>
+                  <th style={{ textAlign: 'right' }}>Wars</th>
+                  <th style={{ textAlign: 'right' }}>Raids</th>
+                  <th style={{ textAlign: 'right' }}>XP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { key: '7', label: '7 Days' },
+                  { key: '14', label: '14 Days' },
+                  { key: '30', label: '30 Days' },
+                ].map((period) => {
+                  const tf = timeFrames[period.key];
+                  if (!tf) return null;
+                  const isSelected = String(selectedDays) === period.key;
+                  return (
+                    <tr key={period.key} style={{
+                      borderBottom: '1px solid var(--border-card)',
+                      background: isSelected ? 'rgba(59,130,246,0.08)' : undefined,
+                    }}>
+                      <td style={{ fontWeight: '600', color: isSelected ? 'var(--color-ocean-400)' : undefined }}>{period.label}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        {tf.hasCompleteData ? formatPlaytime(tf.playtime) : '\u2014'}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        {tf.hasCompleteData ? tf.wars : '\u2014'}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        {tf.hasCompleteData ? tf.raids : '\u2014'}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        {tf.hasCompleteData ? formatNumber(tf.contributed) : '\u2014'}
+                      </td>
+                    </tr>
+                  );
+                })}
 
-          {/* Wynncraft rank badge - centered at TOP of background area (overlapping) */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '-16px',
-            position: 'relative',
-            zIndex: 2,
-          }}>
-            <ProfileBadge label={wynnRankDisplay} baseColor={wynnRankColor} />
-          </div>
-
-          {/* Background area with gradient outline (bot's bg_outline + background) */}
-          <div style={{
-            background: `linear-gradient(180deg, ${edgeColors.shadow}, ${edgeColors.light})`,
-            borderRadius: '12px',
-            padding: '5px',
-            marginBottom: '8px',
-          }}>
-            {/* Inner background area with player bust */}
-            <div style={{
-              borderRadius: '8px',
-              height: '280px',
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              position: 'relative',
-              backgroundImage: `url(/api/profile-background/${customization?.backgroundId || 1})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}>
-              <img
-                src={`https://visage.surgeplay.com/bust/480/${cleanUuid}`}
-                alt={user.ign}
-                style={{
-                  maxHeight: '260px',
-                  imageRendering: 'pixelated',
-                  filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.5))',
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://mc-heads.net/avatar/${cleanUuid}/128`;
-                  (e.target as HTMLImageElement).style.maxHeight = '128px';
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Guild badges — all on one line */}
-          <div style={{
-            display: 'flex',
-            gap: '6px',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            marginBottom: '16px',
-          }}>
-            <ProfileBadge label="THE AQUARIUM" baseColor="#2196f3" />
-            {stats.guildRank && (
-              <ProfileBadge label={stats.guildRank.toUpperCase()} baseColor={rankColor} />
-            )}
-            {daysInGuild !== null && (
-              <ProfileBadge label={`${daysInGuild} D`} baseColor="#363636" />
-            )}
-          </div>
-
-          {/* Stat Grid - 2 columns, row layout (label left, value right) */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '8px',
-          }}>
-            {statEntries.map((entry, i) => (
-              <div key={i} style={{
-                background: 'rgba(0,0,0,0.12)',
-                borderRadius: '10px',
-                padding: '8px 14px',
-                minHeight: '52px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}>
-                <span className="profile-stat-label" style={{ textAlign: 'left' }}>
-                  {entry.label}
-                </span>
-                <span className="profile-stat-value" style={{ textAlign: 'right' }}>
-                  {entry.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Copy as PNG button */}
-      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-        <button
-          onClick={handleCopyPng}
-          disabled={!!copyStatus}
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-card)',
-            borderRadius: '0.5rem',
-            padding: '0.5rem 1.25rem',
-            color: copyStatus === 'Copied!' ? '#22c55e' : 'var(--text-secondary)',
-            fontSize: '0.85rem',
-            cursor: copyStatus ? 'default' : 'pointer',
-          }}
-        >
-          {copyStatus || 'Copy as PNG'}
-        </button>
-      </div>
-
-      {/* ===== ACTIVITY TRENDS (below card) ===== */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: '0.75rem',
-        border: '1px solid var(--border-card)',
-        marginBottom: '1.5rem',
-        overflow: 'hidden',
-      }}>
-        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-card)' }}>
-          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-            Activity Trends
-          </h2>
-        </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: '600' }}>Period</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: '600' }}>Playtime</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: '600' }}>Wars</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: '600' }}>Raids</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: '600' }}>XP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { key: '7', label: '7 Days' },
-                { key: '14', label: '14 Days' },
-                { key: '30', label: '30 Days' },
-              ].map((period) => {
-                const tf = timeFrames[period.key];
-                if (!tf) return null;
-                return (
-                  <tr key={period.key} style={{ borderBottom: '1px solid var(--border-card)' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--text-primary)' }}>{period.label}</td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                      {tf.hasCompleteData ? formatPlaytime(tf.playtime) : '\u2014'}
+                {/* Show selected period row if it's custom (not 7/14/30) */}
+                {!['7', '14', '30'].includes(selectedKey) && selectedTf && (
+                  <tr style={{
+                    borderBottom: '1px solid var(--border-card)',
+                    background: 'rgba(59,130,246,0.08)',
+                  }}>
+                    <td style={{ fontWeight: '600', color: 'var(--color-ocean-400)' }}>{selectedDays} Days</td>
+                    <td style={{ textAlign: 'right' }}>
+                      {selectedTf.hasCompleteData ? formatPlaytime(selectedTf.playtime) : '\u2014'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                      {tf.hasCompleteData ? tf.wars : '\u2014'}
+                    <td style={{ textAlign: 'right' }}>
+                      {selectedTf.hasCompleteData ? selectedTf.wars : '\u2014'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                      {tf.hasCompleteData ? tf.raids : '\u2014'}
+                    <td style={{ textAlign: 'right' }}>
+                      {selectedTf.hasCompleteData ? selectedTf.raids : '\u2014'}
                     </td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                      {tf.hasCompleteData ? formatNumber(tf.contributed) : '\u2014'}
+                    <td style={{ textAlign: 'right' }}>
+                      {selectedTf.hasCompleteData ? formatNumber(selectedTf.contributed) : '\u2014'}
                     </td>
                   </tr>
-                );
-              })}
+                )}
 
-              {/* Custom time frame row */}
-              {customData && (
-                <tr style={{ borderBottom: '1px solid var(--border-card)', background: 'rgba(59,130,246,0.05)' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--color-ocean-400)' }}>{customDays} Days</td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                    {customData.hasCompleteData ? formatPlaytime(customData.playtime) : '\u2014'}
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                    {customData.hasCompleteData ? customData.wars : '\u2014'}
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                    {customData.hasCompleteData ? customData.raids : '\u2014'}
-                  </td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)' }}>
-                    {customData.hasCompleteData ? formatNumber(customData.contributed) : '\u2014'}
-                  </td>
-                </tr>
+                {/* Loading indicator for custom period */}
+                {!['7', '14', '30'].includes(selectedKey) && !selectedTf && periodLoading && (
+                  <tr style={{ borderBottom: '1px solid var(--border-card)', background: 'rgba(59,130,246,0.05)' }}>
+                    <td style={{ fontWeight: '600', color: 'var(--color-ocean-400)' }}>{selectedDays} Days</td>
+                    <td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== CENTER: PROFILE CARD + CONTROLS ===== */}
+      <div className="profile-center">
+        {/* Profile Card */}
+        <div
+          ref={cardRef}
+          className="profile-card"
+          style={{
+            background: `linear-gradient(180deg, ${edgeColors.light}, ${edgeColors.shadow})`,
+            padding: '14px',
+            borderRadius: '20px',
+            marginBottom: '0.75rem',
+          }}
+        >
+          <div style={{
+            background: `linear-gradient(180deg, ${gradColor1}, ${gradColor2})`,
+            borderRadius: '12px',
+            padding: '20px 25px 30px',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            {/* Header: Player name (left) + Shells balance (right) */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              marginBottom: '8px',
+            }}>
+              <h1 className="profile-card-name" style={{ margin: 0 }}>
+                {user.ign}
+              </h1>
+              {shellsBalance > 0 && (
+                <div className="profile-card-balance" style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}>
+                  {shellsBalance}
+                  <img
+                    src="/images/profile/shells.png"
+                    alt="shells"
+                    style={{ width: 22, height: 22, imageRendering: 'pixelated' }}
+                  />
+                </div>
               )}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Wynncraft rank badge - centered at TOP of background area */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '-16px',
+              position: 'relative',
+              zIndex: 2,
+            }}>
+              <ProfileBadge label={wynnRankDisplay} baseColor={wynnRankColor} />
+            </div>
+
+            {/* Background area with gradient outline */}
+            <div style={{
+              background: `linear-gradient(180deg, ${edgeColors.shadow}, ${edgeColors.light})`,
+              borderRadius: '12px',
+              padding: '5px',
+              marginBottom: '8px',
+            }}>
+              <div style={{
+                borderRadius: '8px',
+                height: '280px',
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                position: 'relative',
+                backgroundImage: `url(/api/profile-background/${customization?.backgroundId || 1})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}>
+                <img
+                  src={`https://visage.surgeplay.com/bust/480/${cleanUuid}`}
+                  alt={user.ign}
+                  style={{
+                    maxHeight: '260px',
+                    imageRendering: 'pixelated',
+                    filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.5))',
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://mc-heads.net/avatar/${cleanUuid}/128`;
+                    (e.target as HTMLImageElement).style.maxHeight = '128px';
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Guild badges */}
+            <div style={{
+              display: 'flex',
+              gap: '6px',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              marginBottom: '16px',
+            }}>
+              <ProfileBadge label="THE AQUARIUM" baseColor="#2196f3" />
+              {user.rank && (
+                <ProfileBadge label={user.rank.toUpperCase()} baseColor={rankColor} />
+              )}
+              {daysInGuild !== null && (
+                <ProfileBadge label={`${daysInGuild} D`} baseColor="#363636" />
+              )}
+            </div>
+
+            {/* Stat Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '8px',
+            }}>
+              {statEntries.map((entry, i) => (
+                <div key={i} style={{
+                  background: 'rgba(0,0,0,0.12)',
+                  borderRadius: '10px',
+                  padding: '8px 14px',
+                  minHeight: '52px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}>
+                  <span className="profile-stat-label" style={{ textAlign: 'left' }}>
+                    {entry.label}
+                  </span>
+                  <span className="profile-stat-value" style={{ textAlign: 'right' }}>
+                    {entry.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Loading overlay for period data */}
+            {periodLoading && (
+              <div style={{
+                position: 'absolute',
+                bottom: '8px',
+                right: '12px',
+                fontSize: '0.7rem',
+                color: 'rgba(255,255,255,0.5)',
+                fontFamily: "'MinecraftFont', monospace",
+              }}>
+                Loading...
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Custom period selector */}
-        <div style={{
-          padding: '0.75rem 1rem',
-          borderTop: '1px solid var(--border-card)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-        }}>
-          <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Custom:</label>
-          <input
-            type="number"
-            min={1}
-            max={daysInGuild ?? 365}
-            placeholder="Days"
-            value={customDays}
-            onChange={(e) => setCustomDays(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') fetchCustomPeriod(); }}
-            style={{
-              width: '80px',
-              padding: '0.35rem 0.5rem',
-              fontSize: '0.8rem',
-              borderRadius: '0.375rem',
-              border: '1px solid var(--border-card)',
-              background: 'var(--bg-main)',
-              color: 'var(--text-primary)',
-            }}
-          />
+        {/* Controls: Copy as PNG + Time frame selector */}
+        <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+          {/* Copy as PNG button */}
           <button
-            onClick={fetchCustomPeriod}
-            disabled={customLoading || !customDays}
+            onClick={handleCopyPng}
+            disabled={!!copyStatus}
             style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.8rem',
-              borderRadius: '0.375rem',
-              border: '1px solid var(--border-card)',
               background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              cursor: customLoading || !customDays ? 'default' : 'pointer',
-              opacity: customLoading || !customDays ? 0.5 : 1,
+              border: '1px solid var(--border-card)',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1.25rem',
+              color: copyStatus === 'Copied!' ? '#22c55e' : 'var(--text-secondary)',
+              fontSize: '0.8rem',
+              cursor: copyStatus ? 'default' : 'pointer',
+              fontFamily: "'MinecraftFont', monospace",
+              letterSpacing: '0.5px',
             }}
           >
-            {customLoading ? '...' : 'Go'}
+            {copyStatus || 'Copy as PNG'}
           </button>
-          {daysInGuild !== null && (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              max {daysInGuild}d
-            </span>
+        </div>
+
+        {/* Time frame selector */}
+        <div style={{ textAlign: 'center' }}>
+          <div className="time-controls">
+            {presets.map((p) => (
+              <button
+                key={p.days}
+                className={`time-preset-btn${selectedDays === p.days ? ' active' : ''}`}
+                onClick={() => handleSelectDays(p.days)}
+              >
+                {p.label}
+              </button>
+            ))}
+            <input
+              type="number"
+              className="time-days-input"
+              min={1}
+              max={maxDays}
+              value={daysInput}
+              onChange={(e) => setDaysInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleDaysInputSubmit(); }}
+              onBlur={handleDaysInputSubmit}
+            />
+            <span className="time-max-label">d</span>
+          </div>
+          <div className="time-max-label" style={{ marginTop: '0.15rem' }}>
+            max: {maxDays} days
+          </div>
+        </div>
+      </div>
+
+      {/* ===== RIGHT: GRAID EVENTS ===== */}
+      <div className="profile-right">
+        <div className="profile-panel">
+          <div className="profile-panel-header" style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            <span>Graid Events</span>
+            <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: '400' }}>
+              <span>{totalGraidEventsParticipated} events</span>
+              <span>{totalGraidCompletions} completions</span>
+            </div>
+          </div>
+          {graidEvents.length === 0 ? (
+            <div style={{
+              padding: '2rem 1rem',
+              textAlign: 'center',
+              color: 'var(--text-secondary)',
+              fontSize: '0.8rem',
+              fontFamily: "'MinecraftFont', monospace",
+            }}>
+              No graid event participation yet.
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
+                    <th style={{ textAlign: 'left' }}>Event</th>
+                    <th style={{ textAlign: 'right' }}>Date</th>
+                    <th style={{ textAlign: 'right' }}>Done</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {graidEvents.map((event) => (
+                    <tr key={event.id} style={{ borderBottom: '1px solid var(--border-card)' }}>
+                      <td style={{ fontWeight: '600' }}>
+                        {event.title}
+                      </td>
+                      <td style={{ textAlign: 'right', color: 'var(--text-secondary)' }}>
+                        {formatDate(event.startTs)}
+                      </td>
+                      <td style={{ textAlign: 'right', fontWeight: '700' }}>
+                        {event.completions}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
 
-      {/* ===== GRAID EVENTS ===== */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: '0.75rem',
-        border: '1px solid var(--border-card)',
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          padding: '1rem 1.25rem',
-          borderBottom: '1px solid var(--border-card)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-            Graid Events
-          </h2>
-          <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            <span>{totalGraidEventsParticipated} events</span>
-            <span>{totalGraidCompletions} completions</span>
-          </div>
-        </div>
-        {graidEvents.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            No graid event participation yet.
-          </div>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: '600' }}>Event</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: '600' }}>Date</th>
-                  <th style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: '600' }}>Completions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {graidEvents.map((event) => (
-                  <tr key={event.id} style={{ borderBottom: '1px solid var(--border-card)' }}>
-                    <td style={{ padding: '0.75rem 1rem', fontWeight: '600', color: 'var(--text-primary)' }}>
-                      {event.title}
-                    </td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-secondary)' }}>
-                      {formatDate(event.startTs)}
-                    </td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'right', color: 'var(--text-primary)', fontWeight: '700' }}>
-                      {event.completions}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
       {/* Logout */}
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+      <div className="profile-bottom" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
         <a
           href="/api/auth/discord/logout"
           style={{
             color: 'var(--text-secondary)',
             textDecoration: 'none',
-            fontSize: '0.85rem',
+            fontSize: '0.8rem',
             padding: '0.5rem 1rem',
             borderRadius: '0.5rem',
             border: '1px solid var(--border-card)',
+            fontFamily: "'MinecraftFont', monospace",
           }}
         >
           Logout
