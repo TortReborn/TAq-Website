@@ -975,6 +975,26 @@ body, body *, html, html * {
   color: var(--text-primary);
 }
 
+/* Background loading shimmer */
+.profile-bg-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.03) 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 70%
+  );
+  background-size: 200% 100%;
+  animation: profile-bg-shimmer 1.5s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes profile-bg-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Time frame selector */
 .time-controls {
   display: flex;

@@ -157,12 +157,19 @@ export default function ProfilePage() {
   const [periodCache, setPeriodCache] = useState<Record<string, { playtime: number; wars: number; raids: number; contributed: number; hasCompleteData: boolean }>>({});
   const [periodLoading, setPeriodLoading] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !authenticated) {
       router.push('/login');
     }
   }, [authLoading, authenticated, router]);
+
+  // Reset bgLoaded when background changes
+  const bgId = data?.customization?.backgroundId || 1;
+  useEffect(() => {
+    setBgLoaded(false);
+  }, [bgId]);
 
   const handleCopyPng = useCallback(async () => {
     if (!cardRef.current) return;
@@ -430,6 +437,15 @@ export default function ProfilePage() {
 
       {/* ===== CENTER: PROFILE CARD + CONTROLS ===== */}
       <div className="profile-center">
+        {/* Hidden preloader for background image (outside cardRef so it won't appear in Copy as PNG) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/api/profile-background/${customization?.backgroundId || 1}`}
+          alt=""
+          style={{ display: 'none' }}
+          onLoad={() => setBgLoaded(true)}
+        />
+
         {/* Profile Card */}
         <div
           ref={cardRef}
@@ -500,10 +516,13 @@ export default function ProfilePage() {
                 justifyContent: 'center',
                 overflow: 'hidden',
                 position: 'relative',
-                backgroundImage: `url(/api/profile-background/${customization?.backgroundId || 1})`,
+                backgroundImage: bgLoaded
+                  ? `url(/api/profile-background/${customization?.backgroundId || 1})`
+                  : 'none',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}>
+                {!bgLoaded && <div className="profile-bg-shimmer" />}
                 <img
                   src={`https://visage.surgeplay.com/bust/480/${cleanUuid}`}
                   alt={user.ign}
