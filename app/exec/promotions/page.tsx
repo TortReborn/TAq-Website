@@ -304,11 +304,11 @@ export default function ExecPromotionsPage() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
-        {/* Left panel: Member roster */}
-        <div style={{ flex: '1 1 550px', minWidth: 0 }}>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', height: 'calc(100vh - 14rem)', minHeight: '500px' }}>
+        {/* Column 1: Member roster */}
+        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Controls */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', marginBottom: '1rem' }}>
+          <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', marginBottom: '0.75rem', flexShrink: 0 }}>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
               <button
                 onClick={() => setRankFilter(null)}
@@ -378,150 +378,151 @@ export default function ExecPromotionsPage() {
             )}
           </div>
 
-          {/* Member table */}
+          {/* Member table (scrollable) */}
           <style>{`.promo-row:hover { background: rgba(255, 255, 255, 0.06) !important; }`}</style>
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
-                  <th style={{ padding: '0.5rem 0.75rem', width: '40px' }}>
-                    <input
-                      type="checkbox"
-                      checked={selected.size > 0 && selected.size === filteredMembers.filter(m => !pendingUuids.has(m.uuid) && !stagedUuids.has(m.uuid)).length}
-                      onChange={toggleSelectAll}
-                      style={{ cursor: 'pointer' }}
-                    />
-                  </th>
-                  <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', width: '1%', whiteSpace: 'nowrap' }}>Actions</th>
-                  {([
-                    { key: 'ign' as const, label: 'Player' },
-                    { key: 'rank' as const, label: 'Rank' },
-                    { key: 'playtime' as const, label: 'Playtime (7d)' },
-                    { key: 'wars' as const, label: 'Wars (7d)' },
-                    { key: 'raids' as const, label: 'Raids (7d)' },
-                    { key: 'memberFor' as const, label: 'Member For' },
-                  ]).map(col => (
-                    <th
-                      key={col.key}
-                      onClick={() => handleSort(col.key)}
-                      style={{
-                        padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600',
-                        color: sortCol === col.key ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
-                        textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {col.label}{sortArrow(col.key)}
+          <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden', flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-card-solid)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
+                    <th style={{ padding: '0.5rem 0.75rem', width: '40px' }}>
+                      <input
+                        type="checkbox"
+                        checked={selected.size > 0 && selected.size === filteredMembers.filter(m => !pendingUuids.has(m.uuid) && !stagedUuids.has(m.uuid)).length}
+                        onChange={toggleSelectAll}
+                        style={{ cursor: 'pointer' }}
+                      />
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMembers.length === 0 && (
-                  <tr><td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
-                )}
-                {filteredMembers.map((member, idx) => {
-                  const isPending = pendingUuids.has(member.uuid);
-                  const isStaged = stagedUuids.has(member.uuid);
-                  const isSuggested = suggestedUuids.has(member.uuid);
-                  const currentIdx = RANK_HIERARCHY.indexOf(member.rank);
-                  const maxPromoteIdx = userRankIdx - 1;
-                  const isOdd = idx % 2 === 1;
-                  return (
-                    <tr key={member.uuid} className="promo-row" style={{
-                      borderBottom: '1px solid var(--border-card)',
-                      opacity: isPending ? 0.4 : 1,
-                      background: isOdd ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
-                      transition: 'background 0.1s',
-                    }}>
-                      <td style={{ padding: '0.5rem 0.75rem' }}>
-                        <input
-                          type="checkbox"
-                          checked={selected.has(member.uuid)}
-                          onChange={() => toggleSelect(member.uuid)}
-                          disabled={isPending || isStaged}
-                          style={{ cursor: isPending || isStaged ? 'not-allowed' : 'pointer' }}
-                        />
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', whiteSpace: 'nowrap' }}>
-                        {!isPending && !isStaged && member.rank && (
-                          <div style={{ display: 'flex', gap: '0.25rem' }}>
-                            {currentIdx < maxPromoteIdx && (
+                    <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', width: '1%', whiteSpace: 'nowrap' }}>Actions</th>
+                    {([
+                      { key: 'ign' as const, label: 'Player' },
+                      { key: 'rank' as const, label: 'Rank' },
+                      { key: 'playtime' as const, label: 'Playtime (7d)' },
+                      { key: 'wars' as const, label: 'Wars (7d)' },
+                      { key: 'raids' as const, label: 'Raids (7d)' },
+                      { key: 'memberFor' as const, label: 'Member For' },
+                    ]).map(col => (
+                      <th
+                        key={col.key}
+                        onClick={() => handleSort(col.key)}
+                        style={{
+                          padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600',
+                          color: sortCol === col.key ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
+                          textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {col.label}{sortArrow(col.key)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMembers.length === 0 && (
+                    <tr><td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
+                  )}
+                  {filteredMembers.map((member, idx) => {
+                    const isPending = pendingUuids.has(member.uuid);
+                    const isStaged = stagedUuids.has(member.uuid);
+                    const isSuggested = suggestedUuids.has(member.uuid);
+                    const currentIdx = RANK_HIERARCHY.indexOf(member.rank);
+                    const maxPromoteIdx = userRankIdx - 1;
+                    const isOdd = idx % 2 === 1;
+                    return (
+                      <tr key={member.uuid} className="promo-row" style={{
+                        borderBottom: '1px solid var(--border-card)',
+                        opacity: isPending ? 0.4 : 1,
+                        background: isOdd ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
+                        transition: 'background 0.1s',
+                      }}>
+                        <td style={{ padding: '0.5rem 0.75rem' }}>
+                          <input
+                            type="checkbox"
+                            checked={selected.has(member.uuid)}
+                            onChange={() => toggleSelect(member.uuid)}
+                            disabled={isPending || isStaged}
+                            style={{ cursor: isPending || isStaged ? 'not-allowed' : 'pointer' }}
+                          />
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', whiteSpace: 'nowrap' }}>
+                          {!isPending && !isStaged && member.rank && (
+                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                              {currentIdx < maxPromoteIdx && (
+                                <button
+                                  onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx + 1], 'promote', member.discordId)}
+                                  title={`Promote to ${RANK_HIERARCHY[currentIdx + 1]}`}
+                                  style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                >
+                                  Promote
+                                </button>
+                              )}
+                              {currentIdx > 0 && (
+                                <button
+                                  onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx - 1], 'demote', member.discordId)}
+                                  title={`Demote to ${RANK_HIERARCHY[currentIdx - 1]}`}
+                                  style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                >
+                                  Demote
+                                </button>
+                              )}
                               <button
-                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx + 1], 'promote', member.discordId)}
-                                title={`Promote to ${RANK_HIERARCHY[currentIdx + 1]}`}
-                                style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, null, 'remove', member.discordId)}
+                                title="Remove role"
+                                style={{ ...btnStyle, background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
                               >
-                                Promote
+                                Remove
                               </button>
-                            )}
-                            {currentIdx > 0 && (
-                              <button
-                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx - 1], 'demote', member.discordId)}
-                                title={`Demote to ${RANK_HIERARCHY[currentIdx - 1]}`}
-                                style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
-                              >
-                                Demote
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, null, 'remove', member.discordId)}
-                              title="Remove role"
-                              style={{ ...btnStyle, background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
-                            >
-                              Remove
-                            </button>
-                            {!isSuggested && (
-                              <button
-                                onClick={() => suggestPromotion(member.uuid, member.ign, member.rank)}
-                                title="Add to promo list"
-                                style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
-                              >
-                                Suggest
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>
-                        {member.ign}
-                        {isPending && <span style={{ fontSize: '0.7rem', color: '#f59e0b', marginLeft: '0.5rem' }}>Queued</span>}
-                        {isStaged && <span style={{ fontSize: '0.7rem', color: 'var(--color-ocean-400)', marginLeft: '0.5rem' }}>Staged</span>}
-                        {isSuggested && <span style={{ fontSize: '0.7rem', color: '#a855f7', marginLeft: '0.5rem' }}>Suggested</span>}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(member.rank), fontWeight: '600' }}>
-                        {member.rank || '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {member.hasStats ? `${member.playtime7d.toFixed(1)}h` : '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {member.hasStats ? member.wars7d : '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                        {member.hasStats ? member.raids7d : '\u2014'}
-                      </td>
-                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.joined ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                        {member.joined ? formatDuration(member.joined) : '\u2014'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                              {!isSuggested && (
+                                <button
+                                  onClick={() => suggestPromotion(member.uuid, member.ign, member.rank)}
+                                  title="Add to promo list"
+                                  style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                >
+                                  Suggest
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>
+                          {member.ign}
+                          {isPending && <span style={{ fontSize: '0.7rem', color: '#f59e0b', marginLeft: '0.5rem' }}>Queued</span>}
+                          {isStaged && <span style={{ fontSize: '0.7rem', color: 'var(--color-ocean-400)', marginLeft: '0.5rem' }}>Staged</span>}
+                          {isSuggested && <span style={{ fontSize: '0.7rem', color: '#a855f7', marginLeft: '0.5rem' }}>Suggested</span>}
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(member.rank), fontWeight: '600' }}>
+                          {member.rank || '\u2014'}
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                          {member.hasStats ? `${member.playtime7d.toFixed(1)}h` : '\u2014'}
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                          {member.hasStats ? member.wars7d : '\u2014'}
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                          {member.hasStats ? member.raids7d : '\u2014'}
+                        </td>
+                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.joined ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                          {member.joined ? formatDuration(member.joined) : '\u2014'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {actionError && (
-            <div style={{ marginTop: '0.75rem', color: '#ef4444', fontSize: '0.85rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem' }}>
+            <div style={{ marginTop: '0.75rem', color: '#ef4444', fontSize: '0.85rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', flexShrink: 0 }}>
               {actionError}
             </div>
           )}
         </div>
 
-        {/* Right panel: Queue sidebar */}
-        <div style={{ flex: '0 0 320px' }}>
-          {/* Promo List (shared suggestions for promotion) */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+        {/* Column 2: Promo List */}
+        <div style={{ flex: '0 0 280px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
               <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Promo List
                 {promoSuggestions.length > 0 && (
@@ -543,79 +544,85 @@ export default function ExecPromotionsPage() {
               )}
             </div>
 
-            {promoSuggestions.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
-                No suggestions yet. Use the Suggest button on members to add them here.
-              </p>
-            ) : (
-              promoSuggestions.map(suggestion => {
-                const nextRankIdx = RANK_HIERARCHY.indexOf(suggestion.currentRank) + 1;
-                const nextRank = nextRankIdx < RANK_HIERARCHY.length ? RANK_HIERARCHY[nextRankIdx] : null;
-                return (
-                <div key={suggestion.id} style={{
-                  padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
-                  marginBottom: '0.5rem', fontSize: '0.85rem',
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{suggestion.ign}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '0.125rem' }}>
-                        <span style={{ color: getRankColor(suggestion.currentRank) }}>{suggestion.currentRank}</span>
-                        {nextRank && (
-                          <>
-                            {' \u2192 '}
-                            <span style={{ color: getRankColor(nextRank) }}>{nextRank}</span>
-                          </>
+            <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
+              {promoSuggestions.length === 0 ? (
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+                  No suggestions yet. Use the Suggest button on members to add them here.
+                </p>
+              ) : (
+                promoSuggestions.map(suggestion => {
+                  const nextRankIdx = RANK_HIERARCHY.indexOf(suggestion.currentRank) + 1;
+                  const nextRank = nextRankIdx < RANK_HIERARCHY.length ? RANK_HIERARCHY[nextRankIdx] : null;
+                  return (
+                  <div key={suggestion.id} style={{
+                    padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
+                    marginBottom: '0.5rem', fontSize: '0.85rem',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{suggestion.ign}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '0.125rem' }}>
+                          <span style={{ color: getRankColor(suggestion.currentRank) }}>{suggestion.currentRank}</span>
+                          {nextRank && (
+                            <>
+                              {' \u2192 '}
+                              <span style={{ color: getRankColor(nextRank) }}>{nextRank}</span>
+                            </>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                          suggested by {suggestion.suggestedByIgn}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        {nextRank && !stagedUuids.has(suggestion.uuid) && !pendingUuids.has(suggestion.uuid) && (
+                          <button
+                            onClick={() => handleSingleStage(suggestion.uuid, suggestion.ign, suggestion.currentRank, nextRank, 'promote', suggestion.discordId)}
+                            style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                          >
+                            Stage
+                          </button>
                         )}
-                      </div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
-                        suggested by {suggestion.suggestedByIgn}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                      {nextRank && !stagedUuids.has(suggestion.uuid) && !pendingUuids.has(suggestion.uuid) && (
                         <button
-                          onClick={() => handleSingleStage(suggestion.uuid, suggestion.ign, suggestion.currentRank, nextRank, 'promote', suggestion.discordId)}
-                          style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                          onClick={() => removeSuggestion(suggestion.id)}
+                          style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
                         >
-                          Stage
+                          Remove
                         </button>
-                      )}
-                      <button
-                        onClick={() => removeSuggestion(suggestion.id)}
-                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
-                      >
-                        Remove
-                      </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                );
-              })
-            )}
-          </div>
-
-          {/* Staged actions (local, not yet submitted) */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>
-              Staged Actions
-              {stagedActions.length > 0 && (
-                <span style={{
-                  fontSize: '0.75rem', fontWeight: '600', background: 'var(--color-ocean-400)', color: '#fff',
-                  padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
-                }}>
-                  {stagedActions.length}
-                </span>
+                  );
+                })
               )}
-            </h2>
+            </div>
+          </div>
+        </div>
 
-            {stagedActions.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
-                No staged actions. Use the buttons on the left to stage promotions, demotions, or removals.
-              </p>
-            ) : (
-              <>
-                {stagedActions.map(action => (
+        {/* Column 3: Staged Actions */}
+        <div style={{ flex: '0 0 280px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
+              <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+                Staged Actions
+                {stagedActions.length > 0 && (
+                  <span style={{
+                    fontSize: '0.75rem', fontWeight: '600', background: 'var(--color-ocean-400)', color: '#fff',
+                    padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
+                  }}>
+                    {stagedActions.length}
+                  </span>
+                )}
+              </h2>
+            </div>
+
+            <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
+              {stagedActions.length === 0 ? (
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+                  No staged actions. Use the buttons on the left to stage promotions, demotions, or removals.
+                </p>
+              ) : (
+                stagedActions.map(action => (
                   <div key={action.uuid} style={{
                     padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
                     marginBottom: '0.5rem', fontSize: '0.85rem',
@@ -643,41 +650,47 @@ export default function ExecPromotionsPage() {
                       </button>
                     </div>
                   </div>
-                ))}
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
-                  <button
-                    onClick={handleSubmitQueue}
-                    disabled={submitting}
-                    style={{
-                      ...btnStyle, flex: 1,
-                      background: submitting ? '#6b7280' : '#22c55e', color: '#fff',
-                      cursor: submitting ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    {submitting ? 'Submitting...' : `Submit ${stagedActions.length} to Queue`}
-                  </button>
-                  <button
-                    onClick={() => { setCopied(false); setShowGenerateModal(true); }}
-                    style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}
-                    title="Generate Discord promotion list"
-                  >
-                    Generate List
-                  </button>
-                  <button
-                    onClick={() => setStagedActions([])}
-                    disabled={submitting}
-                    style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}
-                  >
-                    Clear All
-                  </button>
-                </div>
-              </>
+                ))
+              )}
+            </div>
+
+            {stagedActions.length > 0 && (
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexShrink: 0, flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleSubmitQueue}
+                  disabled={submitting}
+                  style={{
+                    ...btnStyle, flex: '1 1 auto',
+                    background: submitting ? '#6b7280' : '#22c55e', color: '#fff',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {submitting ? 'Submitting...' : `Submit ${stagedActions.length}`}
+                </button>
+                <button
+                  onClick={() => { setCopied(false); setShowGenerateModal(true); }}
+                  style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}
+                  title="Generate Discord promotion list"
+                >
+                  Generate
+                </button>
+                <button
+                  onClick={() => setStagedActions([])}
+                  disabled={submitting}
+                  style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}
+                >
+                  Clear
+                </button>
+              </div>
             )}
           </div>
+        </div>
 
-          {/* Pending queue (already submitted, waiting for bot) */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>
+        {/* Column 4: Pending Queue + History */}
+        <div style={{ flex: '0 0 280px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.75rem' }}>
+          {/* Pending queue */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem', flexShrink: 0 }}>
               Pending Queue
               {pendingQueue.length > 0 && (
                 <span style={{
@@ -689,49 +702,51 @@ export default function ExecPromotionsPage() {
               )}
             </h2>
 
-            {pendingQueue.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>No pending actions</p>
-            ) : (
-              pendingQueue.map(entry => (
-                <div key={entry.id} style={{
-                  padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
-                  marginBottom: '0.5rem', fontSize: '0.85rem',
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{entry.ign}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
-                        {entry.actionType === 'remove' ? (
-                          <span><span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span> {'\u2192'} Remove</span>
-                        ) : (
-                          <span>
-                            <span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span>
-                            {' \u2192 '}
-                            <span style={{ color: getRankColor(entry.newRank!) }}>{entry.newRank}</span>
-                          </span>
-                        )}
+            <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
+              {pendingQueue.length === 0 ? (
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>No pending actions</p>
+              ) : (
+                pendingQueue.map(entry => (
+                  <div key={entry.id} style={{
+                    padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
+                    marginBottom: '0.5rem', fontSize: '0.85rem',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{entry.ign}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                          {entry.actionType === 'remove' ? (
+                            <span><span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span> {'\u2192'} Remove</span>
+                          ) : (
+                            <span>
+                              <span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span>
+                              {' \u2192 '}
+                              <span style={{ color: getRankColor(entry.newRank!) }}>{entry.newRank}</span>
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                          by {entry.queuedByIgn}
+                        </div>
                       </div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
-                        by {entry.queuedByIgn}
-                      </div>
+                      <button
+                        onClick={() => cancelQueueEntry(entry.id)}
+                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                      >
+                        Cancel
+                      </button>
                     </div>
-                    <button
-                      onClick={() => cancelQueueEntry(entry.id)}
-                      style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
-                    >
-                      Cancel
-                    </button>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
 
-          {/* History */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem' }}>
+          {/* History (collapsible, shares column with queue) */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', flexShrink: 0, maxHeight: showHistory ? '50%' : 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div
               onClick={() => setShowHistory(!showHistory)}
-              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', flexShrink: 0 }}
             >
               <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Recent History
@@ -743,7 +758,7 @@ export default function ExecPromotionsPage() {
             </div>
 
             {showHistory && (
-              <div style={{ marginTop: '0.75rem' }}>
+              <div className="themed-scrollbar" style={{ marginTop: '0.75rem', overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
                 {recentHistory.length === 0 ? (
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>No recent history</p>
                 ) : (
