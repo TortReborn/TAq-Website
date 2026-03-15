@@ -5,6 +5,7 @@ export interface GuildMember {
   uuid: string;
   ign: string;
   rank: string;
+  discordId: string | null;
   playtime7d: number;
   wars7d: number;
   raids7d: number;
@@ -32,6 +33,7 @@ export interface PromoSuggestion {
   currentRank: string;
   suggestedByIgn: string;
   createdAt: string;
+  discordId: string | null;
 }
 
 interface PromotionsData {

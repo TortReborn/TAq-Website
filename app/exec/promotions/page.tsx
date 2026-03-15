@@ -11,6 +11,7 @@ interface StagedAction {
   currentRank: string;
   newRank: string | null;
   actionType: 'promote' | 'demote' | 'remove';
+  discordId: string | null;
 }
 
 export default function ExecPromotionsPage() {
@@ -33,6 +34,8 @@ export default function ExecPromotionsPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [sortCol, setSortCol] = useState<'ign' | 'rank' | 'playtime' | 'wars' | 'raids'>('rank');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const userRankIdx = user ? RANK_HIERARCHY.indexOf(user.rank) : -1;
 
@@ -141,9 +144,9 @@ export default function ExecPromotionsPage() {
     setStagedActions(prev => prev.filter(a => a.uuid !== uuid));
   };
 
-  const handleSingleStage = (uuid: string, ign: string, currentRank: string, newRank: string | null, actionType: 'promote' | 'demote' | 'remove') => {
+  const handleSingleStage = (uuid: string, ign: string, currentRank: string, newRank: string | null, actionType: 'promote' | 'demote' | 'remove', discordId: string | null = null) => {
     setActionError(null);
-    stageAction({ uuid, ign, currentRank, newRank, actionType });
+    stageAction({ uuid, ign, currentRank, newRank, actionType, discordId });
   };
 
   const handleBulkStage = () => {
@@ -163,6 +166,7 @@ export default function ExecPromotionsPage() {
         currentRank: member.rank,
         newRank: bulkAction === 'remove' ? null : bulkTargetRank,
         actionType: bulkAction,
+        discordId: member.discordId,
       });
     }
     setSelected(new Set());
@@ -180,6 +184,58 @@ export default function ExecPromotionsPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleStageAll = () => {
+    setActionError(null);
+    for (const suggestion of promoSuggestions) {
+      if (stagedUuids.has(suggestion.uuid) || pendingUuids.has(suggestion.uuid)) continue;
+      const nextRankIdx = RANK_HIERARCHY.indexOf(suggestion.currentRank) + 1;
+      if (nextRankIdx >= RANK_HIERARCHY.length) continue;
+      const nextRank = RANK_HIERARCHY[nextRankIdx];
+      stageAction({
+        uuid: suggestion.uuid,
+        ign: suggestion.ign,
+        currentRank: suggestion.currentRank,
+        newRank: nextRank,
+        actionType: 'promote',
+        discordId: suggestion.discordId,
+      });
+    }
+  };
+
+  const generatePromotionList = (): string => {
+    // Only include promote actions for the list
+    const promotes = stagedActions.filter(a => a.actionType === 'promote' && a.newRank);
+
+    // Group by transition (currentRank -> newRank)
+    const groups: Record<string, StagedAction[]> = {};
+    for (const action of promotes) {
+      const key = `${action.currentRank} -> ${action.newRank}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(action);
+    }
+
+    // Sort groups by rank hierarchy (lowest transition first)
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+      const aIdx = RANK_HIERARCHY.indexOf(a.split(' -> ')[0]);
+      const bIdx = RANK_HIERARCHY.indexOf(b.split(' -> ')[0]);
+      return aIdx - bIdx;
+    });
+
+    const lines: string[] = [];
+    for (const key of sortedKeys) {
+      lines.push(`**${key}**`);
+      for (const action of groups[key]) {
+        if (action.discordId) {
+          lines.push(`<@${action.discordId}>`);
+        } else {
+          lines.push(action.ign);
+        }
+      }
+    }
+
+    return lines.join('\n');
   };
 
   const inputStyle: React.CSSProperties = {
@@ -369,7 +425,7 @@ export default function ExecPromotionsPage() {
                           <div style={{ display: 'flex', gap: '0.25rem' }}>
                             {currentIdx < maxPromoteIdx && (
                               <button
-                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx + 1], 'promote')}
+                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx + 1], 'promote', member.discordId)}
                                 title={`Promote to ${RANK_HIERARCHY[currentIdx + 1]}`}
                                 style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
                               >
@@ -378,7 +434,7 @@ export default function ExecPromotionsPage() {
                             )}
                             {currentIdx > 0 && (
                               <button
-                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx - 1], 'demote')}
+                                onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx - 1], 'demote', member.discordId)}
                                 title={`Demote to ${RANK_HIERARCHY[currentIdx - 1]}`}
                                 style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
                               >
@@ -386,7 +442,7 @@ export default function ExecPromotionsPage() {
                               </button>
                             )}
                             <button
-                              onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, null, 'remove')}
+                              onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, null, 'remove', member.discordId)}
                               title="Remove role"
                               style={{ ...btnStyle, background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
                             >
@@ -440,17 +496,27 @@ export default function ExecPromotionsPage() {
         <div style={{ flex: '0 0 320px' }}>
           {/* Promo List (shared suggestions for promotion) */}
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>
-              Promo List
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+                Promo List
+                {promoSuggestions.length > 0 && (
+                  <span style={{
+                    fontSize: '0.75rem', fontWeight: '600', background: '#a855f7', color: '#fff',
+                    padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
+                  }}>
+                    {promoSuggestions.length}
+                  </span>
+                )}
+              </h2>
               {promoSuggestions.length > 0 && (
-                <span style={{
-                  fontSize: '0.75rem', fontWeight: '600', background: '#a855f7', color: '#fff',
-                  padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
-                }}>
-                  {promoSuggestions.length}
-                </span>
+                <button
+                  onClick={handleStageAll}
+                  style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.25rem 0.5rem', fontSize: '0.7rem' }}
+                >
+                  Stage All
+                </button>
               )}
-            </h2>
+            </div>
 
             {promoSuggestions.length === 0 ? (
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
@@ -484,7 +550,7 @@ export default function ExecPromotionsPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                       {nextRank && !stagedUuids.has(suggestion.uuid) && !pendingUuids.has(suggestion.uuid) && (
                         <button
-                          onClick={() => handleSingleStage(suggestion.uuid, suggestion.ign, suggestion.currentRank, nextRank, 'promote')}
+                          onClick={() => handleSingleStage(suggestion.uuid, suggestion.ign, suggestion.currentRank, nextRank, 'promote', suggestion.discordId)}
                           style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
                         >
                           Stage
@@ -564,6 +630,13 @@ export default function ExecPromotionsPage() {
                     }}
                   >
                     {submitting ? 'Submitting...' : `Submit ${stagedActions.length} to Queue`}
+                  </button>
+                  <button
+                    onClick={() => { setCopied(false); setShowGenerateModal(true); }}
+                    style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7' }}
+                    title="Generate Discord promotion list"
+                  >
+                    Generate List
                   </button>
                   <button
                     onClick={() => setStagedActions([])}
@@ -678,6 +751,61 @@ export default function ExecPromotionsPage() {
           </div>
         </div>
       </div>
+
+      {/* Generate List Modal */}
+      {showGenerateModal && (
+        <div
+          onClick={() => setShowGenerateModal(false)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)',
+              padding: '1.5rem', width: '500px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+            }}
+          >
+            <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>
+              Promotion Wave List
+            </h2>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.75rem' }}>
+              Copy the text below and paste it directly into Discord.
+            </p>
+            <textarea
+              readOnly
+              value={generatePromotionList()}
+              style={{
+                background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
+                borderRadius: '0.5rem', padding: '0.75rem', color: 'var(--text-primary)',
+                fontSize: '0.85rem', fontFamily: 'monospace', resize: 'vertical',
+                minHeight: '200px', flex: 1, outline: 'none',
+              }}
+              onFocus={e => e.target.select()}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(generatePromotionList());
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                style={{ ...btnStyle, background: copied ? '#22c55e' : 'var(--color-ocean-400)', color: '#fff' }}
+              >
+                {copied ? 'Copied!' : 'Copy to Clipboard'}
+              </button>
+              <button
+                onClick={() => setShowGenerateModal(false)}
+                style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

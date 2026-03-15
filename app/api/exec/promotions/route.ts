@@ -38,11 +38,13 @@ export async function GET(request: NextRequest) {
          ORDER BY completed_at DESC
          LIMIT 50`
       ),
-      // Promo suggestions
+      // Promo suggestions (with discord_id from discord_links)
       pool.query(
-        `SELECT id, uuid, ign, current_rank, suggested_by_ign, created_at
-         FROM promo_suggestions
-         ORDER BY created_at DESC`
+        `SELECT ps.id, ps.uuid, ps.ign, ps.current_rank, ps.suggested_by_ign, ps.created_at,
+                dl.discord_id
+         FROM promo_suggestions ps
+         LEFT JOIN discord_links dl ON dl.uuid = ps.uuid
+         ORDER BY ps.created_at DESC`
       ),
       // 7-day activity snapshots
       simpleDatabaseCache.getPlayerActivitySnapshots([7], clientIP),
@@ -59,11 +61,13 @@ export async function GET(request: NextRequest) {
     let memberRanks: Record<string, string> = {};
     if (memberUuids.length > 0) {
       const dlResult = await pool.query(
-        `SELECT uuid, ign, rank FROM discord_links WHERE uuid = ANY($1::uuid[])`,
+        `SELECT uuid, ign, rank, discord_id FROM discord_links WHERE uuid = ANY($1::uuid[])`,
         [memberUuids]
       );
+      const memberDiscordIds: Record<string, string> = {};
       for (const row of dlResult.rows) {
         memberRanks[row.uuid] = row.rank;
+        memberDiscordIds[row.uuid] = row.discord_id;
       }
     }
 
@@ -76,6 +80,7 @@ export async function GET(request: NextRequest) {
         uuid: m.uuid,
         ign: m.name,
         rank: memberRanks[m.uuid] || '',
+        discordId: memberDiscordIds[m.uuid] || null,
         playtime7d: h ? Math.max(0, playtime - h.playtime) : 0,
         wars7d: h ? Math.max(0, wars - h.wars) : 0,
         raids7d: h ? Math.max(0, raids - h.raids) : 0,
@@ -104,6 +109,7 @@ export async function GET(request: NextRequest) {
       currentRank: row.current_rank,
       suggestedByIgn: row.suggested_by_ign,
       createdAt: row.created_at,
+      discordId: row.discord_id || null,
     }));
 
     return NextResponse.json({
