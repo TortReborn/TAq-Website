@@ -76,8 +76,11 @@ export async function GET(request: NextRequest) {
 
     const pool = getPool();
 
-    // Fetch profile customization (gradient) and shells balance in parallel
-    const [graidResult, customizationResult, shellsResult] = await Promise.all([
+    // Fetch weekly threshold setting
+    const weeklyRequirement = await simpleDatabaseCache.getSetting<number>('weekly_threshold', 4.0);
+
+    // Fetch profile customization (gradient), shells balance, and kick list status in parallel
+    const [graidResult, customizationResult, shellsResult, kickListResult] = await Promise.all([
       pool.query(
         `SELECT ge.id, ge.title, ge.start_ts, ge.end_ts, get2.total
          FROM graid_event_totals get2
@@ -94,6 +97,10 @@ export async function GET(request: NextRequest) {
       pool.query(
         `SELECT balance FROM shells WHERE "user" = $1`,
         [session.discord_id]
+      ).catch(() => ({ rows: [] })),
+      pool.query(
+        `SELECT tier FROM kick_list WHERE uuid = $1`,
+        [uuid]
       ).catch(() => ({ rows: [] })),
     ]);
 
@@ -114,6 +121,20 @@ export async function GET(request: NextRequest) {
 
     // Shells balance
     const shellsBalance = shellsResult.rows[0]?.balance ?? 0;
+
+    // Kick status
+    const onKickList = kickListResult.rows.length > 0;
+    const kickListTier = onKickList ? kickListResult.rows[0].tier : null;
+
+    // Determine if below playtime threshold (using 14-day window, matching exec activity panel)
+    const tf14 = timeFrames['14'];
+    const threshold14 = (14 * weeklyRequirement) / 7;
+    const joinedDate = memberData.joined ? new Date(memberData.joined) : null;
+    const daysSinceJoin = joinedDate
+      ? (Date.now() - joinedDate.getTime()) / (1000 * 60 * 60 * 24)
+      : 999;
+    const isNewMember = daysSinceJoin < 7;
+    const isBelowThreshold = tf14?.hasCompleteData && !isNewMember && tf14.playtime < threshold14;
 
     return NextResponse.json({
       user: {
@@ -146,6 +167,13 @@ export async function GET(request: NextRequest) {
       graidEvents,
       totalGraidCompletions,
       totalGraidEventsParticipated: graidEvents.length,
+      kickStatus: {
+        inDanger: isBelowThreshold,
+        onKickList,
+        kickListTier,
+        weeklyRequirement,
+        isNewMember,
+      },
     });
   } catch (error) {
     console.error('Profile API error:', error);

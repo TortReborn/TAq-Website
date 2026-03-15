@@ -45,6 +45,13 @@ interface ProfileData {
   }>;
   totalGraidCompletions: number;
   totalGraidEventsParticipated: number;
+  kickStatus: {
+    inDanger: boolean;
+    onKickList: boolean;
+    kickListTier: number | null;
+    weeklyRequirement: number;
+    isNewMember: boolean;
+  };
 }
 
 export function useProfileData() {

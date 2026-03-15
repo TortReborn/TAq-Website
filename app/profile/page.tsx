@@ -235,7 +235,7 @@ export default function ProfilePage() {
 
   if (!data) return null;
 
-  const { user, stats, wynnRank, customization, shellsBalance, timeFrames, graidEvents, totalGraidCompletions, totalGraidEventsParticipated } = data;
+  const { user, stats, wynnRank, customization, shellsBalance, timeFrames, graidEvents, totalGraidCompletions, totalGraidEventsParticipated, kickStatus } = data;
   const daysInGuild = daysSince(stats.joined);
   const rankColor = getRankColor(user.rank);
   const [gradColor1, gradColor2] = parseGradient(customization?.gradient);
@@ -367,6 +367,63 @@ export default function ProfilePage() {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* ===== KICK STATUS ===== */}
+        <div className="profile-panel" style={{ marginTop: '0.75rem' }}>
+          <div className="profile-panel-header">Kick Status</div>
+          <div style={{ padding: '0.75rem 1rem' }}>
+            {/* In danger of being kicked */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '0.5rem',
+            }}>
+              <span style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                flexShrink: 0,
+                background: kickStatus.isNewMember
+                  ? '#3b82f6'
+                  : kickStatus.inDanger
+                    ? '#ef4444'
+                    : '#22c55e',
+              }} />
+              <span style={{ fontSize: '0.85rem' }}>
+                {kickStatus.isNewMember
+                  ? 'New member — exempt from kick requirements'
+                  : kickStatus.inDanger
+                    ? `Below minimum playtime (${kickStatus.weeklyRequirement}h/week)`
+                    : `Meeting playtime requirement (${kickStatus.weeklyRequirement}h/week)`}
+              </span>
+            </div>
+
+            {/* On the kick list */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}>
+              <span style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                flexShrink: 0,
+                background: kickStatus.onKickList ? '#ef4444' : '#22c55e',
+              }} />
+              <span style={{ fontSize: '0.85rem' }}>
+                {kickStatus.onKickList
+                  ? `On the kick list (Tier ${kickStatus.kickListTier}${
+                      kickStatus.kickListTier === 1 ? ' — Kick First'
+                      : kickStatus.kickListTier === 2 ? ' — If Needed'
+                      : ' — Last Resort'
+                    })`
+                  : 'Not on the kick list'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
