@@ -151,6 +151,9 @@ export default function ProfilePage() {
   const { data, loading, error } = useProfileData();
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const [cardScale, setCardScale] = useState(1);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [selectedDays, setSelectedDays] = useState(7);
   const [daysInput, setDaysInput] = useState('7');
@@ -171,11 +174,53 @@ export default function ProfilePage() {
     setBgLoaded(false);
   }, [bgId]);
 
+  // Scale card to fit viewport while preserving aspect ratio
+  useEffect(() => {
+    const card = cardRef.current;
+    const wrapper = wrapperRef.current;
+    if (!card || !wrapper) return;
+
+    let measuring = false;
+    const updateScale = () => {
+      if (measuring) return;
+      measuring = true;
+      // Temporarily reset scale to measure natural height
+      card.style.transform = 'none';
+      wrapper.style.height = 'auto';
+      const naturalHeight = card.offsetHeight;
+      // Measure how far the top of the card is from viewport top
+      const cardTop = wrapper.getBoundingClientRect().top + window.scrollY;
+      // Measure controls below the card
+      const controlsHeight = controlsRef.current?.offsetHeight || 0;
+      const availableHeight = window.innerHeight - cardTop - controlsHeight - 24;
+      const scale = naturalHeight > availableHeight ? availableHeight / naturalHeight : 1;
+      setCardScale(scale);
+      card.style.transform = `scale(${scale})`;
+      // Adjust wrapper height so elements below don't overlap
+      wrapper.style.height = `${naturalHeight * scale}px`;
+      measuring = false;
+    };
+
+    // Small delay to ensure layout is settled before first measurement
+    requestAnimationFrame(updateScale);
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(card);
+    window.addEventListener('resize', updateScale);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [data]);
+
   const handleCopyPng = useCallback(async () => {
     if (!cardRef.current) return;
     setCopyStatus('Capturing...');
     try {
+      // Temporarily reset scale for full-resolution capture
+      const prevTransform = cardRef.current.style.transform;
+      cardRef.current.style.transform = 'none';
       const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+      cardRef.current.style.transform = prevTransform;
       const res = await fetch(dataUrl);
       const blob = await res.blob();
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
@@ -446,15 +491,14 @@ export default function ProfilePage() {
           onLoad={() => setBgLoaded(true)}
         />
 
-        {/* Profile Card */}
+        {/* Profile Card — scaled wrapper preserves proportions to fit viewport */}
+        <div ref={wrapperRef} className="profile-card-wrapper">
         <div
           ref={cardRef}
-          className="profile-card"
+          className="profile-card profile-card-scaled"
           style={{
             background: `linear-gradient(180deg, ${edgeColors.light}, ${edgeColors.shadow})`,
-            padding: '14px',
-            borderRadius: '20px',
-            marginBottom: '0.75rem',
+            transform: `scale(${cardScale})`,
           }}
         >
           <div style={{
@@ -597,8 +641,10 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+        </div>
 
         {/* Controls: Copy as PNG + Backgrounds + Time frame selector */}
+        <div ref={controlsRef}>
         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '0.5rem' }}>
           {/* Copy as PNG button */}
           <button
@@ -664,6 +710,7 @@ export default function ProfilePage() {
           <div className="time-max-label" style={{ marginTop: '0.15rem' }}>
             max: {maxDays} days
           </div>
+        </div>
         </div>
       </div>
 

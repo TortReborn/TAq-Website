@@ -214,6 +214,19 @@ body, body *, html, html * {
   font-family: inherit !important;
 }
 
+/* Profile card wrapper — scales card uniformly to fit viewport */
+.profile-card-wrapper {
+  max-height: calc(100vh - 180px);
+  margin-bottom: 0.75rem;
+  overflow: visible;
+}
+
+.profile-card-scaled {
+  padding: 14px;
+  border-radius: 20px;
+  transform-origin: top center;
+}
+
 /* Soft card glass effect */
 .card {
   background: var(--bg-card);
