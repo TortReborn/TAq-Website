@@ -59,12 +59,12 @@ export async function GET(request: NextRequest) {
 
     // Batch lookup discord_links for all guild members
     let memberRanks: Record<string, string> = {};
+    let memberDiscordIds: Record<string, string> = {};
     if (memberUuids.length > 0) {
       const dlResult = await pool.query(
         `SELECT uuid, ign, rank, discord_id FROM discord_links WHERE uuid = ANY($1::uuid[])`,
         [memberUuids]
       );
-      const memberDiscordIds: Record<string, string> = {};
       for (const row of dlResult.rows) {
         memberRanks[row.uuid] = row.rank;
         memberDiscordIds[row.uuid] = row.discord_id;

@@ -789,7 +789,7 @@ export default function ExecPromotionsPage() {
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)',
+              background: '#1a1a2e', borderRadius: '0.75rem', border: '1px solid var(--border-card)',
               padding: '1.5rem', width: '500px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
             }}
           >
