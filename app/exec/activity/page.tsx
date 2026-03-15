@@ -127,10 +127,12 @@ export default function ExecActivityPage() {
         color: 'var(--text-secondary)',
         fontSize: '0.85rem',
         marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.35rem',
       }}>
         {data.members.length} members &middot; {belowCount} below threshold &middot; {newCount} new (&lt;7d)
-        &middot; Threshold: {threshold.toFixed(1)}h/{timeFrame}d ({weeklyHours}h/week)
-        &middot; Min:&nbsp;
+        &middot; Minimum Playtime:
         <select
           value={weeklyHours}
           onChange={(e) => handleThresholdChange(Number(e.target.value))}

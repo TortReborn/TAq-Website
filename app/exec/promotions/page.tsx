@@ -32,7 +32,7 @@ export default function ExecPromotionsPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [sortCol, setSortCol] = useState<'ign' | 'rank' | 'playtime' | 'wars' | 'raids'>('rank');
+  const [sortCol, setSortCol] = useState<'ign' | 'rank' | 'playtime' | 'wars' | 'raids' | 'memberFor'>('rank');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -76,6 +76,12 @@ export default function ExecPromotionsPage() {
         case 'playtime': cmp = a.playtime7d - b.playtime7d; break;
         case 'wars': cmp = a.wars7d - b.wars7d; break;
         case 'raids': cmp = a.raids7d - b.raids7d; break;
+        case 'memberFor': {
+          const aTime = a.joined ? new Date(a.joined).getTime() : Infinity;
+          const bTime = b.joined ? new Date(b.joined).getTime() : Infinity;
+          cmp = aTime - bTime; // earlier join = longer member
+          break;
+        }
       }
       if (cmp !== 0) return cmp * dir;
       return a.ign.localeCompare(b.ign);
@@ -238,6 +244,21 @@ export default function ExecPromotionsPage() {
     return lines.join('\n');
   };
 
+  const formatDuration = (joinedDate: string) => {
+    const now = new Date();
+    const joined = new Date(joinedDate);
+    const diffMs = now.getTime() - joined.getTime();
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (days < 1) return '<1d';
+    if (days < 30) return `${days}d`;
+    const months = Math.floor(days / 30);
+    const remainDays = days % 30;
+    if (months < 12) return remainDays > 0 ? `${months}mo ${remainDays}d` : `${months}mo`;
+    const years = Math.floor(months / 12);
+    const remainMonths = months % 12;
+    return remainMonths > 0 ? `${years}y ${remainMonths}mo` : `${years}y`;
+  };
+
   const inputStyle: React.CSSProperties = {
     background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
     borderRadius: '0.375rem', padding: '0.5rem 0.75rem',
@@ -378,6 +399,7 @@ export default function ExecPromotionsPage() {
                     { key: 'playtime' as const, label: 'Playtime (7d)' },
                     { key: 'wars' as const, label: 'Wars (7d)' },
                     { key: 'raids' as const, label: 'Raids (7d)' },
+                    { key: 'memberFor' as const, label: 'Member For' },
                   ]).map(col => (
                     <th
                       key={col.key}
@@ -395,7 +417,7 @@ export default function ExecPromotionsPage() {
               </thead>
               <tbody>
                 {filteredMembers.length === 0 && (
-                  <tr><td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
+                  <tr><td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
                 )}
                 {filteredMembers.map((member, idx) => {
                   const isPending = pendingUuids.has(member.uuid);
@@ -477,6 +499,9 @@ export default function ExecPromotionsPage() {
                       </td>
                       <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                         {member.hasStats ? member.raids7d : '\u2014'}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.joined ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                        {member.joined ? formatDuration(member.joined) : '\u2014'}
                       </td>
                     </tr>
                   );

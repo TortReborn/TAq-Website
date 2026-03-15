@@ -10,6 +10,7 @@ export interface GuildMember {
   wars7d: number;
   raids7d: number;
   hasStats: boolean;
+  joined: string | null;
 }
 
 export interface QueueEntry {
