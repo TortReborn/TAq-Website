@@ -29,14 +29,15 @@ export async function GET(request: NextRequest) {
 
     const customization = customizationResult.rows[0];
     const ownedRaw: number[] = customization?.owned ?? [];
-    // Always include the default background (id 1) as owned
-    const owned = ownedRaw.includes(1) ? ownedRaw : [1, ...ownedRaw];
     const activeId: number = customization?.background ?? 0;
     const shellsBalance: number = shellsResult.rows[0]?.balance ?? 0;
 
+    // Always include default (id 1) and the user's active background as owned
+    const owned = [...new Set([1, ...ownedRaw, ...(activeId > 0 ? [activeId] : [])])];
+
     const publicIds = new Set(backgroundsResult.rows.map((row: any) => row.id));
 
-    // Find any owned backgrounds that aren't in the public list (force-unlocked)
+    // Find any owned/active backgrounds that aren't in the public list (force-unlocked or custom)
     const missingOwnedIds = owned.filter(id => !publicIds.has(id));
     let extraBackgrounds: any[] = [];
     if (missingOwnedIds.length > 0) {

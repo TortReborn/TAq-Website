@@ -22,11 +22,14 @@ export async function POST(request: NextRequest) {
     // ID 0 and 1 (default) are always allowed
     if (backgroundId !== 0 && backgroundId !== 1) {
       const custResult = await pool.query(
-        `SELECT owned FROM profile_customization WHERE "user" = $1`,
+        `SELECT owned, background FROM profile_customization WHERE "user" = $1`,
         [session.discord_id]
       );
-      const ownedArr: number[] = custResult.rows[0]?.owned ?? [];
-      if (!ownedArr.includes(backgroundId)) {
+      const row = custResult.rows[0];
+      const ownedArr: number[] = row?.owned ?? [];
+      const currentActive: number = row?.background ?? 0;
+      // Allow if owned OR if it's the user's current active bg (admin-set)
+      if (!ownedArr.includes(backgroundId) && backgroundId !== currentActive) {
         return NextResponse.json({ error: 'Background not owned' }, { status: 400 });
       }
     }
