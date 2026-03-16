@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     const pool = getPool();
 
-    // ID 0 (default) is always allowed
-    if (backgroundId !== 0) {
+    // ID 0 and 1 (default) are always allowed
+    if (backgroundId !== 0 && backgroundId !== 1) {
       const custResult = await pool.query(
         `SELECT owned FROM profile_customization WHERE "user" = $1`,
         [session.discord_id]

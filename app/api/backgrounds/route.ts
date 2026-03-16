@@ -29,11 +29,26 @@ export async function GET(request: NextRequest) {
 
     const customization = customizationResult.rows[0];
     const ownedRaw: number[] = customization?.owned ?? [];
-    const owned = ownedRaw.includes(0) ? ownedRaw : [0, ...ownedRaw];
+    // Always include the default background (id 1) as owned
+    const owned = ownedRaw.includes(1) ? ownedRaw : [1, ...ownedRaw];
     const activeId: number = customization?.background ?? 0;
     const shellsBalance: number = shellsResult.rows[0]?.balance ?? 0;
 
-    const backgrounds = backgroundsResult.rows.map((row: any) => ({
+    const publicIds = new Set(backgroundsResult.rows.map((row: any) => row.id));
+
+    // Find any owned backgrounds that aren't in the public list (force-unlocked)
+    const missingOwnedIds = owned.filter(id => !publicIds.has(id));
+    let extraBackgrounds: any[] = [];
+    if (missingOwnedIds.length > 0) {
+      const extraResult = await pool.query(
+        `SELECT id, name, description, price FROM profile_backgrounds WHERE id = ANY($1)`,
+        [missingOwnedIds]
+      );
+      extraBackgrounds = extraResult.rows;
+    }
+
+    const allRows = [...backgroundsResult.rows, ...extraBackgrounds];
+    const backgrounds = allRows.map((row: any) => ({
       id: row.id,
       name: row.name,
       description: row.description || '',

@@ -57,13 +57,16 @@ export default function BackgroundShopModal({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   const backgrounds = data?.backgrounds ?? [];
-  const owned = data?.owned ?? [0];
+  const owned = data?.owned ?? [1];
   const activeId = data?.activeId ?? 0;
   const shellsBalance = data?.shellsBalance ?? 0;
 
-  // Put default first, then the rest
-  const defaultBg = { id: 0, name: 'Default', description: 'The default profile background', price: 0 };
-  const allBackgrounds = [defaultBg, ...backgrounds.filter(b => b.id !== 0)];
+  // Sort: default (id 1) first, then the rest by price
+  const allBackgrounds = [...backgrounds].sort((a, b) => {
+    if (a.id === 1) return -1;
+    if (b.id === 1) return 1;
+    return a.price - b.price || a.id - b.id;
+  });
 
   return (
     <div className="bg-shop-overlay" onClick={onClose}>
@@ -169,7 +172,7 @@ export default function BackgroundShopModal({ isOpen, onClose }: Props) {
               const isConfirming = confirmingId === bg.id;
               const isLoading = actionLoading === bg.id;
               const canPurchase = !isOwned && bg.price > 0;
-              const isExclusive = !isOwned && bg.price === 0 && bg.id !== 0;
+              const isExclusive = !isOwned && bg.price === 0 && bg.id !== 1;
 
               return (
                 <div
@@ -190,33 +193,17 @@ export default function BackgroundShopModal({ isOpen, onClose }: Props) {
                     borderRadius: '0.375rem 0.375rem 0 0',
                     background: 'var(--bg-secondary)',
                   }}>
-                    {bg.id === 0 ? (
-                      <div style={{
+                    <img
+                      src={`/api/profile-background/${bg.id}`}
+                      alt={bg.name}
+                      loading="lazy"
+                      style={{
                         width: '100%',
                         height: '100%',
-                        background: 'linear-gradient(180deg, #293786, #1d275e)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'rgba(255,255,255,0.4)',
-                        fontFamily: "'MinecraftFont', monospace",
-                        fontSize: '0.75rem',
-                      }}>
-                        Default
-                      </div>
-                    ) : (
-                      <img
-                        src={`/api/profile-background/${bg.id}`}
-                        alt={bg.name}
-                        loading="lazy"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          display: 'block',
-                        }}
-                      />
-                    )}
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
 
                     {/* Status badge */}
                     {isActive && (
@@ -351,6 +338,57 @@ export default function BackgroundShopModal({ isOpen, onClose }: Props) {
                 </div>
               );
             })}
+
+            {/* Custom Background promo card */}
+            <div
+              className="bg-shop-card"
+              style={{
+                border: '1px dashed var(--border-card)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{
+                width: '100%',
+                aspectRatio: '800 / 526',
+                borderRadius: '0.375rem 0.375rem 0 0',
+                background: 'linear-gradient(135deg, rgba(245,200,66,0.1), rgba(59,130,246,0.1))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2.5rem',
+              }}>
+                🎨
+              </div>
+              <div style={{ padding: '0.5rem 0.6rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <div style={{
+                  fontFamily: "'MinecraftFont', monospace",
+                  fontSize: '0.8rem',
+                  color: 'var(--text-primary)',
+                  marginBottom: '0.2rem',
+                  letterSpacing: '0.3px',
+                }}>
+                  Custom Background
+                </div>
+                <div style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.4rem',
+                  lineHeight: 1.3,
+                }}>
+                  Submit your own image as a profile background! Contact an exec to purchase.
+                </div>
+                <div style={{ minHeight: '1.75rem', display: 'flex', alignItems: 'center' }}>
+                  <span style={{
+                    fontFamily: "'MinecraftFont', monospace",
+                    fontSize: '0.7rem',
+                    color: '#f5c842',
+                  }}>
+                    300 shells
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
