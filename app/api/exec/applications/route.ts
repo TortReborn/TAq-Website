@@ -171,10 +171,11 @@ export async function GET(request: NextRequest) {
       // Post-filter based on guild membership for accepted guild apps
       let filtered = applications;
       if (statusFilter === 'pending') {
-        // Keep pending apps + accepted guild apps NOT yet in guild
+        // Keep pending apps + accepted guild apps NOT yet in guild (exclude closed apps)
         filtered = applications.filter(app =>
           app.status === 'pending' ||
-          (app.status === 'accepted' && app.type === 'guild' && !app.inGuild)
+          (app.status === 'accepted' && app.type === 'guild' && !app.inGuild
+            && app.pollStatus !== ':red_circle: Closed')
         );
       } else if (statusFilter === 'accepted') {
         // Only show accepted guild apps that ARE in guild, plus all accepted community apps
