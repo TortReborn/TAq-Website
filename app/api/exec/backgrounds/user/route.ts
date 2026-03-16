@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { warmCache } from '@/lib/background-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,9 +29,16 @@ export async function GET(request: NextRequest) {
     }
 
     const row = result.rows[0];
+    const bg = row.background ?? 0;
+    const owned: number[] = row.owned ?? [];
+
+    // Warm the background image cache for the user's backgrounds
+    const idsToWarm = [...new Set([...(bg > 0 ? [bg] : []), ...owned])];
+    warmCache(idsToWarm).catch(() => {});
+
     return NextResponse.json({
-      background: row.background ?? 0,
-      owned: row.owned ?? [],
+      background: bg,
+      owned,
       gradient: row.gradient ?? null,
     });
   } catch (error) {

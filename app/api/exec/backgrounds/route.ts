@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { warmCache } from '@/lib/background-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,6 +68,10 @@ export async function GET(request: NextRequest) {
         };
       }
     }
+
+    // Warm the background image cache in the background
+    const bgIds = backgroundsResult.rows.map((row: any) => row.id as number);
+    warmCache(bgIds).catch(() => {});
 
     return NextResponse.json({
       backgrounds: backgroundsResult.rows.map((row: any) => ({
