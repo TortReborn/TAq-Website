@@ -6,9 +6,10 @@ import { useBackgroundShop } from '@/hooks/useBackgroundShop';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onBackgroundChange?: () => void;
 }
 
-export default function BackgroundShopModal({ isOpen, onClose }: Props) {
+export default function BackgroundShopModal({ isOpen, onClose, onBackgroundChange }: Props) {
   const { data, loading, error, purchaseBackground, setActiveBackground } = useBackgroundShop();
   const [confirmingId, setConfirmingId] = useState<number | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -41,8 +42,10 @@ export default function BackgroundShopModal({ isOpen, onClose }: Props) {
     setConfirmingId(null);
     if (result.error) {
       setActionError(result.error);
+    } else {
+      onBackgroundChange?.();
     }
-  }, [purchaseBackground]);
+  }, [purchaseBackground, onBackgroundChange]);
 
   const handleSetActive = useCallback(async (id: number) => {
     setActionError(null);
@@ -51,8 +54,10 @@ export default function BackgroundShopModal({ isOpen, onClose }: Props) {
     setActionLoading(null);
     if (result.error) {
       setActionError(result.error);
+    } else {
+      onBackgroundChange?.();
     }
-  }, [setActiveBackground]);
+  }, [setActiveBackground, onBackgroundChange]);
 
   if (!isOpen) return null;
 

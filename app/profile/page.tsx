@@ -148,7 +148,7 @@ function ProfileBadge({ label, baseColor }: { label: string; baseColor: string }
 
 export default function ProfilePage() {
   const { authenticated, loading: authLoading } = useExecSession();
-  const { data, loading, error } = useProfileData();
+  const { data, loading, error, mutate: mutateProfile } = useProfileData();
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -787,7 +787,7 @@ export default function ProfilePage() {
         </a>
       </div>
 
-      <BackgroundShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
+      <BackgroundShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} onBackgroundChange={() => mutateProfile()} />
     </main>
   );
 }
