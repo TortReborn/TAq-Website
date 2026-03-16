@@ -261,19 +261,19 @@ export default function ExecPromotionsPage() {
 
   const inputStyle: React.CSSProperties = {
     background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
-    borderRadius: '0.375rem', padding: '0.5rem 0.75rem',
-    color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none',
+    borderRadius: '0.32rem', padding: '0.425rem 0.64rem',
+    color: 'var(--text-primary)', fontSize: '0.74rem', outline: 'none',
   };
   const btnStyle: React.CSSProperties = {
-    padding: '0.375rem 0.75rem', borderRadius: '0.375rem', border: 'none',
-    cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600', transition: 'opacity 0.15s',
+    padding: '0.32rem 0.64rem', borderRadius: '0.32rem', border: 'none',
+    cursor: 'pointer', fontSize: '0.68rem', fontWeight: '600', transition: 'opacity 0.15s',
   };
 
   if (loading && members.length === 0) {
     return (
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '2rem' }}>Promotions</h1>
-        <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', height: '400px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '1.7rem' }}>Promotions</h1>
+        <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', height: '340px', animation: 'pulse 1.5s ease-in-out infinite' }} />
         <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
       </div>
     );
@@ -282,8 +282,8 @@ export default function ExecPromotionsPage() {
   if (error && members.length === 0) {
     return (
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '2rem' }}>Promotions</h1>
-        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '0.5rem', padding: '1rem', color: '#ef4444' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '1.7rem' }}>Promotions</h1>
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '0.425rem', padding: '0.85rem', color: '#ef4444' }}>
           Failed to load data: {error}
         </div>
       </div>
@@ -292,10 +292,10 @@ export default function ExecPromotionsPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.28rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>Promotions</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>Promotions</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.74rem', margin: '0.21rem 0 0' }}>
             Manage rank promotions, demotions, and role removal
           </p>
         </div>
@@ -304,12 +304,12 @@ export default function ExecPromotionsPage() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', height: 'calc(100vh - 14rem)', minHeight: '500px' }}>
+      <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', height: 'calc(100vh - 11.9rem)', minHeight: '425px' }}>
         {/* Column 1: Member roster */}
         <div style={{ flex: '5 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Controls */}
-          <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', marginBottom: '0.75rem', flexShrink: 0 }}>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+          <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', marginBottom: '0.64rem', flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: '0.425rem', flexWrap: 'wrap', marginBottom: '0.64rem' }}>
               <button
                 onClick={() => setRankFilter(null)}
                 style={{ ...btnStyle, background: !rankFilter ? 'var(--color-ocean-400)' : 'var(--bg-primary)', color: !rankFilter ? '#fff' : 'var(--text-secondary)' }}
@@ -342,9 +342,9 @@ export default function ExecPromotionsPage() {
             {selected.size > 0 && (
               <div style={{
                 borderTop: '1px solid var(--border-card)',
-                paddingTop: '0.75rem', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap',
+                paddingTop: '0.64rem', marginTop: '0.64rem', display: 'flex', alignItems: 'center', gap: '0.64rem', flexWrap: 'wrap',
               }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: '600' }}>
                   {selected.size} selected
                 </span>
                 <select
@@ -380,12 +380,12 @@ export default function ExecPromotionsPage() {
 
           {/* Member table (scrollable) */}
           <style>{`.promo-row:hover { background: rgba(255, 255, 255, 0.06) !important; }`}</style>
-          <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden', flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', overflow: 'hidden', flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-card-solid)' }}>
                   <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
-                    <th style={{ padding: '0.5rem 0.75rem', width: '40px' }}>
+                    <th style={{ padding: '0.425rem 0.64rem', width: '34px' }}>
                       <input
                         type="checkbox"
                         checked={selected.size > 0 && selected.size === filteredMembers.filter(m => !pendingUuids.has(m.uuid) && !stagedUuids.has(m.uuid)).length}
@@ -393,7 +393,7 @@ export default function ExecPromotionsPage() {
                         style={{ cursor: 'pointer' }}
                       />
                     </th>
-                    <th style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', width: '1%', whiteSpace: 'nowrap' }}>Actions</th>
+                    <th style={{ padding: '0.425rem 0.64rem', textAlign: 'left', fontSize: '0.6rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', width: '1%', whiteSpace: 'nowrap' }}>Actions</th>
                     {([
                       { key: 'ign' as const, label: 'Player' },
                       { key: 'rank' as const, label: 'Rank' },
@@ -406,7 +406,7 @@ export default function ExecPromotionsPage() {
                         key={col.key}
                         onClick={() => handleSort(col.key)}
                         style={{
-                          padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600',
+                          padding: '0.425rem 0.64rem', textAlign: 'left', fontSize: '0.6rem', fontWeight: '600',
                           color: sortCol === col.key ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
                           textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap',
                         }}
@@ -418,7 +418,7 @@ export default function ExecPromotionsPage() {
                 </thead>
                 <tbody>
                   {filteredMembers.length === 0 && (
-                    <tr><td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
+                    <tr><td colSpan={8} style={{ padding: '1.7rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No members match filters</td></tr>
                   )}
                   {filteredMembers.map((member, idx) => {
                     const isPending = pendingUuids.has(member.uuid);
@@ -434,7 +434,7 @@ export default function ExecPromotionsPage() {
                         background: isOdd ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
                         transition: 'background 0.1s',
                       }}>
-                        <td style={{ padding: '0.5rem 0.75rem' }}>
+                        <td style={{ padding: '0.425rem 0.64rem' }}>
                           <input
                             type="checkbox"
                             checked={selected.has(member.uuid)}
@@ -443,14 +443,14 @@ export default function ExecPromotionsPage() {
                             style={{ cursor: isPending || isStaged ? 'not-allowed' : 'pointer' }}
                           />
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', whiteSpace: 'nowrap' }}>
                           {!isPending && !isStaged && member.rank && (
-                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                            <div style={{ display: 'flex', gap: '0.21rem' }}>
                               {currentIdx < maxPromoteIdx && (
                                 <button
                                   onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx + 1], 'promote', member.discordId)}
                                   title={`Promote to ${RANK_HIERARCHY[currentIdx + 1]}`}
-                                  style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                  style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                                 >
                                   Promote
                                 </button>
@@ -459,7 +459,7 @@ export default function ExecPromotionsPage() {
                                 <button
                                   onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, RANK_HIERARCHY[currentIdx - 1], 'demote', member.discordId)}
                                   title={`Demote to ${RANK_HIERARCHY[currentIdx - 1]}`}
-                                  style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                  style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                                 >
                                   Demote
                                 </button>
@@ -467,7 +467,7 @@ export default function ExecPromotionsPage() {
                               <button
                                 onClick={() => handleSingleStage(member.uuid, member.ign, member.rank, null, 'remove', member.discordId)}
                                 title="Remove role"
-                                style={{ ...btnStyle, background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                style={{ ...btnStyle, background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                               >
                                 Remove
                               </button>
@@ -475,7 +475,7 @@ export default function ExecPromotionsPage() {
                                 <button
                                   onClick={() => suggestPromotion(member.uuid, member.ign, member.rank)}
                                   title="Add to promo list"
-                                  style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                                  style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                                 >
                                   Suggest
                                 </button>
@@ -483,25 +483,25 @@ export default function ExecPromotionsPage() {
                             </div>
                           )}
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: '500' }}>
                           {member.ign}
-                          {isPending && <span style={{ fontSize: '0.7rem', color: '#f59e0b', marginLeft: '0.5rem' }}>Queued</span>}
-                          {isStaged && <span style={{ fontSize: '0.7rem', color: 'var(--color-ocean-400)', marginLeft: '0.5rem' }}>Staged</span>}
-                          {isSuggested && <span style={{ fontSize: '0.7rem', color: '#a855f7', marginLeft: '0.5rem' }}>Suggested</span>}
+                          {isPending && <span style={{ fontSize: '0.6rem', color: '#f59e0b', marginLeft: '0.425rem' }}>Queued</span>}
+                          {isStaged && <span style={{ fontSize: '0.6rem', color: 'var(--color-ocean-400)', marginLeft: '0.425rem' }}>Staged</span>}
+                          {isSuggested && <span style={{ fontSize: '0.6rem', color: '#a855f7', marginLeft: '0.425rem' }}>Suggested</span>}
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(member.rank), fontWeight: '600' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.68rem', color: getRankColor(member.rank), fontWeight: '600' }}>
                           {member.rank || '\u2014'}
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.68rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                           {member.hasStats ? `${member.playtime7d.toFixed(1)}h` : '\u2014'}
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.68rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                           {member.hasStats ? member.wars7d : '\u2014'}
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.68rem', color: member.hasStats ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                           {member.hasStats ? member.raids7d : '\u2014'}
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: member.joined ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.68rem', color: member.joined ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                           {member.joined ? formatDuration(member.joined) : '\u2014'}
                         </td>
                       </tr>
@@ -513,22 +513,22 @@ export default function ExecPromotionsPage() {
           </div>
 
           {actionError && (
-            <div style={{ marginTop: '0.75rem', color: '#ef4444', fontSize: '0.85rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', flexShrink: 0 }}>
+            <div style={{ marginTop: '0.64rem', color: '#ef4444', fontSize: '0.72rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.425rem 0.64rem', borderRadius: '0.32rem', flexShrink: 0 }}>
               {actionError}
             </div>
           )}
         </div>
 
         {/* Column 2: Promo List */}
-        <div style={{ flex: '1.5 1 0', minWidth: '200px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
-              <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+        <div style={{ flex: '1.5 1 0', minWidth: '170px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.64rem', flexShrink: 0 }}>
+              <h2 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Promo List
                 {promoSuggestions.length > 0 && (
                   <span style={{
-                    fontSize: '0.75rem', fontWeight: '600', background: '#a855f7', color: '#fff',
-                    padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
+                    fontSize: '0.64rem', fontWeight: '600', background: '#a855f7', color: '#fff',
+                    padding: '0.085rem 0.34rem', borderRadius: '0.21rem', marginLeft: '0.425rem',
                   }}>
                     {promoSuggestions.length}
                   </span>
@@ -537,7 +537,7 @@ export default function ExecPromotionsPage() {
               {promoSuggestions.length > 0 && (
                 <button
                   onClick={handleStageAll}
-                  style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.25rem 0.5rem', fontSize: '0.7rem' }}
+                  style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.21rem 0.425rem', fontSize: '0.6rem' }}
                 >
                   Stage All
                 </button>
@@ -546,7 +546,7 @@ export default function ExecPromotionsPage() {
 
             <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
               {promoSuggestions.length === 0 ? (
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.72rem', fontStyle: 'italic', margin: 0 }}>
                   No suggestions yet. Use the Suggest button on members to add them here.
                 </p>
               ) : (
@@ -555,13 +555,13 @@ export default function ExecPromotionsPage() {
                   const nextRank = nextRankIdx < RANK_HIERARCHY.length ? RANK_HIERARCHY[nextRankIdx] : null;
                   return (
                   <div key={suggestion.id} style={{
-                    padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
-                    marginBottom: '0.5rem', fontSize: '0.85rem',
+                    padding: '0.53rem', borderRadius: '0.425rem', background: 'var(--bg-primary)',
+                    marginBottom: '0.425rem', fontSize: '0.72rem',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{suggestion.ign}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '0.125rem' }}>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '0.1rem' }}>
                           <span style={{ color: getRankColor(suggestion.currentRank) }}>{suggestion.currentRank}</span>
                           {nextRank && (
                             <>
@@ -570,22 +570,22 @@ export default function ExecPromotionsPage() {
                             </>
                           )}
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           suggested by {suggestion.suggestedByIgn}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.21rem' }}>
                         {nextRank && !stagedUuids.has(suggestion.uuid) && !pendingUuids.has(suggestion.uuid) && (
                           <button
                             onClick={() => handleSingleStage(suggestion.uuid, suggestion.ign, suggestion.currentRank, nextRank, 'promote', suggestion.discordId)}
-                            style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                            style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                           >
                             Stage
                           </button>
                         )}
                         <button
                           onClick={() => removeSuggestion(suggestion.id)}
-                          style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                          style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                         >
                           Remove
                         </button>
@@ -600,16 +600,16 @@ export default function ExecPromotionsPage() {
         </div>
 
         {/* Column 3: Staged Actions + Pending Queue + History */}
-        <div style={{ flex: '1.5 1 0', minWidth: '200px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.75rem' }}>
+        <div style={{ flex: '1.5 1 0', minWidth: '170px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.64rem' }}>
           {/* Staged Actions */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
-              <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.64rem', flexShrink: 0 }}>
+              <h2 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Staged Actions
                 {stagedActions.length > 0 && (
                   <span style={{
-                    fontSize: '0.75rem', fontWeight: '600', background: 'var(--color-ocean-400)', color: '#fff',
-                    padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
+                    fontSize: '0.64rem', fontWeight: '600', background: 'var(--color-ocean-400)', color: '#fff',
+                    padding: '0.085rem 0.34rem', borderRadius: '0.21rem', marginLeft: '0.425rem',
                   }}>
                     {stagedActions.length}
                   </span>
@@ -619,19 +619,19 @@ export default function ExecPromotionsPage() {
 
             <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
               {stagedActions.length === 0 ? (
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.72rem', fontStyle: 'italic', margin: 0 }}>
                   No staged actions. Use the buttons on the left to stage promotions, demotions, or removals.
                 </p>
               ) : (
                 stagedActions.map(action => (
                   <div key={action.uuid} style={{
-                    padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
-                    marginBottom: '0.5rem', fontSize: '0.85rem',
+                    padding: '0.53rem', borderRadius: '0.425rem', background: 'var(--bg-primary)',
+                    marginBottom: '0.425rem', fontSize: '0.72rem',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{action.ign}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           {action.actionType === 'remove' ? (
                             <span><span style={{ color: getRankColor(action.currentRank) }}>{action.currentRank}</span> {'\u2192'} Remove</span>
                           ) : (
@@ -645,7 +645,7 @@ export default function ExecPromotionsPage() {
                       </div>
                       <button
                         onClick={() => removeStagedAction(action.uuid)}
-                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                       >
                         Remove
                       </button>
@@ -656,7 +656,7 @@ export default function ExecPromotionsPage() {
             </div>
 
             {stagedActions.length > 0 && (
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexShrink: 0, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.425rem', marginTop: '0.64rem', flexShrink: 0, flexWrap: 'wrap' }}>
                 <button
                   onClick={handleSubmitQueue}
                   disabled={submitting}
@@ -687,13 +687,13 @@ export default function ExecPromotionsPage() {
           </div>
 
           {/* Pending queue */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem', flexShrink: 0 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
+            <h2 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.64rem', flexShrink: 0 }}>
               Pending Queue
               {pendingQueue.length > 0 && (
                 <span style={{
-                  fontSize: '0.75rem', fontWeight: '600', background: '#f59e0b', color: '#fff',
-                  padding: '0.1rem 0.4rem', borderRadius: '0.25rem', marginLeft: '0.5rem',
+                  fontSize: '0.64rem', fontWeight: '600', background: '#f59e0b', color: '#fff',
+                  padding: '0.085rem 0.34rem', borderRadius: '0.21rem', marginLeft: '0.425rem',
                 }}>
                   {pendingQueue.length}
                 </span>
@@ -702,17 +702,17 @@ export default function ExecPromotionsPage() {
 
             <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
               {pendingQueue.length === 0 ? (
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>No pending actions</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.72rem', fontStyle: 'italic', margin: 0 }}>No pending actions</p>
               ) : (
                 pendingQueue.map(entry => (
                   <div key={entry.id} style={{
-                    padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--bg-primary)',
-                    marginBottom: '0.5rem', fontSize: '0.85rem',
+                    padding: '0.53rem', borderRadius: '0.425rem', background: 'var(--bg-primary)',
+                    marginBottom: '0.425rem', fontSize: '0.72rem',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{entry.ign}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           {entry.actionType === 'remove' ? (
                             <span><span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span> {'\u2192'} Remove</span>
                           ) : (
@@ -723,13 +723,13 @@ export default function ExecPromotionsPage() {
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.125rem' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           by {entry.queuedByIgn}
                         </div>
                       </div>
                       <button
                         onClick={() => cancelQueueEntry(entry.id)}
-                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.2rem 0.4rem', fontSize: '0.7rem' }}
+                        style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
                       >
                         Cancel
                       </button>
@@ -741,44 +741,44 @@ export default function ExecPromotionsPage() {
           </div>
 
           {/* History (collapsible, shares column with queue) */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', flexShrink: 0, maxHeight: showHistory ? '50%' : 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', flexShrink: 0, maxHeight: showHistory ? '50%' : 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div
               onClick={() => setShowHistory(!showHistory)}
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', flexShrink: 0 }}
             >
-              <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+              <h2 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Recent History
-                <span style={{ fontSize: '0.8rem', fontWeight: '400', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
+                <span style={{ fontSize: '0.68rem', fontWeight: '400', color: 'var(--text-secondary)', marginLeft: '0.425rem' }}>
                   ({recentHistory.length})
                 </span>
               </h2>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{showHistory ? '\u25B2' : '\u25BC'}</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.68rem' }}>{showHistory ? '\u25B2' : '\u25BC'}</span>
             </div>
 
             {showHistory && (
-              <div className="themed-scrollbar" style={{ marginTop: '0.75rem', overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
+              <div className="themed-scrollbar" style={{ marginTop: '0.64rem', overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
                 {recentHistory.length === 0 ? (
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>No recent history</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.72rem', fontStyle: 'italic', margin: 0 }}>No recent history</p>
                 ) : (
                   recentHistory.map(entry => (
                     <div key={entry.id} style={{
-                      padding: '0.5rem', borderRadius: '0.375rem', background: 'var(--bg-primary)',
-                      marginBottom: '0.375rem', fontSize: '0.8rem',
+                      padding: '0.425rem', borderRadius: '0.32rem', background: 'var(--bg-primary)',
+                      marginBottom: '0.32rem', fontSize: '0.68rem',
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{entry.ign}</span>
                         <span style={{
-                          fontSize: '0.7rem', fontWeight: '600',
+                          fontSize: '0.6rem', fontWeight: '600',
                           color: entry.status === 'completed' ? '#22c55e' : '#ef4444',
                         }}>
                           {entry.status === 'completed' ? 'Done' : 'Failed'}
                         </span>
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      <div style={{ fontSize: '0.64rem', color: 'var(--text-secondary)' }}>
                         {entry.actionType === 'remove' ? 'Removed' : `${entry.currentRank} \u2192 ${entry.newRank}`}
                         {entry.errorMessage && <span style={{ color: '#ef4444' }}> — {entry.errorMessage}</span>}
                       </div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                      <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>
                         {entry.completedAt ? new Date(entry.completedAt).toLocaleString() : ''}
                       </div>
                     </div>
@@ -802,14 +802,14 @@ export default function ExecPromotionsPage() {
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              background: '#1a1a2e', borderRadius: '0.75rem', border: '1px solid var(--border-card)',
-              padding: '1.5rem', width: '500px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+              background: '#1a1a2e', borderRadius: '0.64rem', border: '1px solid var(--border-card)',
+              padding: '1.28rem', width: '425px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
             }}
           >
-            <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem' }}>
+            <h2 style={{ fontSize: '0.94rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.64rem' }}>
               Promotion Wave List
             </h2>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.75rem' }}>
+            <p style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', margin: '0 0 0.64rem' }}>
               Copy the text below and paste it directly into Discord.
             </p>
             <textarea
@@ -817,13 +817,13 @@ export default function ExecPromotionsPage() {
               value={generatePromotionList()}
               style={{
                 background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
-                borderRadius: '0.5rem', padding: '0.75rem', color: 'var(--text-primary)',
-                fontSize: '0.85rem', fontFamily: 'monospace', resize: 'vertical',
-                minHeight: '200px', flex: 1, outline: 'none',
+                borderRadius: '0.425rem', padding: '0.64rem', color: 'var(--text-primary)',
+                fontSize: '0.72rem', fontFamily: 'monospace', resize: 'vertical',
+                minHeight: '170px', flex: 1, outline: 'none',
               }}
               onFocus={e => e.target.select()}
             />
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '0.425rem', marginTop: '0.64rem', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(generatePromotionList());
