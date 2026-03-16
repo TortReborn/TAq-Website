@@ -487,7 +487,7 @@ export default function ExecPromotionsPage() {
                           {member.ign}
                           {isPending && <span style={{ fontSize: '0.6rem', color: '#f59e0b', marginLeft: '0.425rem' }}>Queued</span>}
                           {isStaged && <span style={{ fontSize: '0.6rem', color: 'var(--color-ocean-400)', marginLeft: '0.425rem' }}>Staged</span>}
-                          {isSuggested && <span style={{ fontSize: '0.6rem', color: '#a855f7', marginLeft: '0.425rem' }}>Suggested</span>}
+                          {isSuggested && !isStaged && <span style={{ fontSize: '0.6rem', color: '#a855f7', marginLeft: '0.425rem' }}>Suggested</span>}
                         </td>
                         <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.68rem', color: getRankColor(member.rank), fontWeight: '600' }}>
                           {member.rank || '\u2014'}
