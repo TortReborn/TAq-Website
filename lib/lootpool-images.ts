@@ -111,7 +111,7 @@ export const getImageForItem = (itemName: string): string => {
 export const raidImageMap: { [key: string]: string } = {
   "TNA": "TNA.png",
   "TCC": "TCC.png", 
-  "NOL": "NoL.png",
+  "NOL": "NOL.png",
   "NOTG": "NOTG.png"
 };
 
