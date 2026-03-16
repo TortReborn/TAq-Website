@@ -42,16 +42,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'IGN is required' }, { status: 400 });
     }
 
+    const trimmedIgn = ign.trim();
+
+    // Look up the real Minecraft UUID via Mojang API
+    const mojangRes = await fetch(
+      `https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(trimmedIgn)}`,
+      { signal: AbortSignal.timeout(8000) }
+    );
+
+    if (mojangRes.status === 404 || mojangRes.status === 204) {
+      return NextResponse.json({ error: 'Player not found' }, { status: 400 });
+    }
+
+    if (!mojangRes.ok) {
+      return NextResponse.json({ error: 'Could not verify player. Try again later.' }, { status: 502 });
+    }
+
+    const mojangData = await mojangRes.json();
+    const username: string = mojangData.name;
+    const rawUuid: string = mojangData.id;
+    const uuid = [
+      rawUuid.slice(0, 8),
+      rawUuid.slice(8, 12),
+      rawUuid.slice(12, 16),
+      rawUuid.slice(16, 20),
+      rawUuid.slice(20),
+    ].join('-');
+
     const pool = getPool();
     await pool.query(
       `INSERT INTO blacklist (uuid, ign, reason)
-       VALUES (gen_random_uuid(), $1, $2)
-       ON CONFLICT (ign) DO UPDATE SET reason = $2`,
-      [ign.trim(), reason?.trim() || null]
+       VALUES ($1, $2, $3)
+       ON CONFLICT (uuid) DO UPDATE SET ign = EXCLUDED.ign, reason = EXCLUDED.reason`,
+      [uuid, username, reason?.trim() || null]
     );
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.name === 'TimeoutError' || error?.name === 'AbortError') {
+      return NextResponse.json({ error: 'Player lookup timed out. Try again.' }, { status: 504 });
+    }
     console.error('Blacklist add error:', error);
     return NextResponse.json({ error: 'Failed to add to blacklist' }, { status: 500 });
   }
