@@ -1,3 +1,13 @@
+:root {
+  color-scheme: dark;
+}
+
+select,
+select option {
+  background-color: var(--bg-primary, #1a1a2e);
+  color: var(--text-primary, #e2e8f0);
+}
+
 /* Members page responsive styles */
 .members-header-container {
   display: flex;

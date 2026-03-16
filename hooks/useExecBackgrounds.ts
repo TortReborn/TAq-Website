@@ -91,6 +91,17 @@ export function useExecBackgrounds() {
     mutate();
   };
 
+  const removeBackground = async (discordId: string, backgroundId: number) => {
+    const res = await fetch('/api/exec/backgrounds', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'remove', discordId, backgroundId }),
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Failed to remove background');
+    mutate();
+  };
+
   const fetchUserCustomization = async (discordId: string): Promise<UserCustomization> => {
     const res = await fetch(`/api/exec/backgrounds/user?discordId=${encodeURIComponent(discordId)}`);
     const d = await res.json();
@@ -109,6 +120,7 @@ export function useExecBackgrounds() {
     uploadBackground,
     editBackground,
     unlockBackground,
+    removeBackground,
     setBackground,
     setGradient,
     fetchUserCustomization,

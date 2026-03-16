@@ -383,6 +383,52 @@ export async function PUT(request: NextRequest) {
 
       return NextResponse.json({ success: true });
 
+    } else if (action === 'remove') {
+      const { discordId, backgroundId } = body;
+      if (!discordId || backgroundId == null) {
+        return NextResponse.json({ error: 'Missing discordId or backgroundId' }, { status: 400 });
+      }
+
+      // Get background name for audit log
+      const bgResult = await pool.query(`SELECT name FROM profile_backgrounds WHERE id = $1`, [backgroundId]);
+      const bgName = bgResult.rows[0]?.name || `ID ${backgroundId}`;
+
+      // Get current customization
+      const custResult = await pool.query(
+        `SELECT owned, background FROM profile_customization WHERE "user" = $1`, [discordId]
+      );
+
+      if (custResult.rows.length === 0) {
+        return NextResponse.json({ error: 'User has no customization data' }, { status: 404 });
+      }
+
+      const row = custResult.rows[0];
+      const owned: number[] = row.owned ?? [];
+      const activeBackground: number = row.background ?? 0;
+
+      if (!owned.includes(backgroundId)) {
+        return NextResponse.json({ error: 'User does not own this background' }, { status: 400 });
+      }
+
+      const newOwned = owned.filter((id: number) => id !== backgroundId);
+      const newActive = activeBackground === backgroundId ? 1 : activeBackground;
+
+      await pool.query(
+        `UPDATE profile_customization SET owned = $1, background = $2 WHERE "user" = $3`,
+        [JSON.stringify(newOwned), newActive, discordId]
+      );
+
+      // Resolve target IGN
+      const targetResult = await pool.query(`SELECT ign FROM discord_links WHERE discord_id = $1`, [discordId]);
+      const targetIgn = targetResult.rows[0]?.ign || discordId;
+
+      await pool.query(
+        `INSERT INTO audit_log (log_type, actor_name, actor_id, action) VALUES ('background', $1, $2, $3)`,
+        [session.ign, session.discord_id, `removed ${bgName} (${backgroundId}) from ${targetIgn} (${discordId})${activeBackground === backgroundId ? ' and reset to default' : ''}`]
+      );
+
+      return NextResponse.json({ success: true });
+
     } else {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }

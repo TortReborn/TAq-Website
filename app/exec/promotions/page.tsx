@@ -306,7 +306,7 @@ export default function ExecPromotionsPage() {
 
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', height: 'calc(100vh - 14rem)', minHeight: '500px' }}>
         {/* Column 1: Member roster */}
-        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ flex: '5 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Controls */}
           <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', marginBottom: '0.75rem', flexShrink: 0 }}>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
@@ -520,7 +520,7 @@ export default function ExecPromotionsPage() {
         </div>
 
         {/* Column 2: Promo List */}
-        <div style={{ flex: '0 0 280px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ flex: '1.5 1 0', minWidth: '200px', display: 'flex', flexDirection: 'column', height: '100%' }}>
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
               <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
@@ -599,9 +599,10 @@ export default function ExecPromotionsPage() {
           </div>
         </div>
 
-        {/* Column 3: Staged Actions */}
-        <div style={{ flex: '0 0 280px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+        {/* Column 3: Staged Actions + Pending Queue + History */}
+        <div style={{ flex: '1.5 1 0', minWidth: '200px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.75rem' }}>
+          {/* Staged Actions */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexShrink: 0 }}>
               <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Staged Actions
@@ -684,10 +685,7 @@ export default function ExecPromotionsPage() {
               </div>
             )}
           </div>
-        </div>
 
-        {/* Column 4: Pending Queue + History */}
-        <div style={{ flex: '0 0 280px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.75rem' }}>
           {/* Pending queue */}
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
             <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem', flexShrink: 0 }}>

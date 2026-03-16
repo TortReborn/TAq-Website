@@ -16,7 +16,7 @@ export default function ExecBackgroundsPage() {
   const {
     backgrounds, members, discordLinks, auditLog,
     loading, error, refresh,
-    uploadBackground, editBackground, unlockBackground, setBackground, setGradient, fetchUserCustomization,
+    uploadBackground, editBackground, unlockBackground, removeBackground, setBackground, setGradient, fetchUserCustomization,
   } = useExecBackgrounds();
 
   const [activeTab, setActiveTab] = useState<Tab>('manage');
@@ -53,6 +53,7 @@ export default function ExecBackgroundsPage() {
     background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
     borderRadius: '0.375rem', padding: '0.5rem 0.75rem',
     color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none', width: '100%',
+    colorScheme: 'dark',
   };
   const btnStyle: React.CSSProperties = {
     padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none',
@@ -109,6 +110,13 @@ export default function ExecBackgroundsPage() {
     try {
       const cust = await fetchUserCustomization(discordId);
       setUserCustomization(cust);
+      if (cust.gradient) {
+        setGradTop(cust.gradient[0]);
+        setGradBottom(cust.gradient[1]);
+      } else {
+        setGradTop('#000000');
+        setGradBottom('#000000');
+      }
     } catch (e: any) {
       setActionError(e.message);
       setUserCustomization(null);
@@ -185,6 +193,19 @@ export default function ExecBackgroundsPage() {
     try {
       await setGradient(selectedMember.discordId, gradTop, gradBottom);
       setActionSuccess(`Set gradient for ${selectedMember.ign}`);
+      loadUserCustomization(selectedMember.discordId);
+    } catch (e: any) {
+      setActionError(e.message);
+    }
+  };
+
+  const handleRemoveBg = async (backgroundId: number) => {
+    if (!selectedMember) return;
+    clearFeedback();
+    try {
+      await removeBackground(selectedMember.discordId, backgroundId);
+      const bgName = backgrounds.find(b => b.id === backgroundId)?.name || backgroundId;
+      setActionSuccess(`Removed background ${bgName} from ${selectedMember.ign}`);
       loadUserCustomization(selectedMember.discordId);
     } catch (e: any) {
       setActionError(e.message);
@@ -530,9 +551,25 @@ export default function ExecBackgroundsPage() {
                             background: 'var(--bg-card)', border: '1px solid var(--border-card)',
                             borderRadius: '0.25rem', padding: '0.15rem 0.4rem', fontSize: '0.75rem',
                             color: 'var(--text-primary)', fontWeight: '500',
+                            display: 'flex', alignItems: 'center', gap: '0.3rem',
                           }}>
-                            {id}
-                            {backgrounds.find(b => b.id === id) && ` - ${backgrounds.find(b => b.id === id)!.name}`}
+                            <span>
+                              {id}
+                              {backgrounds.find(b => b.id === id) && ` - ${backgrounds.find(b => b.id === id)!.name}`}
+                            </span>
+                            {id !== 1 && (
+                              <button
+                                onClick={() => handleRemoveBg(id)}
+                                title="Remove this background from user"
+                                style={{
+                                  background: 'none', border: 'none', color: '#ef4444',
+                                  cursor: 'pointer', fontSize: '0.85rem', lineHeight: 1,
+                                  padding: '0 0.1rem', fontWeight: '700',
+                                }}
+                              >
+                                &times;
+                              </button>
+                            )}
                           </div>
                         ))
                       )}
