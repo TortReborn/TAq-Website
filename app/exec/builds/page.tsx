@@ -543,9 +543,10 @@ export default function ExecBuildsPage() {
                                     ref={dropdownRef}
                                     style={{
                                       position: 'absolute',
-                                      top: '100%',
+                                      ...(idx >= filteredMembers.length - 3
+                                        ? { bottom: '100%', marginBottom: '0.21rem' }
+                                        : { top: '100%', marginTop: '0.21rem' }),
                                       left: 0,
-                                      marginTop: '0.21rem',
                                       background: 'var(--bg-card-solid)',
                                       border: '1px solid var(--border-card)',
                                       borderRadius: '0.425rem',
