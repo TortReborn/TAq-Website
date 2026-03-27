@@ -102,7 +102,7 @@ function buildQuery(base: string, params: Record<string, any>): string {
 }
 
 export function useExecSnipeMeta() {
-  const { data, error, isLoading } = useSWR<SnipeMetaData>(
+  const { data, error, isLoading, mutate } = useSWR<SnipeMetaData>(
     '/api/exec/snipes/meta',
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 60000, dedupingInterval: 30000 }
@@ -118,6 +118,7 @@ export function useExecSnipeMeta() {
     guildMembers: data?.guildMembers || [],
     loading: isLoading,
     error,
+    mutate,
   };
 }
 

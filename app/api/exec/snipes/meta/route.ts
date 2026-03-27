@@ -5,6 +5,33 @@ import { ALL_TERRITORY_NAMES, TERRITORY_ROUTE_COUNTS } from '@/lib/snipe-constan
 
 export const dynamic = 'force-dynamic';
 
+// PATCH — Update current season
+export async function PATCH(request: NextRequest) {
+  const session = await requireExecSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { season } = await request.json();
+    if (typeof season !== 'number' || season < 1 || !Number.isInteger(season)) {
+      return NextResponse.json({ error: 'Invalid season number' }, { status: 400 });
+    }
+
+    const pool = getPool();
+    await pool.query(
+      `INSERT INTO snipe_settings (key, value) VALUES ('current_season', $1)
+       ON CONFLICT (key) DO UPDATE SET value = $1`,
+      [String(season)]
+    );
+
+    return NextResponse.json({ success: true, season });
+  } catch (error) {
+    console.error('Season update error:', error);
+    return NextResponse.json({ error: 'Failed to update season' }, { status: 500 });
+  }
+}
+
 // GET — Territory list, current season, distinct IGN list, territory route counts
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
