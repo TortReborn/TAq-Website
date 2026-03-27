@@ -9,7 +9,7 @@ const needed = [
   'discord_links','new_app','profile_backgrounds','profile_customization','shells',
   'aspect_queue','aspect_blacklist','uncollected_raids','distribution_log',
   'graid_events','graid_event_totals','player_activity','guild_bank_transactions',
-  'guild_settings','api_keys','cache_entries','territory_snapshots','le_balance_log',
+  'guild_settings','api_keys','cache_entries','le_balance_log',
   'agenda_bau_topics','agenda_requested_topics','audit_log','applications',
   'application_votes','blacklist','kick_list','bot_settings','promotion_queue',
   'guild_generated_colors','guild_prefixes','territory_exchanges','promo_suggestions',
