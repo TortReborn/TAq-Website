@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +40,16 @@ function nameToKey(name: string): string {
 function s3IconKey(category: string, nameKey: string): string {
   const safe = nameKey.replace(/ /g, '_');
   return `shell_exchange/${category}/${safe}.png`;
+}
+
+/** Convert any supported image (PNG, WebP, JPEG, GIF) to 32x32 PNG */
+async function toPng(raw: Buffer): Promise<Buffer> {
+  const img = sharp(raw);
+  const meta = await img.metadata();
+  if (!meta.width || !meta.height) throw new Error('Could not read image dimensions');
+  const valid = (meta.width === 16 && meta.height === 16) || (meta.width === 32 && meta.height === 32);
+  if (!valid) throw new Error(`Image must be 16x16 or 32x32 pixels (got ${meta.width}x${meta.height})`);
+  return img.png().toBuffer();
 }
 
 type CacheKey = 'shellExchangeIngs' | 'shellExchangeMats';
@@ -125,21 +136,11 @@ export async function POST(request: NextRequest) {
     if (type !== 'ingredient' && type !== 'material') {
       return NextResponse.json({ error: 'Type must be "ingredient" or "material"' }, { status: 400 });
     }
-    if (image.type !== 'image/png') {
-      return NextResponse.json({ error: 'Image must be PNG format' }, { status: 400 });
-    }
-
-    const buffer = Buffer.from(await image.arrayBuffer());
-
-    // Validate PNG header and dimensions (16x16 or 32x32)
-    if (buffer.length < 24 || buffer.readUInt32BE(0) !== 0x89504E47) {
-      return NextResponse.json({ error: 'Invalid PNG file' }, { status: 400 });
-    }
-    const width = buffer.readUInt32BE(16);
-    const height = buffer.readUInt32BE(20);
-    const validSize = (width === 16 && height === 16) || (width === 32 && height === 32);
-    if (!validSize) {
-      return NextResponse.json({ error: `Image must be 16x16 or 32x32 pixels (got ${width}x${height})` }, { status: 400 });
+    let buffer: Buffer;
+    try {
+      buffer = await toPng(Buffer.from(await image.arrayBuffer()));
+    } catch (e: any) {
+      return NextResponse.json({ error: e.message || 'Invalid image file' }, { status: 400 });
     }
 
     const key = nameToKey(name);
@@ -236,25 +237,18 @@ export async function PUT(request: NextRequest) {
 
     // Update image if provided
     if (image) {
-      if (image.type !== 'image/png') {
-        return NextResponse.json({ error: 'Image must be PNG format' }, { status: 400 });
-      }
-      const buffer = Buffer.from(await image.arrayBuffer());
-      if (buffer.length < 24 || buffer.readUInt32BE(0) !== 0x89504E47) {
-        return NextResponse.json({ error: 'Invalid PNG file' }, { status: 400 });
-      }
-      const width = buffer.readUInt32BE(16);
-      const height = buffer.readUInt32BE(20);
-      const validSize = (width === 16 && height === 16) || (width === 32 && height === 32);
-      if (!validSize) {
-        return NextResponse.json({ error: `Image must be 16x16 or 32x32 pixels (got ${width}x${height})` }, { status: 400 });
+      let imgBuffer: Buffer;
+      try {
+        imgBuffer = await toPng(Buffer.from(await image.arrayBuffer()));
+      } catch (e: any) {
+        return NextResponse.json({ error: e.message || 'Invalid image file' }, { status: 400 });
       }
 
       const { client, bucket } = getS3();
       await client.send(new PutObjectCommand({
         Bucket: bucket,
         Key: s3IconKey(category, existingKey),
-        Body: buffer,
+        Body: imgBuffer,
         ContentType: 'image/png',
       }));
       // Bump image version for cache busting

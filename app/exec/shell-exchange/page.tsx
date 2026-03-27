@@ -222,10 +222,10 @@ export default function ExecShellExchangePage() {
               />
             </div>
             <div>
-              <label style={labelStyle}>Image (16x16 or 32x32 PNG)</label>
+              <label style={labelStyle}>Image (16x16 or 32x32)</label>
               <input
                 type="file"
-                accept="image/png"
+                accept="image/png,image/webp,image/jpeg,image/gif"
                 onChange={e => setAddFile(e.target.files?.[0] ?? null)}
                 style={{ ...inputStyle, padding: '0.35rem 0.75rem' }}
               />
@@ -269,7 +269,7 @@ export default function ExecShellExchangePage() {
                             width={32} height={32}
                             style={{ imageRendering: 'pixelated' }}
                           />
-                          <input type="file" accept="image/png" onChange={e => setEditFile(e.target.files?.[0] ?? null)} style={{ ...inputStyle, width: '140px', padding: '0.2rem', fontSize: '0.7rem' }} />
+                          <input type="file" accept="image/png,image/webp,image/jpeg,image/gif" onChange={e => setEditFile(e.target.files?.[0] ?? null)} style={{ ...inputStyle, width: '140px', padding: '0.2rem', fontSize: '0.7rem' }} />
                         </div>
                       </td>
                       <td style={tdStyle}>{item.name}</td>
@@ -355,7 +355,7 @@ export default function ExecShellExchangePage() {
                     <td style={tdStyle} rowSpan={1}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <img src={iconUrl('mats', item.key, item.iv)} alt={item.name} width={32} height={32} style={{ imageRendering: 'pixelated' }} />
-                        <input type="file" accept="image/png" onChange={e => setEditFile(e.target.files?.[0] ?? null)} style={{ ...inputStyle, width: '140px', padding: '0.2rem', fontSize: '0.7rem' }} />
+                        <input type="file" accept="image/png,image/webp,image/jpeg,image/gif" onChange={e => setEditFile(e.target.files?.[0] ?? null)} style={{ ...inputStyle, width: '140px', padding: '0.2rem', fontSize: '0.7rem' }} />
                       </div>
                     </td>
                     <td style={tdStyle}>{item.name}</td>
