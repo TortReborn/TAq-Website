@@ -51,6 +51,10 @@ export default function SnipeLogForm({ meta }: Props) {
     { ign: '', role: 'Healer' },
   ];
   const [participants, setParticipants] = useState<SnipeParticipant[]>(defaultSlots);
+  const [logToChannel, setLogToChannel] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -74,6 +78,10 @@ export default function SnipeLogForm({ meta }: Props) {
       return () => window.removeEventListener('scroll', onScroll, true);
     }
   }, [showHqDropdown, hqSearch]);
+
+  useEffect(() => {
+    return () => { if (imagePreview) URL.revokeObjectURL(imagePreview); };
+  }, [imagePreview]);
 
   const snipedHqSet = useMemo(() => new Set(meta.snipedHqs.map(h => h.toLowerCase())), [meta.snipedHqs]);
 
@@ -141,7 +149,7 @@ export default function SnipeLogForm({ meta }: Props) {
   const filledParticipants = participants.filter(p => p.ign.trim());
   const filledCount = filledParticipants.length;
   const allFilledValid = filledParticipants.every(p => guildMemberSet.has(p.ign.trim().toLowerCase()));
-  const isValid = hq && difficulty && parseInt(difficulty, 10) > 0 && guildTag.trim() && filledCount >= 1 && allFilledValid;
+  const isValid = hq && difficulty && parseInt(difficulty, 10) > 0 && guildTag.trim() && filledCount >= 1 && allFilledValid && (!logToChannel || image !== null);
 
   const handleSubmit = async () => {
     if (!isValid) return;
@@ -158,8 +166,12 @@ export default function SnipeLogForm({ meta }: Props) {
         snipedAt: snipedAt ? new Date(snipedAt).toISOString() : undefined,
         season: parseInt(season, 10),
         participants: filledParticipants.map(p => ({ ign: p.ign.trim(), role: p.role })),
-      });
-      setSuccess(`Snipe #${result.id} logged successfully!`);
+        logToChannel,
+        notes: logToChannel ? notes.trim() || undefined : undefined,
+      }, logToChannel ? image ?? undefined : undefined);
+      let msg = `Snipe #${result.id} logged successfully!`;
+      if (result.warning) msg += ` (${result.warning})`;
+      setSuccess(msg);
       setShowConfirm(false);
       // Reset form
       setHq('');
@@ -169,6 +181,10 @@ export default function SnipeLogForm({ meta }: Props) {
       setConns('0');
       setSnipedAt('');
       setParticipants(defaultSlots.map(s => ({ ...s })));
+      setLogToChannel(false);
+      setImage(null);
+      setImagePreview(null);
+      setNotes('');
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -304,6 +320,64 @@ export default function SnipeLogForm({ meta }: Props) {
         </div>
       </div>
 
+      {/* Post to Channel Toggle */}
+      <div style={{ marginBottom: '1rem' }}>
+        <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={logToChannel}
+            onChange={e => {
+              setLogToChannel(e.target.checked);
+              if (!e.target.checked) {
+                setImage(null);
+                setImagePreview(null);
+                setNotes('');
+              }
+            }}
+            style={{ accentColor: '#22c55e' }}
+          />
+          Post to snipe log channel
+        </label>
+
+        {logToChannel && (
+          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--bg-primary)', borderRadius: '0.5rem', border: '1px solid var(--border-card)' }}>
+            {/* Image Upload */}
+            <div style={{ marginBottom: '0.75rem' }}>
+              <label style={labelStyle}>Screenshot (required)</label>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={e => {
+                  const file = e.target.files?.[0] || null;
+                  setImage(file);
+                  if (imagePreview) URL.revokeObjectURL(imagePreview);
+                  if (file) {
+                    setImagePreview(URL.createObjectURL(file));
+                  } else {
+                    setImagePreview(null);
+                  }
+                }}
+                style={{ ...inputStyle, padding: '0.4rem' }}
+              />
+              {imagePreview && (
+                <img src={imagePreview} alt="Preview" style={{ marginTop: '0.5rem', maxWidth: '300px', maxHeight: '200px', borderRadius: '0.375rem', border: '1px solid var(--border-card)' }} />
+              )}
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label style={labelStyle}>Notes (optional)</label>
+              <input
+                style={inputStyle}
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                placeholder="Additional notes for the channel post"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Participants + Review/Submit side by side */}
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-end' }}>
         {/* Participants */}
@@ -389,6 +463,11 @@ export default function SnipeLogForm({ meta }: Props) {
                   <div><strong>Conns:</strong> {conns}{drySnipe ? ' (DRY)' : ''}</div>
                   <div><strong>Season:</strong> {season}</div>
                   <div><strong>Date:</strong> {snipedAt ? new Date(snipedAt).toLocaleDateString() : 'Now'}</div>
+                  {logToChannel && (
+                    <div style={{ color: '#f59e0b', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                      Will post to snipe log channel{notes.trim() ? ' + notes' : ''}
+                    </div>
+                  )}
                 </div>
                 <div style={{ fontSize: '0.8rem', lineHeight: '1.5' }}>
                   <div style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Participants</div>

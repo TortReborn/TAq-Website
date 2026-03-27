@@ -207,12 +207,25 @@ export function useExecSnipeMutations() {
     snipedAt?: string;
     season?: number;
     participants: SnipeParticipant[];
-  }) => {
-    const res = await fetch('/api/exec/snipes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    logToChannel?: boolean;
+    notes?: string;
+  }, image?: File) => {
+    let res: Response;
+    if (body.logToChannel && image) {
+      const formData = new FormData();
+      formData.append('data', JSON.stringify(body));
+      formData.append('image', image);
+      res = await fetch('/api/exec/snipes', {
+        method: 'POST',
+        body: formData,
+      });
+    } else {
+      res = await fetch('/api/exec/snipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    }
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to create snipe');
     return data;

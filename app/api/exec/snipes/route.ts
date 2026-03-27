@@ -1,9 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
-import { normalizeHq, LIST_ORDER_SQL } from '@/lib/snipe-constants';
+import { normalizeHq, isDry, LIST_ORDER_SQL } from '@/lib/snipe-constants';
 
 export const dynamic = 'force-dynamic';
+
+// --- Discord channel posting helpers ---
+
+function isTestMode(): boolean {
+  const v = process.env.TEST_MODE;
+  if (!v) return false;
+  const s = v.toLowerCase().trim();
+  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
+}
+
+function getBotToken(): string | undefined {
+  return isTestMode() ? process.env.TEST_DISCORD_BOT_TOKEN : process.env.DISCORD_BOT_TOKEN;
+}
+
+function getSnipeLogChannelId(): string | undefined {
+  return isTestMode() ? process.env.TEST_SNIPE_LOG_CHANNEL_ID : process.env.SNIPE_LOG_CHANNEL_ID;
+}
+
+function formatParticipantsLog(participants: { ign: string; role: string }[]): string {
+  const roleOrder = ['Healer', 'Tank', 'DPS'];
+  const grouped: Record<string, string[]> = {};
+  for (const p of participants) {
+    if (!grouped[p.role]) grouped[p.role] = [];
+    grouped[p.role].push(p.ign);
+  }
+  const parts: string[] = [];
+  for (const role of roleOrder) {
+    if (grouped[role]?.length) {
+      parts.push(`${grouped[role].join(' ')} ${role}`);
+    }
+  }
+  return parts.join(' / ');
+}
+
+async function postToSnipeLogChannel(
+  logText: string,
+  imageBuffer: Buffer,
+  imageFilename: string,
+): Promise<void> {
+  const botToken = getBotToken();
+  const channelId = getSnipeLogChannelId();
+  if (!botToken || !channelId) {
+    throw new Error('Discord bot token or snipe log channel ID not configured');
+  }
+
+  const formData = new FormData();
+  formData.append('content', logText);
+  formData.append('files[0]', new Blob([imageBuffer]), imageFilename);
+
+  const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: 'POST',
+    headers: { Authorization: `Bot ${botToken}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text();
+    console.error('Discord post failed:', res.status, errBody);
+    throw new Error(`Failed to post to Discord channel: ${res.status}`);
+  }
+}
 
 // GET — List snipes with filtering and pagination
 export async function GET(request: NextRequest) {
@@ -141,7 +202,39 @@ export async function POST(request: NextRequest) {
 
   try {
     const pool = getPool();
-    const body = await request.json();
+
+    // Parse body — supports both JSON and multipart/form-data (when image is attached)
+    const contentType = request.headers.get('content-type') || '';
+    let body: any;
+    let imageBuffer: Buffer | null = null;
+    let imageFilename = 'screenshot.png';
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      const dataField = formData.get('data');
+      if (!dataField || typeof dataField !== 'string') {
+        return NextResponse.json({ error: 'Missing data field' }, { status: 400 });
+      }
+      body = JSON.parse(dataField);
+
+      const imageFile = formData.get('image') as File | null;
+      if (body.logToChannel) {
+        if (!imageFile) {
+          return NextResponse.json({ error: 'Image is required when posting to snipe log channel' }, { status: 400 });
+        }
+        const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
+        if (!validTypes.includes(imageFile.type)) {
+          return NextResponse.json({ error: 'Image must be PNG, JPEG, or WebP' }, { status: 400 });
+        }
+        if (imageFile.size > 8 * 1024 * 1024) {
+          return NextResponse.json({ error: 'Image must be under 8MB' }, { status: 400 });
+        }
+        imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+        imageFilename = imageFile.name || 'screenshot.png';
+      }
+    } else {
+      body = await request.json();
+    }
 
     const { hq, difficulty, guildTag, conns, snipedAt, season, participants } = body;
 
@@ -203,6 +296,32 @@ export async function POST(request: NextRequest) {
        VALUES ('snipe', $1, $2, $3)`,
       [session.ign, session.discord_id, `Logged snipe #${snipeId}: ${normalizedHq} ${difficulty}k vs [${guildTag.toUpperCase()}] with ${participants.length} participants`]
     );
+
+    // Post to Discord snipe log channel if requested
+    if (body.logToChannel && imageBuffer) {
+      try {
+        const snipeDate = new Date(snipedAt || new Date().toISOString());
+        const dateStr = `${String(snipeDate.getUTCDate()).padStart(2, '0')}/${String(snipeDate.getUTCMonth() + 1).padStart(2, '0')}/${String(snipeDate.getUTCFullYear()).slice(-2)}`;
+        const dry = isDry(normalizedHq, conns);
+        const diffLabel = dry ? 'Drysnipe' : `${conns} Conns`;
+        const participantsStr = formatParticipantsLog(participants);
+
+        let logText = `**Date:** ${dateStr}\n`
+          + `**Participants:** ${participantsStr}\n`
+          + `**Location:** ${normalizedHq} (${guildTag.toUpperCase()})\n`
+          + `**Difficulty:** ${diffLabel} / ${difficulty}k\n`
+          + `**Result:** Success`;
+
+        if (body.notes) {
+          logText += `\n**Notes:** ${body.notes}`;
+        }
+
+        await postToSnipeLogChannel(logText, imageBuffer, imageFilename);
+      } catch (discordErr) {
+        console.error('Failed to post to snipe log channel:', discordErr);
+        return NextResponse.json({ success: true, id: snipeId, warning: 'Snipe logged but failed to post to Discord channel' });
+      }
+    }
 
     return NextResponse.json({ success: true, id: snipeId });
   } catch (error) {
