@@ -5,19 +5,51 @@ import sharp from 'sharp';
 
 export const dynamic = 'force-dynamic';
 
-// 32x32 placeholder with "?" — generated once and cached in memory
+// 32x32 placeholder with "?" drawn as raw pixels — generated once and cached
 let _placeholder: Buffer | null = null;
 async function getPlaceholder(): Promise<Buffer> {
   if (_placeholder) return _placeholder;
 
   const size = 32;
-  const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${size}" height="${size}" rx="4" fill="#23272f"/>
-    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"
-      font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#6b7280">?</text>
-  </svg>`;
+  // RGBA raw pixel buffer
+  const pixels = Buffer.alloc(size * size * 4);
 
-  _placeholder = await sharp(Buffer.from(svg)).png().toBuffer();
+  // Fill background #23272f
+  for (let i = 0; i < size * size; i++) {
+    pixels[i * 4] = 0x23;
+    pixels[i * 4 + 1] = 0x27;
+    pixels[i * 4 + 2] = 0x2f;
+    pixels[i * 4 + 3] = 0xff;
+  }
+
+  // Draw "?" in #6b7280 using a bitmap pattern (centered in 32x32)
+  const q: [number, number][] = [
+    // Top curve of ?
+    [13,8],[14,8],[15,8],[16,8],[17,8],[18,8],
+    [12,9],[13,9],[18,9],[19,9],
+    [11,10],[12,10],[19,10],[20,10],
+    [19,11],[20,11],
+    [18,12],[19,12],
+    [17,13],[18,13],
+    [16,14],[17,14],
+    [15,15],[16,15],
+    [15,16],[16,16],
+    [15,17],[16,17],
+    // Dot
+    [15,19],[16,19],
+    [15,20],[16,20],
+  ];
+  for (const [x, y] of q) {
+    const i = (y * size + x) * 4;
+    pixels[i] = 0x9c;
+    pixels[i + 1] = 0xa3;
+    pixels[i + 2] = 0xaf;
+    pixels[i + 3] = 0xff;
+  }
+
+  _placeholder = await sharp(pixels, { raw: { width: size, height: size, channels: 4 } })
+    .png()
+    .toBuffer();
   return _placeholder;
 }
 
