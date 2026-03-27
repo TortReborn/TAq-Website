@@ -62,12 +62,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Image not found' }, { status: 404 });
     }
 
-    return new NextResponse(bytes, {
-      headers: {
-        'Content-Type': 'image/png',
-        'Cache-Control': 'public, max-age=300',
-      },
-    });
+    const etag = resp.ETag ?? null;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'image/png',
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    };
+    if (etag) headers['ETag'] = etag;
+
+    return new NextResponse(bytes, { headers });
   } catch {
     return NextResponse.json({ error: 'Image not found' }, { status: 404 });
   }

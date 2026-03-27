@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
       per: data?.per ?? 1,
       highlight: data?.highlight ?? false,
       toggled: data?.toggled ?? true,
+      iv: data?.iv ?? 0,
     }));
 
     const materials = Object.entries(mats).map(([key, data]) => ({
@@ -95,6 +96,7 @@ export async function GET(request: NextRequest) {
         t2: { shells: data?.t2?.shells ?? 1, per: data?.t2?.per ?? 1, highlight: data?.t2?.highlight ?? false, toggled: data?.t2?.toggled ?? true },
         t3: { shells: data?.t3?.shells ?? 1, per: data?.t3?.per ?? 1, highlight: data?.t3?.highlight ?? false, toggled: data?.t3?.toggled ?? true },
       },
+      iv: data?.iv ?? 0,
     }));
 
     return NextResponse.json({ ingredients, materials });
@@ -153,14 +155,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Add default entry
+    // Add default entry (iv = image version for cache busting)
+    const iv = Date.now();
     if (type === 'ingredient') {
-      data[key] = { shells: 1, per: 1, highlight: false, toggled: true };
+      data[key] = { shells: 1, per: 1, highlight: false, toggled: true, iv };
     } else {
       data[key] = {
         t1: { shells: 1, per: 1, highlight: false, toggled: true },
         t2: { shells: 1, per: 1, highlight: false, toggled: true },
         t3: { shells: 1, per: 1, highlight: false, toggled: true },
+        iv,
       };
     }
 
@@ -253,6 +257,8 @@ export async function PUT(request: NextRequest) {
         Body: buffer,
         ContentType: 'image/png',
       }));
+      // Bump image version for cache busting
+      data[existingKey].iv = Date.now();
       changes.push('image');
     }
 

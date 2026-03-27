@@ -69,8 +69,8 @@ export default function ExecShellExchangePage() {
     </span>
   );
 
-  const iconUrl = (category: string, key: string) =>
-    `/api/exec/shell-exchange/image?category=${category}&key=${encodeURIComponent(key)}`;
+  const iconUrl = (category: string, key: string, iv?: number) =>
+    `/api/exec/shell-exchange/image?category=${category}&key=${encodeURIComponent(key)}${iv ? `&v=${iv}` : ''}`;
 
   // --- Add handler ---
   const handleAdd = async () => {
@@ -264,7 +264,7 @@ export default function ExecShellExchangePage() {
                       <td style={tdStyle}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <img
-                            src={iconUrl('ings', item.key)}
+                            src={iconUrl('ings', item.key, item.iv)}
                             alt={item.name}
                             width={32} height={32}
                             style={{ imageRendering: 'pixelated' }}
@@ -296,7 +296,7 @@ export default function ExecShellExchangePage() {
                     <>
                       <td style={tdStyle}>
                         <img
-                          src={iconUrl('ings', item.key)}
+                          src={iconUrl('ings', item.key, item.iv)}
                           alt={item.name}
                           width={32} height={32}
                           style={{ imageRendering: 'pixelated' }}
@@ -354,7 +354,7 @@ export default function ExecShellExchangePage() {
                   <tr key={item.key} style={{ borderBottom: '1px solid var(--border-card)' }}>
                     <td style={tdStyle} rowSpan={1}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <img src={iconUrl('mats', item.key)} alt={item.name} width={32} height={32} style={{ imageRendering: 'pixelated' }} />
+                        <img src={iconUrl('mats', item.key, item.iv)} alt={item.name} width={32} height={32} style={{ imageRendering: 'pixelated' }} />
                         <input type="file" accept="image/png" onChange={e => setEditFile(e.target.files?.[0] ?? null)} style={{ ...inputStyle, width: '140px', padding: '0.2rem', fontSize: '0.7rem' }} />
                       </div>
                     </td>
@@ -387,7 +387,7 @@ export default function ExecShellExchangePage() {
                       {i === 0 && (
                         <>
                           <td style={tdStyle} rowSpan={3}>
-                            <img src={iconUrl('mats', item.key)} alt={item.name} width={32} height={32} style={{ imageRendering: 'pixelated' }} />
+                            <img src={iconUrl('mats', item.key, item.iv)} alt={item.name} width={32} height={32} style={{ imageRendering: 'pixelated' }} />
                           </td>
                           <td style={tdStyle} rowSpan={3}>{item.name}</td>
                         </>

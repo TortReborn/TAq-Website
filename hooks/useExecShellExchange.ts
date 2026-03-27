@@ -8,6 +8,7 @@ export interface IngredientItem {
   per: number;
   highlight: boolean;
   toggled: boolean;
+  iv: number;
 }
 
 export interface TierData {
@@ -25,6 +26,7 @@ export interface MaterialItem {
     t2: TierData;
     t3: TierData;
   };
+  iv: number;
 }
 
 interface ShellExchangeData {
