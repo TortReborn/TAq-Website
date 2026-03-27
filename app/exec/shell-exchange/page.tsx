@@ -179,30 +179,28 @@ export default function ExecShellExchangePage() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem', width: 'fit-content' }}>
-        {TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => { setActiveTab(tab.key); setEditingKey(null); setShowAdd(false); clearFeedback(); }}
-            style={{
-              ...btnStyle,
-              background: activeTab === tab.key ? 'var(--bg-primary)' : 'transparent',
-              color: activeTab === tab.key ? 'var(--text-primary)' : 'var(--text-secondary)',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Add button */}
-      <div>
+      {/* Tabs + Add button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem', width: 'fit-content' }}>
+          {TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => { setActiveTab(tab.key); setEditingKey(null); setShowAdd(false); clearFeedback(); }}
+              style={{
+                ...btnStyle,
+                background: activeTab === tab.key ? '#3b82f6' : 'transparent',
+                color: activeTab === tab.key ? '#fff' : 'var(--text-secondary)',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={() => { setShowAdd(!showAdd); setEditingKey(null); }}
-          style={{ ...btnStyle, background: '#3b82f6', color: '#fff' }}
+          style={{ ...btnStyle, background: showAdd ? 'rgba(239, 68, 68, 0.15)' : 'rgba(34, 197, 94, 0.15)', color: showAdd ? '#ef4444' : '#22c55e' }}
         >
-          {showAdd ? 'Cancel' : `Add ${activeTab === 'ingredients' ? 'Ingredient' : 'Material'}`}
+          {showAdd ? 'Cancel' : `+ Add ${activeTab === 'ingredients' ? 'Ingredient' : 'Material'}`}
         </button>
       </div>
 
