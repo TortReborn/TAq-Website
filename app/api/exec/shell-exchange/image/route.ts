@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 
 export const dynamic = 'force-dynamic';
+
+// 32x32 placeholder with "?" — generated once and cached in memory
+let _placeholder: Buffer | null = null;
+async function getPlaceholder(): Promise<Buffer> {
+  if (_placeholder) return _placeholder;
+
+  const size = 32;
+  const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${size}" height="${size}" rx="4" fill="#23272f"/>
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"
+      font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#6b7280">?</text>
+  </svg>`;
+
+  _placeholder = await sharp(Buffer.from(svg)).png().toBuffer();
+  return _placeholder;
+}
 
 function truthy(v?: string | null) {
   if (!v) return false;
@@ -59,7 +76,10 @@ export async function GET(request: NextRequest) {
 
     const bytes = await resp.Body?.transformToByteArray();
     if (!bytes) {
-      return NextResponse.json({ error: 'Image not found' }, { status: 404 });
+      const placeholder = await getPlaceholder();
+      return new NextResponse(placeholder, {
+        headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=60' },
+      });
     }
 
     const etag = resp.ETag ?? null;
@@ -72,6 +92,9 @@ export async function GET(request: NextRequest) {
 
     return new NextResponse(bytes, { headers });
   } catch {
-    return NextResponse.json({ error: 'Image not found' }, { status: 404 });
+    const placeholder = await getPlaceholder();
+    return new NextResponse(placeholder, {
+      headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=60' },
+    });
   }
 }
