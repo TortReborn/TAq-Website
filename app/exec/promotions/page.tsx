@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useExecPromotions } from '@/hooks/useExecPromotions';
 import { useExecSession } from '@/hooks/useExecSession';
-import { RANK_HIERARCHY, RANK_ORDER, getRankColor } from '@/lib/rank-constants';
+import { RANK_HIERARCHY, RANK_ORDER, getRankColor, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
 
 interface StagedAction {
   uuid: string;
@@ -45,8 +45,17 @@ export default function ExecPromotionsPage() {
   // Staged UUIDs for showing staged status
   const stagedUuids = useMemo(() => new Set(stagedActions.map(a => a.uuid)), [stagedActions]);
 
+  // Filter promo suggestions: only Narwhal+ can see Hammerhead+ suggestions
+  const visibleSuggestions = useMemo(() => {
+    if (userRankIdx >= PROMO_VISIBILITY_MIN_VIEWER_IDX) return promoSuggestions;
+    return promoSuggestions.filter(s => {
+      const idx = RANK_HIERARCHY.indexOf(s.currentRank);
+      return idx < PROMO_VISIBILITY_RANK_THRESHOLD_IDX;
+    });
+  }, [promoSuggestions, userRankIdx]);
+
   // Suggested UUIDs for showing suggested status
-  const suggestedUuids = useMemo(() => new Set(promoSuggestions.map(s => s.uuid)), [promoSuggestions]);
+  const suggestedUuids = useMemo(() => new Set(visibleSuggestions.map(s => s.uuid)), [visibleSuggestions]);
 
   // Only show members with a rank lower than the user's
   const managableMembers = useMemo(() => {
@@ -194,7 +203,7 @@ export default function ExecPromotionsPage() {
 
   const handleStageAll = () => {
     setActionError(null);
-    for (const suggestion of promoSuggestions) {
+    for (const suggestion of visibleSuggestions) {
       if (stagedUuids.has(suggestion.uuid) || pendingUuids.has(suggestion.uuid)) continue;
       const nextRankIdx = RANK_HIERARCHY.indexOf(suggestion.currentRank) + 1;
       if (nextRankIdx >= RANK_HIERARCHY.length) continue;
@@ -525,16 +534,16 @@ export default function ExecPromotionsPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.64rem', flexShrink: 0 }}>
               <h2 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Promo List
-                {promoSuggestions.length > 0 && (
+                {visibleSuggestions.length > 0 && (
                   <span style={{
                     fontSize: '0.64rem', fontWeight: '600', background: '#a855f7', color: '#fff',
                     padding: '0.085rem 0.34rem', borderRadius: '0.21rem', marginLeft: '0.425rem',
                   }}>
-                    {promoSuggestions.length}
+                    {visibleSuggestions.length}
                   </span>
                 )}
               </h2>
-              {promoSuggestions.length > 0 && (
+              {visibleSuggestions.length > 0 && (
                 <button
                   onClick={handleStageAll}
                   style={{ ...btnStyle, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.21rem 0.425rem', fontSize: '0.6rem' }}
@@ -545,12 +554,12 @@ export default function ExecPromotionsPage() {
             </div>
 
             <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
-              {promoSuggestions.length === 0 ? (
+              {visibleSuggestions.length === 0 ? (
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.72rem', fontStyle: 'italic', margin: 0 }}>
                   No suggestions yet. Use the Suggest button on members to add them here.
                 </p>
               ) : (
-                promoSuggestions.map(suggestion => {
+                visibleSuggestions.map(suggestion => {
                   const nextRankIdx = RANK_HIERARCHY.indexOf(suggestion.currentRank) + 1;
                   const nextRank = nextRankIdx < RANK_HIERARCHY.length ? RANK_HIERARCHY[nextRankIdx] : null;
                   return (

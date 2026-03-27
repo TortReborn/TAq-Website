@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
-import { RANK_HIERARCHY } from '@/lib/rank-constants';
+import { RANK_HIERARCHY, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
@@ -113,11 +113,24 @@ export async function GET(request: NextRequest) {
       discordId: row.discord_id || null,
     }));
 
+    // Filter promo suggestions based on viewer's rank
+    // Only Narwhal+ can see suggestions for Hammerhead+ members
+    let userRankIdx = RANK_HIERARCHY.indexOf(session.rank);
+    if (userRankIdx === -1 && session.rank.includes('Hydra')) {
+      userRankIdx = RANK_HIERARCHY.indexOf('Hydra');
+    }
+    const filteredSuggestions = userRankIdx >= PROMO_VISIBILITY_MIN_VIEWER_IDX
+      ? promoSuggestions
+      : promoSuggestions.filter(s => {
+          const idx = RANK_HIERARCHY.indexOf(s.currentRank);
+          return idx < PROMO_VISIBILITY_RANK_THRESHOLD_IDX;
+        });
+
     return NextResponse.json({
       members,
       pendingQueue: pendingResult.rows.map(mapQueueRow),
       recentHistory: historyResult.rows.map(mapQueueRow),
-      promoSuggestions,
+      promoSuggestions: filteredSuggestions,
     });
   } catch (error) {
     console.error('Promotions fetch error:', error);

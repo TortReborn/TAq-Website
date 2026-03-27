@@ -31,6 +31,11 @@ export function isValidDemotion(currentRank: string, targetRank: string): boolea
   return RANK_HIERARCHY.indexOf(targetRank) < RANK_HIERARCHY.indexOf(currentRank);
 }
 
+// Promo suggestion visibility: suggestions for members at this rank index or above
+// are restricted to PROMO_VISIBILITY_MIN_VIEWER_IDX+ viewers only
+export const PROMO_VISIBILITY_RANK_THRESHOLD_IDX = 5; // Hammerhead
+export const PROMO_VISIBILITY_MIN_VIEWER_IDX = 8;     // Narwhal
+
 // Wynncraft server ranks (from bot's Helpers/variables.py wynn_ranks)
 export const WYNN_RANKS: Record<string, { color: string; display: string }> = {
   champion: { color: '#ffa214', display: 'CHAMPION' },
