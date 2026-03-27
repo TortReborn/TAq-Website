@@ -480,7 +480,7 @@ export default function ExecPromotionsPage() {
                               >
                                 Remove
                               </button>
-                              {!isSuggested && (
+                              {!isSuggested && (userRankIdx >= PROMO_VISIBILITY_MIN_VIEWER_IDX || RANK_HIERARCHY.indexOf(member.rank) < PROMO_VISIBILITY_RANK_THRESHOLD_IDX) && (
                                 <button
                                   onClick={() => suggestPromotion(member.uuid, member.ign, member.rank)}
                                   title="Add to promo list"

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { RANK_HIERARCHY, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,18 @@ export async function POST(request: NextRequest) {
 
     if (!uuid || !ign || !currentRank) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Only Narwhal+ can suggest promotions for Hammerhead+ members
+    const targetRankIdx = RANK_HIERARCHY.indexOf(currentRank);
+    if (targetRankIdx >= PROMO_VISIBILITY_RANK_THRESHOLD_IDX) {
+      let userRankIdx = RANK_HIERARCHY.indexOf(session.rank);
+      if (userRankIdx === -1 && session.rank.includes('Hydra')) {
+        userRankIdx = RANK_HIERARCHY.indexOf('Hydra');
+      }
+      if (userRankIdx < PROMO_VISIBILITY_MIN_VIEWER_IDX) {
+        return NextResponse.json({ error: 'Only Narwhal+ can suggest promotions for this rank' }, { status: 403 });
+      }
     }
 
     const pool = getPool();
