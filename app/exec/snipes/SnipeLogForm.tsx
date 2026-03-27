@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useExecSnipeMutations, type SnipeParticipant } from '@/hooks/useExecSnipes';
 import { SNIPE_ROLES, ROLE_COLORS, isDry, getDifficultyColor, getMaxConns } from '@/lib/snipe-constants';
 
@@ -205,7 +204,7 @@ export default function SnipeLogForm({ meta }: Props) {
             onBlur={() => setTimeout(() => setShowHqDropdown(false), 200)}
             placeholder="Search territory..."
           />
-          {showHqDropdown && filteredTerritories.length > 0 && !hq && dropdownPos && createPortal(
+          {showHqDropdown && filteredTerritories.length > 0 && !hq && dropdownPos && (
             <div style={{
               position: 'fixed',
               top: dropdownPos.top,
@@ -235,8 +234,7 @@ export default function SnipeLogForm({ meta }: Props) {
                   </div>
                 );
               })}
-            </div>,
-            document.body
+            </div>
           )}
         </div>
 
@@ -343,7 +341,7 @@ export default function SnipeLogForm({ meta }: Props) {
             </div>
             );
           })}
-          {ignDropdownIdx !== null && ignDropdownPos && getIgnSuggestions(participants[ignDropdownIdx]?.ign || '').length > 0 && createPortal(
+          {ignDropdownIdx !== null && ignDropdownPos && getIgnSuggestions(participants[ignDropdownIdx]?.ign || '').length > 0 && (
             <div style={{
               position: 'fixed',
               top: ignDropdownPos.top,
@@ -365,8 +363,7 @@ export default function SnipeLogForm({ meta }: Props) {
                   {m}
                 </div>
               ))}
-            </div>,
-            document.body
+            </div>
           )}
         </div>
 
