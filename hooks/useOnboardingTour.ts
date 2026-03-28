@@ -6,8 +6,7 @@ import type { TourStep } from '@/lib/onboarding-steps';
 
 export type { TourStep };
 
-// TODO: Re-enable localStorage after finalizing onboarding text
-// const STORAGE_KEY = 'exec_onboarding_complete';
+const STORAGE_KEY = 'exec_onboarding_complete';
 
 export interface OnboardingTourState {
   isActive: boolean;
@@ -27,9 +26,10 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const retryRef = useRef<number>(0);
 
-  // Auto-start — localStorage disabled for testing, always shows
+  // Auto-start on first visit
   useEffect(() => {
     if (!enabled) return;
+    if (localStorage.getItem(STORAGE_KEY) === 'true') return;
 
     const timer = setTimeout(() => {
       setIsActive(true);
@@ -77,8 +77,7 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
 
   const completeTour = useCallback(() => {
     setIsActive(false);
-    // TODO: Re-enable after finalizing onboarding text
-    // localStorage.setItem(STORAGE_KEY, 'true');
+    localStorage.setItem(STORAGE_KEY, 'true');
   }, []);
 
   const nextStep = useCallback(() => {
