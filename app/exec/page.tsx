@@ -253,7 +253,7 @@ export default function ExecDashboardPage() {
         flexDirection: 'column',
         marginBottom: '1rem',
         flexShrink: 0,
-        height: '340px',
+        height: '350px',
       }}>
         <div style={{
           display: 'flex',
