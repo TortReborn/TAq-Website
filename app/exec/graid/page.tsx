@@ -314,7 +314,7 @@ export default function ExecGraidPage() {
                 {editingId === selectedEvent.id ? (
                   renderForm(handleUpdate, 'Save Changes', () => { setEditingId(null); resetForm(); })
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                     <div><strong>Started:</strong> {new Date(selectedEvent.startTs).toLocaleDateString()}</div>
                     {selectedEvent.endTs && <div><strong>{selectedEvent.active ? 'Ends:' : 'Ended:'}</strong> {new Date(selectedEvent.endTs).toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>}
                     <div><strong>Low Reward:</strong> {formatPayout(selectedEvent.lowRankReward)}/raid</div>
