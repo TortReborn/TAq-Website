@@ -2,9 +2,13 @@
 
 import { useExecSession } from '@/hooks/useExecSession';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useGraidEvent } from '@/hooks/useGraidEvent';
+import { useProfileSnipeStats } from '@/hooks/useProfileSnipeStats';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getRankColor, getWynnRankInfo } from '@/lib/rank-constants';
+import { getDifficultyColor, ROLE_COLORS } from '@/lib/snipe-constants';
+import { formatPayout } from '@/lib/currency';
 import { toPng } from 'html-to-image';
 import BackgroundShopModal from '@/components/BackgroundShopModal';
 
@@ -149,6 +153,8 @@ function ProfileBadge({ label, baseColor }: { label: string; baseColor: string }
 export default function ProfilePage() {
   const { authenticated, loading: authLoading } = useExecSession();
   const { data, loading, error, mutate: mutateProfile } = useProfileData();
+  const { eventData, loading: graidLoading } = useGraidEvent();
+  const { stats: snipeStats, loading: snipeLoading } = useProfileSnipeStats();
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -340,6 +346,13 @@ export default function ProfilePage() {
   if (maxDays > 90) presets.push({ label: '90d', days: 90 });
   if (maxDays > 30) presets.push({ label: 'All', days: maxDays });
 
+  // Current graid event status
+  const currentGraidEvent = eventData?.event ?? null;
+  const isGraidFallback = eventData?.isFallback ?? false;
+  const currentGraidRow = currentGraidEvent && !isGraidFallback
+    ? (eventData?.rows?.find((r: any) => r.username.toLowerCase() === user.ign.toLowerCase()) ?? null)
+    : null;
+
   return (
     <main className="profile-layout">
       {/* ===== LEFT: ACTIVITY TRENDS ===== */}
@@ -478,6 +491,173 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* ===== SNIPE STATS ===== */}
+        {snipeLoading ? (
+          <div className="profile-panel" style={{ marginTop: '0.75rem', padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem', fontFamily: "'MinecraftFont', monospace" }}>
+            Loading snipe stats...
+          </div>
+        ) : snipeStats ? (
+          <div className="profile-panel" style={{ marginTop: '0.75rem' }}>
+            <div className="profile-panel-header" style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <span>Snipe Stats</span>
+              {snipeStats.ranking > 0 && (
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: '400' }}>
+                  Rank #{snipeStats.ranking}
+                </span>
+              )}
+            </div>
+            <div style={{ padding: '0.5rem 1rem 0.75rem' }}>
+              {/* Total snipes */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.4rem',
+                fontSize: '0.85rem',
+              }}>
+                <span>Total Snipes</span>
+                <span style={{ fontWeight: '700' }}>{snipeStats.total}</span>
+              </div>
+
+              {/* Best difficulty */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.4rem',
+                fontSize: '0.85rem',
+              }}>
+                <span>Best Difficulty</span>
+                <span style={{
+                  fontWeight: '700',
+                  color: getDifficultyColor(snipeStats.bestDifficulty),
+                }}>
+                  {snipeStats.bestDifficulty}
+                </span>
+              </div>
+
+              {/* Most Common HQ */}
+              {snipeStats.topHqs.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '0.4rem',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                }}>
+                  <span>Top HQ</span>
+                  <span style={{ fontWeight: '600', maxWidth: '55%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {snipeStats.topHqs[0].name} ({snipeStats.topHqs[0].count})
+                  </span>
+                </div>
+              )}
+
+              {/* Favorite Duo */}
+              {snipeStats.duoPartners.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '0.4rem',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                }}>
+                  <span>Favorite Duo</span>
+                  <span style={{ fontWeight: '600', maxWidth: '55%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {snipeStats.duoPartners[0].ign} ({snipeStats.duoPartners[0].count})
+                  </span>
+                </div>
+              )}
+
+              {/* Streaks */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.4rem',
+                fontSize: '0.85rem',
+              }}>
+                <span>Current Streak</span>
+                <span style={{ fontWeight: '700' }}>{snipeStats.currentStreak}d</span>
+              </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.4rem',
+                fontSize: '0.85rem',
+              }}>
+                <span>Best Streak</span>
+                <span style={{ fontWeight: '700' }}>{snipeStats.bestStreak}d</span>
+              </div>
+
+              {/* Dry / Zero-Conn */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.5rem',
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+              }}>
+                <span>Dry / Zero-Conn</span>
+                <span style={{ fontWeight: '600' }}>{snipeStats.drySnipes} / {snipeStats.zeroConnSnipes}</span>
+              </div>
+
+              {/* Role breakdown bar */}
+              {snipeStats.roleBreakdown.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Roles</div>
+                  <div style={{
+                    display: 'flex',
+                    height: '8px',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    gap: '1px',
+                  }}>
+                    {snipeStats.roleBreakdown.map(({ role, count }) => (
+                      <div
+                        key={role}
+                        title={`${role}: ${count}`}
+                        style={{
+                          flex: count,
+                          background: ROLE_COLORS[role as keyof typeof ROLE_COLORS] || '#666',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '0.75rem',
+                    marginTop: '0.3rem',
+                    fontSize: '0.65rem',
+                    color: 'var(--text-secondary)',
+                  }}>
+                    {snipeStats.roleBreakdown.map(({ role, count }) => (
+                      <span key={role} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: ROLE_COLORS[role as keyof typeof ROLE_COLORS] || '#666',
+                          display: 'inline-block',
+                        }} />
+                        {role} {count}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {/* ===== CENTER: PROFILE CARD + CONTROLS ===== */}
@@ -716,6 +896,103 @@ export default function ProfilePage() {
 
       {/* ===== RIGHT: GRAID EVENTS ===== */}
       <div className="profile-right">
+        {/* Current Graid Event Status */}
+        {graidLoading ? (
+          <div className="profile-panel" style={{ marginBottom: '0.75rem', padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem', fontFamily: "'MinecraftFont', monospace" }}>
+            Loading event...
+          </div>
+        ) : currentGraidEvent && !isGraidFallback ? (
+          <div className="profile-panel" style={{
+            marginBottom: '0.75rem',
+            background: 'rgba(59,130,246,0.08)',
+            border: '1px solid rgba(59,130,246,0.25)',
+          }}>
+            <div className="profile-panel-header" style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <span style={{ color: 'var(--color-ocean-400)' }}>Active Event</span>
+              {currentGraidRow && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '400' }}>
+                  Rank #{currentGraidRow.rankNum}
+                </span>
+              )}
+            </div>
+            <div style={{ padding: '0.5rem 1rem 0.75rem' }}>
+              <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '0.5rem' }}>
+                {currentGraidEvent.title}
+              </div>
+              {/* Completions progress */}
+              <div style={{ marginBottom: '0.5rem' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  marginBottom: '0.25rem',
+                  fontSize: '0.8rem',
+                }}>
+                  <span>Completions</span>
+                  <span style={{
+                    fontWeight: '700',
+                    color: (currentGraidRow?.total ?? 0) >= currentGraidEvent.minc ? '#22c55e' : '#ef4444',
+                  }}>
+                    {currentGraidRow?.total ?? 0} / {currentGraidEvent.minc}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div style={{
+                  height: '6px',
+                  borderRadius: '3px',
+                  background: 'rgba(255,255,255,0.1)',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    borderRadius: '3px',
+                    width: `${Math.min(100, ((currentGraidRow?.total ?? 0) / currentGraidEvent.minc) * 100)}%`,
+                    background: (currentGraidRow?.total ?? 0) >= currentGraidEvent.minc
+                      ? '#22c55e'
+                      : 'var(--color-ocean-400)',
+                    transition: 'width 0.3s ease',
+                  }} />
+                </div>
+              </div>
+              {/* Payout */}
+              {currentGraidRow && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                }}>
+                  <span>Payout</span>
+                  <span style={{
+                    fontWeight: '600',
+                    color: currentGraidRow.meetsMin ? 'var(--text-primary, #e2e8f0)' : 'var(--text-secondary)',
+                  }}>
+                    {currentGraidRow.meetsMin
+                      ? formatPayout(currentGraidRow.payout)
+                      : 'Below minimum'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="profile-panel" style={{
+            marginBottom: '0.75rem',
+            padding: '0.75rem 1rem',
+            textAlign: 'center',
+            color: 'var(--text-secondary)',
+            fontSize: '0.8rem',
+            fontFamily: "'MinecraftFont', monospace",
+          }}>
+            No active graid event
+          </div>
+        )}
+
+        {/* Historical Graid Events */}
         <div className="profile-panel">
           <div className="profile-panel-header" style={{
             display: 'flex',

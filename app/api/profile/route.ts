@@ -126,15 +126,26 @@ export async function GET(request: NextRequest) {
     const onKickList = kickListResult.rows.length > 0;
     const kickListTier = onKickList ? kickListResult.rows[0].tier : null;
 
-    // Determine if below playtime threshold (using 14-day window, matching exec activity panel)
+    // Determine if below playtime threshold (using 7-day window, falling back to 14-day)
+    const tf7 = timeFrames['7'];
     const tf14 = timeFrames['14'];
-    const threshold14 = (14 * weeklyRequirement) / 7;
     const joinedDate = memberData.joined ? new Date(memberData.joined) : null;
     const daysSinceJoin = joinedDate
       ? (Date.now() - joinedDate.getTime()) / (1000 * 60 * 60 * 24)
       : 999;
     const isNewMember = daysSinceJoin < 7;
-    const isBelowThreshold = tf14?.hasCompleteData && !isNewMember && tf14.playtime < threshold14;
+
+    let isBelowThreshold = false;
+    if (!isNewMember) {
+      if (tf7?.hasCompleteData) {
+        // Primary: use 7-day window against weekly requirement
+        isBelowThreshold = tf7.playtime < weeklyRequirement;
+      } else if (tf14?.hasCompleteData) {
+        // Fallback: use 14-day window scaled to weekly requirement
+        const threshold14 = (14 * weeklyRequirement) / 7;
+        isBelowThreshold = tf14.playtime < threshold14;
+      }
+    }
 
     return NextResponse.json({
       user: {
