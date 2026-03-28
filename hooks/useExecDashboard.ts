@@ -16,9 +16,15 @@ interface RecentApplication {
   votes: VoteSummary;
 }
 
+interface OnlineMember {
+  name: string;
+  rank: string;
+}
+
 interface GuildStats {
   totalMembers: number;
   onlineMembers: number;
+  onlineMembersList: OnlineMember[];
   name: string;
 }
 

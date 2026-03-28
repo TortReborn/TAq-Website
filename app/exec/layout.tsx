@@ -5,6 +5,9 @@ import { useExecSession } from '@/hooks/useExecSession';
 import { getRankColor } from '@/lib/rank-constants';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import OnboardingTour from '@/components/OnboardingTour';
+import OnboardingTrigger from '@/components/OnboardingTrigger';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 
 const NAV_GROUPS = [
   {
@@ -55,6 +58,7 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
   const { user, authenticated, isExec, loading } = useExecSession();
 
   const isPublicPage = PUBLIC_PATHS.includes(pathname);
+  const tour = useOnboardingTour(authenticated && isExec && pathname === '/exec');
 
   useEffect(() => {
     if (!loading && !isPublicPage) {
@@ -164,7 +168,7 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
           flex: 1,
         }}>
           {NAV_GROUPS.map((group, groupIndex) => (
-            <div key={group.category || 'top'}>
+            <div key={group.category || 'top'} data-tour={group.category ? `nav-${group.category.toLowerCase()}` : undefined}>
               {group.category && (
                 <div style={{
                   fontSize: '0.65rem',
@@ -224,8 +228,9 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
           ))}
         </nav>
 
-        {/* Logout */}
-        <div style={{ padding: '0 0.75rem' }}>
+        {/* Help & Logout */}
+        <div style={{ padding: '0 0.75rem', display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+          <OnboardingTrigger onRestart={tour.restartTour} />
           <a
             href="/api/auth/discord/logout"
             style={{
@@ -265,6 +270,8 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
       }}>
         {children}
       </main>
+
+      <OnboardingTour {...tour} />
     </div>
   );
 }

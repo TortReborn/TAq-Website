@@ -46,19 +46,50 @@ export async function GET(request: NextRequest) {
         votes: row.votes,
       }));
 
-      // Extract guild stats
-      let guildStats = {
+      // Extract guild stats + online member list
+      let guildStats: {
+        totalMembers: number;
+        onlineMembers: number;
+        onlineMembersList: { name: string; rank: string }[];
+        name: string;
+      } = {
         totalMembers: 0,
         onlineMembers: 0,
+        onlineMembersList: [],
         name: 'The Aquarium',
       };
 
       if (guildDataRaw) {
         const gd = guildDataRaw as any;
         const membersArray = Array.isArray(gd.members) ? gd.members : [];
+
+        // Get Discord ranks for online members
+        let discordRanks: Record<string, string> = {};
+        if (membersArray.length > 0) {
+          const onlineUuids = membersArray
+            .filter((m: any) => m.online === true)
+            .map((m: any) => m.uuid)
+            .filter(Boolean);
+
+          if (onlineUuids.length > 0) {
+            const linksResult = await client.query(
+              'SELECT uuid, rank FROM discord_links WHERE uuid = ANY($1)',
+              [onlineUuids]
+            );
+            linksResult.rows.forEach((row: any) => {
+              discordRanks[row.uuid] = row.rank || '';
+            });
+          }
+        }
+
+        const onlineMembers = membersArray.filter((m: any) => m.online === true);
         guildStats = {
           totalMembers: membersArray.length || (gd.members?.total || 0),
-          onlineMembers: membersArray.filter((m: any) => m.online === true).length,
+          onlineMembers: onlineMembers.length,
+          onlineMembersList: onlineMembers.map((m: any) => ({
+            name: m.name || m.username || 'Unknown',
+            rank: discordRanks[m.uuid] || '',
+          })),
           name: gd.name || 'The Aquarium',
         };
       }

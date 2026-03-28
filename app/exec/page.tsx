@@ -1,7 +1,9 @@
 "use client";
 
 import Link from 'next/link';
+import { useState, useRef } from 'react';
 import { useExecDashboard } from '@/hooks/useExecDashboard';
+import { getRankColor, RANK_ORDER } from '@/lib/rank-constants';
 
 function StatCard({ label, value, color, href }: { label: string; value: string | number; color: string; href?: string }) {
   const content = (
@@ -56,6 +58,95 @@ function StatCard({ label, value, color, href }: { label: string; value: string 
     return <Link href={href} style={{ textDecoration: 'none', flex: '1 1 140px', minWidth: '120px' }}>{content}</Link>;
   }
   return content;
+}
+
+function OnlineStatCard({ count, members }: { count: number; members: { name: string; rank: string }[] }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const sorted = [...members].sort((a, b) => {
+    const aOrder = RANK_ORDER[a.rank] ?? 999;
+    const bOrder = RANK_ORDER[b.rank] ?? 999;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return a.name.localeCompare(b.name);
+  });
+
+  return (
+    <div
+      style={{ position: 'relative', flex: '1 1 140px', minWidth: '120px' }}
+      onMouseEnter={() => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setShowTooltip(true);
+      }}
+      onMouseLeave={() => {
+        timeoutRef.current = setTimeout(() => setShowTooltip(false), 150);
+      }}
+    >
+      <div style={{
+        background: 'var(--bg-card)',
+        borderRadius: '0.5rem',
+        padding: '0.75rem 1rem',
+        border: '1px solid var(--border-card)',
+        cursor: 'default',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+      }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#22c55e';
+          e.currentTarget.style.transform = 'translateY(-1px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'var(--border-card)';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
+      >
+        <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#22c55e', lineHeight: 1 }}>
+          {count}
+        </div>
+        <div style={{
+          fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: '500',
+          textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1.2,
+        }}>
+          Online
+        </div>
+      </div>
+
+      {showTooltip && sorted.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          marginTop: '6px',
+          background: '#1e293b',
+          border: '1px solid var(--border-card)',
+          borderRadius: '0.5rem',
+          padding: '0.5rem 0',
+          minWidth: '180px',
+          maxHeight: '280px',
+          overflowY: 'auto',
+          zIndex: 100,
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
+        }}>
+          {sorted.map((m) => (
+            <div
+              key={m.name}
+              style={{
+                padding: '0.3rem 0.75rem',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                color: getRankColor(m.rank),
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {m.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ExecDashboardPage() {
@@ -129,7 +220,7 @@ export default function ExecDashboardPage() {
       </h1>
 
       {/* Stats row */}
-      <div style={{
+      <div data-tour="stats" style={{
         display: 'flex',
         gap: '0.75rem',
         flexWrap: 'wrap',
@@ -147,23 +238,22 @@ export default function ExecDashboardPage() {
           color="var(--color-ocean-400)"
           href="/exec/activity"
         />
-        <StatCard
-          label="Online"
-          value={data.guild.onlineMembers}
-          color="#22c55e"
+        <OnlineStatCard
+          count={data.guild.onlineMembers}
+          members={data.guild.onlineMembersList || []}
         />
       </div>
 
-      {/* Recent Applications — scrollable */}
-      <div style={{
+      {/* Recent Applications — fixed height for 5 apps */}
+      <div data-tour="recent-apps" style={{
         background: 'var(--bg-card)',
         borderRadius: '0.75rem',
         border: '1px solid var(--border-card)',
-        flex: 1,
-        minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
         marginBottom: '1rem',
+        flexShrink: 0,
+        height: '295px',
       }}>
         <div style={{
           display: 'flex',
@@ -211,7 +301,7 @@ export default function ExecDashboardPage() {
               flexDirection: 'column',
               gap: '0.375rem',
             }}>
-              {data.recentApplications.slice(0, 10).map(app => {
+              {data.recentApplications.slice(0, 5).map(app => {
                 const statusColors: Record<string, string> = {
                   pending: '#f59e0b',
                   accepted: '#22c55e',
@@ -300,7 +390,8 @@ export default function ExecDashboardPage() {
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         gap: '0.75rem',
-        flexShrink: 0,
+        flex: 1,
+        minHeight: 0,
       }}>
         {[
           {
@@ -308,9 +399,9 @@ export default function ExecDashboardPage() {
             color: 'var(--color-ocean-400)',
             links: [
               { href: '/exec/applications', label: 'Applications', desc: 'Review and vote on applications' },
-              { href: '/exec/activity', label: 'Activity', desc: 'Track member logins and playtime' },
-              { href: '/exec/promotions', label: 'Promotions', desc: 'Manage rank promotions' },
-              { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and manage banned players' },
+              { href: '/exec/activity', label: 'Activity', desc: 'Track activity and update kick list' },
+              { href: '/exec/promotions', label: 'Promotions', desc: 'Manage and suggest promotions' },
+              { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and add banned players' },
             ],
           },
           {
@@ -319,8 +410,8 @@ export default function ExecDashboardPage() {
             links: [
               { href: '/exec/graid', label: 'Graid Events', desc: 'Schedule and manage guild raids' },
               { href: '/exec/snipes', label: 'Snipes', desc: 'Track territory snipe attempts' },
-              { href: '/exec/builds', label: 'War Builds', desc: 'Manage approved war builds' },
-              { href: '/exec/guild-bank', label: 'Guild Bank', desc: 'Track war consumables and sets' },
+              { href: '/exec/builds', label: 'War Builds', desc: 'Manage war roles and builds' },
+              { href: '/exec/guild-bank', label: 'Guild Bank', desc: 'Track war consumables and items' },
             ],
           },
           {
@@ -328,7 +419,7 @@ export default function ExecDashboardPage() {
             color: '#f59e0b',
             links: [
               { href: '/exec/shells', label: 'Shells', desc: 'Manage member shell balances' },
-              { href: '/exec/shell-exchange', label: 'Shell Exchange', desc: 'Review exchange requests' },
+              { href: '/exec/shell-exchange', label: 'Shell Exchange', desc: 'Update exchange rates' },
               { href: '/exec/backgrounds', label: 'Backgrounds', desc: 'Manage profile backgrounds' },
             ],
           },
@@ -347,8 +438,8 @@ export default function ExecDashboardPage() {
             overflow: 'hidden',
           }}>
             <div style={{
-              padding: '0.5rem 1rem',
-              fontSize: '0.65rem',
+              padding: '0.625rem 1rem',
+              fontSize: '0.75rem',
               fontWeight: '700',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
@@ -358,14 +449,14 @@ export default function ExecDashboardPage() {
             }}>
               {group.category}
             </div>
-            <div style={{ padding: '0.375rem' }}>
+            <div style={{ padding: '0.5rem' }}>
               {group.links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   style={{
                     display: 'block',
-                    padding: '0.4rem 0.625rem',
+                    padding: '0.55rem 0.75rem',
                     borderRadius: '0.375rem',
                     textDecoration: 'none',
                     transition: 'background 0.15s ease',
@@ -378,15 +469,15 @@ export default function ExecDashboardPage() {
                   }}
                 >
                   <div style={{
-                    fontSize: '0.8rem',
+                    fontSize: '0.9rem',
                     fontWeight: '600',
                     color: 'var(--text-primary)',
-                    marginBottom: '0.1rem',
+                    marginBottom: '0.15rem',
                   }}>
                     {link.label}
                   </div>
                   <div style={{
-                    fontSize: '0.7rem',
+                    fontSize: '0.8rem',
                     color: 'var(--text-secondary)',
                   }}>
                     {link.desc}
