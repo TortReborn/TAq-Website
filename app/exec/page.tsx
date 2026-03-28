@@ -253,7 +253,7 @@ export default function ExecDashboardPage() {
         flexDirection: 'column',
         marginBottom: '1rem',
         flexShrink: 0,
-        height: '295px',
+        height: '340px',
       }}>
         <div style={{
           display: 'flex',
@@ -281,7 +281,7 @@ export default function ExecDashboardPage() {
           </Link>
         </div>
 
-        <div style={{
+        <div className="themed-scrollbar" style={{
           flex: 1,
           overflowY: 'auto',
           padding: '0.5rem',

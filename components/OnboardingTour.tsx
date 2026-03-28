@@ -158,7 +158,7 @@ export default function OnboardingTour({
           top: `${tooltipCoords.top}px`,
           left: `${tooltipCoords.left}px`,
           zIndex: 10002,
-          background: 'var(--bg-secondary)',
+          background: 'var(--bg-card-solid)',
           border: '1px solid var(--border-card)',
           borderRadius: '0.75rem',
           padding: '1.25rem',
