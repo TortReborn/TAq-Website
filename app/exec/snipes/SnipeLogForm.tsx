@@ -51,7 +51,7 @@ export default function SnipeLogForm({ meta }: Props) {
     { ign: '', role: 'Healer' },
   ];
   const [participants, setParticipants] = useState<SnipeParticipant[]>(defaultSlots);
-  const [logToChannel, setLogToChannel] = useState(false);
+  const [logToChannel, setLogToChannel] = useState(true);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
@@ -206,7 +206,7 @@ export default function SnipeLogForm({ meta }: Props) {
       setConns('0');
       setSnipedAt('');
       setParticipants(defaultSlots.map(s => ({ ...s })));
-      setLogToChannel(false);
+      setLogToChannel(true);
       setImage(null);
       setImagePreview(null);
       setNotes('');
