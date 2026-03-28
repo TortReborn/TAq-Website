@@ -87,6 +87,7 @@ export default function ExecGraidPage() {
   const handleCreate = async () => {
     setFormError(null);
     if (!title.trim()) { setFormError('Title is required'); return; }
+    if (!endDate) { setFormError('End date is required'); return; }
     try {
       const result = await createEvent({
         title: title.trim(),
@@ -95,7 +96,7 @@ export default function ExecGraidPage() {
         minCompletions: parseInt(minComp) || 12,
         bonusThreshold: bonusThreshold ? parseInt(bonusThreshold) : undefined,
         bonusAmount: bonusAmount ? parseInt(bonusAmount) : undefined,
-        endDate: endDate ? new Date(endDate).toISOString() : undefined,
+        endDate: new Date(endDate).toISOString(),
       });
       resetForm();
       setShowCreate(false);
@@ -108,6 +109,7 @@ export default function ExecGraidPage() {
   const handleUpdate = async () => {
     if (!editingId) return;
     setFormError(null);
+    if (!endDate) { setFormError('End date is required'); return; }
     try {
       await updateEvent(editingId, {
         title: title.trim(),
@@ -116,7 +118,7 @@ export default function ExecGraidPage() {
         minCompletions: parseInt(minComp) || 12,
         bonusThreshold: bonusThreshold ? parseInt(bonusThreshold) : null,
         bonusAmount: bonusAmount ? parseInt(bonusAmount) : null,
-        endDate: endDate ? new Date(endDate).toISOString() : null,
+        endDate: new Date(endDate).toISOString(),
       });
       setEditingId(null);
       resetForm();
@@ -159,11 +161,8 @@ export default function ExecGraidPage() {
         <input value={title} onChange={e => setTitle(e.target.value)} style={inputStyle} placeholder="e.g. Weekly Graid Event 2026/03/01" />
       </div>
       <div>
-        <label style={labelStyle}>End Date (optional)</label>
-        <input type="datetime-local" value={endDate} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.2rem', display: 'block' }}>
-          Event will automatically end at this time. Leave empty for no auto-end.
-        </span>
+        <label style={labelStyle}>End Date</label>
+        <input type="datetime-local" value={endDate} onChange={e => setEndDate(e.target.value)} style={inputStyle} required />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
         <div>

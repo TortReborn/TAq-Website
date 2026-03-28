@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
   try {
     const { title, lowRankReward, highRankReward, minCompletions, bonusThreshold, bonusAmount, endDate } = await request.json();
 
-    if (!title || !lowRankReward || !highRankReward || !minCompletions) {
-      return NextResponse.json({ error: 'Title, rewards, and min completions are required' }, { status: 400 });
+    if (!title || !lowRankReward || !highRankReward || !minCompletions || !endDate) {
+      return NextResponse.json({ error: 'Title, end date, rewards, and min completions are required' }, { status: 400 });
     }
 
     const pool = getPool();

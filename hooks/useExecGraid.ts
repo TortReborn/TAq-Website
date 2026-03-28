@@ -39,7 +39,7 @@ export function useExecGraid() {
     minCompletions: number;
     bonusThreshold?: number;
     bonusAmount?: number;
-    endDate?: string;
+    endDate: string;
   }) => {
     const res = await fetch('/api/exec/graid', {
       method: 'POST',
