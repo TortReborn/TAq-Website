@@ -52,6 +52,10 @@ export async function PATCH(
       setClauses.push(`bonus_amount = $${paramIndex++}`);
       values.push(updates.bonusAmount || null);
     }
+    if (updates.endDate !== undefined) {
+      setClauses.push(`end_ts = $${paramIndex++}`);
+      values.push(updates.endDate || null);
+    }
     if (updates.active !== undefined) {
       setClauses.push(`active = $${paramIndex++}`);
       values.push(updates.active);

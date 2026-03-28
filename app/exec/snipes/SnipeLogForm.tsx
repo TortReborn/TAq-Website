@@ -83,6 +83,31 @@ export default function SnipeLogForm({ meta }: Props) {
     return () => { if (imagePreview) URL.revokeObjectURL(imagePreview); };
   }, [imagePreview]);
 
+  // Global paste handler: if logToChannel is on and no input/textarea/select is focused, treat image pastes as screenshot input
+  useEffect(() => {
+    if (!logToChannel) return;
+    const handler = (e: ClipboardEvent) => {
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            setImage(file);
+            if (imagePreview) URL.revokeObjectURL(imagePreview);
+            setImagePreview(URL.createObjectURL(file));
+          }
+          e.preventDefault();
+          return;
+        }
+      }
+    };
+    window.addEventListener('paste', handler);
+    return () => window.removeEventListener('paste', handler);
+  }, [logToChannel, imagePreview]);
+
   const snipedHqSet = useMemo(() => new Set(meta.snipedHqs.map(h => h.toLowerCase())), [meta.snipedHqs]);
 
   // Only show territories with 4+ connections (HQ-worthy)
@@ -320,65 +345,7 @@ export default function SnipeLogForm({ meta }: Props) {
         </div>
       </div>
 
-      {/* Post to Channel Toggle */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={logToChannel}
-            onChange={e => {
-              setLogToChannel(e.target.checked);
-              if (!e.target.checked) {
-                setImage(null);
-                setImagePreview(null);
-                setNotes('');
-              }
-            }}
-            style={{ accentColor: '#22c55e' }}
-          />
-          Post to snipe log channel
-        </label>
-
-        {logToChannel && (
-          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--bg-primary)', borderRadius: '0.5rem', border: '1px solid var(--border-card)' }}>
-            {/* Image Upload */}
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label style={labelStyle}>Screenshot (required)</label>
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={e => {
-                  const file = e.target.files?.[0] || null;
-                  setImage(file);
-                  if (imagePreview) URL.revokeObjectURL(imagePreview);
-                  if (file) {
-                    setImagePreview(URL.createObjectURL(file));
-                  } else {
-                    setImagePreview(null);
-                  }
-                }}
-                style={{ ...inputStyle, padding: '0.4rem' }}
-              />
-              {imagePreview && (
-                <img src={imagePreview} alt="Preview" style={{ marginTop: '0.5rem', maxWidth: '300px', maxHeight: '200px', borderRadius: '0.375rem', border: '1px solid var(--border-card)' }} />
-              )}
-            </div>
-
-            {/* Notes */}
-            <div>
-              <label style={labelStyle}>Notes (optional)</label>
-              <input
-                style={inputStyle}
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="Additional notes for the channel post"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Participants + Review/Submit side by side */}
+      {/* Participants + Review/Submit + Post to Channel side by side */}
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-end' }}>
         {/* Participants */}
         <div style={{ flex: 'none' }}>
@@ -495,6 +462,131 @@ export default function SnipeLogForm({ meta }: Props) {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Post to Channel */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          {logToChannel && (
+            <div style={{ marginBottom: '0.5rem', padding: '0.75rem', background: 'var(--bg-primary)', borderRadius: '0.5rem', border: '1px solid var(--border-card)', display: 'flex', gap: '0.75rem' }}>
+              {/* Screenshot (left) */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <label style={labelStyle}>Screenshot (required)</label>
+                <div
+                  tabIndex={0}
+                  onPaste={e => {
+                    const items = e.clipboardData?.items;
+                    if (!items) return;
+                    for (const item of Array.from(items)) {
+                      if (item.type.startsWith('image/')) {
+                        const file = item.getAsFile();
+                        if (file) {
+                          setImage(file);
+                          if (imagePreview) URL.revokeObjectURL(imagePreview);
+                          setImagePreview(URL.createObjectURL(file));
+                        }
+                        e.preventDefault();
+                        return;
+                      }
+                    }
+                  }}
+                  onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+                  onDrop={e => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files?.[0];
+                    if (file && file.type.startsWith('image/')) {
+                      setImage(file);
+                      if (imagePreview) URL.revokeObjectURL(imagePreview);
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/png,image/jpeg,image/webp';
+                    input.onchange = () => {
+                      const file = input.files?.[0] || null;
+                      setImage(file);
+                      if (imagePreview) URL.revokeObjectURL(imagePreview);
+                      setImagePreview(file ? URL.createObjectURL(file) : null);
+                    };
+                    input.click();
+                  }}
+                  style={{
+                    ...inputStyle,
+                    height: '132px',
+                    padding: '0.5rem',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    borderStyle: image ? 'solid' : 'dashed',
+                    borderColor: image ? '#22c55e' : 'var(--border-card)',
+                    outline: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {imagePreview ? (
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img src={imagePreview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '112px', borderRadius: '0.375rem', objectFit: 'contain' }} />
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setImage(null);
+                          if (imagePreview) URL.revokeObjectURL(imagePreview);
+                          setImagePreview(null);
+                        }}
+                        style={{
+                          position: 'absolute', top: '4px', right: '4px',
+                          background: 'rgba(239, 68, 68, 0.85)', color: '#fff',
+                          border: 'none', borderRadius: '50%', width: '22px', height: '22px',
+                          cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          lineHeight: 1,
+                        }}
+                        title="Remove screenshot"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                      Paste, drop, or click to add screenshot
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* Notes (right) */}
+              <div style={{ width: '180px', flexShrink: 0 }}>
+                <label style={labelStyle}>Notes (optional)</label>
+                <textarea
+                  style={{ ...inputStyle, height: 'calc(100% - 1.25rem)', resize: 'none', minHeight: '3rem' }}
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  placeholder="Additional notes for the channel post"
+                />
+              </div>
+            </div>
+          )}
+
+          <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={logToChannel}
+              onChange={e => {
+                setLogToChannel(e.target.checked);
+                if (e.target.checked) {
+                  e.target.blur();
+                } else {
+                  setImage(null);
+                  setImagePreview(null);
+                  setNotes('');
+                }
+              }}
+              style={{ accentColor: '#22c55e' }}
+            />
+            Post to snipe log channel
+          </label>
         </div>
       </div>
     </div>

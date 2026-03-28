@@ -23,6 +23,7 @@ export default function ExecGraidPage() {
   const [minComp, setMinComp] = useState('12');
   const [bonusThreshold, setBonusThreshold] = useState('');
   const [bonusAmount, setBonusAmount] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Auto-select the most recent event on first load
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function ExecGraidPage() {
   const resetForm = () => {
     setTitle(''); setLowReward('1536'); setHighReward('1536');
     setMinComp('12'); setBonusThreshold(''); setBonusAmount('');
-    setFormError(null);
+    setEndDate(''); setFormError(null);
   };
 
   const startEdit = (ev: typeof selectedEvent) => {
@@ -73,6 +74,14 @@ export default function ExecGraidPage() {
     setMinComp(String(ev.minCompletions));
     setBonusThreshold(ev.bonusThreshold ? String(ev.bonusThreshold) : '');
     setBonusAmount(ev.bonusAmount ? String(ev.bonusAmount) : '');
+    if (ev.endTs) {
+      // Convert ISO to local datetime-local format (YYYY-MM-DDTHH:MM)
+      const d = new Date(ev.endTs);
+      const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+      setEndDate(local.toISOString().slice(0, 16));
+    } else {
+      setEndDate('');
+    }
   };
 
   const handleCreate = async () => {
@@ -86,6 +95,7 @@ export default function ExecGraidPage() {
         minCompletions: parseInt(minComp) || 12,
         bonusThreshold: bonusThreshold ? parseInt(bonusThreshold) : undefined,
         bonusAmount: bonusAmount ? parseInt(bonusAmount) : undefined,
+        endDate: endDate ? new Date(endDate).toISOString() : undefined,
       });
       resetForm();
       setShowCreate(false);
@@ -106,6 +116,7 @@ export default function ExecGraidPage() {
         minCompletions: parseInt(minComp) || 12,
         bonusThreshold: bonusThreshold ? parseInt(bonusThreshold) : null,
         bonusAmount: bonusAmount ? parseInt(bonusAmount) : null,
+        endDate: endDate ? new Date(endDate).toISOString() : null,
       });
       setEditingId(null);
       resetForm();
@@ -146,6 +157,13 @@ export default function ExecGraidPage() {
       <div>
         <label style={labelStyle}>Title</label>
         <input value={title} onChange={e => setTitle(e.target.value)} style={inputStyle} placeholder="e.g. Weekly Graid Event 2026/03/01" />
+      </div>
+      <div>
+        <label style={labelStyle}>End Date (optional)</label>
+        <input type="datetime-local" value={endDate} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
+        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.2rem', display: 'block' }}>
+          Event will automatically end at this time. Leave empty for no auto-end.
+        </span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
         <div>
@@ -299,7 +317,7 @@ export default function ExecGraidPage() {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                     <div><strong>Started:</strong> {new Date(selectedEvent.startTs).toLocaleDateString()}</div>
-                    {selectedEvent.endTs && <div><strong>Ended:</strong> {new Date(selectedEvent.endTs).toLocaleDateString()}</div>}
+                    {selectedEvent.endTs && <div><strong>{selectedEvent.active ? 'Ends:' : 'Ended:'}</strong> {new Date(selectedEvent.endTs).toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>}
                     <div><strong>Low Reward:</strong> {formatPayout(selectedEvent.lowRankReward)}/raid</div>
                     <div><strong>High Reward:</strong> {formatPayout(selectedEvent.highRankReward)}/raid</div>
                     <div><strong>Min Completions:</strong> {selectedEvent.minCompletions}</div>

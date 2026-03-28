@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { title, lowRankReward, highRankReward, minCompletions, bonusThreshold, bonusAmount } = await request.json();
+    const { title, lowRankReward, highRankReward, minCompletions, bonusThreshold, bonusAmount, endDate } = await request.json();
 
     if (!title || !lowRankReward || !highRankReward || !minCompletions) {
       return NextResponse.json({ error: 'Title, rewards, and min completions are required' }, { status: 400 });
@@ -62,11 +62,11 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await pool.query(
-      `INSERT INTO graid_events (title, start_ts, low_rank_reward, high_rank_reward, min_completions,
+      `INSERT INTO graid_events (title, start_ts, end_ts, low_rank_reward, high_rank_reward, min_completions,
                                   bonus_threshold, bonus_amount, created_by_discord, active)
-       VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, true)
+       VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, true)
        RETURNING id`,
-      [title.trim(), lowRankReward, highRankReward, minCompletions,
+      [title.trim(), endDate || null, lowRankReward, highRankReward, minCompletions,
        bonusThreshold || null, bonusAmount || null, session.discord_id]
     );
 
