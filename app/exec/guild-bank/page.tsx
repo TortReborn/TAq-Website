@@ -6,35 +6,11 @@ import { useGuildBank, GuildBankTransaction } from '@/hooks/useGuildBank';
 
 type View = 'inventory' | 'history';
 
-interface InventoryItem {
-  itemName: string;
-  bankType: string;
-  quantity: number;
-}
-
 export default function GuildBankPage() {
   useExecSession();
-  const { transactions, loading, error, refresh } = useGuildBank();
+  const { transactions, inventory, stats, total, page, totalPages, loading, error, refresh, goToPage } = useGuildBank();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('inventory');
-
-  // Compute current inventory: sum deposits - withdrawals per item
-  const inventory = useMemo(() => {
-    const map = new Map<string, InventoryItem>();
-    for (const t of transactions) {
-      const key = `${t.itemName}||${t.bankType}`;
-      const existing = map.get(key);
-      const delta = t.action === 'deposited' ? t.itemCount : -t.itemCount;
-      if (existing) {
-        existing.quantity += delta;
-      } else {
-        map.set(key, { itemName: t.itemName, bankType: t.bankType, quantity: delta });
-      }
-    }
-    return Array.from(map.values())
-      .filter(i => i.quantity > 0)
-      .sort((a, b) => a.itemName.localeCompare(b.itemName));
-  }, [transactions]);
 
   const filteredInventory = useMemo(() => {
     if (!search.trim()) return inventory;
@@ -50,12 +26,6 @@ export default function GuildBankPage() {
       t.itemName.toLowerCase().includes(q)
     );
   }, [transactions, search]);
-
-  const stats = useMemo(() => {
-    const deposits = transactions.filter(t => t.action === 'deposited').length;
-    const withdrawals = transactions.filter(t => t.action === 'withdrew').length;
-    return { deposits, withdrawals, totalItems: inventory.reduce((s, i) => s + i.quantity, 0), uniqueItems: inventory.length };
-  }, [transactions, inventory]);
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -271,7 +241,7 @@ export default function GuildBankPage() {
             color: 'var(--text-secondary)',
             marginBottom: '0.5rem',
           }}>
-            Showing {filteredHistory.length} of {transactions.length} transactions
+            Page {page} of {totalPages} ({total.toLocaleString()} total transactions)
           </div>
 
           <div style={{
@@ -340,6 +310,93 @@ export default function GuildBankPage() {
               </table>
             </div>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginTop: '1rem',
+            }}>
+              <button
+                onClick={() => goToPage(1)}
+                disabled={page <= 1}
+                style={{
+                  padding: '0.35rem 0.6rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--border-card)',
+                  background: 'transparent',
+                  color: page <= 1 ? 'var(--text-secondary)' : 'var(--text-primary)',
+                  cursor: page <= 1 ? 'default' : 'pointer',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  opacity: page <= 1 ? 0.4 : 1,
+                }}
+              >
+                First
+              </button>
+              <button
+                onClick={() => goToPage(page - 1)}
+                disabled={page <= 1}
+                style={{
+                  padding: '0.35rem 0.6rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--border-card)',
+                  background: 'transparent',
+                  color: page <= 1 ? 'var(--text-secondary)' : 'var(--text-primary)',
+                  cursor: page <= 1 ? 'default' : 'pointer',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  opacity: page <= 1 ? 0.4 : 1,
+                }}
+              >
+                Prev
+              </button>
+              <span style={{
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+                padding: '0 0.5rem',
+              }}>
+                {page} / {totalPages}
+              </span>
+              <button
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= totalPages}
+                style={{
+                  padding: '0.35rem 0.6rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--border-card)',
+                  background: 'transparent',
+                  color: page >= totalPages ? 'var(--text-secondary)' : 'var(--text-primary)',
+                  cursor: page >= totalPages ? 'default' : 'pointer',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  opacity: page >= totalPages ? 0.4 : 1,
+                }}
+              >
+                Next
+              </button>
+              <button
+                onClick={() => goToPage(totalPages)}
+                disabled={page >= totalPages}
+                style={{
+                  padding: '0.35rem 0.6rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--border-card)',
+                  background: 'transparent',
+                  color: page >= totalPages ? 'var(--text-secondary)' : 'var(--text-primary)',
+                  cursor: page >= totalPages ? 'default' : 'pointer',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  opacity: page >= totalPages ? 0.4 : 1,
+                }}
+              >
+                Last
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
