@@ -57,7 +57,7 @@ function buildQueryString(filters: TrackerFilters): string {
 export function useExecTracker(filters: TrackerFilters = {}) {
   const qs = buildQueryString(filters);
   const { data, error, isLoading, mutate } = useSWR<TrackerData>(
-    `/api/exec/tracker${qs}`,
+    `/api/exec/requests${qs}`,
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 30000, dedupingInterval: 10000 }
   );
@@ -69,7 +69,7 @@ export function useExecTracker(filters: TrackerFilters = {}) {
     description: string;
     priority?: TicketPriority;
   }) => {
-    await fetch('/api/exec/tracker', {
+    await fetch('/api/exec/requests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),

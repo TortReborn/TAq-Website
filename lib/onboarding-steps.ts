@@ -63,7 +63,7 @@ const TOUR_STEPS: TourStep[] = [
     id: 'nav-operations',
     target: 'nav-operations',
     title: 'Operations',
-    description: "Meeting agenda and the Requests tracker — report bugs or request features for the bot, mod, or website and track them all in one place.",
+    description: "Meeting agenda and Requests — report bugs or request features for the bot, mod, or website and track them all in one place.",
     position: 'right',
   },
   {

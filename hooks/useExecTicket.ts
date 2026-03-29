@@ -17,7 +17,7 @@ interface TicketDetailData {
 
 export function useExecTicket(id: number | null) {
   const { data, error, isLoading, mutate } = useSWR<TicketDetailData>(
-    id ? `/api/exec/tracker/${id}` : null,
+    id ? `/api/exec/requests/${id}` : null,
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 15000, dedupingInterval: 5000 }
   );
@@ -30,7 +30,7 @@ export function useExecTicket(id: number | null) {
     description?: string;
   }) => {
     if (!id) return;
-    await fetch(`/api/exec/tracker/${id}`, {
+    await fetch(`/api/exec/requests/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(fields),
@@ -40,7 +40,7 @@ export function useExecTicket(id: number | null) {
 
   const deleteTicket = async () => {
     if (!id) return;
-    await fetch(`/api/exec/tracker/${id}`, {
+    await fetch(`/api/exec/requests/${id}`, {
       method: 'DELETE',
     });
     mutate();
@@ -48,7 +48,7 @@ export function useExecTicket(id: number | null) {
 
   const addComment = async (body: string) => {
     if (!id) return;
-    await fetch(`/api/exec/tracker/${id}/comments`, {
+    await fetch(`/api/exec/requests/${id}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ body }),
