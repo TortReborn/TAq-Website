@@ -109,7 +109,7 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
     }}>
       {/* Sidebar */}
       <aside style={{
-        width: '180px',
+        width: 'clamp(180px, 12vw, 260px)',
         background: 'var(--bg-card)',
         borderRight: '1px solid var(--border-card)',
         padding: '1rem 0',

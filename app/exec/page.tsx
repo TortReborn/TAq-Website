@@ -252,8 +252,8 @@ export default function ExecDashboardPage() {
         display: 'flex',
         flexDirection: 'column',
         marginBottom: '1rem',
-        flexShrink: 0,
-        height: '350px',
+        flex: 1,
+        minHeight: 0,
       }}>
         <div style={{
           display: 'flex',
@@ -390,8 +390,7 @@ export default function ExecDashboardPage() {
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         gap: '0.75rem',
-        flex: 1,
-        minHeight: 0,
+        flexShrink: 0,
       }}>
         {[
           {
