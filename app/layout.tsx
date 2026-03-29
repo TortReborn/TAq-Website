@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from 'next/link';
 import NavLink from '@/components/NavLink';
 import PageTransition from '@/components/PageTransition';
+import AnalyticsProvider from '@/components/AnalyticsProvider';
 import BottomBar from '@/components/BottomBar';
 import { Analytics } from "@vercel/analytics/react";
 import { useExecSession } from '@/hooks/useExecSession';
@@ -776,9 +777,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           )}
         </nav>
         <div style={{ flex: '1 0 auto' }}>
-          <PageTransition>
-            {children}
-          </PageTransition>
+          <AnalyticsProvider>
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </AnalyticsProvider>
         </div>
         <Analytics
           beforeSend={(event) => {

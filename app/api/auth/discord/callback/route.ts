@@ -6,6 +6,7 @@ import {
   setExecSessionCookie,
   getBaseUrl,
 } from '@/lib/exec-auth';
+import { getPool } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl();
@@ -64,6 +65,12 @@ export async function GET(request: NextRequest) {
       rank: linkCheck.rank,
       role: linkCheck.role,
     });
+
+    // Track login for analytics (fire-and-forget)
+    getPool().query(
+      `INSERT INTO analytics_logins (discord_id, ign, rank, role) VALUES ($1, $2, $3, $4)`,
+      [discordUser.id, linkCheck.ign, linkCheck.rank, linkCheck.role]
+    ).catch(() => {});
 
     // Clear OAuth state cookie
     response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
