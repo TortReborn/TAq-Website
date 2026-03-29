@@ -12,8 +12,13 @@ export function formatPayout(payout: number): string {
     const eb = Math.round((payout / EM_PER_EB) * 10) / 10;
     return `${eb % 1 === 0 ? eb.toFixed(0) : eb.toFixed(1)} EB`;
   } else {
-    // 1+ LE
-    const le = Math.round((payout / EM_PER_LE) * 10) / 10;
-    return `${le % 1 === 0 ? le.toFixed(0) : le.toFixed(1)} LE`;
+    // 1+ LE — show as STX (stacks of 64 LE) when applicable
+    const le = Math.ceil(payout / EM_PER_LE);
+    const stx = Math.floor(le / 64);
+    const remainder = le % 64;
+    if (stx > 0) {
+      return remainder > 0 ? `${stx} STX ${remainder} LE` : `${stx} STX`;
+    }
+    return `${le} LE`;
   }
 }

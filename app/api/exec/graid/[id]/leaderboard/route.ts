@@ -53,7 +53,8 @@ export async function GET(
     };
 
     const rowsRes = await pool.query(
-      `SELECT dl.ign AS username, dl.rank AS rank, get.total AS total
+      `SELECT dl.ign AS username, dl.rank AS rank, get.total AS total,
+              get.uuid AS uuid, COALESCE(get.paid, false) AS paid
        FROM graid_event_totals get
        JOIN discord_links dl ON dl.uuid = get.uuid
        WHERE get.event_id = $1
@@ -68,7 +69,7 @@ export async function GET(
       const low = isLow(r.rank);
       const payout = total * (low ? event.low : event.high);
       const meetsMin = total >= event.minc;
-      return { username: r.username || "(unknown)", rank: r.rank, total, payout, meetsMin };
+      return { username: r.username || "(unknown)", rank: r.rank, total, payout, meetsMin, uuid: r.uuid, paid: !!r.paid };
     });
 
     // Find rank leaders
@@ -113,5 +114,39 @@ export async function GET(
   } catch (error) {
     console.error('Graid leaderboard fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await requireExecSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id } = await params;
+    const eventId = parseInt(id, 10);
+    if (isNaN(eventId)) {
+      return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 });
+    }
+
+    const { uuid, paid } = await request.json();
+    if (!uuid || typeof paid !== 'boolean') {
+      return NextResponse.json({ error: 'uuid and paid (boolean) are required' }, { status: 400 });
+    }
+
+    const pool = getPool();
+    await pool.query(
+      `UPDATE graid_event_totals SET paid = $1 WHERE event_id = $2 AND uuid = $3`,
+      [paid, eventId, uuid]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Graid paid toggle error:', error);
+    return NextResponse.json({ error: 'Failed to update paid status' }, { status: 500 });
   }
 }

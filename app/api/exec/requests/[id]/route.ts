@@ -117,6 +117,15 @@ export async function PATCH(
       paramIdx++;
     }
 
+    if (body.system !== undefined) {
+      if (!['discord_bot', 'minecraft_mod', 'website'].includes(body.system)) {
+        return NextResponse.json({ error: 'Invalid system' }, { status: 400 });
+      }
+      updates.push(`system = $${paramIdx}`);
+      values.push(body.system);
+      paramIdx++;
+    }
+
     if (body.assigned_to !== undefined) {
       updates.push(`assigned_to = $${paramIdx}`);
       values.push(body.assigned_to || null);

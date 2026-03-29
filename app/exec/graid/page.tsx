@@ -9,7 +9,7 @@ export default function ExecGraidPage() {
   const { events, loading, error, refresh, createEvent, endEvent, updateEvent } = useExecGraid();
 
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
-  const leaderboard = useExecGraidLeaderboard(selectedEventId);
+  const { markPaid, ...leaderboard } = useExecGraidLeaderboard(selectedEventId);
 
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -346,24 +346,44 @@ export default function ExecGraidPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid var(--border-card)' }}>
-                        {['#', 'Player', 'Rank', 'Raids', 'Payout'].map(h => (
-                          <th key={h} style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{h}</th>
+                        {['#', 'Player', 'Rank', 'Raids', 'Payout', 'Paid'].map(h => (
+                          <th key={h} style={{ padding: '0.5rem 0.75rem', textAlign: h === 'Paid' ? 'center' : 'left', fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {leaderboard.rows.map((row, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid var(--border-card)', opacity: row.meetsMin ? 1 : 0.5, background: i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', fontWeight: '700', color: row.rankNum === 1 ? '#eab308' : row.rankNum === 2 ? '#9ca3af' : row.rankNum <= 5 ? '#b45309' : 'var(--text-secondary)' }}>{row.rankNum}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>{row.username}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(row.rank), fontWeight: '600' }}>
-                            {row.rank || '—'}
-                            {row.isRankLeader && <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', fontWeight: '600', fontSize: '0.7rem', marginLeft: '0.4rem' }}>Leader</span>}
-                          </td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.total}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: row.meetsMin ? '#22c55e' : 'var(--text-secondary)' }}>{row.meetsMin ? `${Math.ceil(row.payout / 4096)} LE` : '—'}</td>
-                        </tr>
-                      ))}
+                      {leaderboard.rows.map((row, i) => {
+                        const le = row.meetsMin ? Math.ceil(row.payout / 4096) : 0;
+                        const stx = Math.floor(le / 64);
+                        const remainder = le % 64;
+                        const payoutStr = row.meetsMin
+                          ? stx > 0
+                            ? remainder > 0 ? `${stx} STX ${remainder} LE` : `${stx} STX`
+                            : `${le} LE`
+                          : '—';
+                        return (
+                          <tr key={i} style={{ borderBottom: '1px solid var(--border-card)', opacity: row.meetsMin ? 1 : 0.5, background: i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
+                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', fontWeight: '700', color: row.rankNum === 1 ? '#eab308' : row.rankNum === 2 ? '#9ca3af' : row.rankNum <= 5 ? '#b45309' : 'var(--text-secondary)' }}>{row.rankNum}</td>
+                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>{row.username}</td>
+                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(row.rank), fontWeight: '600' }}>
+                              {row.rank || '—'}
+                              {row.isRankLeader && <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.1rem 0.4rem', borderRadius: '0.25rem', fontWeight: '600', fontSize: '0.7rem', marginLeft: '0.4rem' }}>Leader</span>}
+                            </td>
+                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.total}</td>
+                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: row.meetsMin ? '#22c55e' : 'var(--text-secondary)' }}>{payoutStr}</td>
+                            <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center' }}>
+                              {row.meetsMin && (
+                                <input
+                                  type="checkbox"
+                                  checked={!!row.paid}
+                                  onChange={() => row.uuid && markPaid(row.uuid, !row.paid)}
+                                  style={{ width: '1rem', height: '1rem', cursor: 'pointer', accentColor: '#22c55e' }}
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}

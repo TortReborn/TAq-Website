@@ -86,11 +86,33 @@ export function useExecGraidLeaderboard(eventId: number | null) {
     { revalidateOnFocus: false, refreshInterval: 30000, dedupingInterval: 10000 }
   );
 
+  const markPaid = async (uuid: string, paid: boolean) => {
+    if (!eventId) return;
+    // Optimistic update
+    if (data) {
+      mutate(
+        { ...data, rows: data.rows.map(r => r.uuid === uuid ? { ...r, paid } : r) },
+        false
+      );
+    }
+    const res = await fetch(`/api/exec/graid/${eventId}/leaderboard`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uuid, paid }),
+    });
+    if (!res.ok) {
+      mutate(); // revert on failure
+      const d = await res.json();
+      throw new Error(d.error || 'Failed to update paid status');
+    }
+  };
+
   return {
     event: data?.event ?? null,
     rows: data?.rows ?? [],
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),
+    markPaid,
   };
 }

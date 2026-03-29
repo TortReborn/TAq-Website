@@ -83,6 +83,8 @@ export type Row = {
   meetsMin: boolean;
   rankNum: number;
   isRankLeader: boolean;
+  uuid?: string;
+  paid?: boolean;
 };
 
 const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha", "Barracuda"]);

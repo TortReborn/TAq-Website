@@ -168,6 +168,10 @@ export default function ExecTrackerPage() {
   const [commentText, setCommentText] = useState('');
   const [commenting, setCommenting] = useState(false);
 
+  // Edit title
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editTitleValue, setEditTitleValue] = useState('');
+
   // Delete confirm
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -471,17 +475,76 @@ export default function ExecTrackerPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>#{detail.ticket.id}</span>
                       <Badge label={TYPE_LABELS[detail.ticket.type]} color={detail.ticket.type === 'bug' ? '#ef4444' : '#8b5cf6'} />
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{SYSTEM_LABELS[detail.ticket.system]}</span>
+                      <select
+                        value={detail.ticket.system}
+                        onChange={async (e) => { await detail.updateTicket({ system: e.target.value }); refresh(); }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-secondary)',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          outline: 'none',
+                          padding: 0,
+                        }}
+                      >
+                        <option value="discord_bot">Discord Bot</option>
+                        <option value="minecraft_mod">Minecraft Mod</option>
+                        <option value="website">Website</option>
+                      </select>
                     </div>
-                    <h2 style={{
-                      fontSize: '1.1rem',
-                      fontWeight: '700',
-                      color: 'var(--text-primary)',
-                      margin: 0,
-                      lineHeight: 1.3,
-                    }}>
-                      {detail.ticket.title}
-                    </h2>
+                    {editingTitle ? (
+                      <input
+                        autoFocus
+                        value={editTitleValue}
+                        onChange={(e) => setEditTitleValue(e.target.value)}
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && editTitleValue.trim()) {
+                            await detail.updateTicket({ title: editTitleValue.trim() });
+                            refresh();
+                            setEditingTitle(false);
+                          } else if (e.key === 'Escape') {
+                            setEditingTitle(false);
+                          }
+                        }}
+                        onBlur={async () => {
+                          if (editTitleValue.trim() && editTitleValue.trim() !== detail.ticket!.title) {
+                            await detail.updateTicket({ title: editTitleValue.trim() });
+                            refresh();
+                          }
+                          setEditingTitle(false);
+                        }}
+                        maxLength={200}
+                        style={{
+                          ...inputStyle,
+                          fontSize: '1.1rem',
+                          fontWeight: '700',
+                          padding: '0.25rem 0.5rem',
+                        }}
+                      />
+                    ) : (
+                      <h2
+                        onClick={() => {
+                          setEditTitleValue(detail.ticket!.title);
+                          setEditingTitle(true);
+                        }}
+                        style={{
+                          fontSize: '1.1rem',
+                          fontWeight: '700',
+                          color: 'var(--text-primary)',
+                          margin: 0,
+                          lineHeight: 1.3,
+                          cursor: 'pointer',
+                          borderRadius: '0.25rem',
+                          transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                        title="Click to edit title"
+                      >
+                        {detail.ticket.title}
+                      </h2>
+                    )}
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
                       by {detail.ticket.submittedByIgn || 'Unknown'} &middot; {timeAgo(detail.ticket.createdAt)}
                     </div>
