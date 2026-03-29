@@ -326,6 +326,47 @@ export default function ExecGraidPage() {
                 )}
               </div>
 
+              {/* Payout Stats */}
+              {leaderboard.rows.length > 0 && (() => {
+                const eligibleRows = leaderboard.rows.filter(r => r.meetsMin);
+                const totalLE = eligibleRows.reduce((sum, r) => sum + Math.ceil(r.payout / 4096), 0);
+                const paidLE = eligibleRows.filter(r => r.paid).reduce((sum, r) => sum + Math.ceil(r.payout / 4096), 0);
+                const fmtLE = (le: number) => {
+                  const stx = Math.floor(le / 64);
+                  const rem = le % 64;
+                  if (stx > 0) return rem > 0 ? `${stx} STX ${rem} LE` : `${stx} STX`;
+                  return `${le} LE`;
+                };
+                const pct = totalLE > 0 ? Math.round((paidLE / totalLE) * 100) : 0;
+                const paidCount = eligibleRows.filter(r => r.paid).length;
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem 1.25rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Total Event Payout</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)' }}>{fmtLE(totalLE)}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{eligibleRows.length} eligible players</div>
+                    </div>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem 1.25rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Paid Out</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#22c55e' }}>{fmtLE(paidLE)}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>{paidCount} / {eligibleRows.length} players paid</div>
+                    </div>
+                    <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem 1.25rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Remaining</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: '800', color: pct === 100 ? '#22c55e' : '#f59e0b' }}>{fmtLE(totalLE - paidLE)}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ flex: 1, height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', borderRadius: '2px', background: '#22c55e', transition: 'width 0.3s ease' }} />
+                          </div>
+                          <span>{pct}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Leaderboard */}
               <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
                 <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-card)' }}>
