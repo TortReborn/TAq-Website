@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   useAnalyticsOverview,
   useAnalyticsLogins,
@@ -9,6 +9,9 @@ import {
   useAnalyticsUsers,
   useAnalyticsUserDetail,
 } from '@/hooks/useExecAnalytics';
+import { useExecSession } from '@/hooks/useExecSession';
+import { ANALYTICS_DISCORD_ID } from '@/lib/analytics-auth';
+import { useRouter } from 'next/navigation';
 
 type Tab = 'logins' | 'pages' | 'users' | 'actions';
 type Range = '7d' | '30d' | '90d' | 'all';
@@ -41,12 +44,26 @@ function formatDay(d: string): string {
 }
 
 export default function AnalyticsPage() {
+  const { user, loading: sessionLoading } = useExecSession();
+  const router = useRouter();
+
   const [range, setRange] = useState<Range>('30d');
   const [tab, setTab] = useState<Tab>('logins');
   const [pageFilter, setPageFilter] = useState<string>('');
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
   const { from } = useMemo(() => getDateRange(range), [range]);
+
+  // Redirect non-Thundderr users away
+  useEffect(() => {
+    if (!sessionLoading && user && user.discord_id !== ANALYTICS_DISCORD_ID) {
+      router.push('/exec');
+    }
+  }, [sessionLoading, user, router]);
+
+  if (sessionLoading || !user || user.discord_id !== ANALYTICS_DISCORD_ID) {
+    return null;
+  }
 
   const overview = useAnalyticsOverview(from);
   const logins = useAnalyticsLogins(from);
