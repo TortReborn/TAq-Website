@@ -1199,3 +1199,64 @@ body, body *, html, html * {
     grid-template-columns: 1fr;
   }
 }
+
+/* Markdown content styles (Terms of Service, Privacy Policy) */
+.markdown-content h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.markdown-content h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.4rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.markdown-content p {
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.markdown-content ul {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.markdown-content li {
+  margin-bottom: 0.35rem;
+}
+
+.markdown-content strong {
+  color: var(--text-primary);
+}
+
+.markdown-content a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content code {
+  background: var(--bg-secondary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
