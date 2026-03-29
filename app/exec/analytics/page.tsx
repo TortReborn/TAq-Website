@@ -389,15 +389,23 @@ export default function AnalyticsPage() {
                             onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.background = 'transparent'; }}
                           >
                             <td style={{ ...tdStyle, width: '24px', padding: '0.625rem 0.25rem 0.625rem 0.75rem' }}>
-                              <span style={{
-                                display: 'inline-block',
-                                transition: 'transform 0.2s',
-                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                                fontSize: '0.75rem',
-                                color: 'var(--text-secondary)',
-                              }}>
-                                &#9654;
-                              </span>
+                              <svg
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  transition: 'transform 0.2s',
+                                  transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                  color: 'var(--text-secondary)',
+                                }}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M9 5l7 7-7 7" />
+                              </svg>
                             </td>
                             <td style={{ ...tdStyle, fontWeight: '600' }}>{u.ign || u.discordId}</td>
                             <td style={tdStyle}>{u.totalViews.toLocaleString()}</td>
