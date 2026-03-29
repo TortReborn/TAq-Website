@@ -209,6 +209,55 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ users });
     }
 
+    if (metric === 'user-detail') {
+      const discordId = searchParams.get('discord_id');
+      if (!discordId) {
+        return NextResponse.json({ error: 'discord_id required' }, { status: 400 });
+      }
+
+      const userDateParams = [discordId, ...dateParams];
+      const userDateClause = dateClause.replace(/\$(\d+)/g, (_, n) => `$${parseInt(n) + 1}`);
+
+      const [topPagesRes, recentActionsRes, loginCountRes, sessionCountRes] = await Promise.all([
+        pool.query(
+          `SELECT page_path, COUNT(*) as views, COALESCE(AVG(duration_ms), 0) as avg_duration
+           FROM analytics_page_views WHERE discord_id = $1${userDateClause}
+           GROUP BY page_path ORDER BY views DESC LIMIT 10`,
+          userDateParams
+        ),
+        pool.query(
+          `SELECT action_label, action_type, page_path, created_at
+           FROM analytics_actions WHERE discord_id = $1${userDateClause}
+           ORDER BY created_at DESC LIMIT 20`,
+          userDateParams
+        ),
+        pool.query(
+          `SELECT COUNT(*) as count FROM analytics_logins WHERE discord_id = $1${userDateClause}`,
+          userDateParams
+        ),
+        pool.query(
+          `SELECT COUNT(DISTINCT session_id) as count FROM analytics_page_views WHERE discord_id = $1${userDateClause}`,
+          userDateParams
+        ),
+      ]);
+
+      return NextResponse.json({
+        topPages: topPagesRes.rows.map(r => ({
+          page: r.page_path,
+          views: parseInt(r.views),
+          avgDuration: Math.round(parseFloat(r.avg_duration)),
+        })),
+        recentActions: recentActionsRes.rows.map(r => ({
+          label: r.action_label,
+          type: r.action_type,
+          page: r.page_path,
+          time: r.created_at,
+        })),
+        loginCount: parseInt(loginCountRes.rows[0]?.count ?? 0),
+        sessionCount: parseInt(sessionCountRes.rows[0]?.count ?? 0),
+      });
+    }
+
     return NextResponse.json({ error: 'Unknown metric' }, { status: 400 });
   } catch (error) {
     console.error('[analytics] Query error:', error);

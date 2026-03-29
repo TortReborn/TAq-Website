@@ -427,6 +427,7 @@ export default function ExecDashboardPage() {
             color: '#22c55e',
             links: [
               { href: '/exec/agenda', label: 'Agenda', desc: 'View and manage meeting agenda' },
+              { href: '/exec/tracker', label: 'Requests', desc: 'Report bugs and request features' },
             ],
           },
         ].map((group) => (

@@ -80,3 +80,24 @@ export function useAnalyticsUsers(from?: string, to?: string) {
   );
   return { data: data ?? null, loading: isLoading, error: error?.message ?? null, refresh: () => mutate() };
 }
+
+export interface UserDetailData {
+  topPages: { page: string; views: number; avgDuration: number }[];
+  recentActions: { label: string; type: string; page: string; time: string }[];
+  loginCount: number;
+  sessionCount: number;
+}
+
+export function useAnalyticsUserDetail(discordId: string | null, from?: string, to?: string) {
+  const params = new URLSearchParams({ metric: 'user-detail' });
+  if (discordId) params.set('discord_id', discordId);
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+
+  const { data, error, isLoading } = useSWR<UserDetailData>(
+    discordId ? `/api/exec/analytics?${params.toString()}` : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
+  return { data: data ?? null, loading: isLoading, error: error?.message ?? null };
+}

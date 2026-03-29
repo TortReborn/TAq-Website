@@ -7,6 +7,7 @@ import {
   useAnalyticsPageviews,
   useAnalyticsActions,
   useAnalyticsUsers,
+  useAnalyticsUserDetail,
 } from '@/hooks/useExecAnalytics';
 
 type Tab = 'logins' | 'pages' | 'users' | 'actions';
@@ -43,14 +44,24 @@ export default function AnalyticsPage() {
   const [range, setRange] = useState<Range>('30d');
   const [tab, setTab] = useState<Tab>('logins');
   const [pageFilter, setPageFilter] = useState<string>('');
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
   const { from } = useMemo(() => getDateRange(range), [range]);
 
   const overview = useAnalyticsOverview(from);
   const logins = useAnalyticsLogins(from);
   const pageviews = useAnalyticsPageviews(from, undefined, pageFilter || undefined);
+  const actionsUnfiltered = useAnalyticsActions(from);
   const actions = useAnalyticsActions(from, undefined, pageFilter || undefined);
   const users = useAnalyticsUsers(from);
+  const userDetail = useAnalyticsUserDetail(expandedUser, from);
+
+  // Unique pages from unfiltered actions for the filter dropdown
+  const actionPages = useMemo(() => {
+    if (!actionsUnfiltered.data) return [];
+    const pages = new Set(actionsUnfiltered.data.actions.map(a => a.page));
+    return Array.from(pages).sort();
+  }, [actionsUnfiltered.data]);
 
   const loading = overview.loading;
   const error = overview.error;
@@ -357,6 +368,7 @@ export default function AnalyticsPage() {
                 <table style={tableStyle}>
                   <thead>
                     <tr>
+                      <th style={thStyle}></th>
                       <th style={thStyle}>IGN</th>
                       <th style={thStyle}>Page Views</th>
                       <th style={thStyle}>Actions</th>
@@ -365,24 +377,158 @@ export default function AnalyticsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.data.users.map((u, i) => (
-                      <tr key={i}>
-                        <td style={{ ...tdStyle, fontWeight: '600' }}>{u.ign || u.discordId}</td>
-                        <td style={tdStyle}>{u.totalViews.toLocaleString()}</td>
-                        <td style={tdStyle}>{u.totalActions.toLocaleString()}</td>
-                        <td style={tdStyle}>
-                          {u.topPage && (
-                            <span
-                              style={{ cursor: 'pointer', color: 'var(--color-ocean-400)', fontSize: '0.85rem' }}
-                              onClick={() => { setTab('pages'); setPageFilter(u.topPage); }}
-                            >
-                              {u.topPage}
-                            </span>
+                    {users.data.users.map((u, i) => {
+                      const isExpanded = expandedUser === u.discordId;
+                      return (
+                        <>
+                          <tr
+                            key={u.discordId}
+                            onClick={() => setExpandedUser(isExpanded ? null : u.discordId)}
+                            style={{ cursor: 'pointer', transition: 'background 0.15s' }}
+                            onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                            onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            <td style={{ ...tdStyle, width: '24px', padding: '0.625rem 0.25rem 0.625rem 0.75rem' }}>
+                              <span style={{
+                                display: 'inline-block',
+                                transition: 'transform 0.2s',
+                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                fontSize: '0.75rem',
+                                color: 'var(--text-secondary)',
+                              }}>
+                                &#9654;
+                              </span>
+                            </td>
+                            <td style={{ ...tdStyle, fontWeight: '600' }}>{u.ign || u.discordId}</td>
+                            <td style={tdStyle}>{u.totalViews.toLocaleString()}</td>
+                            <td style={tdStyle}>{u.totalActions.toLocaleString()}</td>
+                            <td style={tdStyle}>
+                              {u.topPage && (
+                                <span style={{ color: 'var(--color-ocean-400)', fontSize: '0.85rem' }}>
+                                  {u.topPage}
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{formatDate(u.lastSeen)}</td>
+                          </tr>
+                          {isExpanded && (
+                            <tr key={`${u.discordId}-detail`}>
+                              <td colSpan={6} style={{ padding: 0, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{
+                                  background: 'var(--bg-primary)',
+                                  padding: '1rem 1.25rem',
+                                  margin: '0',
+                                }}>
+                                  {userDetail.loading && !userDetail.data ? (
+                                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Loading details...</div>
+                                  ) : userDetail.error ? (
+                                    <div style={{ color: '#ef4444', fontSize: '0.85rem' }}>Failed to load details</div>
+                                  ) : userDetail.data ? (
+                                    <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                                      {/* Left: Stats + Top Pages */}
+                                      <div style={{ flex: 1, minWidth: '250px' }}>
+                                        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
+                                          <div>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Logins</div>
+                                            <div style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)' }}>{userDetail.data.loginCount}</div>
+                                          </div>
+                                          <div>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Sessions</div>
+                                            <div style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)' }}>{userDetail.data.sessionCount}</div>
+                                          </div>
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Top Pages</div>
+                                        {userDetail.data.topPages.length === 0 ? (
+                                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No page data</div>
+                                        ) : (
+                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                                            {userDetail.data.topPages.map((p, j) => {
+                                              const maxViews = userDetail.data!.topPages[0].views;
+                                              return (
+                                                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                  <div style={{
+                                                    flex: 1,
+                                                    position: 'relative',
+                                                    background: 'rgba(255,255,255,0.05)',
+                                                    borderRadius: '0.25rem',
+                                                    overflow: 'hidden',
+                                                    height: '24px',
+                                                  }}>
+                                                    <div style={{
+                                                      position: 'absolute',
+                                                      top: 0, left: 0, bottom: 0,
+                                                      width: `${(p.views / maxViews) * 100}%`,
+                                                      background: 'rgba(59, 130, 246, 0.2)',
+                                                      borderRadius: '0.25rem',
+                                                    }} />
+                                                    <span style={{
+                                                      position: 'relative',
+                                                      padding: '0 0.5rem',
+                                                      fontSize: '0.75rem',
+                                                      fontWeight: '500',
+                                                      color: 'var(--text-primary)',
+                                                      lineHeight: '24px',
+                                                      whiteSpace: 'nowrap',
+                                                    }}>
+                                                      {p.page}
+                                                    </span>
+                                                  </div>
+                                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', minWidth: '60px', textAlign: 'right' }}>
+                                                    {p.views} views
+                                                  </span>
+                                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', minWidth: '50px', textAlign: 'right' }}>
+                                                    {formatDuration(p.avgDuration)}
+                                                  </span>
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Right: Recent Actions */}
+                                      <div style={{ flex: 1, minWidth: '250px' }}>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Recent Actions</div>
+                                        {userDetail.data.recentActions.length === 0 ? (
+                                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>No actions</div>
+                                        ) : (
+                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxHeight: '200px', overflowY: 'auto' }}>
+                                            {userDetail.data.recentActions.map((a, j) => (
+                                              <div key={j} style={{
+                                                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '0.25rem',
+                                                background: 'rgba(255,255,255,0.03)',
+                                                fontSize: '0.75rem',
+                                              }}>
+                                                <span style={{
+                                                  padding: '0.0625rem 0.375rem', borderRadius: '9999px', fontSize: '0.65rem', fontWeight: '600',
+                                                  background: a.type === 'click' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+                                                  color: a.type === 'click' ? '#3b82f6' : '#22c55e',
+                                                  flexShrink: 0,
+                                                }}>
+                                                  {a.type}
+                                                </span>
+                                                <span style={{ color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                                                  {a.label}
+                                                </span>
+                                                <span style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', flexShrink: 0 }}>
+                                                  {formatDate(a.time)}
+                                                </span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              </td>
+                            </tr>
                           )}
-                        </td>
-                        <td style={{ ...tdStyle, color: 'var(--text-secondary)' }}>{formatDate(u.lastSeen)}</td>
-                      </tr>
-                    ))}
+                        </>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -397,18 +543,40 @@ export default function AnalyticsPage() {
               <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 Actions
               </h2>
-              {pageFilter && (
-                <button
-                  onClick={() => setPageFilter('')}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <select
+                  value={pageFilter}
+                  onChange={(e) => setPageFilter(e.target.value)}
                   style={{
-                    padding: '0.25rem 0.75rem', borderRadius: '9999px', border: '1px solid var(--border-card)',
-                    background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)', fontSize: '0.8rem',
-                    fontWeight: '600', cursor: 'pointer',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-card)',
+                    borderRadius: '0.375rem',
+                    padding: '0.375rem 0.625rem',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.8rem',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    minWidth: '160px',
                   }}
                 >
-                  {pageFilter} &times;
-                </button>
-              )}
+                  <option value="">All pages</option>
+                  {actionPages.map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+                {pageFilter && (
+                  <button
+                    onClick={() => setPageFilter('')}
+                    style={{
+                      padding: '0.25rem 0.5rem', borderRadius: '0.375rem', border: '1px solid var(--border-card)',
+                      background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.8rem',
+                      fontWeight: '600', cursor: 'pointer',
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
             {actions.data.actions.length === 0 ? (
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic' }}>No actions in this period</p>
