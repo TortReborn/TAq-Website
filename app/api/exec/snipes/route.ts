@@ -62,7 +62,7 @@ async function postToSnipeLogChannel(
   if (!res.ok) {
     const errBody = await res.text();
     console.error('Discord post failed:', res.status, errBody);
-    throw new Error(`Failed to post to Discord channel: ${res.status}`);
+    throw new Error(`Failed to post to Discord channel: ${res.status} ${errBody}`);
   }
 }
 
@@ -319,7 +319,8 @@ export async function POST(request: NextRequest) {
         await postToSnipeLogChannel(logText, imageBuffer, imageFilename);
       } catch (discordErr) {
         console.error('Failed to post to snipe log channel:', discordErr);
-        return NextResponse.json({ success: true, id: snipeId, warning: 'Snipe logged but failed to post to Discord channel' });
+        const errMsg = discordErr instanceof Error ? discordErr.message : String(discordErr);
+        return NextResponse.json({ success: true, id: snipeId, warning: `Snipe logged but failed to post to Discord channel: ${errMsg}` });
       }
     }
 
