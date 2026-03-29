@@ -36,8 +36,16 @@ interface GuildBankData {
   stats: GuildBankStats;
 }
 
-export function useGuildBank(pageSize = 100) {
+export const PAGE_SIZE_OPTIONS = [100, 250, 500, 1000] as const;
+export type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+
+export function useGuildBank() {
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<PageSize>(() => {
+    if (typeof window === 'undefined') return 100;
+    const cached = Number(sessionStorage.getItem('guildBank:pageSize'));
+    return PAGE_SIZE_OPTIONS.includes(cached as PageSize) ? (cached as PageSize) : 100;
+  });
 
   const { data, error, isLoading, mutate } = useSWR<GuildBankData>(
     `/api/exec/guild-bank?page=${page}&limit=${pageSize}`,
@@ -54,16 +62,24 @@ export function useGuildBank(pageSize = 100) {
     setPage(Math.max(1, p));
   }, []);
 
+  const changePageSize = useCallback((size: PageSize) => {
+    setPageSize(size);
+    setPage(1);
+    sessionStorage.setItem('guildBank:pageSize', String(size));
+  }, []);
+
   return {
     transactions: data?.transactions ?? [],
     inventory: data?.inventory ?? [],
     stats: data?.stats ?? { deposits: 0, withdrawals: 0, totalItems: 0, uniqueItems: 0 },
     total: data?.total ?? 0,
     page: data?.page ?? page,
+    pageSize,
     totalPages: data?.totalPages ?? 1,
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),
     goToPage,
+    changePageSize,
   };
 }

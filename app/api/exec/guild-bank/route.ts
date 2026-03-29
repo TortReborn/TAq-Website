@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const pool = getPool();
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
-    const limit = Math.min(500, Math.max(1, parseInt(searchParams.get('limit') ?? '100', 10)));
+    const limit = Math.min(1000, Math.max(1, parseInt(searchParams.get('limit') ?? '100', 10)));
     const offset = (page - 1) * limit;
 
     // Paginated transaction history + total count

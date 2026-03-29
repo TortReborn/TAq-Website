@@ -2,15 +2,24 @@
 
 import { useState, useMemo } from 'react';
 import { useExecSession } from '@/hooks/useExecSession';
-import { useGuildBank, GuildBankTransaction } from '@/hooks/useGuildBank';
+import { useGuildBank, GuildBankTransaction, PAGE_SIZE_OPTIONS } from '@/hooks/useGuildBank';
 
 type View = 'inventory' | 'history';
 
 export default function GuildBankPage() {
   useExecSession();
-  const { transactions, inventory, stats, total, page, totalPages, loading, error, refresh, goToPage } = useGuildBank();
+  const { transactions, inventory, stats, total, page, pageSize, totalPages, loading, error, refresh, goToPage, changePageSize } = useGuildBank();
   const [search, setSearch] = useState('');
-  const [view, setView] = useState<View>('inventory');
+  const [view, setView] = useState<View>(() => {
+    if (typeof window === 'undefined') return 'inventory';
+    const cached = sessionStorage.getItem('guildBank:view');
+    return cached === 'history' ? 'history' : 'inventory';
+  });
+
+  const handleViewChange = (v: View) => {
+    setView(v);
+    sessionStorage.setItem('guildBank:view', v);
+  };
 
   const filteredInventory = useMemo(() => {
     if (!search.trim()) return inventory;
@@ -97,7 +106,7 @@ export default function GuildBankPage() {
           {views.map(v => (
             <button
               key={v.value}
-              onClick={() => setView(v.value)}
+              onClick={() => handleViewChange(v.value)}
               style={{
                 padding: '0.4rem 0.75rem',
                 borderRadius: '0.375rem',
@@ -237,11 +246,36 @@ export default function GuildBankPage() {
       ) : (
         <>
           <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             fontSize: '0.75rem',
             color: 'var(--text-secondary)',
             marginBottom: '0.5rem',
           }}>
-            Page {page} of {totalPages} ({total.toLocaleString()} total transactions)
+            <span>Page {page} of {totalPages} ({total.toLocaleString()} total transactions)</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span>Show</span>
+              <select
+                value={pageSize}
+                onChange={e => changePageSize(Number(e.target.value) as typeof pageSize)}
+                style={{
+                  padding: '0.2rem 0.4rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--border-card)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+              >
+                {PAGE_SIZE_OPTIONS.map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+              <span>per page</span>
+            </div>
           </div>
 
           <div style={{
