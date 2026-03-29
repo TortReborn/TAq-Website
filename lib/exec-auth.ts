@@ -147,7 +147,7 @@ export function getBaseUrl(): string {
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
 
 // Ranks that are allowed to access the exec dashboard (Hammerhead or higher)
-export const EXEC_RANKS = ['Hammerhead', 'Sailfish', 'Dolphin', 'Trial-Narwhal', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
+export const EXEC_RANKS = ['Hammerhead', 'Sailfish', 'Dolphin', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
 const ALLOWED_RANKS = EXEC_RANKS;
 
 export function getDiscordOAuthUrl(state: string): string {
