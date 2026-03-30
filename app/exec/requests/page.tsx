@@ -602,7 +602,7 @@ export default function ExecTrackerPage() {
                         ]}
                         value={detail.ticket.type}
                         onChange={async (v) => {
-                          if (!v || v === detail.ticket.type) return;
+                          if (!v || v === detail.ticket!.type) return;
                           if (selectedId) updateTicketLocally(selectedId, { type: v as any });
                           await detail.updateTicket({ type: v });
                           refresh();
