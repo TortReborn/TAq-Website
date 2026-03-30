@@ -110,6 +110,49 @@ function Badge({ label, color }: { label: string; color: string }) {
   );
 }
 
+function FilterGroup({ options, value, onChange, colors }: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+  colors?: Record<string, string>;
+}) {
+  return (
+    <div style={{ display: 'flex', gap: '0.25rem' }}>
+      {options.map((opt) => {
+        const active = value === opt.value;
+        const accentColor = colors?.[opt.value];
+        return (
+          <button
+            key={opt.value}
+            onClick={() => onChange(active ? '' : opt.value)}
+            style={{
+              fontSize: '0.72rem',
+              fontWeight: '600',
+              padding: '0.25rem 0.6rem',
+              borderRadius: '999px',
+              border: active
+                ? `1px solid ${accentColor || 'var(--color-ocean-500)'}`
+                : '1px solid var(--border-card)',
+              background: active
+                ? `${accentColor || 'var(--color-ocean-500)'}22`
+                : 'transparent',
+              color: active
+                ? (accentColor || 'var(--color-ocean-500)')
+                : 'var(--text-secondary)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.12s ease',
+              outline: 'none',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -149,7 +192,7 @@ export default function ExecTrackerPage() {
     order: sortOrder,
   }), [typeFilter, systemFilter, statusFilter, priorityFilter, sortKey, sortOrder]);
 
-  const { tickets, execMembers, loading, error, refresh, createTicket } = useExecTracker(filters);
+  const { tickets, execMembers, loading, error, refresh, createTicket, updateTicketLocally } = useExecTracker(filters);
 
   // Detail panel
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -276,40 +319,67 @@ export default function ExecTrackerPage() {
       {/* Filter bar */}
       <div style={{
         display: 'flex',
-        gap: '0.5rem',
+        gap: '0.75rem',
         flexWrap: 'wrap',
         marginBottom: '0.75rem',
         alignItems: 'center',
       }}>
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Types</option>
-          <option value="bug">Bug</option>
-          <option value="feature">Feature</option>
-        </select>
+        <FilterGroup
+          options={[
+            { value: 'bug', label: 'Bug' },
+            { value: 'feature', label: 'Feature' },
+          ]}
+          value={typeFilter}
+          onChange={setTypeFilter}
+          colors={{ bug: '#ef4444', feature: '#8b5cf6' }}
+        />
 
-        <select value={systemFilter} onChange={(e) => setSystemFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Systems</option>
-          <option value="discord_bot">Discord Bot</option>
-          <option value="minecraft_mod">Minecraft Mod</option>
-          <option value="website">Website</option>
-        </select>
+        <div style={{ width: '1px', height: '1.2rem', background: 'var(--border-card)' }} />
 
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Statuses</option>
-          <option value="open,in_progress">Active</option>
-          <option value="open">Open</option>
-          <option value="in_progress">In Progress</option>
-          <option value="resolved">Resolved</option>
-          <option value="closed">Closed</option>
-        </select>
+        <FilterGroup
+          options={[
+            { value: 'discord_bot', label: 'Discord Bot' },
+            { value: 'minecraft_mod', label: 'Minecraft Mod' },
+            { value: 'website', label: 'Website' },
+          ]}
+          value={systemFilter}
+          onChange={setSystemFilter}
+        />
 
-        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Priorities</option>
-          <option value="critical">Critical</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
+        <div style={{ width: '1px', height: '1.2rem', background: 'var(--border-card)' }} />
+
+        <FilterGroup
+          options={[
+            { value: 'open,in_progress', label: 'Active' },
+            { value: 'open', label: 'Open' },
+            { value: 'in_progress', label: 'In Progress' },
+            { value: 'resolved', label: 'Resolved' },
+            { value: 'closed', label: 'Closed' },
+          ]}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          colors={{
+            'open,in_progress': '#3b82f6',
+            open: '#3b82f6',
+            in_progress: '#f59e0b',
+            resolved: '#22c55e',
+            closed: '#6b7280',
+          }}
+        />
+
+        <div style={{ width: '1px', height: '1.2rem', background: 'var(--border-card)' }} />
+
+        <FilterGroup
+          options={[
+            { value: 'critical', label: 'Critical' },
+            { value: 'high', label: 'High' },
+            { value: 'medium', label: 'Medium' },
+            { value: 'low', label: 'Low' },
+          ]}
+          value={priorityFilter}
+          onChange={setPriorityFilter}
+          colors={PRIORITY_COLORS}
+        />
 
         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
           {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
@@ -477,7 +547,7 @@ export default function ExecTrackerPage() {
                       <Badge label={TYPE_LABELS[detail.ticket.type]} color={detail.ticket.type === 'bug' ? '#ef4444' : '#8b5cf6'} />
                       <select
                         value={detail.ticket.system}
-                        onChange={async (e) => { await detail.updateTicket({ system: e.target.value }); refresh(); }}
+                        onChange={async (e) => { const v = e.target.value; if (selectedId) updateTicketLocally(selectedId, { system: v as any }); await detail.updateTicket({ system: v }); refresh(); }}
                         style={{
                           background: 'transparent',
                           border: 'none',
@@ -500,6 +570,7 @@ export default function ExecTrackerPage() {
                         onChange={(e) => setEditTitleValue(e.target.value)}
                         onKeyDown={async (e) => {
                           if (e.key === 'Enter' && editTitleValue.trim()) {
+                            if (selectedId) updateTicketLocally(selectedId, { title: editTitleValue.trim() });
                             await detail.updateTicket({ title: editTitleValue.trim() });
                             refresh();
                             setEditingTitle(false);
@@ -509,6 +580,7 @@ export default function ExecTrackerPage() {
                         }}
                         onBlur={async () => {
                           if (editTitleValue.trim() && editTitleValue.trim() !== detail.ticket!.title) {
+                            if (selectedId) updateTicketLocally(selectedId, { title: editTitleValue.trim() });
                             await detail.updateTicket({ title: editTitleValue.trim() });
                             refresh();
                           }
@@ -580,7 +652,7 @@ export default function ExecTrackerPage() {
                       </label>
                       <select
                         value={detail.ticket.status}
-                        onChange={async (e) => { await detail.updateTicket({ status: e.target.value }); refresh(); }}
+                        onChange={async (e) => { const v = e.target.value; if (selectedId) updateTicketLocally(selectedId, { status: v as any }); await detail.updateTicket({ status: v }); refresh(); }}
                         style={{ ...selectStyle, width: '100%', minWidth: 0, fontSize: '0.8rem', padding: '0.35rem 0.5rem' }}
                       >
                         {Object.entries(STATUS_LABELS).map(([val, label]) => (
@@ -594,7 +666,7 @@ export default function ExecTrackerPage() {
                       </label>
                       <select
                         value={detail.ticket.priority}
-                        onChange={async (e) => { await detail.updateTicket({ priority: e.target.value }); refresh(); }}
+                        onChange={async (e) => { const v = e.target.value; if (selectedId) updateTicketLocally(selectedId, { priority: v as any }); await detail.updateTicket({ priority: v }); refresh(); }}
                         style={{ ...selectStyle, width: '100%', minWidth: 0, fontSize: '0.8rem', padding: '0.35rem 0.5rem' }}
                       >
                         {Object.entries(PRIORITY_LABELS).map(([val, label]) => (
@@ -608,7 +680,7 @@ export default function ExecTrackerPage() {
                       </label>
                       <select
                         value={detail.ticket.assignedTo || ''}
-                        onChange={async (e) => { await detail.updateTicket({ assigned_to: e.target.value || null }); refresh(); }}
+                        onChange={async (e) => { const v = e.target.value || null; if (selectedId) updateTicketLocally(selectedId, { assignedTo: v }); await detail.updateTicket({ assigned_to: v }); refresh(); }}
                         style={{ ...selectStyle, width: '100%', minWidth: 0, fontSize: '0.8rem', padding: '0.35rem 0.5rem' }}
                       >
                         <option value="">Unassigned</option>

@@ -77,6 +77,17 @@ export function useExecTracker(filters: TrackerFilters = {}) {
     mutate();
   };
 
+  const updateTicketLocally = (id: number, fields: Partial<Ticket>) => {
+    if (!data) return;
+    mutate(
+      {
+        ...data,
+        tickets: data.tickets.map(t => t.id === id ? { ...t, ...fields } : t),
+      },
+      false,
+    );
+  };
+
   return {
     tickets: data?.tickets ?? [],
     execMembers: data?.execMembers ?? [],
@@ -84,5 +95,6 @@ export function useExecTracker(filters: TrackerFilters = {}) {
     error: error?.message ?? null,
     refresh: () => mutate(),
     createTicket,
+    updateTicketLocally,
   };
 }
