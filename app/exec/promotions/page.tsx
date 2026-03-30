@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useExecPromotions } from '@/hooks/useExecPromotions';
 import { useExecSession } from '@/hooks/useExecSession';
 import { RANK_HIERARCHY, RANK_ORDER, getRankColor, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
@@ -36,6 +36,15 @@ export default function ExecPromotionsPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [suggestingUuid, setSuggestingUuid] = useState<string | null>(null);
+  const [suggestReason, setSuggestReason] = useState('');
+  const suggestInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (suggestingUuid && suggestInputRef.current) {
+      suggestInputRef.current.focus();
+    }
+  }, [suggestingUuid]);
 
   const userRankIdx = user ? RANK_HIERARCHY.indexOf(user.rank) : -1;
 
@@ -481,13 +490,56 @@ export default function ExecPromotionsPage() {
                                 Remove
                               </button>
                               {!isSuggested && (userRankIdx >= PROMO_VISIBILITY_MIN_VIEWER_IDX || RANK_HIERARCHY.indexOf(member.rank) < PROMO_VISIBILITY_RANK_THRESHOLD_IDX) && (
-                                <button
-                                  onClick={() => suggestPromotion(member.uuid, member.ign, member.rank)}
-                                  title="Add to promo list"
-                                  style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
-                                >
-                                  Suggest
-                                </button>
+                                suggestingUuid === member.uuid ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.21rem' }}>
+                                    <div style={{ position: 'relative' }}>
+                                      <input
+                                        ref={suggestInputRef}
+                                        type="text"
+                                        value={suggestReason}
+                                        onChange={(e) => setSuggestReason(e.target.value.slice(0, 50))}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            suggestPromotion(member.uuid, member.ign, member.rank, suggestReason.trim() || undefined);
+                                            setSuggestingUuid(null);
+                                            setSuggestReason('');
+                                          } else if (e.key === 'Escape') {
+                                            setSuggestingUuid(null);
+                                            setSuggestReason('');
+                                          }
+                                        }}
+                                        placeholder="Reason (optional)"
+                                        maxLength={50}
+                                        style={{
+                                          background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
+                                          borderRadius: '0.21rem', padding: '0.12rem 2.2rem 0.12rem 0.25rem', fontSize: '0.6rem',
+                                          color: 'var(--text-primary)', width: '120px', outline: 'none',
+                                        }}
+                                      />
+                                      <span style={{ position: 'absolute', right: '0.25rem', top: '50%', transform: 'translateY(-50%)', fontSize: '0.5rem', color: suggestReason.length >= 50 ? '#ef4444' : 'var(--text-secondary)', pointerEvents: 'none' }}>
+                                        {suggestReason.length}/50
+                                      </span>
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        suggestPromotion(member.uuid, member.ign, member.rank, suggestReason.trim() || undefined);
+                                        setSuggestingUuid(null);
+                                        setSuggestReason('');
+                                      }}
+                                      style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
+                                    >
+                                      Confirm
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => { setSuggestingUuid(member.uuid); setSuggestReason(''); }}
+                                    title="Add to promo list"
+                                    style={{ ...btnStyle, background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '0.17rem 0.34rem', fontSize: '0.6rem' }}
+                                  >
+                                    Suggest
+                                  </button>
+                                )
                               )}
                             </div>
                           )}
@@ -529,7 +581,7 @@ export default function ExecPromotionsPage() {
         </div>
 
         {/* Column 2: Promo List */}
-        <div style={{ flex: '1.5 1 0', minWidth: '170px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ flex: '1.3 1 0', minWidth: '155px', display: 'flex', flexDirection: 'column', height: '100%' }}>
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.64rem', flexShrink: 0 }}>
               <h2 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
@@ -582,6 +634,11 @@ export default function ExecPromotionsPage() {
                         <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           suggested by {suggestion.suggestedByIgn}
                         </div>
+                        {suggestion.reason && (
+                          <div style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', marginTop: '0.1rem', fontStyle: 'italic', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                            &ldquo;{suggestion.reason}&rdquo;
+                          </div>
+                        )}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.21rem' }}>
                         {nextRank && !stagedUuids.has(suggestion.uuid) && !pendingUuids.has(suggestion.uuid) && (
@@ -609,7 +666,7 @@ export default function ExecPromotionsPage() {
         </div>
 
         {/* Column 3: Staged Actions + Pending Queue + History */}
-        <div style={{ flex: '1.5 1 0', minWidth: '170px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.64rem' }}>
+        <div style={{ flex: '1.3 1 0', minWidth: '155px', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.64rem' }}>
           {/* Staged Actions */}
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '0.85rem', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.64rem', flexShrink: 0 }}>

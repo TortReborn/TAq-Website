@@ -28,5 +28,9 @@ CREATE TABLE IF NOT EXISTS promo_suggestions (
   current_rank VARCHAR(32) NOT NULL,
   suggested_by_discord_id BIGINT NOT NULL,
   suggested_by_ign VARCHAR(64) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  reason VARCHAR(50)
 );
+
+-- Add reason column to promo_suggestions if it doesn't exist
+ALTER TABLE promo_suggestions ADD COLUMN IF NOT EXISTS reason VARCHAR(50);

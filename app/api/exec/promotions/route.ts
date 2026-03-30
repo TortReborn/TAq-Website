@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       ),
       // Promo suggestions (with discord_id from discord_links)
       pool.query(
-        `SELECT ps.id, ps.uuid, ps.ign, ps.current_rank, ps.suggested_by_ign, ps.created_at,
+        `SELECT ps.id, ps.uuid, ps.ign, ps.current_rank, ps.suggested_by_ign, ps.created_at, ps.reason,
                 dl.discord_id
          FROM promo_suggestions ps
          LEFT JOIN discord_links dl ON dl.uuid = ps.uuid
@@ -111,6 +111,7 @@ export async function GET(request: NextRequest) {
       suggestedByIgn: row.suggested_by_ign,
       createdAt: row.created_at,
       discordId: row.discord_id || null,
+      reason: row.reason || null,
     }));
 
     // Filter promo suggestions based on viewer's rank

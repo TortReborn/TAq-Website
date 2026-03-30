@@ -12,10 +12,15 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { uuid, ign, currentRank } = await request.json();
+    const { uuid, ign, currentRank, reason } = await request.json();
 
     if (!uuid || !ign || !currentRank) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const trimmedReason = typeof reason === 'string' ? reason.trim() : null;
+    if (trimmedReason && trimmedReason.length > 50) {
+      return NextResponse.json({ error: 'Reason must be 50 characters or less' }, { status: 400 });
     }
 
     // Only Narwhal+ can suggest promotions for Hammerhead+ members
@@ -32,10 +37,10 @@ export async function POST(request: NextRequest) {
 
     const pool = getPool();
     await pool.query(
-      `INSERT INTO promo_suggestions (uuid, ign, current_rank, suggested_by_discord_id, suggested_by_ign)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO promo_suggestions (uuid, ign, current_rank, suggested_by_discord_id, suggested_by_ign, reason)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (uuid) DO NOTHING`,
-      [uuid, ign, currentRank, session.discord_id, session.ign]
+      [uuid, ign, currentRank, session.discord_id, session.ign, trimmedReason || null]
     );
 
     return NextResponse.json({ success: true });

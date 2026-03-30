@@ -35,6 +35,7 @@ export interface PromoSuggestion {
   suggestedByIgn: string;
   createdAt: string;
   discordId: string | null;
+  reason: string | null;
 }
 
 interface PromotionsData {
@@ -92,11 +93,11 @@ export function useExecPromotions() {
     mutate();
   };
 
-  const suggestPromotion = async (uuid: string, ign: string, currentRank: string) => {
+  const suggestPromotion = async (uuid: string, ign: string, currentRank: string, reason?: string) => {
     const res = await fetch('/api/exec/promotions/suggest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uuid, ign, currentRank }),
+      body: JSON.stringify({ uuid, ign, currentRank, reason: reason || undefined }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to suggest promotion');
