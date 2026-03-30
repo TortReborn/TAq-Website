@@ -117,12 +117,23 @@ export async function PATCH(
       paramIdx++;
     }
 
+    if (body.type !== undefined) {
+      if (!['bug', 'feature'].includes(body.type)) {
+        return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+      }
+      updates.push(`type = $${paramIdx}`);
+      values.push(body.type);
+      paramIdx++;
+    }
+
     if (body.system !== undefined) {
-      if (!['discord_bot', 'minecraft_mod', 'website'].includes(body.system)) {
+      const validSystems = ['discord_bot', 'minecraft_mod', 'website'];
+      const systemArr: string[] = Array.isArray(body.system) ? body.system : [body.system];
+      if (systemArr.length === 0 || !systemArr.every((s: string) => validSystems.includes(s))) {
         return NextResponse.json({ error: 'Invalid system' }, { status: 400 });
       }
-      updates.push(`system = $${paramIdx}`);
-      values.push(body.system);
+      updates.push(`system = $${paramIdx}::text[]`);
+      values.push(systemArr);
       paramIdx++;
     }
 

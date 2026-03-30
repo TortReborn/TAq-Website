@@ -28,7 +28,8 @@ export function useExecTicket(id: number | null) {
     assigned_to?: string | null;
     title?: string;
     description?: string;
-    system?: string;
+    type?: string;
+    system?: string[];
   }) => {
     if (!id) return;
     await fetch(`/api/exec/requests/${id}`, {

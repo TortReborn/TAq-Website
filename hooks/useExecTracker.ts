@@ -9,7 +9,7 @@ export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 export interface Ticket {
   id: number;
   type: TicketType;
-  system: TicketSystem;
+  system: TicketSystem[];
   title: string;
   description: string;
   status: TicketStatus;
@@ -64,7 +64,7 @@ export function useExecTracker(filters: TrackerFilters = {}) {
 
   const createTicket = async (input: {
     type: TicketType;
-    system: TicketSystem;
+    system: TicketSystem[];
     title: string;
     description: string;
     priority?: TicketPriority;

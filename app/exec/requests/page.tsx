@@ -153,6 +153,55 @@ function FilterGroup({ options, value, onChange, colors }: {
   );
 }
 
+function MultiToggleGroup({ options, value, onChange, colors }: {
+  options: { value: string; label: string }[];
+  value: string[];
+  onChange: (v: string[]) => void;
+  colors?: Record<string, string>;
+}) {
+  return (
+    <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+      {options.map((opt) => {
+        const active = value.includes(opt.value);
+        const accentColor = colors?.[opt.value];
+        return (
+          <button
+            key={opt.value}
+            onClick={() => {
+              if (active) {
+                onChange(value.filter(v => v !== opt.value));
+              } else {
+                onChange([...value, opt.value]);
+              }
+            }}
+            style={{
+              fontSize: '0.72rem',
+              fontWeight: '600',
+              padding: '0.25rem 0.6rem',
+              borderRadius: '999px',
+              border: active
+                ? `1px solid ${accentColor || 'var(--color-ocean-500)'}`
+                : '1px solid var(--border-card)',
+              background: active
+                ? `${accentColor || 'var(--color-ocean-500)'}22`
+                : 'transparent',
+              color: active
+                ? (accentColor || 'var(--color-ocean-500)')
+                : 'var(--text-secondary)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.12s ease',
+              outline: 'none',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -201,7 +250,7 @@ export default function ExecTrackerPage() {
   // New ticket modal
   const [showModal, setShowModal] = useState(false);
   const [newType, setNewType] = useState<TicketType>('bug');
-  const [newSystem, setNewSystem] = useState<TicketSystem>('discord_bot');
+  const [newSystems, setNewSystems] = useState<TicketSystem[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newPriority, setNewPriority] = useState<TicketPriority>('medium');
@@ -219,12 +268,12 @@ export default function ExecTrackerPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleCreate = async () => {
-    if (!newTitle.trim() || !newDesc.trim()) return;
+    if (!newTitle.trim() || !newDesc.trim() || newSystems.length === 0) return;
     setCreating(true);
     try {
       await createTicket({
         type: newType,
-        system: newSystem,
+        system: newSystems,
         title: newTitle,
         description: newDesc,
         priority: newPriority,
@@ -233,6 +282,8 @@ export default function ExecTrackerPage() {
       setNewTitle('');
       setNewDesc('');
       setNewPriority('medium');
+      setNewType('bug');
+      setNewSystems([]);
     } finally {
       setCreating(false);
     }
@@ -307,7 +358,7 @@ export default function ExecTrackerPage() {
           Requests
         </h1>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => { setNewType('bug'); setNewSystems([]); setNewTitle(''); setNewDesc(''); setNewPriority('medium'); setShowModal(true); }}
           style={btnPrimary}
           onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
           onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
@@ -493,7 +544,7 @@ export default function ExecTrackerPage() {
                     )}
                   </div>
                   <div><Badge label={TYPE_LABELS[ticket.type]} color={ticket.type === 'bug' ? '#ef4444' : '#8b5cf6'} /></div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{SYSTEM_LABELS[ticket.system]}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ticket.system.map(s => SYSTEM_LABELS[s]).join(', ')}</div>
                   <div><Badge label={STATUS_LABELS[ticket.status]} color={STATUS_COLORS[ticket.status]} /></div>
                   <div><Badge label={PRIORITY_LABELS[ticket.priority]} color={PRIORITY_COLORS[ticket.priority]} /></div>
                   <div style={{
@@ -542,26 +593,37 @@ export default function ExecTrackerPage() {
                   gap: '0.75rem',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>#{detail.ticket.id}</span>
-                      <Badge label={TYPE_LABELS[detail.ticket.type]} color={detail.ticket.type === 'bug' ? '#ef4444' : '#8b5cf6'} />
-                      <select
-                        value={detail.ticket.system}
-                        onChange={async (e) => { const v = e.target.value; if (selectedId) updateTicketLocally(selectedId, { system: v as any }); await detail.updateTicket({ system: v }); refresh(); }}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: 'var(--text-secondary)',
-                          fontSize: '0.75rem',
-                          cursor: 'pointer',
-                          outline: 'none',
-                          padding: 0,
+                      <FilterGroup
+                        options={[
+                          { value: 'bug', label: 'Bug' },
+                          { value: 'feature', label: 'Feature' },
+                        ]}
+                        value={detail.ticket.type}
+                        onChange={async (v) => {
+                          if (!v || v === detail.ticket.type) return;
+                          if (selectedId) updateTicketLocally(selectedId, { type: v as any });
+                          await detail.updateTicket({ type: v });
+                          refresh();
                         }}
-                      >
-                        <option value="discord_bot">Discord Bot</option>
-                        <option value="minecraft_mod">Minecraft Mod</option>
-                        <option value="website">Website</option>
-                      </select>
+                        colors={{ bug: '#ef4444', feature: '#8b5cf6' }}
+                      />
+                      <div style={{ width: '1px', height: '1rem', background: 'var(--border-card)' }} />
+                      <MultiToggleGroup
+                        options={[
+                          { value: 'discord_bot', label: 'Bot' },
+                          { value: 'minecraft_mod', label: 'Mod' },
+                          { value: 'website', label: 'Web' },
+                        ]}
+                        value={detail.ticket.system}
+                        onChange={async (v) => {
+                          if (v.length === 0) return;
+                          if (selectedId) updateTicketLocally(selectedId, { system: v as any });
+                          await detail.updateTicket({ system: v });
+                          refresh();
+                        }}
+                      />
                     </div>
                     {editingTitle ? (
                       <input
@@ -684,7 +746,7 @@ export default function ExecTrackerPage() {
                         style={{ ...selectStyle, width: '100%', minWidth: 0, fontSize: '0.8rem', padding: '0.35rem 0.5rem' }}
                       >
                         <option value="">Unassigned</option>
-                        {execMembers.map((m) => (
+                        {execMembers.filter(m => ['Thundderr', 'LordGonner', 'Kenji121'].includes(m.ign)).map((m) => (
                           <option key={m.discordId} value={m.discordId}>{m.ign}</option>
                         ))}
                       </select>
@@ -875,17 +937,34 @@ export default function ExecTrackerPage() {
             {/* System */}
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.35rem' }}>
-                System
+                System <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(select one or more)</span>
               </label>
-              <select
-                value={newSystem}
-                onChange={(e) => setNewSystem(e.target.value as TicketSystem)}
-                style={{ ...selectStyle, width: '100%' }}
-              >
-                <option value="discord_bot">Discord Bot</option>
-                <option value="minecraft_mod">Minecraft Mod</option>
-                <option value="website">Website</option>
-              </select>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {([['discord_bot', 'Discord Bot'], ['minecraft_mod', 'Minecraft Mod'], ['website', 'Website']] as const).map(([val, label]) => {
+                  const active = newSystems.includes(val);
+                  return (
+                    <button
+                      key={val}
+                      onClick={() => {
+                        if (active && newSystems.length > 1) {
+                          setNewSystems(newSystems.filter(x => x !== val));
+                        } else if (!active) {
+                          setNewSystems([...newSystems, val]);
+                        }
+                      }}
+                      style={{
+                        ...btnStyle,
+                        flex: 1,
+                        background: active ? 'rgba(59,130,246,0.15)' : 'transparent',
+                        border: `1px solid ${active ? 'var(--color-ocean-500)' : 'var(--border-card)'}`,
+                        color: active ? 'var(--color-ocean-500)' : 'var(--text-secondary)',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Title */}
@@ -948,11 +1027,11 @@ export default function ExecTrackerPage() {
               </button>
               <button
                 onClick={handleCreate}
-                disabled={!newTitle.trim() || !newDesc.trim() || creating}
+                disabled={!newTitle.trim() || !newDesc.trim() || newSystems.length === 0 || creating}
                 style={{
                   ...btnPrimary,
-                  opacity: !newTitle.trim() || !newDesc.trim() || creating ? 0.5 : 1,
-                  cursor: !newTitle.trim() || !newDesc.trim() || creating ? 'default' : 'pointer',
+                  opacity: !newTitle.trim() || !newDesc.trim() || newSystems.length === 0 || creating ? 0.5 : 1,
+                  cursor: !newTitle.trim() || !newDesc.trim() || newSystems.length === 0 || creating ? 'default' : 'pointer',
                 }}
               >
                 {creating ? 'Submitting...' : 'Submit'}

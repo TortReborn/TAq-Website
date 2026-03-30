@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS tracker_tickets (
   id            SERIAL        PRIMARY KEY,
   type          VARCHAR(20)   NOT NULL CHECK (type IN ('bug', 'feature')),
-  system        VARCHAR(20)   NOT NULL CHECK (system IN ('discord_bot', 'minecraft_mod', 'website')),
+  system        TEXT[]        NOT NULL DEFAULT '{}',
   title         VARCHAR(200)  NOT NULL,
   description   TEXT          NOT NULL,
   status        VARCHAR(20)   NOT NULL DEFAULT 'open'

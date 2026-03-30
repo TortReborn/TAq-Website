@@ -37,8 +37,9 @@ export async function GET(request: NextRequest) {
 
     const system = searchParams.get('system');
     if (system) {
-      conditions.push(`t.system = $${paramIdx}`);
-      params.push(system);
+      const systems = system.split(',');
+      conditions.push(`t.system && $${paramIdx}::text[]`);
+      params.push(systems);
       paramIdx++;
     }
 
@@ -122,8 +123,10 @@ export async function POST(request: NextRequest) {
     if (!type || !['bug', 'feature'].includes(type)) {
       return NextResponse.json({ error: 'Type must be "bug" or "feature"' }, { status: 400 });
     }
-    if (!system || !['discord_bot', 'minecraft_mod', 'website'].includes(system)) {
-      return NextResponse.json({ error: 'Invalid system' }, { status: 400 });
+    const validSystems = ['discord_bot', 'minecraft_mod', 'website'];
+    const systemArr: string[] = Array.isArray(system) ? system : (system ? [system] : []);
+    if (systemArr.length === 0 || !systemArr.every((s: string) => validSystems.includes(s))) {
+      return NextResponse.json({ error: 'At least one valid system is required' }, { status: 400 });
     }
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
@@ -139,7 +142,7 @@ export async function POST(request: NextRequest) {
       `INSERT INTO tracker_tickets (type, system, title, description, priority, submitted_by)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id`,
-      [type, system, title.trim(), description.trim(), validPriority, session.discord_id]
+      [type, systemArr, title.trim(), description.trim(), validPriority, session.discord_id]
     );
 
     return NextResponse.json({ success: true, id: result.rows[0].id });
