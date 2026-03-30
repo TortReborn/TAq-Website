@@ -83,6 +83,15 @@ export async function GET(request: NextRequest) {
         return false;
       }
 
+      // Fetch blacklist for cross-referencing
+      const blacklistResult = await client.query(
+        `SELECT uuid, reason FROM blacklist`
+      );
+      const blacklistMap = new Map<string, string | null>();
+      for (const row of blacklistResult.rows) {
+        blacklistMap.set(row.uuid.replace(/-/g, ''), row.reason || null);
+      }
+
       const result = await client.query(
         `SELECT
           a.id,
@@ -148,6 +157,17 @@ export async function GET(request: NextRequest) {
           ? isUuidInGuild(row.applicant_uuid)
           : null; // not applicable for community apps
 
+        // Check blacklist
+        let blacklisted = false;
+        let blacklistReason: string | null = null;
+        if (row.applicant_uuid) {
+          const normalizedUuid = row.applicant_uuid.replace(/-/g, '');
+          if (blacklistMap.has(normalizedUuid)) {
+            blacklisted = true;
+            blacklistReason = blacklistMap.get(normalizedUuid) ?? null;
+          }
+        }
+
         return {
           id: row.id,
           type: row.application_type,
@@ -162,6 +182,8 @@ export async function GET(request: NextRequest) {
           guildLeavePending: row.guild_leave_pending,
           pollStatus: row.poll_status,
           inGuild,
+          blacklisted,
+          blacklistReason,
           votes,
           voteSummary,
           userVote: userVote?.vote || null,

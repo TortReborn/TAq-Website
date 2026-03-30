@@ -135,6 +135,20 @@ export default function ApplicationCard({ app, onVoteChange, onDecision }: Props
               }}>
                 {app.type}
               </span>
+              {app.blacklisted && (
+                <span style={{
+                  fontSize: '0.65rem',
+                  fontWeight: '700',
+                  padding: '0.15rem 0.4rem',
+                  borderRadius: '0.25rem',
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  color: '#ef4444',
+                  textTransform: 'uppercase',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                }}>
+                  BLACKLISTED
+                </span>
+              )}
             </div>
             <div style={{
               fontSize: '0.75rem',
@@ -205,6 +219,27 @@ export default function ApplicationCard({ app, onVoteChange, onDecision }: Props
           borderTop: '1px solid var(--border-card)',
           padding: '1.25rem',
         }}>
+          {/* Blacklist warning */}
+          {app.blacklisted && (
+            <div style={{
+              marginBottom: '1rem',
+              padding: '0.75rem 1rem',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '0.5rem',
+              color: '#ef4444',
+              fontSize: '0.85rem',
+              fontWeight: '600',
+            }}>
+              This player is on the blacklist.
+              {app.blacklistReason && (
+                <span style={{ fontWeight: '400', marginLeft: '0.5rem' }}>
+                  Reason: {app.blacklistReason}
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Vote buttons */}
           <div style={{
             marginBottom: '1.25rem',

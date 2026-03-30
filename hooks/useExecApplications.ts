@@ -29,6 +29,8 @@ export interface ExecApplication {
   guildLeavePending: boolean;
   pollStatus: string | null;
   inGuild: boolean | null; // null for community apps
+  blacklisted: boolean;
+  blacklistReason: string | null;
   votes: Vote[];
   voteSummary: VoteSummary;
   userVote: 'accept' | 'deny' | 'abstain' | null;
