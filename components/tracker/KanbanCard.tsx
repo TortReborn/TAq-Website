@@ -56,19 +56,24 @@ export default function KanbanCard({
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      {/* Title */}
-      <div style={{
-        fontSize: '0.85rem',
-        fontWeight: 600,
-        color: 'var(--text-primary)',
-        lineHeight: 1.35,
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-        marginBottom: '0.4rem',
-      }}>
-        {ticket.title}
+      {/* ID + Title */}
+      <div style={{ marginBottom: '0.4rem' }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+          REQ-{ticket.id}
+        </span>
+        <div style={{
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          lineHeight: 1.35,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          marginTop: '0.1rem',
+        }}>
+          {ticket.title}
+        </div>
       </div>
 
       {/* Metadata row */}

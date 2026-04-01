@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useExecTracker, type TicketStatus } from '@/hooks/useExecTracker';
 import { useExecTicket } from '@/hooks/useExecTicket';
 import { btnPrimary } from '@/components/tracker/constants';
@@ -10,6 +11,9 @@ import TicketDetailPanel from '@/components/tracker/TicketDetailPanel';
 import CreateTicketModal from '@/components/tracker/CreateTicketModal';
 
 export default function ExecTrackerPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   // Filters — no status filter (board columns handle that)
   const [typeFilter, setTypeFilter] = useState('');
   const [systemFilter, setSystemFilter] = useState('');
@@ -31,9 +35,18 @@ export default function ExecTrackerPage() {
     return tickets.filter(t => t.assignedTo === assigneeFilter);
   }, [tickets, assigneeFilter]);
 
-  // Detail panel
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  // Detail panel — synced with URL ?ticket=ID
+  const [selectedId, setSelectedIdRaw] = useState<number | null>(() => {
+    const param = searchParams.get('ticket');
+    return param ? parseInt(param, 10) || null : null;
+  });
   const detail = useExecTicket(selectedId);
+
+  const setSelectedId = useCallback((id: number | null) => {
+    setSelectedIdRaw(id);
+    const url = id ? `/exec/requests?ticket=${id}` : '/exec/requests';
+    router.replace(url, { scroll: false });
+  }, [router]);
 
   // Create modal
   const [showModal, setShowModal] = useState(false);
