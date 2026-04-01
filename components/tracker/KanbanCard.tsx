@@ -55,34 +55,16 @@ export default function KanbanCard({
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      {/* Top row: priority + type + due date */}
+      {/* Top row: TAQ-ID + due date */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: '0.3rem',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <PriorityIcon priority={ticket.priority} size={14} />
-          <span style={{
-            fontSize: '0.65rem',
-            fontWeight: 600,
-            padding: '0.1rem 0.35rem',
-            borderRadius: '0.2rem',
-            background: `${TYPE_COLORS[ticket.type]}18`,
-            color: TYPE_COLORS[ticket.type],
-          }}>
-            {TYPE_LABELS[ticket.type]}
-          </span>
-          {ticket.commentCount > 0 && (
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
-                <path d="M3 4.5C3 3.67 3.67 3 4.5 3h7c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5H7l-2.5 2V11H4.5C3.67 11 3 10.33 3 9.5v-5z" stroke="currentColor" strokeWidth="1.2" />
-              </svg>
-              {ticket.commentCount}
-            </span>
-          )}
-        </div>
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+          TAQ-{ticket.id}
+        </span>
         {dueDate && (
           <span style={{ fontSize: '0.65rem', color: dueDateColor, fontWeight: 500 }}>
             {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -105,16 +87,34 @@ export default function KanbanCard({
         {ticket.title}
       </div>
 
-      {/* Footer: TAQ-ID bottom left, assignee bottom right */}
+      {/* Footer: priority + type bottom left, assignee bottom right */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         fontSize: '0.7rem',
       }}>
-        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-          TAQ-{ticket.id}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          <PriorityIcon priority={ticket.priority} size={14} />
+          <span style={{
+            fontSize: '0.65rem',
+            fontWeight: 600,
+            padding: '0.1rem 0.35rem',
+            borderRadius: '0.2rem',
+            background: `${TYPE_COLORS[ticket.type]}18`,
+            color: TYPE_COLORS[ticket.type],
+          }}>
+            {TYPE_LABELS[ticket.type]}
+          </span>
+          {ticket.commentCount > 0 && (
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+                <path d="M3 4.5C3 3.67 3.67 3 4.5 3h7c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5H7l-2.5 2V11H4.5C3.67 11 3 10.33 3 9.5v-5z" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+              {ticket.commentCount}
+            </span>
+          )}
+        </div>
         <span style={{
           color: ticket.assignedToIgn ? 'var(--color-ocean-400)' : 'var(--text-muted)',
           fontWeight: ticket.assignedToIgn ? 500 : 400,

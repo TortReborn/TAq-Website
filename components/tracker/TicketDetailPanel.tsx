@@ -131,6 +131,7 @@ export default function TicketDetailPanel({
   const [editTitleValue, setEditTitleValue] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     if (ticket) {
@@ -237,60 +238,102 @@ export default function TicketDetailPanel({
                     }}
                   />
                 </div>
-                {editingTitle ? (
-                  <input
-                    autoFocus
-                    value={editTitleValue}
-                    onChange={(e) => setEditTitleValue(e.target.value)}
-                    onKeyDown={async (e) => {
-                      if (e.key === 'Enter' && editTitleValue.trim()) {
-                        onUpdateLocal(ticket.id, { title: editTitleValue.trim() });
-                        await onUpdateTicket({ title: editTitleValue.trim() });
-                        onRefresh();
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem' }}>
+                  {editingTitle ? (
+                    <input
+                      autoFocus
+                      value={editTitleValue}
+                      onChange={(e) => setEditTitleValue(e.target.value)}
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter' && editTitleValue.trim()) {
+                          onUpdateLocal(ticket.id, { title: editTitleValue.trim() });
+                          await onUpdateTicket({ title: editTitleValue.trim() });
+                          onRefresh();
+                          setEditingTitle(false);
+                        } else if (e.key === 'Escape') {
+                          setEditingTitle(false);
+                        }
+                      }}
+                      onBlur={async () => {
+                        if (editTitleValue.trim() && editTitleValue.trim() !== ticket.title) {
+                          onUpdateLocal(ticket.id, { title: editTitleValue.trim() });
+                          await onUpdateTicket({ title: editTitleValue.trim() });
+                          onRefresh();
+                        }
                         setEditingTitle(false);
-                      } else if (e.key === 'Escape') {
-                        setEditingTitle(false);
-                      }
-                    }}
-                    onBlur={async () => {
-                      if (editTitleValue.trim() && editTitleValue.trim() !== ticket.title) {
-                        onUpdateLocal(ticket.id, { title: editTitleValue.trim() });
-                        await onUpdateTicket({ title: editTitleValue.trim() });
-                        onRefresh();
-                      }
-                      setEditingTitle(false);
-                    }}
-                    maxLength={200}
-                    style={{
-                      ...inputStyle,
-                      fontSize: '1.1rem',
-                      fontWeight: '700',
-                      padding: '0.25rem 0.5rem',
-                    }}
-                  />
-                ) : (
-                  <h2
+                      }}
+                      maxLength={200}
+                      size={Math.max(editTitleValue.length, 10)}
+                      style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--color-ocean-500)',
+                        borderRadius: '0.25rem',
+                        padding: '0.15rem 0.35rem',
+                        color: 'var(--text-primary)',
+                        fontSize: '1.1rem',
+                        fontWeight: '700',
+                        outline: 'none',
+                        width: 'auto',
+                        minWidth: '100px',
+                        maxWidth: '100%',
+                      }}
+                    />
+                  ) : (
+                    <h2
+                      onClick={() => {
+                        setEditTitleValue(ticket.title);
+                        setEditingTitle(true);
+                      }}
+                      style={{
+                        fontSize: '1.1rem',
+                        fontWeight: '700',
+                        color: 'var(--text-primary)',
+                        margin: 0,
+                        lineHeight: 1.3,
+                        cursor: 'pointer',
+                        borderRadius: '0.25rem',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      title="Click to edit title"
+                    >
+                      {ticket.title}
+                    </h2>
+                  )}
+                  <button
                     onClick={() => {
-                      setEditTitleValue(ticket.title);
-                      setEditingTitle(true);
+                      const url = `${window.location.origin}/exec/requests/${ticket.id}`;
+                      navigator.clipboard.writeText(url);
+                      setLinkCopied(true);
+                      setTimeout(() => setLinkCopied(false), 2000);
                     }}
+                    title="Copy link to ticket"
                     style={{
-                      fontSize: '1.1rem',
-                      fontWeight: '700',
-                      color: 'var(--text-primary)',
-                      margin: 0,
-                      lineHeight: 1.3,
+                      background: 'none',
+                      border: 'none',
                       cursor: 'pointer',
-                      borderRadius: '0.25rem',
-                      transition: 'background 0.15s',
+                      padding: '0.2rem',
+                      color: linkCopied ? 'var(--color-ocean-500)' : 'var(--text-muted)',
+                      flexShrink: 0,
+                      marginTop: '0.1rem',
+                      transition: 'color 0.15s',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                    title="Click to edit title"
+                    onMouseEnter={(e) => { if (!linkCopied) e.currentTarget.style.color = 'var(--text-primary)'; }}
+                    onMouseLeave={(e) => { if (!linkCopied) e.currentTarget.style.color = 'var(--text-muted)'; }}
                   >
-                    {ticket.title}
-                  </h2>
-                )}
+                    {linkCopied ? (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <polyline points="3,8.5 6.5,12 13,4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6.5 9.5l-1-1a2.12 2.12 0 0 1 0-3l2-2a2.12 2.12 0 0 1 3 0l.5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M9.5 6.5l1 1a2.12 2.12 0 0 1 0 3l-2 2a2.12 2.12 0 0 1-3 0l-.5-.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
                   by {ticket.submittedByIgn || 'Unknown'} &middot; {timeAgo(ticket.createdAt)}
                 </div>
