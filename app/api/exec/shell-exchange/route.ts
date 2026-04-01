@@ -47,9 +47,9 @@ async function toPng(raw: Buffer): Promise<Buffer> {
   const img = sharp(raw);
   const meta = await img.metadata();
   if (!meta.width || !meta.height) throw new Error('Could not read image dimensions');
-  const valid = (meta.width === 16 && meta.height === 16) || (meta.width === 32 && meta.height === 32);
-  if (!valid) throw new Error(`Image must be 16x16 or 32x32 pixels (got ${meta.width}x${meta.height})`);
-  return img.png().toBuffer();
+  const valid = (meta.width === 16 && meta.height === 16) || (meta.width === 32 && meta.height === 32) || (meta.width === 64 && meta.height === 64);
+  if (!valid) throw new Error(`Image must be 16x16, 32x32, or 64x64 pixels (got ${meta.width}x${meta.height})`);
+  return img.resize(32, 32, { kernel: sharp.kernel.nearest }).png().toBuffer();
 }
 
 type CacheKey = 'shellExchangeIngs' | 'shellExchangeMats';
