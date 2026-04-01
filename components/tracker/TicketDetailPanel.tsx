@@ -206,7 +206,7 @@ export default function TicketDetailPanel({
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>REQ-{ticket.id}</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>TAQ-{ticket.id}</span>
                   <FilterGroup
                     options={[
                       { value: 'bug', label: 'Bug' },

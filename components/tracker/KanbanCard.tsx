@@ -1,6 +1,5 @@
 import type { Ticket } from '@/hooks/useExecTracker';
 import PriorityIcon from './PriorityIcon';
-import SystemIcon from './SystemIcon';
 import { TYPE_LABELS, TYPE_COLORS } from './constants';
 
 export default function KanbanCard({
@@ -56,77 +55,72 @@ export default function KanbanCard({
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      {/* ID + Title */}
-      <div style={{ marginBottom: '0.4rem' }}>
-        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-          REQ-{ticket.id}
-        </span>
-        <div style={{
-          fontSize: '0.85rem',
-          fontWeight: 600,
-          color: 'var(--text-primary)',
-          lineHeight: 1.35,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          marginTop: '0.1rem',
-        }}>
-          {ticket.title}
-        </div>
-      </div>
-
-      {/* Metadata row */}
+      {/* Top row: priority + type + due date */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '0.4rem',
-        fontSize: '0.7rem',
-        marginBottom: '0.35rem',
-        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        marginBottom: '0.3rem',
       }}>
-        <PriorityIcon priority={ticket.priority} size={14} />
-        {ticket.system.map((s) => (
-          <SystemIcon key={s} system={s} size={13} />
-        ))}
-        <span style={{
-          fontSize: '0.65rem',
-          fontWeight: 600,
-          padding: '0.1rem 0.35rem',
-          borderRadius: '0.2rem',
-          background: `${TYPE_COLORS[ticket.type]}18`,
-          color: TYPE_COLORS[ticket.type],
-        }}>
-          {TYPE_LABELS[ticket.type]}
-        </span>
-        {ticket.commentCount > 0 && (
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
-              <path d="M3 4.5C3 3.67 3.67 3 4.5 3h7c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5H7l-2.5 2V11H4.5C3.67 11 3 10.33 3 9.5v-5z" stroke="currentColor" strokeWidth="1.2" />
-            </svg>
-            {ticket.commentCount}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          <PriorityIcon priority={ticket.priority} size={14} />
+          <span style={{
+            fontSize: '0.65rem',
+            fontWeight: 600,
+            padding: '0.1rem 0.35rem',
+            borderRadius: '0.2rem',
+            background: `${TYPE_COLORS[ticket.type]}18`,
+            color: TYPE_COLORS[ticket.type],
+          }}>
+            {TYPE_LABELS[ticket.type]}
+          </span>
+          {ticket.commentCount > 0 && (
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+                <path d="M3 4.5C3 3.67 3.67 3 4.5 3h7c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5H7l-2.5 2V11H4.5C3.67 11 3 10.33 3 9.5v-5z" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+              {ticket.commentCount}
+            </span>
+          )}
+        </div>
+        {dueDate && (
+          <span style={{ fontSize: '0.65rem', color: dueDateColor, fontWeight: 500 }}>
+            {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </span>
         )}
       </div>
 
-      {/* Footer */}
+      {/* Title */}
+      <div style={{
+        fontSize: '0.85rem',
+        fontWeight: 600,
+        color: 'var(--text-primary)',
+        lineHeight: 1.35,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        marginBottom: '0.35rem',
+      }}>
+        {ticket.title}
+      </div>
+
+      {/* Footer: TAQ-ID bottom left, assignee bottom right */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         fontSize: '0.7rem',
       }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+          TAQ-{ticket.id}
+        </span>
         <span style={{
           color: ticket.assignedToIgn ? 'var(--color-ocean-400)' : 'var(--text-muted)',
           fontWeight: ticket.assignedToIgn ? 500 : 400,
         }}>
           {ticket.assignedToIgn || 'Unassigned'}
         </span>
-        {dueDate && (
-          <span style={{ color: dueDateColor, fontWeight: 500 }}>
-            {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </span>
-        )}
       </div>
     </div>
   );
