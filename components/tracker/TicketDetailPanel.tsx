@@ -392,7 +392,7 @@ export default function TicketDetailPanel({
                   </label>
                   <input
                     type="date"
-                    value={ticket.dueDate ? ticket.dueDate.split('T')[0] : ''}
+                    value={ticket.dueDate ? (ticket.dueDate.split('T')[0]) : ''}
                     onChange={async (e) => {
                       const v = e.target.value || null;
                       onUpdateLocal(ticket.id, { dueDate: v });

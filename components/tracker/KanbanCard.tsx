@@ -18,7 +18,8 @@ export default function KanbanCard({
   onDragStart: (e: React.DragEvent, id: number) => void;
   onDragEnd: () => void;
 }) {
-  const dueDate = ticket.dueDate ? new Date(ticket.dueDate) : null;
+  const dueDateStr = ticket.dueDate ? ticket.dueDate.split('T')[0] : null;
+  const dueDate = dueDateStr ? new Date(dueDateStr + 'T00:00:00') : null;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const daysUntilDue = dueDate ? Math.ceil((dueDate.getTime() - now.getTime()) / 86400000) : null;
