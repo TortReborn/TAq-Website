@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       created_at: 't.created_at',
       updated_at: 't.updated_at',
       priority: `CASE t.priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END`,
-      status: `CASE t.status WHEN 'open' THEN 0 WHEN 'in_progress' THEN 1 WHEN 'resolved' THEN 2 WHEN 'closed' THEN 3 END`,
+      status: `CASE t.status WHEN 'untriaged' THEN 0 WHEN 'todo' THEN 1 WHEN 'in_progress' THEN 2 WHEN 'deployed' THEN 3 WHEN 'declined' THEN 4 END`,
     };
     const sortParam = searchParams.get('sort') || 'created_at';
     const sortColumn = allowedSorts[sortParam] || 't.created_at';
@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
         assignedTo: row.assigned_to?.toString() || null,
         assignedToIgn: row.assigned_to_ign || null,
         commentCount: parseInt(row.comment_count, 10),
+        dueDate: row.due_date || null,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       })),

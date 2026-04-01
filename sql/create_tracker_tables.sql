@@ -7,12 +7,13 @@ CREATE TABLE IF NOT EXISTS tracker_tickets (
   system        TEXT[]        NOT NULL DEFAULT '{}',
   title         VARCHAR(200)  NOT NULL,
   description   TEXT          NOT NULL,
-  status        VARCHAR(20)   NOT NULL DEFAULT 'open'
-                              CHECK (status IN ('open', 'in_progress', 'resolved', 'closed')),
+  status        VARCHAR(20)   NOT NULL DEFAULT 'untriaged'
+                              CHECK (status IN ('untriaged', 'todo', 'in_progress', 'deployed', 'declined')),
   priority      VARCHAR(10)   NOT NULL DEFAULT 'medium'
                               CHECK (priority IN ('low', 'medium', 'high', 'critical')),
   submitted_by  BIGINT        NOT NULL,
   assigned_to   BIGINT,
+  due_date      DATE,
   created_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
