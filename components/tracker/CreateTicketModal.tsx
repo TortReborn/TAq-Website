@@ -35,7 +35,7 @@ export default function CreateTicketModal({
         return;
       }
       if (file.size > MAX_FILE_SIZE) {
-        setFileError(`"${file.name}" exceeds the 5MB size limit.`);
+        setFileError(`"${file.name}" exceeds the 10MB size limit.`);
         return;
       }
       newFiles.push(file);

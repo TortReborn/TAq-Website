@@ -578,7 +578,7 @@ export default function TicketDetailPanel({
                             return;
                           }
                           if (file.size > MAX_FILE_SIZE) {
-                            setAttachError(`"${file.name}" exceeds the 5MB size limit.`);
+                            setAttachError(`"${file.name}" exceeds the 10MB size limit.`);
                             return;
                           }
                           files.push(file);
