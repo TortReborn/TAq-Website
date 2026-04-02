@@ -3,7 +3,7 @@ import { fetcher } from './fetcher';
 
 export type TicketType = 'bug' | 'feature';
 export type TicketSystem = 'discord_bot' | 'minecraft_mod' | 'website';
-export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+export type TicketStatus = 'untriaged' | 'todo' | 'in_progress' | 'deployed' | 'declined';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Ticket {
@@ -19,6 +19,7 @@ export interface Ticket {
   assignedTo: string | null;
   assignedToIgn: string | null;
   commentCount: number;
+  dueDate: string | null;
   createdAt: string;
   updatedAt: string;
 }

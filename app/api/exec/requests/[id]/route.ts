@@ -61,6 +61,7 @@ export async function GET(
         submittedByIgn: row.submitted_by_ign,
         assignedTo: row.assigned_to?.toString() || null,
         assignedToIgn: row.assigned_to_ign || null,
+        dueDate: row.due_date || null,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
       },
@@ -100,7 +101,7 @@ export async function PATCH(
     let paramIdx = 1;
 
     if (body.status !== undefined) {
-      if (!['open', 'in_progress', 'resolved', 'closed'].includes(body.status)) {
+      if (!['untriaged', 'todo', 'in_progress', 'deployed', 'declined'].includes(body.status)) {
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
       }
       updates.push(`status = $${paramIdx}`);
@@ -158,6 +159,12 @@ export async function PATCH(
       }
       updates.push(`description = $${paramIdx}`);
       values.push(body.description.trim());
+      paramIdx++;
+    }
+
+    if (body.due_date !== undefined) {
+      updates.push(`due_date = $${paramIdx}`);
+      values.push(body.due_date || null);
       paramIdx++;
     }
 

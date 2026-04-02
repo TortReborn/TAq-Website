@@ -30,6 +30,7 @@ export function useExecTicket(id: number | null) {
     description?: string;
     type?: string;
     system?: string[];
+    due_date?: string | null;
   }) => {
     if (!id) return;
     await fetch(`/api/exec/requests/${id}`, {
