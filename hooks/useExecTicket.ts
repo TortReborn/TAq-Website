@@ -10,9 +10,19 @@ export interface TicketComment {
   createdAt: string;
 }
 
+export interface TicketAttachment {
+  id: number;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+  uploadedBy: string;
+  createdAt: string;
+}
+
 interface TicketDetailData {
   ticket: Ticket;
   comments: TicketComment[];
+  attachments: TicketAttachment[];
 }
 
 export function useExecTicket(id: number | null) {
@@ -59,14 +69,38 @@ export function useExecTicket(id: number | null) {
     mutate();
   };
 
+  const uploadAttachments = async (files: File[]) => {
+    if (!id || files.length === 0) return;
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file);
+    }
+    await fetch(`/api/exec/requests/${id}/attachments`, {
+      method: 'POST',
+      body: formData,
+    });
+    mutate();
+  };
+
+  const deleteAttachment = async (attachmentId: number) => {
+    if (!id) return;
+    await fetch(`/api/exec/requests/${id}/attachments/${attachmentId}`, {
+      method: 'DELETE',
+    });
+    mutate();
+  };
+
   return {
     ticket: data?.ticket ?? null,
     comments: data?.comments ?? [],
+    attachments: data?.attachments ?? [],
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),
     updateTicket,
     deleteTicket,
     addComment,
+    uploadAttachments,
+    deleteAttachment,
   };
 }

@@ -70,13 +70,15 @@ export function useExecTracker(filters: TrackerFilters = {}) {
     title: string;
     description: string;
     priority?: TicketPriority;
-  }) => {
-    await fetch('/api/exec/requests', {
+  }): Promise<number> => {
+    const res = await fetch('/api/exec/requests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
     });
+    const data = await res.json();
     mutate();
+    return data.id;
   };
 
   const updateTicketLocally = (id: number, fields: Partial<Ticket>) => {

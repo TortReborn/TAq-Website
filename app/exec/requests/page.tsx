@@ -144,12 +144,15 @@ export default function ExecTrackerPage() {
         <TicketDetailPanel
           ticket={detail.ticket}
           comments={detail.comments}
+          attachments={detail.attachments}
           loading={detail.loading}
           execMembers={execMembers}
           onClose={() => setSelectedId(null)}
           onUpdateTicket={detail.updateTicket}
           onUpdateLocal={updateTicketLocally}
           onAddComment={detail.addComment}
+          onUploadAttachments={detail.uploadAttachments}
+          onDeleteAttachment={detail.deleteAttachment}
           onDelete={handleDelete}
           onRefresh={refresh}
         />
@@ -159,7 +162,10 @@ export default function ExecTrackerPage() {
       {showModal && (
         <CreateTicketModal
           onClose={() => setShowModal(false)}
-          onCreate={createTicket}
+          onCreate={async (input) => {
+            const id = await createTicket(input);
+            return id;
+          }}
         />
       )}
 

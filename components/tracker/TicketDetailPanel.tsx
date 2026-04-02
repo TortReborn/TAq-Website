@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Ticket, TicketStatus, TicketSystem, ExecMember } from '@/hooks/useExecTracker';
-import type { TicketComment } from '@/hooks/useExecTicket';
+import type { TicketComment, TicketAttachment } from '@/hooks/useExecTicket';
 import {
   STATUS_LABELS,
   PRIORITY_LABELS,
@@ -102,26 +102,36 @@ function FilterGroup({ options, value, onChange, colors }: {
   );
 }
 
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_ATTACHMENTS = 5;
+
 export default function TicketDetailPanel({
   ticket,
   comments,
+  attachments,
   loading,
   execMembers,
   onClose,
   onUpdateTicket,
   onUpdateLocal,
   onAddComment,
+  onUploadAttachments,
+  onDeleteAttachment,
   onDelete,
   onRefresh,
 }: {
   ticket: Ticket | null;
   comments: TicketComment[];
+  attachments: TicketAttachment[];
   loading: boolean;
   execMembers: ExecMember[];
   onClose: () => void;
   onUpdateTicket: (fields: Record<string, any>) => Promise<void>;
   onUpdateLocal: (id: number, fields: Partial<Ticket>) => void;
   onAddComment: (body: string) => Promise<void>;
+  onUploadAttachments: (files: File[]) => Promise<void>;
+  onDeleteAttachment: (id: number) => Promise<void>;
   onDelete: () => Promise<void>;
   onRefresh: () => void;
 }) {
@@ -132,6 +142,10 @@ export default function TicketDetailPanel({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [visible, setVisible] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [attachError, setAttachError] = useState('');
+  const attachInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (ticket) {
@@ -473,6 +487,141 @@ export default function TicketDetailPanel({
                 </div>
               </div>
 
+              {/* Attachments */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{
+                  fontSize: '0.7rem',
+                  fontWeight: '700',
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: '0.4rem',
+                }}>
+                  Attachments ({attachments.length}/{MAX_ATTACHMENTS})
+                </div>
+
+                {attachments.length > 0 && (
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+                    {attachments.map((att) => (
+                      <div key={att.id} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                        <img
+                          src={`/api/exec/requests/${ticket.id}/attachments/${att.id}`}
+                          alt={att.filename}
+                          onClick={() => setLightboxUrl(`/api/exec/requests/${ticket.id}/attachments/${att.id}`)}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '0.375rem',
+                            border: '1px solid var(--border-card)',
+                            cursor: 'pointer',
+                            transition: 'border-color 0.15s',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-ocean-500)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-card)'; }}
+                        />
+                        <button
+                          onClick={async () => {
+                            await onDeleteAttachment(att.id);
+                            onRefresh();
+                          }}
+                          title="Remove attachment"
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            background: '#ef4444',
+                            border: 'none',
+                            color: '#fff',
+                            fontSize: '0.65rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            lineHeight: 1,
+                          }}
+                        >
+                          x
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {attachError && (
+                  <div style={{ fontSize: '0.75rem', color: '#ef4444', marginBottom: '0.4rem' }}>
+                    {attachError}
+                  </div>
+                )}
+
+                {attachments.length < MAX_ATTACHMENTS && (
+                  <>
+                    <input
+                      ref={attachInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/gif,image/webp"
+                      multiple
+                      onChange={async (e) => {
+                        const fileList = e.target.files;
+                        if (!fileList || fileList.length === 0) return;
+                        setAttachError('');
+
+                        const files: File[] = [];
+                        for (let i = 0; i < fileList.length; i++) {
+                          const file = fileList[i];
+                          if (!ALLOWED_TYPES.includes(file.type)) {
+                            setAttachError(`"${file.name}" is not a supported image type.`);
+                            return;
+                          }
+                          if (file.size > MAX_FILE_SIZE) {
+                            setAttachError(`"${file.name}" exceeds the 5MB size limit.`);
+                            return;
+                          }
+                          files.push(file);
+                        }
+
+                        if (attachments.length + files.length > MAX_ATTACHMENTS) {
+                          setAttachError(`Cannot exceed ${MAX_ATTACHMENTS} attachments.`);
+                          return;
+                        }
+
+                        setUploading(true);
+                        try {
+                          await onUploadAttachments(files);
+                          onRefresh();
+                        } finally {
+                          setUploading(false);
+                          if (attachInputRef.current) attachInputRef.current.value = '';
+                        }
+                      }}
+                      style={{ display: 'none' }}
+                    />
+                    <button
+                      onClick={() => attachInputRef.current?.click()}
+                      disabled={uploading}
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: '600',
+                        padding: '0.3rem 0.65rem',
+                        borderRadius: '0.375rem',
+                        border: '1px dashed var(--border-card)',
+                        background: 'transparent',
+                        color: uploading ? 'var(--text-muted)' : 'var(--text-secondary)',
+                        cursor: uploading ? 'default' : 'pointer',
+                        transition: 'all 0.12s ease',
+                        outline: 'none',
+                      }}
+                    >
+                      {uploading ? 'Uploading...' : '+ Add Images'}
+                    </button>
+                  </>
+                )}
+              </div>
+
               {/* Comments */}
               <div>
                 <div style={{
@@ -568,6 +717,58 @@ export default function TicketDetailPanel({
           </>
         ) : null}
       </div>
+
+      {/* Lightbox */}
+      {lightboxUrl && (
+        <div
+          onClick={() => setLightboxUrl(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1002,
+            cursor: 'pointer',
+          }}
+        >
+          <img
+            src={lightboxUrl}
+            alt="Attachment preview"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              objectFit: 'contain',
+              borderRadius: '0.5rem',
+              cursor: 'default',
+            }}
+          />
+          <button
+            onClick={() => setLightboxUrl(null)}
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              background: 'rgba(255,255,255,0.15)',
+              border: 'none',
+              color: '#fff',
+              fontSize: '1.5rem',
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
+          >
+            x
+          </button>
+        </div>
+      )}
 
       {/* Delete confirmation */}
       {showDeleteConfirm && (

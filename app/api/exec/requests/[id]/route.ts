@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { getS3 } from '@/lib/s3';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,14 +41,23 @@ export async function GET(
 
     const row = ticketResult.rows[0];
 
-    const commentsResult = await pool.query(
-      `SELECT c.*, dl.ign AS author_ign
-       FROM tracker_comments c
-       LEFT JOIN discord_links dl ON dl.discord_id = c.author_id
-       WHERE c.ticket_id = $1
-       ORDER BY c.created_at ASC`,
-      [ticketId]
-    );
+    const [commentsResult, attachmentsResult] = await Promise.all([
+      pool.query(
+        `SELECT c.*, dl.ign AS author_ign
+         FROM tracker_comments c
+         LEFT JOIN discord_links dl ON dl.discord_id = c.author_id
+         WHERE c.ticket_id = $1
+         ORDER BY c.created_at ASC`,
+        [ticketId]
+      ),
+      pool.query(
+        `SELECT id, filename, content_type, size_bytes, uploaded_by, created_at
+         FROM tracker_attachments
+         WHERE ticket_id = $1
+         ORDER BY created_at ASC`,
+        [ticketId]
+      ),
+    ]);
 
     return NextResponse.json({
       ticket: {
@@ -71,6 +82,14 @@ export async function GET(
         authorIgn: c.author_ign,
         body: c.body,
         createdAt: c.created_at,
+      })),
+      attachments: attachmentsResult.rows.map(a => ({
+        id: a.id,
+        filename: a.filename,
+        contentType: a.content_type,
+        sizeBytes: a.size_bytes,
+        uploadedBy: a.uploaded_by?.toString(),
+        createdAt: a.created_at,
       })),
     });
   } catch (error) {
@@ -205,6 +224,22 @@ export async function DELETE(
     }
 
     const pool = getPool();
+
+    // Clean up S3 objects for any attachments
+    const attResult = await pool.query(
+      'SELECT s3_key FROM tracker_attachments WHERE ticket_id = $1',
+      [ticketId]
+    );
+    if (attResult.rows.length > 0) {
+      const { client, bucket } = getS3();
+      await Promise.all(
+        attResult.rows.map(row =>
+          client.send(new DeleteObjectCommand({ Bucket: bucket, Key: row.s3_key }))
+            .catch(() => {}) // best-effort cleanup
+        )
+      );
+    }
+
     await pool.query(`DELETE FROM tracker_tickets WHERE id = $1`, [ticketId]);
 
     return NextResponse.json({ success: true });

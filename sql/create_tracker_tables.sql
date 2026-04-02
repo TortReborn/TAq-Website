@@ -30,3 +30,17 @@ CREATE TABLE IF NOT EXISTS tracker_comments (
 CREATE INDEX IF NOT EXISTS idx_tracker_tickets_status ON tracker_tickets(status);
 CREATE INDEX IF NOT EXISTS idx_tracker_tickets_system ON tracker_tickets(system);
 CREATE INDEX IF NOT EXISTS idx_tracker_comments_ticket ON tracker_comments(ticket_id);
+
+-- Ticket attachments (images)
+CREATE TABLE IF NOT EXISTS tracker_attachments (
+  id            SERIAL        PRIMARY KEY,
+  ticket_id     INT           NOT NULL REFERENCES tracker_tickets(id) ON DELETE CASCADE,
+  s3_key        TEXT          NOT NULL,
+  filename      VARCHAR(255)  NOT NULL,
+  content_type  VARCHAR(50)   NOT NULL,
+  size_bytes    INT           NOT NULL,
+  uploaded_by   BIGINT        NOT NULL,
+  created_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_tracker_attachments_ticket ON tracker_attachments(ticket_id);
