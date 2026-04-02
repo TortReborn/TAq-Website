@@ -103,7 +103,7 @@ function FilterGroup({ options, value, onChange, colors }: {
 }
 
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_ATTACHMENTS = 5;
 
 export default function TicketDetailPanel({

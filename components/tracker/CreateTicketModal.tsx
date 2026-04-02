@@ -3,7 +3,7 @@ import type { TicketType, TicketSystem, TicketPriority } from '@/hooks/useExecTr
 import { inputStyle, selectStyle, btnStyle, btnPrimary, btnSecondary } from './constants';
 
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_ATTACHMENTS = 5;
 
 export default function CreateTicketModal({
