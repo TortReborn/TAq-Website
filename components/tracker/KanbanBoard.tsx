@@ -12,7 +12,7 @@ export default function KanbanBoard({
   tickets: Ticket[];
   selectedId: number | null;
   onSelectTicket: (id: number) => void;
-  onMoveTicket: (ticketId: number, newStatus: TicketStatus) => void;
+  onMoveTicket: (ticketId: number, newStatus: TicketStatus, position: number) => void;
 }) {
   const [draggingId, setDraggingId] = useState<number | null>(null);
 
@@ -39,12 +39,9 @@ export default function KanbanBoard({
     setDraggingId(null);
   };
 
-  const handleDrop = (status: TicketStatus, ticketId: number) => {
+  const handleDrop = (status: TicketStatus, position: number, ticketId: number) => {
     setDraggingId(null);
-    const ticket = tickets.find((t) => t.id === ticketId);
-    if (ticket && ticket.status !== status) {
-      onMoveTicket(ticketId, status);
-    }
+    onMoveTicket(ticketId, status, position);
   };
 
   return (

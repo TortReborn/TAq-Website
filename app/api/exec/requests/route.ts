@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
        LEFT JOIN discord_links dl1 ON dl1.discord_id = t.submitted_by
        LEFT JOIN discord_links dl2 ON dl2.discord_id = t.assigned_to
        ${whereClause}
-       ORDER BY ${sortColumn} ${order}`,
+       ORDER BY t.position ASC, ${sortColumn} ${order}`,
       params
     );
 
@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
         assignedTo: row.assigned_to?.toString() || null,
         assignedToIgn: row.assigned_to_ign || null,
         commentCount: parseInt(row.comment_count, 10),
+        position: row.position,
         dueDate: row.due_date || null,
         createdAt: row.created_at,
         updatedAt: row.updated_at,

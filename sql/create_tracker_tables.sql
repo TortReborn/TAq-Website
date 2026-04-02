@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS tracker_tickets (
   submitted_by  BIGINT        NOT NULL,
   assigned_to   BIGINT,
   due_date      DATE,
+  position      INT           NOT NULL DEFAULT 0,
   created_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );

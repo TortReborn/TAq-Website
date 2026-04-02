@@ -19,6 +19,7 @@ export interface Ticket {
   assignedTo: string | null;
   assignedToIgn: string | null;
   commentCount: number;
+  position: number;
   dueDate: string | null;
   createdAt: string;
   updatedAt: string;

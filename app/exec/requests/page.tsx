@@ -51,12 +51,12 @@ export default function ExecTrackerPage() {
   // Create modal
   const [showModal, setShowModal] = useState(false);
 
-  const handleMoveTicket = async (ticketId: number, newStatus: TicketStatus) => {
+  const handleMoveTicket = async (ticketId: number, newStatus: TicketStatus, position: number) => {
     updateTicketLocally(ticketId, { status: newStatus });
-    await fetch(`/api/exec/requests/${ticketId}`, {
-      method: 'PATCH',
+    await fetch('/api/exec/requests/reorder', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
+      body: JSON.stringify({ ticketId, status: newStatus, position }),
     });
     refresh();
   };
