@@ -106,20 +106,6 @@ describe('RETIRED_TERRITORIES set', () => {
     }
   });
 
-  it('does NOT contain FRUMA TBD territory names (they are not retired, just unreleased)', () => {
-    const frumaTBD = [
-      'Agricultural Sector',
-      'Industrial Sector',
-      'Residence Sector',
-      "Citadel's Shadow",
-      'Royal Barracks',
-      'Fort Hegea',
-      'Fort Tericen',
-    ];
-    for (const name of frumaTBD) {
-      expect(RETIRED_TERRITORIES.has(name), `FRUMA TBD "${name}" should NOT be in retired set`).toBe(false);
-    }
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -167,10 +153,6 @@ describe('shouldRenderTerritory — live mode', () => {
     }
   });
 
-  it('returns true for FRUMA TBD territories in live mode (they are unreleased, not retired)', () => {
-    expect(shouldRenderTerritory('Agricultural Sector', 'live')).toBe(true);
-    expect(shouldRenderTerritory('Royal Barracks', 'live')).toBe(true);
-  });
 });
 
 // ---------------------------------------------------------------------------

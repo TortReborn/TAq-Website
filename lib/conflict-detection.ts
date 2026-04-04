@@ -80,26 +80,6 @@ function classifyTerritory(rawName: string): string {
   // Normalize Unicode apostrophes to ASCII for consistent matching
   const name = rawName.replace(/[\u2018\u2019\u2032]/g, "'");
 
-  // --- Fruma ---
-  if (
-    name === "Agricultural Sector" || name === "Industrial Sector" ||
-    name === "Residence Sector" || name === "Water Processing Sector" ||
-    name === "Citadel's Shadow" || name === "Contested District" ||
-    name === "Gates to Aelumia" || name === "Royal Barracks" ||
-    name === "Royal Dam" || name === "University Campus" ||
-    name === "The Lumbermill" || name === "Espren" ||
-    name === "Festival Grounds" || name === "Highlands Gate" ||
-    name === "Lake Gitephe" || name === "Lake Rieke" ||
-    name === "Hyloch" || name === "Xima Valley" ||
-    name === "Wellspring of Eternity" || name === "The Frog Bog" ||
-    name === "Forts in Fall" || name === "Alder Understory" ||
-    name === "Deforested Ecotone" || name === "Verdant Grove" ||
-    name === "Aldwell" || name === "Timasca" ||
-    name === "Fort Hegea" || name === "Fort Tericen" ||
-    name === "Fort Torann" || name === "Feuding Houses" ||
-    name === "Frosty Outpost"
-  ) return "Fruma";
-
   // --- Corkus ---
   if (
     name.startsWith("Corkus") ||
