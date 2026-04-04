@@ -245,7 +245,24 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
 
         {/* Help & Logout */}
         <div style={{ padding: '0 0.75rem', display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
-          <OnboardingTrigger onRestart={tour.restartTour} />
+          <OnboardingTrigger onRestart={() => {
+            if (pathname !== '/exec') {
+              router.push('/exec');
+              // Wait for dashboard to render before starting tour
+              const waitForDashboard = () => {
+                const el = document.querySelector('[data-tour="stats"]');
+                if (el) {
+                  tour.restartTour();
+                } else {
+                  requestAnimationFrame(waitForDashboard);
+                }
+              };
+              // Start checking after a brief delay for navigation
+              setTimeout(waitForDashboard, 100);
+            } else {
+              tour.restartTour();
+            }
+          }} />
           <a
             href="/api/auth/discord/logout"
             style={{
