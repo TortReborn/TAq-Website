@@ -157,10 +157,10 @@ export async function POST(request: NextRequest) {
     const pool = getPool();
     const client = await pool.connect();
 
-    // Check 30-minute cooldown
+    // Check 3-day cooldown for hammerhead applications
     const cooldownResult = await client.query(
       `SELECT submitted_at FROM applications
-       WHERE discord_id = $1
+       WHERE discord_id = $1 AND application_type = 'hammerhead'
        ORDER BY submitted_at DESC LIMIT 1`,
       [session.discord_id]
     );
@@ -168,14 +168,19 @@ export async function POST(request: NextRequest) {
     if (cooldownResult.rows.length > 0) {
       const lastSubmitted = new Date(cooldownResult.rows[0].submitted_at);
       const msSinceLastApp = Date.now() - lastSubmitted.getTime();
-      const cooldownMs = 30 * 60 * 1000;
+      const cooldownMs = 3 * 24 * 60 * 60 * 1000; // 3 days
 
       if (msSinceLastApp < cooldownMs) {
         const remainingMs = cooldownMs - msSinceLastApp;
-        const remainingMin = Math.ceil(remainingMs / 60000);
+        const remainingHours = Math.ceil(remainingMs / (60 * 60 * 1000));
+        const remainingDays = Math.floor(remainingHours / 24);
+        const leftoverHours = remainingHours % 24;
+        const timeStr = remainingDays > 0
+          ? `${remainingDays} day${remainingDays === 1 ? '' : 's'}${leftoverHours > 0 ? ` and ${leftoverHours} hour${leftoverHours === 1 ? '' : 's'}` : ''}`
+          : `${leftoverHours} hour${leftoverHours === 1 ? '' : 's'}`;
         client.release();
         return NextResponse.json(
-          { error: `You can only submit one application every 30 minutes. Please try again in ${remainingMin} minute${remainingMin === 1 ? '' : 's'}.` },
+          { error: `You can only submit one Hammerhead application every 3 days. Please try again in ${timeStr}.` },
           { status: 429 }
         );
       }
