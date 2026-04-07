@@ -43,24 +43,34 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const statusFilter = searchParams.get('status') || 'all';
+  const typeFilter = searchParams.get('type') || null; // 'hammerhead' or null
 
   try {
     const pool = getPool();
     const client = await pool.connect();
 
     try {
-      // Build query with optional status filter
+      // Build query with optional status and type filters
       // For 'pending', also fetch accepted apps (we'll post-filter by guild membership)
       // For 'accepted', also fetch accepted apps (we'll post-filter to only in-guild)
-      let whereClause = '';
+      const conditions: string[] = [];
       const params: string[] = [];
 
-      if (statusFilter === 'pending') {
-        whereClause = "WHERE a.status IN ('pending', 'accepted')";
-      } else if (statusFilter !== 'all') {
-        whereClause = 'WHERE a.status = $1';
-        params.push(statusFilter);
+      if (typeFilter === 'hammerhead') {
+        conditions.push("a.application_type = 'hammerhead'");
+      } else {
+        // Regular view excludes hammerhead apps
+        conditions.push("a.application_type != 'hammerhead'");
       }
+
+      if (statusFilter === 'pending') {
+        conditions.push("a.status IN ('pending', 'accepted')");
+      } else if (statusFilter !== 'all') {
+        params.push(statusFilter);
+        conditions.push(`a.status = $${params.length}`);
+      }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
       // Fetch guild data once for membership checks
       const guildDataResult = await client.query(

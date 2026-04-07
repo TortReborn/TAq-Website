@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { generateOAuthState, getDiscordOAuthUrl, getBaseUrl } from '@/lib/exec-auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const state = generateOAuthState();
     const url = getDiscordOAuthUrl(state);
@@ -16,6 +16,18 @@ export async function GET() {
       path: '/',
       maxAge: 300, // 5 minutes
     });
+
+    // Store post-login redirect path if provided
+    const redirect = new URL(request.url).searchParams.get('redirect');
+    if (redirect) {
+      response.cookies.set('oauth_redirect', redirect, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 300,
+      });
+    }
 
     return response;
   } catch (error) {

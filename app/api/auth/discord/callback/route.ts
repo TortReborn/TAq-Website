@@ -53,8 +53,9 @@ export async function GET(request: NextRequest) {
       ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
       : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(discordUser.id) >> 22n) % 6}.png`;
 
-    // Redirect based on role: execs to dashboard, members to profile
-    const redirectPath = linkCheck.role === 'exec' ? '/exec' : '/profile';
+    // Redirect: use stored redirect path if present, otherwise role-based default
+    const storedRedirect = request.cookies.get('oauth_redirect')?.value;
+    const redirectPath = storedRedirect || (linkCheck.role === 'exec' ? '/exec' : '/profile');
     const response = NextResponse.redirect(new URL(redirectPath, baseUrl));
     setExecSessionCookie(response, {
       discord_id: discordUser.id,
@@ -72,8 +73,9 @@ export async function GET(request: NextRequest) {
       [discordUser.id, linkCheck.ign, linkCheck.rank, linkCheck.role]
     ).catch(() => {});
 
-    // Clear OAuth state cookie
+    // Clear OAuth cookies
     response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
+    response.cookies.set('oauth_redirect', '', { maxAge: 0, path: '/' });
 
     return response;
   } catch (err) {

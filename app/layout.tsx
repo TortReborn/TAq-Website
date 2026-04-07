@@ -9,6 +9,8 @@ import AnalyticsProvider from '@/components/AnalyticsProvider';
 import BottomBar from '@/components/BottomBar';
 import { Analytics } from "@vercel/analytics/react";
 import { useExecSession } from '@/hooks/useExecSession';
+import { RANK_HIERARCHY } from '@/lib/rank-constants';
+import { ViewAsContext } from '@/hooks/useViewAs';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(true);
@@ -16,8 +18,29 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { authenticated, isExec } = useExecSession();
+  const [viewAs, setViewAs] = useState<'normal' | 'non-member' | 'below-angler' | 'angler'>('normal');
+  const [viewAsOpen, setViewAsOpen] = useState(false);
+  const { authenticated: realAuthenticated, isExec: realIsExec, user: realUser } = useExecSession();
+
+  // "View as" overrides for exec members to test other perspectives
+  const authenticated = viewAs === 'non-member' ? false : realAuthenticated;
+  const isExec = viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' ? false : realIsExec;
+  const user = viewAs === 'non-member' ? null
+    : viewAs === 'below-angler' ? (realUser ? { ...realUser, rank: 'Piranha', role: 'member' as const } : realUser)
+    : viewAs === 'angler' ? (realUser ? { ...realUser, rank: 'Angler', role: 'member' as const } : realUser)
+    : realUser;
+  const rankIdx = user?.rank ? RANK_HIERARCHY.indexOf(user.rank) : -1;
+  const isAngler = rankIdx === 4; // Angler index in RANK_HIERARCHY
+  const isExecRank = rankIdx >= 5; // Hammerhead+
   
+  // Close View As dropdown on outside click
+  useEffect(() => {
+    if (!viewAsOpen) return;
+    const handleClick = () => setViewAsOpen(false);
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [viewAsOpen]);
+
   // Toggle dark mode and update document
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
@@ -420,36 +443,66 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
           {/* Right side controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {/* Apply button */}
-            <a
-              href="https://discord.gg/njRpZwKVaa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mobile-apply-button"
-              style={{
-                padding: '8px 16px',
-                background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                transition: 'all 0.3s ease',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(88, 101, 242, 0.3)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(88, 101, 242, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 4px rgba(88, 101, 242, 0.3)';
-              }}
-            >
-              📝 Apply
-            </a>
+            {/* Apply / Hammerhead Application button */}
+            {authenticated && isAngler ? (
+              <Link
+                href="/apply/hammerhead"
+                className="mobile-apply-button"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(135deg, #04b0eb 0%, #0390c0 100%)',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 4px rgba(4, 176, 235, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(4, 176, 235, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(4, 176, 235, 0.3)';
+                }}
+              >
+                Hammerhead Application
+              </Link>
+            ) : !(authenticated && isExecRank) && (
+              <a
+                href="https://discord.gg/njRpZwKVaa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-apply-button"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 4px rgba(88, 101, 242, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(88, 101, 242, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(88, 101, 242, 0.3)';
+                }}
+              >
+                Apply
+              </a>
+            )}
 
             {/* Login button - only show when not authenticated */}
             {!authenticated && (
@@ -480,6 +533,94 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             >
               Login
             </Link>
+            )}
+
+            {/* View As selector — exec only */}
+            {realIsExec && (
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                aria-label="View as different role"
+                onClick={(e) => { e.stopPropagation(); setViewAsOpen(!viewAsOpen); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 10px',
+                  background: viewAs !== 'normal'
+                    ? 'linear-gradient(135deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%)'
+                    : 'transparent',
+                  border: viewAs !== 'normal' ? '1px solid rgba(251,191,36,0.4)' : '1px solid transparent',
+                  borderRadius: '6px',
+                  color: viewAs !== 'normal' ? '#fbbf24' : 'var(--text-muted)',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                {viewAs !== 'normal' && (
+                  <span>{viewAs === 'non-member' ? 'Non-member' : viewAs === 'below-angler' ? 'Below Angler' : 'Angler'}</span>
+                )}
+              </button>
+              {viewAsOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 4px)',
+                  right: 0,
+                  background: 'var(--bg-nav)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                  zIndex: 1001,
+                  minWidth: '180px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{ padding: '8px 12px', fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--border-color)' }}>
+                    View As
+                  </div>
+                  {([
+                    { value: 'normal' as const, label: 'Normal (You)' },
+                    { value: 'non-member' as const, label: 'Non-guild Member' },
+                    { value: 'below-angler' as const, label: 'Guild Member (Below Angler)' },
+                    { value: 'angler' as const, label: 'Angler' },
+                  ]).map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setViewAs(opt.value); setViewAsOpen(false); }}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        padding: '10px 12px',
+                        background: viewAs === opt.value ? 'rgba(4,176,235,0.1)' : 'transparent',
+                        border: 'none',
+                        color: viewAs === opt.value ? '#04b0eb' : 'var(--text-primary)',
+                        fontSize: '0.85rem',
+                        fontWeight: viewAs === opt.value ? '600' : '400',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        transition: 'background 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (viewAs !== opt.value) e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (viewAs !== opt.value) e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      {viewAs === opt.value ? '\u2713 ' : ''}{opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             )}
 
             {/* Dark mode toggle pill */}
@@ -752,6 +893,27 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 }}
               >Manage</NavLink>
               )}
+              {authenticated && isAngler && (
+              <NavLink
+                href="/apply/hammerhead"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  color: '#04b0eb',
+                  fontWeight: 'bold',
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(4,176,235,0.15) 0%, rgba(4,176,235,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Hammerhead Application</NavLink>
+              )}
               {!authenticated && (
               <NavLink
                 href="/login"
@@ -777,11 +939,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           )}
         </nav>
         <div style={{ flex: '1 0 auto' }}>
+          <ViewAsContext.Provider value={viewAs}>
           <AnalyticsProvider>
             <PageTransition>
               {children}
             </PageTransition>
           </AnalyticsProvider>
+          </ViewAsContext.Provider>
         </div>
         <Analytics
           beforeSend={(event) => {

@@ -63,3 +63,27 @@ export function useExecApplications(statusFilter: string = 'all') {
     mutate,
   };
 }
+
+export function useExecHammerheadApplications(statusFilter: string = 'all') {
+  const params = new URLSearchParams({ type: 'hammerhead' });
+  if (statusFilter !== 'all') params.set('status', statusFilter);
+  const url = `/api/exec/applications?${params.toString()}`;
+
+  const { data, error, isLoading, mutate } = useSWR<ApplicationsData>(
+    url,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 30000,
+      dedupingInterval: 10000,
+    }
+  );
+
+  return {
+    applications: data?.applications ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
+    refresh: () => mutate(),
+    mutate,
+  };
+}

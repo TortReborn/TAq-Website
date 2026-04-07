@@ -10,11 +10,13 @@ function LoginContent() {
   const { authenticated, isExec, loading } = useExecSession();
   const error = searchParams.get('error');
 
+  const redirect = searchParams.get('redirect');
+
   useEffect(() => {
     if (!loading && authenticated) {
-      router.replace(isExec ? '/exec' : '/profile');
+      router.replace(redirect || (isExec ? '/exec' : '/profile'));
     }
-  }, [loading, authenticated, isExec, router]);
+  }, [loading, authenticated, isExec, router, redirect]);
 
   const errorMessages: Record<string, string> = {
     denied: 'You cancelled the Discord authorization.',
@@ -113,7 +115,7 @@ function LoginContent() {
         )}
 
         <a
-          href="/api/auth/discord"
+          href={redirect ? `/api/auth/discord?redirect=${encodeURIComponent(redirect)}` : '/api/auth/discord'}
           style={{
             display: 'inline-flex',
             alignItems: 'center',

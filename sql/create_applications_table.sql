@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS applications (
   id SERIAL PRIMARY KEY,
-  application_type VARCHAR(20) NOT NULL CHECK (application_type IN ('guild', 'community')),
+  application_type VARCHAR(20) NOT NULL CHECK (application_type IN ('guild', 'community', 'hammerhead')),
   discord_id VARCHAR(30) NOT NULL,
   discord_username VARCHAR(50) NOT NULL,
   discord_avatar VARCHAR(255),
