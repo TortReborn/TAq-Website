@@ -750,7 +750,7 @@ export default function ExecDashboardPage() {
                             fontSize: '0.75rem',
                             color: 'var(--text-secondary)',
                           }}>
-                            {app.type === 'guild' ? 'Guild' : 'Community'} &middot; {new Date(app.submittedAt).toLocaleDateString()}
+                            {app.type === 'guild' ? 'Guild' : app.type === 'hammerhead' ? 'Hammerhead' : 'Community'} &middot; {new Date(app.submittedAt).toLocaleDateString()}
                           </div>
                         </div>
                       </div>

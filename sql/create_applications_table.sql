@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS applications (
   thread_id BIGINT,                               -- Discussion thread ID in exec channel
   poll_message_id BIGINT,                          -- Poll message ID in exec channel
   guild_leave_pending BOOLEAN DEFAULT FALSE,       -- Accepted guild member waiting to leave current guild
-  poll_status TEXT DEFAULT ':green_circle: Received' -- Current poll embed status string
+  poll_status TEXT DEFAULT ':green_circle: Received', -- Current poll embed status string
+  message_ids BIGINT[] DEFAULT NULL                  -- All embed message IDs (for multi-part hammerhead apps)
 );
 
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications (status);
