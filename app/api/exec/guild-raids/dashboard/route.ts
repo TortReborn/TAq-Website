@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const dateFrom = url.searchParams.get('dateFrom');
     const dateTo = url.searchParams.get('dateTo');
+    const isDateFiltered = !!(dateFrom || dateTo);
 
-    // Build optional date filter
     const conditions: string[] = [];
     const params: any[] = [];
     let paramIdx = 1;
@@ -35,11 +35,17 @@ export async function GET(request: NextRequest) {
     const totalResult = await pool.query(
       `SELECT COUNT(*) as cnt FROM graid_logs gl ${whereClause}`, params
     );
-    const totalRaids = parseInt(totalResult.rows[0].cnt, 10);
+    let totalRaids = parseInt(totalResult.rows[0].cnt, 10);
 
-    // Unique participants
+    // Add total offset when not date-filtered
+    if (!isDateFiltered) {
+      const offsetSum = await pool.query(`SELECT COALESCE(SUM(raid_offset), 0) as s FROM graid_raid_offsets`);
+      totalRaids += parseInt(offsetSum.rows[0].s, 10);
+    }
+
+    // Unique participants (by UUID)
     const partResult = await pool.query(
-      `SELECT COUNT(DISTINCT glp.ign) as cnt
+      `SELECT COUNT(DISTINCT glp.uuid) as cnt
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
        ${whereClause}`,
@@ -47,17 +53,18 @@ export async function GET(request: NextRequest) {
     );
     const uniqueParticipants = parseInt(partResult.rows[0].cnt, 10);
 
-    // Most active player
+    // Most active player (UUID-first)
     const topPlayerResult = await pool.query(
-      `SELECT glp.ign, COUNT(*) as cnt
+      `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, COUNT(*) as cnt
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
+       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
        ${whereClause}
-       GROUP BY glp.ign ORDER BY cnt DESC LIMIT 1`,
+       GROUP BY glp.uuid, COALESCE(dl.ign, glp.ign) ORDER BY cnt DESC LIMIT 1`,
       params
     );
-    const mostActivePlayer = topPlayerResult.rows.length > 0
-      ? { ign: topPlayerResult.rows[0].ign, count: parseInt(topPlayerResult.rows[0].cnt, 10) }
+    let mostActivePlayer = topPlayerResult.rows.length > 0
+      ? { ign: topPlayerResult.rows[0].display_name, count: parseInt(topPlayerResult.rows[0].cnt, 10) }
       : null;
 
     // Raid type distribution
@@ -85,17 +92,18 @@ export async function GET(request: NextRequest) {
       count: parseInt(r.cnt, 10),
     }));
 
-    // Top 10 players
+    // Top 10 players (UUID-first)
     const topPlayersResult = await pool.query(
-      `SELECT glp.ign, COUNT(*) as cnt
+      `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, COUNT(*) as cnt
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
+       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
        ${whereClause}
-       GROUP BY glp.ign ORDER BY cnt DESC LIMIT 10`,
+       GROUP BY glp.uuid, COALESCE(dl.ign, glp.ign) ORDER BY cnt DESC LIMIT 10`,
       params
     );
     const topPlayers = topPlayersResult.rows.map((r: any) => ({
-      ign: r.ign,
+      ign: r.display_name,
       count: parseInt(r.cnt, 10),
     }));
 

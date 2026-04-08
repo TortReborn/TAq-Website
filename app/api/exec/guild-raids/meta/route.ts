@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
     const pool = getPool();
 
     const [ignsResult, raidTypesResult, guildDataResult] = await Promise.all([
-      pool.query(`SELECT DISTINCT ign FROM graid_log_participants WHERE ign IS NOT NULL ORDER BY ign`),
+      // Get current display names: prefer discord_links name for UUID players, fall back to participant IGN
+      pool.query(`
+        SELECT DISTINCT COALESCE(dl.ign, glp.ign) AS ign
+        FROM graid_log_participants glp
+        LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+        WHERE glp.ign IS NOT NULL
+        ORDER BY ign
+      `),
       pool.query(`SELECT DISTINCT raid_type FROM graid_logs WHERE raid_type IS NOT NULL ORDER BY raid_type`),
       pool.query(`SELECT data FROM cache_entries WHERE cache_key = 'guildData'`),
     ]);

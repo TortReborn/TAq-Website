@@ -60,8 +60,17 @@ export async function GET(request: NextRequest) {
       params.push(dateTo);
     }
     if (ign) {
-      conditions.push(`gl.id IN (SELECT log_id FROM graid_log_participants WHERE LOWER(ign) = LOWER($${paramIdx++}))`);
-      params.push(ign);
+      // Resolve IGN → UUID first for accurate filtering across name changes
+      const uuidLookup = await pool.query(
+        `SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1) AND uuid IS NOT NULL`, [ign]
+      );
+      if (uuidLookup.rows.length > 0) {
+        conditions.push(`gl.id IN (SELECT log_id FROM graid_log_participants WHERE uuid = $${paramIdx++})`);
+        params.push(uuidLookup.rows[0].uuid);
+      } else {
+        conditions.push(`gl.id IN (SELECT log_id FROM graid_log_participants WHERE LOWER(ign) = LOWER($${paramIdx++}))`);
+        params.push(ign);
+      }
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -89,12 +98,16 @@ export async function GET(request: NextRequest) {
     if (logIds.length > 0) {
       const placeholders = logIds.map((_: any, i: number) => `$${i + 1}`).join(',');
       const partResult = await pool.query(
-        `SELECT log_id, ign, uuid FROM graid_log_participants WHERE log_id IN (${placeholders}) ORDER BY ign`,
+        `SELECT glp.log_id, COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid
+         FROM graid_log_participants glp
+         LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+         WHERE glp.log_id IN (${placeholders})
+         ORDER BY display_name`,
         logIds
       );
       for (const row of partResult.rows) {
         if (!participantsByLog[row.log_id]) participantsByLog[row.log_id] = [];
-        participantsByLog[row.log_id].push({ ign: row.ign, uuid: row.uuid });
+        participantsByLog[row.log_id].push({ ign: row.display_name, uuid: row.uuid });
       }
     }
 

@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const sort = url.searchParams.get('sort') || 'Total Raids';
     const dateFrom = url.searchParams.get('dateFrom');
     const dateTo = url.searchParams.get('dateTo');
+    const isDateFiltered = !!(dateFrom || dateTo);
 
     const conditions: string[] = [];
     const params: any[] = [];
@@ -25,33 +26,58 @@ export async function GET(request: NextRequest) {
     if (dateTo) { conditions.push(`gl.completed_at <= $${paramIdx++}`); params.push(dateTo); }
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
+    // UUID-first aggregation with display name from discord_links
     const result = await pool.query(
-      `SELECT glp.ign, gl.raid_type, gl.completed_at
+      `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, gl.raid_type
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
-       ${whereClause}
-       ORDER BY glp.ign, gl.completed_at`,
+       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+       ${whereClause}`,
       params
     );
 
+    // Aggregate per UUID
     const playerMap = new Map<string, {
+      displayName: string;
       total: number;
       typeCounts: Record<string, number>;
     }>();
 
     for (const row of result.rows) {
-      let data = playerMap.get(row.ign);
+      const key = row.uuid || row.display_name; // fall back to IGN for NULL uuid
+      let data = playerMap.get(key);
       if (!data) {
-        data = { total: 0, typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
-        playerMap.set(row.ign, data);
+        data = { displayName: row.display_name, total: 0, typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
+        playerMap.set(key, data);
       }
       data.total++;
       const short = getRaidShort(row.raid_type);
       data.typeCounts[short] = (data.typeCounts[short] || 0) + 1;
     }
 
-    const players = Array.from(playerMap.entries()).map(([ign, data]) => ({
-      ign,
+    // Apply offsets (only when NOT date-filtered)
+    if (!isDateFiltered) {
+      const offsetResult = await pool.query(`SELECT uuid, raid_offset FROM graid_raid_offsets`);
+      for (const r of offsetResult.rows) {
+        const key = String(r.uuid);
+        const data = playerMap.get(key);
+        if (data) {
+          data.total += r.raid_offset;
+        } else {
+          // Player has offset but no logged raids — get display name
+          const dlResult = await pool.query(`SELECT ign FROM discord_links WHERE uuid = $1`, [r.uuid]);
+          const name = dlResult.rows.length > 0 ? dlResult.rows[0].ign : key;
+          playerMap.set(key, {
+            displayName: name,
+            total: r.raid_offset,
+            typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 },
+          });
+        }
+      }
+    }
+
+    const players = Array.from(playerMap.values()).map(data => ({
+      ign: data.displayName,
       total: data.total,
       notg: data.typeCounts.NOTG || 0,
       tcc: data.typeCounts.TCC || 0,
