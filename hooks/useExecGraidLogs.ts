@@ -83,7 +83,7 @@ function buildQuery(base: string, params: Record<string, any>): string {
 
 export function useExecGraidLogMeta() {
   const { data, error, isLoading, mutate } = useSWR<GraidLogMetaData>(
-    '/api/exec/graid-logs/meta',
+    '/api/exec/guild-raids/meta',
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 60000, dedupingInterval: 30000 }
   );
@@ -98,7 +98,7 @@ export function useExecGraidLogMeta() {
 }
 
 export function useExecGraidLogs(filters: GraidLogFilters) {
-  const key = buildQuery('/api/exec/graid-logs', {
+  const key = buildQuery('/api/exec/guild-raids', {
     page: filters.page,
     perPage: filters.perPage,
     raidType: filters.raidType,
@@ -126,7 +126,7 @@ export function useExecGraidLogs(filters: GraidLogFilters) {
 }
 
 export function useExecGraidLogLeaderboard(sort: string, dateFrom?: string, dateTo?: string) {
-  const key = buildQuery('/api/exec/graid-logs/leaderboard', { sort, dateFrom, dateTo });
+  const key = buildQuery('/api/exec/guild-raids/leaderboard', { sort, dateFrom, dateTo });
 
   const { data, error, isLoading } = useSWR<{ players: GraidLogLeaderboardPlayer[] }>(
     key,
@@ -143,7 +143,7 @@ export function useExecGraidLogLeaderboard(sort: string, dateFrom?: string, date
 
 export function useExecGraidLogStats(ign: string | null) {
   const { data, error, isLoading } = useSWR<{ stats: GraidLogPlayerStats }>(
-    ign ? buildQuery('/api/exec/graid-logs/stats', { ign }) : null,
+    ign ? buildQuery('/api/exec/guild-raids/stats', { ign }) : null,
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 30000, dedupingInterval: 10000 }
   );
@@ -157,7 +157,7 @@ export function useExecGraidLogStats(ign: string | null) {
 
 export function useExecGraidLogDashboard(dateFrom?: string, dateTo?: string) {
   const { data, error, isLoading } = useSWR<{ data: GraidLogDashboardData }>(
-    buildQuery('/api/exec/graid-logs/dashboard', { dateFrom, dateTo }),
+    buildQuery('/api/exec/guild-raids/dashboard', { dateFrom, dateTo }),
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 30000, dedupingInterval: 10000 }
   );
@@ -171,7 +171,7 @@ export function useExecGraidLogDashboard(dateFrom?: string, dateTo?: string) {
 
 export function useExecGraidLogMutations() {
   const deleteLog = async (id: number) => {
-    const res = await fetch(`/api/exec/graid-logs/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/exec/guild-raids/${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to delete graid log');
     return data;
