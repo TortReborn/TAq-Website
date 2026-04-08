@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { title, lowRankReward, highRankReward, minCompletions, bonusThreshold, bonusAmount, endDate } = await request.json();
+    const { title, lowRankReward, highRankReward, minCompletions, bonusThreshold, bonusAmount, endDate, raidRewards } = await request.json();
 
     if (!title || !lowRankReward || !highRankReward || !minCompletions || !endDate) {
       return NextResponse.json({ error: 'Title, end date, rewards, and min completions are required' }, { status: 400 });
@@ -70,7 +70,22 @@ export async function POST(request: NextRequest) {
        bonusThreshold || null, bonusAmount || null, session.discord_id]
     );
 
-    return NextResponse.json({ success: true, id: result.rows[0].id });
+    const eventId = result.rows[0].id;
+
+    // Insert per-raid-type reward overrides if provided
+    if (raidRewards && Array.isArray(raidRewards) && raidRewards.length > 0) {
+      for (const rr of raidRewards) {
+        if (rr.raidType && rr.low != null && rr.high != null) {
+          await pool.query(
+            `INSERT INTO graid_event_raid_rewards (event_id, raid_type, low_rank_reward, high_rank_reward)
+             VALUES ($1, $2, $3, $4)`,
+            [eventId, rr.raidType, rr.low, rr.high]
+          );
+        }
+      }
+    }
+
+    return NextResponse.json({ success: true, id: eventId });
   } catch (error: any) {
     if (error?.code === '23505') {
       return NextResponse.json({ error: 'An event with that title already exists' }, { status: 409 });

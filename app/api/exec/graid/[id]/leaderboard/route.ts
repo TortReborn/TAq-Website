@@ -52,22 +52,73 @@ export async function GET(
       bonusAmount: ev.bonus_amount != null ? Number(ev.bonus_amount) : null,
     };
 
-    const rowsRes = await pool.query(
-      `SELECT dl.ign AS username, dl.rank AS rank, get.total AS total,
-              get.uuid AS uuid, COALESCE(get.paid, false) AS paid
-       FROM graid_event_totals get
-       JOIN discord_links dl ON dl.uuid = get.uuid
-       WHERE get.event_id = $1
-       ORDER BY get.total DESC, dl.ign ASC
-       LIMIT 1000`,
-      [eventId]
-    );
+    const [rowsRes, raidRewardsRes, typeCountsRes] = await Promise.all([
+      pool.query(
+        `SELECT dl.ign AS username, dl.rank AS rank, get.total AS total,
+                get.uuid AS uuid, COALESCE(get.paid, false) AS paid
+         FROM graid_event_totals get
+         JOIN discord_links dl ON dl.uuid = get.uuid
+         WHERE get.event_id = $1
+         ORDER BY get.total DESC, dl.ign ASC
+         LIMIT 1000`,
+        [eventId]
+      ),
+      // Per-raid-type reward overrides (if any)
+      pool.query(
+        `SELECT raid_type, low_rank_reward, high_rank_reward
+         FROM graid_event_raid_rewards WHERE event_id = $1`,
+        [eventId]
+      ),
+      // Per-player per-type counts from graid_logs (if overrides exist)
+      pool.query(
+        `SELECT glp.uuid, gl.raid_type, COUNT(*) as cnt
+         FROM graid_log_participants glp
+         JOIN graid_logs gl ON gl.id = glp.log_id
+         WHERE gl.event_id = $1
+         GROUP BY glp.uuid, gl.raid_type`,
+        [eventId]
+      ),
+    ]);
+
+    // Build per-type override map
+    const typeOverrides: Record<string, { low: number; high: number }> = {};
+    for (const r of raidRewardsRes.rows) {
+      typeOverrides[r.raid_type] = { low: Number(r.low_rank_reward), high: Number(r.high_rank_reward) };
+    }
+    const hasOverrides = Object.keys(typeOverrides).length > 0;
+
+    // Build per-player per-type count map (only needed if overrides exist)
+    const playerTypeCounts: Record<string, Record<string, number>> = {};
+    if (hasOverrides) {
+      for (const r of typeCountsRes.rows) {
+        const uuid = String(r.uuid);
+        if (!playerTypeCounts[uuid]) playerTypeCounts[uuid] = {};
+        playerTypeCounts[uuid][r.raid_type || '__unknown__'] = Number(r.cnt);
+      }
+    }
 
     // Compute payouts with multipliers (replicating processRowsWithMultipliers logic)
     const baseRows = rowsRes.rows.map((r: any) => {
       const total = Number(r.total) || 0;
       const low = isLow(r.rank);
-      const payout = total * (low ? event.low : event.high);
+      let payout: number;
+
+      if (hasOverrides) {
+        // Per-type payout: sum each type's count * its reward rate
+        const counts = playerTypeCounts[String(r.uuid)] || {};
+        payout = 0;
+        for (const [raidType, cnt] of Object.entries(counts)) {
+          const override = typeOverrides[raidType];
+          if (override) {
+            payout += cnt * (low ? override.low : override.high);
+          } else {
+            payout += cnt * (low ? event.low : event.high);
+          }
+        }
+      } else {
+        payout = total * (low ? event.low : event.high);
+      }
+
       const meetsMin = total >= event.minc;
       return { username: r.username || "(unknown)", rank: r.rank, total, payout, meetsMin, uuid: r.uuid, paid: !!r.paid };
     });

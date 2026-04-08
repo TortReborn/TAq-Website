@@ -40,6 +40,7 @@ export function useExecGraid() {
     bonusThreshold?: number;
     bonusAmount?: number;
     endDate: string;
+    raidRewards?: { raidType: string; low: number; high: number }[];
   }) => {
     const res = await fetch('/api/exec/graid', {
       method: 'POST',

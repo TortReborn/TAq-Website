@@ -24,6 +24,13 @@ export default function ExecGraidPage() {
   const [bonusThreshold, setBonusThreshold] = useState('');
   const [bonusAmount, setBonusAmount] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [showPerTypeRewards, setShowPerTypeRewards] = useState(false);
+  const [perTypeRewards, setPerTypeRewards] = useState<Record<string, { low: string; high: string }>>({
+    'Nest of the Grootslangs': { low: '', high: '' },
+    'The Canyon Colossus': { low: '', high: '' },
+    'The Nameless Anomaly': { low: '', high: '' },
+    "Orphion's Nexus of Light": { low: '', high: '' },
+  });
 
   // Auto-select the most recent event on first load
   useEffect(() => {
@@ -62,7 +69,13 @@ export default function ExecGraidPage() {
   const resetForm = () => {
     setTitle(''); setLowReward('1536'); setHighReward('1536');
     setMinComp('12'); setBonusThreshold(''); setBonusAmount('');
-    setEndDate(''); setFormError(null);
+    setEndDate(''); setFormError(null); setShowPerTypeRewards(false);
+    setPerTypeRewards({
+      'Nest of the Grootslangs': { low: '', high: '' },
+      'The Canyon Colossus': { low: '', high: '' },
+      'The Nameless Anomaly': { low: '', high: '' },
+      "Orphion's Nexus of Light": { low: '', high: '' },
+    });
   };
 
   const startEdit = (ev: typeof selectedEvent) => {
@@ -89,6 +102,14 @@ export default function ExecGraidPage() {
     if (!title.trim()) { setFormError('Title is required'); return; }
     if (!endDate) { setFormError('End date is required'); return; }
     try {
+      // Build per-type rewards (only include filled-out entries)
+      const raidRewards: { raidType: string; low: number; high: number }[] = [];
+      for (const [raidType, rewards] of Object.entries(perTypeRewards)) {
+        if (rewards.low && rewards.high) {
+          raidRewards.push({ raidType, low: parseInt(rewards.low), high: parseInt(rewards.high) });
+        }
+      }
+
       const result = await createEvent({
         title: title.trim(),
         lowRankReward: parseInt(lowReward) || 1536,
@@ -97,6 +118,7 @@ export default function ExecGraidPage() {
         bonusThreshold: bonusThreshold ? parseInt(bonusThreshold) : undefined,
         bonusAmount: bonusAmount ? parseInt(bonusAmount) : undefined,
         endDate: new Date(endDate).toISOString(),
+        raidRewards: raidRewards.length > 0 ? raidRewards : undefined,
       });
       resetForm();
       setShowCreate(false);
@@ -187,6 +209,45 @@ export default function ExecGraidPage() {
           <label style={labelStyle}>Bonus Amount (optional, in LE)</label>
           <input value={bonusAmount} onChange={e => setBonusAmount(e.target.value)} style={inputStyle} type="number" placeholder="LE bonus" />
         </div>
+      </div>
+      {/* Per-raid-type reward overrides */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowPerTypeRewards(!showPerTypeRewards)}
+          style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+        >
+          {showPerTypeRewards ? 'Hide' : 'Show'} Per-Raid-Type Rewards (optional)
+        </button>
+        {showPerTypeRewards && (
+          <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.75rem', background: 'var(--bg-primary)', borderRadius: '0.5rem', border: '1px solid var(--border-card)' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+              Override reward rates for specific raid types. Leave empty to use default rates.
+            </div>
+            {Object.entries(perTypeRewards).map(([raidType, rewards]) => {
+              const shortNames: Record<string, string> = { 'Nest of the Grootslangs': 'NOTG', 'The Canyon Colossus': 'TCC', 'The Nameless Anomaly': 'TNA', "Orphion's Nexus of Light": 'NOL' };
+              return (
+                <div key={raidType} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1fr', gap: '0.5rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{shortNames[raidType]}</span>
+                  <input
+                    type="number"
+                    placeholder="Low rank EM"
+                    value={rewards.low}
+                    onChange={e => setPerTypeRewards(prev => ({ ...prev, [raidType]: { ...prev[raidType], low: e.target.value } }))}
+                    style={{ ...inputStyle, fontSize: '0.8rem', padding: '0.3rem 0.5rem' }}
+                  />
+                  <input
+                    type="number"
+                    placeholder="High rank EM"
+                    value={rewards.high}
+                    onChange={e => setPerTypeRewards(prev => ({ ...prev, [raidType]: { ...prev[raidType], high: e.target.value } }))}
+                    style={{ ...inputStyle, fontSize: '0.8rem', padding: '0.3rem 0.5rem' }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       {formError && <div style={{ color: '#ef4444', fontSize: '0.85rem' }}>{formError}</div>}
       <div style={{ display: 'flex', gap: '0.5rem' }}>
