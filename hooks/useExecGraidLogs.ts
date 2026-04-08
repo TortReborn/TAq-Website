@@ -125,8 +125,8 @@ export function useExecGraidLogs(filters: GraidLogFilters) {
   };
 }
 
-export function useExecGraidLogLeaderboard(sort: string) {
-  const key = buildQuery('/api/exec/graid-logs/leaderboard', { sort });
+export function useExecGraidLogLeaderboard(sort: string, dateFrom?: string, dateTo?: string) {
+  const key = buildQuery('/api/exec/graid-logs/leaderboard', { sort, dateFrom, dateTo });
 
   const { data, error, isLoading } = useSWR<{ players: GraidLogLeaderboardPlayer[] }>(
     key,

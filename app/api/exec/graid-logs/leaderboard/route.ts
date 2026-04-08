@@ -15,12 +15,23 @@ export async function GET(request: NextRequest) {
     const pool = getPool();
     const url = new URL(request.url);
     const sort = url.searchParams.get('sort') || 'Total Raids';
+    const dateFrom = url.searchParams.get('dateFrom');
+    const dateTo = url.searchParams.get('dateTo');
+
+    const conditions: string[] = [];
+    const params: any[] = [];
+    let paramIdx = 1;
+    if (dateFrom) { conditions.push(`gl.completed_at >= $${paramIdx++}`); params.push(dateFrom); }
+    if (dateTo) { conditions.push(`gl.completed_at <= $${paramIdx++}`); params.push(dateTo); }
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const result = await pool.query(
       `SELECT glp.ign, gl.raid_type, gl.completed_at
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
-       ORDER BY glp.ign, gl.completed_at`
+       ${whereClause}
+       ORDER BY glp.ign, gl.completed_at`,
+      params
     );
 
     const playerMap = new Map<string, {

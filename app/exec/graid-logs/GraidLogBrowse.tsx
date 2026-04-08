@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useExecGraidLogs, useExecGraidLogMutations } from '@/hooks/useExecGraidLogs';
 import { getRaidShort, getRaidColor, RAID_NAMES } from '@/lib/graid-log-constants';
 
@@ -17,11 +17,26 @@ const inputStyle: React.CSSProperties = {
 
 export default function GraidLogBrowse({ meta, onViewStats }: Props) {
   const [raidType, setRaidType] = useState('');
+  const [ignSearch, setIgnSearch] = useState('');
   const [ign, setIgn] = useState('');
+  const [showIgnDropdown, setShowIgnDropdown] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [sort, setSort] = useState('Newest');
   const [page, setPage] = useState(1);
+
+  const filteredIgns = useMemo(() => {
+    if (!ignSearch) return [];
+    const lower = ignSearch.toLowerCase();
+    return meta.igns.filter(i => i.toLowerCase().includes(lower)).slice(0, 15);
+  }, [ignSearch, meta.igns]);
+
+  const selectIgn = (name: string) => {
+    setIgnSearch(name);
+    setIgn(name);
+    setShowIgnDropdown(false);
+    setPage(1);
+  };
 
   const { logs, total, perPage, loading, error, refresh } = useExecGraidLogs({
     page, perPage: 25,
@@ -51,11 +66,35 @@ export default function GraidLogBrowse({ meta, onViewStats }: Props) {
             <option value="Unknown">Unknown</option>
           </select>
         </div>
-        <div>
+        <div style={{ position: 'relative' }}>
           <label style={labelStyle}>Player</label>
-          <input style={inputStyle} list="graid-ign-list" placeholder="Filter by IGN..." value={ign}
-            onChange={e => { setIgn(e.target.value); setPage(1); }} />
-          <datalist id="graid-ign-list">{meta.igns.map(n => <option key={n} value={n} />)}</datalist>
+          <input
+            style={inputStyle}
+            placeholder="Search IGN..."
+            value={ignSearch}
+            onChange={e => { setIgnSearch(e.target.value); setIgn(''); setShowIgnDropdown(true); setPage(1); }}
+            onFocus={() => setShowIgnDropdown(true)}
+            onBlur={() => setTimeout(() => setShowIgnDropdown(false), 200)}
+          />
+          {showIgnDropdown && filteredIgns.length > 0 && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
+              background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+              maxHeight: '200px', overflowY: 'auto', marginTop: '2px',
+            }}>
+              {filteredIgns.map(name => (
+                <div
+                  key={name}
+                  style={{ padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-primary)' }}
+                  onMouseDown={() => selectIgn(name)}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-primary)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  {name}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           <label style={labelStyle}>From</label>

@@ -37,7 +37,6 @@ export default function GraidLogDashboard() {
   const weeks = data.raidsOverTime;
   const maxWeekly = Math.max(...weeks.map(w => w.count), 1);
 
-  // SVG dimensions for line graph
   const svgW = 800, svgH = 200;
   const margin = { top: 15, right: 15, bottom: 30, left: 40 };
   const plotW = svgW - margin.left - margin.right;
@@ -51,14 +50,12 @@ export default function GraidLogDashboard() {
   const linePath = linePoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
   const areaPath = linePath + ` L${linePoints[linePoints.length - 1]?.x ?? margin.left},${margin.top + plotH} L${margin.left},${margin.top + plotH} Z`;
 
-  // Y-axis labels
   const yStep = Math.max(1, Math.ceil(maxWeekly / 4));
   const yLabels: { y: number; label: string }[] = [];
   for (let v = 0; v <= maxWeekly; v += yStep) {
     yLabels.push({ y: margin.top + plotH - (v / maxWeekly) * plotH, label: String(v) });
   }
 
-  // X-axis labels (show ~6 evenly spaced)
   const xLabelCount = Math.min(6, weeks.length);
   const xLabels = weeks.length <= xLabelCount
     ? linePoints.map(p => ({ x: p.x, label: p.week.slice(5) }))
@@ -69,24 +66,6 @@ export default function GraidLogDashboard() {
 
   return (
     <div>
-      {/* Date range filter */}
-      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'end' }}>
-        <div>
-          <label style={labelStyle}>From</label>
-          <input type="date" style={inputStyle} value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-        </div>
-        <div>
-          <label style={labelStyle}>To</label>
-          <input type="date" style={inputStyle} value={dateTo} onChange={e => setDateTo(e.target.value)} />
-        </div>
-        {(dateFrom || dateTo) && (
-          <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
-            padding: '0.4rem 0.6rem', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer',
-          }}>Clear</button>
-        )}
-      </div>
-
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
         <div style={{ ...cardStyle, textAlign: 'center' }}>
@@ -106,39 +85,43 @@ export default function GraidLogDashboard() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {/* Raids per week — Line Graph */}
-        {weeks.length > 0 && (
-          <div style={cardStyle}>
-            <h3 style={sectionTitle}>Raids Per Week</h3>
+        {/* Raids per week — Line Graph with date range */}
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Raids Per Week</h3>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'end' }}>
+              <div>
+                <label style={labelStyle}>From</label>
+                <input type="date" style={inputStyle} value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>To</label>
+                <input type="date" style={inputStyle} value={dateTo} onChange={e => setDateTo(e.target.value)} />
+              </div>
+              {(dateFrom || dateTo) && (
+                <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{
+                  background: 'var(--bg-primary)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+                  padding: '0.4rem 0.6rem', color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer',
+                }}>Clear</button>
+              )}
+            </div>
+          </div>
+
+          {weeks.length > 0 ? (
             <svg viewBox={`0 0 ${svgW} ${svgH}`} style={{ width: '100%', height: 'auto', maxHeight: '250px' }}>
-              {/* Grid lines */}
               {yLabels.map(({ y, label }) => (
                 <g key={label}>
                   <line x1={margin.left} y1={y} x2={margin.left + plotW} y2={y} stroke="var(--border-card)" strokeWidth="0.5" strokeDasharray="4,4" />
                   <text x={margin.left - 6} y={y + 3} fill="var(--text-secondary)" fontSize="10" textAnchor="end">{label}</text>
                 </g>
               ))}
-
-              {/* Axes */}
               <line x1={margin.left} y1={margin.top} x2={margin.left} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
               <line x1={margin.left} y1={margin.top + plotH} x2={margin.left + plotW} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
-
-              {/* X-axis labels */}
               {xLabels.map(({ x, label }) => (
                 <text key={label} x={x} y={svgH - 6} fill="var(--text-secondary)" fontSize="9" textAnchor="middle">{label}</text>
               ))}
-
-              {/* Area fill */}
-              {linePoints.length > 1 && (
-                <path d={areaPath} fill="var(--color-ocean-400)" opacity="0.15" />
-              )}
-
-              {/* Line */}
-              {linePoints.length > 1 && (
-                <path d={linePath} fill="none" stroke="var(--color-ocean-400)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-              )}
-
-              {/* Data points */}
+              {linePoints.length > 1 && <path d={areaPath} fill="var(--color-ocean-400)" opacity="0.15" />}
+              {linePoints.length > 1 && <path d={linePath} fill="none" stroke="var(--color-ocean-400)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />}
               {linePoints.map((p, i) => (
                 <g key={i}>
                   <circle cx={p.x} cy={p.y} r="3" fill="var(--color-ocean-400)" />
@@ -146,8 +129,10 @@ export default function GraidLogDashboard() {
                 </g>
               ))}
             </svg>
-          </div>
-        )}
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>No data for this range</div>
+          )}
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           {/* Raid Type Distribution */}
@@ -172,7 +157,7 @@ export default function GraidLogDashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {data.topPlayers.map((p, i) => (
                 <div key={p.ign} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '0.7rem', color: i < 3 ? '#f59e0b' : 'var(--text-secondary)', width: '16px', textAlign: 'right' }}>{i + 1}</span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', width: '16px', textAlign: 'right' }}>{i + 1}</span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-primary)', width: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.ign}</span>
                   <div style={{ flex: 1, height: '14px', background: 'var(--bg-primary)', borderRadius: '7px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${(p.count / maxPlayer) * 100}%`, background: 'var(--color-ocean-400)', borderRadius: '7px' }} />
