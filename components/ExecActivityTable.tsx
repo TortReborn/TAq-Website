@@ -28,6 +28,7 @@ interface Props {
   sortMode: 'activity' | 'kick';
   weeklyHours: number;
   onAddToKickList?: (uuid: string, ign: string, tier: number) => void;
+  onRemoveFromKickList?: (uuid: string) => void;
   kickListUuids?: Set<string>;
 }
 
@@ -37,7 +38,7 @@ const TIER_BUTTONS = [
   { tier: 3, label: 'T3', color: '#3b82f6' },
 ];
 
-export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, weeklyHours, onAddToKickList, kickListUuids }: Props) {
+export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, weeklyHours, onAddToKickList, onRemoveFromKickList, kickListUuids }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>(sortMode === 'kick' ? 'kickScore' : 'playtime');
   const [sortDir, setSortDir] = useState<SortDirection>(sortMode === 'kick' ? 'asc' : 'desc');
   const [hoveredUuid, setHoveredUuid] = useState<string | null>(null);
@@ -224,11 +225,25 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                     textAlign: 'center',
                   }}>
                     {kickListUuids?.has(member.uuid) ? (
-                      <span style={{
-                        fontSize: '0.7rem', fontWeight: '600',
-                        color: 'var(--text-secondary)',
-                        fontStyle: 'italic',
-                      }}>Added</span>
+                      <button
+                        onClick={() => onRemoveFromKickList?.(member.uuid)}
+                        title="Remove from kick list"
+                        style={{
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '0.25rem',
+                          border: '1px solid rgba(34, 197, 94, 0.4)',
+                          background: 'rgba(34, 197, 94, 0.15)',
+                          color: '#22c55e',
+                          cursor: 'pointer',
+                          fontSize: '0.65rem',
+                          fontWeight: '700',
+                          lineHeight: 1,
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(34, 197, 94, 0.3)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(34, 197, 94, 0.15)'; }}
+                      >
+                        Remove
+                      </button>
                     ) : (
                       <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'center' }}>
                         {TIER_BUTTONS.map(tb => (

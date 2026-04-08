@@ -284,6 +284,7 @@ export default function ExecActivityPage() {
           sortMode={sortMode}
           weeklyHours={weeklyHours}
           onAddToKickList={kickList.addToKickList}
+          onRemoveFromKickList={kickList.removeFromKickList}
           kickListUuids={new Set(kickList.entries.map(e => e.uuid))}
         />
       </div>
