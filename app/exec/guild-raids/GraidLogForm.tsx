@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useExecGraidLogMutations } from '@/hooks/useExecGraidLogs';
+import { RAID_TYPE_COLORS } from '@/lib/graid-log-constants';
 
 interface Props {
   meta: { guildMembers: string[] };
@@ -117,10 +118,33 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <div>
           <label style={labelStyle}>Raid Type</label>
-          <select style={inputStyle} value={raidType} onChange={e => setRaidType(e.target.value)}>
-            <option value="">Select raid...</option>
-            {RAID_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {RAID_TYPES.map(t => {
+              const selected = raidType === t.value;
+              const color = RAID_TYPE_COLORS[t.value] || '#6b7280';
+              return (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setRaidType(selected ? '' : t.value)}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem 0.25rem',
+                    borderRadius: '0.375rem',
+                    border: selected ? `2px solid ${color}` : '2px solid var(--border-card)',
+                    background: selected ? `${color}20` : 'var(--bg-primary)',
+                    color: selected ? color : 'var(--text-secondary)',
+                    fontWeight: selected ? '700' : '500',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {t.value}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {[0, 1, 2, 3].map(i => (
