@@ -2,17 +2,18 @@
 
 import { useState, useCallback } from 'react';
 import { useExecGraidLogMeta } from '@/hooks/useExecGraidLogs';
+import GraidLogForm from './GraidLogForm';
 import GraidLogBrowse from './GraidLogBrowse';
 import GraidLogLeaderboard from './GraidLogLeaderboard';
 import GraidLogStats from './GraidLogStats';
 import GraidLogDashboard from './GraidLogDashboard';
 
-const TABS = ['Browse', 'Leaderboard', 'Stats', 'Dashboard'] as const;
+const TABS = ['Log', 'Browse', 'Leaderboard', 'Stats', 'Dashboard'] as const;
 type Tab = (typeof TABS)[number];
 
 function getInitialTab(): Tab {
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('graid_logs_active_tab');
+    const saved = localStorage.getItem('guild_raids_active_tab');
     if (saved && TABS.includes(saved as Tab)) return saved as Tab;
   }
   return 'Browse';
@@ -25,7 +26,7 @@ export default function ExecGuildRaidsPage() {
 
   const changeTab = useCallback((tab: Tab) => {
     setActiveTab(tab);
-    localStorage.setItem('graid_logs_active_tab', tab);
+    localStorage.setItem('guild_raids_active_tab', tab);
   }, []);
 
   const navigateToStats = (ign: string) => {
@@ -71,6 +72,7 @@ export default function ExecGuildRaidsPage() {
         ))}
       </div>
 
+      {activeTab === 'Log' && <GraidLogForm meta={meta} onLogged={() => meta.mutate()} />}
       {activeTab === 'Browse' && <GraidLogBrowse meta={meta} onViewStats={navigateToStats} />}
       {activeTab === 'Leaderboard' && <GraidLogLeaderboard onViewStats={navigateToStats} />}
       {activeTab === 'Stats' && <GraidLogStats meta={meta} initialIgn={statsIgn} />}

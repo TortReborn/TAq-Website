@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
-import { LIST_ORDER_SQL } from '@/lib/graid-log-constants';
+import { LIST_ORDER_SQL, RAID_SHORT_TO_FULL } from '@/lib/graid-log-constants';
 
 export const dynamic = 'force-dynamic';
+
+function isTestMode(): boolean {
+  const v = process.env.TEST_MODE;
+  if (!v) return false;
+  const s = v.toLowerCase().trim();
+  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
+}
+
+function getBotToken(): string | undefined {
+  return isTestMode() ? process.env.TEST_DISCORD_BOT_TOKEN : process.env.DISCORD_BOT_TOKEN;
+}
+
+function getRaidLogChannelId(): string | undefined {
+  return isTestMode() ? process.env.TEST_RAID_LOG_CHANNEL_ID : process.env.RAID_LOG_CHANNEL_ID;
+}
 
 // GET — List graid logs with filtering and pagination
 export async function GET(request: NextRequest) {
@@ -94,5 +109,132 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Graid log list error:', error);
     return NextResponse.json({ error: 'Failed to fetch graid logs' }, { status: 500 });
+  }
+}
+
+// POST — Manually log a guild raid
+export async function POST(request: NextRequest) {
+  const session = await requireExecSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const pool = getPool();
+    const { raidType, participants } = await request.json();
+
+    // Validate raid type
+    const fullRaidName = RAID_SHORT_TO_FULL[raidType];
+    if (!fullRaidName) {
+      return NextResponse.json({ error: 'Invalid raid type. Must be NOTG, TCC, TNA, or NOL.' }, { status: 400 });
+    }
+
+    // Validate participants
+    if (!participants || !Array.isArray(participants) || participants.length !== 4) {
+      return NextResponse.json({ error: 'Exactly 4 participants are required.' }, { status: 400 });
+    }
+    for (const p of participants) {
+      if (!p || typeof p !== 'string' || !p.trim()) {
+        return NextResponse.json({ error: 'All participants must have a valid IGN.' }, { status: 400 });
+      }
+    }
+    const uniqueIgns = new Set(participants.map((p: string) => p.trim().toLowerCase()));
+    if (uniqueIgns.size < 4) {
+      return NextResponse.json({ error: 'All 4 participants must be different players.' }, { status: 400 });
+    }
+
+    // Validate participants are guild members
+    const cacheResult = await pool.query(`SELECT data FROM cache_entries WHERE cache_key = 'guildData'`);
+    let guildMembers: Set<string> = new Set();
+    if (cacheResult.rows.length > 0) {
+      const members = cacheResult.rows[0].data?.members;
+      if (Array.isArray(members)) {
+        for (const m of members) {
+          const name = m.name || m.username;
+          if (name) guildMembers.add(name.toLowerCase());
+        }
+      }
+    }
+
+    if (guildMembers.size > 0) {
+      const nonMembers = participants.filter((p: string) => !guildMembers.has(p.trim().toLowerCase()));
+      if (nonMembers.length > 0) {
+        return NextResponse.json({ error: `Not current guild members: ${nonMembers.join(', ')}` }, { status: 400 });
+      }
+    }
+
+    // Check for active event
+    const eventResult = await pool.query(`SELECT id FROM graid_events WHERE active = TRUE LIMIT 1`);
+    const eventId = eventResult.rows.length > 0 ? eventResult.rows[0].id : null;
+
+    // Insert log
+    const logResult = await pool.query(
+      `INSERT INTO graid_logs (event_id, raid_type) VALUES ($1, $2) RETURNING id`,
+      [eventId, fullRaidName]
+    );
+    const logId = logResult.rows[0].id;
+
+    // Insert participants
+    for (const ign of participants) {
+      const trimmed = ign.trim();
+      const uuidResult = await pool.query(`SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1)`, [trimmed]);
+      const uuid = uuidResult.rows.length > 0 ? uuidResult.rows[0].uuid : null;
+      await pool.query(
+        `INSERT INTO graid_log_participants (log_id, uuid, ign) VALUES ($1, $2, $3)`,
+        [logId, uuid, trimmed]
+      );
+
+      // Upsert event totals if active event
+      if (eventId && uuid) {
+        await pool.query(`
+          INSERT INTO graid_event_totals (event_id, uuid, total)
+          VALUES ($1, $2, 1)
+          ON CONFLICT (event_id, uuid) DO UPDATE
+            SET total = graid_event_totals.total + 1, last_updated = NOW()
+        `, [eventId, uuid]);
+      }
+    }
+
+    // Post to Discord raid-log channel
+    const botToken = getBotToken();
+    const channelId = getRaidLogChannelId();
+    let discordWarning: string | undefined;
+
+    if (botToken && channelId) {
+      try {
+        const bolded = participants.map((p: string) => `**${p.trim()}**`);
+        const namesStr = bolded.slice(0, -1).join(', ') + ', and ' + bolded[bolded.length - 1];
+        const embed = {
+          title: `${fullRaidName} Completed!`,
+          description: namesStr,
+          color: 0x00FF00,
+        };
+        const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+          method: 'POST',
+          headers: { Authorization: `Bot ${botToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ embeds: [embed] }),
+        });
+        if (!res.ok) {
+          const errBody = await res.text();
+          console.error('Discord post failed:', res.status, errBody);
+          discordWarning = `Raid logged but failed to post to Discord: ${res.status}`;
+        }
+      } catch (discordErr) {
+        console.error('Discord post error:', discordErr);
+        discordWarning = 'Raid logged but failed to post to Discord channel';
+      }
+    }
+
+    // Audit log
+    await pool.query(
+      `INSERT INTO audit_log (log_type, actor_name, actor_id, action)
+       VALUES ('graid', $1, $2, $3)`,
+      [session.ign, session.discord_id, `Logged guild raid #${logId}: ${raidType} with ${participants.join(', ')}`]
+    );
+
+    return NextResponse.json({ success: true, id: logId, warning: discordWarning });
+  } catch (error) {
+    console.error('Guild raid log error:', error);
+    return NextResponse.json({ error: 'Failed to log guild raid' }, { status: 500 });
   }
 }

@@ -28,6 +28,7 @@ export interface GraidLogFilters {
 export interface GraidLogMetaData {
   igns: string[];
   raidTypes: string[];
+  guildMembers: string[];
 }
 
 export interface GraidLogLeaderboardPlayer {
@@ -91,6 +92,7 @@ export function useExecGraidLogMeta() {
   return {
     igns: data?.igns || [],
     raidTypes: data?.raidTypes || [],
+    guildMembers: data?.guildMembers || [],
     loading: isLoading,
     error,
     mutate,
@@ -177,5 +179,16 @@ export function useExecGraidLogMutations() {
     return data;
   };
 
-  return { deleteLog };
+  const createLog = async (raidType: string, participants: string[]) => {
+    const res = await fetch('/api/exec/guild-raids', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ raidType, participants }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to log guild raid');
+    return data;
+  };
+
+  return { deleteLog, createLog };
 }
