@@ -48,13 +48,13 @@ export default function GraidLogLeaderboard({ onViewStats }: Props) {
         </div>
         {(dateFrom || dateTo) && (
           <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+            background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
             padding: '0.4rem 0.6rem', color: 'var(--text-secondary)', fontSize: '0.8rem', cursor: 'pointer',
           }}>Clear</button>
         )}
       </div>
 
-      <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ height: '300px', animation: 'pulse 1.5s ease-in-out infinite' }} />
         ) : error ? (

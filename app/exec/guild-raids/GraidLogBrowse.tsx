@@ -79,7 +79,7 @@ export default function GraidLogBrowse({ meta, onViewStats }: Props) {
           {showIgnDropdown && filteredIgns.length > 0 && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
-              background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+              background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
               maxHeight: '200px', overflowY: 'auto', marginTop: '2px',
             }}>
               {filteredIgns.map(name => (
@@ -117,7 +117,7 @@ export default function GraidLogBrowse({ meta, onViewStats }: Props) {
         {total} result{total !== 1 ? 's' : ''}{totalPages > 1 && ` — Page ${page} of ${totalPages}`}
       </div>
 
-      <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ height: '300px', animation: 'pulse 1.5s ease-in-out infinite' }} />
         ) : error ? (
@@ -185,6 +185,6 @@ const labelStyle: React.CSSProperties = { fontSize: '0.7rem', fontWeight: '600',
 const thStyle: React.CSSProperties = { padding: '0.6rem 0.5rem', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.7rem' };
 const tdStyle: React.CSSProperties = { padding: '0.5rem' };
 const pageBtnStyle: React.CSSProperties = {
-  background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+  background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
   padding: '0.4rem 0.75rem', color: 'var(--text-primary)', fontSize: '0.8rem', cursor: 'pointer',
 };

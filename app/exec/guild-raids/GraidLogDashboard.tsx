@@ -11,7 +11,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const cardStyle: React.CSSProperties = {
-  background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem',
+  background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem',
 };
 
 export default function GraidLogDashboard() {

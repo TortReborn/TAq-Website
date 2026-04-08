@@ -46,7 +46,7 @@ function MemberInput({ value, onChange, guildMembers, placeholder, id }: {
       {showDropdown && filtered.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
-          background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+          background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
           maxHeight: '180px', overflowY: 'auto', marginTop: '2px',
         }}>
           {filtered.map(name => (
@@ -111,7 +111,7 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
   };
 
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', maxWidth: '500px' }}>
+    <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', maxWidth: '500px' }}>
       <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>Log Guild Raid</h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

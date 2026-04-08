@@ -21,7 +21,7 @@ const cardStyle: React.CSSProperties = {
 };
 
 const sectionStyle: React.CSSProperties = {
-  background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)',
+  background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)',
   padding: '1rem', marginBottom: '1rem',
 };
 
@@ -70,7 +70,7 @@ export default function GraidLogStats({ meta, initialIgn }: Props) {
         {showDropdown && filtered.length > 0 && (
           <div style={{
             position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
-            background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+            background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
             maxHeight: '200px', overflowY: 'auto', marginTop: '2px',
           }}>
             {filtered.map(ign => (
@@ -95,7 +95,7 @@ export default function GraidLogStats({ meta, initialIgn }: Props) {
       )}
 
       {loading && selectedIgn && (
-        <div style={{ height: '300px', background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ height: '300px', background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', animation: 'pulse 1.5s ease-in-out infinite' }} />
       )}
 
       {error && selectedIgn && (
