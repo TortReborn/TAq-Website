@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef } from 'react';
 import { useExecGraidLogDashboard, useExecGraidEventDistribution } from '@/hooks/useExecGraidLogs';
+import type { GraidDashboardEvent } from '@/hooks/useExecGraidLogs';
 import { RAID_TYPE_COLORS } from '@/lib/graid-log-constants';
 
 const RAID_TYPE_ORDER = ['NOTG', 'TCC', 'TNA', 'NOL', 'Unknown'] as const;
@@ -17,27 +18,31 @@ const cardStyle: React.CSSProperties = {
   background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1rem',
 };
 
+interface Bucket {
+  key: string;        // e.g. week start or day
+  label: string;      // x-axis short label
+  total: number;
+  types: Record<string, number>;
+}
+
 interface HoverState {
   x: number;
   y: number;
-  title: string;
-  rows: { label: string; value: number; color: string }[];
-  total: number;
+  bucket: Bucket;
+  titlePrefix: string;
 }
 
 export default function GraidLogDashboard() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
-  const [hover, setHover] = useState<HoverState | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const { data, loading, error } = useExecGraidLogDashboard(dateFrom || undefined, dateTo || undefined);
   const { data: eventDist, loading: eventLoading } = useExecGraidEventDistribution(selectedEventId);
 
   if (loading) {
     return (
-      <div style={{ ...cardStyle, height: '400px', animation: 'pulse 1.5s ease-in-out infinite' }}>
+      <div style={{ ...cardStyle, height: '320px', animation: 'pulse 1.5s ease-in-out infinite' }}>
         <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
       </div>
     );
@@ -48,96 +53,30 @@ export default function GraidLogDashboard() {
 
   const maxType = Math.max(...data.raidTypeDistribution.map(t => t.count), 1);
 
-  const weeks = data.raidsOverTime;
-  const maxWeekly = Math.max(...weeks.map(w => w.total), 1);
+  const weeklyBuckets: Bucket[] = data.raidsOverTime.map(w => ({
+    key: w.week,
+    label: w.week.slice(5),
+    total: w.total,
+    types: w.types,
+  }));
 
-  // Larger SVG dimensions for the chart
-  const svgW = 1000;
-  const svgH = 360;
-  const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-  const plotW = svgW - margin.left - margin.right;
-  const plotH = svgH - margin.top - margin.bottom;
+  const drilldownBuckets: Bucket[] = (eventDist?.days || []).map(d => ({
+    key: d.date,
+    label: d.date.slice(5),
+    total: d.total,
+    types: d.types,
+  }));
 
-  // Determine the time range covered by the chart
-  const weekStarts = weeks.map(w => new Date(w.week).getTime());
-  const minTime = weekStarts.length > 0 ? Math.min(...weekStarts) : Date.now();
-  const maxTime = weekStarts.length > 0 ? Math.max(...weekStarts) : Date.now();
-  const timeSpan = Math.max(1, maxTime - minTime);
+  const selectedEvent: GraidDashboardEvent | undefined = data.events.find(e => e.id === selectedEventId);
+  const inDrilldown = selectedEventId != null;
 
-  const xForTime = (t: number) => {
-    if (weeks.length <= 1) return margin.left + plotW / 2;
-    return margin.left + ((t - minTime) / timeSpan) * plotW;
+  const fmtDate = (s: string) => {
+    const d = new Date(s);
+    return `${d.toLocaleString('default', { month: 'short' })} ${d.getDate()}`;
   };
-
-  // Bar geometry
-  const barSlot = weeks.length > 0 ? plotW / Math.max(1, weeks.length) : 0;
-  const barWidth = Math.max(6, Math.min(60, barSlot * 0.7));
-
-  const barPoints = weeks.map((w, i) => {
-    const t = new Date(w.week).getTime();
-    const cx = weeks.length === 1 ? margin.left + plotW / 2 : xForTime(t);
-    return { x: cx - barWidth / 2, cx, ...w };
-  });
-
-  // Y axis labels (~5 ticks)
-  const yTickCount = 5;
-  const yStep = Math.max(1, Math.ceil(maxWeekly / yTickCount));
-  const yLabels: { y: number; label: string }[] = [];
-  for (let v = 0; v <= maxWeekly; v += yStep) {
-    yLabels.push({ y: margin.top + plotH - (v / maxWeekly) * plotH, label: String(v) });
-  }
-  if (yLabels[yLabels.length - 1]?.label !== String(maxWeekly)) {
-    // ensure top tick
-  }
-
-  // X axis labels — try to evenly sample week labels
-  const desiredXLabels = Math.min(8, weeks.length);
-  const xLabels = weeks.length === 0 ? [] : weeks.length <= desiredXLabels
-    ? barPoints.map(p => ({ x: p.cx, label: p.week.slice(5) }))
-    : Array.from({ length: desiredXLabels }, (_, i) => {
-        const idx = Math.round((i / (desiredXLabels - 1)) * (weeks.length - 1));
-        return { x: barPoints[idx].cx, label: barPoints[idx].week.slice(5) };
-      });
-
-  const handleBarHover = (p: typeof barPoints[number], e: React.MouseEvent) => {
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (!containerRect) return;
-    const rows = RAID_TYPE_ORDER
-      .map(t => ({ label: t, value: p.types[t] || 0, color: RAID_TYPE_COLORS[t] }))
-      .filter(r => r.value > 0);
-    setHover({
-      x: e.clientX - containerRect.left,
-      y: e.clientY - containerRect.top,
-      title: `Week of ${p.week}`,
-      rows,
-      total: p.total,
-    });
-  };
-
-  // Event bars geometry — render below the chart, mapped to the same time axis
-  const eventBarHeight = 18;
-  const eventBarGap = 4;
-  const eventBarsTop = margin.top + plotH + 14;
-
-  const eventsInRange = data.events.filter(ev => {
-    if (weeks.length === 0) return true;
-    const start = new Date(ev.startTs).getTime();
-    const end = ev.endTs ? new Date(ev.endTs).getTime() : Date.now();
-    // include if any overlap with [minTime, maxTime + 1 week]
-    const upperBound = maxTime + 7 * 86400000;
-    return end >= minTime && start <= upperBound;
-  });
-
-  const eventLayout = eventsInRange.map(ev => {
-    const start = new Date(ev.startTs).getTime();
-    const end = ev.endTs ? new Date(ev.endTs).getTime() : Date.now();
-    const x1 = Math.max(margin.left, xForTime(Math.max(start, minTime)));
-    const x2 = Math.min(margin.left + plotW, xForTime(Math.min(end, maxTime + 7 * 86400000)));
-    return { ev, x1, x2: Math.max(x1 + 6, x2) };
-  });
 
   return (
-    <div ref={containerRef} style={{ position: 'relative' }}>
+    <div>
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
         <div style={{ ...cardStyle, textAlign: 'center' }}>
@@ -157,29 +96,62 @@ export default function GraidLogDashboard() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {/* Raids per week — Stacked Bar Graph with hover tooltips and event bars */}
+        {/* Chart card */}
         <div style={cardStyle}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Raids Per Week</h3>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
+                {inDrilldown && selectedEvent
+                  ? `${selectedEvent.title} — Per-Day Distribution`
+                  : 'Raids Per Week'}
+              </h3>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-                Hover bars for breakdown · Click event bars below chart for per-day details
+                {inDrilldown && selectedEvent ? (
+                  <>
+                    {fmtDate(selectedEvent.startTs)}
+                    {selectedEvent.endTs ? ` – ${fmtDate(selectedEvent.endTs)}` : ' – ongoing'}
+                    {eventDist ? ` · ${eventDist.total} total raids` : ''}
+                  </>
+                ) : (
+                  'Hover the chart for per-week breakdown'
+                )}
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'end' }}>
-              <div>
-                <label style={labelStyle}>From</label>
-                <input type="date" style={inputStyle} value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>To</label>
-                <input type="date" style={inputStyle} value={dateTo} onChange={e => setDateTo(e.target.value)} />
-              </div>
-              {(dateFrom || dateTo) && (
-                <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{
-                  background: 'var(--bg-primary)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
-                  padding: '0.4rem 0.6rem', color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer',
-                }}>Clear</button>
+              {inDrilldown ? (
+                <button
+                  onClick={() => setSelectedEventId(null)}
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-card)',
+                    borderRadius: '0.375rem',
+                    padding: '0.45rem 0.75rem',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ← Back to Weekly
+                </button>
+              ) : (
+                <>
+                  <div>
+                    <label style={labelStyle}>From</label>
+                    <input type="date" style={inputStyle} value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>To</label>
+                    <input type="date" style={inputStyle} value={dateTo} onChange={e => setDateTo(e.target.value)} />
+                  </div>
+                  {(dateFrom || dateTo) && (
+                    <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{
+                      background: 'var(--bg-primary)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
+                      padding: '0.4rem 0.6rem', color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer',
+                    }}>Clear</button>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -194,175 +166,127 @@ export default function GraidLogDashboard() {
             ))}
           </div>
 
-          {weeks.length > 0 ? (
-            <svg
-              viewBox={`0 0 ${svgW} ${svgH + eventBarsTop - margin.top - plotH + (eventLayout.length > 0 ? eventBarHeight + 18 : 0)}`}
-              style={{ width: '100%', height: 'auto', maxHeight: '520px', display: 'block' }}
-              onMouseLeave={() => setHover(null)}
+          {/* Drilldown totals chips */}
+          {inDrilldown && eventDist && eventDist.total > 0 && (
+            <div
+              key={`chips-${selectedEventId}`}
+              className="graid-fade-swap"
+              style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}
             >
-              {/* Y grid */}
-              {yLabels.map(({ y, label }) => (
-                <g key={`y-${label}`}>
-                  <line x1={margin.left} y1={y} x2={margin.left + plotW} y2={y} stroke="var(--border-card)" strokeWidth="0.5" strokeDasharray="4,4" />
-                  <text x={margin.left - 8} y={y + 3} fill="var(--text-secondary)" fontSize="11" textAnchor="end">{label}</text>
-                </g>
-              ))}
-              {/* axes */}
-              <line x1={margin.left} y1={margin.top} x2={margin.left} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
-              <line x1={margin.left} y1={margin.top + plotH} x2={margin.left + plotW} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
-
-              {/* X axis labels */}
-              {xLabels.map(({ x, label }, i) => (
-                <text key={`x-${i}`} x={x} y={margin.top + plotH + 16} fill="var(--text-secondary)" fontSize="10" textAnchor="middle">{label}</text>
-              ))}
-
-              {/* Stacked bars */}
-              {barPoints.map((p, i) => {
-                let yOffset = margin.top + plotH;
-                const segments: React.ReactNode[] = [];
-                for (const t of RAID_TYPE_ORDER) {
-                  const v = p.types[t] || 0;
-                  if (v <= 0) continue;
-                  const segH = (v / maxWeekly) * plotH;
-                  yOffset -= segH;
-                  segments.push(
-                    <rect
-                      key={`${i}-${t}`}
-                      x={p.x}
-                      y={yOffset}
-                      width={barWidth}
-                      height={segH}
-                      fill={RAID_TYPE_COLORS[t]}
-                      opacity={0.9}
-                    />
-                  );
-                }
-                const totalH = (p.total / maxWeekly) * plotH;
+              {RAID_TYPE_ORDER.map(t => {
+                const count = eventDist.totalsByType[t] || 0;
+                if (count === 0) return null;
+                const pct = ((count / eventDist.total) * 100).toFixed(0);
                 return (
-                  <g key={`bar-${i}`}>
-                    {segments}
-                    {/* invisible hover capture */}
-                    <rect
-                      x={p.x}
-                      y={margin.top + plotH - totalH}
-                      width={barWidth}
-                      height={Math.max(totalH, 4)}
-                      fill="transparent"
-                      onMouseMove={(e) => handleBarHover(p, e)}
-                      onMouseEnter={(e) => handleBarHover(p, e)}
-                      style={{ cursor: 'pointer' }}
-                    />
-                  </g>
+                  <div key={t} style={{
+                    background: 'var(--bg-primary)',
+                    border: `1px solid ${RAID_TYPE_COLORS[t]}40`,
+                    borderRadius: '0.375rem',
+                    padding: '0.25rem 0.55rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}>
+                    <span style={{ width: '8px', height: '8px', background: RAID_TYPE_COLORS[t], borderRadius: '2px' }} />
+                    <span style={{ fontSize: '0.7rem', fontWeight: '700', color: RAID_TYPE_COLORS[t] }}>{t}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-primary)' }}>{count}</span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>({pct}%)</span>
+                  </div>
                 );
               })}
-
-              {/* Event bars below chart */}
-              {eventLayout.length > 0 && (
-                <>
-                  <text
-                    x={margin.left}
-                    y={eventBarsTop - 4}
-                    fill="var(--text-secondary)"
-                    fontSize="10"
-                    fontWeight="600"
-                  >
-                    Guild Raid Events (click for per-day breakdown)
-                  </text>
-                  {eventLayout.map(({ ev, x1, x2 }, i) => {
-                    const isSelected = selectedEventId === ev.id;
-                    return (
-                      <g key={`evt-${ev.id}`}>
-                        <rect
-                          x={x1}
-                          y={eventBarsTop}
-                          width={x2 - x1}
-                          height={eventBarHeight}
-                          fill={isSelected ? 'var(--color-ocean-400)' : 'var(--color-ocean-600, #1e3a8a)'}
-                          stroke={isSelected ? '#fff' : 'var(--color-ocean-400)'}
-                          strokeWidth={isSelected ? 2 : 1}
-                          rx={3}
-                          style={{ cursor: 'pointer' }}
-                          opacity={ev.active ? 1 : 0.75}
-                          onClick={() => setSelectedEventId(isSelected ? null : ev.id)}
-                          onMouseMove={(e) => {
-                            const containerRect = containerRef.current?.getBoundingClientRect();
-                            if (!containerRect) return;
-                            setHover({
-                              x: e.clientX - containerRect.left,
-                              y: e.clientY - containerRect.top,
-                              title: ev.title,
-                              rows: [
-                                { label: 'Total Raids', value: ev.totalRaids, color: 'var(--color-ocean-400)' },
-                              ],
-                              total: ev.totalRaids,
-                            });
-                          }}
-                          onMouseLeave={() => setHover(null)}
-                        />
-                        {x2 - x1 > 60 && (
-                          <text
-                            x={(x1 + x2) / 2}
-                            y={eventBarsTop + eventBarHeight / 2 + 4}
-                            fill="#fff"
-                            fontSize="10"
-                            fontWeight="700"
-                            textAnchor="middle"
-                            pointerEvents="none"
-                          >
-                            {ev.title.length > Math.floor((x2 - x1) / 7) ? ev.title.slice(0, Math.floor((x2 - x1) / 7) - 1) + '…' : ev.title}
-                          </text>
-                        )}
-                      </g>
-                    );
-                  })}
-                </>
-              )}
-            </svg>
-          ) : (
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>No data for this range</div>
+            </div>
           )}
 
-          {/* Hover tooltip */}
-          {hover && (
-            <div
-              style={{
-                position: 'absolute',
-                left: hover.x + 12,
-                top: hover.y + 12,
-                background: 'var(--bg-card-solid)',
-                border: '1px solid var(--border-card)',
-                borderRadius: '0.5rem',
-                padding: '0.5rem 0.75rem',
-                pointerEvents: 'none',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                zIndex: 50,
-                minWidth: '160px',
-              }}
-            >
-              <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.3rem' }}>{hover.title}</div>
-              {hover.rows.map(r => (
-                <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.7rem' }}>
-                  <span style={{ width: '8px', height: '8px', background: r.color, borderRadius: '2px', display: 'inline-block' }} />
-                  <span style={{ color: 'var(--text-secondary)', flex: 1 }}>{r.label}</span>
-                  <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{r.value}</span>
+          {/* Swappable chart slot */}
+          <div
+            key={inDrilldown ? `event-${selectedEventId}` : 'weekly'}
+            className="graid-fade-swap"
+          >
+            {inDrilldown ? (
+              eventLoading ? (
+                <div style={{ height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  Loading event distribution…
                 </div>
-              ))}
-              <div style={{ borderTop: '1px solid var(--border-card)', marginTop: '0.3rem', paddingTop: '0.25rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
-                <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Total</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: '700' }}>{hover.total}</span>
+              ) : drilldownBuckets.length === 0 ? (
+                <div style={{ height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  No raids logged during this event
+                </div>
+              ) : (
+                <StackedAreaChart buckets={drilldownBuckets} titlePrefix="" />
+              )
+            ) : weeklyBuckets.length === 0 ? (
+              <div style={{ height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                No data for this range
+              </div>
+            ) : (
+              <StackedAreaChart buckets={weeklyBuckets} titlePrefix="Week of " />
+            )}
+          </div>
+
+          {/* Event chips row — always visible, persists across drilldown swap */}
+          {data.events.length > 0 && (
+            <div style={{ marginTop: '1rem' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Guild Raid Events
+              </div>
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                overflowX: 'auto',
+                paddingBottom: '0.4rem',
+                scrollbarWidth: 'thin',
+              }}>
+                {data.events.map(ev => {
+                  const isSelected = selectedEventId === ev.id;
+                  return (
+                    <button
+                      key={ev.id}
+                      onClick={() => setSelectedEventId(isSelected ? null : ev.id)}
+                      style={{
+                        flexShrink: 0,
+                        width: '180px',
+                        background: isSelected ? 'rgba(56, 189, 248, 0.12)' : 'var(--bg-primary)',
+                        border: isSelected ? '2px solid var(--color-ocean-400)' : '1px solid var(--border-card)',
+                        borderRadius: '0.5rem',
+                        padding: isSelected ? '0.5rem 0.65rem' : '0.55rem 0.7rem',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.15s',
+                        color: 'inherit',
+                      }}
+                      onMouseEnter={e => { if (!isSelected) e.currentTarget.style.borderColor = 'var(--color-ocean-400)'; }}
+                      onMouseLeave={e => { if (!isSelected) e.currentTarget.style.borderColor = 'var(--border-card)'; }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                        <span style={{
+                          width: '8px', height: '8px',
+                          background: ev.active ? '#22c55e' : 'var(--text-muted)',
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          boxShadow: ev.active ? '0 0 6px #22c55e' : 'none',
+                        }} />
+                        <span style={{
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          color: 'var(--text-primary)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}>{ev.title}</span>
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>
+                        {fmtDate(ev.startTs)}{ev.endTs ? ` – ${fmtDate(ev.endTs)}` : ' – now'}
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
+                        <span style={{ color: 'var(--color-ocean-400)', fontWeight: '700' }}>{ev.totalRaids}</span> raids
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
         </div>
-
-        {/* Per-event drilldown panel */}
-        {selectedEventId != null && (
-          <EventDrilldownPanel
-            data={eventDist}
-            loading={eventLoading}
-            onClose={() => setSelectedEventId(null)}
-          />
-        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           {/* Raid Type Distribution */}
@@ -393,7 +317,200 @@ export default function GraidLogDashboard() {
         </div>
       </div>
 
-      <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
+      <style>{`
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes graidFadeSwap {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .graid-fade-swap { animation: graidFadeSwap 220ms ease-out; }
+      `}</style>
+    </div>
+  );
+}
+
+// --- Stacked Area Chart (line on top + filled stacked layers) ---
+
+function StackedAreaChart({ buckets, titlePrefix }: { buckets: Bucket[]; titlePrefix: string }) {
+  const [hover, setHover] = useState<HoverState | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const svgW = 1000;
+  const svgH = 260;
+  const margin = { top: 18, right: 18, bottom: 32, left: 44 };
+  const plotW = svgW - margin.left - margin.right;
+  const plotH = svgH - margin.top - margin.bottom;
+
+  const maxTotal = Math.max(...buckets.map(b => b.total), 1);
+
+  const points = useMemo(() => buckets.map((b, i) => {
+    const x = buckets.length === 1
+      ? margin.left + plotW / 2
+      : margin.left + (i / (buckets.length - 1)) * plotW;
+    return { ...b, x };
+  }), [buckets, plotW]);
+
+  // Build stacked area paths (bottom layer first)
+  const layers = RAID_TYPE_ORDER.map((type, layerIdx) => {
+    const upper: { x: number; y: number }[] = [];
+    const lower: { x: number; y: number }[] = [];
+    for (const p of points) {
+      let belowSum = 0;
+      for (let li = 0; li < layerIdx; li++) belowSum += p.types[RAID_TYPE_ORDER[li]] || 0;
+      const aboveSum = belowSum + (p.types[type] || 0);
+      upper.push({ x: p.x, y: margin.top + plotH - (aboveSum / maxTotal) * plotH });
+      lower.push({ x: p.x, y: margin.top + plotH - (belowSum / maxTotal) * plotH });
+    }
+    if (points.length === 1) {
+      // Degenerate single-point case: render a thin centered rect via path
+      const p0 = points[0];
+      const w = 20;
+      const top = margin.top + plotH - ((points[0].types[type] || 0) / maxTotal) * plotH; // not used, fallback
+      // Instead, fall back to no path; the user shouldn't really hit this with weekly data.
+      return { type, path: '', single: true };
+    }
+    const topPath = upper.map((q, i) => `${i === 0 ? 'M' : 'L'}${q.x},${q.y}`).join(' ');
+    const bottomPath = lower.slice().reverse().map(q => `L${q.x},${q.y}`).join(' ');
+    return { type, path: `${topPath} ${bottomPath} Z`, single: false };
+  });
+
+  const totalLinePoints = points.map(p => ({ x: p.x, y: margin.top + plotH - (p.total / maxTotal) * plotH }));
+  const totalPath = totalLinePoints.map((q, i) => `${i === 0 ? 'M' : 'L'}${q.x},${q.y}`).join(' ');
+
+  // Y axis ticks
+  const yTickCount = 4;
+  const yStep = Math.max(1, Math.ceil(maxTotal / yTickCount));
+  const yLabels: { y: number; label: string }[] = [];
+  for (let v = 0; v <= maxTotal; v += yStep) {
+    yLabels.push({ y: margin.top + plotH - (v / maxTotal) * plotH, label: String(v) });
+  }
+
+  // X axis labels
+  const desiredXLabels = Math.min(8, points.length);
+  const xLabels = points.length === 0 ? [] : points.length <= desiredXLabels
+    ? points.map(p => ({ x: p.x, label: p.label }))
+    : Array.from({ length: desiredXLabels }, (_, i) => {
+        const idx = Math.round((i / (desiredXLabels - 1)) * (points.length - 1));
+        return { x: points[idx].x, label: points[idx].label };
+      });
+
+  const handleStripHover = (p: typeof points[number], e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setHover({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      bucket: p,
+      titlePrefix,
+    });
+  };
+
+  const hoveredX = hover ? points.find(p => p.key === hover.bucket.key)?.x : undefined;
+  const hoveredY = hover ? margin.top + plotH - (hover.bucket.total / maxTotal) * plotH : undefined;
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <svg
+        viewBox={`0 0 ${svgW} ${svgH}`}
+        style={{ width: '100%', height: 'auto', maxHeight: '320px', display: 'block' }}
+        onMouseLeave={() => setHover(null)}
+      >
+        {/* Y grid */}
+        {yLabels.map(({ y, label }) => (
+          <g key={`y-${label}`}>
+            <line x1={margin.left} y1={y} x2={margin.left + plotW} y2={y} stroke="var(--border-card)" strokeWidth="0.5" strokeDasharray="4,4" />
+            <text x={margin.left - 8} y={y + 3} fill="var(--text-secondary)" fontSize="11" textAnchor="end">{label}</text>
+          </g>
+        ))}
+        {/* axes */}
+        <line x1={margin.left} y1={margin.top} x2={margin.left} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
+        <line x1={margin.left} y1={margin.top + plotH} x2={margin.left + plotW} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
+
+        {/* X labels */}
+        {xLabels.map(({ x, label }, i) => (
+          <text key={`x-${i}`} x={x} y={margin.top + plotH + 16} fill="var(--text-secondary)" fontSize="10" textAnchor="middle">{label}</text>
+        ))}
+
+        {/* Stacked area layers */}
+        {points.length > 1 && layers.map(l => (
+          <path key={l.type} d={l.path} fill={RAID_TYPE_COLORS[l.type]} opacity={0.55} />
+        ))}
+
+        {/* Total line + dots */}
+        {points.length > 1 && (
+          <path d={totalPath} fill="none" stroke="var(--color-ocean-400)" strokeWidth="2.25" strokeLinejoin="round" strokeLinecap="round" />
+        )}
+        {totalLinePoints.map((q, i) => (
+          <circle key={`dot-${i}`} cx={q.x} cy={q.y} r="3" fill="var(--color-ocean-400)" />
+        ))}
+
+        {/* Hover guideline + highlighted dot */}
+        {hover && hoveredX !== undefined && hoveredY !== undefined && (
+          <g pointerEvents="none">
+            <line x1={hoveredX} y1={margin.top} x2={hoveredX} y2={margin.top + plotH} stroke="var(--text-secondary)" strokeWidth="1" strokeDasharray="3,3" opacity="0.5" />
+            <circle cx={hoveredX} cy={hoveredY} r="5" fill="var(--color-ocean-400)" stroke="#fff" strokeWidth="1.5" />
+          </g>
+        )}
+
+        {/* Invisible hover capture strips */}
+        {points.map((p, i) => {
+          const prevX = i > 0 ? points[i - 1].x : p.x - (points[1]?.x - p.x || plotW) / 2;
+          const nextX = i < points.length - 1 ? points[i + 1].x : p.x + (p.x - points[i - 1]?.x || plotW) / 2;
+          const left = (prevX + p.x) / 2;
+          const right = (nextX + p.x) / 2;
+          return (
+            <rect
+              key={`hit-${i}`}
+              x={left}
+              y={margin.top}
+              width={Math.max(2, right - left)}
+              height={plotH}
+              fill="transparent"
+              style={{ cursor: 'pointer' }}
+              onMouseMove={(e) => handleStripHover(p, e)}
+              onMouseEnter={(e) => handleStripHover(p, e)}
+            />
+          );
+        })}
+      </svg>
+
+      {/* Tooltip */}
+      {hover && (
+        <div
+          style={{
+            position: 'absolute',
+            left: hover.x + 14,
+            top: hover.y + 14,
+            background: 'var(--bg-card-solid)',
+            border: '1px solid var(--border-card)',
+            borderRadius: '0.5rem',
+            padding: '0.5rem 0.75rem',
+            pointerEvents: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            zIndex: 50,
+            minWidth: '160px',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.3rem' }}>
+            {hover.titlePrefix}{hover.bucket.key}
+          </div>
+          {RAID_TYPE_ORDER.map(t => {
+            const v = hover.bucket.types[t] || 0;
+            if (v === 0) return null;
+            return (
+              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.7rem' }}>
+                <span style={{ width: '8px', height: '8px', background: RAID_TYPE_COLORS[t], borderRadius: '2px' }} />
+                <span style={{ color: 'var(--text-secondary)', flex: 1 }}>{t}</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{v}</span>
+              </div>
+            );
+          })}
+          <div style={{ borderTop: '1px solid var(--border-card)', marginTop: '0.3rem', paddingTop: '0.25rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Total</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: '700' }}>{hover.bucket.total}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -471,208 +588,5 @@ function TopPlayerRow({ player, rank, maxCount }: {
   );
 }
 
-// --- Per-event Drilldown Panel ---
-
-function EventDrilldownPanel({
-  data,
-  loading,
-  onClose,
-}: {
-  data: { event: { id: number; title: string; startTs: string; endTs: string | null }; total: number; totalsByType: Record<string, number>; days: { date: string; total: number; types: Record<string, number> }[] } | null;
-  loading: boolean;
-  onClose: () => void;
-}) {
-  const [hover, setHover] = useState<{ x: number; y: number; day: { date: string; total: number; types: Record<string, number> } } | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  if (loading) {
-    return (
-      <div style={{ ...cardStyle, height: '300px', animation: 'pulse 1.5s ease-in-out infinite' }} />
-    );
-  }
-  if (!data) {
-    return (
-      <div style={cardStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={sectionTitle}>Event Drilldown</h3>
-          <button onClick={onClose} style={closeBtn}>Close</button>
-        </div>
-        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem', padding: '1rem' }}>
-          No data for this event
-        </div>
-      </div>
-    );
-  }
-
-  const maxDayTotal = Math.max(...data.days.map(d => d.total), 1);
-  const days = data.days;
-
-  // Per-day stacked bar chart
-  const svgW = 1000;
-  const svgH = 240;
-  const margin = { top: 16, right: 16, bottom: 30, left: 40 };
-  const plotW = svgW - margin.left - margin.right;
-  const plotH = svgH - margin.top - margin.bottom;
-
-  const barSlot = days.length > 0 ? plotW / Math.max(1, days.length) : 0;
-  const barWidth = Math.max(8, Math.min(40, barSlot * 0.7));
-
-  const yTickCount = 4;
-  const yStep = Math.max(1, Math.ceil(maxDayTotal / yTickCount));
-  const yLabels: { y: number; label: string }[] = [];
-  for (let v = 0; v <= maxDayTotal; v += yStep) {
-    yLabels.push({ y: margin.top + plotH - (v / maxDayTotal) * plotH, label: String(v) });
-  }
-
-  return (
-    <div ref={containerRef} style={{ ...cardStyle, position: 'relative' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <div>
-          <h3 style={{ ...sectionTitle, margin: 0 }}>{data.event.title} — Per-Day Distribution</h3>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-            {new Date(data.event.startTs).toLocaleDateString()}
-            {data.event.endTs && ` — ${new Date(data.event.endTs).toLocaleDateString()}`}
-            {' · '}{data.total} total raids
-          </div>
-        </div>
-        <button onClick={onClose} style={closeBtn}>Close</button>
-      </div>
-
-      {/* Totals by type chips */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-        {RAID_TYPE_ORDER.map(t => {
-          const count = data.totalsByType[t] || 0;
-          if (count === 0) return null;
-          const pct = data.total > 0 ? (count / data.total * 100).toFixed(0) : '0';
-          return (
-            <div key={t} style={{
-              background: 'var(--bg-primary)',
-              border: `1px solid ${RAID_TYPE_COLORS[t]}40`,
-              borderRadius: '0.375rem',
-              padding: '0.3rem 0.6rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-            }}>
-              <span style={{ width: '10px', height: '10px', background: RAID_TYPE_COLORS[t], borderRadius: '2px' }} />
-              <span style={{ fontSize: '0.7rem', fontWeight: '700', color: RAID_TYPE_COLORS[t] }}>{t}</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-primary)' }}>{count}</span>
-              <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>({pct}%)</span>
-            </div>
-          );
-        })}
-      </div>
-
-      {days.length > 0 ? (
-        <svg
-          viewBox={`0 0 ${svgW} ${svgH}`}
-          style={{ width: '100%', height: 'auto', maxHeight: '320px', display: 'block' }}
-          onMouseLeave={() => setHover(null)}
-        >
-          {yLabels.map(({ y, label }) => (
-            <g key={`y-${label}`}>
-              <line x1={margin.left} y1={y} x2={margin.left + plotW} y2={y} stroke="var(--border-card)" strokeWidth="0.5" strokeDasharray="4,4" />
-              <text x={margin.left - 6} y={y + 3} fill="var(--text-secondary)" fontSize="10" textAnchor="end">{label}</text>
-            </g>
-          ))}
-          <line x1={margin.left} y1={margin.top} x2={margin.left} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
-          <line x1={margin.left} y1={margin.top + plotH} x2={margin.left + plotW} y2={margin.top + plotH} stroke="var(--border-card)" strokeWidth="1" />
-
-          {days.map((d, i) => {
-            const cx = days.length === 1
-              ? margin.left + plotW / 2
-              : margin.left + (i / (days.length - 1)) * plotW;
-            const x = cx - barWidth / 2;
-            let yOff = margin.top + plotH;
-            const segs: React.ReactNode[] = [];
-            for (const t of RAID_TYPE_ORDER) {
-              const v = d.types[t] || 0;
-              if (v <= 0) continue;
-              const segH = (v / maxDayTotal) * plotH;
-              yOff -= segH;
-              segs.push(
-                <rect key={t} x={x} y={yOff} width={barWidth} height={segH} fill={RAID_TYPE_COLORS[t]} opacity={0.9} />
-              );
-            }
-            const totalH = (d.total / maxDayTotal) * plotH;
-            return (
-              <g key={i}>
-                {segs}
-                <rect
-                  x={x}
-                  y={margin.top + plotH - totalH}
-                  width={barWidth}
-                  height={Math.max(totalH, 4)}
-                  fill="transparent"
-                  style={{ cursor: 'pointer' }}
-                  onMouseMove={(e) => {
-                    const rect = containerRef.current?.getBoundingClientRect();
-                    if (!rect) return;
-                    setHover({ x: e.clientX - rect.left, y: e.clientY - rect.top, day: d });
-                  }}
-                />
-                {/* X label every nth bar */}
-                {(days.length <= 8 || i % Math.ceil(days.length / 8) === 0) && (
-                  <text x={cx} y={margin.top + plotH + 16} fill="var(--text-secondary)" fontSize="9" textAnchor="middle">
-                    {d.date.slice(5)}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
-      ) : (
-        <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          No raids logged during this event
-        </div>
-      )}
-
-      {hover && (
-        <div
-          style={{
-            position: 'absolute',
-            left: hover.x + 12,
-            top: hover.y + 12,
-            background: 'var(--bg-card-solid)',
-            border: '1px solid var(--border-card)',
-            borderRadius: '0.5rem',
-            padding: '0.5rem 0.75rem',
-            pointerEvents: 'none',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 50,
-            minWidth: '150px',
-          }}
-        >
-          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '0.3rem' }}>{hover.day.date}</div>
-          {RAID_TYPE_ORDER.map(t => {
-            const v = hover.day.types[t] || 0;
-            if (v === 0) return null;
-            return (
-              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.7rem' }}>
-                <span style={{ width: '8px', height: '8px', background: RAID_TYPE_COLORS[t], borderRadius: '2px' }} />
-                <span style={{ color: 'var(--text-secondary)', flex: 1 }}>{t}</span>
-                <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{v}</span>
-              </div>
-            );
-          })}
-          <div style={{ borderTop: '1px solid var(--border-card)', marginTop: '0.3rem', paddingTop: '0.25rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem' }}>
-            <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Total</span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: '700' }}>{hover.day.total}</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 const labelStyle: React.CSSProperties = { fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.15rem' };
 const sectionTitle: React.CSSProperties = { fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem 0' };
-const closeBtn: React.CSSProperties = {
-  background: 'var(--bg-primary)',
-  border: '1px solid var(--border-card)',
-  borderRadius: '0.375rem',
-  padding: '0.3rem 0.7rem',
-  color: 'var(--text-secondary)',
-  fontSize: '0.7rem',
-  cursor: 'pointer',
-};
