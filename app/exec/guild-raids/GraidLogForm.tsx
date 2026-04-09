@@ -22,6 +22,8 @@ const RAID_TYPES = [
   { value: 'NOL', label: "Orphion's Nexus of Light (NOL)" },
 ];
 
+const UNKNOWN_TYPE = { value: 'Unknown', label: 'Unknown raid type' };
+
 function MemberInput({ value, onChange, guildMembers, placeholder, id }: {
   value: string; onChange: (v: string) => void; guildMembers: string[]; placeholder: string; id: string;
 }) {
@@ -67,9 +69,13 @@ function MemberInput({ value, onChange, guildMembers, placeholder, id }: {
   );
 }
 
+type Mode = 'group' | 'individual';
+
 export default function GraidLogForm({ meta, onLogged }: Props) {
+  const [mode, setMode] = useState<Mode>('group');
   const [raidType, setRaidType] = useState('');
-  const [players, setPlayers] = useState(['', '', '', '']);
+  const [groupPlayers, setGroupPlayers] = useState(['', '', '', '']);
+  const [individualPlayer, setIndividualPlayer] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -77,65 +83,123 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
 
   const memberSet = useMemo(() => new Set(meta.guildMembers.map(m => m.toLowerCase())), [meta.guildMembers]);
 
-  const setPlayer = (idx: number, value: string) => {
-    setPlayers(prev => { const next = [...prev]; next[idx] = value; return next; });
+  const setGroupPlayer = (idx: number, value: string) => {
+    setGroupPlayers(prev => { const next = [...prev]; next[idx] = value; return next; });
+  };
+
+  const switchMode = (next: Mode) => {
+    setMode(next);
+    setError(null);
+    setSuccess(null);
+    if (next === 'group' && raidType === 'Unknown') setRaidType('');
   };
 
   const handleSubmit = async () => {
     setError(null);
     setSuccess(null);
 
-    if (!raidType) { setError('Select a raid type.'); return; }
+    if (mode === 'group') {
+      if (!raidType || raidType === 'Unknown') { setError('Select a raid type.'); return; }
+      const trimmed = groupPlayers.map(p => p.trim());
+      const empty = trimmed.filter(p => !p);
+      if (empty.length > 0) { setError('All 4 participants are required.'); return; }
+      const nonMembers = trimmed.filter(p => !memberSet.has(p.toLowerCase()));
+      if (nonMembers.length > 0) { setError(`Not current guild members: ${nonMembers.join(', ')}`); return; }
+      const unique = new Set(trimmed.map(p => p.toLowerCase()));
+      if (unique.size < 4) { setError('All 4 participants must be different.'); return; }
 
-    const trimmed = players.map(p => p.trim());
-    const empty = trimmed.filter(p => !p);
-    if (empty.length > 0) { setError('All 4 participants are required.'); return; }
+      setSaving(true);
+      try {
+        const result = await createLog(raidType, trimmed, 'group');
+        setSuccess(`Logged ${raidType} raid (#${result.id})${result.warning ? ` — ${result.warning}` : ''}`);
+        setRaidType('');
+        setGroupPlayers(['', '', '', '']);
+        onLogged();
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      // Individual mode
+      const player = individualPlayer.trim();
+      if (!player) { setError('Player is required.'); return; }
+      if (!memberSet.has(player.toLowerCase())) { setError(`Not a current guild member: ${player}`); return; }
+      const typeToSend = raidType || 'Unknown';
 
-    const nonMembers = trimmed.filter(p => !memberSet.has(p.toLowerCase()));
-    if (nonMembers.length > 0) { setError(`Not current guild members: ${nonMembers.join(', ')}`); return; }
-
-    const unique = new Set(trimmed.map(p => p.toLowerCase()));
-    if (unique.size < 4) { setError('All 4 participants must be different.'); return; }
-
-    setSaving(true);
-    try {
-      const result = await createLog(raidType, trimmed);
-      setSuccess(`Logged ${raidType} raid (#${result.id})${result.warning ? ` — ${result.warning}` : ''}`);
-      setRaidType('');
-      setPlayers(['', '', '', '']);
-      onLogged();
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
+      setSaving(true);
+      try {
+        const result = await createLog(typeToSend, [player], 'individual');
+        setSuccess(`Logged individual ${typeToSend} raid (#${result.id}) for ${player}`);
+        setRaidType('');
+        setIndividualPlayer('');
+        onLogged();
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setSaving(false);
+      }
     }
   };
+
+  const raidOptions = mode === 'individual' ? [...RAID_TYPES, UNKNOWN_TYPE] : RAID_TYPES;
 
   return (
     <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', maxWidth: '500px' }}>
       <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>Log Guild Raid</h3>
 
+      <div style={{
+        display: 'flex', gap: '0.25rem', marginBottom: '1rem',
+        background: 'var(--bg-primary)', borderRadius: '0.5rem', padding: '0.25rem',
+        border: '1px solid var(--border-card)',
+      }}>
+        {(['group', 'individual'] as Mode[]).map(m => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => switchMode(m)}
+            style={{
+              flex: 1,
+              padding: '0.5rem 0.75rem',
+              borderRadius: '0.375rem',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              fontWeight: mode === m ? '700' : '500',
+              background: mode === m ? 'var(--color-ocean-400)' : 'transparent',
+              color: mode === m ? '#fff' : 'var(--text-secondary)',
+              transition: 'all 0.15s',
+            }}
+          >
+            {m === 'group' ? 'Full Group (4)' : 'Individual'}
+          </button>
+        ))}
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <div>
-          <label style={labelStyle}>Raid Type</label>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            {RAID_TYPES.map(t => {
-              const selected = raidType === t.value;
+          <label style={labelStyle}>Raid Type{mode === 'individual' && ' (or Unknown)'}</label>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: mode === 'individual' ? 'repeat(5, 1fr)' : 'repeat(4, 1fr)',
+            gap: '0.5rem',
+          }}>
+            {raidOptions.map(t => {
+              const selected = raidType === t.value || (mode === 'individual' && t.value === 'Unknown' && !raidType);
               const color = RAID_TYPE_COLORS[t.value] || '#6b7280';
               return (
                 <button
                   key={t.value}
                   type="button"
-                  onClick={() => setRaidType(selected ? '' : t.value)}
+                  onClick={() => setRaidType(selected && t.value !== 'Unknown' ? '' : t.value)}
                   style={{
-                    flex: 1,
                     padding: '0.5rem 0.25rem',
                     borderRadius: '0.375rem',
                     border: selected ? `2px solid ${color}` : '2px solid var(--border-card)',
                     background: selected ? `${color}20` : 'var(--bg-primary)',
                     color: selected ? color : 'var(--text-secondary)',
                     fontWeight: selected ? '700' : '500',
-                    fontSize: '0.8rem',
+                    fontSize: '0.75rem',
                     cursor: 'pointer',
                     transition: 'all 0.15s',
                   }}
@@ -147,18 +211,34 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
           </div>
         </div>
 
-        {[0, 1, 2, 3].map(i => (
-          <div key={i}>
-            <label style={labelStyle}>Player {i + 1}</label>
+        {mode === 'group' ? (
+          [0, 1, 2, 3].map(i => (
+            <div key={i}>
+              <label style={labelStyle}>Player {i + 1}</label>
+              <MemberInput
+                value={groupPlayers[i]}
+                onChange={v => setGroupPlayer(i, v)}
+                guildMembers={meta.guildMembers}
+                placeholder="Search guild member..."
+                id={`player-${i}`}
+              />
+            </div>
+          ))
+        ) : (
+          <div>
+            <label style={labelStyle}>Player</label>
             <MemberInput
-              value={players[i]}
-              onChange={v => setPlayer(i, v)}
+              value={individualPlayer}
+              onChange={setIndividualPlayer}
               guildMembers={meta.guildMembers}
               placeholder="Search guild member..."
-              id={`player-${i}`}
+              id="player-individual"
             />
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.4rem 0 0 0' }}>
+              Adds a single raid completion to this player only. Use this for fixing missing/desynced raids. Not posted to Discord.
+            </p>
           </div>
-        ))}
+        )}
 
         {error && <div style={{ color: '#ef4444', fontSize: '0.85rem' }}>{error}</div>}
         {success && <div style={{ color: '#22c55e', fontSize: '0.85rem' }}>{success}</div>}
@@ -172,7 +252,7 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
             cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1,
           }}
         >
-          {saving ? 'Logging...' : 'Log Raid'}
+          {saving ? 'Logging...' : mode === 'group' ? 'Log Raid' : 'Log Individual Raid'}
         </button>
       </div>
     </div>

@@ -32,6 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const rankIdx = user?.rank ? RANK_HIERARCHY.indexOf(user.rank) : -1;
   const isAngler = rankIdx === 4; // Angler index in RANK_HIERARCHY
   const isExecRank = rankIdx >= 5; // Hammerhead+
+  const isBelowAngler = authenticated && rankIdx >= 0 && rankIdx < 4; // Guild member below Angler (Starfish–Barracuda)
   
   // Close View As dropdown on outside click
   useEffect(() => {
@@ -472,6 +473,29 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               >
                 Hammerhead Application
               </Link>
+            ) : isBelowAngler ? (
+              <button
+                type="button"
+                disabled
+                title="You can only apply for Hammerhead once you reach Angler rank."
+                aria-label="Hammerhead Application — requires Angler rank"
+                className="mobile-apply-button"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(135deg, rgba(4, 176, 235, 0.25) 0%, rgba(3, 144, 192, 0.25) 100%)',
+                  color: 'rgba(255,255,255,0.55)',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  border: '1px solid rgba(4, 176, 235, 0.25)',
+                  cursor: 'not-allowed',
+                  opacity: 0.6,
+                  fontFamily: 'inherit',
+                  boxShadow: 'none',
+                }}
+              >
+                Hammerhead Application
+              </button>
             ) : !(authenticated && isExecRank) && (
               <a
                 href="https://discord.gg/njRpZwKVaa"
@@ -913,6 +937,27 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   e.currentTarget.style.background = 'transparent';
                 }}
               >Hammerhead Application</NavLink>
+              )}
+              {isBelowAngler && (
+              <button
+                type="button"
+                disabled
+                title="You can only apply for Hammerhead once you reach Angler rank."
+                aria-label="Hammerhead Application — requires Angler rank"
+                style={{
+                  color: 'rgba(4, 176, 235, 0.55)',
+                  fontWeight: 'bold',
+                  fontSize: '1.125rem',
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'not-allowed',
+                  opacity: 0.65,
+                  fontFamily: 'inherit',
+                }}
+              >Hammerhead Application (Angler only)</button>
               )}
               {!authenticated && (
               <NavLink

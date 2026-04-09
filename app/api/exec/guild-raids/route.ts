@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST — Manually log a guild raid
+// POST — Manually log a guild raid (group of 4) or an individual completion
 export async function POST(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) {
@@ -134,26 +134,46 @@ export async function POST(request: NextRequest) {
 
   try {
     const pool = getPool();
-    const { raidType, participants } = await request.json();
-
-    // Validate raid type
-    const fullRaidName = RAID_SHORT_TO_FULL[raidType];
-    if (!fullRaidName) {
-      return NextResponse.json({ error: 'Invalid raid type. Must be NOTG, TCC, TNA, or NOL.' }, { status: 400 });
-    }
+    const { raidType, participants, mode } = await request.json();
 
     // Validate participants
-    if (!participants || !Array.isArray(participants) || participants.length !== 4) {
-      return NextResponse.json({ error: 'Exactly 4 participants are required.' }, { status: 400 });
+    if (!participants || !Array.isArray(participants) || participants.length === 0) {
+      return NextResponse.json({ error: 'Participants are required.' }, { status: 400 });
     }
     for (const p of participants) {
       if (!p || typeof p !== 'string' || !p.trim()) {
         return NextResponse.json({ error: 'All participants must have a valid IGN.' }, { status: 400 });
       }
     }
-    const uniqueIgns = new Set(participants.map((p: string) => p.trim().toLowerCase()));
-    if (uniqueIgns.size < 4) {
-      return NextResponse.json({ error: 'All 4 participants must be different players.' }, { status: 400 });
+
+    // Determine mode: explicit or inferred from participant count
+    const inferredMode: 'group' | 'individual' = mode === 'individual' || participants.length === 1 ? 'individual' : 'group';
+
+    if (inferredMode === 'group') {
+      if (participants.length !== 4) {
+        return NextResponse.json({ error: 'Exactly 4 participants are required for a group raid.' }, { status: 400 });
+      }
+      const uniqueIgns = new Set(participants.map((p: string) => p.trim().toLowerCase()));
+      if (uniqueIgns.size < 4) {
+        return NextResponse.json({ error: 'All 4 participants must be different players.' }, { status: 400 });
+      }
+    } else {
+      if (participants.length !== 1) {
+        return NextResponse.json({ error: 'Individual logs must have exactly 1 participant.' }, { status: 400 });
+      }
+    }
+
+    // Validate raid type — required for group, optional (Unknown allowed) for individual
+    let fullRaidName: string | null = null;
+    const rawType = (raidType ?? '').toString().trim();
+    if (rawType && rawType !== 'Unknown') {
+      const resolved = RAID_SHORT_TO_FULL[rawType];
+      if (!resolved) {
+        return NextResponse.json({ error: 'Invalid raid type. Must be NOTG, TCC, TNA, NOL, or Unknown.' }, { status: 400 });
+      }
+      fullRaidName = resolved;
+    } else if (inferredMode === 'group') {
+      return NextResponse.json({ error: 'Raid type is required for group raids.' }, { status: 400 });
     }
 
     // Validate participants are guild members
@@ -208,12 +228,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Post to Discord raid-log channel
+    // Post to Discord raid-log channel — only for group raids with a known type
     const botToken = getBotToken();
     const channelId = getRaidLogChannelId();
     let discordWarning: string | undefined;
 
-    if (botToken && channelId) {
+    if (inferredMode === 'group' && fullRaidName && botToken && channelId) {
       try {
         const bolded = participants.map((p: string) => `**${p.trim()}**`);
         const namesStr = bolded.slice(0, -1).join(', ') + ', and ' + bolded[bolded.length - 1];
@@ -239,13 +259,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Audit log
+    const typeLabel = fullRaidName ?? 'Unknown';
+    const actionDesc = inferredMode === 'individual'
+      ? `Logged individual raid #${logId}: ${typeLabel} for ${participants[0]}`
+      : `Logged guild raid #${logId}: ${typeLabel} with ${participants.join(', ')}`;
     await pool.query(
       `INSERT INTO audit_log (log_type, actor_name, actor_id, action)
        VALUES ('graid', $1, $2, $3)`,
-      [session.ign, session.discord_id, `Logged guild raid #${logId}: ${raidType} with ${participants.join(', ')}`]
+      [session.ign, session.discord_id, actionDesc]
     );
 
-    return NextResponse.json({ success: true, id: logId, warning: discordWarning });
+    return NextResponse.json({ success: true, id: logId, mode: inferredMode, warning: discordWarning });
   } catch (error) {
     console.error('Guild raid log error:', error);
     return NextResponse.json({ error: 'Failed to log guild raid' }, { status: 500 });

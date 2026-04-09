@@ -62,13 +62,48 @@ export interface GraidLogPlayerStats {
   activityByDay: Record<string, number>;
 }
 
+export interface GraidWeekBucket {
+  week: string;
+  total: number;
+  types: Record<string, number>;
+}
+
+export interface GraidTopPlayer {
+  ign: string;
+  count: number;
+  types: Record<string, number>;
+}
+
+export interface GraidDashboardEvent {
+  id: number;
+  title: string;
+  startTs: string;
+  endTs: string | null;
+  active: boolean;
+  totalRaids: number;
+}
+
 export interface GraidLogDashboardData {
   totalRaids: number;
   uniqueParticipants: number;
   mostActivePlayer: { ign: string; count: number } | null;
   raidTypeDistribution: { type: string; fullName: string | null; count: number }[];
-  raidsOverTime: { week: string; count: number }[];
-  topPlayers: { ign: string; count: number }[];
+  raidsOverTime: GraidWeekBucket[];
+  topPlayers: GraidTopPlayer[];
+  events: GraidDashboardEvent[];
+}
+
+export interface GraidEventDayBucket {
+  date: string;
+  total: number;
+  types: Record<string, number>;
+}
+
+export interface GraidEventDistributionData {
+  event: { id: number; title: string; startTs: string; endTs: string | null; active: boolean };
+  total: number;
+  totalsByType: Record<string, number>;
+  days: GraidEventDayBucket[];
 }
 
 // --- Hooks ---
@@ -179,11 +214,11 @@ export function useExecGraidLogMutations() {
     return data;
   };
 
-  const createLog = async (raidType: string, participants: string[]) => {
+  const createLog = async (raidType: string, participants: string[], mode: 'group' | 'individual' = 'group') => {
     const res = await fetch('/api/exec/guild-raids', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raidType, participants }),
+      body: JSON.stringify({ raidType, participants, mode }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to log guild raid');
@@ -191,4 +226,18 @@ export function useExecGraidLogMutations() {
   };
 
   return { deleteLog, createLog };
+}
+
+export function useExecGraidEventDistribution(eventId: number | null) {
+  const { data, error, isLoading } = useSWR<GraidEventDistributionData>(
+    eventId != null ? `/api/exec/guild-raids/event-distribution?eventId=${eventId}` : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 10000 }
+  );
+
+  return {
+    data: data || null,
+    loading: isLoading,
+    error,
+  };
 }
