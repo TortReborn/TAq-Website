@@ -55,14 +55,14 @@ export default function GraidLogDashboard() {
 
   const weeklyBuckets: Bucket[] = data.raidsOverTime.map(w => ({
     key: w.week,
-    label: w.week.slice(5),
+    label: shortAxisLabel(w.week),
     total: w.total,
     types: w.types,
   }));
 
   const drilldownBuckets: Bucket[] = (eventDist?.days || []).map(d => ({
     key: d.date,
-    label: d.date.slice(5),
+    label: shortAxisLabel(d.date),
     total: d.total,
     types: d.types,
   }));
@@ -70,9 +70,14 @@ export default function GraidLogDashboard() {
   const selectedEvent: GraidDashboardEvent | undefined = data.events.find(e => e.id === selectedEventId);
   const inDrilldown = selectedEventId != null;
 
+  // API returns events newest-first; flip for display so oldest is on the left.
+  const eventsOrdered = [...data.events].reverse();
+
   const fmtDate = (s: string) => {
     const d = new Date(s);
-    return `${d.toLocaleString('default', { month: 'short' })} ${d.getDate()}`;
+    const month = d.toLocaleString('default', { month: 'short' });
+    const yr = d.getFullYear().toString().slice(-2);
+    return `${month} ${d.getDate()}, '${yr}`;
   };
 
   return (
@@ -224,7 +229,7 @@ export default function GraidLogDashboard() {
           </div>
 
           {/* Event chips row — always visible, persists across drilldown swap */}
-          {data.events.length > 0 && (
+          {eventsOrdered.length > 0 && (
             <div style={{ marginTop: '1rem' }}>
               <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Guild Raid Events
@@ -236,7 +241,7 @@ export default function GraidLogDashboard() {
                 paddingBottom: '0.4rem',
                 scrollbarWidth: 'thin',
               }}>
-                {data.events.map(ev => {
+                {eventsOrdered.map(ev => {
                   const isSelected = selectedEventId === ev.id;
                   return (
                     <button
@@ -590,3 +595,12 @@ function TopPlayerRow({ player, rank, maxCount }: {
 
 const labelStyle: React.CSSProperties = { fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.15rem' };
 const sectionTitle: React.CSSProperties = { fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 0.75rem 0' };
+
+// Compact axis label including year, e.g. "Apr 09 '26"
+function shortAxisLabel(isoDate: string): string {
+  const d = new Date(isoDate);
+  const month = d.toLocaleString('default', { month: 'short' });
+  const day = d.getDate().toString().padStart(2, '0');
+  const yr = d.getFullYear().toString().slice(-2);
+  return `${month} ${day} '${yr}`;
+}
