@@ -627,6 +627,22 @@ export default function ExecBuildsPage() {
                               const memberVersion: VersionRef = { major: memberBuild.major, minor: memberBuild.minor };
                               const latest = def.latestVersion;
                               const isOutdated = latest ? !versionsEqual(memberVersion, latest) : false;
+
+                              // Undo target: only show if a previous version is recorded,
+                              // it differs from the current one, AND it still exists in build_versions
+                              // (might have been deleted since the upgrade).
+                              const prevRef: VersionRef | null =
+                                memberBuild.prevMajor !== null && memberBuild.prevMinor !== null
+                                  ? { major: memberBuild.prevMajor, minor: memberBuild.prevMinor }
+                                  : null;
+                              const prevStillExists =
+                                prevRef !== null &&
+                                def.versions.some(v => v.major === prevRef.major && v.minor === prevRef.minor);
+                              const canUndo =
+                                prevRef !== null &&
+                                prevStillExists &&
+                                !versionsEqual(prevRef, memberVersion);
+
                               const tooltip = isOutdated && latest
                                 ? `Outdated — latest is v${formatVersion(latest)}`
                                 : def.name;
@@ -666,6 +682,24 @@ export default function ExecBuildsPage() {
                                       }}
                                     >
                                       ↑
+                                    </button>
+                                  )}
+                                  {canUndo && prevRef && (
+                                    <button
+                                      onClick={() => assignBuild(member.uuid, memberBuild.buildKey, prevRef)}
+                                      title={`Undo — revert to v${formatVersion(prevRef)}`}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: def.color,
+                                        cursor: 'pointer',
+                                        fontSize: '0.7rem',
+                                        lineHeight: 1,
+                                        padding: 0,
+                                        marginLeft: '0.1rem',
+                                      }}
+                                    >
+                                      ↶
                                     </button>
                                   )}
                                   <span
@@ -974,6 +1008,23 @@ export default function ExecBuildsPage() {
                                 </button>
                               )}
                             </div>
+
+                            {/* Latest version notes — explains *why* this version exists */}
+                            {latestVersion?.notes && (
+                              <div
+                                style={{
+                                  marginTop: '0.425rem',
+                                  fontSize: '0.6rem',
+                                  color: 'var(--text-secondary)',
+                                  fontStyle: 'italic',
+                                  lineHeight: 1.4,
+                                  paddingLeft: '0.32rem',
+                                  borderLeft: `2px solid ${def.color}40`,
+                                }}
+                              >
+                                {latestVersion.notes}
+                              </div>
+                            )}
 
                             {/* Inline new-version form */}
                             {isAddingVersion && (

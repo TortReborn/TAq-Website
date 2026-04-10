@@ -6,6 +6,10 @@ export interface MemberBuildRef {
   buildKey: string;
   major: number;
   minor: number;
+  // The version this member was on before the most recent change.
+  // Null if they've never been re-assigned. Used to render an undo button.
+  prevMajor: number | null;
+  prevMinor: number | null;
 }
 
 export interface MemberWithBuilds {

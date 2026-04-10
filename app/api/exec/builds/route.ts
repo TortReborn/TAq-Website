@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
           'SELECT build_key, major, minor, conns_url, hq_url, notes, created_at, created_by FROM build_versions ORDER BY build_key, major DESC, minor DESC'
         ),
         client.query('SELECT uuid, rank, discord_id, ign FROM discord_links'),
-        client.query('SELECT uuid, build_key, version_major, version_minor, created_at FROM member_builds'),
+        client.query('SELECT uuid, build_key, version_major, version_minor, prev_version_major, prev_version_minor, created_at FROM member_builds'),
         client.query('SELECT uuid, flag FROM member_war_flags'),
       ]);
 
@@ -106,8 +106,18 @@ export async function GET(request: NextRequest) {
       }
 
       // Index builds by uuid — only these members will be shown.
-      // Each entry is { buildKey, major, minor }.
-      const buildsByUuid: Record<string, { buildKey: string; major: number; minor: number }[]> = {};
+      // Each entry includes the current version and (optionally) the previous
+      // version, so the UI can render an "undo" button after a version change.
+      const buildsByUuid: Record<
+        string,
+        {
+          buildKey: string;
+          major: number;
+          minor: number;
+          prevMajor: number | null;
+          prevMinor: number | null;
+        }[]
+      > = {};
       for (const row of buildsResult.rows) {
         if (!validBuildKeys.has(row.build_key)) continue;
         if (!buildsByUuid[row.uuid]) buildsByUuid[row.uuid] = [];
@@ -115,6 +125,8 @@ export async function GET(request: NextRequest) {
           buildKey: row.build_key,
           major: row.version_major,
           minor: row.version_minor,
+          prevMajor: row.prev_version_major,
+          prevMinor: row.prev_version_minor,
         });
       }
 
@@ -233,11 +245,26 @@ export async function POST(request: NextRequest) {
 
     // Upsert: a member only ever has one version of a given build.
     // Switching versions is the same operation as initial assignment.
+    // On update, we snapshot the old (version_major, version_minor) into
+    // (prev_version_major, prev_version_minor) so the UI can offer an undo
+    // button. If the version isn't actually changing, prev is left alone.
     await pool.query(
       `INSERT INTO member_builds (uuid, build_key, version_major, version_minor, assigned_by)
        VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (uuid, build_key) DO UPDATE
-         SET version_major = EXCLUDED.version_major,
+         SET prev_version_major = CASE
+               WHEN member_builds.version_major = EXCLUDED.version_major
+                AND member_builds.version_minor = EXCLUDED.version_minor
+               THEN member_builds.prev_version_major
+               ELSE member_builds.version_major
+             END,
+             prev_version_minor = CASE
+               WHEN member_builds.version_major = EXCLUDED.version_major
+                AND member_builds.version_minor = EXCLUDED.version_minor
+               THEN member_builds.prev_version_minor
+               ELSE member_builds.version_minor
+             END,
+             version_major = EXCLUDED.version_major,
              version_minor = EXCLUDED.version_minor,
              assigned_by   = EXCLUDED.assigned_by`,
       [uuid, buildKey, resolvedMajor, resolvedMinor, session.ign]
