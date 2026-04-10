@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { getImageForItem, raidImageMap, classImageMap } from '@/lib/lootpool-images';
+import { getImageForItem, raidImageMap, classImageMap, isWard, getWardColor } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
 import Image from 'next/image';
 import PageHeader from '@/components/PageHeader';
@@ -330,6 +330,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
           
           return allItems.map((item: string, index: number) => {
             const isShiny = item === shinyItem;
+            const itemIsWard = isWard(item);
+            const wardColor = getWardColor(item);
             return (
             <div
               key={`item-${index}`}
@@ -355,7 +357,7 @@ function LootrunColumn({ regionName, regionData, icons }: {
               e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
             }}
           >
-            {/* Item icon */}
+            {/* Item icon (or colored ward swatch for ward items) */}
             <div style={{
               width: '20px',
               height: '20px',
@@ -364,23 +366,37 @@ function LootrunColumn({ regionName, regionData, icons }: {
               position: 'relative',
               overflow: 'hidden'
             }}>
-              <Image
-                src={`/images/mythics/${getImageForItem(item)}`}
-                alt={item}
-                width={20}
-                height={20}
-                style={{
-                  objectFit: 'contain',
-                  width: '100%',
-                  height: '100%'
-                }}
-                onError={(e) => {
-                  // Hide on error
-                  (e.currentTarget as HTMLElement).style.display = 'none';
-                }}
-              />
+              {itemIsWard ? (
+                <div
+                  title={item}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '0.25rem',
+                    background: wardColor,
+                    border: '1px solid rgba(0, 0, 0, 0.6)',
+                    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.35)'
+                  }}
+                />
+              ) : (
+                <Image
+                  src={`/images/mythics/${getImageForItem(item)}`}
+                  alt={item}
+                  width={20}
+                  height={20}
+                  style={{
+                    objectFit: 'contain',
+                    width: '100%',
+                    height: '100%'
+                  }}
+                  onError={(e) => {
+                    // Hide on error
+                    (e.currentTarget as HTMLElement).style.display = 'none';
+                  }}
+                />
+              )}
             </div>
-            
+
             {/* Shiny indicator */}
             {isShiny && (
               <div style={{
@@ -399,11 +415,11 @@ function LootrunColumn({ regionName, regionData, icons }: {
                 ✨
               </div>
             )}
-            
+
             <div style={{ flex: 1 }}>
               <span style={{
                 fontSize: '0.875rem',
-                color: isShiny ? '#ffaa00' : '#aa00aa',
+                color: isShiny ? '#ffaa00' : (itemIsWard ? wardColor : '#aa00aa'),
                 fontWeight: '500'
               }}>
                 {item}
@@ -520,6 +536,9 @@ function RaidColumn({ raid, aspects }: {
               displayName = aspect.replace("Aspect of ", "");
             }
 
+            const aspectIsWard = isWard(aspect);
+            const wardColor = getWardColor(aspect);
+
             return (
               <div
                 key={`${rarity}-${index}`}
@@ -544,7 +563,7 @@ function RaidColumn({ raid, aspects }: {
                   e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
                 }}
               >
-                {/* Class icon */}
+                {/* Class icon (or colored ward swatch for ward items) */}
                 <div style={{
                   width: '20px',
                   height: '20px',
@@ -553,7 +572,19 @@ function RaidColumn({ raid, aspects }: {
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  {(() => {
+                  {aspectIsWard ? (
+                    <div
+                      title={aspect}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '0.25rem',
+                        background: wardColor,
+                        border: '1px solid rgba(0, 0, 0, 0.6)',
+                        boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.35)'
+                      }}
+                    />
+                  ) : (() => {
                     const aspectClass = getClassForAspect(aspect);
                     if (aspectClass && classImageMap[aspectClass]) {
                       return (
@@ -577,10 +608,10 @@ function RaidColumn({ raid, aspects }: {
                     return null;
                   })()}
                 </div>
-                
+
                 <span style={{
                   fontSize: '0.875rem',
-                  color: color,
+                  color: aspectIsWard ? wardColor : color,
                   fontWeight: '500'
                 }}>
                   {displayName}

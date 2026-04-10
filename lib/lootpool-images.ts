@@ -133,6 +133,25 @@ export const raidImageMap: { [key: string]: string } = {
   "TWP": "TWP.png"
 };
 
+// Ward items are raid drops that don't have a real item icon — they're just
+// colored "wards" / tokens. Render them as a colored swatch instead of an
+// (incorrect) chestplate icon.
+export const wardColors: { [key: string]: string } = {
+  "Pink Ward":   "#ff69b4",
+  "Orange Ward": "#ff8c00",
+  "Green Ward":  "#22c55e",
+  "Red Ward":    "#dc2626",
+  "Blue Ward":   "#3b82f6",
+  "Purple Ward": "#a855f7",
+  "Yellow Ward": "#facc15"
+};
+
+export const isWard = (itemName: string): boolean =>
+  Object.prototype.hasOwnProperty.call(wardColors, itemName);
+
+export const getWardColor = (itemName: string): string | undefined =>
+  wardColors[itemName];
+
 // Class name to aspect icon mapping
 export const classImageMap: { [key: string]: string } = {
   "archer": "aspect_archer.png",
