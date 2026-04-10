@@ -112,7 +112,7 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
       setSaving(true);
       try {
         const result = await createLog(raidType, trimmed, 'group');
-        setSuccess(`Logged ${raidType} raid (#${result.id})${result.warning ? ` — ${result.warning}` : ''}`);
+        setSuccess(`Queued ${raidType} raid (queue #${result.id}) — the bot will post it to Discord on its next tick (within ~3 min).`);
         setRaidType('');
         setGroupPlayers(['', '', '', '']);
         onLogged();
@@ -131,7 +131,7 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
       setSaving(true);
       try {
         const result = await createLog(typeToSend, [player], 'individual');
-        setSuccess(`Logged individual ${typeToSend} raid (#${result.id}) for ${player}`);
+        setSuccess(`Queued individual ${typeToSend} raid (queue #${result.id}) for ${player} — will be applied on the next bot tick (within ~3 min).`);
         setRaidType('');
         setIndividualPlayer('');
         onLogged();

@@ -944,22 +944,31 @@ export default function ExecBuildsPage() {
                             <div style={{ display: 'flex', gap: '0.21rem', alignItems: 'center', flexWrap: 'wrap' }}>
                               <button
                                 onClick={() => { setNewVersionFor({ buildKey: def.key, bump: 'minor' }); setDefError(null); }}
-                                style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}
+                                style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}
                                 title="Create next minor version"
                               >
                                 + New Version
                               </button>
                               <button
                                 onClick={() => { setNewVersionFor({ buildKey: def.key, bump: 'major' }); setDefError(null); }}
-                                style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(168, 85, 247, 0.12)', color: '#a855f7' }}
+                                style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(168, 85, 247, 0.12)', color: '#a855f7' }}
                                 title="Create next major version"
                               >
                                 + Major
                               </button>
+                              {latestVersion && !isAddingVersion && editingVersion?.buildKey !== def.key && (
+                                <button
+                                  onClick={() => { setEditingVersion({ buildKey: def.key, version: { major: latestVersion.major, minor: latestVersion.minor } }); setDefError(null); }}
+                                  style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(59, 130, 246, 0.12)', color: 'var(--color-ocean-400)' }}
+                                  title="Edit latest version's links"
+                                >
+                                  Edit v{formatVersion(latestVersion)}
+                                </button>
+                              )}
                               {olderVersions.length > 0 && (
                                 <button
                                   onClick={() => toggleVersionsExpanded(def.key)}
-                                  style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}
+                                  style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}
                                 >
                                   {isExpanded ? 'Hide' : 'Show'} {olderVersions.length} older
                                 </button>
@@ -1072,17 +1081,6 @@ export default function ExecBuildsPage() {
                                   );
                                 })}
                               </div>
-                            )}
-
-                            {/* Edit-latest button: lets execs fix the current latest version's links inline */}
-                            {latestVersion && !isAddingVersion && editingVersion?.buildKey !== def.key && (
-                              <button
-                                onClick={() => { setEditingVersion({ buildKey: def.key, version: { major: latestVersion.major, minor: latestVersion.minor } }); setDefError(null); }}
-                                style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'transparent', color: 'var(--text-secondary)', marginTop: '0.32rem' }}
-                                title="Edit latest version's links"
-                              >
-                                Edit v{formatVersion(latestVersion)}
-                              </button>
                             )}
 
                             {/* Inline edit form for the latest version (rendered when latest is selected for edit) */}

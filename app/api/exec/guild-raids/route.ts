@@ -5,21 +5,6 @@ import { LIST_ORDER_SQL, RAID_SHORT_TO_FULL } from '@/lib/graid-log-constants';
 
 export const dynamic = 'force-dynamic';
 
-function isTestMode(): boolean {
-  const v = process.env.TEST_MODE;
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
-}
-
-function getBotToken(): string | undefined {
-  return isTestMode() ? process.env.TEST_DISCORD_BOT_TOKEN : process.env.DISCORD_BOT_TOKEN;
-}
-
-function getRaidLogChannelId(): string | undefined {
-  return isTestMode() ? process.env.TEST_RAID_LOG_CHANNEL_ID : process.env.RAID_LOG_CHANNEL_ID;
-}
-
 // GET — List graid logs with filtering and pagination
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
@@ -125,7 +110,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST — Manually log a guild raid (group of 4) or an individual completion
+// POST — Queue a manually-logged guild raid for the bot to process.
+// We do NOT write to graid_logs / graid_event_totals / uncollected_raids here —
+// that all happens in the bot's update_member_data loop when it drains
+// graid_log_queue. This way the manual-log path runs through the same code
+// as auto-detected raids (including the guild level progress image embed).
 export async function POST(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) {
@@ -196,82 +185,50 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Check for active event
-    const eventResult = await pool.query(`SELECT id FROM graid_events WHERE active = TRUE LIMIT 1`);
-    const eventId = eventResult.rows.length > 0 ? eventResult.rows[0].id : null;
-
-    // Insert log
-    const logResult = await pool.query(
-      `INSERT INTO graid_logs (event_id, raid_type) VALUES ($1, $2) RETURNING id`,
-      [eventId, fullRaidName]
-    );
-    const logId = logResult.rows[0].id;
-
-    // Insert participants
+    // Resolve UUIDs from IGNs so the queue carries everything the bot needs
+    // and we don't have to hit discord_links again at processing time.
+    const resolvedParticipants: { uuid: string | null; ign: string }[] = [];
     for (const ign of participants) {
       const trimmed = ign.trim();
-      const uuidResult = await pool.query(`SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1)`, [trimmed]);
-      const uuid = uuidResult.rows.length > 0 ? uuidResult.rows[0].uuid : null;
-      await pool.query(
-        `INSERT INTO graid_log_participants (log_id, uuid, ign) VALUES ($1, $2, $3)`,
-        [logId, uuid, trimmed]
+      const uuidResult = await pool.query(
+        `SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1)`, [trimmed]
       );
-
-      // Upsert event totals if active event
-      if (eventId && uuid) {
-        await pool.query(`
-          INSERT INTO graid_event_totals (event_id, uuid, total)
-          VALUES ($1, $2, 1)
-          ON CONFLICT (event_id, uuid) DO UPDATE
-            SET total = graid_event_totals.total + 1, last_updated = NOW()
-        `, [eventId, uuid]);
-      }
+      resolvedParticipants.push({
+        uuid: uuidResult.rows.length > 0 ? uuidResult.rows[0].uuid : null,
+        ign: trimmed,
+      });
     }
 
-    // Post to Discord raid-log channel — only for group raids with a known type
-    const botToken = getBotToken();
-    const channelId = getRaidLogChannelId();
-    let discordWarning: string | undefined;
-
-    if (inferredMode === 'group' && fullRaidName && botToken && channelId) {
-      try {
-        const bolded = participants.map((p: string) => `**${p.trim()}**`);
-        const namesStr = bolded.slice(0, -1).join(', ') + ', and ' + bolded[bolded.length - 1];
-        const embed = {
-          title: `${fullRaidName} Completed!`,
-          description: namesStr,
-          color: 0x00FF00,
-        };
-        const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
-          method: 'POST',
-          headers: { Authorization: `Bot ${botToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ embeds: [embed] }),
-        });
-        if (!res.ok) {
-          const errBody = await res.text();
-          console.error('Discord post failed:', res.status, errBody);
-          discordWarning = `Raid logged but failed to post to Discord: ${res.status}`;
-        }
-      } catch (discordErr) {
-        console.error('Discord post error:', discordErr);
-        discordWarning = 'Raid logged but failed to post to Discord channel';
-      }
-    }
+    // Insert into the queue. The bot's update_member_data loop will pick this
+    // up on its next tick (~3 minutes) and run it through the same flow as
+    // auto-detected raids.
+    const queueResult = await pool.query(
+      `INSERT INTO graid_log_queue (raid_type, mode, participants, submitted_by, submitted_by_ign)
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [fullRaidName, inferredMode, JSON.stringify(resolvedParticipants), session.discord_id, session.ign]
+    );
+    const queueId = queueResult.rows[0].id;
 
     // Audit log
     const typeLabel = fullRaidName ?? 'Unknown';
     const actionDesc = inferredMode === 'individual'
-      ? `Logged individual raid #${logId}: ${typeLabel} for ${participants[0]}`
-      : `Logged guild raid #${logId}: ${typeLabel} with ${participants.join(', ')}`;
+      ? `Queued individual raid (queue #${queueId}): ${typeLabel} for ${participants[0]}`
+      : `Queued guild raid (queue #${queueId}): ${typeLabel} with ${participants.join(', ')}`;
     await pool.query(
       `INSERT INTO audit_log (log_type, actor_name, actor_id, action)
        VALUES ('graid', $1, $2, $3)`,
       [session.ign, session.discord_id, actionDesc]
     );
 
-    return NextResponse.json({ success: true, id: logId, mode: inferredMode, warning: discordWarning });
+    return NextResponse.json({
+      success: true,
+      id: queueId,
+      mode: inferredMode,
+      status: 'pending',
+      warning: 'Queued for the bot — will appear in Discord on the next bot tick (within ~3 minutes).',
+    });
   } catch (error) {
-    console.error('Guild raid log error:', error);
-    return NextResponse.json({ error: 'Failed to log guild raid' }, { status: 500 });
+    console.error('Guild raid queue error:', error);
+    return NextResponse.json({ error: 'Failed to queue guild raid' }, { status: 500 });
   }
 }
