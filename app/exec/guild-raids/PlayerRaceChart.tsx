@@ -909,6 +909,112 @@ function Bar({ rank, ign, total, totalRaw, types, typesRaw, widthPct }: {
 
 // --- Frame builder ---
 
+// Smoothing window in days. The cumulative-raid time series is smoothed by
+// spreading each day's raid increments across this many days, which fixes the
+// "1-day-on / 1-day-off" stutter without changing each player's final total.
+// Larger window = smoother bars but more "lead-in" before raids actually happen.
+const SMOOTH_WINDOW_DAYS = 5;
+
+// Spreads each value in `arr` across a centered window of `windowSize` days,
+// returning a new array of the same length whose total exactly equals the
+// input total (so re-cumulating preserves each player's final count).
+function smoothIncrements(arr: number[], windowSize: number): number[] {
+  if (windowSize <= 1 || arr.length <= 1) return arr.slice();
+  const halfWindow = Math.floor(windowSize / 2);
+  const out = new Array<number>(arr.length).fill(0);
+  for (let i = 0; i < arr.length; i++) {
+    const v = arr[i];
+    if (v === 0) continue;
+    // Count how many output positions land inside [0, arr.length - 1] for
+    // this source index, then split v evenly among them. This preserves the
+    // total even at the start/end edges of the array.
+    const lo = Math.max(0, i - halfWindow);
+    const hi = Math.min(arr.length - 1, i + halfWindow);
+    const inBounds = hi - lo + 1;
+    const share = v / inBounds;
+    for (let j = lo; j <= hi; j++) out[j] += share;
+  }
+  return out;
+}
+
+// Returns a new frame array where each player's daily cumulative is smoothed.
+// The very last frame is pinned to the unsmoothed truth so the displayed final
+// totals stay exact.
+function smoothFrames(frames: Frame[], windowDays: number): Frame[] {
+  if (frames.length === 0 || windowDays <= 1) return frames;
+
+  const allKeys = new Set<string>();
+  for (const f of frames) for (const k of f.players.keys()) allKeys.add(k);
+
+  const out: Frame[] = frames.map(f => ({
+    date: f.date,
+    players: new Map<string, PlayerState>(),
+  }));
+
+  for (const key of allKeys) {
+    // Pick the most recent ign for display
+    let ign = key;
+    for (const f of frames) {
+      const p = f.players.get(key);
+      if (p) ign = p.ign;
+    }
+
+    // Per-day cumulative + per-type cumulative
+    const dailyTotal = frames.map(f => f.players.get(key)?.total ?? 0);
+    const dailyTypeTotals: Record<string, number[]> = {};
+    for (const t of RAID_TYPE_ORDER) {
+      dailyTypeTotals[t] = frames.map(f => f.players.get(key)?.types[t] ?? 0);
+    }
+
+    // Convert to per-day increments
+    const totalInc = dailyTotal.map((v, i) => (i === 0 ? v : v - dailyTotal[i - 1]));
+    const typeInc: Record<string, number[]> = {};
+    for (const t of RAID_TYPE_ORDER) {
+      typeInc[t] = dailyTypeTotals[t].map((v, i) =>
+        i === 0 ? v : v - dailyTypeTotals[t][i - 1]
+      );
+    }
+
+    // Smooth each series independently
+    const smoothedTotalInc = smoothIncrements(totalInc, windowDays);
+    const smoothedTypeInc: Record<string, number[]> = {};
+    for (const t of RAID_TYPE_ORDER) {
+      smoothedTypeInc[t] = smoothIncrements(typeInc[t], windowDays);
+    }
+
+    // Re-cumulate
+    let cumTotal = 0;
+    const cumTypes: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 };
+    for (let i = 0; i < frames.length; i++) {
+      cumTotal += smoothedTotalInc[i];
+      for (const t of RAID_TYPE_ORDER) cumTypes[t] += smoothedTypeInc[t][i];
+      // Skip writing players whose smoothed cumulative is still effectively 0
+      if (cumTotal > 0.001) {
+        out[i].players.set(key, {
+          key,
+          ign,
+          total: cumTotal,
+          types: { ...cumTypes },
+        });
+      }
+    }
+
+    // Pin the last frame to the unsmoothed final so end-of-race totals are exact
+    const lastIdx = frames.length - 1;
+    const truthLast = frames[lastIdx].players.get(key);
+    if (truthLast) {
+      out[lastIdx].players.set(key, {
+        key,
+        ign,
+        total: truthLast.total,
+        types: { ...truthLast.types },
+      });
+    }
+  }
+
+  return out;
+}
+
 function buildFrames(raids: GraidRaceRaid[]): {
   frames: Frame[];
   trackedPlayers: string[];
@@ -956,14 +1062,19 @@ function buildFrames(raids: GraidRaceRaid[]): {
     dailySnapshots.push({ date: day, players: snap });
   }
 
+  // Smooth the cumulative time series so the bar growth doesn't stutter on
+  // sparse raid patterns (1 day on / 1 day off). Final per-player totals are
+  // pinned to the unsmoothed truth so end-of-race numbers stay exact.
+  const smoothedSnapshots = smoothFrames(dailySnapshots, SMOOTH_WINDOW_DAYS);
+
   const everTop = new Set<string>();
-  for (const snap of dailySnapshots) {
+  for (const snap of smoothedSnapshots) {
     const sorted = Array.from(snap.players.values()).sort((a, b) => b.total - a.total);
     for (const p of sorted.slice(0, VISIBLE_BARS)) everTop.add(p.key);
   }
   const finalPlayerOrder = new Map<string, { ign: string; total: number }>();
-  if (dailySnapshots.length > 0) {
-    const last = dailySnapshots[dailySnapshots.length - 1];
+  if (smoothedSnapshots.length > 0) {
+    const last = smoothedSnapshots[smoothedSnapshots.length - 1];
     const finalSorted = Array.from(last.players.values()).sort((a, b) => b.total - a.total);
     for (const p of finalSorted.slice(0, VISIBLE_BARS)) {
       everTop.add(p.key);
@@ -971,7 +1082,7 @@ function buildFrames(raids: GraidRaceRaid[]): {
     }
   }
 
-  return { frames: dailySnapshots, trackedPlayers: Array.from(everTop), finalTotals, finalPlayerOrder };
+  return { frames: smoothedSnapshots, trackedPlayers: Array.from(everTop), finalTotals, finalPlayerOrder };
 }
 
 // --- Avatar pre-loading for canvas rendering ---
