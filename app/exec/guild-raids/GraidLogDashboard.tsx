@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useExecGraidLogDashboard, useExecGraidEventDistribution } from '@/hooks/useExecGraidLogs';
 import type { GraidDashboardEvent } from '@/hooks/useExecGraidLogs';
 import { RAID_TYPE_COLORS } from '@/lib/graid-log-constants';
+import PlayerRaceChart from './PlayerRaceChart';
 
 const RAID_TYPE_ORDER = ['NOTG', 'TCC', 'TNA', 'NOL', 'Unknown'] as const;
 type RaidTypeKey = (typeof RAID_TYPE_ORDER)[number];
@@ -39,6 +40,17 @@ export default function GraidLogDashboard() {
 
   const { data, loading, error } = useExecGraidLogDashboard(dateFrom || undefined, dateTo || undefined);
   const { data: eventDist, loading: eventLoading } = useExecGraidEventDistribution(selectedEventId);
+
+  // Auto-scroll the event chips strip to the most recent (rightmost) entry on first non-empty load.
+  const eventChipsRef = useRef<HTMLDivElement>(null);
+  const hasScrolledEventsRef = useRef(false);
+  const eventCount = data?.events?.length ?? 0;
+  useEffect(() => {
+    if (!hasScrolledEventsRef.current && eventCount > 0 && eventChipsRef.current) {
+      eventChipsRef.current.scrollLeft = eventChipsRef.current.scrollWidth;
+      hasScrolledEventsRef.current = true;
+    }
+  }, [eventCount]);
 
   if (loading) {
     return (
@@ -101,8 +113,10 @@ export default function GraidLogDashboard() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* Top row: weekly chart (left) + player race (right, narrow), same height */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 375px', gap: '1rem', alignItems: 'stretch' }}>
         {/* Chart card */}
-        <div style={cardStyle}>
+        <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
@@ -234,7 +248,7 @@ export default function GraidLogDashboard() {
               <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Guild Raid Events
               </div>
-              <div style={{
+              <div ref={eventChipsRef} style={{
                 display: 'flex',
                 gap: '0.5rem',
                 overflowX: 'auto',
@@ -291,6 +305,9 @@ export default function GraidLogDashboard() {
               </div>
             </div>
           )}
+        </div>
+        {/* Player race chart (right side of top row) */}
+        <PlayerRaceChart dateFrom={dateFrom} dateTo={dateTo} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

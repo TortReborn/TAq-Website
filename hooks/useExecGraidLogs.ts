@@ -106,6 +106,19 @@ export interface GraidEventDistributionData {
   days: GraidEventDayBucket[];
 }
 
+export interface GraidRaceRaid {
+  id: number;
+  raidType: string | null;
+  completedAt: string;
+  participants: { ign: string; uuid: string | null }[];
+}
+
+export interface GraidRaceFilters {
+  dateFrom?: string;
+  dateTo?: string;
+  raidTypes?: string;
+}
+
 // --- Hooks ---
 
 function buildQuery(base: string, params: Record<string, any>): string {
@@ -226,6 +239,29 @@ export function useExecGraidLogMutations() {
   };
 
   return { deleteLog, createLog };
+}
+
+export function useExecGraidRaceData(filters: GraidRaceFilters | null) {
+  const key = filters
+    ? buildQuery('/api/exec/guild-raids/race-data', {
+        dateFrom: filters.dateFrom,
+        dateTo: filters.dateTo,
+        raidTypes: filters.raidTypes,
+      })
+    : null;
+
+  const { data, error, isLoading, mutate } = useSWR<{ raids: GraidRaceRaid[] }>(
+    key,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 60000 }
+  );
+
+  return {
+    raids: data?.raids || [],
+    loading: isLoading,
+    error,
+    refresh: mutate,
+  };
 }
 
 export function useExecGraidEventDistribution(eventId: number | null) {

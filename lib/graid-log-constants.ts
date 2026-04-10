@@ -25,7 +25,7 @@ export const RAID_SHORT_TO_FULL: Record<string, string> = {
 
 export const RAID_TYPE_COLORS: Record<string, string> = {
   'NOTG': '#ff6b35',
-  'TCC': '#4ecdc4',
+  'TCC': '#0d9488',
   'TNA': '#a855f7',
   'NOL': '#fbbf24',
   'Unknown': '#6b7280',
