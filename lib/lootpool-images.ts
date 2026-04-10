@@ -69,7 +69,12 @@ export const mythicImageMap: { [key: string]: string } = {
   "Thrundacrack": "spear.thunder3.png",
   "Riptide": "wand.multi3.png",
   "Pink Ward": "diamond_chestplate.png",
-  "Orange Ward": "diamond_chestplate.png"
+  "Orange Ward": "diamond_chestplate.png",
+  "Green Ward": "diamond_chestplate.png",
+  "Red Ward": "diamond_chestplate.png",
+  "Blue Ward": "diamond_chestplate.png",
+  "Purple Ward": "diamond_chestplate.png",
+  "Yellow Ward": "diamond_chestplate.png"
 };
 
 // Get image for mythic item - uses a fallback strategy
