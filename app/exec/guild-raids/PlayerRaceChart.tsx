@@ -1339,7 +1339,12 @@ function drawRaceFrame(
   const minFill = Math.min(MIN_BAR_FILL_PX, barTrackW);
 
   // Sort by rendered rank so bars draw in the right z-order during transitions.
-  const drawList = [...layout].sort((a, b) => a.renderedRank - b.renderedRank);
+  // Secondary key: when two bars are at the exact same rendered Y mid-swap,
+  // the one whose TARGET rank is lower (the overtaker) draws last so it appears
+  // on top — making the overtaker visually win the swap.
+  const drawList = [...layout].sort((a, b) =>
+    a.renderedRank - b.renderedRank || b.targetRank - a.targetRank
+  );
 
   for (const entry of drawList) {
     const p = entry.player;
@@ -1386,12 +1391,12 @@ function drawRaceFrame(
       ctx.fillRect(avX, avY, avatarSize, avatarSize);
     }
 
-    // Bar background track
+    // No dark "bar track" rectangle — drawing it per-bar caused the squish
+    // artifact during swaps (the overtaker's full-width track would mask the
+    // overtaken bar's longer colored fill in the overlap region). The colored
+    // fill below sits directly on the canvas gradient background instead.
     const trackY = y + 4;
     const trackH = barH - 8;
-    ctx.fillStyle = '#161b29';
-    roundRect(ctx, barLeft, trackY, barTrackW, trackH, 4);
-    ctx.fill();
 
     // Stacked colored fill — clamped to minFill so the IGN is always readable
     const widthRatio = maxValueRaw > 0 ? p.totalRaw / maxValueRaw : 0;
