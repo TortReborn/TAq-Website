@@ -201,7 +201,7 @@ function LootrunsView({ data }: { data: LootData }) {
       justifyContent: 'center'
     }}>
       {/* Lootrun Regions Grid */}
-      <div className="lootpools-grid-container lootpools-grid-5" style={{
+      <div className="lootpools-grid-container lootpools-grid-7" style={{
         width: '90%',
         maxWidth: '1200px'
       }}>
@@ -220,7 +220,7 @@ function LootrunsView({ data }: { data: LootData }) {
 
 // Raids component
 function RaidsView({ data }: { data: LootData }) {
-  const raids = ["TNA", "TCC", "NOL", "NOTG"];
+  const raids = ["TNA", "TCC", "NOL", "NOTG", "TWP"];
 
   return (
     <div style={{
@@ -228,7 +228,7 @@ function RaidsView({ data }: { data: LootData }) {
       justifyContent: 'center'
     }}>
       {/* Raid Aspects Grid */}
-      <div className="lootpools-grid-container lootpools-grid-4" style={{
+      <div className="lootpools-grid-container lootpools-grid-5" style={{
         width: '90%',
         maxWidth: '1200px'
       }}>
@@ -261,7 +261,9 @@ function LootrunColumn({ regionName, regionData, icons }: {
     'Sky': { name: 'Sky Islands', color: '#58d6fc' },
     'Canyon': { name: 'Canyon of the Lost', color: '#bd1e1e' },
     'Corkus': { name: 'Corkus', color: '#edca3b' },
-    'Molten': { name: 'Molten Heights', color: '#3440eb' }
+    'Molten': { name: 'Molten Heights', color: '#3440eb' },
+    'FrumaEast': { name: 'Fruma East', color: '#dc82dc' },
+    'FrumaWest': { name: 'Fruma West', color: '#82dcdc' }
   };
 
   const regionInfo = regionMap[regionName] || { name: regionName, color: '#7a187a' };

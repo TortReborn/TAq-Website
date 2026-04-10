@@ -38,6 +38,12 @@ select option {
 }
 
 /* Lootpools page responsive styles */
+.lootpools-grid-7 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1.5rem;
+}
+
 .lootpools-grid-5 {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -51,7 +57,16 @@ select option {
 }
 
 /* Large tablets and small desktops */
+@media (max-width: 1400px) {
+  .lootpools-grid-7 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 @media (max-width: 1200px) {
+  .lootpools-grid-7 {
+    grid-template-columns: repeat(4, 1fr);
+  }
   .lootpools-grid-5 {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -62,6 +77,9 @@ select option {
 
 /* Tablets */
 @media (max-width: 900px) {
+  .lootpools-grid-7 {
+    grid-template-columns: repeat(3, 1fr);
+  }
   .lootpools-grid-5 {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -76,6 +94,9 @@ select option {
 
 /* Small tablets */
 @media (max-width: 700px) {
+  .lootpools-grid-7 {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .lootpools-grid-5 {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -86,6 +107,7 @@ select option {
 
 /* Mobile */
 @media (max-width: 500px) {
+  .lootpools-grid-7,
   .lootpools-grid-5,
   .lootpools-grid-4 {
     grid-template-columns: 1fr;

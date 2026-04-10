@@ -30,16 +30,16 @@ export default function LootpoolSkeleton() {
         </div>
       </div>
 
-      {/* Grid of 5 columns */}
+      {/* Grid of 7 columns */}
       <div style={{
         display: 'flex',
         justifyContent: 'center'
       }}>
-        <div className="lootpools-grid-container lootpools-grid-5" style={{
+        <div className="lootpools-grid-container lootpools-grid-7" style={{
           width: '90%',
           maxWidth: '1200px'
         }}>
-          {[1, 2, 3, 4, 5].map(i => (
+          {[1, 2, 3, 4, 5, 6, 7].map(i => (
             <div key={i} style={{
               background: 'var(--bg-card)',
               borderRadius: '1rem',

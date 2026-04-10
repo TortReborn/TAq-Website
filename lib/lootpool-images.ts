@@ -16,23 +16,28 @@ export const mythicImageMap: { [key: string]: string } = {
   "Az": "bow.thunder3.png",
   "Divzer": "bow.thunder3.png",
   "Epoch": "bow.basicGold.png",
+  "Eschaton": "bow.multi3.png",
   "Freedom": "bow.multi3.png",
   "Grandmother": "bow.earth3.png",
   "Ignis": "bow.fire3.png",
   "Labyrinth": "bow.earth3.png",
+  "Revolution": "bow.multi3.png",
   "Spring": "bow.water3.png",
   "Stratiformis": "bow.air3.png",
   "Absolution": "relik.fire3.png",
   "Aftershock": "relik.earth3.png",
   "Fantasia": "relik.multi3.png",
+  "Fate": "relik.multi3.png",
   "Hadal": "relik.water3.png",
   "Immolation": "relik.fire3.png",
   "Olympic": "relik.air3.png",
   "Resonance": "relik.basicGold.png",
   "Sunstar": "relik.thunder3.png",
   "Toxoplasmosis": "relik.earth3.png",
+  "Transfiguration": "relik.multi3.png",
   "Fatal": "wand.thunder3.png",
   "Gaia": "wand.earth3.png",
+  "Halcyon": "wand.multi3.png",
   "Lament": "wand.water3.png",
   "Monster": "wand.fire3.png",
   "Pure": "wand.multi1.png",
@@ -40,7 +45,8 @@ export const mythicImageMap: { [key: string]: string } = {
   "Singularity": "wand.multi3.png",
   "Trance": "wand.fire3.png",
   "Warp": "wand.air3.png",
-  "Archangel": "spear.air3.png",
+  "Archangel": "dagger.air3.png",
+  "Architect": "dagger.multi3.png",
   "Cataclysm": "dagger.thunder3.png",
   "Grimtrap": "dagger.earth3.png",
   "Hanafubuki": "dagger.air3.png",
@@ -48,16 +54,22 @@ export const mythicImageMap: { [key: string]: string } = {
   "Nirvana": "dagger.water3.png",
   "Nullification": "dagger.basicGold.png",
   "Oblivion": "dagger.multi3.png",
+  "Vengeance": "dagger.multi3.png",
   "Weathered": "dagger.air3.png",
   "Alkatraz": "spear.earth1.png",
   "Apocalypse": "spear.fire3.png",
+  "Ascendancy": "spear.multi3.png",
   "Bloodbath": "spear.earth3.png",
   "Collapse": "spear.multi3.png",
   "Convergence": "spear.multi3.png",
   "Guardian": "spear.fire3.png",
   "Hero": "spear.air3.png",
   "Idol": "spear.water3.png",
-  "Thrundacrack": "spear.thunder3.png"
+  "Restitution": "spear.multi3.png",
+  "Thrundacrack": "spear.thunder3.png",
+  "Riptide": "wand.multi3.png",
+  "Pink Ward": "diamond_chestplate.png",
+  "Orange Ward": "diamond_chestplate.png"
 };
 
 // Get image for mythic item - uses a fallback strategy
@@ -110,9 +122,10 @@ export const getImageForItem = (itemName: string): string => {
 // Raid name to image mapping
 export const raidImageMap: { [key: string]: string } = {
   "TNA": "TNA.png",
-  "TCC": "TCC.png", 
+  "TCC": "TCC.png",
   "NOL": "NOL.png",
-  "NOTG": "NOTG.png"
+  "NOTG": "NOTG.png",
+  "TWP": "TWP.png"
 };
 
 // Class name to aspect icon mapping
