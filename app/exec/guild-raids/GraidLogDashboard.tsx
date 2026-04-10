@@ -6,7 +6,7 @@ import type { GraidDashboardEvent } from '@/hooks/useExecGraidLogs';
 import { RAID_TYPE_COLORS } from '@/lib/graid-log-constants';
 import PlayerRaceChart from './PlayerRaceChart';
 
-const RAID_TYPE_ORDER = ['NOTG', 'TCC', 'TNA', 'NOL', 'Unknown'] as const;
+const RAID_TYPE_ORDER = ['NOTG', 'TCC', 'TNA', 'NOL', 'TWP', 'Unknown'] as const;
 type RaidTypeKey = (typeof RAID_TYPE_ORDER)[number];
 
 const inputStyle: React.CSSProperties = {

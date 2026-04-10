@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       const key = row.uuid || row.display_name; // fall back to IGN for NULL uuid
       let data = playerMap.get(key);
       if (!data) {
-        data = { displayName: row.display_name, total: 0, typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
+        data = { displayName: row.display_name, total: 0, typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 } };
         playerMap.set(key, data);
       }
       data.total++;
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
           playerMap.set(key, {
             displayName: name,
             total: r.raid_offset,
-            typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 },
+            typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 },
           });
         }
       }
@@ -83,6 +83,7 @@ export async function GET(request: NextRequest) {
       tcc: data.typeCounts.TCC || 0,
       tna: data.typeCounts.TNA || 0,
       nol: data.typeCounts.NOL || 0,
+      twp: data.typeCounts.TWP || 0,
       unknown: data.typeCounts.Unknown || 0,
     }));
 
@@ -95,6 +96,8 @@ export async function GET(request: NextRequest) {
       players.sort((a, b) => b.tna - a.tna || b.total - a.total);
     } else if (sortKey.includes('nol')) {
       players.sort((a, b) => b.nol - a.nol || b.total - a.total);
+    } else if (sortKey.includes('twp')) {
+      players.sort((a, b) => b.twp - a.twp || b.total - a.total);
     } else {
       players.sort((a, b) => b.total - a.total);
     }

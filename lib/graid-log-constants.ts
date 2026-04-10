@@ -5,6 +5,7 @@ export const RAID_NAMES = [
   'The Canyon Colossus',
   'The Nameless Anomaly',
   "Orphion's Nexus of Light",
+  'The Wartorn Palace',
 ] as const;
 
 export type RaidName = (typeof RAID_NAMES)[number];
@@ -14,6 +15,7 @@ export const RAID_SHORT: Record<string, string> = {
   'The Canyon Colossus': 'TCC',
   'The Nameless Anomaly': 'TNA',
   "Orphion's Nexus of Light": 'NOL',
+  'The Wartorn Palace': 'TWP',
 };
 
 export const RAID_SHORT_TO_FULL: Record<string, string> = {
@@ -21,6 +23,7 @@ export const RAID_SHORT_TO_FULL: Record<string, string> = {
   'TCC': 'The Canyon Colossus',
   'TNA': 'The Nameless Anomaly',
   'NOL': "Orphion's Nexus of Light",
+  'TWP': 'The Wartorn Palace',
 };
 
 export const RAID_TYPE_COLORS: Record<string, string> = {
@@ -28,6 +31,7 @@ export const RAID_TYPE_COLORS: Record<string, string> = {
   'TCC': '#0d9488',
   'TNA': '#a855f7',
   'NOL': '#fbbf24',
+  'TWP': '#ef4444',
   'Unknown': '#6b7280',
 };
 
@@ -41,7 +45,7 @@ export function getRaidColor(raidType: string | null): string {
   return RAID_TYPE_COLORS[short] || RAID_TYPE_COLORS['Unknown'];
 }
 
-export const LB_SORT_CHOICES = ['Total Raids', 'NOTG Count', 'TCC Count', 'TNA Count', 'NOL Count'] as const;
+export const LB_SORT_CHOICES = ['Total Raids', 'NOTG Count', 'TCC Count', 'TNA Count', 'NOL Count', 'TWP Count'] as const;
 export const LIST_SORT_CHOICES = ['Newest', 'Oldest'] as const;
 
 export const LIST_ORDER_SQL: Record<string, string> = {

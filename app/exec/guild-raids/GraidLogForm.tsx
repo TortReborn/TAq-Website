@@ -20,6 +20,7 @@ const RAID_TYPES = [
   { value: 'TCC', label: 'The Canyon Colossus (TCC)' },
   { value: 'TNA', label: 'The Nameless Anomaly (TNA)' },
   { value: 'NOL', label: "Orphion's Nexus of Light (NOL)" },
+  { value: 'TWP', label: 'The Wartorn Palace (TWP)' },
 ];
 
 const UNKNOWN_TYPE = { value: 'Unknown', label: 'Unknown raid type' };
@@ -181,7 +182,7 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
           <label style={labelStyle}>Raid Type{mode === 'individual' && ' (or Unknown)'}</label>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: mode === 'individual' ? 'repeat(5, 1fr)' : 'repeat(4, 1fr)',
+            gridTemplateColumns: mode === 'individual' ? 'repeat(6, 1fr)' : 'repeat(5, 1fr)',
             gap: '0.5rem',
           }}>
             {raidOptions.map(t => {

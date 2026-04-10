@@ -3,7 +3,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useExecBuilds } from '@/hooks/useExecBuilds';
 import { RANK_HIERARCHY, getRankColor } from '@/lib/rank-constants';
-import { BUILD_ROLE_OPTIONS, ROLE_COLORS, type BuildDefinition, type BuildRole } from '@/lib/build-constants';
+import {
+  BUILD_ROLE_OPTIONS,
+  ROLE_COLORS,
+  formatVersion,
+  versionsEqual,
+  type BuildDefinition,
+  type BuildRole,
+  type BuildVersion,
+  type VersionRef,
+} from '@/lib/build-constants';
 
 const FLAG_COLORS = {
   frequent_sniper: '#f59e0b',
@@ -47,6 +56,18 @@ function MemberName({ ign, flags }: { ign: string; flags: string[] }) {
 }
 
 // ── Build definition form (add / edit) ──────────────────────────
+// Edit mode only edits display metadata. Conns/HQ links live on versions and
+// are managed by VersionForm below. Create mode also collects the seed v1.0
+// links so a new build is immediately usable.
+type BuildDefFormPayload = {
+  key: string;
+  name: string;
+  role: string;
+  color: string;
+  connsUrl: string;
+  hqUrl: string;
+};
+
 function BuildDefForm({
   initial,
   onSubmit,
@@ -54,7 +75,7 @@ function BuildDefForm({
   submitLabel,
 }: {
   initial?: BuildDefinition;
-  onSubmit: (data: { key: string; name: string; role: string; color: string; connsUrl: string; hqUrl: string }) => void;
+  onSubmit: (data: BuildDefFormPayload) => void;
   onCancel: () => void;
   submitLabel: string;
 }) {
@@ -62,8 +83,8 @@ function BuildDefForm({
   const [name, setName] = useState(initial?.name ?? '');
   const [role, setRole] = useState<BuildRole>(initial?.role ?? 'DPS');
   const [color, setColor] = useState(initial?.color ?? ROLE_COLORS.DPS);
-  const [connsUrl, setConnsUrl] = useState(initial?.connsUrl ?? '#');
-  const [hqUrl, setHqUrl] = useState(initial?.hqUrl ?? '#');
+  const [connsUrl, setConnsUrl] = useState('#');
+  const [hqUrl, setHqUrl] = useState('#');
 
   // Default color when role changes (only for new builds)
   useEffect(() => {
@@ -107,14 +128,18 @@ function BuildDefForm({
           />
         </div>
       </div>
-      <div>
-        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Conns Build Link</label>
-        <input value={connsUrl} onChange={e => setConnsUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
-      </div>
-      <div>
-        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>HQ Build Link</label>
-        <input value={hqUrl} onChange={e => setHqUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
-      </div>
+      {!isEdit && (
+        <>
+          <div>
+            <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Conns Link (v1.0)</label>
+            <input value={connsUrl} onChange={e => setConnsUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>HQ Link (v1.0)</label>
+            <input value={hqUrl} onChange={e => setHqUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
+          </div>
+        </>
+      )}
       <div style={{ display: 'flex', gap: '0.32rem', marginTop: '0.32rem' }}>
         <button
           onClick={() => onSubmit({ key: isEdit ? initial.key : key, name, role, color, connsUrl, hqUrl })}
@@ -136,12 +161,63 @@ function BuildDefForm({
   );
 }
 
+// ── Version form (new version / edit version) ──────────────────
+type VersionFormPayload = { connsUrl: string; hqUrl: string; notes: string };
+
+function VersionForm({
+  initial,
+  title,
+  onSubmit,
+  onCancel,
+  submitLabel,
+}: {
+  initial: { connsUrl: string; hqUrl: string; notes: string };
+  title: string;
+  onSubmit: (data: VersionFormPayload) => void;
+  onCancel: () => void;
+  submitLabel: string;
+}) {
+  const [connsUrl, setConnsUrl] = useState(initial.connsUrl);
+  const [hqUrl, setHqUrl] = useState(initial.hqUrl);
+  const [notes, setNotes] = useState(initial.notes);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.425rem' }}>
+      <div style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--text-primary)' }}>{title}</div>
+      <div>
+        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Conns Link</label>
+        <input value={connsUrl} onChange={e => setConnsUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
+      </div>
+      <div>
+        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>HQ Link</label>
+        <input value={hqUrl} onChange={e => setHqUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
+      </div>
+      <div>
+        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Notes (optional)</label>
+        <input value={notes} onChange={e => setNotes(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="What changed in this version..." />
+      </div>
+      <div style={{ display: 'flex', gap: '0.32rem', marginTop: '0.32rem' }}>
+        <button
+          onClick={() => onSubmit({ connsUrl, hqUrl, notes })}
+          style={{ ...btnStyle, flex: 1, background: '#22c55e', color: '#fff' }}
+        >
+          {submitLabel}
+        </button>
+        <button onClick={onCancel} style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main page ──────────────────────────────────────────────────
 export default function ExecBuildsPage() {
   const {
     members, allGuildMembers, buildDefinitions, lastUpdated, loading, error, refresh,
     assignBuild, removeBuild, toggleFlag,
     createBuildDefinition, updateBuildDefinition, deleteBuildDefinition,
+    bumpBuildVersion, editBuildVersion, deleteBuildVersion,
   } = useExecBuilds();
 
   const [rankFilter, setRankFilter] = useState<string | null>(null);
@@ -155,6 +231,11 @@ export default function ExecBuildsPage() {
   const [editingBuild, setEditingBuild] = useState<BuildDefinition | null>(null);
   const [deletingBuild, setDeletingBuild] = useState<string | null>(null);
   const [defError, setDefError] = useState<string | null>(null);
+
+  // Per-build sidebar UI state
+  const [expandedVersions, setExpandedVersions] = useState<Set<string>>(new Set());
+  const [newVersionFor, setNewVersionFor] = useState<{ buildKey: string; bump: 'minor' | 'major' } | null>(null);
+  const [editingVersion, setEditingVersion] = useState<{ buildKey: string; version: VersionRef } | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -229,7 +310,7 @@ export default function ExecBuildsPage() {
     setAddMemberSearch('');
   };
 
-  const handleCreateBuild = async (data: { key: string; name: string; role: string; color: string; connsUrl: string; hqUrl: string }) => {
+  const handleCreateBuild = async (data: BuildDefFormPayload) => {
     setDefError(null);
     try {
       await createBuildDefinition(data);
@@ -239,10 +320,15 @@ export default function ExecBuildsPage() {
     }
   };
 
-  const handleUpdateBuild = async (data: { key: string; name: string; role: string; color: string; connsUrl: string; hqUrl: string }) => {
+  const handleUpdateBuild = async (data: BuildDefFormPayload) => {
     setDefError(null);
     try {
-      await updateBuildDefinition(data);
+      await updateBuildDefinition({
+        key: data.key,
+        name: data.name,
+        role: data.role,
+        color: data.color,
+      });
       setEditingBuild(null);
     } catch (e: any) {
       setDefError(e.message);
@@ -257,6 +343,54 @@ export default function ExecBuildsPage() {
     } catch (e: any) {
       setDefError(e.message);
     }
+  };
+
+  const handleCreateVersion = async (data: VersionFormPayload) => {
+    if (!newVersionFor) return;
+    setDefError(null);
+    try {
+      await bumpBuildVersion(newVersionFor.buildKey, newVersionFor.bump, {
+        connsUrl: data.connsUrl,
+        hqUrl: data.hqUrl,
+        notes: data.notes,
+      });
+      setNewVersionFor(null);
+    } catch (e: any) {
+      setDefError(e.message);
+    }
+  };
+
+  const handleEditVersion = async (data: VersionFormPayload) => {
+    if (!editingVersion) return;
+    setDefError(null);
+    try {
+      await editBuildVersion(editingVersion.buildKey, editingVersion.version, {
+        connsUrl: data.connsUrl,
+        hqUrl: data.hqUrl,
+        notes: data.notes,
+      });
+      setEditingVersion(null);
+    } catch (e: any) {
+      setDefError(e.message);
+    }
+  };
+
+  const handleDeleteVersion = async (buildKey: string, version: VersionRef) => {
+    setDefError(null);
+    try {
+      await deleteBuildVersion(buildKey, version);
+    } catch (e: any) {
+      setDefError(e.message);
+    }
+  };
+
+  const toggleVersionsExpanded = (buildKey: string) => {
+    setExpandedVersions(prev => {
+      const next = new Set(prev);
+      if (next.has(buildKey)) next.delete(buildKey);
+      else next.add(buildKey);
+      return next;
+    });
   };
 
   if (loading && members.length === 0) {
@@ -395,13 +529,16 @@ export default function ExecBuildsPage() {
                               <button
                                 key={def.key}
                                 onClick={() => handleAddMember(m.uuid, def.key)}
-                                title={`Add with ${def.name}`}
+                                title={`Add with ${def.name}${def.latestVersion ? ` v${formatVersion(def.latestVersion)}` : ''}`}
+                                disabled={!def.latestVersion}
                                 style={{
                                   ...btnStyle,
                                   padding: '0.1rem 0.32rem',
                                   fontSize: '0.58rem',
                                   background: `${def.color}1a`,
                                   color: def.color,
+                                  opacity: def.latestVersion ? 1 : 0.4,
+                                  cursor: def.latestVersion ? 'pointer' : 'not-allowed',
                                 }}
                               >
                                 {def.name}
@@ -443,7 +580,10 @@ export default function ExecBuildsPage() {
                   )}
                   {filteredMembers.map((member, idx) => {
                     const isOdd = idx % 2 === 1;
-                    const missingBuilds = buildDefinitions.filter(d => !member.builds.includes(d.key));
+                    // A member can only have one version of a build at a time,
+                    // so "missing" is "not present at all by buildKey".
+                    const memberKeys = new Set(member.builds.map(b => b.buildKey));
+                    const missingBuilds = buildDefinitions.filter(d => !memberKeys.has(d.key));
 
                     return (
                       <tr
@@ -481,12 +621,20 @@ export default function ExecBuildsPage() {
                         {/* Builds */}
                         <td style={{ padding: '0.425rem 0.64rem' }}>
                           <div style={{ display: 'flex', gap: '0.32rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                            {member.builds.map(buildKey => {
-                              const def = buildDefMap[buildKey];
+                            {member.builds.map(memberBuild => {
+                              const def = buildDefMap[memberBuild.buildKey];
                               if (!def) return null;
+                              const memberVersion: VersionRef = { major: memberBuild.major, minor: memberBuild.minor };
+                              const latest = def.latestVersion;
+                              const isOutdated = latest ? !versionsEqual(memberVersion, latest) : false;
+                              const tooltip = isOutdated && latest
+                                ? `Outdated — latest is v${formatVersion(latest)}`
+                                : def.name;
+
                               return (
                                 <span
-                                  key={buildKey}
+                                  key={`${memberBuild.buildKey}-${memberBuild.major}-${memberBuild.minor}`}
+                                  title={tooltip}
                                   style={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -497,11 +645,31 @@ export default function ExecBuildsPage() {
                                     fontWeight: '600',
                                     color: def.color,
                                     background: `${def.color}1a`,
+                                    border: isOutdated ? `1px dashed ${def.color}` : '1px solid transparent',
+                                    opacity: isOutdated ? 0.7 : 1,
                                   }}
                                 >
-                                  {def.name}
+                                  {def.name} v{formatVersion(memberVersion)}
+                                  {isOutdated && latest && (
+                                    <button
+                                      onClick={() => assignBuild(member.uuid, memberBuild.buildKey, latest)}
+                                      title={`Upgrade to v${formatVersion(latest)}`}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: def.color,
+                                        cursor: 'pointer',
+                                        fontSize: '0.7rem',
+                                        lineHeight: 1,
+                                        padding: 0,
+                                        marginLeft: '0.1rem',
+                                      }}
+                                    >
+                                      ↑
+                                    </button>
+                                  )}
                                   <span
-                                    onClick={() => removeBuild(member.uuid, buildKey)}
+                                    onClick={() => removeBuild(member.uuid, memberBuild.buildKey)}
                                     style={{
                                       fontSize: '0.62rem',
                                       opacity: 0.5,
@@ -563,6 +731,7 @@ export default function ExecBuildsPage() {
                                           assignBuild(member.uuid, def.key);
                                           setAddDropdownUuid(null);
                                         }}
+                                        disabled={!def.latestVersion}
                                         style={{
                                           display: 'block',
                                           width: '100%',
@@ -574,12 +743,13 @@ export default function ExecBuildsPage() {
                                           color: def.color,
                                           fontSize: '0.68rem',
                                           fontWeight: '600',
-                                          cursor: 'pointer',
+                                          cursor: def.latestVersion ? 'pointer' : 'not-allowed',
+                                          opacity: def.latestVersion ? 1 : 0.4,
                                         }}
                                         onMouseEnter={e => (e.currentTarget.style.background = `${def.color}1a`)}
                                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                                       >
-                                        {def.name}
+                                        {def.name}{def.latestVersion ? ` v${formatVersion(def.latestVersion)}` : ''}
                                       </button>
                                     ))}
                                   </div>
@@ -658,102 +828,286 @@ export default function ExecBuildsPage() {
                     {role}
                   </div>
 
-                  {defs.map(def => (
-                    <div key={def.key} style={{ paddingLeft: '0.85rem', marginBottom: '0.64rem' }}>
-                      {editingBuild?.key === def.key ? (
-                        /* Edit form inline */
-                        <div style={{ padding: '0.53rem', background: 'var(--bg-primary)', borderRadius: '0.425rem', border: '1px solid var(--border-card)' }}>
-                          <BuildDefForm
-                            initial={def}
-                            onSubmit={handleUpdateBuild}
-                            onCancel={() => { setEditingBuild(null); setDefError(null); }}
-                            submitLabel="Save"
-                          />
-                        </div>
-                      ) : deletingBuild === def.key ? (
-                        /* Delete confirmation */
-                        <div style={{ padding: '0.53rem', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '0.425rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                          <div style={{ fontSize: '0.68rem', color: '#ef4444', fontWeight: '600', marginBottom: '0.32rem' }}>
-                            Delete &quot;{def.name}&quot;?
+                  {defs.map(def => {
+                    const latestVersion = def.versions[0] ?? null;
+                    const olderVersions = def.versions.slice(1);
+                    const isExpanded = expandedVersions.has(def.key);
+                    const isAddingVersion = newVersionFor?.buildKey === def.key;
+
+                    return (
+                      <div key={def.key} style={{ paddingLeft: '0.85rem', marginBottom: '0.85rem' }}>
+                        {editingBuild?.key === def.key ? (
+                          /* Edit definition form */
+                          <div style={{ padding: '0.53rem', background: 'var(--bg-primary)', borderRadius: '0.425rem', border: '1px solid var(--border-card)' }}>
+                            <BuildDefForm
+                              initial={def}
+                              onSubmit={handleUpdateBuild}
+                              onCancel={() => { setEditingBuild(null); setDefError(null); }}
+                              submitLabel="Save"
+                            />
                           </div>
-                          <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
-                            This will remove this build from all members. This cannot be undone.
-                          </div>
-                          <div style={{ display: 'flex', gap: '0.32rem' }}>
-                            <button
-                              onClick={() => handleDeleteBuild(def.key)}
-                              style={{ ...btnStyle, background: '#ef4444', color: '#fff', fontSize: '0.62rem' }}
-                            >
-                              Yes, Delete
-                            </button>
-                            <button
-                              onClick={() => { setDeletingBuild(null); setDefError(null); }}
-                              style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)', fontSize: '0.62rem' }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Normal display */
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.32rem' }}>
-                            <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                              {def.name}
+                        ) : deletingBuild === def.key ? (
+                          /* Delete confirmation */
+                          <div style={{ padding: '0.53rem', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '0.425rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                            <div style={{ fontSize: '0.68rem', color: '#ef4444', fontWeight: '600', marginBottom: '0.32rem' }}>
+                              Delete &quot;{def.name}&quot;?
                             </div>
-                            <div style={{ display: 'flex', gap: '0.21rem' }}>
+                            <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
+                              This will remove this build (all versions) from all members. This cannot be undone.
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.32rem' }}>
                               <button
-                                onClick={() => { setEditingBuild(def); setDeletingBuild(null); setShowAddBuild(false); setDefError(null); }}
-                                title="Edit"
-                                style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)' }}
+                                onClick={() => handleDeleteBuild(def.key)}
+                                style={{ ...btnStyle, background: '#ef4444', color: '#fff', fontSize: '0.62rem' }}
                               >
-                                Edit
+                                Yes, Delete
                               </button>
                               <button
-                                onClick={() => { setDeletingBuild(def.key); setEditingBuild(null); setShowAddBuild(false); setDefError(null); }}
-                                title="Delete"
-                                style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
+                                onClick={() => { setDeletingBuild(null); setDefError(null); }}
+                                style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)', fontSize: '0.62rem' }}
                               >
-                                Del
+                                Cancel
                               </button>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '0.425rem' }}>
-                            <a
-                              href={def.connsUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                ...btnStyle,
-                                padding: '0.21rem 0.53rem',
-                                fontSize: '0.64rem',
-                                color: 'var(--color-ocean-400)',
-                                background: 'rgba(59, 130, 246, 0.1)',
-                                textDecoration: 'none',
-                              }}
-                            >
-                              Conns
-                            </a>
-                            <a
-                              href={def.hqUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                ...btnStyle,
-                                padding: '0.21rem 0.53rem',
-                                fontSize: '0.64rem',
-                                color: 'var(--color-ocean-400)',
-                                background: 'rgba(59, 130, 246, 0.1)',
-                                textDecoration: 'none',
-                              }}
-                            >
-                              HQ
-                            </a>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
+                        ) : (
+                          <>
+                            {/* Header row: name + edit/del */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.32rem' }}>
+                              <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                {def.name}
+                                {latestVersion && (
+                                  <span style={{ fontSize: '0.64rem', color: 'var(--text-secondary)', fontWeight: '500', marginLeft: '0.32rem' }}>
+                                    v{formatVersion(latestVersion)}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', gap: '0.21rem' }}>
+                                <button
+                                  onClick={() => { setEditingBuild(def); setDeletingBuild(null); setShowAddBuild(false); setDefError(null); }}
+                                  title="Edit"
+                                  style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)' }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => { setDeletingBuild(def.key); setEditingBuild(null); setShowAddBuild(false); setDefError(null); }}
+                                  title="Delete"
+                                  style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
+                                >
+                                  Del
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Latest version: Conns/HQ links */}
+                            {latestVersion ? (
+                              <div style={{ display: 'flex', gap: '0.425rem', marginBottom: '0.32rem' }}>
+                                <a
+                                  href={latestVersion.connsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    ...btnStyle,
+                                    padding: '0.21rem 0.53rem',
+                                    fontSize: '0.64rem',
+                                    color: 'var(--color-ocean-400)',
+                                    background: 'rgba(59, 130, 246, 0.1)',
+                                    textDecoration: 'none',
+                                  }}
+                                >
+                                  Conns
+                                </a>
+                                <a
+                                  href={latestVersion.hqUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    ...btnStyle,
+                                    padding: '0.21rem 0.53rem',
+                                    fontSize: '0.64rem',
+                                    color: 'var(--color-ocean-400)',
+                                    background: 'rgba(59, 130, 246, 0.1)',
+                                    textDecoration: 'none',
+                                  }}
+                                >
+                                  HQ
+                                </a>
+                              </div>
+                            ) : (
+                              <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '0.32rem' }}>
+                                No versions yet
+                              </div>
+                            )}
+
+                            {/* Version actions */}
+                            <div style={{ display: 'flex', gap: '0.21rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                              <button
+                                onClick={() => { setNewVersionFor({ buildKey: def.key, bump: 'minor' }); setDefError(null); }}
+                                style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}
+                                title="Create next minor version"
+                              >
+                                + New Version
+                              </button>
+                              <button
+                                onClick={() => { setNewVersionFor({ buildKey: def.key, bump: 'major' }); setDefError(null); }}
+                                style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(168, 85, 247, 0.12)', color: '#a855f7' }}
+                                title="Create next major version"
+                              >
+                                + Major
+                              </button>
+                              {olderVersions.length > 0 && (
+                                <button
+                                  onClick={() => toggleVersionsExpanded(def.key)}
+                                  style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}
+                                >
+                                  {isExpanded ? 'Hide' : 'Show'} {olderVersions.length} older
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Inline new-version form */}
+                            {isAddingVersion && (
+                              <div style={{ marginTop: '0.425rem', padding: '0.53rem', background: 'var(--bg-primary)', borderRadius: '0.425rem', border: '1px solid var(--border-card)' }}>
+                                <VersionForm
+                                  initial={{
+                                    connsUrl: latestVersion?.connsUrl ?? '#',
+                                    hqUrl: latestVersion?.hqUrl ?? '#',
+                                    notes: '',
+                                  }}
+                                  title={
+                                    newVersionFor!.bump === 'major'
+                                      ? `New major version of ${def.name}`
+                                      : `New version of ${def.name}`
+                                  }
+                                  submitLabel="Create Version"
+                                  onSubmit={handleCreateVersion}
+                                  onCancel={() => { setNewVersionFor(null); setDefError(null); }}
+                                />
+                              </div>
+                            )}
+
+                            {/* Older versions list */}
+                            {isExpanded && olderVersions.length > 0 && (
+                              <div style={{ marginTop: '0.425rem', display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
+                                {olderVersions.map(v => {
+                                  const versionRef: VersionRef = { major: v.major, minor: v.minor };
+                                  const isEditingThis =
+                                    editingVersion?.buildKey === def.key &&
+                                    versionsEqual(editingVersion.version, versionRef);
+
+                                  if (isEditingThis) {
+                                    return (
+                                      <div key={`${v.major}.${v.minor}`} style={{ padding: '0.425rem', background: 'var(--bg-primary)', borderRadius: '0.32rem', border: '1px solid var(--border-card)' }}>
+                                        <VersionForm
+                                          initial={{
+                                            connsUrl: v.connsUrl,
+                                            hqUrl: v.hqUrl,
+                                            notes: v.notes ?? '',
+                                          }}
+                                          title={`Edit v${formatVersion(versionRef)}`}
+                                          submitLabel="Save"
+                                          onSubmit={handleEditVersion}
+                                          onCancel={() => { setEditingVersion(null); setDefError(null); }}
+                                        />
+                                      </div>
+                                    );
+                                  }
+
+                                  return (
+                                    <div
+                                      key={`${v.major}.${v.minor}`}
+                                      style={{
+                                        padding: '0.32rem 0.425rem',
+                                        background: 'var(--bg-primary)',
+                                        borderRadius: '0.32rem',
+                                        border: '1px solid var(--border-card)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: '0.425rem',
+                                      }}
+                                    >
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.425rem', flexWrap: 'wrap' }}>
+                                        <span style={{ fontSize: '0.64rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                          v{formatVersion(versionRef)}
+                                        </span>
+                                        <a
+                                          href={v.connsUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          style={{ fontSize: '0.58rem', color: 'var(--color-ocean-400)', textDecoration: 'none' }}
+                                        >
+                                          Conns
+                                        </a>
+                                        <a
+                                          href={v.hqUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          style={{ fontSize: '0.58rem', color: 'var(--color-ocean-400)', textDecoration: 'none' }}
+                                        >
+                                          HQ
+                                        </a>
+                                        {v.notes && (
+                                          <span style={{ fontSize: '0.56rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                                            {v.notes}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div style={{ display: 'flex', gap: '0.17rem' }}>
+                                        <button
+                                          onClick={() => { setEditingVersion({ buildKey: def.key, version: versionRef }); setDefError(null); }}
+                                          style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)' }}
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteVersion(def.key, versionRef)}
+                                          style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
+                                        >
+                                          Del
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Edit-latest button: lets execs fix the current latest version's links inline */}
+                            {latestVersion && !isAddingVersion && editingVersion?.buildKey !== def.key && (
+                              <button
+                                onClick={() => { setEditingVersion({ buildKey: def.key, version: { major: latestVersion.major, minor: latestVersion.minor } }); setDefError(null); }}
+                                style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'transparent', color: 'var(--text-secondary)', marginTop: '0.32rem' }}
+                                title="Edit latest version's links"
+                              >
+                                Edit v{formatVersion(latestVersion)}
+                              </button>
+                            )}
+
+                            {/* Inline edit form for the latest version (rendered when latest is selected for edit) */}
+                            {latestVersion &&
+                              editingVersion?.buildKey === def.key &&
+                              versionsEqual(editingVersion.version, { major: latestVersion.major, minor: latestVersion.minor }) && (
+                                <div style={{ marginTop: '0.425rem', padding: '0.53rem', background: 'var(--bg-primary)', borderRadius: '0.425rem', border: '1px solid var(--border-card)' }}>
+                                  <VersionForm
+                                    initial={{
+                                      connsUrl: latestVersion.connsUrl,
+                                      hqUrl: latestVersion.hqUrl,
+                                      notes: latestVersion.notes ?? '',
+                                    }}
+                                    title={`Edit v${formatVersion({ major: latestVersion.major, minor: latestVersion.minor })}`}
+                                    submitLabel="Save"
+                                    onSubmit={handleEditVersion}
+                                    onCancel={() => { setEditingVersion(null); setDefError(null); }}
+                                  />
+                                </div>
+                              )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
@@ -780,7 +1134,7 @@ export default function ExecBuildsPage() {
               </span> Split = Both
             </div>
             <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginTop: '0.425rem', borderTop: '1px solid var(--border-card)', paddingTop: '0.425rem' }}>
-              Right-click a member to toggle flags
+              Right-click a member to toggle flags. Dashed chips = on an outdated version; click ↑ to upgrade.
             </div>
           </div>
 

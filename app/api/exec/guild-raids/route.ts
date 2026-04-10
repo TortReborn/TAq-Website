@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
     if (rawType && rawType !== 'Unknown') {
       const resolved = RAID_SHORT_TO_FULL[rawType];
       if (!resolved) {
-        return NextResponse.json({ error: 'Invalid raid type. Must be NOTG, TCC, TNA, NOL, or Unknown.' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid raid type. Must be NOTG, TCC, TNA, NOL, TWP, or Unknown.' }, { status: 400 });
       }
       fullRaidName = resolved;
     } else if (inferredMode === 'group') {

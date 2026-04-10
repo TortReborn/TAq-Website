@@ -53,24 +53,48 @@ export async function GET(request: NextRequest) {
     const client = await pool.connect();
 
     try {
-      // Fetch definitions, discord links, builds, and flags in parallel
-      const [defsResult, discordLinksResult, buildsResult, flagsResult] = await Promise.all([
-        client.query('SELECT key, name, role, color, conns_url, hq_url, sort_order FROM build_definitions ORDER BY sort_order'),
+      // Fetch definitions, versions, discord links, builds, and flags in parallel
+      const [defsResult, versionsResult, discordLinksResult, buildsResult, flagsResult] = await Promise.all([
+        client.query('SELECT key, name, role, color, sort_order FROM build_definitions ORDER BY sort_order'),
+        client.query(
+          'SELECT build_key, major, minor, conns_url, hq_url, notes, created_at, created_by FROM build_versions ORDER BY build_key, major DESC, minor DESC'
+        ),
         client.query('SELECT uuid, rank, discord_id, ign FROM discord_links'),
-        client.query('SELECT uuid, build_key, created_at FROM member_builds'),
+        client.query('SELECT uuid, build_key, version_major, version_minor, created_at FROM member_builds'),
         client.query('SELECT uuid, flag FROM member_war_flags'),
       ]);
 
-      // Build definitions
-      const buildDefinitions = defsResult.rows.map(row => ({
-        key: row.key,
-        name: row.name,
-        role: row.role,
-        color: row.color,
-        connsUrl: row.conns_url,
-        hqUrl: row.hq_url,
-        sortOrder: row.sort_order,
-      }));
+      // Group versions by build_key (already sorted newest first by query)
+      const versionsByKey: Record<string, any[]> = {};
+      for (const row of versionsResult.rows) {
+        if (!versionsByKey[row.build_key]) versionsByKey[row.build_key] = [];
+        versionsByKey[row.build_key].push({
+          major: row.major,
+          minor: row.minor,
+          connsUrl: row.conns_url,
+          hqUrl: row.hq_url,
+          notes: row.notes,
+          createdAt: row.created_at,
+          createdBy: row.created_by,
+        });
+      }
+
+      // Build definitions with attached versions
+      const buildDefinitions = defsResult.rows.map(row => {
+        const versions = versionsByKey[row.key] ?? [];
+        const latest = versions[0]
+          ? { major: versions[0].major, minor: versions[0].minor }
+          : null;
+        return {
+          key: row.key,
+          name: row.name,
+          role: row.role,
+          color: row.color,
+          sortOrder: row.sort_order,
+          versions,
+          latestVersion: latest,
+        };
+      });
 
       // Valid build keys from DB
       const validBuildKeys = new Set(buildDefinitions.map(d => d.key));
@@ -81,13 +105,17 @@ export async function GET(request: NextRequest) {
         discordLinks[row.uuid] = { rank: row.rank, discordId: row.discord_id, ign: row.ign };
       }
 
-      // Index builds by uuid — only these members will be shown
-      const buildsByUuid: Record<string, string[]> = {};
+      // Index builds by uuid — only these members will be shown.
+      // Each entry is { buildKey, major, minor }.
+      const buildsByUuid: Record<string, { buildKey: string; major: number; minor: number }[]> = {};
       for (const row of buildsResult.rows) {
-        // Only include builds that still have a valid definition
         if (!validBuildKeys.has(row.build_key)) continue;
         if (!buildsByUuid[row.uuid]) buildsByUuid[row.uuid] = [];
-        buildsByUuid[row.uuid].push(row.build_key);
+        buildsByUuid[row.uuid].push({
+          buildKey: row.build_key,
+          major: row.version_major,
+          minor: row.version_minor,
+        });
       }
 
       // Index flags by uuid
@@ -162,7 +190,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { uuid, buildKey } = await request.json();
+    const { uuid, buildKey, major, minor } = await request.json();
     if (!uuid || typeof uuid !== 'string') {
       return NextResponse.json({ error: 'UUID is required' }, { status: 400 });
     }
@@ -170,21 +198,52 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Build key is required' }, { status: 400 });
     }
 
-    // Validate build key exists in DB
     const pool = getPool();
+
+    // Validate build definition exists
     const defCheck = await pool.query('SELECT 1 FROM build_definitions WHERE key = $1', [buildKey]);
     if (defCheck.rowCount === 0) {
       return NextResponse.json({ error: 'Invalid build key' }, { status: 400 });
     }
 
+    // Resolve the target version. If caller didn't specify, default to latest.
+    let resolvedMajor: number | null = null;
+    let resolvedMinor: number | null = null;
+    if (typeof major === 'number' && typeof minor === 'number') {
+      const versionCheck = await pool.query(
+        'SELECT 1 FROM build_versions WHERE build_key = $1 AND major = $2 AND minor = $3',
+        [buildKey, major, minor]
+      );
+      if (versionCheck.rowCount === 0) {
+        return NextResponse.json({ error: 'Invalid build version' }, { status: 400 });
+      }
+      resolvedMajor = major;
+      resolvedMinor = minor;
+    } else {
+      const latest = await pool.query(
+        'SELECT major, minor FROM build_versions WHERE build_key = $1 ORDER BY major DESC, minor DESC LIMIT 1',
+        [buildKey]
+      );
+      if (latest.rowCount === 0) {
+        return NextResponse.json({ error: 'Build has no versions' }, { status: 400 });
+      }
+      resolvedMajor = latest.rows[0].major;
+      resolvedMinor = latest.rows[0].minor;
+    }
+
+    // Upsert: a member only ever has one version of a given build.
+    // Switching versions is the same operation as initial assignment.
     await pool.query(
-      `INSERT INTO member_builds (uuid, build_key, assigned_by)
-       VALUES ($1, $2, $3)
-       ON CONFLICT DO NOTHING`,
-      [uuid, buildKey, session.ign]
+      `INSERT INTO member_builds (uuid, build_key, version_major, version_minor, assigned_by)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (uuid, build_key) DO UPDATE
+         SET version_major = EXCLUDED.version_major,
+             version_minor = EXCLUDED.version_minor,
+             assigned_by   = EXCLUDED.assigned_by`,
+      [uuid, buildKey, resolvedMajor, resolvedMinor, session.ign]
     );
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, version: { major: resolvedMajor, minor: resolvedMinor } });
   } catch (error) {
     console.error('Build assign error:', error);
     return NextResponse.json({ error: 'Failed to assign build' }, { status: 500 });

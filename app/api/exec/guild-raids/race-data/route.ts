@@ -6,7 +6,7 @@ import { RAID_SHORT_TO_FULL } from '@/lib/graid-log-constants';
 export const dynamic = 'force-dynamic';
 
 // GET — Returns all raid logs (no pagination) for the player race animation.
-// Filters: dateFrom, dateTo, raidTypes (CSV of NOTG/TCC/TNA/NOL/Unknown).
+// Filters: dateFrom, dateTo, raidTypes (CSV of NOTG/TCC/TNA/NOL/TWP/Unknown).
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) {

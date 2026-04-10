@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       const cnt = parseInt(r.cnt, 10);
       let entry = dayMap.get(date);
       if (!entry) {
-        entry = { date, total: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
+        entry = { date, total: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 } };
         dayMap.set(date, entry);
       }
       entry.total += cnt;
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     const days = Array.from(dayMap.values()).sort((a, b) => a.date.localeCompare(b.date));
 
     // Aggregate totals by raid type for the event
-    const totalsByType: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 };
+    const totalsByType: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 };
     let total = 0;
     for (const d of days) {
       total += d.total;

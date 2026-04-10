@@ -6,7 +6,7 @@ import { useExecGraidRaceData } from '@/hooks/useExecGraidLogs';
 import type { GraidRaceRaid, GraidRaceFilters } from '@/hooks/useExecGraidLogs';
 import { RAID_TYPE_COLORS, getRaidShort } from '@/lib/graid-log-constants';
 
-const RAID_TYPE_ORDER = ['NOTG', 'TCC', 'TNA', 'NOL', 'Unknown'] as const;
+const RAID_TYPE_ORDER = ['NOTG', 'TCC', 'TNA', 'NOL', 'TWP', 'Unknown'] as const;
 type RaidTypeKey = (typeof RAID_TYPE_ORDER)[number];
 
 interface Props {
@@ -1053,7 +1053,7 @@ function smoothFrames(frames: Frame[], windowDays: number): Frame[] {
 
     // Re-cumulate
     let cumTotal = 0;
-    const cumTypes: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 };
+    const cumTypes: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 };
     for (let i = 0; i < frames.length; i++) {
       cumTotal += smoothedTotalInc[i];
       for (const t of RAID_TYPE_ORDER) cumTypes[t] += smoothedTypeInc[t][i];
@@ -1116,7 +1116,7 @@ function buildFrames(raids: GraidRaceRaid[]): {
         const key = p.uuid || p.ign.toLowerCase();
         let entry = players.get(key);
         if (!entry) {
-          entry = { key, ign: p.ign, total: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
+          entry = { key, ign: p.ign, total: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 } };
           players.set(key, entry);
         }
         entry.ign = p.ign;

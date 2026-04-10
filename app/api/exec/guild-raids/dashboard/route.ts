@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       const cnt = parseInt(r.cnt, 10);
       let entry = weekMap.get(week);
       if (!entry) {
-        entry = { week, total: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
+        entry = { week, total: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 } };
         weekMap.set(week, entry);
       }
       entry.total += cnt;
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       const short = getRaidShort(r.raid_type);
       let entry = playerMap.get(key);
       if (!entry) {
-        entry = { ign: r.display_name, count: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 } };
+        entry = { ign: r.display_name, count: 0, types: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 } };
         playerMap.set(key, entry);
       }
       entry.count += cnt;

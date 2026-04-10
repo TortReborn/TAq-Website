@@ -98,7 +98,7 @@ export async function getPlayerGraidStats(ign: string): Promise<PlayerGraidStats
   const streaks = computeStreaks(dates);
 
   // Raid type breakdown
-  const raidTypeCounts: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, Unknown: 0 };
+  const raidTypeCounts: Record<string, number> = { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, TWP: 0, Unknown: 0 };
   for (const r of rows) {
     const short = getRaidShort(r.raid_type);
     raidTypeCounts[short] = (raidTypeCounts[short] || 0) + 1;
