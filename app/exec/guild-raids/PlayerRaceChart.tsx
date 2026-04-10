@@ -61,9 +61,28 @@ const VISIBLE_BARS = 10;
 const BAR_HEIGHT = 28;
 const BAR_GAP = 4;
 
-// Canvas dimensions for the recorded video
+// Base canvas coordinate space — every draw call works in these coordinates.
+// At save time the offscreen canvas is resized to (CANVAS_W * scale, CANVAS_H * scale)
+// and `drawRaceFrame` applies a matching transform so the existing layout
+// math doesn't need to change.
 const CANVAS_W = 700;
 const CANVAS_H = 500;
+
+// --- Quality presets for the saved video ---
+type Quality = 'low' | 'medium' | 'high';
+
+interface QualityPreset {
+  label: string;
+  scale: number;   // pixel multiplier on the base canvas size
+  bitrate: number; // bits per second for the VP9 encoder
+  fps: number;     // frame rate of the saved file
+}
+
+const QUALITY_PRESETS: Record<Quality, QualityPreset> = {
+  low:    { label: 'Low',    scale: 1.0, bitrate:  2_000_000, fps: 30 },
+  medium: { label: 'Medium', scale: 1.5, bitrate:  5_000_000, fps: 60 },
+  high:   { label: 'High',   scale: 2.0, bitrate: 10_000_000, fps: 60 },
+};
 
 // --- Inline SVG icon components ---
 
@@ -112,6 +131,7 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
     new Set(RAID_TYPE_ORDER)
   );
   const [speed, setSpeed] = useState(7); // days per second
+  const [quality, setQuality] = useState<Quality>('medium');
   const [filters, setFilters] = useState<GraidRaceFilters | null>(null);
   const [playing, setPlaying] = useState(false);
   const [animState, setAnimState] = useState<{ idx: number; t: number }>({ idx: 0, t: 0 });
@@ -309,9 +329,18 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
   // `webm-muxer`. Decoupled from wall time, so the save completes as fast as
   // the browser can encode VP9 frames (typically 1–3 s for a few hundred days).
   const encodeWithWebCodecs = async (canvas: HTMLCanvasElement) => {
+    const preset = QUALITY_PRESETS[quality];
+    const FPS = preset.fps;
+    const outW = Math.round(CANVAS_W * preset.scale);
+    const outH = Math.round(CANVAS_H * preset.scale);
+
+    // Resize the offscreen canvas to the target output resolution. drawRaceFrame
+    // applies a matching transform so existing layout math still works.
+    canvas.width = outW;
+    canvas.height = outH;
+
     setDownloadStatus('Encoding 0%');
 
-    const FPS = 60;
     // Match the on-screen preview duration: frames.length days at `speed` days/sec.
     const playbackSeconds = frames.length / Math.max(1, speed);
     const tailSeconds = 0.6; // hold the last frame for 0.6s of video time
@@ -319,7 +348,7 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
 
     const muxer = new Muxer({
       target: new ArrayBufferTarget(),
-      video: { codec: 'V_VP9', width: CANVAS_W, height: CANVAS_H, frameRate: FPS },
+      video: { codec: 'V_VP9', width: outW, height: outH, frameRate: FPS },
     });
 
     let encoderError: unknown = null;
@@ -333,9 +362,9 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
 
     encoder.configure({
       codec: 'vp09.00.10.08', // VP9 profile 0
-      width: CANVAS_W,
-      height: CANVAS_H,
-      bitrate: 4_000_000,
+      width: outW,
+      height: outH,
+      bitrate: preset.bitrate,
       framerate: FPS,
     });
 
@@ -401,6 +430,10 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
       return;
     }
 
+    const preset = QUALITY_PRESETS[quality];
+    canvas.width = Math.round(CANVAS_W * preset.scale);
+    canvas.height = Math.round(CANVAS_H * preset.scale);
+
     setDownloadStatus('Recording…');
 
     const session = createDrawSession(
@@ -416,7 +449,7 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
 
     let stream: MediaStream;
     try {
-      stream = canvas.captureStream(60);
+      stream = canvas.captureStream(preset.fps);
     } catch (e) {
       console.error('captureStream failed', e);
       setDownloadStatus('Canvas capture not supported');
@@ -429,7 +462,7 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
 
     let recorder: MediaRecorder;
     try {
-      recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 4_000_000 });
+      recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: preset.bitrate });
     } catch (e) {
       console.error('MediaRecorder failed', e);
       setDownloadStatus('Recording not supported');
@@ -590,6 +623,42 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
             </button>
           );
         })}
+      </div>
+
+      {/* Quality selector */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '50px' }}>
+          Quality
+        </span>
+        <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }}>
+          {(Object.keys(QUALITY_PRESETS) as Quality[]).map(q => {
+            const selected = quality === q;
+            return (
+              <button
+                key={q}
+                type="button"
+                onClick={() => setQuality(q)}
+                disabled={recording}
+                title={`${QUALITY_PRESETS[q].label} — ${Math.round(CANVAS_W * QUALITY_PRESETS[q].scale)}×${Math.round(CANVAS_H * QUALITY_PRESETS[q].scale)} @ ${QUALITY_PRESETS[q].fps}fps, ${(QUALITY_PRESETS[q].bitrate / 1_000_000).toFixed(1)} Mbps`}
+                style={{
+                  flex: 1,
+                  background: selected ? 'rgba(56, 189, 248, 0.18)' : 'var(--bg-primary)',
+                  border: selected ? '1.5px solid var(--color-ocean-400)' : '1px solid var(--border-card)',
+                  borderRadius: '0.375rem',
+                  padding: '0.2rem 0.3rem',
+                  fontSize: '0.65rem',
+                  fontWeight: '700',
+                  color: selected ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
+                  cursor: recording ? 'not-allowed' : 'pointer',
+                  opacity: recording ? 0.6 : 1,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {QUALITY_PRESETS[q].label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Speed slider */}
@@ -1286,8 +1355,14 @@ function drawRaceFrame(
 ) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  const W = canvas.width;
-  const H = canvas.height;
+  // The canvas pixel buffer can be any size (set by the quality preset).
+  // All drawing math below operates in the base coordinate space, so we
+  // apply a transform that maps base coords → actual pixel coords.
+  const scaleX = canvas.width / CANVAS_W;
+  const scaleY = canvas.height / CANVAS_H;
+  ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
+  const W = CANVAS_W;
+  const H = CANVAS_H;
   const padX = 24;
 
   // Background
