@@ -7,8 +7,9 @@ import GraidLogBrowse from './GraidLogBrowse';
 import GraidLogLeaderboard from './GraidLogLeaderboard';
 import GraidLogStats from './GraidLogStats';
 import GraidLogDashboard from './GraidLogDashboard';
+import GraidEvents from './GraidEvents';
 
-const TABS = ['Log', 'Browse', 'Leaderboard', 'Stats', 'Dashboard'] as const;
+const TABS = ['Log', 'Browse', 'Leaderboard', 'Stats', 'Dashboard', 'Events'] as const;
 type Tab = (typeof TABS)[number];
 
 function getInitialTab(): Tab {
@@ -77,6 +78,7 @@ export default function ExecGuildRaidsPage() {
       {activeTab === 'Leaderboard' && <GraidLogLeaderboard onViewStats={navigateToStats} />}
       {activeTab === 'Stats' && <GraidLogStats meta={meta} initialIgn={statsIgn} />}
       {activeTab === 'Dashboard' && <GraidLogDashboard />}
+      {activeTab === 'Events' && <GraidEvents />}
     </div>
   );
 }

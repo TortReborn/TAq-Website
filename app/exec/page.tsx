@@ -805,9 +805,7 @@ export default function ExecDashboardPage() {
             category: 'Activities',
             color: '#ef4444',
             links: [
-              { href: '/exec/graid', label: 'Graid Events', desc: 'Schedule and manage guild raids' },
-              { href: '/exec/snipes', label: 'Snipes', desc: 'Track territory snipe attempts' },
-              { href: '/exec/builds', label: 'War Builds', desc: 'Manage war roles and builds' },
+              { href: '/exec/snipes', label: 'Guild Wars', desc: 'Track territory snipe attempts' },
               { href: '/exec/guild-bank', label: 'Guild Bank', desc: 'Track war consumables and items' },
             ],
           },

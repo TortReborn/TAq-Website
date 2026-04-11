@@ -7,8 +7,9 @@ import SnipeBrowse from './SnipeBrowse';
 import SnipeLeaderboard from './SnipeLeaderboard';
 import SnipeStats from './SnipeStats';
 import SnipeDashboard from './SnipeDashboard';
+import Builds from './Builds';
 
-const TABS = ['Log', 'Browse', 'Leaderboard', 'Stats', 'Dashboard'] as const;
+const TABS = ['Log', 'Browse', 'Leaderboard', 'Stats', 'Dashboard', 'Builds'] as const;
 type Tab = (typeof TABS)[number];
 
 function getInitialTab(): Tab {
@@ -72,7 +73,7 @@ export default function ExecSnipesPage() {
   if (meta.loading) {
     return (
       <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '2rem' }}>Snipes</h1>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '2rem' }}>Guild Wars</h1>
         <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', height: '400px', animation: 'pulse 1.5s ease-in-out infinite' }} />
         <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
       </div>
@@ -82,7 +83,7 @@ export default function ExecSnipesPage() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>Snipes</h1>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>Guild Wars</h1>
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => { setShowSeasonPicker(!showSeasonPicker); setPendingSeason(null); }}
@@ -178,6 +179,7 @@ export default function ExecSnipesPage() {
       {activeTab === 'Leaderboard' && <SnipeLeaderboard meta={meta} onViewStats={navigateToStats} />}
       {activeTab === 'Stats' && <SnipeStats meta={meta} initialIgn={statsIgn} />}
       {activeTab === 'Dashboard' && <SnipeDashboard meta={meta} />}
+      {activeTab === 'Builds' && <Builds />}
     </div>
   );
 }

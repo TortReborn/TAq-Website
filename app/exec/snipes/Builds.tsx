@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useExecBuilds } from '@/hooks/useExecBuilds';
 import { RANK_HIERARCHY, getRankColor } from '@/lib/rank-constants';
@@ -220,8 +218,8 @@ function VersionForm({
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────
-export default function ExecBuildsPage() {
+// ── Main component ─────────────────────────────────────────────
+export default function Builds() {
   const {
     members, allGuildMembers, buildDefinitions, lastUpdated, loading, error, refresh,
     assignBuild, removeBuild, toggleFlag,
@@ -425,9 +423,7 @@ export default function ExecBuildsPage() {
 
   if (loading && members.length === 0) {
     return (
-      <div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '1.7rem' }}>War Builds</h1>
-        <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', height: '340px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', height: '340px', animation: 'pulse 1.5s ease-in-out infinite' }}>
         <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
       </div>
     );
@@ -435,21 +431,15 @@ export default function ExecBuildsPage() {
 
   if (error && members.length === 0) {
     return (
-      <div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '1.7rem' }}>War Builds</h1>
-        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '0.425rem', padding: '0.85rem', color: '#ef4444' }}>
-          Failed to load data: {error}
-        </div>
+      <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '0.425rem', padding: '0.85rem', color: '#ef4444' }}>
+        Failed to load data: {error}
       </div>
     );
   }
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.28rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>War Builds</h1>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '1rem' }}>
         <button onClick={refresh} style={{ ...btnStyle, background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}>
           Refresh
         </button>
