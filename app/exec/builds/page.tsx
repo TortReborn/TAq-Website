@@ -56,9 +56,12 @@ function MemberName({ ign, flags }: { ign: string; flags: string[] }) {
 }
 
 // ── Build definition form (add / edit) ──────────────────────────
-// Edit mode only edits display metadata. Conns/HQ links live on versions and
-// are managed by VersionForm below. Create mode also collects the seed v1.0
-// links so a new build is immediately usable.
+// One form covers display metadata (name/role/color) AND the latest version's
+// links/notes, so execs only see a single "Edit" affordance per build.
+//
+// In create mode the link/notes fields seed v1.0.
+// In edit mode they apply to the latest existing version (the parent component
+// fans the payload out to two API calls).
 type BuildDefFormPayload = {
   key: string;
   name: string;
@@ -66,6 +69,7 @@ type BuildDefFormPayload = {
   color: string;
   connsUrl: string;
   hqUrl: string;
+  notes: string;
 };
 
 function BuildDefForm({
@@ -79,12 +83,14 @@ function BuildDefForm({
   onCancel: () => void;
   submitLabel: string;
 }) {
+  const initialLatest = initial?.versions[0];
   const [key, setKey] = useState(initial?.key ?? '');
   const [name, setName] = useState(initial?.name ?? '');
   const [role, setRole] = useState<BuildRole>(initial?.role ?? 'DPS');
   const [color, setColor] = useState(initial?.color ?? ROLE_COLORS.DPS);
-  const [connsUrl, setConnsUrl] = useState('#');
-  const [hqUrl, setHqUrl] = useState('#');
+  const [connsUrl, setConnsUrl] = useState(initialLatest?.connsUrl ?? '#');
+  const [hqUrl, setHqUrl] = useState(initialLatest?.hqUrl ?? '#');
+  const [notes, setNotes] = useState(initialLatest?.notes ?? '');
 
   // Default color when role changes (only for new builds)
   useEffect(() => {
@@ -92,6 +98,9 @@ function BuildDefForm({
   }, [role, initial]);
 
   const isEdit = !!initial;
+  const linksLabel = isEdit && initialLatest
+    ? `(v${initialLatest.major}.${initialLatest.minor})`
+    : '(v1.0)';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.425rem' }}>
@@ -128,21 +137,21 @@ function BuildDefForm({
           />
         </div>
       </div>
-      {!isEdit && (
-        <>
-          <div>
-            <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Conns Link (v1.0)</label>
-            <input value={connsUrl} onChange={e => setConnsUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
-          </div>
-          <div>
-            <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>HQ Link (v1.0)</label>
-            <input value={hqUrl} onChange={e => setHqUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
-          </div>
-        </>
-      )}
+      <div>
+        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Conns Link {linksLabel}</label>
+        <input value={connsUrl} onChange={e => setConnsUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
+      </div>
+      <div>
+        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>HQ Link {linksLabel}</label>
+        <input value={hqUrl} onChange={e => setHqUrl(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="https://..." />
+      </div>
+      <div>
+        <label style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '600' }}>Notes {linksLabel}</label>
+        <input value={notes} onChange={e => setNotes(e.target.value)} style={{ ...inputStyle, width: '100%' }} placeholder="What changed in this version..." />
+      </div>
       <div style={{ display: 'flex', gap: '0.32rem', marginTop: '0.32rem' }}>
         <button
-          onClick={() => onSubmit({ key: isEdit ? initial.key : key, name, role, color, connsUrl, hqUrl })}
+          onClick={() => onSubmit({ key: isEdit ? initial.key : key, name, role, color, connsUrl, hqUrl, notes })}
           disabled={!name.trim() || (!isEdit && !key.trim())}
           style={{
             ...btnStyle, flex: 1,
@@ -313,7 +322,19 @@ export default function ExecBuildsPage() {
   const handleCreateBuild = async (data: BuildDefFormPayload) => {
     setDefError(null);
     try {
-      await createBuildDefinition(data);
+      await createBuildDefinition({
+        key: data.key,
+        name: data.name,
+        role: data.role,
+        color: data.color,
+        connsUrl: data.connsUrl,
+        hqUrl: data.hqUrl,
+      });
+      // The create endpoint seeds v1.0 with the conns/hq URLs but doesn't
+      // accept a notes field. If the exec entered notes, patch v1.0 after.
+      if (data.notes.trim()) {
+        await editBuildVersion(data.key, { major: 1, minor: 0 }, { notes: data.notes });
+      }
       setShowAddBuild(false);
     } catch (e: any) {
       setDefError(e.message);
@@ -329,6 +350,15 @@ export default function ExecBuildsPage() {
         role: data.role,
         color: data.color,
       });
+      // Also push the link/notes changes to the latest version, if one exists.
+      const latest = editingBuild?.versions[0];
+      if (latest) {
+        await editBuildVersion(
+          data.key,
+          { major: latest.major, minor: latest.minor },
+          { connsUrl: data.connsUrl, hqUrl: data.hqUrl, notes: data.notes }
+        );
+      }
       setEditingBuild(null);
     } catch (e: any) {
       setDefError(e.message);
@@ -988,17 +1018,8 @@ export default function ExecBuildsPage() {
                                 style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(168, 85, 247, 0.12)', color: '#a855f7' }}
                                 title="Create next major version"
                               >
-                                + Major
+                                + Major Update
                               </button>
-                              {latestVersion && !isAddingVersion && editingVersion?.buildKey !== def.key && (
-                                <button
-                                  onClick={() => { setEditingVersion({ buildKey: def.key, version: { major: latestVersion.major, minor: latestVersion.minor } }); setDefError(null); }}
-                                  style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(59, 130, 246, 0.12)', color: 'var(--color-ocean-400)' }}
-                                  title="Edit latest version's links"
-                                >
-                                  Edit v{formatVersion(latestVersion)}
-                                </button>
-                              )}
                               {olderVersions.length > 0 && (
                                 <button
                                   onClick={() => toggleVersionsExpanded(def.key)}
@@ -1134,24 +1155,6 @@ export default function ExecBuildsPage() {
                               </div>
                             )}
 
-                            {/* Inline edit form for the latest version (rendered when latest is selected for edit) */}
-                            {latestVersion &&
-                              editingVersion?.buildKey === def.key &&
-                              versionsEqual(editingVersion.version, { major: latestVersion.major, minor: latestVersion.minor }) && (
-                                <div style={{ marginTop: '0.425rem', padding: '0.53rem', background: 'var(--bg-primary)', borderRadius: '0.425rem', border: '1px solid var(--border-card)' }}>
-                                  <VersionForm
-                                    initial={{
-                                      connsUrl: latestVersion.connsUrl,
-                                      hqUrl: latestVersion.hqUrl,
-                                      notes: latestVersion.notes ?? '',
-                                    }}
-                                    title={`Edit v${formatVersion({ major: latestVersion.major, minor: latestVersion.minor })}`}
-                                    submitLabel="Save"
-                                    onSubmit={handleEditVersion}
-                                    onCancel={() => { setEditingVersion(null); setDefError(null); }}
-                                  />
-                                </div>
-                              )}
                           </>
                         )}
                       </div>

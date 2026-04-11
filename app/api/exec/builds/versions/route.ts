@@ -88,7 +88,8 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const { buildKey, major, minor, connsUrl, hqUrl, notes } = await request.json();
+    const body = await request.json();
+    const { buildKey, major, minor } = body;
 
     if (!buildKey || typeof buildKey !== 'string') {
       return NextResponse.json({ error: 'buildKey is required' }, { status: 400 });
@@ -97,21 +98,40 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'major and minor are required' }, { status: 400 });
     }
 
+    // Build the SET clause dynamically so callers can clear `notes` by passing
+    // an empty string. A field is only updated if its key is present in the
+    // request body — that way we can distinguish "leave alone" from "set to
+    // empty".
+    const setClauses: string[] = [];
+    const params: unknown[] = [buildKey, major, minor];
+
+    if ('connsUrl' in body) {
+      const v = typeof body.connsUrl === 'string' ? body.connsUrl.trim() || '#' : '#';
+      params.push(v);
+      setClauses.push(`conns_url = $${params.length}`);
+    }
+    if ('hqUrl' in body) {
+      const v = typeof body.hqUrl === 'string' ? body.hqUrl.trim() || '#' : '#';
+      params.push(v);
+      setClauses.push(`hq_url = $${params.length}`);
+    }
+    if ('notes' in body) {
+      const raw = body.notes;
+      const v = typeof raw === 'string' && raw.trim() ? raw.trim() : null;
+      params.push(v);
+      setClauses.push(`notes = $${params.length}`);
+    }
+
+    if (setClauses.length === 0) {
+      return NextResponse.json({ success: true, noop: true });
+    }
+
     const pool = getPool();
     const result = await pool.query(
       `UPDATE build_versions
-         SET conns_url = COALESCE($4, conns_url),
-             hq_url    = COALESCE($5, hq_url),
-             notes     = COALESCE($6, notes)
+         SET ${setClauses.join(', ')}
        WHERE build_key = $1 AND major = $2 AND minor = $3`,
-      [
-        buildKey,
-        major,
-        minor,
-        typeof connsUrl === 'string' ? connsUrl.trim() || '#' : null,
-        typeof hqUrl === 'string' ? hqUrl.trim() || '#' : null,
-        typeof notes === 'string' ? (notes.trim() || null) : null,
-      ]
+      params
     );
 
     if (result.rowCount === 0) {
