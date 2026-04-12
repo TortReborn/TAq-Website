@@ -11,7 +11,7 @@ export default function HammerheadApplicationPage() {
           width: '40px',
           height: '40px',
           border: '3px solid var(--border-color)',
-          borderTopColor: '#04b0eb',
+          borderTopColor: '#396aff',
           borderRadius: '50%',
           animation: 'spin 0.8s linear infinite',
         }} />

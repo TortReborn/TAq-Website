@@ -16,6 +16,7 @@ import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLim
 export const dynamic = 'force-dynamic';
 
 const ANGLER_INDEX = RANK_HIERARCHY.indexOf('Angler');
+const HAMMERHEAD_INDEX = RANK_HIERARCHY.indexOf('Hammerhead');
 
 export async function POST(request: NextRequest) {
   // Rate limit
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
       { status: 403 }
     );
   }
-  if (rankIdx > ANGLER_INDEX) {
+  if (rankIdx >= HAMMERHEAD_INDEX) {
     return NextResponse.json(
       { error: 'You are already Hammerhead rank or higher.' },
       { status: 403 }

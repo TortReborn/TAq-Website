@@ -24,11 +24,13 @@ interface ExecUser {
 type FormState = 'loading' | 'unauthenticated' | 'insufficient_rank' | 'already_exec' | 'form' | 'submitting' | 'success' | 'error';
 
 const ANGLER_INDEX = RANK_HIERARCHY.indexOf('Angler');
+const HAMMERHEAD_INDEX = RANK_HIERARCHY.indexOf('Hammerhead');
 const TOTAL_STEPS = 3;
 
 export default function HammerheadApplicationForm() {
   const viewAs = useViewAs();
-  const isPreviewMode = viewAs === 'angler';
+  const isPreviewMode = viewAs === 'angler' || viewAs === 'swordfish';
+  const previewRank = viewAs === 'swordfish' ? 'Swordfish' : 'Angler';
   const [formState, setFormState] = useState<FormState>('loading');
   const [user, setUser] = useState<ExecUser | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -48,12 +50,12 @@ export default function HammerheadApplicationForm() {
           const u = data.user as ExecUser;
           const rankIdx = RANK_HIERARCHY.indexOf(u.rank);
 
-          // In preview mode (View as Angler), skip rank gating
+          // In preview mode (View as Angler/Swordfish), skip rank gating
           if (isPreviewMode) {
-            setUser({ ...u, rank: 'Angler', role: 'member' });
+            setUser({ ...u, rank: previewRank, role: 'member' });
             setAnswers(prev => ({
               ...prev,
-              hh_ign_rank: `${u.ign}, Angler`,
+              hh_ign_rank: `${u.ign}, ${previewRank}`,
             }));
             setFormState('form');
             return;
@@ -64,7 +66,7 @@ export default function HammerheadApplicationForm() {
             setFormState('insufficient_rank');
             return;
           }
-          if (rankIdx > ANGLER_INDEX) {
+          if (rankIdx >= HAMMERHEAD_INDEX) {
             setUser(u);
             setFormState('already_exec');
             return;
@@ -85,7 +87,7 @@ export default function HammerheadApplicationForm() {
     }
 
     authenticate();
-  }, [isPreviewMode]);
+  }, [isPreviewMode, previewRank]);
 
   const validateField = useCallback((question: ApplicationQuestion, value: string | string[] | undefined): string => {
     if (question.type === 'checkbox') {
@@ -368,7 +370,7 @@ export default function HammerheadApplicationForm() {
           width: '40px',
           height: '40px',
           border: '3px solid var(--border-color)',
-          borderTopColor: '#04b0eb',
+          borderTopColor: '#396aff',
           borderRadius: '50%',
           animation: 'spin 0.8s linear infinite',
         }} />
@@ -400,7 +402,7 @@ export default function HammerheadApplicationForm() {
             style={{
               display: 'inline-block',
               padding: '12px 24px',
-              background: 'linear-gradient(135deg, #04b0eb 0%, #0390c0 100%)',
+              background: 'linear-gradient(135deg, #396aff 0%, #2050d4 100%)',
               color: 'white',
               textDecoration: 'none',
               borderRadius: '8px',
@@ -430,7 +432,7 @@ export default function HammerheadApplicationForm() {
             Insufficient Rank
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-            You must be <strong>Angler</strong> rank to apply for Hammerhead.
+            You must be <strong>Angler</strong> or <strong>Swordfish</strong> rank to apply for Hammerhead.
             Your current rank is <strong>{user?.rank}</strong>.
           </p>
         </div>
@@ -507,7 +509,7 @@ export default function HammerheadApplicationForm() {
         <h1 style={{
           fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
           fontWeight: '800',
-          background: 'linear-gradient(135deg, #04b0eb, #0390c0)',
+          background: 'linear-gradient(135deg, #396aff, #2050d4)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
@@ -525,7 +527,7 @@ export default function HammerheadApplicationForm() {
             <div key={label} style={{
               fontSize: '0.8rem',
               fontWeight: i === currentStep ? '700' : '400',
-              color: i <= currentStep ? '#04b0eb' : 'var(--text-muted)',
+              color: i <= currentStep ? '#396aff' : 'var(--text-muted)',
               transition: 'all 0.3s ease',
             }}>
               {label}
@@ -541,7 +543,7 @@ export default function HammerheadApplicationForm() {
           <div style={{
             height: '100%',
             width: `${((currentStep + 1) / TOTAL_STEPS) * 100}%`,
-            background: 'linear-gradient(90deg, #04b0eb, #0390c0)',
+            background: 'linear-gradient(90deg, #396aff, #2050d4)',
             borderRadius: '2px',
             transition: 'width 0.4s ease',
           }} />
@@ -663,9 +665,9 @@ export default function HammerheadApplicationForm() {
                       style={{
                         padding: '0.6rem 1.2rem',
                         borderRadius: '8px',
-                        border: `2px solid ${isSelected ? '#04b0eb' : 'var(--border-color)'}`,
-                        background: isSelected ? 'rgba(4, 176, 235, 0.15)' : 'var(--bg-secondary)',
-                        color: isSelected ? '#04b0eb' : 'var(--text-primary)',
+                        border: `2px solid ${isSelected ? '#396aff' : 'var(--border-color)'}`,
+                        background: isSelected ? 'rgba(57, 106, 255, 0.15)' : 'var(--bg-secondary)',
+                        color: isSelected ? '#396aff' : 'var(--text-primary)',
                         fontWeight: isSelected ? '700' : '500',
                         fontSize: '0.9rem',
                         cursor: 'pointer',
@@ -698,7 +700,7 @@ export default function HammerheadApplicationForm() {
                   <h3 style={{
                     fontSize: '1.1rem',
                     fontWeight: '700',
-                    color: '#04b0eb',
+                    color: '#396aff',
                     marginBottom: '1.25rem',
                   }}>
                     {task}
@@ -759,7 +761,7 @@ export default function HammerheadApplicationForm() {
               onClick={handleNext}
               style={{
                 padding: '14px 24px',
-                background: 'linear-gradient(135deg, #04b0eb 0%, #0390c0 100%)',
+                background: 'linear-gradient(135deg, #396aff 0%, #2050d4 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '10px',
@@ -767,16 +769,16 @@ export default function HammerheadApplicationForm() {
                 fontWeight: '700',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 2px 8px rgba(4, 176, 235, 0.3)',
+                boxShadow: '0 2px 8px rgba(57, 106, 255, 0.3)',
                 fontFamily: 'inherit',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(4, 176, 235, 0.4)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(57, 106, 255, 0.4)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(4, 176, 235, 0.3)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(57, 106, 255, 0.3)';
               }}
             >
               Next
@@ -790,7 +792,7 @@ export default function HammerheadApplicationForm() {
                 padding: '14px 24px',
                 background: formState === 'submitting' || isPreviewMode
                   ? 'linear-gradient(135deg, #6b7280, #4b5563)'
-                  : 'linear-gradient(135deg, #04b0eb 0%, #0390c0 100%)',
+                  : 'linear-gradient(135deg, #396aff 0%, #2050d4 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '10px',
@@ -798,19 +800,19 @@ export default function HammerheadApplicationForm() {
                 fontWeight: '700',
                 cursor: formState === 'submitting' || isPreviewMode ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s ease',
-                boxShadow: isPreviewMode ? 'none' : '0 2px 8px rgba(4, 176, 235, 0.3)',
+                boxShadow: isPreviewMode ? 'none' : '0 2px 8px rgba(57, 106, 255, 0.3)',
                 fontFamily: 'inherit',
                 opacity: isPreviewMode ? 0.6 : 1,
               }}
               onMouseEnter={(e) => {
                 if (formState !== 'submitting' && !isPreviewMode) {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(4, 176, 235, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(57, 106, 255, 0.4)';
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = isPreviewMode ? 'none' : '0 2px 8px rgba(4, 176, 235, 0.3)';
+                e.currentTarget.style.boxShadow = isPreviewMode ? 'none' : '0 2px 8px rgba(57, 106, 255, 0.3)';
               }}
             >
               {isPreviewMode ? 'Submission Disabled (Preview)' : formState === 'submitting' ? 'Submitting...' : 'Submit Application'}

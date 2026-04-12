@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
       // Rank priority for sorting
       const rankPriority: Record<string, number> = {
         'Hydra': 1, 'Narwhal': 2, 'Dolphin': 3, 'Sailfish': 4,
-        'Hammerhead': 5, 'Angler': 6, 'Barracuda': 7, 'Piranha': 8,
+        'Hammerhead': 5, 'Swordfish': 6, 'Angler': 7, 'Piranha': 8,
         'Manatee': 9, 'Starfish': 10,
       };
 

@@ -273,7 +273,7 @@ export default function GraidEventPage() {
           }}>
             Multiplicative bonuses do not stack.<br />
             {showEvent && showEvent.low !== showEvent.high && (
-              <>Starfish, Manatee, Piranha, Barracuda are treated as <strong>low ranks</strong>. Others are high.<br /></>
+              <>Starfish, Manatee, Piranha are treated as <strong>low ranks</strong>. Others are high.<br /></>
             )}
             Payouts below the minimum completions threshold are shown in gray as hypothetical.
             {showEvent?.bonusThreshold != null && showEvent?.bonusAmount != null && (

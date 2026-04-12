@@ -18,21 +18,25 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [viewAs, setViewAs] = useState<'normal' | 'non-member' | 'below-angler' | 'angler'>('normal');
+  const [viewAs, setViewAs] = useState<'normal' | 'non-member' | 'below-angler' | 'angler' | 'swordfish'>('normal');
   const [viewAsOpen, setViewAsOpen] = useState(false);
   const { authenticated: realAuthenticated, isExec: realIsExec, user: realUser } = useExecSession();
 
   // "View as" overrides for exec members to test other perspectives
   const authenticated = viewAs === 'non-member' ? false : realAuthenticated;
-  const isExec = viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' ? false : realIsExec;
+  const isExec = viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' || viewAs === 'swordfish' ? false : realIsExec;
   const user = viewAs === 'non-member' ? null
     : viewAs === 'below-angler' ? (realUser ? { ...realUser, rank: 'Piranha', role: 'member' as const } : realUser)
     : viewAs === 'angler' ? (realUser ? { ...realUser, rank: 'Angler', role: 'member' as const } : realUser)
+    : viewAs === 'swordfish' ? (realUser ? { ...realUser, rank: 'Swordfish', role: 'member' as const } : realUser)
     : realUser;
   const rankIdx = user?.rank ? RANK_HIERARCHY.indexOf(user.rank) : -1;
-  const isAngler = rankIdx === 4; // Angler index in RANK_HIERARCHY
-  const isExecRank = rankIdx >= 5; // Hammerhead+
-  const isBelowAngler = authenticated && rankIdx >= 0 && rankIdx < 4; // Guild member below Angler (Starfish–Barracuda)
+  const ANGLER_IDX = RANK_HIERARCHY.indexOf('Angler');
+  const HAMMERHEAD_IDX = RANK_HIERARCHY.indexOf('Hammerhead');
+  // "isAngler" = eligible to apply for Hammerhead (Angler or Swordfish — non-HR ranks at/above Angler)
+  const isAngler = rankIdx >= ANGLER_IDX && rankIdx < HAMMERHEAD_IDX;
+  const isExecRank = rankIdx >= HAMMERHEAD_IDX;
+  const isBelowAngler = authenticated && rankIdx >= 0 && rankIdx < ANGLER_IDX;
   
   // Close View As dropdown on outside click
   useEffect(() => {
@@ -451,7 +455,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 className="mobile-apply-button"
                 style={{
                   padding: '8px 16px',
-                  background: 'linear-gradient(135deg, #04b0eb 0%, #0390c0 100%)',
+                  background: 'linear-gradient(135deg, #396aff 0%, #2050d4 100%)',
                   color: 'white',
                   textDecoration: 'none',
                   borderRadius: '8px',
@@ -460,15 +464,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   transition: 'all 0.3s ease',
                   border: 'none',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 4px rgba(4, 176, 235, 0.3)'
+                  boxShadow: '0 2px 4px rgba(57, 106, 255, 0.3)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(4, 176, 235, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(57, 106, 255, 0.4)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(4, 176, 235, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(57, 106, 255, 0.3)';
                 }}
               >
                 Hammerhead Application
@@ -482,12 +486,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 className="mobile-apply-button"
                 style={{
                   padding: '8px 16px',
-                  background: 'linear-gradient(135deg, rgba(4, 176, 235, 0.25) 0%, rgba(3, 144, 192, 0.25) 100%)',
+                  background: 'linear-gradient(135deg, rgba(57, 106, 255, 0.25) 0%, rgba(32, 80, 212, 0.25) 100%)',
                   color: 'rgba(255,255,255,0.55)',
                   borderRadius: '8px',
                   fontSize: '0.875rem',
                   fontWeight: '600',
-                  border: '1px solid rgba(4, 176, 235, 0.25)',
+                  border: '1px solid rgba(57, 106, 255, 0.25)',
                   cursor: 'not-allowed',
                   opacity: 0.6,
                   fontFamily: 'inherit',
@@ -589,7 +593,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
                 {viewAs !== 'normal' && (
-                  <span>{viewAs === 'non-member' ? 'Non-member' : viewAs === 'below-angler' ? 'Below Angler' : 'Angler'}</span>
+                  <span>{viewAs === 'non-member' ? 'Non-member' : viewAs === 'below-angler' ? 'Below Angler' : viewAs === 'swordfish' ? 'Swordfish' : 'Angler'}</span>
                 )}
               </button>
               {viewAsOpen && (
@@ -613,6 +617,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     { value: 'non-member' as const, label: 'Non-guild Member' },
                     { value: 'below-angler' as const, label: 'Guild Member (Below Angler)' },
                     { value: 'angler' as const, label: 'Angler' },
+                    { value: 'swordfish' as const, label: 'Swordfish' },
                   ]).map(opt => (
                     <button
                       key={opt.value}
@@ -622,9 +627,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                         display: 'block',
                         width: '100%',
                         padding: '10px 12px',
-                        background: viewAs === opt.value ? 'rgba(4,176,235,0.1)' : 'transparent',
+                        background: viewAs === opt.value ? 'rgba(57,106,255,0.1)' : 'transparent',
                         border: 'none',
-                        color: viewAs === opt.value ? '#04b0eb' : 'var(--text-primary)',
+                        color: viewAs === opt.value ? '#396aff' : 'var(--text-primary)',
                         fontSize: '0.85rem',
                         fontWeight: viewAs === opt.value ? '600' : '400',
                         textAlign: 'left',
@@ -922,7 +927,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 href="/apply/hammerhead"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
-                  color: '#04b0eb',
+                  color: '#396aff',
                   fontWeight: 'bold',
                   fontSize: '1.125rem',
                   textDecoration: 'none',
@@ -931,7 +936,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   transition: 'all 0.3s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(4,176,235,0.15) 0%, rgba(4,176,235,0.05) 100%)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(57,106,255,0.15) 0%, rgba(57,106,255,0.05) 100%)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
@@ -945,7 +950,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 title="You can only apply for Hammerhead once you reach Angler rank."
                 aria-label="Hammerhead Application — requires Angler rank"
                 style={{
-                  color: 'rgba(4, 176, 235, 0.55)',
+                  color: 'rgba(57, 106, 255, 0.55)',
                   fontWeight: 'bold',
                   fontSize: '1.125rem',
                   textAlign: 'left',

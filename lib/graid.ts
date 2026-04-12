@@ -87,7 +87,7 @@ export type Row = {
   paid?: boolean;
 };
 
-const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha", "Barracuda"]);
+const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha"]);
 
 function isLow(rank?: string | null) {
   return rank ? LOW_RANKS.has(rank) : false;

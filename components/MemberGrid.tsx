@@ -65,34 +65,34 @@ export default function MemberGrid({ members, onRefresh, showOnlineOnly = false 
 
   // Discord rank order as specified
   const discordRankOrder = [
-    'Hydra', 
+    'Hydra',
     'Narwhal',
     'Dolphin',
     'Sailfish',
     'Hammerhead',
+    'Swordfish',
     'Angler',
-    'Barracuda',
     'Piranha',
     'Manatee',
     'Starfish'
   ];
 
-  const sortedRanks = showOnlineOnly 
+  const sortedRanks = showOnlineOnly
     ? ['Online Players'] // Single group when showing online only
     : discordRankOrder.filter(rank => groupedMembers[rank]);
 
   const getRankColor = (rank: string) => {
     switch (rank) {
-      case 'Hydra': return '#ac034c';
+      case 'Hydra': return '#b01444';
       case 'Narwhal': return '#eb2279';
-      case 'Dolphin': return '#9d68ff';
-      case 'Sailfish': return '#396aff';
-      case 'Hammerhead': return '#04b0eb';
-      case 'Angler': return '#00e2db';
-      case 'Barracuda': return '#79e64a';
-      case 'Piranha': return '#c8ff00';
+      case 'Dolphin': return '#e66bff';
+      case 'Sailfish': return '#9e6bff';
+      case 'Hammerhead': return '#396aff';
+      case 'Swordfish': return '#18baf1';
+      case 'Angler': return '#0bf6ef';
+      case 'Piranha': return '#aaf64a';
       case 'Manatee': return '#ffe226';
-      case 'Starfish': return '#e8a41c';
+      case 'Starfish': return '#f8b01f';
       default: return 'var(--text-muted)';
     }
   };  const getOnlineStatusColor = (online: boolean) => {

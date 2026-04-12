@@ -4,7 +4,7 @@ import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha", "Barracuda"]);
+const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha"]);
 
 function isLow(rank?: string | null) {
   return rank ? LOW_RANKS.has(rank) : false;

@@ -233,8 +233,8 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
                 fontWeight: '600',
                 padding: '0.15rem 0.4rem',
                 borderRadius: '0.25rem',
-                background: 'rgba(4, 176, 235, 0.15)',
-                color: '#04b0eb',
+                background: 'rgba(57, 106, 255, 0.15)',
+                color: '#396aff',
                 textTransform: 'uppercase',
               }}>
                 Hammerhead
@@ -383,9 +383,9 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
                     fontWeight: '600',
                     padding: '0.2rem 0.5rem',
                     borderRadius: '0.25rem',
-                    background: 'rgba(4, 176, 235, 0.12)',
-                    border: '1px solid rgba(4, 176, 235, 0.25)',
-                    color: '#04b0eb',
+                    background: 'rgba(57, 106, 255, 0.12)',
+                    border: '1px solid rgba(57, 106, 255, 0.25)',
+                    color: '#396aff',
                   }}>
                     {task}
                   </span>
@@ -406,7 +406,7 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
                     <div style={{
                       fontSize: '0.85rem',
                       fontWeight: '700',
-                      color: '#04b0eb',
+                      color: '#396aff',
                       marginBottom: '0.75rem',
                     }}>
                       {section.label}
@@ -458,13 +458,13 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-                    <path d="M8 1L2 3.5V7.5C2 11.1 4.5 14.4 8 15.5C11.5 14.4 14 11.1 14 7.5V3.5L8 1Z" stroke="#04b0eb" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
-                    <path d="M6 8L7.5 9.5L10 6.5" stroke="#04b0eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M8 1L2 3.5V7.5C2 11.1 4.5 14.4 8 15.5C11.5 14.4 14 11.1 14 7.5V3.5L8 1Z" stroke="#396aff" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
+                    <path d="M6 8L7.5 9.5L10 6.5" stroke="#396aff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <span style={{
                     fontSize: '0.75rem',
                     fontWeight: '700',
-                    color: '#04b0eb',
+                    color: '#396aff',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                   }}>
