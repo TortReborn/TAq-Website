@@ -18,17 +18,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [viewAs, setViewAs] = useState<'normal' | 'non-member' | 'below-angler' | 'angler' | 'swordfish'>('normal');
+  const [viewAs, setViewAs] = useState<'normal' | 'non-member' | 'below-angler' | 'angler'>('normal');
   const [viewAsOpen, setViewAsOpen] = useState(false);
   const { authenticated: realAuthenticated, isExec: realIsExec, user: realUser } = useExecSession();
 
   // "View as" overrides for exec members to test other perspectives
   const authenticated = viewAs === 'non-member' ? false : realAuthenticated;
-  const isExec = viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' || viewAs === 'swordfish' ? false : realIsExec;
+  const isExec = viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' ? false : realIsExec;
   const user = viewAs === 'non-member' ? null
     : viewAs === 'below-angler' ? (realUser ? { ...realUser, rank: 'Piranha', role: 'member' as const } : realUser)
     : viewAs === 'angler' ? (realUser ? { ...realUser, rank: 'Angler', role: 'member' as const } : realUser)
-    : viewAs === 'swordfish' ? (realUser ? { ...realUser, rank: 'Swordfish', role: 'member' as const } : realUser)
     : realUser;
   const rankIdx = user?.rank ? RANK_HIERARCHY.indexOf(user.rank) : -1;
   const ANGLER_IDX = RANK_HIERARCHY.indexOf('Angler');
@@ -593,7 +592,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
                 {viewAs !== 'normal' && (
-                  <span>{viewAs === 'non-member' ? 'Non-member' : viewAs === 'below-angler' ? 'Below Angler' : viewAs === 'swordfish' ? 'Swordfish' : 'Angler'}</span>
+                  <span>{viewAs === 'non-member' ? 'Non-member' : viewAs === 'below-angler' ? 'Below Angler' : 'Angler+'}</span>
                 )}
               </button>
               {viewAsOpen && (
@@ -616,8 +615,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     { value: 'normal' as const, label: 'Normal (You)' },
                     { value: 'non-member' as const, label: 'Non-guild Member' },
                     { value: 'below-angler' as const, label: 'Guild Member (Below Angler)' },
-                    { value: 'angler' as const, label: 'Angler' },
-                    { value: 'swordfish' as const, label: 'Swordfish' },
+                    { value: 'angler' as const, label: 'Angler+' },
                   ]).map(opt => (
                     <button
                       key={opt.value}

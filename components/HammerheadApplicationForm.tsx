@@ -29,8 +29,7 @@ const TOTAL_STEPS = 3;
 
 export default function HammerheadApplicationForm() {
   const viewAs = useViewAs();
-  const isPreviewMode = viewAs === 'angler' || viewAs === 'swordfish';
-  const previewRank = viewAs === 'swordfish' ? 'Swordfish' : 'Angler';
+  const isPreviewMode = viewAs === 'angler';
   const [formState, setFormState] = useState<FormState>('loading');
   const [user, setUser] = useState<ExecUser | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -50,12 +49,12 @@ export default function HammerheadApplicationForm() {
           const u = data.user as ExecUser;
           const rankIdx = RANK_HIERARCHY.indexOf(u.rank);
 
-          // In preview mode (View as Angler/Swordfish), skip rank gating
+          // In preview mode (View as Angler+), skip rank gating
           if (isPreviewMode) {
-            setUser({ ...u, rank: previewRank, role: 'member' });
+            setUser({ ...u, rank: 'Angler', role: 'member' });
             setAnswers(prev => ({
               ...prev,
-              hh_ign_rank: `${u.ign}, ${previewRank}`,
+              hh_ign_rank: `${u.ign}, Angler+`,
             }));
             setFormState('form');
             return;
@@ -87,7 +86,7 @@ export default function HammerheadApplicationForm() {
     }
 
     authenticate();
-  }, [isPreviewMode, previewRank]);
+  }, [isPreviewMode]);
 
   const validateField = useCallback((question: ApplicationQuestion, value: string | string[] | undefined): string => {
     if (question.type === 'checkbox') {
