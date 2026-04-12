@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-export type ViewAsMode = 'normal' | 'non-member' | 'below-angler' | 'angler';
+export type ViewAsMode = 'normal' | 'non-member' | 'below-angler' | 'angler' | 'swordfish';
 
 export const ViewAsContext = createContext<ViewAsMode>('normal');
 
