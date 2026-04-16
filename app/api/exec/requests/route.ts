@@ -15,6 +15,17 @@ export async function GET(request: NextRequest) {
     const pool = getPool();
     const { searchParams } = new URL(request.url);
 
+    // Auto-archive: deployed/declined tickets untouched for >= 7 days
+    // are rolled into 'archived' so the deployed/declined columns stay
+    // focused on recent activity. Runs on every list fetch — cheap
+    // (single UPDATE, indexed on status).
+    await pool.query(
+      `UPDATE tracker_tickets
+         SET status = 'archived'
+       WHERE status IN ('deployed', 'declined')
+         AND updated_at < NOW() - INTERVAL '7 days'`
+    );
+
     // Build dynamic WHERE clause
     const conditions: string[] = [];
     const params: (string | string[])[] = [];
@@ -50,6 +61,14 @@ export async function GET(request: NextRequest) {
       paramIdx++;
     }
 
+    const q = searchParams.get('q');
+    if (q && q.trim()) {
+      const needle = `%${q.trim()}%`;
+      conditions.push(`(t.title ILIKE $${paramIdx} OR t.description ILIKE $${paramIdx})`);
+      params.push(needle);
+      paramIdx++;
+    }
+
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // Sort
@@ -57,7 +76,7 @@ export async function GET(request: NextRequest) {
       created_at: 't.created_at',
       updated_at: 't.updated_at',
       priority: `CASE t.priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END`,
-      status: `CASE t.status WHEN 'untriaged' THEN 0 WHEN 'todo' THEN 1 WHEN 'in_progress' THEN 2 WHEN 'deployed' THEN 3 WHEN 'declined' THEN 4 END`,
+      status: `CASE t.status WHEN 'untriaged' THEN 0 WHEN 'todo' THEN 1 WHEN 'blocked' THEN 2 WHEN 'in_progress' THEN 3 WHEN 'deployed' THEN 4 WHEN 'declined' THEN 5 WHEN 'archived' THEN 6 END`,
     };
     const sortParam = searchParams.get('sort') || 'created_at';
     const sortColumn = allowedSorts[sortParam] || 't.created_at';

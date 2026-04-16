@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Ticket, TicketStatus } from '@/hooks/useExecTracker';
-import { COLUMN_ORDER } from './constants';
+import { COLUMN_ORDER, VISIBLE_COLUMN_COUNT } from './constants';
 import KanbanColumn from './KanbanColumn';
 
 export default function KanbanBoard({
@@ -44,6 +44,11 @@ export default function KanbanBoard({
     onMoveTicket(ticketId, status, position);
   };
 
+  // Fit exactly VISIBLE_COLUMN_COUNT columns in the visible area; the
+  // extra columns (declined, archived) scroll off to the right.
+  // 0.75rem gap * (N - 1) between the visible N columns.
+  const colBasis = `calc((100% - ${(VISIBLE_COLUMN_COUNT - 1) * 0.75}rem) / ${VISIBLE_COLUMN_COUNT})`;
+
   return (
     <div style={{
       display: 'flex',
@@ -51,6 +56,7 @@ export default function KanbanBoard({
       flex: 1,
       minHeight: 0,
       overflowX: 'auto',
+      ['--kanban-col-basis' as any]: colBasis,
     }}>
       {COLUMN_ORDER.map((status) => (
         <KanbanColumn

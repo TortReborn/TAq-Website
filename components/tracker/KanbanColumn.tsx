@@ -62,8 +62,11 @@ export default function KanbanColumn({
         if (!isNaN(ticketId)) onDrop(status, idx, ticketId);
       }}
       style={{
-        flex: 1,
-        minWidth: '200px',
+        // Fixed basis so the first N columns fit the viewport exactly and
+        // the remaining columns hang off to the right for horizontal
+        // scrolling. See KanbanBoard where --kanban-col-basis is set.
+        flex: '0 0 var(--kanban-col-basis, 220px)',
+        minWidth: '220px',
         background: dragOver ? `${color}0A` : 'var(--bg-card)',
         borderRadius: '0.75rem',
         border: `1px solid ${dragOver ? color : 'var(--border-card)'}`,

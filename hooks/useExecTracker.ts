@@ -3,7 +3,7 @@ import { fetcher } from './fetcher';
 
 export type TicketType = 'bug' | 'feature';
 export type TicketSystem = 'discord_bot' | 'minecraft_mod' | 'website';
-export type TicketStatus = 'untriaged' | 'todo' | 'in_progress' | 'deployed' | 'declined';
+export type TicketStatus = 'untriaged' | 'todo' | 'blocked' | 'in_progress' | 'deployed' | 'declined' | 'archived';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Ticket {
@@ -35,6 +35,7 @@ export interface TrackerFilters {
   type?: string;
   system?: string;
   priority?: string;
+  q?: string;
   sort?: string;
   order?: 'asc' | 'desc';
 }
@@ -50,6 +51,7 @@ function buildQueryString(filters: TrackerFilters): string {
   if (filters.type) params.set('type', filters.type);
   if (filters.system) params.set('system', filters.system);
   if (filters.priority) params.set('priority', filters.priority);
+  if (filters.q) params.set('q', filters.q);
   if (filters.sort) params.set('sort', filters.sort);
   if (filters.order) params.set('order', filters.order);
   const qs = params.toString();

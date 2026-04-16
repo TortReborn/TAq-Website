@@ -59,6 +59,8 @@ export default function FilterBar({
   setPriorityFilter,
   assigneeFilter,
   setAssigneeFilter,
+  searchInput,
+  setSearchInput,
   execMembers,
   ticketCount,
 }: {
@@ -70,6 +72,8 @@ export default function FilterBar({
   setPriorityFilter: (v: string) => void;
   assigneeFilter: string;
   setAssigneeFilter: (v: string) => void;
+  searchInput: string;
+  setSearchInput: (v: string) => void;
   execMembers: ExecMember[];
   ticketCount: number;
 }) {
@@ -127,8 +131,71 @@ export default function FilterBar({
         onChange={setAssigneeFilter}
       />
 
-      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-        {ticketCount} ticket{ticketCount !== 1 ? 's' : ''}
+      <div style={{
+        marginLeft: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+      }}>
+        <div style={{ position: 'relative' }}>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 16 16"
+            fill="none"
+            style={{
+              position: 'absolute',
+              left: '0.5rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--text-muted)',
+              pointerEvents: 'none',
+            }}
+          >
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3" />
+            <path d="M10.5 10.5L13 13" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search title or description..."
+            style={{
+              fontSize: '0.72rem',
+              padding: '0.3rem 0.55rem 0.3rem 1.7rem',
+              borderRadius: '999px',
+              border: '1px solid var(--border-card)',
+              background: 'var(--bg-primary)',
+              color: 'var(--text-primary)',
+              outline: 'none',
+              width: '220px',
+            }}
+          />
+          {searchInput && (
+            <button
+              onClick={() => setSearchInput('')}
+              title="Clear search"
+              style={{
+                position: 'absolute',
+                right: '0.35rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                lineHeight: 1,
+                padding: '0 0.2rem',
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          {ticketCount} ticket{ticketCount !== 1 ? 's' : ''}
+        </div>
       </div>
     </div>
   );

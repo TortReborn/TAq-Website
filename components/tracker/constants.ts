@@ -5,19 +5,31 @@ import type { TicketStatus, TicketPriority } from '@/hooks/useExecTracker';
 export const COLUMN_ORDER: TicketStatus[] = [
   'untriaged',
   'todo',
+  'blocked',
   'in_progress',
   'deployed',
   'declined',
+  'archived',
 ];
+
+/* Columns visible without horizontal scrolling. Remaining columns hang
+   off to the right and can be scrolled to. */
+export const VISIBLE_COLUMN_COUNT = 5;
+
+/* Deployed/declined tickets older than this roll over into `archived` on
+   the next list fetch. Kept in sync with server-side archival logic. */
+export const AUTO_ARCHIVE_DAYS = 7;
 
 /* ─── Labels ─── */
 
 export const STATUS_LABELS: Record<string, string> = {
   untriaged: 'Untriaged',
   todo: 'Todo',
+  blocked: 'Blocked',
   in_progress: 'In Progress',
   deployed: 'Deployed',
   declined: 'Declined',
+  archived: 'Archived',
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {
@@ -43,9 +55,11 @@ export const SYSTEM_LABELS: Record<string, string> = {
 export const COLUMN_COLORS: Record<string, string> = {
   untriaged: '#3b82f6',
   todo: '#a855f7',
+  blocked: '#ec4899',
   in_progress: '#f59e0b',
   deployed: '#22c55e',
   declined: '#6b7280',
+  archived: '#475569',
 };
 
 export const PRIORITY_COLORS: Record<string, string> = {

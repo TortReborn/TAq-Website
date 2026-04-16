@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'ticketId and position are required' }, { status: 400 });
     }
 
-    const validStatuses = ['untriaged', 'todo', 'in_progress', 'deployed', 'declined'];
+    const validStatuses = ['untriaged', 'todo', 'blocked', 'in_progress', 'deployed', 'declined', 'archived'];
     if (status && !validStatuses.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }

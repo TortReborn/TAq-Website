@@ -19,13 +19,22 @@ export default function ExecTrackerPage() {
   const [systemFilter, setSystemFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [assigneeFilter, setAssigneeFilter] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Debounce free-text search so we don't refetch on every keystroke.
+  useEffect(() => {
+    const h = setTimeout(() => setSearchQuery(searchInput.trim()), 250);
+    return () => clearTimeout(h);
+  }, [searchInput]);
 
   // Fetch all tickets (no status filter)
   const filters = useMemo(() => ({
     ...(typeFilter && { type: typeFilter }),
     ...(systemFilter && { system: systemFilter }),
     ...(priorityFilter && { priority: priorityFilter }),
-  }), [typeFilter, systemFilter, priorityFilter]);
+    ...(searchQuery && { q: searchQuery }),
+  }), [typeFilter, systemFilter, priorityFilter, searchQuery]);
 
   const { tickets, execMembers, loading, error, refresh, createTicket, updateTicketLocally } = useExecTracker(filters);
 
@@ -127,6 +136,8 @@ export default function ExecTrackerPage() {
         setPriorityFilter={setPriorityFilter}
         assigneeFilter={assigneeFilter}
         setAssigneeFilter={setAssigneeFilter}
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
         execMembers={execMembers}
         ticketCount={filteredTickets.length}
       />

@@ -120,7 +120,7 @@ export async function PATCH(
     let paramIdx = 1;
 
     if (body.status !== undefined) {
-      if (!['untriaged', 'todo', 'in_progress', 'deployed', 'declined'].includes(body.status)) {
+      if (!['untriaged', 'todo', 'blocked', 'in_progress', 'deployed', 'declined', 'archived'].includes(body.status)) {
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
       }
       updates.push(`status = $${paramIdx}`);
