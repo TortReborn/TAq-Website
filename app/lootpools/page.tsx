@@ -8,22 +8,24 @@ import PageHeader from '@/components/PageHeader';
 import { useLootruns, useAspects } from '@/hooks/useLootpools';
 import LootpoolSkeleton from '@/components/skeletons/LootpoolSkeleton';
 
+interface LootRegion {
+  Mythic?: string[];
+  Fabled?: string[];
+  Legendary?: string[];
+  Rare?: string[];
+  Unique?: string[];
+  Shiny?: {
+    Item: string;
+    Tracker: string;
+  };
+}
+
 interface LootData {
   Timestamp: number;
   Icon?: { [itemName: string]: string };
-  Loot: {
-    [region: string]: {
-      Mythic?: string[];
-      Fabled?: string[];
-      Legendary?: string[];
-      Rare?: string[];
-      Unique?: string[];
-      Shiny?: {
-        Item: string;
-        Tracker: string;
-      };
-    };
-  };
+  Loot?: { [region: string]: LootRegion };
+  Aspects?: { [raid: string]: LootRegion };
+  Items?: { [region: string]: LootRegion };
 }
 
 export default function LootpoolsPage() {
@@ -193,7 +195,8 @@ export default function LootpoolsPage() {
 
 // Lootruns component
 function LootrunsView({ data }: { data: LootData }) {
-  const regions = Object.keys(data.Loot);
+  const loot = data.Loot || data.Items || {};
+  const regions = Object.keys(loot);
 
   return (
     <div style={{
@@ -209,7 +212,7 @@ function LootrunsView({ data }: { data: LootData }) {
           <LootrunColumn
             key={regionName}
             regionName={regionName}
-            regionData={data.Loot[regionName] || {}}
+            regionData={loot[regionName] || {}}
             icons={data.Icon}
           />
         ))}
@@ -221,6 +224,7 @@ function LootrunsView({ data }: { data: LootData }) {
 // Raids component
 function RaidsView({ data }: { data: LootData }) {
   const raids = ["TNA", "TCC", "NOL", "NOTG", "TWP"];
+  const loot = data.Aspects || data.Loot || {};
 
   return (
     <div style={{
@@ -236,7 +240,7 @@ function RaidsView({ data }: { data: LootData }) {
           <RaidColumn
             key={raid}
             raid={raid}
-            aspects={data.Loot[raid] || {}}
+            aspects={loot[raid] || {}}
           />
         ))}
       </div>
