@@ -38,7 +38,7 @@ export interface GraidLogLeaderboardPlayer {
   tcc: number;
   tna: number;
   nol: number;
-  twp: number;
+  wtp: number;
   unknown: number;
 }
 

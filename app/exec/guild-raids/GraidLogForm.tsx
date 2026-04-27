@@ -20,7 +20,7 @@ const RAID_TYPES = [
   { value: 'TCC', label: 'The Canyon Colossus (TCC)' },
   { value: 'TNA', label: 'The Nameless Anomaly (TNA)' },
   { value: 'NOL', label: "Orphion's Nexus of Light (NOL)" },
-  { value: 'TWP', label: 'The Wartorn Palace (TWP)' },
+  { value: 'WTP', label: 'The Wartorn Palace (WTP)' },
 ];
 
 const UNKNOWN_TYPE = { value: 'Unknown', label: 'Unknown raid type' };

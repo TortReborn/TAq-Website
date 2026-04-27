@@ -220,7 +220,7 @@ export default function GraidEvents() {
               Override reward rates for specific raid types. Leave empty to use default rates.
             </div>
             {Object.entries(perTypeRewards).map(([raidType, rewards]) => {
-              const shortNames: Record<string, string> = { 'Nest of the Grootslangs': 'NOTG', 'The Canyon Colossus': 'TCC', 'The Nameless Anomaly': 'TNA', "Orphion's Nexus of Light": 'NOL', 'The Wartorn Palace': 'TWP' };
+              const shortNames: Record<string, string> = { 'Nest of the Grootslangs': 'NOTG', 'The Canyon Colossus': 'TCC', 'The Nameless Anomaly': 'TNA', "Orphion's Nexus of Light": 'NOL', 'The Wartorn Palace': 'WTP' };
               return (
                 <div key={raidType} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1fr', gap: '0.5rem', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-primary)' }}>{shortNames[raidType]}</span>
