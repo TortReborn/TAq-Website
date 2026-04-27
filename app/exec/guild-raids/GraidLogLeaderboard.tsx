@@ -14,7 +14,7 @@ const inputStyle: React.CSSProperties = {
   color: 'var(--text-primary)', fontSize: '0.8rem', outline: 'none',
 };
 
-type SortCol = 'total' | 'notg' | 'tcc' | 'tna' | 'nol' | 'twp' | 'ign';
+type SortCol = 'total' | 'notg' | 'tcc' | 'tna' | 'nol' | 'wtp' | 'ign';
 type SortDir = 'asc' | 'desc';
 
 export default function GraidLogLeaderboard({ onViewStats }: Props) {
@@ -73,7 +73,7 @@ export default function GraidLogLeaderboard({ onViewStats }: Props) {
                   <th style={{ ...thStyle, cursor: 'pointer', userSelect: 'none', color: RAID_TYPE_COLORS.TCC }} onClick={() => toggleColSort('tcc')}>TCC{colArrow('tcc')}</th>
                   <th style={{ ...thStyle, cursor: 'pointer', userSelect: 'none', color: RAID_TYPE_COLORS.TNA }} onClick={() => toggleColSort('tna')}>TNA{colArrow('tna')}</th>
                   <th style={{ ...thStyle, cursor: 'pointer', userSelect: 'none', color: RAID_TYPE_COLORS.NOL }} onClick={() => toggleColSort('nol')}>NOL{colArrow('nol')}</th>
-                  <th style={{ ...thStyle, cursor: 'pointer', userSelect: 'none', color: RAID_TYPE_COLORS.WTP }} onClick={() => toggleColSort('twp')}>WTP{colArrow('twp')}</th>
+                  <th style={{ ...thStyle, cursor: 'pointer', userSelect: 'none', color: RAID_TYPE_COLORS.WTP }} onClick={() => toggleColSort('wtp')}>WTP{colArrow('wtp')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,7 +86,7 @@ export default function GraidLogLeaderboard({ onViewStats }: Props) {
                     <td style={{ ...tdStyle, textAlign: 'center', color: RAID_TYPE_COLORS.TCC }}>{p.tcc || '-'}</td>
                     <td style={{ ...tdStyle, textAlign: 'center', color: RAID_TYPE_COLORS.TNA }}>{p.tna || '-'}</td>
                     <td style={{ ...tdStyle, textAlign: 'center', color: RAID_TYPE_COLORS.NOL }}>{p.nol || '-'}</td>
-                    <td style={{ ...tdStyle, textAlign: 'center', color: RAID_TYPE_COLORS.WTP }}>{p.twp || '-'}</td>
+                    <td style={{ ...tdStyle, textAlign: 'center', color: RAID_TYPE_COLORS.WTP }}>{p.wtp || '-'}</td>
                   </tr>
                 ))}
               </tbody>

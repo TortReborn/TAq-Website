@@ -226,7 +226,7 @@ const RAID_DISPLAY_ORDER = ["TNA", "TCC", "NOL", "NOG", "TWP"];
 // Map nori.fish abbreviations to local image filename prefixes
 const RAID_ICON_MAP: { [key: string]: string } = { "NOG": "NOTG", "TWP": "WTP" };
 // Display names shown under the icon
-const RAID_DISPLAY_NAMES: { [key: string]: string } = { "NOG": "NOTG" };
+const RAID_DISPLAY_NAMES: { [key: string]: string } = { "NOG": "NOTG", "TWP": "WTP" };
 
 // Raids component
 function RaidsView({ data }: { data: LootData }) {
