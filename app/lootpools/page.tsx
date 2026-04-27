@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { getImageForItem, raidImageMap, classImageMap, isWard, getWardColor } from '@/lib/lootpool-images';
+import { getImageForItem, raidImageMap, classImageMap, isWard, getWardImage, getWardColor } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
 import Image from 'next/image';
 import PageHeader from '@/components/PageHeader';
@@ -221,9 +221,15 @@ function LootrunsView({ data }: { data: LootData }) {
   );
 }
 
+// nori.fish uses NOG for NOTG and TWP for WTP
+const RAID_DISPLAY_ORDER = ["TNA", "TCC", "NOL", "NOG", "TWP"];
+// Map nori.fish abbreviations to local image filename prefixes
+const RAID_ICON_MAP: { [key: string]: string } = { "NOG": "NOTG", "TWP": "WTP" };
+// Display names shown under the icon
+const RAID_DISPLAY_NAMES: { [key: string]: string } = { "NOG": "NOTG" };
+
 // Raids component
 function RaidsView({ data }: { data: LootData }) {
-  const raids = ["TNA", "TCC", "NOL", "NOTG", "TWP"];
   const loot = data.Aspects || data.Loot || {};
 
   return (
@@ -236,10 +242,11 @@ function RaidsView({ data }: { data: LootData }) {
         width: '90%',
         maxWidth: '1200px'
       }}>
-        {raids.map(raid => (
+        {RAID_DISPLAY_ORDER.map(raid => (
           <RaidColumn
             key={raid}
-            raid={raid}
+            raid={RAID_DISPLAY_NAMES[raid] || raid}
+            iconKey={RAID_ICON_MAP[raid] || raid}
             aspects={loot[raid] || {}}
           />
         ))}
@@ -371,15 +378,15 @@ function LootrunColumn({ regionName, regionData, icons }: {
               overflow: 'hidden'
             }}>
               {itemIsWard ? (
-                <div
-                  title={item}
+                <Image
+                  src={`/images/wards/${getWardImage(item)}`}
+                  alt={item}
+                  width={20}
+                  height={20}
                   style={{
+                    objectFit: 'contain',
                     width: '100%',
-                    height: '100%',
-                    borderRadius: '0.25rem',
-                    background: wardColor,
-                    border: '1px solid rgba(0, 0, 0, 0.6)',
-                    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.35)'
+                    height: '100%'
                   }}
                 />
               ) : (
@@ -450,8 +457,9 @@ function LootrunColumn({ regionName, regionData, icons }: {
 }
 
 // Raid column component
-function RaidColumn({ raid, aspects }: {
+function RaidColumn({ raid, iconKey, aspects }: {
   raid: string;
+  iconKey: string;
   aspects: any;
 }) {
   const rarityColors = {
@@ -482,7 +490,7 @@ function RaidColumn({ raid, aspects }: {
         overflow: 'hidden'
       }}>
         <Image
-          src={`/images/raids/${raidImageMap[raid] || raid + '.png'}`}
+          src={`/images/raids/${raidImageMap[iconKey] || iconKey + '.png'}`}
           alt={raid}
           width={100}
           height={100}
@@ -577,15 +585,15 @@ function RaidColumn({ raid, aspects }: {
                   overflow: 'hidden'
                 }}>
                   {aspectIsWard ? (
-                    <div
-                      title={aspect}
+                    <Image
+                      src={`/images/wards/${getWardImage(aspect)}`}
+                      alt={aspect}
+                      width={20}
+                      height={20}
                       style={{
+                        objectFit: 'contain',
                         width: '100%',
-                        height: '100%',
-                        borderRadius: '0.25rem',
-                        background: wardColor,
-                        border: '1px solid rgba(0, 0, 0, 0.6)',
-                        boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.35)'
+                        height: '100%'
                       }}
                     />
                   ) : (() => {

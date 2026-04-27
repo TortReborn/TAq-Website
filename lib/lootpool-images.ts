@@ -130,12 +130,21 @@ export const raidImageMap: { [key: string]: string } = {
   "TCC": "TCC.png",
   "NOL": "NOL.png",
   "NOTG": "NOTG.png",
-  "TWP": "TWP.png"
+  "WTP": "WTP.png",
 };
 
-// Ward items are raid drops that don't have a real item icon — they're just
-// colored "wards" / tokens. Render them as a colored swatch instead of an
-// (incorrect) chestplate icon.
+// Ward items are raid drops with their own icons.
+export const wardImageMap: { [key: string]: string } = {
+  "Pink Ward":   "pink_ward.png",
+  "Orange Ward": "orange_ward.png",
+  "Green Ward":  "green_ward.png",
+  "Red Ward":    "red_ward.png",
+  "Blue Ward":   "blue_ward.png",
+  "Purple Ward": "purple_ward.png",
+  "Yellow Ward": "yellow_ward.png",
+  "White Ward":  "white_ward.png",
+};
+
 export const wardColors: { [key: string]: string } = {
   "Pink Ward":   "#ff69b4",
   "Orange Ward": "#ff8c00",
@@ -143,11 +152,15 @@ export const wardColors: { [key: string]: string } = {
   "Red Ward":    "#dc2626",
   "Blue Ward":   "#3b82f6",
   "Purple Ward": "#a855f7",
-  "Yellow Ward": "#facc15"
+  "Yellow Ward": "#facc15",
+  "White Ward":  "#e2e8f0",
 };
 
 export const isWard = (itemName: string): boolean =>
-  Object.prototype.hasOwnProperty.call(wardColors, itemName);
+  Object.prototype.hasOwnProperty.call(wardImageMap, itemName);
+
+export const getWardImage = (itemName: string): string | undefined =>
+  wardImageMap[itemName];
 
 export const getWardColor = (itemName: string): string | undefined =>
   wardColors[itemName];
