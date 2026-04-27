@@ -72,7 +72,6 @@ export default function LootpoolsPage() {
   return (
     <div style={{
       padding: '2rem',
-      maxWidth: '1400px',
       margin: '0 auto',
       minHeight: '100vh'
     }}>
@@ -95,7 +94,6 @@ export default function LootpoolsPage() {
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
           border: '3px solid #240059',
           width: '90%',
-          maxWidth: '1200px'
         }}>
           {/* Next Rotation (Left) */}
           {nextRotation && (
@@ -206,7 +204,6 @@ function LootrunsView({ data }: { data: LootData }) {
       {/* Lootrun Regions Grid */}
       <div className="lootpools-grid-container lootpools-grid-7" style={{
         width: '90%',
-        maxWidth: '1200px'
       }}>
         {regions.map(regionName => (
           <LootrunColumn
