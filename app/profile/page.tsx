@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getRankColor, getWynnRankInfo } from '@/lib/rank-constants';
 import { getDifficultyColor, ROLE_COLORS } from '@/lib/snipe-constants';
-import { formatLePayout } from '@/lib/currency';
+import { formatLePayout, formatPoints } from '@/lib/currency';
 import { toPng } from 'html-to-image';
 import BackgroundShopModal from '@/components/BackgroundShopModal';
 
@@ -939,7 +939,7 @@ export default function ProfilePage() {
                     fontWeight: '700',
                     color: currentGraidPoints >= currentGraidMinimum ? '#22c55e' : '#ef4444',
                   }}>
-                    {currentGraidPoints} / {currentGraidMinimum}
+                    {formatPoints(currentGraidPoints)} / {formatPoints(currentGraidMinimum)}
                   </span>
                 </div>
                 {/* Progress bar */}

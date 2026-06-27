@@ -3,7 +3,7 @@
 import EventTable from "@/components/EventTable";
 import EventSkeleton from "@/components/skeletons/EventSkeleton";
 import { useGraidEvent } from "@/hooks/useGraidEvent";
-import { formatLePayout, formatPayout } from "@/lib/currency";
+import { formatLePayout, formatPayout, formatPoints } from "@/lib/currency";
 import type { ActiveEvent, Row } from "@/lib/graid";
 import { RAID_NAMES, RAID_SHORT_NAMES } from "@/lib/raid-constants";
 
@@ -170,7 +170,7 @@ export default function GraidEventPage() {
                                 <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{RAID_SHORT_NAMES[raidName]}</span>
                                 <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{raidName}</span>
                               </td>
-                              <td style={{ ...TD_VALUE, borderBottom: last ? 'none' : '1px solid var(--table-border)' }}>{pts}</td>
+                              <td style={{ ...TD_VALUE, borderBottom: last ? 'none' : '1px solid var(--table-border)' }}>{formatPoints(pts)}</td>
                             </tr>
                           );
                         })}

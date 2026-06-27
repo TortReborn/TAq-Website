@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useExecGraid, useExecGraidLeaderboard } from '@/hooks/useExecGraid';
 import { getRankColor } from '@/lib/rank-constants';
-import { formatLePayout, formatPayout } from '@/lib/currency';
+import { formatLePayout, formatPayout, formatPoints } from '@/lib/currency';
 import { RAID_NAMES, RAID_SHORT_NAMES } from '@/lib/raid-constants';
 
 const DEFAULT_RAID_POINTS = {
@@ -27,6 +27,10 @@ function parseBonusString(input: string, leftKey: 'threshold' | 'placement') {
 
 function bonusString(items: any[] | undefined, leftKey: 'threshold' | 'placement') {
   return (items ?? []).map(item => `${item[leftKey]}=${item.points}`).join(',');
+}
+
+function isNonNegativePointDecimal(value: string) {
+  return /^\d+(\.\d{1,2})?$/.test(value.trim());
 }
 
 export default function GraidEvents() {
@@ -130,8 +134,8 @@ export default function GraidEvents() {
     const parsedRaidPoints: Record<string, number> = {};
     for (const raidName of RAID_NAMES) {
       const value = Number(raidPoints[raidName]);
-      if (!Number.isInteger(value) || value < 0) {
-        throw new Error(`${RAID_SHORT_NAMES[raidName]} points must be a non-negative integer`);
+      if (!isNonNegativePointDecimal(raidPoints[raidName]) || !Number.isFinite(value)) {
+        throw new Error(`${RAID_SHORT_NAMES[raidName]} points must be a non-negative decimal with at most 2 decimal places`);
       }
       parsedRaidPoints[raidName] = value;
     }
@@ -221,6 +225,7 @@ export default function GraidEvents() {
                 style={inputStyle}
                 type="number"
                 min={0}
+                step="0.01"
               />
             </div>
           ))}
@@ -390,7 +395,7 @@ export default function GraidEvents() {
                         <div><strong>LE per Point:</strong> {selectedEvent.lePerPoint}</div>
                         <div><strong>Milestones:</strong> {bonusString(selectedEvent.milestones, 'threshold') || 'None'}</div>
                         <div><strong>Placements:</strong> {bonusString(selectedEvent.placementBonuses, 'placement') || 'None'}</div>
-                        <div style={{ gridColumn: '1 / -1' }}><strong>Raid Points:</strong> {RAID_NAMES.map(name => `${RAID_SHORT_NAMES[name]}=${selectedEvent.raidPoints?.[name] ?? 0}`).join(', ')}</div>
+                        <div style={{ gridColumn: '1 / -1' }}><strong>Raid Points:</strong> {RAID_NAMES.map(name => `${RAID_SHORT_NAMES[name]}=${formatPoints(selectedEvent.raidPoints?.[name] ?? 0)}`).join(', ')}</div>
                       </>
                     )}
                   </div>
@@ -461,9 +466,9 @@ export default function GraidEvents() {
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', fontWeight: '700', color: row.rankNum === 1 ? '#eab308' : row.rankNum === 2 ? '#9ca3af' : row.rankNum === 3 ? '#b45309' : 'var(--text-secondary)' }}>{row.rankNum}</td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '500' }}>{row.username}</td>
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', color: getRankColor(row.rank), fontWeight: '600' }}>{row.rank || '-'}</td>
-                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.rankingPoints}</td>
+                          <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{selectedIsLegacy ? row.rankingPoints : formatPoints(row.rankingPoints)}</td>
                           {!selectedIsLegacy && (
-                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }} title={row.bonusDetails.join(', ') || undefined}>{row.rewardPoints}</td>
+                            <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)' }} title={row.bonusDetails.join(', ') || undefined}>{formatPoints(row.rewardPoints)}</td>
                           )}
                           <td style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', color: row.meetsMin ? '#22c55e' : 'var(--text-secondary)' }}>
                             {row.meetsMin ? formatLePayout(row.payoutLe) : '-'}

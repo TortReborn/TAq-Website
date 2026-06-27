@@ -16,6 +16,12 @@ function isPositiveInt(value: unknown) {
   return Number.isInteger(value) && Number(value) > 0;
 }
 
+function isNonNegativePointDecimal(value: unknown) {
+  const text = String(value);
+  const num = Number(value);
+  return Number.isFinite(num) && num >= 0 && /^\d+(\.\d{1,2})?$/.test(text);
+}
+
 function validateConfig(body: any) {
   const title = typeof body.title === 'string' ? body.title.trim() : '';
   const endDate = typeof body.endDate === 'string' ? body.endDate : '';
@@ -38,8 +44,8 @@ function validateConfig(body: any) {
   const normalizedRaidPoints: Record<string, number> = {};
   for (const raidName of RAID_NAMES) {
     const points = Number(raidPoints[raidName]);
-    if (!isNonNegativeInt(points)) {
-      return { error: `Points for ${raidName} must be a non-negative integer` };
+    if (!isNonNegativePointDecimal(raidPoints[raidName])) {
+      return { error: `Points for ${raidName} must be a non-negative decimal with at most 2 decimal places` };
     }
     normalizedRaidPoints[raidName] = points;
   }
