@@ -22,3 +22,15 @@ export function formatPayout(payout: number): string {
     return `${le} LE`;
   }
 }
+
+export function formatLePayout(le: number): string {
+  const safeLe = Math.max(0, Math.floor(Number(le) || 0));
+  const stx = Math.floor(safeLe / 64);
+  const remainder = safeLe % 64;
+
+  if (stx > 0) {
+    return remainder > 0 ? `${stx} STX ${remainder} LE` : `${stx} STX`;
+  }
+
+  return `${safeLe} LE`;
+}

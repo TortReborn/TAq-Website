@@ -3,20 +3,20 @@
 import React, { useState } from "react";
 import type { Row } from "@/lib/graid";
 import { fmtInt } from "@/lib/utils";
-import { formatPayout } from "@/lib/currency";
+import { formatLePayout } from "@/lib/currency";
 import { getRankColor } from "@/lib/rank-constants";
 
 export default function EventTable({
   rows,
-  minc,
-  bonusThreshold,
-  bonusAmount,
+  minPoints,
+  valueLabel = "Points",
+  minimumLabel = "points",
   onRefresh
 }: {
   rows: Row[];
-  minc: number;
-  bonusThreshold: number | null;
-  bonusAmount: number | null;
+  minPoints: number;
+  valueLabel?: string;
+  minimumLabel?: string;
   onRefresh?: () => Promise<void>;
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -71,7 +71,7 @@ export default function EventTable({
               width: '30%',
               fontSize: 'clamp(0.75rem, 2.5vw, 1rem)'
             }}>
-              Raids
+              {valueLabel}
             </th>
             <th style={{
               textAlign: 'left',
@@ -136,12 +136,7 @@ export default function EventTable({
               </td>
             </tr>
           ) : (() => {
-            // Find the last index where meetsMin is true
             const lastMinIdx = rows.map(r => r.meetsMin).lastIndexOf(true);
-            // Find the last index where rankNum <= 5
-            const lastRank5OrLessIdx = rows.map(r => r.rankNum <= 5).lastIndexOf(true);
-            const hasRank6Plus = rows.some(r => r.rankNum > 5);
-            const showRankCutoff = rows.length > 5 && hasRank6Plus && lastRank5OrLessIdx !== -1 && lastRank5OrLessIdx !== rows.length - 1;
             return rows.map((r, i) => (
               <React.Fragment key={`row-group-${r.username}-${i}`}>
                 <tr
@@ -172,9 +167,9 @@ export default function EventTable({
                   </td>
                   <td style={{
                     padding: '0.75rem 0.5rem',
-                    fontWeight: r.isRankLeader ? '700' : '500',
+                    fontWeight: '500',
                     fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
-                    color: r.isRankLeader && r.rank ? getRankColor(r.rank) : 'var(--table-text)',
+                    color: getRankColor(r.rank),
                     wordBreak: 'break-word'
                   }}>
                     {r.username}
@@ -187,19 +182,7 @@ export default function EventTable({
                     alignItems: 'center',
                     gap: '0.25rem'
                   }}>
-                    {fmtInt(r.total)}
-                    {bonusThreshold != null && bonusAmount != null && r.total >= bonusThreshold && (
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          color: '#10b981',
-                          fontWeight: '600'
-                        }}
-                        title={`${bonusThreshold}+ raids bonus: +${(bonusAmount * 4096).toLocaleString()} emeralds (${bonusAmount} LE)`}
-                      >
-                        ★
-                      </span>
-                    )}
+                    {fmtInt(r.rankingPoints)}
                   </td>
                   <td
                     style={{
@@ -211,11 +194,13 @@ export default function EventTable({
                     }}
                     title={
                       r.meetsMin
-                        ? "Meets minimum completions"
-                        : `Below minimum (${minc}) — hypothetical payout shown`
+                        ? r.bonusDetails.length > 0
+                          ? r.bonusDetails.join(", ")
+                          : `Meets minimum ${minimumLabel}`
+                        : `Below minimum ${minimumLabel} (${minPoints}) - hypothetical payout shown`
                     }
                   >
-                    {formatPayout(r.payout)}
+                    {formatLePayout(r.payoutLe)}
                   </td>
                 </tr>
                 {i === lastMinIdx && lastMinIdx !== rows.length - 1 && (
