@@ -264,17 +264,17 @@ function LootrunColumn({ regionName, regionData, icons }: {
   regionData: any;
   icons?: { [itemName: string]: string };
 }) {
-  const regionMap: { [key: string]: { name: string; color: string } } = {
-    'SE': { name: 'Silent Expanse', color: '#55e340' },
-    'Sky': { name: 'Sky Islands', color: '#58d6fc' },
-    'Canyon': { name: 'Canyon of the Lost', color: '#bd1e1e' },
-    'Corkus': { name: 'Corkus', color: '#edca3b' },
-    'Molten': { name: 'Molten Heights', color: '#3440eb' },
-    'FrumaEast': { name: 'Fruma East', color: '#dc82dc' },
-    'FrumaWest': { name: 'Fruma West', color: '#82dcdc' }
+  const regionMap: { [key: string]: { name: string; color: string; image: string } } = {
+    'SE': { name: 'Silent Expanse', color: '#55e340', image: 'silent-expanse.webp' },
+    'Sky': { name: 'Sky Islands', color: '#58d6fc', image: 'sky-islands.png' },
+    'Canyon': { name: 'Canyon of the Lost', color: '#bd1e1e', image: 'canyon-of-the-lost.png' },
+    'Corkus': { name: 'Corkus', color: '#edca3b', image: 'corkus.png' },
+    'Molten': { name: 'Molten Heights', color: '#3440eb', image: 'molten-heights.png' },
+    'FrumaEast': { name: 'Fruma East', color: '#dc82dc', image: 'fruma-east.png' },
+    'FrumaWest': { name: 'Fruma West', color: '#82dcdc', image: 'fruma-west.png' }
   };
 
-  const regionInfo = regionMap[regionName] || { name: regionName, color: '#7a187a' };
+  const regionInfo = regionMap[regionName] || { name: regionName, color: '#7a187a', image: '' };
   
   const rarityColors = {
     Mythic: '#aa00aa',
@@ -296,10 +296,10 @@ function LootrunColumn({ regionName, regionData, icons }: {
       border: '3px solid #240059',
       height: 'fit-content'
     }}>
-      {/* Region icon placeholder */}
+      {/* Region image */}
       <div style={{
-        width: '120px',
-        height: '120px',
+        width: '100%',
+        aspectRatio: '1920 / 991',
         borderRadius: '0.5rem',
         margin: '0 auto 1rem auto',
         display: 'flex',
@@ -309,9 +309,23 @@ function LootrunColumn({ regionName, regionData, icons }: {
         overflow: 'hidden',
         background: regionInfo.color,
         color: 'white',
-        fontSize: '3rem'
+        fontSize: '3rem',
+        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)'
       }}>
-        📦
+        {regionInfo.image ? (
+          <Image
+            src={`/images/lootruns/${regionInfo.image}`}
+            alt={`${regionInfo.name} lootrun camp`}
+            fill
+            sizes="(max-width: 640px) 80vw, (max-width: 1200px) 28vw, 12vw"
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+          />
+        ) : (
+          '📦'
+        )}
       </div>
       
       <h3 style={{
