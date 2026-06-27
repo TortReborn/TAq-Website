@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getRankColor, getWynnRankInfo } from '@/lib/rank-constants';
 import { getDifficultyColor, ROLE_COLORS } from '@/lib/snipe-constants';
-import { formatPayout } from '@/lib/currency';
+import { formatLePayout } from '@/lib/currency';
 import { toPng } from 'html-to-image';
 import BackgroundShopModal from '@/components/BackgroundShopModal';
 
@@ -352,6 +352,8 @@ export default function ProfilePage() {
   const currentGraidRow = currentGraidEvent && !isGraidFallback
     ? (eventData?.rows?.find((r: any) => r.username.toLowerCase() === user.ign.toLowerCase()) ?? null)
     : null;
+  const currentGraidPoints = currentGraidRow?.rankingPoints ?? currentGraidRow?.total ?? 0;
+  const currentGraidMinimum = currentGraidEvent ? (currentGraidEvent.minPoints ?? currentGraidEvent.minc ?? 0) : 0;
 
   return (
     <main className="profile-layout">
@@ -923,7 +925,7 @@ export default function ProfilePage() {
               <div style={{ fontWeight: '700', fontSize: '0.95rem', marginBottom: '0.5rem' }}>
                 {currentGraidEvent.title}
               </div>
-              {/* Completions progress */}
+              {/* Point progress */}
               <div style={{ marginBottom: '0.5rem' }}>
                 <div style={{
                   display: 'flex',
@@ -932,12 +934,12 @@ export default function ProfilePage() {
                   marginBottom: '0.25rem',
                   fontSize: '0.8rem',
                 }}>
-                  <span>Completions</span>
+                  <span>Points</span>
                   <span style={{
                     fontWeight: '700',
-                    color: (currentGraidRow?.total ?? 0) >= currentGraidEvent.minc ? '#22c55e' : '#ef4444',
+                    color: currentGraidPoints >= currentGraidMinimum ? '#22c55e' : '#ef4444',
                   }}>
-                    {currentGraidRow?.total ?? 0} / {currentGraidEvent.minc}
+                    {currentGraidPoints} / {currentGraidMinimum}
                   </span>
                 </div>
                 {/* Progress bar */}
@@ -950,8 +952,8 @@ export default function ProfilePage() {
                   <div style={{
                     height: '100%',
                     borderRadius: '3px',
-                    width: `${Math.min(100, ((currentGraidRow?.total ?? 0) / currentGraidEvent.minc) * 100)}%`,
-                    background: (currentGraidRow?.total ?? 0) >= currentGraidEvent.minc
+                    width: `${Math.min(100, (currentGraidPoints / (currentGraidMinimum || 1)) * 100)}%`,
+                    background: currentGraidPoints >= currentGraidMinimum
                       ? '#22c55e'
                       : 'var(--color-ocean-400)',
                     transition: 'width 0.3s ease',
@@ -972,7 +974,7 @@ export default function ProfilePage() {
                     color: currentGraidRow.meetsMin ? 'var(--text-primary, #e2e8f0)' : 'var(--text-secondary)',
                   }}>
                     {currentGraidRow.meetsMin
-                      ? formatPayout(currentGraidRow.payout)
+                      ? formatLePayout(currentGraidRow.payoutLe ?? currentGraidRow.payout)
                       : 'Below minimum'}
                   </span>
                 </div>

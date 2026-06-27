@@ -8,9 +8,15 @@ export interface GraidEvent {
   startTs: string;
   endTs: string | null;
   active: boolean;
-  lowRankReward: number;
-  highRankReward: number;
-  minCompletions: number;
+  rewardMode: 'points' | 'legacy';
+  minPoints: number;
+  lePerPoint: number;
+  raidPoints: Record<string, number>;
+  milestones: { threshold: number; points: number }[];
+  placementBonuses: { placement: number; points: number }[];
+  low: number;
+  high: number;
+  minc: number;
   bonusThreshold: number | null;
   bonusAmount: number | null;
   createdAt: string;
@@ -34,13 +40,12 @@ export function useExecGraid() {
 
   const createEvent = async (eventData: {
     title: string;
-    lowRankReward: number;
-    highRankReward: number;
-    minCompletions: number;
-    bonusThreshold?: number;
-    bonusAmount?: number;
+    minPoints: number;
+    lePerPoint: number;
+    raidPoints: Record<string, number>;
+    milestones?: { threshold: number; points: number }[];
+    placementBonuses?: { placement: number; points: number }[];
     endDate: string;
-    raidRewards?: { raidType: string; low: number; high: number }[];
   }) => {
     const res = await fetch('/api/exec/graid', {
       method: 'POST',

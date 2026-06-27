@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { fetchEventById } from '@/lib/graid';
 
 export const dynamic = 'force-dynamic';
-
-const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha"]);
-
-function isLow(rank?: string | null) {
-  return rank ? LOW_RANKS.has(rank) : false;
-}
 
 export async function GET(
   request: NextRequest,
@@ -26,140 +21,10 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 });
     }
 
-    const pool = getPool();
-
-    const evRes = await pool.query(
-      `SELECT id, title, start_ts, end_ts, low_rank_reward, high_rank_reward,
-              min_completions, bonus_threshold, bonus_amount, active
-       FROM graid_events WHERE id = $1`,
-      [eventId]
-    );
-
-    if (evRes.rowCount === 0) {
+    const { event, rows } = await fetchEventById(eventId);
+    if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
-
-    const ev = evRes.rows[0];
-    const event = {
-      id: ev.id,
-      title: ev.title,
-      startTs: ev.start_ts?.toISOString?.() ?? new Date(ev.start_ts).toISOString(),
-      endTs: ev.end_ts ? (ev.end_ts.toISOString?.() ?? new Date(ev.end_ts).toISOString()) : null,
-      low: Number(ev.low_rank_reward),
-      high: Number(ev.high_rank_reward),
-      minc: Number(ev.min_completions),
-      bonusThreshold: ev.bonus_threshold != null ? Number(ev.bonus_threshold) : null,
-      bonusAmount: ev.bonus_amount != null ? Number(ev.bonus_amount) : null,
-    };
-
-    const [rowsRes, raidRewardsRes, typeCountsRes] = await Promise.all([
-      pool.query(
-        `SELECT dl.ign AS username, dl.rank AS rank, get.total AS total,
-                get.uuid AS uuid, COALESCE(get.paid, false) AS paid
-         FROM graid_event_totals get
-         JOIN discord_links dl ON dl.uuid = get.uuid
-         WHERE get.event_id = $1
-         ORDER BY get.total DESC, dl.ign ASC
-         LIMIT 1000`,
-        [eventId]
-      ),
-      // Per-raid-type reward overrides (if any)
-      pool.query(
-        `SELECT raid_type, low_rank_reward, high_rank_reward
-         FROM graid_event_raid_rewards WHERE event_id = $1`,
-        [eventId]
-      ),
-      // Per-player per-type counts from graid_logs (if overrides exist)
-      pool.query(
-        `SELECT glp.uuid, gl.raid_type, COUNT(*) as cnt
-         FROM graid_log_participants glp
-         JOIN graid_logs gl ON gl.id = glp.log_id
-         WHERE gl.event_id = $1
-         GROUP BY glp.uuid, gl.raid_type`,
-        [eventId]
-      ),
-    ]);
-
-    // Build per-type override map
-    const typeOverrides: Record<string, { low: number; high: number }> = {};
-    for (const r of raidRewardsRes.rows) {
-      typeOverrides[r.raid_type] = { low: Number(r.low_rank_reward), high: Number(r.high_rank_reward) };
-    }
-    const hasOverrides = Object.keys(typeOverrides).length > 0;
-
-    // Build per-player per-type count map (only needed if overrides exist)
-    const playerTypeCounts: Record<string, Record<string, number>> = {};
-    if (hasOverrides) {
-      for (const r of typeCountsRes.rows) {
-        const uuid = String(r.uuid);
-        if (!playerTypeCounts[uuid]) playerTypeCounts[uuid] = {};
-        playerTypeCounts[uuid][r.raid_type || '__unknown__'] = Number(r.cnt);
-      }
-    }
-
-    // Compute payouts with multipliers (replicating processRowsWithMultipliers logic)
-    const baseRows = rowsRes.rows.map((r: any) => {
-      const total = Number(r.total) || 0;
-      const low = isLow(r.rank);
-      let payout: number;
-
-      if (hasOverrides) {
-        // Per-type payout: sum each type's count * its reward rate
-        const counts = playerTypeCounts[String(r.uuid)] || {};
-        payout = 0;
-        for (const [raidType, cnt] of Object.entries(counts)) {
-          const override = typeOverrides[raidType];
-          if (override) {
-            payout += cnt * (low ? override.low : override.high);
-          } else {
-            payout += cnt * (low ? event.low : event.high);
-          }
-        }
-      } else {
-        payout = total * (low ? event.low : event.high);
-      }
-
-      const meetsMin = total >= event.minc;
-      return { username: r.username || "(unknown)", rank: r.rank, total, payout, meetsMin, uuid: r.uuid, paid: !!r.paid };
-    });
-
-    // Find rank leaders
-    const rankGroups: Record<string, any[]> = {};
-    baseRows.forEach(row => {
-      const key = row.rank || 'Unknown';
-      if (!rankGroups[key]) rankGroups[key] = [];
-      rankGroups[key].push(row);
-    });
-    const rankLeaders: Record<string, number> = {};
-    Object.keys(rankGroups).forEach(rank => {
-      rankLeaders[rank] = Math.max(...rankGroups[rank].map((r: any) => r.total));
-    });
-
-    // Competition ranking
-    let lastTotal: number | null = null;
-    let lastRank = 0;
-    let ties = 0;
-
-    const rows = baseRows.map(row => {
-      let rankNum;
-      if (lastTotal === null) { rankNum = 1; ties = 1; }
-      else if (row.total === lastTotal) { rankNum = lastRank; ties++; }
-      else { rankNum = lastRank + ties; ties = 1; }
-      lastTotal = row.total;
-      lastRank = rankNum;
-
-      const isRankLeader = row.rank && row.total === rankLeaders[row.rank];
-      let payout = row.payout;
-      if (rankNum === 1) payout *= 2;
-      else if (rankNum >= 2 && rankNum <= 5) payout *= 1.5;
-      else if (isRankLeader) payout *= 1.5;
-
-      if (event.bonusThreshold != null && event.bonusAmount != null && row.total >= event.bonusThreshold) {
-        payout += event.bonusAmount * 4096;
-      }
-
-      return { ...row, rankNum, payout: Math.round(payout), isRankLeader: isRankLeader || false };
-    });
 
     return NextResponse.json({ event, rows });
   } catch (error) {
@@ -191,8 +56,11 @@ export async function PATCH(
 
     const pool = getPool();
     await pool.query(
-      `UPDATE graid_event_totals SET paid = $1 WHERE event_id = $2 AND uuid = $3`,
-      [paid, eventId, uuid]
+      `INSERT INTO graid_event_totals (event_id, uuid, total, paid)
+       VALUES ($1, $2, 0, $3)
+       ON CONFLICT (event_id, uuid)
+       DO UPDATE SET paid = EXCLUDED.paid, last_updated = NOW()`,
+      [eventId, uuid, paid]
     );
 
     return NextResponse.json({ success: true });
