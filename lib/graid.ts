@@ -114,6 +114,10 @@ function buildEvent(row: EventRow): ActiveEvent {
   };
 }
 
+function roundPointValue(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
 const LOW_RANKS = new Set(["Starfish", "Manatee", "Piranha"]);
 
 function isLow(rank?: string | null) {
@@ -176,7 +180,8 @@ function applyRewardBonuses(event: ActiveEvent, row: PlayerAccumulator, placemen
     bonusDetails.push(`+${placementBonus.points} from ${label} place`);
   }
 
-  const payoutLe = rewardPoints * event.lePerPoint;
+  rewardPoints = roundPointValue(rewardPoints);
+  const payoutLe = Math.ceil(rewardPoints * event.lePerPoint);
   return {
     username: row.username || "(unknown)",
     rank: row.rank,
@@ -240,7 +245,7 @@ async function buildRows(client: any, event: ActiveEvent): Promise<Row[]> {
         uuid,
         username: row.username || "(unknown)",
         rank: row.rank ?? null,
-        rankingPoints: points,
+        rankingPoints: roundPointValue(points),
         reachedAtMs: completedAt.getTime(),
         reachedLogId: Number(row.log_id),
       });
@@ -249,7 +254,7 @@ async function buildRows(client: any, event: ActiveEvent): Promise<Row[]> {
 
     existing.username = row.username || existing.username;
     existing.rank = row.rank ?? existing.rank;
-    existing.rankingPoints += points;
+    existing.rankingPoints = roundPointValue(existing.rankingPoints + points);
     existing.reachedAtMs = completedAt.getTime();
     existing.reachedLogId = Number(row.log_id);
   }

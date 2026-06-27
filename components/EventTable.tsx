@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import type { Row } from "@/lib/graid";
-import { fmtInt } from "@/lib/utils";
-import { formatLePayout } from "@/lib/currency";
+import { formatLePayout, formatPoints } from "@/lib/currency";
 import { getRankColor } from "@/lib/rank-constants";
 
 export default function EventTable({
@@ -182,7 +181,7 @@ export default function EventTable({
                     alignItems: 'center',
                     gap: '0.25rem'
                   }}>
-                    {fmtInt(r.rankingPoints)}
+                    {formatPoints(r.rankingPoints)}
                   </td>
                   <td
                     style={{

@@ -34,3 +34,7 @@ export function formatLePayout(le: number): string {
 
   return `${safeLe} LE`;
 }
+
+export function formatPoints(value: number): string {
+  return (Math.round((Number(value) || 0) * 100) / 100).toFixed(2).replace(/\.?0+$/, '');
+}
