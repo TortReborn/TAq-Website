@@ -344,11 +344,9 @@ function LootrunColumn({ regionName, regionData, icons }: {
           const mythicItems = regionData.Mythic || [];
           const shinyItem = regionData.Shiny?.Item;
           
-          // Combine mythic items and shiny item (if shiny exists and isn't already in mythics)
-          const allItems = [...mythicItems];
-          if (shinyItem && !mythicItems.includes(shinyItem)) {
-            allItems.unshift(shinyItem); // Add shiny at the beginning
-          }
+          const allItems = shinyItem
+            ? [shinyItem, ...mythicItems.filter((item: string) => item !== shinyItem)]
+            : mythicItems;
           
           return allItems.map((item: string, index: number) => {
             const isShiny = item === shinyItem;
