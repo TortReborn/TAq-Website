@@ -26,6 +26,8 @@ interface LootData {
 interface RawLootItem {
   name?: string;
   rarity?: string;
+  type?: string;
+  itemType?: string;
   shiny?: boolean;
   shinyStat?: {
     statType?: {
@@ -52,6 +54,7 @@ interface RawLootPayload {
 }
 
 const RARITIES = new Set<Rarity>(['Mythic', 'Fabled', 'Legendary', 'Rare', 'Unique']);
+const WARD_PATTERN = /Ward$/i;
 
 const LOOTRUN_REGION_KEYS: Record<string, string> = {
   'Silent Expanse': 'SE',
@@ -105,6 +108,14 @@ function addItem(region: LootRegion, rarity: string | undefined, itemName: strin
   }
 }
 
+function getLootrunItemRarity(group: RawLootGroup, item: RawLootItem): string | undefined {
+  if (item.type === 'WARD' || item.itemType === 'WardItem' || (item.name && WARD_PATTERN.test(item.name))) {
+    return 'Mythic';
+  }
+
+  return group.group || item.rarity;
+}
+
 function normalizeLegacyRaidKeys(data: LootData): LootData {
   const source = data.Aspects || data.Loot;
   if (!source) {
@@ -146,7 +157,7 @@ function normalizeLootruns(data: unknown): LootData | null {
       }
 
       for (const item of group.loot_items || []) {
-        addItem(region, group.group || item.rarity, item.name);
+        addItem(region, getLootrunItemRarity(group, item), item.name);
       }
     }
 
