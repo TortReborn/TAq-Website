@@ -564,6 +564,31 @@ export default function TerritoryOverlay({
           })()}
         </>
       )}
+      {/* HQ marker — gold star in the top-right corner of guild headquarters (live API flag) */}
+      {territory.hq && (() => {
+        const starSize = Math.max(16, fontSize * 0.6);
+        const starX = topRight[0] - starSize / 2 - 6;
+        const starY = topRight[1] + starSize / 2 + 6;
+        return (
+          <text
+            x={starX}
+            y={starY}
+            textAnchor="middle"
+            alignmentBaseline="middle"
+            fontSize={starSize}
+            fill="#FFD700"
+            stroke="#000"
+            strokeWidth={Math.max(1.5, starSize * 0.12)}
+            pointerEvents="none"
+            style={{
+              paintOrder: 'stroke fill',
+              textRendering: 'geometricPrecision',
+            }}
+          >
+            ★
+          </text>
+        );
+      })()}
     </svg>
   );
 }

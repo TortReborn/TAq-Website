@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { Territory, getContrastColor } from "@/lib/utils";
-import { getTreasuryTier, formatTimeHeld } from "@/lib/tower-stats";
+import { getTreasuryTier, getRatingDisplay, formatTimeHeld } from "@/lib/tower-stats";
 import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
 interface TerritoryHoverPanelProps {
@@ -78,8 +78,17 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
     return '#FFFFFF';
   }, [territory, guildColors]);
 
-  // Get treasury info
-  const treasuryInfo = useMemo(() => getTreasuryTier(timeHeld), [timeHeld]);
+  // Get treasury info — prefer the live API rating, fall back to the time-held estimate
+  const treasuryInfo = useMemo(
+    () => getRatingDisplay(territory?.territory.treasury) ?? getTreasuryTier(timeHeld),
+    [territory?.territory.treasury, timeHeld]
+  );
+
+  // Live defence rating from the API (live mode only; absent in history snapshots)
+  const defenceInfo = useMemo(
+    () => getRatingDisplay(territory?.territory.defences),
+    [territory?.territory.defences]
+  );
 
   // Get resources from verboseData
   const resources = useMemo(() => {
@@ -125,12 +134,28 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
     >
       {/* Territory Name */}
       <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
         fontWeight: 'bold',
         fontSize: '1.2rem',
         color: 'var(--text-primary)',
         marginBottom: '0.5rem'
       }}>
-        {name}
+        <span>{name}</span>
+        {terr.hq && (
+          <span title="Guild Headquarters" style={{
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            color: '#1a1a1a',
+            background: '#FFD700',
+            borderRadius: '0.25rem',
+            padding: '0.1rem 0.35rem',
+          }}>
+            ★ HQ
+          </span>
+        )}
       </div>
 
       {/* Guild Name */}
@@ -179,11 +204,25 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
       {terr.acquired && timeHeld > 0 && (
         <div style={{
           fontSize: '0.875rem',
-          color: 'var(--text-primary)'
+          color: 'var(--text-primary)',
+          marginBottom: defenceInfo ? '0.25rem' : 0,
         }}>
           <span style={{ color: 'var(--text-secondary)' }}>Treasury:</span>{' '}
           <span style={{ color: treasuryInfo.color, fontWeight: '600' }}>
             {treasuryInfo.tier}
+          </span>
+        </div>
+      )}
+
+      {/* Defence (live API rating) */}
+      {defenceInfo && (
+        <div style={{
+          fontSize: '0.875rem',
+          color: 'var(--text-primary)'
+        }}>
+          <span style={{ color: 'var(--text-secondary)' }}>Defence:</span>{' '}
+          <span style={{ color: defenceInfo.color, fontWeight: '600' }}>
+            {defenceInfo.tier}
           </span>
         </div>
       )}

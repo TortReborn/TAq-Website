@@ -12,6 +12,7 @@ import {
   calculateTotalDamage,
   getDefenseTier,
   getTreasuryTier,
+  getRatingDisplay,
   formatTimeHeld,
   formatNumber,
   getHealthDisplay,
@@ -191,10 +192,11 @@ export default function TerritoryInfoPanel({
     setDefenseLevel(11);
     setAuraLevel(0);
     setVolleyLevel(0);
-    setIsHQ(false);
+    // Seed the HQ toggle from the live API flag so tower math defaults correctly.
+    setIsHQ(!!selectedTerritory?.territory.hq);
     setConnectionOverride(null);
     setExternalsOverride(null);
-  }, [selectedTerritory?.name]);
+  }, [selectedTerritory?.name, selectedTerritory?.territory.hq]);
 
   // Calculate time held and update every second
   useEffect(() => {
@@ -285,8 +287,17 @@ export default function TerritoryInfoPanel({
     return getDefenseTier(damageLevel, attackSpeedLevel, healthLevel, defenseLevel, auraLevel, volleyLevel, isHQ);
   }, [damageLevel, attackSpeedLevel, healthLevel, defenseLevel, auraLevel, volleyLevel, isHQ]);
 
-  // Get treasury info
-  const treasuryInfo = useMemo(() => getTreasuryTier(timeHeld), [timeHeld]);
+  // Get treasury info — prefer the live API rating, fall back to the time-held estimate
+  const treasuryInfo = useMemo(
+    () => getRatingDisplay(selectedTerritory?.territory.treasury) ?? getTreasuryTier(timeHeld),
+    [selectedTerritory?.territory.treasury, timeHeld]
+  );
+
+  // Live defence rating from the API (live mode only; absent in history snapshots)
+  const liveDefenceInfo = useMemo(
+    () => getRatingDisplay(selectedTerritory?.territory.defences),
+    [selectedTerritory?.territory.defences]
+  );
 
   // Get resources from verboseData
   const resources = useMemo(() => {
@@ -371,13 +382,30 @@ export default function TerritoryInfoPanel({
 
       {/* Territory Name */}
       <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        flexWrap: 'wrap',
         fontWeight: 'bold',
         fontSize: '1.2rem',
         color: 'var(--text-primary)',
         marginBottom: '0.5rem',
         paddingRight: '2rem',
       }}>
-        {name}
+        <span>{name}</span>
+        {territory.hq && (
+          <span title="Guild Headquarters" style={{
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            color: '#1a1a1a',
+            background: '#FFD700',
+            borderRadius: '0.25rem',
+            padding: '0.1rem 0.35rem',
+          }}>
+            ★ HQ
+          </span>
+        )}
       </div>
 
       {/* Guild Name */}
@@ -424,11 +452,25 @@ export default function TerritoryInfoPanel({
         <div style={{
           fontSize: '0.875rem',
           color: 'var(--text-primary)',
-          marginBottom: '1rem'
+          marginBottom: liveDefenceInfo ? '0.25rem' : '1rem'
         }}>
           <span style={{ color: 'var(--text-secondary)' }}>Treasury:</span>{' '}
           <span style={{ color: treasuryInfo.color, fontWeight: '600' }}>
             {treasuryInfo.tier}
+          </span>
+        </div>
+      )}
+
+      {/* Defence (live API rating — distinct from the tower calculator below) */}
+      {liveDefenceInfo && (
+        <div style={{
+          fontSize: '0.875rem',
+          color: 'var(--text-primary)',
+          marginBottom: '1rem'
+        }}>
+          <span style={{ color: 'var(--text-secondary)' }}>Defence:</span>{' '}
+          <span style={{ color: liveDefenceInfo.color, fontWeight: '600' }}>
+            {liveDefenceInfo.tier}
           </span>
         </div>
       )}

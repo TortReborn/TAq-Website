@@ -34,7 +34,17 @@ export interface Territory {
     wood: string;
   };
   "Trading Routes"?: string[];
+  links?: string[];
+  /** True when this territory is the owning guild's headquarters (live API field). */
+  hq?: boolean;
+  /** Live defence rating from the Wynncraft API. */
+  defences?: TerritoryDefence;
+  /** Live treasury rating from the Wynncraft API. */
+  treasury?: TerritoryTreasury;
 }
+
+export type TerritoryDefence = 'VERY_LOW' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
+export type TerritoryTreasury = 'VERY_LOW' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
 
 // Legacy interface for territories_verbose.json
 export interface TerritoryVerbose {

@@ -1465,6 +1465,7 @@
     },
     "Trading Routes": [
       "Freezing Heights",
+      "Active Volcano",
       "Pyroclastic Flow"
     ],
     "Guild": {
@@ -15363,13 +15364,17 @@
   },
   "Deforested Ecotone": {
     "resources": {
-      "emeralds": "0",
+      "emeralds": "9000",
       "ore": "0",
       "crops": "0",
       "fish": "0",
-      "wood": "0"
+      "wood": "3600"
     },
-    "Trading Routes": [],
+    "Trading Routes": [
+      "Timasca",
+      "Verdant Grove",
+      "Aldwell"
+    ],
     "Location": {
       "start": [
         -1576,
@@ -15478,11 +15483,11 @@
   },
   "Fort Hegea": {
     "resources": {
-      "emeralds": "9000",
-      "ore": "3600",
-      "crops": "3600",
-      "fish": "3600",
-      "wood": "3600"
+      "emeralds": "1800",
+      "ore": "900",
+      "crops": "900",
+      "fish": "900",
+      "wood": "900"
     },
     "Trading Routes": [
       "Aldwell",
@@ -15547,8 +15552,9 @@
     },
     "Trading Routes": [
       "Royal Gate",
-      "Forts in Fall",
-      "Xima Valley"
+      "Wellspring of Eternity",
+      "Xima Valley",
+      "Forts in Fall"
     ],
     "Location": {
       "start": [
@@ -15719,13 +15725,17 @@
   },
   "Industrial Sector": {
     "resources": {
-      "emeralds": "0",
+      "emeralds": "9000",
       "ore": "0",
       "crops": "0",
-      "fish": "0",
+      "fish": "3600",
       "wood": "0"
     },
-    "Trading Routes": [],
+    "Trading Routes": [
+      "Timasca",
+      "Agricultural Sector",
+      "Water Processing Sector"
+    ],
     "Location": {
       "start": [
         -2113,
@@ -15900,8 +15910,9 @@
       "wood": "0"
     },
     "Trading Routes": [
-      "Festival Grounds",
-      "Forts in Fall"
+      "Wellspring of Eternity",
+      "Forts in Fall",
+      "Festival Grounds"
     ],
     "Location": {
       "start": [
@@ -15929,9 +15940,9 @@
       "wood": "3600"
     },
     "Trading Routes": [
-      "Gates to Aelumia",
+      "Forts in Fall",
       "Espren",
-      "Forts in Fall"
+      "Royal Barracks"
     ],
     "Location": {
       "start": [
@@ -16017,12 +16028,13 @@
       "ore": "0",
       "crops": "0",
       "fish": "0",
-      "wood": "0"
+      "wood": "3600"
     },
     "Trading Routes": [
       "Contested District",
-      "Highlands Gate",
-      "Aldwell"
+      "Aldwell",
+      "Deforested Ecotone",
+      "Highlands Gate"
     ],
     "Location": {
       "start": [
@@ -16043,13 +16055,16 @@
   },
   "Water Processing Sector": {
     "resources": {
-      "emeralds": "0",
+      "emeralds": "9000",
       "ore": "0",
-      "crops": "0",
+      "crops": "3600",
       "fish": "0",
       "wood": "0"
     },
-    "Trading Routes": [],
+    "Trading Routes": [
+      "Industrial Sector",
+      "Agricultural Sector"
+    ],
     "Location": {
       "start": [
         -2277,
@@ -16069,11 +16084,11 @@
   },
   "Wellspring of Eternity": {
     "resources": {
-      "emeralds": "9000",
-      "ore": "3600",
-      "crops": "3600",
-      "fish": "3600",
-      "wood": "3600"
+      "emeralds": "1800",
+      "ore": "900",
+      "crops": "900",
+      "fish": "900",
+      "wood": "900"
     },
     "Trading Routes": [
       "The Frog Bog",

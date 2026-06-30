@@ -145,6 +145,21 @@ export function getTreasuryTier(timeHeldSeconds: number): { tier: string; color:
   }
 }
 
+// Map a live Wynncraft rating enum (defences / treasury) to a display tier + color.
+// Colors match getDefenseTier's palette (green = low → red = high).
+const RATING_DISPLAY: Record<string, { tier: string; color: string }> = {
+  VERY_LOW: { tier: 'Very Low', color: '#43a047' },
+  LOW: { tier: 'Low', color: '#8bc34a' },
+  MEDIUM: { tier: 'Medium', color: '#fb8c00' },
+  HIGH: { tier: 'High', color: '#e57373' },
+  VERY_HIGH: { tier: 'Very High', color: '#b71c1c' },
+};
+
+export function getRatingDisplay(rating?: string | null): { tier: string; color: string } | null {
+  if (!rating) return null;
+  return RATING_DISPLAY[rating] ?? null;
+}
+
 // Format time held as readable string
 export function formatTimeHeld(timeHeldSeconds: number): string {
   if (timeHeldSeconds < 0 || isNaN(timeHeldSeconds)) return '';
