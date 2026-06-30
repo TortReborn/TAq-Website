@@ -26,13 +26,12 @@ export interface Territory {
     start: [number, number];
     end: [number, number];
   };
-  resources?: {
-    emeralds: string;
-    ore: string;
-    crops: string;
-    fish: string;
-    wood: string;
-  };
+  /**
+   * Live per-resource data from the Wynncraft API (array form). `generation` is the
+   * CURRENT production (base × the owning guild's bonuses); `baseGeneration` is the
+   * intrinsic base. Absent in history mode (snapshots only carry ownership).
+   */
+  resources?: LiveResource[];
   "Trading Routes"?: string[];
   links?: string[];
   /** True when this territory is the owning guild's headquarters (live API field). */
@@ -45,6 +44,43 @@ export interface Territory {
 
 export type TerritoryDefence = 'VERY_LOW' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
 export type TerritoryTreasury = 'VERY_LOW' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
+
+export type LiveResourceType = 'EMERALD' | 'ORE' | 'WOOD' | 'FISH' | 'CROP';
+
+export interface LiveResource {
+  type: LiveResourceType;
+  /** Current production per hour (base × the owning guild's bonuses). */
+  generation: number;
+  /** Intrinsic base production per hour (owner-independent). */
+  baseGeneration: number;
+  stored: number;
+  limit: number;
+}
+
+// Map the live API resource-type enum to the verbose object keys used elsewhere.
+const LIVE_RESOURCE_KEY: Record<LiveResourceType, string> = {
+  EMERALD: 'emeralds',
+  ORE: 'ore',
+  WOOD: 'wood',
+  FISH: 'fish',
+  CROP: 'crops',
+};
+
+/**
+ * Pull CURRENT production per resource from a territory's live API resources array,
+ * keyed by verbose key (emeralds/ore/wood/fish/crops). Returns null when the live
+ * array is unavailable (e.g. history mode), so callers can fall back to base-only.
+ */
+export function currentGenerationByKey(territory: Territory): Record<string, number> | null {
+  const res = territory.resources;
+  if (!Array.isArray(res)) return null;
+  const out: Record<string, number> = {};
+  for (const r of res) {
+    const key = LIVE_RESOURCE_KEY[r.type];
+    if (key) out[key] = r.generation;
+  }
+  return out;
+}
 
 // Legacy interface for territories_verbose.json
 export interface TerritoryVerbose {

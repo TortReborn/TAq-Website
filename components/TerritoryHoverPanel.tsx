@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { Territory, getContrastColor } from "@/lib/utils";
+import { Territory, getContrastColor, currentGenerationByKey, fmtInt } from "@/lib/utils";
 import { getTreasuryTier, getRatingDisplay, formatTimeHeld } from "@/lib/tower-stats";
 import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
@@ -90,26 +90,30 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
     [territory?.territory.defences]
   );
 
-  // Get resources from verboseData
+  // Get resources from verboseData (base) + live API (current production)
   const resources = useMemo(() => {
     if (!verboseData?.resources) return [];
     const res = verboseData.resources;
-    const resourceList: { type: string; amount: string }[] = [];
+    const current = territory ? currentGenerationByKey(territory.territory) : null;
+    const resourceList: { type: string; base: string; current: number | null }[] = [];
+    const add = (type: string, base: string) =>
+      resourceList.push({ type, base, current: current ? current[type] ?? null : null });
 
-    // Only show emeralds if > 9000
-    const emeraldAmount = parseInt(res.emeralds || '0', 10);
-    if (emeraldAmount > 9000) {
-      resourceList.push({ type: 'emeralds', amount: res.emeralds });
-    }
-
+    // Always show emerald output
+    if (res.emeralds) add('emeralds', res.emeralds);
     // Show other resources if > 0
-    if (res.ore && res.ore !== '0') resourceList.push({ type: 'ore', amount: res.ore });
-    if (res.wood && res.wood !== '0') resourceList.push({ type: 'wood', amount: res.wood });
-    if (res.fish && res.fish !== '0') resourceList.push({ type: 'fish', amount: res.fish });
-    if (res.crops && res.crops !== '0') resourceList.push({ type: 'crops', amount: res.crops });
+    if (res.ore && res.ore !== '0') add('ore', res.ore);
+    if (res.wood && res.wood !== '0') add('wood', res.wood);
+    if (res.fish && res.fish !== '0') add('fish', res.fish);
+    if (res.crops && res.crops !== '0') add('crops', res.crops);
 
     return resourceList;
-  }, [verboseData?.resources]);
+  }, [verboseData?.resources, territory]);
+
+  const hasCurrentProduction = useMemo(
+    () => resources.some((r) => r.current != null),
+    [resources]
+  );
 
   if (!territory) return null;
 
@@ -169,9 +173,20 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
         {terr.guild.prefix && ` [${terr.guild.prefix}]`}
       </div>
 
-      {/* Resources */}
+      {/* Resources — base production first, live current production second */}
       {resources.length > 0 && (
         <div style={{ marginBottom: '0.75rem' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '0.75rem',
+            fontSize: '0.7rem',
+            color: 'var(--text-secondary)',
+            marginBottom: '0.25rem',
+          }}>
+            <span style={{ minWidth: '55px', textAlign: 'right' }}>Base /hr</span>
+            {hasCurrentProduction && <span style={{ minWidth: '65px', textAlign: 'right' }}>Current /hr</span>}
+          </div>
           {resources.map((res, i) => (
             <div key={i} style={{
               fontSize: '0.875rem',
@@ -179,10 +194,20 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
               marginBottom: '0.2rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              justifyContent: 'space-between',
+              gap: '0.75rem',
             }}>
-              <span style={{ color: 'var(--text-secondary)' }}>+{res.amount}</span>
-              <span>{res.type} per hour</span>
+              <span style={{ textTransform: 'capitalize' }}>{res.type}</span>
+              <span style={{ display: 'flex', gap: '0.75rem' }}>
+                <span style={{ color: 'var(--text-secondary)', minWidth: '55px', textAlign: 'right' }}>
+                  +{fmtInt(parseInt(res.base, 10))}
+                </span>
+                {hasCurrentProduction && (
+                  <span style={{ fontWeight: 600, minWidth: '65px', textAlign: 'right' }}>
+                    {res.current != null ? `+${fmtInt(res.current)}` : '—'}
+                  </span>
+                )}
+              </span>
             </div>
           ))}
         </div>
