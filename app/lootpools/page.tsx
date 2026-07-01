@@ -28,13 +28,23 @@ interface LootData {
   Items?: { [region: string]: LootRegion };
 }
 
+type LootpoolTab = 'lootruns' | 'raids';
+
 export default function LootpoolsPage() {
-  const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('lootruns');
+  const [activeTab, setActiveTab] = useState<LootpoolTab>('lootruns');
   const { data: lootrunsData, loading: lootrunsLoading, error: lootrunsError } = useLootruns();
   const { data: aspectsData, loading: aspectsLoading, error: aspectsError } = useAspects();
 
   const loading = lootrunsLoading || aspectsLoading;
   const error = lootrunsError || aspectsError;
+
+  const switchTab = (tab: LootpoolTab) => {
+    if (tab === activeTab) {
+      return;
+    }
+
+    setActiveTab(tab);
+  };
 
   if (loading) {
     return <LootpoolSkeleton />;
@@ -136,42 +146,28 @@ export default function LootpoolsPage() {
           </div>
 
           {/* Tab Selector (Right) */}
-          <div style={{
-            display: 'flex',
-            gap: '0.5rem',
-            background: 'var(--bg-secondary)',
-            borderRadius: '0.5rem',
-            padding: '0.25rem'
-          }}>
+          <div
+            className="lootpools-tab-selector"
+            role="tablist"
+            aria-label="Lootpool view"
+            data-active-tab={activeTab}
+          >
+            <span className="lootpools-tab-indicator" aria-hidden="true" />
             <button
-              onClick={() => setActiveTab('lootruns')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: activeTab === 'lootruns' ? '#7a187a' : 'transparent',
-                color: activeTab === 'lootruns' ? 'white' : 'var(--text-primary)',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'lootruns'}
+              className={`lootpools-tab-button ${activeTab === 'lootruns' ? 'is-active' : ''}`}
+              onClick={() => switchTab('lootruns')}
             >
               🏃 Lootruns
             </button>
             <button
-              onClick={() => setActiveTab('raids')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: activeTab === 'raids' ? '#7a187a' : 'transparent',
-                color: activeTab === 'raids' ? 'white' : 'var(--text-primary)',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'raids'}
+              className={`lootpools-tab-button ${activeTab === 'raids' ? 'is-active' : ''}`}
+              onClick={() => switchTab('raids')}
             >
               ⚔️ Raids
             </button>
@@ -180,13 +176,20 @@ export default function LootpoolsPage() {
       </div>
 
       {/* Content */}
-      {activeTab === 'lootruns' && lootrunsData && (
-        <LootrunsView data={lootrunsData} />
-      )}
-
-      {activeTab === 'raids' && aspectsData && (
-        <RaidsView data={aspectsData} />
-      )}
+      <div className="lootpools-content-stage">
+        <div
+          className={`lootpools-content-pane ${activeTab === 'lootruns' ? 'is-active' : 'is-inactive'}`}
+          aria-hidden={activeTab !== 'lootruns'}
+        >
+          {lootrunsData && <LootrunsView data={lootrunsData} />}
+        </div>
+        <div
+          className={`lootpools-content-pane ${activeTab === 'raids' ? 'is-active' : 'is-inactive'}`}
+          aria-hidden={activeTab !== 'raids'}
+        >
+          {aspectsData && <RaidsView data={aspectsData} />}
+        </div>
+      </div>
     </div>
   );
 }
@@ -286,17 +289,17 @@ function LootrunColumn({ regionName, regionData, icons }: {
   regionData: any;
   icons?: { [itemName: string]: string };
 }) {
-  const regionMap: { [key: string]: { name: string; color: string; image: string } } = {
-    'SE': { name: 'Silent Expanse', color: '#55e340', image: 'silent-expanse.webp' },
-    'Sky': { name: 'Sky Islands', color: '#58d6fc', image: 'sky-islands.png' },
-    'Canyon': { name: 'Canyon of the Lost', color: '#bd1e1e', image: 'canyon-of-the-lost.png' },
-    'Corkus': { name: 'Corkus', color: '#edca3b', image: 'corkus.png' },
-    'Molten': { name: 'Molten Heights', color: '#3440eb', image: 'molten-heights.png' },
-    'FrumaEast': { name: 'Fruma East', color: '#dc82dc', image: 'fruma-east.png' },
-    'FrumaWest': { name: 'Fruma West', color: '#82dcdc', image: 'fruma-west.png' }
+  const regionMap: { [key: string]: { name: string; image: string } } = {
+    'SE': { name: 'Silent Expanse', image: 'silent-expanse.webp' },
+    'Sky': { name: 'Sky Islands', image: 'sky-islands.webp' },
+    'Canyon': { name: 'Canyon of the Lost', image: 'canyon-of-the-lost.webp' },
+    'Corkus': { name: 'Corkus', image: 'corkus.webp' },
+    'Molten': { name: 'Molten Heights', image: 'molten-heights.webp' },
+    'FrumaEast': { name: 'Fruma East', image: 'fruma-east.webp' },
+    'FrumaWest': { name: 'Fruma West', image: 'fruma-west.webp' }
   };
 
-  const regionInfo = regionMap[regionName] || { name: regionName, color: '#7a187a', image: '' };
+  const regionInfo = regionMap[regionName] || { name: regionName, image: '' };
   
   const rarityColors = {
     Mythic: '#aa00aa',
@@ -329,8 +332,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: regionInfo.color,
-        color: 'white',
+        background: 'var(--bg-secondary)',
+        color: 'var(--text-muted)',
         fontSize: '3rem',
         boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)'
       }}>
@@ -561,7 +564,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
       {/* Aspects by rarity */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {Object.entries(rarityColors).map(([rarity, color]) => {
-          const aspectList = aspects[rarity] || [];
+          const aspectList = (aspects[rarity] || []).filter((aspect: string) => !isWard(aspect));
           return aspectList.map((aspect: string, index: number) => {
             let displayName = aspect;
             if (aspect.includes("Aspect of a ")) {
@@ -571,9 +574,6 @@ function RaidColumn({ raid, iconKey, aspects }: {
             } else if (aspect.includes("Aspect of ")) {
               displayName = aspect.replace("Aspect of ", "");
             }
-
-            const aspectIsWard = isWard(aspect);
-            const wardColor = getWardColor(aspect);
 
             return (
               <div
@@ -608,19 +608,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  {aspectIsWard ? (
-                    <Image
-                      src={`/images/wards/${getWardImage(aspect)}`}
-                      alt={aspect}
-                      width={20}
-                      height={20}
-                      style={{
-                        objectFit: 'contain',
-                        width: '100%',
-                        height: '100%'
-                      }}
-                    />
-                  ) : (() => {
+                  {(() => {
                     const aspectClass = getClassForAspect(aspect);
                     if (aspectClass && classImageMap[aspectClass]) {
                       return (
@@ -647,7 +635,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
 
                 <span style={{
                   fontSize: '0.875rem',
-                  color: aspectIsWard ? wardColor : color,
+                  color,
                   fontWeight: '500'
                 }}>
                   {displayName}
