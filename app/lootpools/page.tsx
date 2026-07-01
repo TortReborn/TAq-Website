@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getImageForItem, raidImageMap, classImageMap, isWard, getWardImage, getWardColor } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
 import Image from 'next/image';
@@ -32,18 +32,45 @@ type LootpoolTab = 'lootruns' | 'raids';
 
 export default function LootpoolsPage() {
   const [activeTab, setActiveTab] = useState<LootpoolTab>('lootruns');
+  const [exitingTab, setExitingTab] = useState<LootpoolTab | null>(null);
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: lootrunsData, loading: lootrunsLoading, error: lootrunsError } = useLootruns();
   const { data: aspectsData, loading: aspectsLoading, error: aspectsError } = useAspects();
 
   const loading = lootrunsLoading || aspectsLoading;
   const error = lootrunsError || aspectsError;
 
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const switchTab = (tab: LootpoolTab) => {
     if (tab === activeTab) {
       return;
     }
 
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+
+    setExitingTab(activeTab);
     setActiveTab(tab);
+    transitionTimeoutRef.current = setTimeout(() => {
+      setExitingTab(null);
+      transitionTimeoutRef.current = null;
+    }, 320);
+  };
+
+  const renderTabContent = (tab: LootpoolTab) => {
+    if (tab === 'lootruns') {
+      return lootrunsData ? <LootrunsView data={lootrunsData} /> : null;
+    }
+
+    return aspectsData ? <RaidsView data={aspectsData} /> : null;
   };
 
   if (loading) {
@@ -177,17 +204,20 @@ export default function LootpoolsPage() {
 
       {/* Content */}
       <div className="lootpools-content-stage">
+        {exitingTab && (
+          <div
+            key={`exiting-${exitingTab}`}
+            className="lootpools-content-pane is-exiting"
+            aria-hidden="true"
+          >
+            {renderTabContent(exitingTab)}
+          </div>
+        )}
         <div
-          className={`lootpools-content-pane ${activeTab === 'lootruns' ? 'is-active' : 'is-inactive'}`}
-          aria-hidden={activeTab !== 'lootruns'}
+          key={`active-${activeTab}`}
+          className={`lootpools-content-pane ${exitingTab ? 'is-entering' : ''}`}
         >
-          {lootrunsData && <LootrunsView data={lootrunsData} />}
-        </div>
-        <div
-          className={`lootpools-content-pane ${activeTab === 'raids' ? 'is-active' : 'is-inactive'}`}
-          aria-hidden={activeTab !== 'raids'}
-        >
-          {aspectsData && <RaidsView data={aspectsData} />}
+          {renderTabContent(activeTab)}
         </div>
       </div>
     </div>
