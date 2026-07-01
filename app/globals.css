@@ -193,35 +193,46 @@ select option {
 .lootpools-content-stage {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
-  overflow: clip;
-  overflow-clip-margin: 1.5rem;
 }
 
 .lootpools-content-pane {
   position: relative;
   z-index: 1;
-  opacity: 1;
-  transform: translateY(0);
-  transition:
-    opacity 260ms ease,
-    transform 360ms cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.lootpools-content-pane.is-active {
-  z-index: 1;
-  opacity: 1;
-  transform: translateY(0);
+.lootpools-content-pane.is-entering {
+  animation: lootpools-content-enter 320ms cubic-bezier(0.25, 1, 0.5, 1) both;
 }
 
-.lootpools-content-pane.is-inactive {
+.lootpools-content-pane.is-exiting {
   position: absolute;
   inset: 0;
   z-index: 0;
   width: 100%;
-  opacity: 0;
   pointer-events: none;
-  transform: translateY(0.35rem);
+  animation: lootpools-content-exit 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes lootpools-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lootpools-content-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
 }
 
 @media (max-width: 500px) {
@@ -237,8 +248,9 @@ select option {
     transition-duration: 0.01ms;
   }
 
-  .lootpools-content-pane {
-    transition-duration: 0.01ms;
+  .lootpools-content-pane.is-entering,
+  .lootpools-content-pane.is-exiting {
+    animation-duration: 0.01ms;
   }
 }
 
