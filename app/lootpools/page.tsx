@@ -258,6 +258,28 @@ function formatNextRotation(timestamp: number) {
   return nextRotation.toLocaleString();
 }
 
+function ShinySparkleIcon({ style }: { style?: React.CSSProperties }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      width="14"
+      height="14"
+      style={style}
+    >
+      <path
+        d="M7.4 1.4 8.9 5l3.7 1.5-3.7 1.6-1.5 3.6-1.6-3.6-3.6-1.6L5.8 5l1.6-3.6Z"
+        fill="currentColor"
+      />
+      <path
+        d="m12.7 9.4.6 1.4 1.4.6-1.4.6-.6 1.5-.6-1.5-1.4-.6 1.4-.6.6-1.4Z"
+        fill="currentColor"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
+
 // Lootrun column component (matches raid column styling)
 function LootrunColumn({ regionName, regionData, icons }: {
   regionName: string;
@@ -419,27 +441,20 @@ function LootrunColumn({ regionName, regionData, icons }: {
 
             {/* Shiny indicator */}
             {isShiny && (
-              <div style={{
+              <ShinySparkleIcon style={{
                 position: 'absolute',
-                top: '0.25rem',
-                right: '0.25rem',
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: '#ffaa00',
-                fontSize: '0.6rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                ✨
-              </div>
+                top: '0.35rem',
+                right: '0.35rem',
+                color: '#f5c842',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))',
+                pointerEvents: 'none'
+              }} />
             )}
 
             <div style={{ flex: 1 }}>
               <span style={{
                 fontSize: '0.875rem',
-                color: isShiny ? '#ffaa00' : (itemIsWard ? wardColor : '#aa00aa'),
+                color: isShiny ? '#f5c842' : (itemIsWard ? wardColor : '#aa00aa'),
                 fontWeight: '500'
               }}>
                 {item}
@@ -448,7 +463,7 @@ function LootrunColumn({ regionName, regionData, icons }: {
               {isShiny && shinyTracker && (
                 <div style={{
                   fontSize: '0.75rem',
-                  color: '#ffaa00',
+                  color: '#f5c842',
                   fontWeight: '400',
                   marginTop: '0.25rem'
                 }}>
