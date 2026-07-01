@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOAuthState, getDiscordOAuthUrl, getBaseUrl } from '@/lib/exec-auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const state = generateOAuthState();

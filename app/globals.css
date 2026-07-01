@@ -177,6 +177,11 @@ select option {
   --table-text: var(--color-ocean-900);
   --table-cutoff-border: var(--color-ocean-400);
   --table-rank-cutoff-border: var(--color-ocean-300);
+
+  /* Homepage fixed background overlays (light mode) */
+  --home-bg-shade: rgba(15, 74, 96, 0.22);
+  --home-bg-veil: rgba(232, 251, 255, 0.38);
+  --home-section-scrim: rgba(232, 251, 255, 0.72);
 }
 
 /* Dark mode colors */
@@ -210,6 +215,11 @@ select option {
   --table-text: #e2e8f0;
   --table-cutoff-border: #94a3b8;
   --table-rank-cutoff-border: #cbd5e1;
+
+  /* Homepage fixed background overlays (dark mode) */
+  --home-bg-shade: rgba(8, 14, 28, 0.58);
+  --home-bg-veil: transparent;
+  --home-section-scrim: rgba(8, 14, 28, 0.64);
 }
 
 /* CSS Reset */
@@ -419,6 +429,34 @@ body, body *, html, html * {
 
 .home-page {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+body.home-fixed-bg-active .site-nav,
+body.home-fixed-bg-active .site-content,
+body.home-fixed-bg-active > footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fixed background photo — mounted in the root layout so it
+   stays pinned to the viewport while page content scrolls over it. A
+   transformed ancestor (e.g. PageTransition's animated wrapper) would
+   otherwise become its containing block and break position: fixed. */
+.home-bg-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--home-bg-veil), var(--home-bg-veil)),
+    linear-gradient(var(--home-bg-shade), var(--home-bg-shade)),
+    url('/images/home/discord-banner.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 
 /* Hero Section */
@@ -530,10 +568,12 @@ body, body *, html, html * {
 /* Section Styles */
 .home-section {
   padding: 5rem 1.5rem;
+  background: var(--home-section-scrim);
+  backdrop-filter: blur(8px);
 }
 
 .home-section-dark {
-  background: var(--bg-secondary);
+  background: color-mix(in srgb, var(--home-section-scrim) 82%, var(--color-ocean-900) 18%);
 }
 
 .home-section-content {
@@ -652,7 +692,9 @@ body, body *, html, html * {
 /* CTA Section */
 .home-section-cta {
   text-align: center;
-  background: radial-gradient(ellipse at center, rgba(56, 169, 207, 0.1) 0%, transparent 60%);
+  background:
+    radial-gradient(ellipse at center, rgba(56, 169, 207, 0.18) 0%, transparent 64%),
+    var(--home-section-scrim);
 }
 
 .home-cta-title {
