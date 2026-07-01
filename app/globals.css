@@ -178,9 +178,9 @@ select option {
   --table-cutoff-border: var(--color-ocean-400);
   --table-rank-cutoff-border: var(--color-ocean-300);
 
-  /* Homepage fixed background overlays (light mode) */
-  --home-bg-shade: rgba(15, 74, 96, 0.22);
-  --home-bg-veil: rgba(232, 251, 255, 0.38);
+  /* Site fixed background overlays (light mode) */
+  --site-bg-shade: rgba(15, 74, 96, 0.22);
+  --site-bg-veil: rgba(232, 251, 255, 0.38);
   --home-section-scrim: rgba(232, 251, 255, 0.72);
 }
 
@@ -216,9 +216,9 @@ select option {
   --table-cutoff-border: #94a3b8;
   --table-rank-cutoff-border: #cbd5e1;
 
-  /* Homepage fixed background overlays (dark mode) */
-  --home-bg-shade: rgba(8, 14, 28, 0.58);
-  --home-bg-veil: transparent;
+  /* Site fixed background overlays (dark mode) */
+  --site-bg-shade: rgba(8, 14, 28, 0.58);
+  --site-bg-veil: transparent;
   --home-section-scrim: rgba(8, 14, 28, 0.64);
 }
 
@@ -434,9 +434,9 @@ body, body *, html, html * {
   background: transparent;
 }
 
-body.home-fixed-bg-active .site-nav,
-body.home-fixed-bg-active .site-content,
-body.home-fixed-bg-active > footer {
+body.site-fixed-bg-active .site-nav,
+body.site-fixed-bg-active .site-content,
+body.site-fixed-bg-active > footer {
   position: relative;
   z-index: 1;
 }
@@ -445,13 +445,13 @@ body.home-fixed-bg-active > footer {
    stays pinned to the viewport while page content scrolls over it. A
    transformed ancestor (e.g. PageTransition's animated wrapper) would
    otherwise become its containing block and break position: fixed. */
-.home-bg-fixed {
+.site-bg-fixed {
   position: fixed;
   inset: 0;
   z-index: 0;
   background-image:
-    linear-gradient(var(--home-bg-veil), var(--home-bg-veil)),
-    linear-gradient(var(--home-bg-shade), var(--home-bg-shade)),
+    linear-gradient(var(--site-bg-veil), var(--site-bg-veil)),
+    linear-gradient(var(--site-bg-shade), var(--site-bg-shade)),
     url('/images/home/discord-banner.jpg');
   background-size: cover;
   background-position: center;

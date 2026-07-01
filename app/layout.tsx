@@ -15,7 +15,7 @@ import { ViewAsContext } from '@/hooks/useViewAs';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isHome = pathname === '/';
+  const usesFixedBg = !(pathname === '/map' || pathname.startsWith('/map/'));
   const [darkMode, setDarkMode] = useState(true);
   const [showSplash, setShowSplash] = useState(false); // Start with false
   const [splashFading, setSplashFading] = useState(false);
@@ -174,7 +174,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
       </head>
-      <body className={isHome ? 'home-fixed-bg-active' : undefined} style={{
+      <body className={usesFixedBg ? 'site-fixed-bg-active' : undefined} style={{
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
@@ -183,12 +183,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         background: 'var(--bg-gradient)',
         fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif"
       }}>
-        {/* Homepage fixed background — rendered here, as a sibling of
+        {/* Site fixed background — rendered here, as a sibling of
             PageTransition rather than inside it, so it's never a descendant
             of the page-transition wrapper's animated (transform) element.
             A transformed ancestor would become its containing block and
             break position: fixed. */}
-        {isHome && <div className="home-bg-fixed" aria-hidden="true" />}
+        {usesFixedBg && <div className="site-bg-fixed" aria-hidden="true" />}
 
         {/* Splash Screen */}
         {showSplash && (
