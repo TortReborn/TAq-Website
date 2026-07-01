@@ -71,8 +71,32 @@ export default function GraidEventPage() {
     return (
       <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
         <div style={{ padding: '2rem', textAlign: 'center', minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ fontSize: '1.125rem', color: '#e33232', background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #e33232' }}>
-            Failed to fetch event data.
+          <div style={{ fontSize: '1.125rem', color: '#ef4444', background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #ef4444', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <span>Couldn't load event data. Check your connection and try again.</span>
+            <button
+              onClick={() => refresh()}
+              style={{
+                padding: '0.5rem 1.25rem',
+                borderRadius: '0.375rem',
+                border: 'none',
+                background: 'var(--color-ocean-500)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                transition: 'background 0.2s ease, transform 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-ocean-400)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--color-ocean-500)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Try Again
+            </button>
           </div>
         </div>
       </main>
@@ -89,10 +113,10 @@ export default function GraidEventPage() {
     <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '2rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
       <div style={{ maxWidth: '52rem', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
 
-        <div className="card" style={{ width: '100%', padding: '1.5rem', border: '3px solid #240059' }}>
+        <div className="card" style={{ width: '100%', padding: '1.5rem', border: '3px solid var(--border-emphasis)' }}>
 
           {isFallback && (
-            <p style={{ textAlign: 'center', color: '#dc2626', fontWeight: '700', marginBottom: '1rem', marginTop: 0 }}>
+            <p style={{ textAlign: 'center', color: '#ef4444', fontWeight: '700', marginBottom: '1rem', marginTop: 0 }}>
               No active event — showing the most recent event below.
             </p>
           )}
@@ -226,7 +250,7 @@ export default function GraidEventPage() {
           )}
         </div>
 
-        <div style={{ width: '100%', border: '3px solid #240059', borderRadius: '1rem', overflow: 'hidden' }}>
+        <div style={{ width: '100%', border: '3px solid var(--border-emphasis)', borderRadius: '1rem', overflow: 'hidden' }}>
           <EventTable
             rows={showRows}
             minPoints={isLegacy ? showEvent?.minc ?? 0 : showEvent?.minPoints ?? 0}

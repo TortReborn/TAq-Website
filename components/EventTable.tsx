@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { Row } from "@/lib/graid";
 import { formatLePayout, formatPoints } from "@/lib/currency";
 import { getRankColor } from "@/lib/rank-constants";
+import { useExecSession } from "@/hooks/useExecSession";
 
 export default function EventTable({
   rows,
@@ -19,6 +20,8 @@ export default function EventTable({
   onRefresh?: () => Promise<void>;
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { user } = useExecSession();
+  const myUsername = user?.ign?.toLowerCase() ?? null;
 
   const handleRefresh = async () => {
     if (!onRefresh) return;
@@ -90,8 +93,10 @@ export default function EventTable({
                 <button
                   onClick={handleRefresh}
                   disabled={isRefreshing}
+                  aria-label="Refresh table data"
+                  aria-busy={isRefreshing}
+                  className="event-table-refresh-btn"
                   style={{
-                    background: 'none',
                     border: 'none',
                     cursor: isRefreshing ? 'wait' : 'pointer',
                     padding: '0.25rem',
@@ -99,22 +104,15 @@ export default function EventTable({
                     color: 'var(--table-header-text)',
                     fontSize: '0.875rem',
                     opacity: isRefreshing ? 0.6 : 1,
-                    transition: 'opacity 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
-                  onMouseEnter={(e) => {
-                    if (!isRefreshing) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
                   title="Refresh table data"
                 >
-                  {isRefreshing ? '⟳' : '↻'}
+                  <span className={isRefreshing ? 'event-table-refresh-icon event-table-refresh-spinning' : 'event-table-refresh-icon'}>
+                    ↻
+                  </span>
                 </button>
               </div>
             </th>
@@ -136,19 +134,24 @@ export default function EventTable({
             </tr>
           ) : (() => {
             const lastMinIdx = rows.map(r => r.meetsMin).lastIndexOf(true);
-            return rows.map((r, i) => (
+            return rows.map((r, i) => {
+              const isMe = myUsername !== null && r.username.toLowerCase() === myUsername;
+              const baseBackground = isMe
+                ? 'rgba(56, 169, 207, 0.14)'
+                : i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'var(--table-row-bg)';
+              return (
               <React.Fragment key={`row-group-${r.username}-${i}`}>
                 <tr
                   key={`${r.username}-${i}`}
                   style={{
-                    background: i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'var(--table-row-bg)',
+                    background: baseBackground,
                     borderBottom: '1px solid var(--table-border)'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'var(--table-row-hover)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'var(--table-row-bg)';
+                    e.currentTarget.style.background = baseBackground;
                   }}
                 >
                   <td
@@ -156,7 +159,7 @@ export default function EventTable({
                       padding: '0.75rem 0.5rem',
                       fontWeight: '700',
                       fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
-                      color: r.rankNum === 1 ? '#eab308' : 
+                      color: r.rankNum === 1 ? '#eab308' :
                              r.rankNum === 2 ? '#9ca3af' :
                              r.rankNum >= 3 && r.rankNum <= 5 ? '#b45309' :
                              'var(--table-text)'
@@ -172,6 +175,22 @@ export default function EventTable({
                     wordBreak: 'break-word'
                   }}>
                     {r.username}
+                    {isMe && (
+                      <span style={{
+                        display: 'inline-block',
+                        marginLeft: '0.4rem',
+                        fontSize: '0.65rem',
+                        fontWeight: '700',
+                        letterSpacing: '0.03em',
+                        color: '#fff',
+                        background: 'var(--color-ocean-500)',
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '0.25rem',
+                        verticalAlign: 'middle'
+                      }}>
+                        YOU
+                      </span>
+                    )}
                   </td>
                   <td style={{
                     padding: '0.75rem 0.5rem',
@@ -214,7 +233,8 @@ export default function EventTable({
                   </tr>
                 )}
               </React.Fragment>
-            ));
+              );
+            });
           })()}
         </tbody>
       </table>

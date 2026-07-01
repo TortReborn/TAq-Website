@@ -130,6 +130,118 @@ select option {
   }
 }
 
+.lootpools-tab-selector {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 15rem;
+  padding: 0.25rem;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-card);
+  border-radius: 0.375rem;
+}
+
+.lootpools-tab-indicator {
+  position: absolute;
+  inset: 0.25rem auto 0.25rem 0.25rem;
+  z-index: 0;
+  width: calc((100% - 0.5rem) / 2);
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--color-ocean-700) 88%, var(--bg-card-solid) 12%);
+  transform: translateX(0);
+  transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lootpools-tab-selector[data-active-tab="raids"] .lootpools-tab-indicator {
+  transform: translateX(100%);
+}
+
+.lootpools-tab-button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 220ms ease;
+}
+
+.lootpools-tab-button:hover:not(.is-active) {
+  color: var(--text-primary);
+}
+
+.lootpools-tab-button:focus-visible {
+  outline: 2px solid var(--color-ocean-400);
+  outline-offset: -2px;
+}
+
+.lootpools-tab-button.is-active {
+  color: #ffffff;
+}
+
+.lootpools-content-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: 1.5rem;
+}
+
+.lootpools-content-pane {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 260ms ease,
+    transform 360ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.lootpools-content-pane.is-active {
+  z-index: 1;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lootpools-content-pane.is-inactive {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.35rem);
+}
+
+@media (max-width: 500px) {
+  .lootpools-tab-selector {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lootpools-tab-indicator,
+  .lootpools-tab-button {
+    transition-duration: 0.01ms;
+  }
+
+  .lootpools-content-pane {
+    transition-duration: 0.01ms;
+  }
+}
+
 /* CSS Custom Properties for Light and Dark Mode */
 :root {
   /* Light mode colors */
@@ -143,7 +255,10 @@ select option {
   --color-ocean-700: #246c8b;
   --color-ocean-800: #235a73;
   --color-ocean-900: #204a5f;
-  
+
+  /* Border emphasis */
+  --border-emphasis: #009bff;
+
   /* Theme colors - Light mode */
   --bg-gradient: radial-gradient(1200px 600px at 50% -10%,
     rgba(255,255,255,0.6), rgba(255,255,255,0) 60%),
@@ -174,6 +289,11 @@ select option {
   --table-text: var(--color-ocean-900);
   --table-cutoff-border: var(--color-ocean-400);
   --table-rank-cutoff-border: var(--color-ocean-300);
+
+  /* Site fixed background overlays (light mode) */
+  --site-bg-shade: rgba(15, 74, 96, 0.22);
+  --site-bg-veil: rgba(232, 251, 255, 0.38);
+  --home-section-scrim: rgba(232, 251, 255, 0.72);
 }
 
 /* Dark mode colors */
@@ -207,6 +327,11 @@ select option {
   --table-text: #e2e8f0;
   --table-cutoff-border: #94a3b8;
   --table-rank-cutoff-border: #cbd5e1;
+
+  /* Site fixed background overlays (dark mode) */
+  --site-bg-shade: rgba(8, 14, 28, 0.58);
+  --site-bg-veil: transparent;
+  --home-section-scrim: rgba(8, 14, 28, 0.64);
 }
 
 /* CSS Reset */
@@ -416,6 +541,34 @@ body, body *, html, html * {
 
 .home-page {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+body.site-fixed-bg-active .site-nav,
+body.site-fixed-bg-active .site-content,
+body.site-fixed-bg-active > footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fixed background photo — mounted in the root layout so it
+   stays pinned to the viewport while page content scrolls over it. A
+   transformed ancestor (e.g. PageTransition's animated wrapper) would
+   otherwise become its containing block and break position: fixed. */
+.site-bg-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--site-bg-veil), var(--site-bg-veil)),
+    linear-gradient(var(--site-bg-shade), var(--site-bg-shade)),
+    url('/images/home/discord-banner.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 
 /* Hero Section */
@@ -527,10 +680,12 @@ body, body *, html, html * {
 /* Section Styles */
 .home-section {
   padding: 5rem 1.5rem;
+  background: var(--home-section-scrim);
+  backdrop-filter: blur(8px);
 }
 
 .home-section-dark {
-  background: var(--bg-secondary);
+  background: color-mix(in srgb, var(--home-section-scrim) 82%, var(--color-ocean-900) 18%);
 }
 
 .home-section-content {
@@ -649,7 +804,9 @@ body, body *, html, html * {
 /* CTA Section */
 .home-section-cta {
   text-align: center;
-  background: radial-gradient(ellipse at center, rgba(56, 169, 207, 0.1) 0%, transparent 60%);
+  background:
+    radial-gradient(ellipse at center, rgba(56, 169, 207, 0.18) 0%, transparent 64%),
+    var(--home-section-scrim);
 }
 
 .home-cta-title {
@@ -801,6 +958,35 @@ body, body *, html, html * {
 @media (max-width: 480px) {
   .mobile-apply-button {
     display: block !important;
+  }
+}
+
+/* ========== EVENT TABLE REFRESH SPINNER ========== */
+.event-table-refresh-btn {
+  background-color: transparent;
+  transition: background-color 0.15s ease, opacity 0.2s ease;
+}
+
+.event-table-refresh-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.event-table-refresh-icon {
+  display: inline-block;
+}
+
+.event-table-refresh-spinning {
+  animation: event-table-spin 0.6s linear infinite;
+}
+
+@keyframes event-table-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-table-refresh-spinning {
+    animation: none;
+    opacity: 0.5;
   }
 }
 

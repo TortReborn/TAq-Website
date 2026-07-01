@@ -8,6 +8,8 @@ import {
 } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrl();
   const { searchParams } = new URL(request.url);

@@ -23,7 +23,7 @@ export default function LeaderboardSkeleton() {
           background: 'var(--bg-card)',
           borderRadius: '0.75rem',
           padding: '1.5rem',
-          border: '3px solid #240059'
+          border: '3px solid var(--border-emphasis)'
         }}>
           {/* Title */}
           <div style={{ display: 'flex', justifyContent: 'center' }}>

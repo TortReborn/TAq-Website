@@ -28,13 +28,23 @@ interface LootData {
   Items?: { [region: string]: LootRegion };
 }
 
+type LootpoolTab = 'lootruns' | 'raids';
+
 export default function LootpoolsPage() {
-  const [activeTab, setActiveTab] = useState<'lootruns' | 'raids'>('lootruns');
+  const [activeTab, setActiveTab] = useState<LootpoolTab>('lootruns');
   const { data: lootrunsData, loading: lootrunsLoading, error: lootrunsError } = useLootruns();
   const { data: aspectsData, loading: aspectsLoading, error: aspectsError } = useAspects();
 
   const loading = lootrunsLoading || aspectsLoading;
   const error = lootrunsError || aspectsError;
+
+  const switchTab = (tab: LootpoolTab) => {
+    if (tab === activeTab) {
+      return;
+    }
+
+    setActiveTab(tab);
+  };
 
   if (loading) {
     return <LootpoolSkeleton />;
@@ -52,11 +62,11 @@ export default function LootpoolsPage() {
       }}>
         <div style={{
           fontSize: '1.125rem',
-          color: '#e33232',
+          color: '#ef4444',
           background: 'var(--bg-card)',
           padding: '1.5rem',
           borderRadius: '0.5rem',
-          border: '1px solid #e33232'
+          border: '1px solid #ef4444'
         }}>
           {error}
         </div>
@@ -92,7 +102,7 @@ export default function LootpoolsPage() {
           borderRadius: '0.75rem',
           padding: '1.5rem',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          border: '3px solid #240059',
+          border: '3px solid var(--border-emphasis)',
           width: '90%',
         }}>
           {/* Next Rotation (Left) */}
@@ -136,42 +146,28 @@ export default function LootpoolsPage() {
           </div>
 
           {/* Tab Selector (Right) */}
-          <div style={{
-            display: 'flex',
-            gap: '0.5rem',
-            background: 'var(--bg-secondary)',
-            borderRadius: '0.5rem',
-            padding: '0.25rem'
-          }}>
+          <div
+            className="lootpools-tab-selector"
+            role="tablist"
+            aria-label="Lootpool view"
+            data-active-tab={activeTab}
+          >
+            <span className="lootpools-tab-indicator" aria-hidden="true" />
             <button
-              onClick={() => setActiveTab('lootruns')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: activeTab === 'lootruns' ? '#7a187a' : 'transparent',
-                color: activeTab === 'lootruns' ? 'white' : 'var(--text-primary)',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'lootruns'}
+              className={`lootpools-tab-button ${activeTab === 'lootruns' ? 'is-active' : ''}`}
+              onClick={() => switchTab('lootruns')}
             >
               🏃 Lootruns
             </button>
             <button
-              onClick={() => setActiveTab('raids')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: activeTab === 'raids' ? '#7a187a' : 'transparent',
-                color: activeTab === 'raids' ? 'white' : 'var(--text-primary)',
-                border: 'none',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'raids'}
+              className={`lootpools-tab-button ${activeTab === 'raids' ? 'is-active' : ''}`}
+              onClick={() => switchTab('raids')}
             >
               ⚔️ Raids
             </button>
@@ -180,13 +176,20 @@ export default function LootpoolsPage() {
       </div>
 
       {/* Content */}
-      {activeTab === 'lootruns' && lootrunsData && (
-        <LootrunsView data={lootrunsData} />
-      )}
-
-      {activeTab === 'raids' && aspectsData && (
-        <RaidsView data={aspectsData} />
-      )}
+      <div className="lootpools-content-stage">
+        <div
+          className={`lootpools-content-pane ${activeTab === 'lootruns' ? 'is-active' : 'is-inactive'}`}
+          aria-hidden={activeTab !== 'lootruns'}
+        >
+          {lootrunsData && <LootrunsView data={lootrunsData} />}
+        </div>
+        <div
+          className={`lootpools-content-pane ${activeTab === 'raids' ? 'is-active' : 'is-inactive'}`}
+          aria-hidden={activeTab !== 'raids'}
+        >
+          {aspectsData && <RaidsView data={aspectsData} />}
+        </div>
+      </div>
     </div>
   );
 }
@@ -258,23 +261,45 @@ function formatNextRotation(timestamp: number) {
   return nextRotation.toLocaleString();
 }
 
+function ShinySparkleIcon({ style }: { style?: React.CSSProperties }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      width="14"
+      height="14"
+      style={style}
+    >
+      <path
+        d="M7.4 1.4 8.9 5l3.7 1.5-3.7 1.6-1.5 3.6-1.6-3.6-3.6-1.6L5.8 5l1.6-3.6Z"
+        fill="currentColor"
+      />
+      <path
+        d="m12.7 9.4.6 1.4 1.4.6-1.4.6-.6 1.5-.6-1.5-1.4-.6 1.4-.6.6-1.4Z"
+        fill="currentColor"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
+
 // Lootrun column component (matches raid column styling)
 function LootrunColumn({ regionName, regionData, icons }: {
   regionName: string;
   regionData: any;
   icons?: { [itemName: string]: string };
 }) {
-  const regionMap: { [key: string]: { name: string; color: string; image: string } } = {
-    'SE': { name: 'Silent Expanse', color: '#55e340', image: 'silent-expanse.webp' },
-    'Sky': { name: 'Sky Islands', color: '#58d6fc', image: 'sky-islands.png' },
-    'Canyon': { name: 'Canyon of the Lost', color: '#bd1e1e', image: 'canyon-of-the-lost.png' },
-    'Corkus': { name: 'Corkus', color: '#edca3b', image: 'corkus.png' },
-    'Molten': { name: 'Molten Heights', color: '#3440eb', image: 'molten-heights.png' },
-    'FrumaEast': { name: 'Fruma East', color: '#dc82dc', image: 'fruma-east.png' },
-    'FrumaWest': { name: 'Fruma West', color: '#82dcdc', image: 'fruma-west.png' }
+  const regionMap: { [key: string]: { name: string; image: string } } = {
+    'SE': { name: 'Silent Expanse', image: 'silent-expanse.webp' },
+    'Sky': { name: 'Sky Islands', image: 'sky-islands.webp' },
+    'Canyon': { name: 'Canyon of the Lost', image: 'canyon-of-the-lost.webp' },
+    'Corkus': { name: 'Corkus', image: 'corkus.webp' },
+    'Molten': { name: 'Molten Heights', image: 'molten-heights.webp' },
+    'FrumaEast': { name: 'Fruma East', image: 'fruma-east.webp' },
+    'FrumaWest': { name: 'Fruma West', image: 'fruma-west.webp' }
   };
 
-  const regionInfo = regionMap[regionName] || { name: regionName, color: '#7a187a', image: '' };
+  const regionInfo = regionMap[regionName] || { name: regionName, image: '' };
   
   const rarityColors = {
     Mythic: '#aa00aa',
@@ -293,7 +318,7 @@ function LootrunColumn({ regionName, regionData, icons }: {
       borderRadius: '1rem',
       padding: '1.5rem',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-      border: '3px solid #240059',
+      border: '3px solid var(--border-emphasis)',
       height: 'fit-content'
     }}>
       {/* Region image */}
@@ -307,8 +332,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: regionInfo.color,
-        color: 'white',
+        background: 'var(--bg-secondary)',
+        color: 'var(--text-muted)',
         fontSize: '3rem',
         boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)'
       }}>
@@ -419,27 +444,20 @@ function LootrunColumn({ regionName, regionData, icons }: {
 
             {/* Shiny indicator */}
             {isShiny && (
-              <div style={{
+              <ShinySparkleIcon style={{
                 position: 'absolute',
-                top: '0.25rem',
-                right: '0.25rem',
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: '#ffaa00',
-                fontSize: '0.6rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                ✨
-              </div>
+                top: '0.35rem',
+                right: '0.35rem',
+                color: '#f5c842',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))',
+                pointerEvents: 'none'
+              }} />
             )}
 
             <div style={{ flex: 1 }}>
               <span style={{
                 fontSize: '0.875rem',
-                color: isShiny ? '#ffaa00' : (itemIsWard ? wardColor : '#aa00aa'),
+                color: isShiny ? '#f5c842' : (itemIsWard ? wardColor : '#aa00aa'),
                 fontWeight: '500'
               }}>
                 {item}
@@ -448,7 +466,7 @@ function LootrunColumn({ regionName, regionData, icons }: {
               {isShiny && shinyTracker && (
                 <div style={{
                   fontSize: '0.75rem',
-                  color: '#ffaa00',
+                  color: '#f5c842',
                   fontWeight: '400',
                   marginTop: '0.25rem'
                 }}>
@@ -483,7 +501,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
       borderRadius: '1rem',
       padding: '1.5rem',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-      border: '3px solid #240059',
+      border: '3px solid var(--border-emphasis)',
       height: 'fit-content'
     }}>
       {/* Raid icon */}
@@ -546,7 +564,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
       {/* Aspects by rarity */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {Object.entries(rarityColors).map(([rarity, color]) => {
-          const aspectList = aspects[rarity] || [];
+          const aspectList = (aspects[rarity] || []).filter((aspect: string) => !isWard(aspect));
           return aspectList.map((aspect: string, index: number) => {
             let displayName = aspect;
             if (aspect.includes("Aspect of a ")) {
@@ -556,9 +574,6 @@ function RaidColumn({ raid, iconKey, aspects }: {
             } else if (aspect.includes("Aspect of ")) {
               displayName = aspect.replace("Aspect of ", "");
             }
-
-            const aspectIsWard = isWard(aspect);
-            const wardColor = getWardColor(aspect);
 
             return (
               <div
@@ -593,19 +608,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  {aspectIsWard ? (
-                    <Image
-                      src={`/images/wards/${getWardImage(aspect)}`}
-                      alt={aspect}
-                      width={20}
-                      height={20}
-                      style={{
-                        objectFit: 'contain',
-                        width: '100%',
-                        height: '100%'
-                      }}
-                    />
-                  ) : (() => {
+                  {(() => {
                     const aspectClass = getClassForAspect(aspect);
                     if (aspectClass && classImageMap[aspectClass]) {
                       return (
@@ -632,7 +635,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
 
                 <span style={{
                   fontSize: '0.875rem',
-                  color: aspectIsWard ? wardColor : color,
+                  color,
                   fontWeight: '500'
                 }}>
                   {displayName}

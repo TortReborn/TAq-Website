@@ -108,12 +108,32 @@ function addItem(region: LootRegion, rarity: string | undefined, itemName: strin
   }
 }
 
+function isWardItem(item: RawLootItem): boolean {
+  return item.type === 'WARD' || item.itemType === 'WardItem' || (!!item.name && WARD_PATTERN.test(item.name));
+}
+
+function isWardName(itemName: string): boolean {
+  return WARD_PATTERN.test(itemName.trim());
+}
+
 function getLootrunItemRarity(group: RawLootGroup, item: RawLootItem): string | undefined {
-  if (item.type === 'WARD' || item.itemType === 'WardItem' || (item.name && WARD_PATTERN.test(item.name))) {
+  if (isWardItem(item)) {
     return 'Mythic';
   }
 
   return group.group || item.rarity;
+}
+
+function removeWards(region: LootRegion): LootRegion {
+  const filtered: LootRegion = { ...region };
+
+  for (const rarity of RARITIES) {
+    if (filtered[rarity]) {
+      filtered[rarity] = filtered[rarity]!.filter((item) => !isWardName(item));
+    }
+  }
+
+  return filtered;
 }
 
 function normalizeLegacyRaidKeys(data: LootData): LootData {
@@ -124,7 +144,7 @@ function normalizeLegacyRaidKeys(data: LootData): LootData {
 
   const normalized: Record<string, LootRegion> = {};
   for (const [key, value] of Object.entries(source)) {
-    normalized[RAID_KEYS[key] || key] = value;
+    normalized[RAID_KEYS[key] || key] = removeWards(value);
   }
 
   return {
@@ -187,6 +207,9 @@ function normalizeAspects(data: unknown): LootData | null {
       }
 
       for (const item of group.loot_items || []) {
+        if (isWardItem(item)) {
+          continue;
+        }
         addItem(raid, item.rarity, item.name);
       }
     }

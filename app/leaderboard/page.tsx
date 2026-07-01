@@ -92,11 +92,11 @@ export default function LeaderboardPage() {
         }}>
           <div style={{
             fontSize: '1.125rem',
-            color: '#e33232',
+            color: '#ef4444',
             background: 'var(--bg-card)',
             padding: '1.5rem',
             borderRadius: '0.5rem',
-            border: '1px solid #e33232'
+            border: '1px solid #ef4444'
           }}>
             ❌ {error}
           </div>
@@ -142,7 +142,7 @@ export default function LeaderboardPage() {
           borderRadius: '0.75rem',
           padding: '1.5rem',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          border: '3px solid #240059'
+          border: '3px solid var(--border-emphasis)'
         }}>
             {/* Title Row */}
             <div style={{ textAlign: 'center' }}>
