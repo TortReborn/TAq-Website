@@ -71,8 +71,32 @@ export default function GraidEventPage() {
     return (
       <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '5rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
         <div style={{ padding: '2rem', textAlign: 'center', minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ fontSize: '1.125rem', color: '#e33232', background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #e33232' }}>
-            Failed to fetch event data.
+          <div style={{ fontSize: '1.125rem', color: '#e33232', background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #e33232', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <span>Couldn't load event data. Check your connection and try again.</span>
+            <button
+              onClick={() => refresh()}
+              style={{
+                padding: '0.5rem 1.25rem',
+                borderRadius: '0.375rem',
+                border: 'none',
+                background: 'var(--color-ocean-500)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                transition: 'background 0.2s ease, transform 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-ocean-400)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--color-ocean-500)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Try Again
+            </button>
           </div>
         </div>
       </main>
