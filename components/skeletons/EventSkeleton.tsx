@@ -23,7 +23,7 @@ export default function EventSkeleton() {
           textAlign: 'center',
           background: 'var(--bg-card)',
           borderRadius: '1rem',
-          border: '3px solid #240059'
+          border: '3px solid var(--border-emphasis)'
         }}>
           <div className="skeleton" style={{ width: '220px', height: '2rem', margin: '0 auto 1rem' }} />
           <div className="skeleton" style={{ width: '300px', height: '1rem', margin: '0 auto 0.5rem' }} />
@@ -34,7 +34,7 @@ export default function EventSkeleton() {
         {/* Table */}
         <div style={{
           width: '100%',
-          border: '3px solid #240059',
+          border: '3px solid var(--border-emphasis)',
           borderRadius: '1rem',
           overflow: 'hidden'
         }}>

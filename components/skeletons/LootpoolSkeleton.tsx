@@ -20,7 +20,7 @@ export default function LootpoolSkeleton() {
           background: 'var(--bg-card)',
           borderRadius: '0.75rem',
           padding: '1.5rem',
-          border: '3px solid #240059',
+          border: '3px solid var(--border-emphasis)',
           width: '90%',
           maxWidth: '1200px'
         }}>
@@ -44,7 +44,7 @@ export default function LootpoolSkeleton() {
               background: 'var(--bg-card)',
               borderRadius: '1rem',
               padding: '1.5rem',
-              border: '3px solid #240059'
+              border: '3px solid var(--border-emphasis)'
             }}>
               <div className="skeleton" style={{
                 width: '120px',
