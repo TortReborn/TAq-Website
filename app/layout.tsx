@@ -16,6 +16,7 @@ import { ViewAsContext } from '@/hooks/useViewAs';
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const usesFixedBg = !(pathname === '/map' || pathname.startsWith('/map/'));
+  const isMembersPage = pathname === '/members';
   const [darkMode, setDarkMode] = useState(true);
   const [showSplash, setShowSplash] = useState(false); // Start with false
   const [splashFading, setSplashFading] = useState(false);
@@ -189,6 +190,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             A transformed ancestor would become its containing block and
             break position: fixed. */}
         {usesFixedBg && <div className="site-bg-fixed" aria-hidden="true" />}
+        {usesFixedBg && <div className={`site-bg-dark-overlay${isMembersPage ? ' is-active' : ''}`} aria-hidden="true" />}
 
         {/* Splash Screen */}
         {showSplash && (
