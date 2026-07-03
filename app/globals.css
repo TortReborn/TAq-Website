@@ -583,6 +583,22 @@ body.site-fixed-bg-active > footer {
   pointer-events: none;
 }
 
+/* Separate layer (not baked into .site-bg-fixed) so opacity can be transitioned */
+.site-bg-dark-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transition: opacity 600ms ease;
+  pointer-events: none;
+}
+
+/* Dark theme only; looks mismatched against light theme's cards/text. */
+[data-theme="dark"] .site-bg-dark-overlay.is-active {
+  opacity: 1;
+}
+
 /* Hero Section */
 .home-hero {
   min-height: calc(100vh - 60px);

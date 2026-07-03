@@ -23,6 +23,46 @@ export function getRankColor(rank: string | null | undefined): string {
   return (rank && RANK_COLORS[rank]) || 'var(--text-muted)';
 }
 
+// Rank gradients (Discord role colors), start -> end
+export const RANK_GRADIENTS: Record<string, [string, string]> = {
+  Hydra: ['#300303', '#ac034c'],
+  Narwhal: ['#eb2279', '#860074'],
+  Dolphin: ['#e66bff', '#a418a7'],
+  Sailfish: ['#a351ff', '#6a13c0'],
+  Hammerhead: ['#396aff', '#1041d6'],
+  Swordfish: ['#04b0eb', '#007ca5'],
+  Angler: ['#00e2db', '#00a2b8'],
+  Piranha: ['#92f64a', '#4daa0a'],
+  Manatee: ['#ffe226', '#f59300'],
+  Starfish: ['#fdb21d', '#f87401'],
+};
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+}
+
+// t: 0 = start color, 1 = end color
+export function getRankGradientColorAt(rank: string | null | undefined, t: number): string {
+  const stops = (rank && RANK_GRADIENTS[rank]) || null;
+  if (!stops) return getRankColor(rank);
+  const [r1, g1, b1] = hexToRgb(stops[0]);
+  const [r2, g2, b2] = hexToRgb(stops[1]);
+  const clamped = Math.max(0, Math.min(1, t));
+  return rgbToHex(r1 + (r2 - r1) * clamped, g1 + (g2 - g1) * clamped, b1 + (b2 - b1) * clamped);
+}
+
+export function getRankGradientCss(rank: string | null | undefined, angle: string = '135deg'): string {
+  const stops = (rank && RANK_GRADIENTS[rank]) || null;
+  if (!stops) return getRankColor(rank);
+  return `linear-gradient(${angle}, ${stops[0]}, ${stops[1]})`;
+}
+
+
 export function isValidPromotion(currentRank: string, targetRank: string): boolean {
   return RANK_HIERARCHY.indexOf(targetRank) > RANK_HIERARCHY.indexOf(currentRank);
 }
