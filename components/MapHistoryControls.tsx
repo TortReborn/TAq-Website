@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import HistoryTimeline from "./HistoryTimeline";
+import { SeasonPeriod } from "@/lib/seasons";
 import HistoryDatePicker from "./HistoryDatePicker";
 import HistoryPlayback from "./HistoryPlayback";
 
@@ -29,6 +30,7 @@ interface MapHistoryControlsProps {
   isConflictFocused?: boolean;
   onConflictFocusToggle?: () => void;
   loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
+  seasons?: SeasonPeriod[]; // On/off-season periods for timeline context
 }
 
 const SPEED_OPTIONS = [1, 2, 10, 50];
@@ -85,6 +87,7 @@ export default function MapHistoryControls({
   isConflictFocused,
   onConflictFocusToggle,
   loadedRanges,
+  seasons,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -708,6 +711,7 @@ export default function MapHistoryControls({
                 vertical
                 hideCurrentTime
                 loadedRanges={loadedRanges}
+                seasons={seasons}
               />
             </div>
 
@@ -1034,6 +1038,7 @@ export default function MapHistoryControls({
             onChange={onTimeChange}
             gaps={gaps}
             loadedRanges={loadedRanges}
+            seasons={seasons}
           />
           {controlsSection}
         </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useCallback, useRef, useState, useEffect } from "react";
+import { SeasonPeriod, seasonAtDate, seasonColor } from "@/lib/seasons";
 
 interface HistoryTimelineProps {
   earliest: Date;
@@ -11,22 +12,38 @@ interface HistoryTimelineProps {
   vertical?: boolean;
   hideCurrentTime?: boolean; // Hide the current time display (shown externally)
   loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
+  seasons?: SeasonPeriod[]; // On/off-season periods to overlay as context
 }
 
 export default function HistoryTimeline({
-  earliest,
-  latest,
+  earliest: earliestProp,
+  latest: latestProp,
   current,
   onChange,
   gaps,
   vertical,
   hideCurrentTime,
   loadedRanges,
+  seasons,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
   const [hoverPos, setHoverPos] = useState(0); // X position (horizontal) or Y position (vertical)
+
+  // Season zoom: when set, the timeline is scoped to a single season/off-season period.
+  // The effective range is the intersection of that period with the available data bounds,
+  // so all downstream math (percentages, ribbon, gaps, labels) re-scopes automatically.
+  const [seasonZoom, setSeasonZoom] = useState<{ start: Date; end: Date; label: string } | null>(null);
+
+  const earliest = useMemo(
+    () => (seasonZoom ? new Date(Math.max(earliestProp.getTime(), seasonZoom.start.getTime())) : earliestProp),
+    [seasonZoom, earliestProp]
+  );
+  const latest = useMemo(
+    () => (seasonZoom ? new Date(Math.min(latestProp.getTime(), seasonZoom.end.getTime())) : latestProp),
+    [seasonZoom, latestProp]
+  );
 
   // Calculate the total range in milliseconds
   const totalRange = latest.getTime() - earliest.getTime();
@@ -40,6 +57,25 @@ export default function HistoryTimeline({
       return { startPct, endPct };
     });
   }, [gaps, earliest, totalRange]);
+
+  // Precompute season-period positions as percentages, clipped to the visible range
+  const seasonRegions = useMemo(() => {
+    if (!seasons || seasons.length === 0 || totalRange === 0) return [];
+    const earliestMs = earliest.getTime();
+    const latestMs = latest.getTime();
+    return seasons
+      .map((period) => {
+        const clampedStart = Math.max(earliestMs, period.start.getTime());
+        const clampedEnd = Math.min(latestMs, period.end.getTime());
+        if (clampedStart >= clampedEnd) return null;
+        return {
+          period,
+          startPct: ((clampedStart - earliestMs) / totalRange) * 100,
+          endPct: ((clampedEnd - earliestMs) / totalRange) * 100,
+        };
+      })
+      .filter((r): r is { period: SeasonPeriod; startPct: number; endPct: number } => r !== null);
+  }, [seasons, earliest, latest, totalRange]);
 
   // Precompute loaded-range positions as percentages of the total range
   const loadedRegions = useMemo(() => {
@@ -90,7 +126,9 @@ export default function HistoryTimeline({
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
     if (totalRange === 0) return 0;
-    return ((current.getTime() - earliest.getTime()) / totalRange) * 100;
+    const raw = ((current.getTime() - earliest.getTime()) / totalRange) * 100;
+    // Clamp so the thumb stays on-track even if `current` sits outside a zoomed window.
+    return Math.max(0, Math.min(100, raw));
   }, [current, earliest, totalRange]);
 
   // Helper to convert percentage to CSS position that keeps thumb within bounds
@@ -207,6 +245,21 @@ export default function HistoryTimeline({
     return percentToDate(hoverPercent);
   }, [hoverPercent, percentToDate]);
 
+  // Which season (or off-season) the hovered date falls in
+  const hoverSeason = useMemo(() => {
+    if (!hoverDate || !seasons || seasons.length === 0) return null;
+    return seasonAtDate(seasons, hoverDate);
+  }, [hoverDate, seasons]);
+
+  // Jump the scrubber to a season boundary (clamped to bounds + snapped), skipping no-data gaps
+  const jumpToDate = useCallback((date: Date) => {
+    const clampedMs = Math.max(earliest.getTime(), Math.min(latest.getTime(), date.getTime()));
+    const snapped = snapTo10Min(new Date(clampedMs));
+    const pct = totalRange === 0 ? 0 : ((snapped.getTime() - earliest.getTime()) / totalRange) * 100;
+    if (isInGap(pct)) return;
+    onChange(snapped);
+  }, [earliest, latest, totalRange, snapTo10Min, isInGap, onChange]);
+
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -258,10 +311,18 @@ export default function HistoryTimeline({
 
   // ── Shared sub-elements ──────────────────────────────────────────────
 
+  const seasonTooltipLine = hoverSeason ? (
+    <span style={{ opacity: 0.8, color: hoverSeason.type === 'season' ? seasonColor(hoverSeason.season!) : 'var(--text-secondary)' }}>
+      {hoverSeason.type === 'season'
+        ? `Season ${hoverSeason.season}`
+        : 'Off-season'}
+    </span>
+  ) : null;
+
   const tooltipContent = hoverDate
     ? (hoverInGap && hoverGap
       ? <>{formatDate(hoverGap.start)} – {formatDate(hoverGap.end)}<br /><span style={{ opacity: 0.7 }}>No data available</span></>
-      : formatDateTime(hoverDate))
+      : <>{formatDateTime(hoverDate)}{seasonTooltipLine && <><br />{seasonTooltipLine}</>}</>)
     : '';
 
   const thumbStyle: React.CSSProperties = {
@@ -391,17 +452,137 @@ export default function HistoryTimeline({
     );
   };
 
+  // ── Season ribbon ────────────────────────────────────────────────────
+  // A strip alongside the track showing on-season (colored, labeled) vs off-season
+  // (hatched) periods. Each segment is clickable to jump to that period's start.
+
+  const seasonRibbon = (isVert: boolean) => {
+    if (seasonRegions.length === 0) return null;
+    const OFF_HATCH = 'repeating-linear-gradient(45deg, rgba(140,140,140,0.30) 0 4px, rgba(140,140,140,0.08) 4px 8px)';
+
+    return (
+      <div
+        style={{
+          position: 'relative',
+          ...(isVert
+            ? { width: '14px', borderRadius: '3px', flex: 1, minHeight: '100px' }
+            : { height: '16px', borderRadius: '3px', width: '100%', marginBottom: '4px' }),
+          background: 'var(--bg-tertiary)',
+          overflow: 'hidden',
+        }}
+      >
+        {seasonRegions.map(({ period, startPct, endPct }, i) => {
+          const isSeason = period.type === 'season';
+          const widthPct = endPct - startPct;
+          const title = (isSeason
+            ? `Season ${period.season} (${formatDate(period.start)} – ${formatDate(period.end)})`
+            : `Off-season (${formatDate(period.start)} – ${formatDate(period.end)})`) +
+            ' — click to zoom';
+          return (
+            <div
+              key={i}
+              title={title}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSeasonZoom({ start: period.start, end: period.end, label: period.label });
+                // Bring the scrubber into the zoomed range if it's currently outside it
+                const zs = Math.max(earliestProp.getTime(), period.start.getTime());
+                const ze = Math.min(latestProp.getTime(), period.end.getTime());
+                if (current.getTime() < zs || current.getTime() > ze) {
+                  jumpToDate(new Date(zs));
+                }
+              }}
+              style={{
+                position: 'absolute',
+                cursor: 'pointer',
+                // Full-width positioning (not the thumb-padded formula) so segments
+                // fill the ribbon edge-to-edge, including the rounded corners.
+                ...(isVert
+                  ? {
+                      left: 0,
+                      right: 0,
+                      top: `${startPct}%`,
+                      height: `${endPct - startPct}%`,
+                      borderBottom: '1px solid var(--bg-card-solid, rgba(0,0,0,0.4))',
+                    }
+                  : {
+                      top: 0,
+                      bottom: 0,
+                      left: `${startPct}%`,
+                      width: `${endPct - startPct}%`,
+                      borderRight: '1px solid var(--bg-card-solid, rgba(0,0,0,0.4))',
+                    }),
+                background: isSeason ? seasonColor(period.season!) : OFF_HATCH,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Label only on the horizontal ribbon and only when there's room */}
+              {!isVert && isSeason && widthPct > 4 && (
+                <span style={{
+                  fontSize: '0.6rem',
+                  fontWeight: 700,
+                  color: '#fff',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.85)',
+                  whiteSpace: 'nowrap',
+                  pointerEvents: 'none',
+                }}>
+                  {period.label}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Reset-zoom button — shown top-left of the component when zoomed into a season.
+  const resetZoomButton = seasonZoom ? (
+    <button
+      onClick={(e) => { e.stopPropagation(); setSeasonZoom(null); }}
+      onMouseDown={(e) => e.stopPropagation()}
+      title={`Zoomed to ${seasonZoom.label === 'Off' ? 'off-season' : seasonZoom.label} — back to full range`}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 25,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '3px',
+        padding: '0.1rem 0.4rem',
+        fontSize: '0.65rem',
+        fontWeight: 600,
+        color: 'var(--text-primary)',
+        background: 'var(--bg-card-solid, var(--bg-card))',
+        border: '1px solid var(--border-color)',
+        borderRadius: '0.375rem',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+      }}
+    >
+      ↺ Full range
+    </button>
+  ) : null;
+
   // ── Vertical layout ──────────────────────────────────────────────────
 
   if (vertical) {
     return (
       <div style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         height: '100%',
         padding: '0 0.25rem',
       }}>
+        {resetZoomButton}
         {/* Current time display (hidden when shown externally) */}
         {!hideCurrentTime && (
           <div style={{
@@ -434,6 +615,9 @@ export default function HistoryTimeline({
           minHeight: '100px',
           alignItems: 'stretch',
         }}>
+          {/* Season ribbon (far left) */}
+          {seasons && seasons.length > 0 && seasonRibbon(true)}
+
           {/* Loaded-data indicator bar (left of track) */}
           {loadedRanges && loadedIndicatorBar(true)}
 
@@ -532,7 +716,8 @@ export default function HistoryTimeline({
   // ── Horizontal layout (default) ──────────────────────────────────────
 
   return (
-    <div style={{ width: '100%', padding: '0.25rem 0' }}>
+    <div style={{ position: 'relative', width: '100%', padding: '0.25rem 0' }}>
+      {resetZoomButton}
       {/* Current time display - above the slider */}
       <div style={{
         textAlign: 'center',
@@ -555,6 +740,33 @@ export default function HistoryTimeline({
         <span>{formatDate(earliest)}</span>
         <span>{formatDate(latest)}</span>
       </div>
+
+      {/* Season ribbon + legend */}
+      {seasons && seasons.length > 0 && (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '0.75rem',
+            marginBottom: '2px',
+            fontSize: '0.65rem',
+            color: 'var(--text-secondary)',
+          }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+              <span style={{ width: '9px', height: '9px', borderRadius: '2px', background: seasonColor(31) }} />
+              Season
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+              <span style={{
+                width: '9px', height: '9px', borderRadius: '2px',
+                background: 'repeating-linear-gradient(45deg, rgba(140,140,140,0.45) 0 2px, rgba(140,140,140,0.12) 2px 4px)',
+              }} />
+              Off-season
+            </span>
+          </div>
+          {seasonRibbon(false)}
+        </>
+      )}
 
       {/* Timeline track */}
       <div

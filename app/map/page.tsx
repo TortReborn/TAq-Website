@@ -15,6 +15,7 @@ import FactionPanel from "@/components/FactionPanel";
 import ConflictFinder from "@/components/ConflictFinder";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
+import { useSeasons } from "@/hooks/useSeasons";
 import {
   HistoryBounds,
   expandSnapshot,
@@ -97,6 +98,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
   // History mode state
   const [viewMode, setViewMode] = useState<'live' | 'history'>(initialMode ?? 'live');
+
+  // Guild seasons for history-timeline context (fetched only when the history tab is active)
+  const seasons = useSeasons(viewMode === 'history');
   const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -2153,6 +2157,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               isConflictFocused={isConflictFocused}
               onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}
               loadedRanges={loadedRanges}
+              seasons={seasons}
             />
           </div>
         )}
