@@ -128,7 +128,7 @@ export async function requireExecSession(request: NextRequest): Promise<ExecSess
   const rankCheck = await checkDiscordLinkRank(session.discord_id);
   if (!rankCheck.ok) return null;
 
-  return session;
+  return { ...session, rank: rankCheck.rank };
 }
 
 /**
@@ -148,7 +148,17 @@ const DISCORD_API_BASE = 'https://discord.com/api/v10';
 
 // Ranks that are allowed to access the exec dashboard (Hammerhead or higher)
 export const EXEC_RANKS = ['Hammerhead', 'Sailfish', 'Dolphin', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
+export const NARWHAL_RANKS = ['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
 const ALLOWED_RANKS = EXEC_RANKS;
+
+export function isNarwhalRank(rank?: string | null): boolean {
+  return !!rank && NARWHAL_RANKS.includes(rank);
+}
+
+export async function requireNarwhalSession(request: NextRequest): Promise<ExecSessionData | null> {
+  const session = await requireExecSession(request);
+  return session && isNarwhalRank(session.rank) ? session : null;
+}
 
 export function getDiscordOAuthUrl(state: string): string {
   const clientId = pickEnv('DISCORD_CLIENT_ID', 'TEST_DISCORD_CLIENT_ID');
