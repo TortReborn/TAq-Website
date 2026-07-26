@@ -1,0 +1,58 @@
+.page { width: min(100%, 1400px); margin: 0 auto; color: var(--text-primary); }
+.page > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.page > header span { color: var(--color-ocean-400); font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.page h1 { margin: .15rem 0 .35rem; font-size: clamp(1.65rem, 2.5vw, 2.25rem); }
+.page > header p { max-width: 720px; margin: 0; color: var(--text-secondary); font-size: .84rem; line-height: 1.5; }
+.page button { min-height: 2.35rem; padding: .45rem .75rem; border: 1px solid var(--border-card); border-radius: .5rem; background: var(--bg-card); color: var(--text-primary); font-size: .74rem; font-weight: 700; cursor: pointer; }
+.page > header > button, .save { border-color: var(--color-ocean-400) !important; background: var(--color-ocean-500) !important; color: #fff !important; }
+.tabs { display: inline-flex; gap: .2rem; margin-bottom: .8rem; padding: .25rem; border: 1px solid var(--border-card); border-radius: .6rem; background: var(--bg-card); }
+.tabs button { border: 0; background: transparent; color: var(--text-secondary); }
+.tabs .active { background: color-mix(in srgb, var(--color-ocean-500) 20%, var(--bg-card)); color: #fff; }
+.error { margin-bottom: .8rem; padding: .7rem .85rem; border: 1px solid color-mix(in srgb, #ef4444 40%, transparent); border-radius: .6rem; color: #fca5a5; }
+.tableWrap { overflow-x: auto; border: 1px solid var(--border-card); border-radius: .75rem; background: var(--bg-card); }
+.tableWrap table { width: 100%; min-width: 1050px; border-collapse: collapse; font-size: .75rem; }
+.tableWrap th { padding: .65rem .7rem; color: var(--text-secondary); font-size: .62rem; letter-spacing: .05em; text-align: left; text-transform: uppercase; }
+.tableWrap td { padding: .65rem .7rem; border-top: 1px solid color-mix(in srgb, var(--border-card) 65%, transparent); color: var(--text-secondary); vertical-align: top; }
+.tableWrap strong { display: block; color: var(--text-primary); }
+.tableWrap small { display: block; margin-top: .15rem; color: var(--text-secondary); font-size: .62rem; }
+.type { display: inline-flex; padding: .22rem .45rem; border-radius: 99px; background: color-mix(in srgb, var(--color-ocean-500) 13%, transparent); color: var(--color-ocean-400); text-transform: capitalize; white-space: nowrap; }
+.arrow { color: var(--color-ocean-400); }
+.edit { min-height: 1.9rem !important; padding: .3rem .55rem !important; }
+.allianceGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.allianceGrid article { position: relative; display: flex; gap: .85rem; padding: .9rem; border: 1px solid var(--border-card); border-radius: .75rem; background: var(--bg-card); }
+.allianceGrid article > .edit { position: absolute; top: .75rem; right: .75rem; }
+.allianceGrid article.disabled { opacity: .58; }
+.guildMark { display: grid; width: 3.4rem; height: 3.4rem; flex: none; place-items: center; border: 1px solid color-mix(in srgb, var(--color-ocean-400) 40%, var(--border-card)); border-radius: .7rem; background: color-mix(in srgb, var(--color-ocean-500) 12%, transparent); color: var(--color-ocean-400); font-size: .78rem; font-weight: 850; }
+.guildBody { flex: 1; min-width: 0; }
+.guildBody > div:first-child { display: flex; align-items: center; gap: .5rem; padding-right: 3rem; }
+.guildBody h2 { margin: 0; font-size: 1rem; }
+.guildBody > div:first-child span { color: #65e59b; font-size: .62rem; font-weight: 700; }
+.guildBody dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin: .8rem 0 0; }
+.guildBody dt { color: var(--text-secondary); font-size: .6rem; text-transform: uppercase; }
+.guildBody dd { margin: .15rem 0 0; overflow: hidden; color: var(--text-primary); font-size: .7rem; text-overflow: ellipsis; }
+.guildBody p { margin: .7rem 0 0; color: var(--text-secondary); font-size: .68rem; }
+.loading { height: 240px; border: 1px solid var(--border-card); border-radius: .75rem; background: var(--bg-card); }
+.backdrop { position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgb(2 8 23 / .75); backdrop-filter: blur(8px); }
+.modal { width: min(720px, 100%); max-height: 92vh; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-card); border-radius: .85rem; background: var(--bg-card-solid, var(--bg-card)); box-shadow: 0 30px 90px rgb(0 0 0 / .5); }
+.smallModal { width: min(560px, 100%); }
+.modalHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: .85rem; }
+.modalHeader h2 { margin: 0; font-size: 1.15rem; }
+.modalHeader button { width: 2.2rem; padding: 0; border-radius: 50%; font-size: 1.2rem; }
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.modal label { display: flex; flex-direction: column; gap: .3rem; color: var(--text-secondary); font-size: .68rem; font-weight: 700; }
+.modal input, .modal select, .modal textarea { width: 100%; min-height: 2.4rem; padding: .5rem .6rem; border: 1px solid var(--border-card); border-radius: .45rem; outline: 0; background: var(--bg-primary); color: var(--text-primary); font: inherit; font-size: .76rem; }
+.modal textarea { min-height: 4rem; resize: vertical; }
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--color-ocean-400); }
+.modal .full { grid-column: 1 / -1; }
+.modal .checkbox { flex-direction: row; align-items: center; align-self: end; min-height: 2.4rem; }
+.checkbox input { width: 1rem; min-height: 1rem; }
+.actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--border-card); }
+.hint { margin: .75rem 0 0; color: var(--text-secondary); font-size: .65rem; }
+@media (max-width: 850px) { .allianceGrid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) {
+  .page > header { align-items: stretch; flex-direction: column; }
+  .page > header > button { width: 100%; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; }
+  .formGrid, .guildBody dl { grid-template-columns: 1fr; }
+  .modal .full { grid-column: auto; }
+}
