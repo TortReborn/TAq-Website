@@ -70,7 +70,6 @@ export default function AccountingPage() {
         <div>
           <span>Guild treasury</span>
           <h1>Accounting</h1>
-          <p>Every LE balance scan from the management mod, including its reason and author.</p>
         </div>
         <button onClick={() => void load()}>Refresh</button>
       </header>
