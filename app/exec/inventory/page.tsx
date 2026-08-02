@@ -147,6 +147,7 @@ function itemDraft(item: InventoryItem): ItemDraft {
 export default function InventoryPage() {
   const { user } = useExecSession();
   const canEdit = NARWHAL_RANKS.has(user?.rank ?? '');
+  const canAddItems = Boolean(user);
   const [data, setData] = useState<InventoryData>(EMPTY);
   const [view, setView] = useState<View>('ingredient');
   const [search, setSearch] = useState('');
@@ -488,7 +489,7 @@ export default function InventoryPage() {
       </div>
 
       {!canEdit && (
-        <p className={styles.readOnlyNote}>You have read access. Narwhal, Hydra, and Leader ranks can edit stock configuration.</p>
+        <p className={styles.readOnlyNote}>You can add inventory items. Narwhal, Hydra, and Leader ranks can edit existing items and manage categories.</p>
       )}
 
       {loading ? (
@@ -510,25 +511,29 @@ export default function InventoryPage() {
                     <h2>{category.name}</h2>
                     <span>{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
                   </div>
-                  {canEdit && view !== 'archive' && (
+                  {canAddItems && view !== 'archive' && (
                     <div className={styles.categoryActions}>
-                      <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
-                      <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
-                      <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
-                      <button
-                        className={styles.dangerText}
-                        onClick={() => {
-                          const replacement = data.categories.find(candidate => (
-                            candidate.kind === category.kind && candidate.id !== category.id && !candidate.archived
-                          ));
-                          setDeleteCategoryDialog({
-                            category,
-                            replacementId: replacement ? String(replacement.id) : '',
-                          });
-                        }}
-                      >
-                        Delete
-                      </button>
+                      {canEdit && (
+                        <>
+                          <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
+                          <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
+                          <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
+                          <button
+                            className={styles.dangerText}
+                            onClick={() => {
+                              const replacement = data.categories.find(candidate => (
+                                candidate.kind === category.kind && candidate.id !== category.id && !candidate.archived
+                              ));
+                              setDeleteCategoryDialog({
+                                category,
+                                replacementId: replacement ? String(replacement.id) : '',
+                              });
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
                       <button className={styles.primaryButton} onClick={() => newItem(category)}>Add item</button>
                     </div>
                   )}

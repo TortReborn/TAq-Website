@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession, requireNarwhalSession } from '@/lib/exec-auth';
+import { isNarwhalRank, requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -154,8 +154,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await requireNarwhalSession(request);
-  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+  const session = await requireExecSession(request);
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   let body: Record<string, unknown>;
   try {
@@ -165,6 +165,10 @@ export async function POST(request: NextRequest) {
   }
 
   const action = body.action;
+  if (action !== 'createItem' && !isNarwhalRank(session.rank)) {
+    return NextResponse.json({ error: 'Narwhal access required for this action.' }, { status: 403 });
+  }
+
   const pool = getPool();
   try {
     if (action === 'createCategory') {
