@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useExecGraidLogMutations } from '@/hooks/useExecGraidLogs';
 import { RAID_TYPE_COLORS } from '@/lib/graid-log-constants';
+import { MAX_RAIDS_PER_SUBMISSION } from '@/lib/graid-log-validation';
 
 interface Props {
   meta: { guildMembers: string[] };
@@ -21,9 +22,8 @@ const RAID_TYPES = [
   { value: 'TNA', label: 'The Nameless Anomaly (TNA)' },
   { value: 'NOL', label: "Orphion's Nexus of Light (NOL)" },
   { value: 'WTP', label: 'The Wartorn Palace (WTP)' },
+  { value: 'Unknown', label: 'Unknown raid type' },
 ];
-
-const UNKNOWN_TYPE = { value: 'Unknown', label: 'Unknown raid type' };
 
 function MemberInput({ value, onChange, guildMembers, placeholder, id }: {
   value: string; onChange: (v: string) => void; guildMembers: string[]; placeholder: string; id: string;
@@ -70,17 +70,15 @@ function MemberInput({ value, onChange, guildMembers, placeholder, id }: {
   );
 }
 
-type Mode = 'group' | 'individual';
-
 export default function GraidLogForm({ meta, onLogged }: Props) {
-  const [mode, setMode] = useState<Mode>('group');
   const [raidType, setRaidType] = useState('');
   const [groupPlayers, setGroupPlayers] = useState(['', '', '', '']);
-  const [individualPlayer, setIndividualPlayer] = useState('');
+  const [raidCount, setRaidCount] = useState('1');
+  const [announce, setAnnounce] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const { createLog } = useExecGraidLogMutations();
+  const { createLogs } = useExecGraidLogMutations();
 
   const memberSet = useMemo(() => new Set(meta.guildMembers.map(m => m.toLowerCase())), [meta.guildMembers]);
 
@@ -88,111 +86,76 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
     setGroupPlayers(prev => { const next = [...prev]; next[idx] = value; return next; });
   };
 
-  const switchMode = (next: Mode) => {
-    setMode(next);
-    setError(null);
-    setSuccess(null);
-    if (next === 'group' && raidType === 'Unknown') setRaidType('');
-  };
+  // Unknown raids are never posted by the bot, so the toggle is forced off.
+  const canAnnounce = raidType !== 'Unknown';
+  const effectiveAnnounce = canAnnounce && announce;
 
   const handleSubmit = async () => {
     setError(null);
     setSuccess(null);
 
-    if (mode === 'group') {
-      if (!raidType || raidType === 'Unknown') { setError('Select a raid type.'); return; }
-      const trimmed = groupPlayers.map(p => p.trim());
-      const empty = trimmed.filter(p => !p);
-      if (empty.length > 0) { setError('All 4 participants are required.'); return; }
-      const nonMembers = trimmed.filter(p => !memberSet.has(p.toLowerCase()));
-      if (nonMembers.length > 0) { setError(`Not current guild members: ${nonMembers.join(', ')}`); return; }
-      const unique = new Set(trimmed.map(p => p.toLowerCase()));
-      if (unique.size < 4) { setError('All 4 participants must be different.'); return; }
+    if (!raidType) { setError('Select a raid type.'); return; }
+    // Empty slots are allowed: cross-guild parties only log our own members.
+    const filled = groupPlayers.map(p => p.trim()).filter(Boolean);
+    if (filled.length === 0) { setError('At least 1 participant is required.'); return; }
+    const nonMembers = filled.filter(p => !memberSet.has(p.toLowerCase()));
+    if (nonMembers.length > 0) { setError(`Not current guild members: ${nonMembers.join(', ')}`); return; }
+    const unique = new Set(filled.map(p => p.toLowerCase()));
+    if (unique.size < filled.length) { setError('All participants must be different.'); return; }
+    const count = parseInt(raidCount, 10);
+    if (!Number.isInteger(count) || count < 1 || count > MAX_RAIDS_PER_SUBMISSION) {
+      setError(`Number of raids must be between 1 and ${MAX_RAIDS_PER_SUBMISSION}.`);
+      return;
+    }
 
-      setSaving(true);
-      try {
-        const result = await createLog(raidType, trimmed, 'group');
-        setSuccess(`Queued ${raidType} raid (queue #${result.id}) — the bot will post it to Discord on its next tick (within ~3 min).`);
-        setRaidType('');
-        setGroupPlayers(['', '', '', '']);
-        onLogged();
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setSaving(false);
-      }
-    } else {
-      // Individual mode
-      const player = individualPlayer.trim();
-      if (!player) { setError('Player is required.'); return; }
-      if (!memberSet.has(player.toLowerCase())) { setError(`Not a current guild member: ${player}`); return; }
-      const typeToSend = raidType || 'Unknown';
+    const raids = Array.from({ length: count }, () => ({
+      raidType,
+      participants: filled,
+      announce: effectiveAnnounce,
+    }));
 
-      setSaving(true);
-      try {
-        const result = await createLog(typeToSend, [player], 'individual');
-        setSuccess(`Queued individual ${typeToSend} raid (queue #${result.id}) for ${player} — will be applied on the next bot tick (within ~3 min).`);
-        setRaidType('');
-        setIndividualPlayer('');
-        onLogged();
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setSaving(false);
-      }
+    setSaving(true);
+    try {
+      const result = await createLogs(raids);
+      const n = result.count ?? count;
+      setSuccess(
+        effectiveAnnounce
+          ? `Queued ${n} raid${n === 1 ? '' : 's'} — the bot will post them to Discord on its next tick (within ~3 min).`
+          : `Queued ${n} raid${n === 1 ? '' : 's'} silently — added to totals on the next bot tick (within ~3 min), not posted to Discord.`
+      );
+      setRaidType('');
+      setGroupPlayers(['', '', '', '']);
+      setRaidCount('1');
+      setAnnounce(true);
+      onLogged();
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const raidOptions = mode === 'individual' ? [...RAID_TYPES, UNKNOWN_TYPE] : RAID_TYPES;
-
   return (
     <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', padding: '1.25rem', maxWidth: '500px' }}>
-      <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>Log Guild Raid</h3>
-
-      <div style={{
-        display: 'flex', gap: '0.25rem', marginBottom: '1rem',
-        background: 'var(--bg-primary)', borderRadius: '0.5rem', padding: '0.25rem',
-        border: '1px solid var(--border-card)',
-      }}>
-        {(['group', 'individual'] as Mode[]).map(m => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => switchMode(m)}
-            style={{
-              flex: 1,
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.8rem',
-              fontWeight: mode === m ? '700' : '500',
-              background: mode === m ? 'var(--color-ocean-400)' : 'transparent',
-              color: mode === m ? '#fff' : 'var(--text-secondary)',
-              transition: 'all 0.15s',
-            }}
-          >
-            {m === 'group' ? 'Full Group (4)' : 'Individual'}
-          </button>
-        ))}
-      </div>
+      <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>Log Guild Raids</h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <div>
-          <label style={labelStyle}>Raid Type{mode === 'individual' && ' (or Unknown)'}</label>
+          <label style={labelStyle}>Raid Type</label>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: mode === 'individual' ? 'repeat(6, 1fr)' : 'repeat(5, 1fr)',
+            gridTemplateColumns: 'repeat(6, 1fr)',
             gap: '0.5rem',
           }}>
-            {raidOptions.map(t => {
-              const selected = raidType === t.value || (mode === 'individual' && t.value === 'Unknown' && !raidType);
+            {RAID_TYPES.map(t => {
+              const selected = raidType === t.value;
               const color = RAID_TYPE_COLORS[t.value] || '#6b7280';
               return (
                 <button
                   key={t.value}
                   type="button"
-                  onClick={() => setRaidType(selected && t.value !== 'Unknown' ? '' : t.value)}
+                  onClick={() => setRaidType(selected ? '' : t.value)}
+                  title={t.label}
                   style={{
                     padding: '0.5rem 0.25rem',
                     borderRadius: '0.375rem',
@@ -205,41 +168,65 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
                     transition: 'all 0.15s',
                   }}
                 >
-                  {t.value}
+                  {t.value === 'Unknown' ? '?' : t.value}
                 </button>
               );
             })}
           </div>
+          {raidType === 'Unknown' && (
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.4rem 0 0 0' }}>
+              Unknown raids are added to player totals but never posted to Discord — use for fixing missing/desynced raids.
+            </p>
+          )}
         </div>
 
-        {mode === 'group' ? (
-          [0, 1, 2, 3].map(i => (
-            <div key={i}>
-              <label style={labelStyle}>Player {i + 1}</label>
-              <MemberInput
-                value={groupPlayers[i]}
-                onChange={v => setGroupPlayer(i, v)}
-                guildMembers={meta.guildMembers}
-                placeholder="Search guild member..."
-                id={`player-${i}`}
-              />
-            </div>
-          ))
-        ) : (
-          <div>
-            <label style={labelStyle}>Player</label>
+        {[0, 1, 2, 3].map(i => (
+          <div key={i}>
+            <label style={labelStyle}>Player {i + 1}{i > 0 && ' (optional)'}</label>
             <MemberInput
-              value={individualPlayer}
-              onChange={setIndividualPlayer}
+              value={groupPlayers[i]}
+              onChange={v => setGroupPlayer(i, v)}
               guildMembers={meta.guildMembers}
               placeholder="Search guild member..."
-              id="player-individual"
+              id={`player-${i}`}
             />
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.4rem 0 0 0' }}>
-              Adds a single raid completion to this player only. Use this for fixing missing/desynced raids. Not posted to Discord.
-            </p>
           </div>
-        )}
+        ))}
+        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '-0.35rem 0 0 0' }}>
+          Raided with players from another guild? Only list our members and leave the rest empty.
+        </p>
+
+        <div>
+          <label style={labelStyle} htmlFor="raid-count">Number of Raids</label>
+          <input
+            id="raid-count"
+            type="number"
+            min={1}
+            max={MAX_RAIDS_PER_SUBMISSION}
+            value={raidCount}
+            onChange={e => setRaidCount(e.target.value)}
+            style={{ ...inputStyle, width: '6rem' }}
+          />
+          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.4rem 0 0 0' }}>
+            Logs this same group and raid type multiple times.
+          </p>
+        </div>
+
+        <label style={{
+          display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: canAnnounce ? 'pointer' : 'not-allowed',
+          fontSize: '0.85rem', color: canAnnounce ? 'var(--text-primary)' : 'var(--text-muted)',
+          userSelect: 'none',
+        }}>
+          <input
+            type="checkbox"
+            checked={effectiveAnnounce}
+            disabled={!canAnnounce || saving}
+            onChange={e => setAnnounce(e.target.checked)}
+            style={{ width: '1rem', height: '1rem', accentColor: 'var(--color-ocean-400)' }}
+          />
+          Post to the Discord raid channel
+          {!canAnnounce && ' (unavailable for Unknown raids)'}
+        </label>
 
         {error && <div style={{ color: '#ef4444', fontSize: '0.85rem' }}>{error}</div>}
         {success && <div style={{ color: '#22c55e', fontSize: '0.85rem' }}>{success}</div>}
@@ -253,7 +240,7 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
             cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1,
           }}
         >
-          {saving ? 'Logging...' : mode === 'group' ? 'Log Raid' : 'Log Individual Raid'}
+          {saving ? 'Logging...' : `Log Raid${parseInt(raidCount, 10) > 1 ? `s (×${parseInt(raidCount, 10)})` : ''}`}
         </button>
       </div>
     </div>
