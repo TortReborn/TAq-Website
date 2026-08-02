@@ -44,6 +44,8 @@ export async function PATCH(
         `UPDATE inventory_items
          SET archived = $1,
              archived_at = CASE WHEN $1 THEN NOW() ELSE NULL END,
+             quantity = CASE WHEN $1 THEN 0 ELSE quantity END,
+             reserve_quantity = CASE WHEN $1 THEN 0 ELSE reserve_quantity END,
              updated_at = NOW(),
              updated_by = $2
          WHERE id = $3`,
@@ -60,16 +62,17 @@ export async function PATCH(
         return NextResponse.json({ error: 'Category and name are required.' }, { status: 400 });
       }
       await pool.query(
-        `UPDATE inventory_items
+         `UPDATE inventory_items
          SET category_id = $1, name = $2, scan_key = $3, aliases = $4,
-             quantity = $5, desired_quantity = $6, used_by = $7, bank_page = $8,
-             charges = $9, recipe_url = $10, storage_bucket = $11, notes = $12,
-             texture_path = $13, updated_at = NOW(), updated_by = $14
-         WHERE id = $15`,
+             quantity = $5, reserve_quantity = $6, desired_quantity = $7, used_by = $8, bank_page = $9,
+             charges = $10, recipe_url = $11, storage_bucket = $12, notes = $13,
+             texture_path = $14, updated_at = NOW(), updated_by = $15
+         WHERE id = $16`,
         [
           categoryId, name, nullableString(body.scanKey) ?? name,
           Array.isArray(body.aliases) ? body.aliases.filter(value => typeof value === 'string') : [],
-          nonNegativeInteger(body.quantity ?? 0), nonNegativeInteger(body.desiredQuantity, true),
+          nonNegativeInteger(body.quantity ?? 0), nonNegativeInteger(body.reserveQuantity ?? 0),
+          nonNegativeInteger(body.desiredQuantity, true),
           nullableString(body.usedBy), nullableString(body.bankPage),
           nonNegativeInteger(body.charges, true), nullableString(body.recipeUrl),
           storageBucket, nullableString(body.notes), nullableString(body.texturePath),

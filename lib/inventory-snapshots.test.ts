@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { aggregateInventorySnapshots, matchInventorySnapshot } from './inventory-snapshots';
+import {
+  aggregateInventorySnapshots,
+  isReserveInventorySource,
+  matchInventorySnapshot,
+} from './inventory-snapshots';
 
 const items = [
   { id: 1, name: 'Golden Avia Feathers', scanKey: 'Golden Avia Feathers', aliases: ['Golden Avia Feather'] },
@@ -29,5 +33,12 @@ describe('inventory source snapshots', () => {
       { 'MR Pot': 7 },
     ], items);
     expect(totals.get(2)).toBe(7);
+  });
+
+  it('only classifies Bonus Consu snapshots as reserve', () => {
+    expect(isReserveInventorySource('character_bank:bonus-consu-1')).toBe(true);
+    expect(isReserveInventorySource('character_bank:bonus-consu-3')).toBe(true);
+    expect(isReserveInventorySource('character_bank:dry-consu')).toBe(false);
+    expect(isReserveInventorySource('account_bank')).toBe(false);
   });
 });

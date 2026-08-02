@@ -25,6 +25,7 @@ interface InventoryItem {
   scanKey: string;
   aliases: string[];
   quantity: number;
+  reserveQuantity: number;
   desiredQuantity: number | null;
   enough: boolean | null;
   usedBy: string | null;
@@ -56,7 +57,6 @@ interface InventoryScan {
   receivedAt: string;
   reportedItems: number;
   matchedItems: number;
-  unknownItems: Record<string, number>;
 }
 
 interface InventoryData {
@@ -87,6 +87,7 @@ interface ItemDraft {
   scanKey: string;
   aliases: string;
   quantity: string;
+  reserveQuantity: string;
   desiredQuantity: string;
   usedBy: string;
   bankPage: string;
@@ -95,6 +96,7 @@ interface ItemDraft {
   storageBucket: Bucket;
   notes: string;
   texturePath: string;
+  archived: boolean;
 }
 
 const EMPTY: InventoryData = { categories: [], items: [], scans: [], exchangeMaterials: [] };
@@ -129,6 +131,7 @@ function itemDraft(item: InventoryItem): ItemDraft {
     scanKey: item.scanKey,
     aliases: item.aliases.join(', '),
     quantity: String(item.quantity),
+    reserveQuantity: String(item.reserveQuantity),
     desiredQuantity: item.desiredQuantity === null ? '' : String(item.desiredQuantity),
     usedBy: item.usedBy ?? '',
     bankPage: item.bankPage ?? '',
@@ -137,12 +140,14 @@ function itemDraft(item: InventoryItem): ItemDraft {
     storageBucket: item.storageBucket,
     notes: item.notes ?? '',
     texturePath: item.texturePath ?? '',
+    archived: item.archived,
   };
 }
 
 export default function InventoryPage() {
   const { user } = useExecSession();
   const canEdit = NARWHAL_RANKS.has(user?.rank ?? '');
+  const canAddItems = Boolean(user);
   const [data, setData] = useState<InventoryData>(EMPTY);
   const [view, setView] = useState<View>('ingredient');
   const [search, setSearch] = useState('');
@@ -233,6 +238,7 @@ export default function InventoryPage() {
       scanKey: draft.scanKey || draft.name,
       aliases: draft.aliases.split(',').map(value => value.trim()).filter(Boolean),
       quantity: Number(draft.quantity || 0),
+      reserveQuantity: Number(draft.reserveQuantity || 0),
       desiredQuantity: draft.desiredQuantity === '' ? null : Number(draft.desiredQuantity),
       usedBy: draft.usedBy,
       bankPage: draft.bankPage,
@@ -381,6 +387,7 @@ export default function InventoryPage() {
       scanKey: '',
       aliases: '',
       quantity: '0',
+      reserveQuantity: '0',
       desiredQuantity: '',
       usedBy: '',
       bankPage: '',
@@ -389,6 +396,7 @@ export default function InventoryPage() {
       storageBucket: category.kind === 'ingredient' ? 'misc_bucket' : 'account_bank',
       notes: '',
       texturePath: '',
+      archived: false,
     });
   }
 
@@ -481,7 +489,7 @@ export default function InventoryPage() {
       </div>
 
       {!canEdit && (
-        <p className={styles.readOnlyNote}>You have read access. Narwhal, Hydra, and Leader ranks can edit stock configuration.</p>
+        <p className={styles.readOnlyNote}>You can add inventory items. Narwhal, Hydra, and Leader ranks can edit existing items and manage categories.</p>
       )}
 
       {loading ? (
@@ -503,25 +511,29 @@ export default function InventoryPage() {
                     <h2>{category.name}</h2>
                     <span>{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
                   </div>
-                  {canEdit && view !== 'archive' && (
+                  {canAddItems && view !== 'archive' && (
                     <div className={styles.categoryActions}>
-                      <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
-                      <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
-                      <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
-                      <button
-                        className={styles.dangerText}
-                        onClick={() => {
-                          const replacement = data.categories.find(candidate => (
-                            candidate.kind === category.kind && candidate.id !== category.id && !candidate.archived
-                          ));
-                          setDeleteCategoryDialog({
-                            category,
-                            replacementId: replacement ? String(replacement.id) : '',
-                          });
-                        }}
-                      >
-                        Delete
-                      </button>
+                      {canEdit && (
+                        <>
+                          <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
+                          <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
+                          <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
+                          <button
+                            className={styles.dangerText}
+                            onClick={() => {
+                              const replacement = data.categories.find(candidate => (
+                                candidate.kind === category.kind && candidate.id !== category.id && !candidate.archived
+                              ));
+                              setDeleteCategoryDialog({
+                                category,
+                                replacementId: replacement ? String(replacement.id) : '',
+                              });
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
                       <button className={styles.primaryButton} onClick={() => newItem(category)}>Add item</button>
                     </div>
                   )}
@@ -532,12 +544,13 @@ export default function InventoryPage() {
                     <thead>
                       <tr>
                         <th>Item</th>
-                        <th>Stock</th>
-                        <th>Target</th>
+                        {view !== 'archive' && <th>Stock</th>}
+                        {view !== 'archive' && category.kind === 'consumable' && <th>Reserve</th>}
+                        {view !== 'archive' && <th>Target</th>}
                         {category.kind === 'consumable' && <th>Used by</th>}
                         {category.kind === 'consumable' && <th>Woealer page</th>}
                         {category.kind === 'consumable' && <th>Charges</th>}
-                        <th>Status</th>
+                        {view !== 'archive' && <th>Status</th>}
                         {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                       </tr>
                     </thead>
@@ -562,24 +575,33 @@ export default function InventoryPage() {
                               </div>
                             </div>
                           </td>
-                          <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
-                          <td className={styles.number}>
-                            {item.desiredQuantity === null ? '—' : item.kind === 'ingredient'
-                              ? stackAmount(item.desiredQuantity)
-                              : item.desiredQuantity}
-                          </td>
+                          {view !== 'archive' && (
+                            <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
+                          )}
+                          {view !== 'archive' && item.kind === 'consumable' && (
+                            <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
+                          )}
+                          {view !== 'archive' && (
+                            <td className={styles.number}>
+                              {item.desiredQuantity === null ? '—' : item.kind === 'ingredient'
+                                ? stackAmount(item.desiredQuantity)
+                                : item.desiredQuantity}
+                            </td>
+                          )}
                           {item.kind === 'consumable' && <td>{item.usedBy || '—'}</td>}
                           {item.kind === 'consumable' && <td>{item.bankPage || '—'}</td>}
                           {item.kind === 'consumable' && <td className={styles.number}>{item.charges ?? '—'}</td>}
-                          <td>
-                            {item.enough === null ? (
-                              <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
-                            ) : item.enough ? (
-                              <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
-                            ) : (
-                              <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
-                            )}
-                          </td>
+                          {view !== 'archive' && (
+                            <td>
+                              {item.enough === null ? (
+                                <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
+                              ) : item.enough ? (
+                                <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
+                              ) : (
+                                <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
+                              )}
+                            </td>
+                          )}
                           {canEdit && (
                             <td>
                               <div className={styles.rowActions}>
@@ -631,8 +653,15 @@ export default function InventoryPage() {
                   <option value="character_bank">Dry Consu</option>
                 </select>
               </label>
-              <label>Current quantity<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
-              <label>Enough at<input type="number" min="0" value={draft.desiredQuantity} onChange={event => setDraft({ ...draft, desiredQuantity: event.target.value })} placeholder="No target" /></label>
+              {!draft.archived && (
+                <>
+                  <label>Stock<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
+                  {draft.kind === 'consumable' && (
+                    <label>Reserve<input type="number" min="0" required value={draft.reserveQuantity} onChange={event => setDraft({ ...draft, reserveQuantity: event.target.value })} /></label>
+                  )}
+                  <label>Enough at<input type="number" min="0" value={draft.desiredQuantity} onChange={event => setDraft({ ...draft, desiredQuantity: event.target.value })} placeholder="No target" /></label>
+                </>
+              )}
               {draft.kind === 'consumable' && (
                 <>
                   <label>Used by<input value={draft.usedBy} onChange={event => setDraft({ ...draft, usedBy: event.target.value })} placeholder="DPS / Healer" /></label>

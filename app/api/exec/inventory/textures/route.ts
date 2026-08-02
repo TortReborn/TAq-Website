@@ -4,7 +4,7 @@ import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
-import { requireExecSession, requireNarwhalSession } from '@/lib/exec-auth';
+import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { getS3 } from '@/lib/s3';
 
@@ -115,8 +115,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await requireNarwhalSession(request);
-  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+  const session = await requireExecSession(request);
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const form = await request.formData();

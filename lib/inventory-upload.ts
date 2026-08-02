@@ -3,6 +3,7 @@ import { getPool } from '@/lib/db';
 import {
   aggregateInventorySnapshots,
   InventoryMatchItem,
+  isReserveInventorySource,
   matchInventorySnapshot,
 } from '@/lib/inventory-snapshots';
 
@@ -54,8 +55,9 @@ export async function handleInventoryUpload(request: NextRequest) {
   }
   const sourceName = (typeof body.sourceName === 'string' && body.sourceName.trim() ? body.sourceName.trim() : scanType).slice(0, 120);
   const primary = scanType === 'misc_bucket' ? asCountMap(body.ingredients) : asCountMap(body.consumables);
-  const unknown = asCountMap(body.unknownItems);
-  const reported = { ...unknown, ...primary };
+  const itemKind = scanType === 'misc_bucket' ? 'ingredient' : 'consumable';
+  const reported = primary;
+  const reserveSource = itemKind === 'consumable' && isReserveInventorySource(requestedSourceKey);
   const clientTimestamp = typeof body.timestamp === 'number' && Number.isFinite(body.timestamp)
     ? new Date(body.timestamp)
     : null;
@@ -65,19 +67,25 @@ export async function handleInventoryUpload(request: NextRequest) {
   try {
     await client.query('BEGIN');
     const itemResult = await client.query(
-      `SELECT id, name, scan_key, aliases
+      `SELECT id, name, scan_key, aliases, storage_bucket
        FROM inventory_items
-       WHERE storage_bucket = $1 AND archived = FALSE
+       WHERE kind = $1 AND archived = FALSE
+       ORDER BY sort_order, id
        FOR UPDATE`,
-      [scanType]
+      [itemKind]
     );
-    const items: InventoryMatchItem[] = itemResult.rows.map(row => ({
+    const items: Array<InventoryMatchItem & { storageBucket: string }> = itemResult.rows.map(row => ({
       id: Number(row.id),
       name: row.name,
       scanKey: row.scan_key,
       aliases: row.aliases ?? [],
+      storageBucket: row.storage_bucket,
     }));
-    const { matchedCounts, unmatched, matched } = matchInventorySnapshot(reported, items);
+    const sourceItems = itemKind === 'ingredient' || reserveSource
+      ? items
+      : items.filter(item => item.storageBucket === scanType);
+    const { matchedCounts, matched } = matchInventorySnapshot(reported, sourceItems);
+    const unmatched = {};
 
     await client.query(
       `INSERT INTO inventory_scan_sources (
@@ -95,28 +103,38 @@ export async function handleInventoryUpload(request: NextRequest) {
     );
 
     const snapshotResult = await client.query(
-      `SELECT item_counts
+      `SELECT source_key, item_counts
        FROM inventory_scan_sources
-       WHERE storage_bucket = $1`,
-      [scanType]
+       WHERE storage_bucket = ANY($1::text[])`,
+      [itemKind === 'consumable' ? ['account_bank', 'character_bank'] : ['misc_bucket']]
     );
-    const totals = aggregateInventorySnapshots(
-      snapshotResult.rows.map(row => parseJsonCountMap(row.item_counts)),
+    const stockTotals = aggregateInventorySnapshots(
+      snapshotResult.rows
+        .filter(row => !isReserveInventorySource(row.source_key))
+        .map(row => parseJsonCountMap(row.item_counts)),
       items
     );
+    const reserveTotals = itemKind === 'consumable'
+      ? aggregateInventorySnapshots(
+        snapshotResult.rows
+          .filter(row => isReserveInventorySource(row.source_key))
+          .map(row => parseJsonCountMap(row.item_counts)),
+        items
+      )
+      : new Map<number, number>();
 
     await client.query(
       `UPDATE inventory_items
-       SET quantity = 0, updated_at = NOW(), updated_by = $2
-       WHERE storage_bucket = $1 AND archived = FALSE`,
-      [scanType, uploader]
+       SET quantity = 0, reserve_quantity = 0, updated_at = NOW(), updated_by = $2
+       WHERE kind = $1 AND archived = FALSE`,
+      [itemKind, uploader]
     );
-    for (const [id, quantity] of totals) {
+    for (const item of items) {
       await client.query(
         `UPDATE inventory_items
-         SET quantity = $1, updated_at = NOW(), updated_by = $2
-         WHERE id = $3`,
-        [quantity, uploader, id]
+         SET quantity = $1, reserve_quantity = $2, updated_at = NOW(), updated_by = $3
+         WHERE id = $4`,
+        [stockTotals.get(item.id) ?? 0, reserveTotals.get(item.id) ?? 0, uploader, item.id]
       );
     }
 
@@ -134,7 +152,6 @@ export async function handleInventoryUpload(request: NextRequest) {
       sourceKey: requestedSourceKey,
       sourceName,
       matched,
-      unknownItems: unmatched,
     });
   } catch (error) {
     await client.query('ROLLBACK');
