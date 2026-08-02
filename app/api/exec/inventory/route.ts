@@ -48,7 +48,7 @@ async function loadInventory() {
        ORDER BY kind, archived, sort_order, name`
     ),
     pool.query(
-      `SELECT id, scan_type, uploaded_by, client_timestamp, received_at,
+      `SELECT id, scan_type, source_key, source_name, uploaded_by, client_timestamp, received_at,
               reported_items, matched_items, unknown_items
        FROM inventory_scans
        ORDER BY received_at DESC
@@ -129,6 +129,8 @@ async function loadInventory() {
     scans: scanResult.rows.map(row => ({
       id: Number(row.id),
       scanType: row.scan_type,
+      sourceKey: row.source_key,
+      sourceName: row.source_name,
       uploadedBy: row.uploaded_by,
       clientTimestamp: row.client_timestamp,
       receivedAt: row.received_at,

@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS inventory_scans (
   id                BIGSERIAL   PRIMARY KEY,
   scan_type         TEXT        NOT NULL
                                 CHECK (scan_type IN ('misc_bucket', 'account_bank', 'character_bank')),
+  source_key        TEXT,
+  source_name       TEXT,
   uploaded_by       TEXT        NOT NULL,
   client_timestamp  TIMESTAMPTZ,
   received_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -58,6 +60,22 @@ CREATE TABLE IF NOT EXISTS inventory_scans (
 
 CREATE INDEX IF NOT EXISTS idx_inventory_scans_received
   ON inventory_scans(received_at DESC);
+
+CREATE TABLE IF NOT EXISTS inventory_scan_sources (
+  storage_bucket    TEXT        NOT NULL
+                                CHECK (storage_bucket IN ('misc_bucket', 'account_bank', 'character_bank')),
+  source_key        TEXT        NOT NULL,
+  source_name       TEXT        NOT NULL,
+  item_counts       JSONB       NOT NULL DEFAULT '{}'::jsonb,
+  unknown_items     JSONB       NOT NULL DEFAULT '{}'::jsonb,
+  uploaded_by       TEXT        NOT NULL,
+  client_timestamp  TIMESTAMPTZ,
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (storage_bucket, source_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_inventory_scan_sources_updated
+  ON inventory_scan_sources(storage_bucket, updated_at DESC);
 
 INSERT INTO inventory_categories (kind, name, slug, sort_order)
 VALUES
