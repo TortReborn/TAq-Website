@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
-import { LIST_ORDER_SQL, RAID_SHORT_TO_FULL } from '@/lib/graid-log-constants';
+import { LIST_ORDER_SQL } from '@/lib/graid-log-constants';
+import {
+  validateGraidLogBatch,
+  validateGraidLogSubmission,
+  validateGraidRaidType,
+} from '@/lib/graid-log-validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,46 +128,40 @@ export async function POST(request: NextRequest) {
 
   try {
     const pool = getPool();
-    const { raidType, participants, mode } = await request.json();
+    const body = await request.json();
 
-    // Validate participants
-    if (!participants || !Array.isArray(participants) || participants.length === 0) {
-      return NextResponse.json({ error: 'Participants are required.' }, { status: 400 });
-    }
-    for (const p of participants) {
-      if (!p || typeof p !== 'string' || !p.trim()) {
-        return NextResponse.json({ error: 'All participants must have a valid IGN.' }, { status: 400 });
+    // Normalize to a list of raids. The form submits { raids: [...] } — each
+    // raid has 1-4 participants (cross-guild parties only log our own members)
+    // and an optional type (Unknown = recorded but not posted to Discord).
+    // The legacy single-raid shape { raidType, participants, mode } is still
+    // accepted. See lib/graid-log-validation.
+    let entries: { fullRaidName: string | null; participants: string[]; mode: 'group' | 'individual' }[];
+    if (Array.isArray(body?.raids)) {
+      const batch = validateGraidLogBatch(body.raids);
+      if (!batch.ok) {
+        return NextResponse.json({ error: batch.error }, { status: 400 });
       }
-    }
-
-    // Determine mode: explicit or inferred from participant count
-    const inferredMode: 'group' | 'individual' = mode === 'individual' || participants.length === 1 ? 'individual' : 'group';
-
-    if (inferredMode === 'group') {
-      if (participants.length !== 4) {
-        return NextResponse.json({ error: 'Exactly 4 participants are required for a group raid.' }, { status: 400 });
-      }
-      const uniqueIgns = new Set(participants.map((p: string) => p.trim().toLowerCase()));
-      if (uniqueIgns.size < 4) {
-        return NextResponse.json({ error: 'All 4 participants must be different players.' }, { status: 400 });
-      }
+      // The queue's mode column doubles as the announce flag: the bot only
+      // posts to Discord for mode 'group' with a known raid type.
+      entries = batch.raids.map(r => ({
+        fullRaidName: r.raidType,
+        participants: r.participants,
+        mode: (r.announce && r.raidType ? 'group' : 'individual') as 'group' | 'individual',
+      }));
     } else {
-      if (participants.length !== 1) {
-        return NextResponse.json({ error: 'Individual logs must have exactly 1 participant.' }, { status: 400 });
+      const validation = validateGraidLogSubmission(body?.participants, body?.mode);
+      if (!validation.ok) {
+        return NextResponse.json({ error: validation.error }, { status: 400 });
       }
-    }
-
-    // Validate raid type — required for group, optional (Unknown allowed) for individual
-    let fullRaidName: string | null = null;
-    const rawType = (raidType ?? '').toString().trim();
-    if (rawType && rawType !== 'Unknown') {
-      const resolved = RAID_SHORT_TO_FULL[rawType];
-      if (!resolved) {
-        return NextResponse.json({ error: 'Invalid raid type. Must be NOTG, TCC, TNA, NOL, WTP, or Unknown.' }, { status: 400 });
+      const typeResult = validateGraidRaidType(body?.raidType);
+      if (!typeResult.ok) {
+        return NextResponse.json({ error: typeResult.error }, { status: 400 });
       }
-      fullRaidName = resolved;
-    } else if (inferredMode === 'group') {
-      return NextResponse.json({ error: 'Raid type is required for group raids.' }, { status: 400 });
+      entries = [{
+        fullRaidName: typeResult.fullRaidName,
+        participants: validation.participants,
+        mode: validation.mode,
+      }];
     }
 
     // Validate participants are guild members
@@ -178,52 +177,75 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Distinct IGNs across all raids (lowercased key → display form)
+    const distinctIgns = new Map<string, string>();
+    for (const entry of entries) {
+      for (const ign of entry.participants) {
+        if (!distinctIgns.has(ign.toLowerCase())) distinctIgns.set(ign.toLowerCase(), ign);
+      }
+    }
+
     if (guildMembers.size > 0) {
-      const nonMembers = participants.filter((p: string) => !guildMembers.has(p.trim().toLowerCase()));
+      const nonMembers = [...distinctIgns.values()].filter(p => !guildMembers.has(p.toLowerCase()));
       if (nonMembers.length > 0) {
         return NextResponse.json({ error: `Not current guild members: ${nonMembers.join(', ')}` }, { status: 400 });
       }
     }
 
-    // Resolve UUIDs from IGNs so the queue carries everything the bot needs
-    // and we don't have to hit discord_links again at processing time.
-    const resolvedParticipants: { uuid: string | null; ign: string }[] = [];
-    for (const ign of participants) {
-      const trimmed = ign.trim();
+    // Resolve UUIDs from IGNs (once per distinct player) so the queue carries
+    // everything the bot needs and we don't have to hit discord_links again
+    // at processing time.
+    const uuidByIgn = new Map<string, string | null>();
+    for (const [key, ign] of distinctIgns) {
       const uuidResult = await pool.query(
-        `SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1)`, [trimmed]
+        `SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1)`, [ign]
       );
-      resolvedParticipants.push({
-        uuid: uuidResult.rows.length > 0 ? uuidResult.rows[0].uuid : null,
-        ign: trimmed,
-      });
+      uuidByIgn.set(key, uuidResult.rows.length > 0 ? uuidResult.rows[0].uuid : null);
     }
 
-    // Insert into the queue. The bot's update_member_data loop will pick this
-    // up on its next tick (~3 minutes) and run it through the same flow as
+    // Insert all raids into the queue atomically — a failed batch queues
+    // nothing. The bot's update_member_data loop will pick these up on its
+    // next tick (~3 minutes) and run them through the same flow as
     // auto-detected raids.
-    const queueResult = await pool.query(
-      `INSERT INTO graid_log_queue (raid_type, mode, participants, submitted_by, submitted_by_ign)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [fullRaidName, inferredMode, JSON.stringify(resolvedParticipants), session.discord_id, session.ign]
-    );
-    const queueId = queueResult.rows[0].id;
+    const queueIds: number[] = [];
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      for (const entry of entries) {
+        const resolvedParticipants = entry.participants.map(ign => ({
+          uuid: uuidByIgn.get(ign.toLowerCase()) ?? null,
+          ign,
+        }));
+        const queueResult = await client.query(
+          `INSERT INTO graid_log_queue (raid_type, mode, participants, submitted_by, submitted_by_ign)
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          [entry.fullRaidName, entry.mode, JSON.stringify(resolvedParticipants), session.discord_id, session.ign]
+        );
+        const queueId = queueResult.rows[0].id;
+        queueIds.push(queueId);
 
-    // Audit log
-    const typeLabel = fullRaidName ?? 'Unknown';
-    const actionDesc = inferredMode === 'individual'
-      ? `Queued individual raid (queue #${queueId}): ${typeLabel} for ${participants[0]}`
-      : `Queued guild raid (queue #${queueId}): ${typeLabel} with ${participants.join(', ')}`;
-    await pool.query(
-      `INSERT INTO audit_log (log_type, actor_name, actor_id, action)
-       VALUES ('graid', $1, $2, $3)`,
-      [session.ign, session.discord_id, actionDesc]
-    );
+        const typeLabel = entry.fullRaidName ?? 'Unknown';
+        const actionDesc = `Queued ${entry.mode === 'group' ? 'guild raid' : 'silent guild raid'} (queue #${queueId}): ${typeLabel} with ${entry.participants.join(', ')}`;
+        await client.query(
+          `INSERT INTO audit_log (log_type, actor_name, actor_id, action)
+           VALUES ('graid', $1, $2, $3)`,
+          [session.ign, session.discord_id, actionDesc]
+        );
+      }
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
 
     return NextResponse.json({
       success: true,
-      id: queueId,
-      mode: inferredMode,
+      id: queueIds[0],
+      ids: queueIds,
+      count: queueIds.length,
+      mode: entries[0].mode,
       status: 'pending',
       warning: 'Queued for the bot — will appear in Discord on the next bot tick (within ~3 minutes).',
     });

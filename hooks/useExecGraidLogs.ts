@@ -228,18 +228,18 @@ export function useExecGraidLogMutations() {
     return data;
   };
 
-  const createLog = async (raidType: string, participants: string[], mode: 'group' | 'individual' = 'group') => {
+  const createLogs = async (raids: { raidType: string; participants: string[]; announce: boolean }[]) => {
     const res = await fetch('/api/exec/guild-raids', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raidType, participants, mode }),
+      body: JSON.stringify({ raids }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to log guild raid');
+    if (!res.ok) throw new Error(data.error || 'Failed to log guild raids');
     return data;
   };
 
-  return { deleteLog, createLog };
+  return { deleteLog, createLogs };
 }
 
 export function useExecGraidRaceData(filters: GraidRaceFilters | null) {
