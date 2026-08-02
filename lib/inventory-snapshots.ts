@@ -14,6 +14,10 @@ export function normalizeInventoryName(value: string): string {
     .toLocaleLowerCase('en-US');
 }
 
+export function isReserveInventorySource(sourceKey: string): boolean {
+  return sourceKey.startsWith('character_bank:bonus-consu-');
+}
+
 export function matchInventorySnapshot(
   reported: Record<string, number>,
   items: InventoryMatchItem[]

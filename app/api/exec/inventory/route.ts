@@ -41,7 +41,7 @@ async function loadInventory() {
        ORDER BY kind, sort_order, name`
     ),
     pool.query(
-      `SELECT id, kind, category_id, name, scan_key, aliases, quantity, desired_quantity,
+      `SELECT id, kind, category_id, name, scan_key, aliases, quantity, reserve_quantity, desired_quantity,
               used_by, bank_page, charges, recipe_url, storage_bucket, notes, texture_path,
               sort_order, archived, archived_at, updated_by, updated_at
        FROM inventory_items
@@ -49,7 +49,7 @@ async function loadInventory() {
     ),
     pool.query(
       `SELECT id, scan_type, source_key, source_name, uploaded_by, client_timestamp, received_at,
-              reported_items, matched_items, unknown_items
+              reported_items, matched_items
        FROM inventory_scans
        ORDER BY received_at DESC
        LIMIT 12`
@@ -101,6 +101,7 @@ async function loadInventory() {
         scanKey: row.scan_key,
         aliases: row.aliases ?? [],
         quantity: row.quantity,
+        reserveQuantity: row.reserve_quantity,
         desiredQuantity: row.desired_quantity,
         enough: row.desired_quantity === null ? null : row.quantity >= row.desired_quantity,
         usedBy: row.used_by,
@@ -136,7 +137,6 @@ async function loadInventory() {
       receivedAt: row.received_at,
       reportedItems: row.reported_items,
       matchedItems: row.matched_items,
-      unknownItems: row.unknown_items ?? {},
     })),
   };
 }
@@ -270,16 +270,17 @@ export async function POST(request: NextRequest) {
       );
       await pool.query(
         `INSERT INTO inventory_items (
-           kind, category_id, name, scan_key, aliases, quantity, desired_quantity,
+           kind, category_id, name, scan_key, aliases, quantity, reserve_quantity, desired_quantity,
            used_by, bank_page, charges, recipe_url, storage_bucket, notes, texture_path,
            sort_order, updated_by
          ) VALUES (
-           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
          )`,
         [
           kind, categoryId, name, nullableString(body.scanKey) ?? name,
           Array.isArray(body.aliases) ? body.aliases.filter(value => typeof value === 'string') : [],
-          nonNegativeInteger(body.quantity ?? 0), nonNegativeInteger(body.desiredQuantity, true),
+          nonNegativeInteger(body.quantity ?? 0), nonNegativeInteger(body.reserveQuantity ?? 0),
+          nonNegativeInteger(body.desiredQuantity, true),
           nullableString(body.usedBy), nullableString(body.bankPage),
           nonNegativeInteger(body.charges, true), nullableString(body.recipeUrl),
           storageBucket, nullableString(body.notes), nullableString(body.texturePath),

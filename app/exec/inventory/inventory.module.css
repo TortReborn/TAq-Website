@@ -445,6 +445,10 @@
   white-space: nowrap;
 }
 
+.reserveNumber {
+  color: #fcd34d !important;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
