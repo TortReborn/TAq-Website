@@ -26,12 +26,20 @@ export async function GET(request: NextRequest) {
     if (dateTo) { conditions.push(`gl.completed_at <= $${paramIdx++}`); params.push(dateTo); }
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    // UUID-first aggregation with display name from discord_links
+    // UUID-first aggregation with display name from discord_links. uuid is not
+    // unique in discord_links (relinks, unlinked history) — pick one best link
+    // per participant or the join fans out and inflates raid counts.
     const result = await pool.query(
       `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, gl.raid_type
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
-       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+       LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = glp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        ${whereClause}`,
       params
     );
@@ -90,7 +98,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const players = Array.from(playerMap.values()).map(data => ({
+    const players = Array.from(playerMap.entries()).map(([key, data]) => ({
+      key,
       ign: data.displayName,
       total: data.total,
       notg: data.typeCounts.NOTG || 0,
