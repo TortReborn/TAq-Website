@@ -1,33 +1,21 @@
 // Validation for manually-logged guild raids (the /exec/guild-raids Log tab).
 // Raids allow 1-4 participants: when raiding alongside players from other
 // guilds, only our own members are logged, so a full party of 4 is not
-// guaranteed. Raids with an Unknown type are recorded for totals but not
-// posted to Discord by the bot — that replaces the old "individual" fix-up
-// mode, which is kept only for API backward compatibility.
+// guaranteed. Party size never changes how a raid is processed — the announce
+// flag decides whether the bot posts it to Discord, and raids with an Unknown
+// type are recorded for totals but never announced.
 
 import { RAID_SHORT_TO_FULL } from './graid-log-constants';
 
-export const GROUP_MIN_PARTICIPANTS = 1;
-export const GROUP_MAX_PARTICIPANTS = 4;
+export const MIN_PARTICIPANTS = 1;
+export const MAX_PARTICIPANTS = 4;
 export const MAX_RAIDS_PER_SUBMISSION = 50;
 
-export type GraidLogMode = 'group' | 'individual';
-
 export type GraidLogValidationResult =
-  | { ok: true; mode: GraidLogMode; participants: string[] }
+  | { ok: true; participants: string[] }
   | { ok: false; error: string };
 
-// Explicit mode wins; otherwise a single participant is treated as an
-// individual fix-up and anything larger as a group raid.
-export function resolveGraidLogMode(mode: unknown, participantCount: number): GraidLogMode {
-  if (mode === 'group' || mode === 'individual') return mode;
-  return participantCount === 1 ? 'individual' : 'group';
-}
-
-export function validateGraidLogSubmission(
-  participants: unknown,
-  mode: unknown,
-): GraidLogValidationResult {
+export function validateGraidLogSubmission(participants: unknown): GraidLogValidationResult {
   if (!participants || !Array.isArray(participants) || participants.length === 0) {
     return { ok: false, error: 'Participants are required.' };
   }
@@ -38,24 +26,18 @@ export function validateGraidLogSubmission(
   }
 
   const trimmed = (participants as string[]).map(p => p.trim());
-  const resolvedMode = resolveGraidLogMode(mode, trimmed.length);
-
-  if (resolvedMode === 'group') {
-    if (trimmed.length < GROUP_MIN_PARTICIPANTS || trimmed.length > GROUP_MAX_PARTICIPANTS) {
-      return {
-        ok: false,
-        error: `Group raids must have between ${GROUP_MIN_PARTICIPANTS} and ${GROUP_MAX_PARTICIPANTS} participants.`,
-      };
-    }
-    const uniqueIgns = new Set(trimmed.map(p => p.toLowerCase()));
-    if (uniqueIgns.size < trimmed.length) {
-      return { ok: false, error: 'All participants must be different players.' };
-    }
-  } else if (trimmed.length !== 1) {
-    return { ok: false, error: 'Individual logs must have exactly 1 participant.' };
+  if (trimmed.length < MIN_PARTICIPANTS || trimmed.length > MAX_PARTICIPANTS) {
+    return {
+      ok: false,
+      error: `Raids must have between ${MIN_PARTICIPANTS} and ${MAX_PARTICIPANTS} participants.`,
+    };
+  }
+  const uniqueIgns = new Set(trimmed.map(p => p.toLowerCase()));
+  if (uniqueIgns.size < trimmed.length) {
+    return { ok: false, error: 'All participants must be different players.' };
   }
 
-  return { ok: true, mode: resolvedMode, participants: trimmed };
+  return { ok: true, participants: trimmed };
 }
 
 // Resolves a short raid type (NOTG, TCC, ...) to its full name.
@@ -106,7 +88,6 @@ export function validateGraidLogBatch(raids: unknown): GraidLogBatchResult {
     }
     const participantsResult = validateGraidLogSubmission(
       (entry as Record<string, unknown>).participants,
-      'group',
     );
     if (!participantsResult.ok) {
       return { ok: false, error: `Raid ${i + 1}: ${participantsResult.error}` };
