@@ -43,7 +43,13 @@ export async function GET(request: NextRequest) {
         `SELECT ps.id, ps.uuid, ps.ign, ps.current_rank, ps.suggested_by_ign, ps.created_at, ps.reason,
                 dl.discord_id
          FROM promo_suggestions ps
-         LEFT JOIN discord_links dl ON dl.uuid = ps.uuid
+         LEFT JOIN LATERAL (
+           SELECT discord_id
+           FROM discord_links
+           WHERE uuid = ps.uuid
+           ORDER BY linked DESC, (rank <> '') DESC, discord_id
+           LIMIT 1
+         ) dl ON TRUE
          ORDER BY ps.created_at DESC`
       ),
       // 7-day activity snapshots

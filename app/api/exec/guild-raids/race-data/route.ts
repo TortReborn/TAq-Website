@@ -67,7 +67,13 @@ export async function GET(request: NextRequest) {
               ) AS participants
        FROM graid_logs gl
        LEFT JOIN graid_log_participants glp ON glp.log_id = gl.id
-       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+       LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = glp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        ${where}
        GROUP BY gl.id
        ORDER BY gl.completed_at ASC`,

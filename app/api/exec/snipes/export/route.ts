@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { LIST_ORDER_SQL } from '@/lib/snipe-constants';
+import { resolveUuidByIgn } from '@/lib/discord-links';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,7 +49,18 @@ export async function GET(request: NextRequest) {
     if (diffMax) { conditions.push(`sl.difficulty <= $${paramIdx++}`); params.push(parseInt(diffMax, 10)); }
     if (dateFrom) { conditions.push(`sl.sniped_at >= $${paramIdx++}`); params.push(dateFrom); }
     if (dateTo) { conditions.push(`sl.sniped_at <= $${paramIdx++}`); params.push(dateTo); }
-    if (ign) { conditions.push(`sl.id IN (SELECT snipe_id FROM snipe_participants WHERE LOWER(ign) = LOWER($${paramIdx++}))`); params.push(ign); }
+    if (ign) {
+      // Resolve IGN → UUID first for accurate filtering across name changes.
+      // Old rows may have no uuid — those keep ign-fallback identity.
+      const filterUuid = await resolveUuidByIgn(pool, ign);
+      if (filterUuid) {
+        conditions.push(`sl.id IN (SELECT snipe_id FROM snipe_participants WHERE uuid = $${paramIdx++} OR (uuid IS NULL AND LOWER(ign) = LOWER($${paramIdx++})))`);
+        params.push(filterUuid, ign);
+      } else {
+        conditions.push(`sl.id IN (SELECT snipe_id FROM snipe_participants WHERE LOWER(ign) = LOWER($${paramIdx++}))`);
+        params.push(ign);
+      }
+    }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
     const orderClause = LIST_ORDER_SQL[sort] || LIST_ORDER_SQL['Newest'];
@@ -63,27 +75,32 @@ export async function GET(request: NextRequest) {
       params
     );
 
-    // Fetch participants
+    // Fetch participants (uuids exported alongside names, in the same order,
+    // so downstream can re-key across renames; old rows may have no uuid)
     const snipeIds = logsResult.rows.map((r: any) => r.id);
     let participantsBySnipe: Record<number, string> = {};
+    let participantUuidsBySnipe: Record<number, string> = {};
     if (snipeIds.length > 0) {
       const placeholders = snipeIds.map((_: any, i: number) => `$${i + 1}`).join(',');
       const partResult = await pool.query(
-        `SELECT snipe_id, ign, role FROM snipe_participants WHERE snipe_id IN (${placeholders}) ORDER BY role, ign`,
+        `SELECT snipe_id, ign, role, uuid FROM snipe_participants WHERE snipe_id IN (${placeholders}) ORDER BY role, ign`,
         snipeIds
       );
       for (const row of partResult.rows) {
         const existing = participantsBySnipe[row.snipe_id] || '';
         participantsBySnipe[row.snipe_id] = existing ? `${existing}; ${row.ign} (${row.role})` : `${row.ign} (${row.role})`;
+        const existingUuids = participantUuidsBySnipe[row.snipe_id];
+        participantUuidsBySnipe[row.snipe_id] = existingUuids != null ? `${existingUuids}; ${row.uuid || ''}` : `${row.uuid || ''}`;
       }
     }
 
     // Build CSV
-    const header = 'ID,Date,HQ,Guild,Difficulty,Connections,Season,Participants';
+    const header = 'ID,Date,HQ,Guild,Difficulty,Connections,Season,Participants,ParticipantUuids';
     const rows = logsResult.rows.map((r: any) => {
       const date = new Date(r.sniped_at).toISOString().slice(0, 19).replace('T', ' ');
       const parts = (participantsBySnipe[r.id] || '').replace(/"/g, '""');
-      return `${r.id},${date},"${r.hq}",${r.guild_tag},${r.difficulty},${r.conns},${r.season},"${parts}"`;
+      const partUuids = participantUuidsBySnipe[r.id] || '';
+      return `${r.id},${date},"${r.hq}",${r.guild_tag},${r.difficulty},${r.conns},${r.season},"${parts}","${partUuids}"`;
     });
 
     const csv = [header, ...rows].join('\n');

@@ -60,9 +60,13 @@ export async function GET(request: NextRequest) {
           dateParams
         ),
         pool.query(
-          `SELECT discord_id, ign, COUNT(*) as views, MAX(created_at) as last_seen
+          // Group by discord_id only so a rename doesn't split a user's rows;
+          // display the most recently recorded ign
+          `SELECT discord_id,
+                  (array_agg(ign ORDER BY created_at DESC) FILTER (WHERE ign IS NOT NULL))[1] AS ign,
+                  COUNT(*) as views, MAX(created_at) as last_seen
            FROM analytics_page_views WHERE discord_id IS NOT NULL${dateClause}
-           GROUP BY discord_id, ign ORDER BY views DESC LIMIT 10`,
+           GROUP BY discord_id ORDER BY views DESC LIMIT 10`,
           dateParams
         ),
       ]);
@@ -168,16 +172,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (metric === 'users') {
-      // Get user view counts
+      // Get user view counts, grouped by discord_id only so a rename doesn't
+      // split a user's rows; display the most recently recorded ign
       const viewsResult = await pool.query(
         `SELECT
            pv.discord_id,
-           pv.ign,
+           (array_agg(pv.ign ORDER BY pv.created_at DESC) FILTER (WHERE pv.ign IS NOT NULL))[1] AS ign,
            COUNT(*) as total_views,
            MAX(pv.created_at) as last_seen
          FROM analytics_page_views pv
          WHERE pv.discord_id IS NOT NULL${dateClause}
-         GROUP BY pv.discord_id, pv.ign
+         GROUP BY pv.discord_id
          ORDER BY total_views DESC LIMIT 50`,
         dateParams
       );

@@ -5,6 +5,7 @@ interface ExecUser {
   discord_id: string;
   discord_username: string;
   discord_avatar: string;
+  uuid: string;
   ign: string;
   rank: string;
   role: 'exec' | 'member';

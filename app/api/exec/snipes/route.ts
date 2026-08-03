@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { normalizeHq, isDry, LIST_ORDER_SQL } from '@/lib/snipe-constants';
+import { resolveUuidByIgn, resolveUuidsByIgns } from '@/lib/discord-links';
 import { escapeDiscordMarkdown } from '@/lib/discord-markdown';
 
 export const dynamic = 'force-dynamic';
@@ -134,8 +135,16 @@ export async function GET(request: NextRequest) {
       params.push(dateTo);
     }
     if (ign) {
-      conditions.push(`sl.id IN (SELECT snipe_id FROM snipe_participants WHERE LOWER(ign) = LOWER($${paramIdx++}))`);
-      params.push(ign);
+      // Resolve IGN → UUID first for accurate filtering across name changes.
+      // Old rows may have no uuid — those keep ign-fallback identity.
+      const filterUuid = await resolveUuidByIgn(pool, ign);
+      if (filterUuid) {
+        conditions.push(`sl.id IN (SELECT snipe_id FROM snipe_participants WHERE uuid = $${paramIdx++} OR (uuid IS NULL AND LOWER(ign) = LOWER($${paramIdx++})))`);
+        params.push(filterUuid, ign);
+      } else {
+        conditions.push(`sl.id IN (SELECT snipe_id FROM snipe_participants WHERE LOWER(ign) = LOWER($${paramIdx++}))`);
+        params.push(ign);
+      }
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -161,17 +170,17 @@ export async function GET(request: NextRequest) {
 
     // Fetch participants for all returned snipes
     const snipeIds = logsResult.rows.map((r: any) => r.id);
-    let participantsBySnipe: Record<number, { ign: string; role: string }[]> = {};
+    let participantsBySnipe: Record<number, { ign: string; role: string; uuid: string | null }[]> = {};
 
     if (snipeIds.length > 0) {
       const placeholders = snipeIds.map((_: any, i: number) => `$${i + 1}`).join(',');
       const partResult = await pool.query(
-        `SELECT snipe_id, ign, role FROM snipe_participants WHERE snipe_id IN (${placeholders}) ORDER BY role, ign`,
+        `SELECT snipe_id, ign, role, uuid FROM snipe_participants WHERE snipe_id IN (${placeholders}) ORDER BY role, ign`,
         snipeIds
       );
       for (const row of partResult.rows) {
         if (!participantsBySnipe[row.snipe_id]) participantsBySnipe[row.snipe_id] = [];
-        participantsBySnipe[row.snipe_id].push({ ign: row.ign, role: row.role });
+        participantsBySnipe[row.snipe_id].push({ ign: row.ign, role: row.role, uuid: row.uuid });
       }
     }
 
@@ -283,11 +292,12 @@ export async function POST(request: NextRequest) {
     );
     const snipeId = snipeResult.rows[0].id;
 
-    // Insert participants
+    // Insert participants, carrying the stable uuid identity when resolvable
+    const uuidByIgn = await resolveUuidsByIgns(pool, participants.map((p: any) => p.ign));
     for (const p of participants) {
       await pool.query(
-        `INSERT INTO snipe_participants (snipe_id, ign, role) VALUES ($1, $2, $3)`,
-        [snipeId, p.ign, p.role]
+        `INSERT INTO snipe_participants (snipe_id, ign, role, uuid) VALUES ($1, $2, $3, $4)`,
+        [snipeId, p.ign, p.role, uuidByIgn.get(p.ign.toLowerCase()) ?? null]
       );
     }
 

@@ -3,6 +3,7 @@ import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { LIST_ORDER_SQL } from '@/lib/graid-log-constants';
 import { validateGraidLogBatch } from '@/lib/graid-log-validation';
+import { resolveUuidsByIgns } from '@/lib/discord-links';
 
 export const dynamic = 'force-dynamic';
 
@@ -86,7 +87,13 @@ export async function GET(request: NextRequest) {
       const partResult = await pool.query(
         `SELECT glp.log_id, COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid
          FROM graid_log_participants glp
-         LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+         LEFT JOIN LATERAL (
+           SELECT ign
+           FROM discord_links
+           WHERE uuid = glp.uuid
+           ORDER BY linked DESC, (rank <> '') DESC, discord_id
+           LIMIT 1
+         ) dl ON TRUE
          WHERE glp.log_id IN (${placeholders})
          ORDER BY display_name`,
         logIds
@@ -166,23 +173,8 @@ export async function POST(request: NextRequest) {
 
     // Resolve UUIDs from IGNs in one query so the queue carries everything the
     // bot needs and we don't have to hit discord_links again at processing
-    // time. discord_links can hold several rows per ign (relinks, unlinked
-    // history) — prefer the live linked row.
-    const uuidByIgn = new Map<string, string | null>(
-      [...distinctIgns.keys()].map(key => [key, null])
-    );
-    if (distinctIgns.size > 0) {
-      const uuidResult = await pool.query(
-        `SELECT DISTINCT ON (LOWER(ign)) LOWER(ign) AS key, uuid
-         FROM discord_links
-         WHERE LOWER(ign) = ANY($1::text[])
-         ORDER BY LOWER(ign), linked DESC, (rank <> '') DESC, discord_id`,
-        [[...distinctIgns.keys()]]
-      );
-      for (const row of uuidResult.rows) {
-        uuidByIgn.set(row.key, row.uuid);
-      }
-    }
+    // time.
+    const uuidByIgn = await resolveUuidsByIgns(pool, [...distinctIgns.values()]);
 
     // IGNs whose uuid could not be resolved from discord_links — either no
     // row, or a row with no uuid recorded. Both mean the identity is

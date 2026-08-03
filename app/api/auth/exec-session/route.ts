@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
       discord_id: session.discord_id,
       discord_username: session.discord_username,
       discord_avatar: session.discord_avatar,
+      uuid: linkCheck.uuid,
       ign: linkCheck.ign,
       rank: linkCheck.rank,
       role: linkCheck.role,
