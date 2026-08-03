@@ -49,7 +49,7 @@ const TOUR_STEPS: TourStep[] = [
     id: 'nav-activities',
     target: 'nav-activities',
     title: 'Activities',
-    description: 'Log and browse guild raids, manage raid events, review territory snipes, and track guild bank inventory. Great one stop shop for guild activities.',
+    description: 'Log and browse guild raids, manage raid events, review territory snipes, and track guild bank inventory. A great one-stop shop for guild activities.',
     position: 'right',
   },
   {

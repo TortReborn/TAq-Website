@@ -8,7 +8,7 @@ import { ANALYTICS_DISCORD_ID } from '@/lib/analytics-auth';
  */
 
 // Client-safe copy: lib/exec-auth.ts exports the canonical NARWHAL_RANKS but
-// is server-only (imports crypto/next-server). Keep the two lists in sync.
+// is server-only (imports crypto and next/server). Keep the two lists in sync.
 const NARWHAL_RANKS = new Set(['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader']);
 
 export interface ExecNavItem {
