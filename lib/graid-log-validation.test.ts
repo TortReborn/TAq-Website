@@ -1,35 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   MAX_RAIDS_PER_SUBMISSION,
-  resolveGraidLogMode,
   validateGraidLogBatch,
   validateGraidLogSubmission,
   validateGraidRaidType,
 } from './graid-log-validation';
 
-describe('resolveGraidLogMode', () => {
-  it('respects an explicit group mode even with a single participant', () => {
-    expect(resolveGraidLogMode('group', 1)).toBe('group');
-  });
-
-  it('respects an explicit individual mode', () => {
-    expect(resolveGraidLogMode('individual', 1)).toBe('individual');
-  });
-
-  it('infers individual for a single participant when mode is missing', () => {
-    expect(resolveGraidLogMode(undefined, 1)).toBe('individual');
-  });
-
-  it('infers group for multiple participants when mode is missing', () => {
-    expect(resolveGraidLogMode(undefined, 3)).toBe('group');
-    expect(resolveGraidLogMode('bogus', 4)).toBe('group');
-  });
-});
-
 describe('validateGraidLogSubmission', () => {
   it('rejects missing, non-array, or empty participants', () => {
     for (const bad of [undefined, null, 'Alice', {}, []]) {
-      const result = validateGraidLogSubmission(bad, 'group');
+      const result = validateGraidLogSubmission(bad);
       expect(result.ok).toBe(false);
       if (!result.ok) expect(result.error).toBe('Participants are required.');
     }
@@ -37,7 +17,7 @@ describe('validateGraidLogSubmission', () => {
 
   it('rejects blank or non-string entries', () => {
     for (const bad of [['Alice', ''], ['Alice', '   '], ['Alice', 42], ['Alice', null]]) {
-      const result = validateGraidLogSubmission(bad, 'group');
+      const result = validateGraidLogSubmission(bad);
       expect(result.ok).toBe(false);
       if (!result.ok) expect(result.error).toBe('All participants must have a valid IGN.');
     }
@@ -48,47 +28,26 @@ describe('validateGraidLogSubmission', () => {
     [['Alice', 'Bob']],
     [['Alice', 'Bob', 'Cara']],
     [['Alice', 'Bob', 'Cara', 'Dana']],
-  ])('accepts a group raid with %j', participants => {
-    const result = validateGraidLogSubmission(participants, 'group');
-    expect(result).toEqual({ ok: true, mode: 'group', participants });
+  ])('accepts a raid with %j', participants => {
+    const result = validateGraidLogSubmission(participants);
+    expect(result).toEqual({ ok: true, participants });
   });
 
-  it('rejects a group raid with more than 4 participants', () => {
-    const result = validateGraidLogSubmission(['A', 'B', 'C', 'D', 'E'], 'group');
+  it('rejects a raid with more than 4 participants', () => {
+    const result = validateGraidLogSubmission(['A', 'B', 'C', 'D', 'E']);
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBe('Group raids must have between 1 and 4 participants.');
+    if (!result.ok) expect(result.error).toBe('Raids must have between 1 and 4 participants.');
   });
 
   it('rejects duplicate participants case-insensitively', () => {
-    const result = validateGraidLogSubmission(['Alice', 'alice', 'Bob'], 'group');
+    const result = validateGraidLogSubmission(['Alice', 'alice', 'Bob']);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBe('All participants must be different players.');
   });
 
   it('trims whitespace from participants', () => {
-    const result = validateGraidLogSubmission(['  Alice ', 'Bob  '], 'group');
-    expect(result).toEqual({ ok: true, mode: 'group', participants: ['Alice', 'Bob'] });
-  });
-
-  it('keeps a single-participant explicit group raid in group mode', () => {
-    const result = validateGraidLogSubmission(['Alice'], 'group');
-    expect(result).toEqual({ ok: true, mode: 'group', participants: ['Alice'] });
-  });
-
-  it('accepts an individual log with exactly 1 participant', () => {
-    const result = validateGraidLogSubmission(['Alice'], 'individual');
-    expect(result).toEqual({ ok: true, mode: 'individual', participants: ['Alice'] });
-  });
-
-  it('rejects an individual log with more than 1 participant', () => {
-    const result = validateGraidLogSubmission(['Alice', 'Bob'], 'individual');
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBe('Individual logs must have exactly 1 participant.');
-  });
-
-  it('infers individual mode for a single participant with no explicit mode', () => {
-    const result = validateGraidLogSubmission(['Alice'], undefined);
-    expect(result).toEqual({ ok: true, mode: 'individual', participants: ['Alice'] });
+    const result = validateGraidLogSubmission(['  Alice ', 'Bob  ']);
+    expect(result).toEqual({ ok: true, participants: ['Alice', 'Bob'] });
   });
 });
 
