@@ -203,6 +203,9 @@ async function buildRows(client: any, event: ActiveEvent): Promise<Row[]> {
     return buildLegacyRows(client, event);
   }
 
+  // discord_links.uuid is not unique (one player can end up with multiple linked
+  // discord accounts), so joins on uuid must pick a single best link — a plain
+  // join fans out, double-counting points and duplicating leaderboard rows.
   const [contribRes, paidRes] = await Promise.all([
     client.query(
       `SELECT gl.id AS log_id,
@@ -213,7 +216,13 @@ async function buildRows(client: any, event: ActiveEvent): Promise<Row[]> {
               dl.rank AS rank
        FROM graid_logs gl
        JOIN graid_log_participants glp ON glp.log_id = gl.id
-       LEFT JOIN discord_links dl ON dl.uuid = glp.uuid
+       LEFT JOIN LATERAL (
+         SELECT ign, rank
+         FROM discord_links
+         WHERE uuid = glp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        WHERE gl.event_id = $1
          AND glp.uuid IS NOT NULL
        ORDER BY gl.completed_at ASC, gl.id ASC`,
@@ -282,7 +291,13 @@ async function buildLegacyRows(client: any, event: ActiveEvent): Promise<Row[]> 
               get.uuid::text AS uuid,
               COALESCE(get.paid, false) AS paid
        FROM graid_event_totals get
-       JOIN discord_links dl ON dl.uuid = get.uuid
+       JOIN LATERAL (
+         SELECT ign, rank
+         FROM discord_links
+         WHERE uuid = get.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        WHERE get.event_id = $1
        ORDER BY get.total DESC, dl.ign ASC
        LIMIT 1000`,
