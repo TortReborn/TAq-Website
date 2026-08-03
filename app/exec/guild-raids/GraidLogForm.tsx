@@ -118,10 +118,14 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
     try {
       const result = await createLogs(raids);
       const n = result.count ?? count;
+      const base = effectiveAnnounce
+        ? `Queued ${n} raid${n === 1 ? '' : 's'} — the bot will post them to Discord on its next tick (within ~3 min).`
+        : `Queued ${n} raid${n === 1 ? '' : 's'} silently — added to totals on the next bot tick (within ~3 min), not posted to Discord.`;
+      const unlinked: string[] = result.unlinked ?? [];
       setSuccess(
-        effectiveAnnounce
-          ? `Queued ${n} raid${n === 1 ? '' : 's'} — the bot will post them to Discord on its next tick (within ~3 min).`
-          : `Queued ${n} raid${n === 1 ? '' : 's'} silently — added to totals on the next bot tick (within ~3 min), not posted to Discord.`
+        unlinked.length > 0
+          ? `${base} Note: ${unlinked.join(', ')} ${unlinked.length === 1 ? 'is' : 'are'} not linked to Discord yet — the raid still counts, but double-check the spelling.`
+          : base
       );
       setRaidType('');
       setGroupPlayers(['', '', '', '']);
