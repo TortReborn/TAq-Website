@@ -36,15 +36,18 @@ export async function GET(request: NextRequest) {
       params
     );
 
-    // Aggregate per UUID
+    // Aggregate per UUID. Participant rows with a NULL uuid fold into the
+    // uuid-keyed player of the same name when one exists — otherwise they'd
+    // surface as a second row with an identical IGN (duplicate React keys
+    // downstream). Only truly unmatched names get their own ign-keyed entry.
     const playerMap = new Map<string, {
       displayName: string;
       total: number;
       typeCounts: Record<string, number>;
     }>();
+    const keyByName = new Map<string, string>();
 
-    for (const row of result.rows) {
-      const key = row.uuid || row.display_name; // fall back to IGN for NULL uuid
+    const addRow = (key: string, row: { display_name: string; raid_type: string | null }) => {
       let data = playerMap.get(key);
       if (!data) {
         data = { displayName: row.display_name, total: 0, typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, WTP: 0, Unknown: 0 } };
@@ -53,6 +56,17 @@ export async function GET(request: NextRequest) {
       data.total++;
       const short = getRaidShort(row.raid_type);
       data.typeCounts[short] = (data.typeCounts[short] || 0) + 1;
+    };
+
+    for (const row of result.rows) {
+      if (!row.uuid) continue;
+      keyByName.set(row.display_name.toLowerCase(), row.uuid);
+      addRow(row.uuid, row);
+    }
+    for (const row of result.rows) {
+      if (row.uuid) continue;
+      const nameKey = row.display_name.toLowerCase();
+      addRow(keyByName.get(nameKey) ?? `ign:${nameKey}`, row);
     }
 
     // Apply offsets (only when NOT date-filtered)
