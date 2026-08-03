@@ -49,14 +49,14 @@ const TOUR_STEPS: TourStep[] = [
     id: 'nav-activities',
     target: 'nav-activities',
     title: 'Activities',
-    description: 'Manage guild raid events, log and review territory snipes, manage war builds, and track guild bank inventory. Great one stop shop for guild activities.',
+    description: 'Log and browse guild raids, manage raid events, review territory snipes, and track guild bank inventory. Great one stop shop for guild activities.',
     position: 'right',
   },
   {
     id: 'nav-economy',
     target: 'nav-economy',
     title: 'Economy',
-    description: 'Manage the shell currency system — member balances, exchange rates, and profile background purchases (thank god old background management made me sad).',
+    description: 'Manage the shell currency system — member balances, exchange rates, and profile background purchases (thank god old background management made me sad) — plus ingredient stock and guild accounting.',
     position: 'right',
   },
   {
