@@ -6,6 +6,14 @@ import { useExecDashboard } from '@/hooks/useExecDashboard';
 import { useExecDashboardNotes } from '@/hooks/useExecDashboardNotes';
 import { useExecDashboardEvents } from '@/hooks/useExecDashboardEvents';
 import { getRankColor, RANK_ORDER } from '@/lib/rank-constants';
+import { EXEC_NAV } from '@/lib/exec-nav';
+
+const QUICK_LINK_COLORS: Record<string, string> = {
+  Members: 'var(--color-ocean-400)',
+  Activities: '#ef4444',
+  Economy: '#f59e0b',
+  Operations: '#22c55e',
+};
 
 function StatCard({ label, value, color, href }: { label: string; value: string | number; color: string; href?: string }) {
   const content = (
@@ -790,43 +798,14 @@ export default function ExecDashboardPage() {
         gap: '0.75rem',
         flexShrink: 0,
       }}>
-        {[
-          {
-            category: 'Members',
-            color: 'var(--color-ocean-400)',
-            links: [
-              { href: '/exec/applications', label: 'Applications', desc: 'Review and vote on applications' },
-              { href: '/exec/activity', label: 'Activity', desc: 'Track activity and update kick list' },
-              { href: '/exec/promotions', label: 'Promotions', desc: 'Manage and suggest promotions' },
-              { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and add banned players' },
-            ],
-          },
-          {
-            category: 'Activities',
-            color: '#ef4444',
-            links: [
-              { href: '/exec/snipes', label: 'Guild Wars', desc: 'Track territory snipe attempts' },
-              { href: '/exec/guild-bank', label: 'Guild Bank', desc: 'Track war consumables and items' },
-            ],
-          },
-          {
-            category: 'Economy',
-            color: '#f59e0b',
-            links: [
-              { href: '/exec/shells', label: 'Shells', desc: 'Manage member shell balances' },
-              { href: '/exec/shell-exchange', label: 'Shell Exchange', desc: 'Update exchange rates' },
-              { href: '/exec/backgrounds', label: 'Backgrounds', desc: 'Manage profile backgrounds' },
-            ],
-          },
-          {
-            category: 'Operations',
-            color: '#22c55e',
-            links: [
-              { href: '/exec/agenda', label: 'Agenda', desc: 'View and manage meeting agenda' },
-              { href: '/exec/requests', label: 'Requests', desc: 'Report bugs and request features' },
-            ],
-          },
-        ].map((group) => (
+        {EXEC_NAV
+          .filter((group): group is typeof group & { category: string } => !!group.category)
+          .map((group) => ({
+            category: group.category,
+            color: QUICK_LINK_COLORS[group.category] ?? 'var(--color-ocean-400)',
+            links: group.items.filter((item) => !item.requires),
+          }))
+          .map((group) => (
           <div key={group.category} style={{
             background: 'var(--bg-card)',
             borderRadius: '0.75rem',
