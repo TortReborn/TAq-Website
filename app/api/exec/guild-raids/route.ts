@@ -184,9 +184,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // IGNs without a discord link are still queued — the bot resolves their
-    // Minecraft uuid from the ign at processing time — but surface them so
-    // the submitter can spot a typo or an unregistered member.
+    // IGNs whose uuid could not be resolved from discord_links — either no
+    // row, or a row with no uuid recorded. Both mean the identity is
+    // unknown at queue time; they still queue (the bot resolves the uuid
+    // from the ign at processing time), but surface them so the submitter
+    // can spot a typo or an unregistered member.
     const unlinked = [...distinctIgns.entries()]
       .filter(([key]) => !uuidByIgn.get(key))
       .map(([, ign]) => ign);
