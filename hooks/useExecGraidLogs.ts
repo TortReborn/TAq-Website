@@ -32,6 +32,9 @@ export interface GraidLogMetaData {
 }
 
 export interface GraidLogLeaderboardPlayer {
+  // Stable identity: the player's uuid, or an ign-derived key for the rare
+  // participant with no resolvable uuid. Never changes with sort order.
+  key: string;
   ign: string;
   total: number;
   notg: number;

@@ -26,25 +26,36 @@ export async function GET(request: NextRequest) {
     if (dateTo) { conditions.push(`gl.completed_at <= $${paramIdx++}`); params.push(dateTo); }
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    // UUID-first aggregation with display name from discord_links
+    // UUID-first aggregation with display name from discord_links. uuid is not
+    // unique in discord_links (relinks, unlinked history) — pick one best link
+    // per participant or the join fans out and inflates raid counts.
     const result = await pool.query(
       `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, gl.raid_type
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
-       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+       LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = glp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        ${whereClause}`,
       params
     );
 
-    // Aggregate per UUID
+    // Aggregate per UUID. Participant rows with a NULL uuid fold into the
+    // uuid-keyed player of the same name when one exists — otherwise they'd
+    // surface as a second row with an identical IGN (duplicate React keys
+    // downstream). Only truly unmatched names get their own ign-keyed entry.
     const playerMap = new Map<string, {
       displayName: string;
       total: number;
       typeCounts: Record<string, number>;
     }>();
+    const keyByName = new Map<string, string>();
 
-    for (const row of result.rows) {
-      const key = row.uuid || row.display_name; // fall back to IGN for NULL uuid
+    const addRow = (key: string, row: { display_name: string; raid_type: string | null }) => {
       let data = playerMap.get(key);
       if (!data) {
         data = { displayName: row.display_name, total: 0, typeCounts: { NOTG: 0, TCC: 0, TNA: 0, NOL: 0, WTP: 0, Unknown: 0 } };
@@ -53,6 +64,17 @@ export async function GET(request: NextRequest) {
       data.total++;
       const short = getRaidShort(row.raid_type);
       data.typeCounts[short] = (data.typeCounts[short] || 0) + 1;
+    };
+
+    for (const row of result.rows) {
+      if (!row.uuid) continue;
+      keyByName.set(row.display_name.toLowerCase(), row.uuid);
+      addRow(row.uuid, row);
+    }
+    for (const row of result.rows) {
+      if (row.uuid) continue;
+      const nameKey = row.display_name.toLowerCase();
+      addRow(keyByName.get(nameKey) ?? `ign:${nameKey}`, row);
     }
 
     // Apply offsets (only when NOT date-filtered)
@@ -76,7 +98,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const players = Array.from(playerMap.values()).map(data => ({
+    const players = Array.from(playerMap.entries()).map(([key, data]) => ({
+      key,
       ign: data.displayName,
       total: data.total,
       notg: data.typeCounts.NOTG || 0,

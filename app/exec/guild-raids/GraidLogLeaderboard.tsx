@@ -78,7 +78,7 @@ export default function GraidLogLeaderboard({ onViewStats }: Props) {
               </thead>
               <tbody>
                 {sortedPlayers.map((p, idx) => (
-                  <tr key={p.ign} style={{ borderBottom: '1px solid var(--border-card)', cursor: 'pointer' }} onClick={() => onViewStats(p.ign)}>
+                  <tr key={p.key ?? `${p.ign}-${idx}`} style={{ borderBottom: '1px solid var(--border-card)', cursor: 'pointer' }} onClick={() => onViewStats(p.ign)}>
                     <td style={{ ...tdStyle, textAlign: 'center', color: 'var(--text-secondary)' }}>{idx + 1}</td>
                     <td style={{ ...tdStyle, fontWeight: '600', color: 'var(--text-primary)' }}>{p.ign}</td>
                     <td style={{ ...tdStyle, textAlign: 'center', fontWeight: '700', color: 'var(--text-primary)' }}>{p.total}</td>
