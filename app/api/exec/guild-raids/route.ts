@@ -184,6 +184,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // IGNs without a discord link are still queued — the bot resolves their
+    // Minecraft uuid from the ign at processing time — but surface them so
+    // the submitter can spot a typo or an unregistered member.
+    const unlinked = [...distinctIgns.entries()]
+      .filter(([key]) => !uuidByIgn.get(key))
+      .map(([, ign]) => ign);
+
     // Insert all raids into the queue atomically — a failed batch queues
     // nothing. The bot's update_member_data loop will pick these up on its
     // next tick (~3 minutes) and run them through the same flow as
@@ -228,6 +235,7 @@ export async function POST(request: NextRequest) {
       ids: queueIds,
       count: queueIds.length,
       status: 'pending',
+      unlinked,
       warning: 'Queued for the bot — will appear in Discord on the next bot tick (within ~3 minutes).',
     });
   } catch (error) {
