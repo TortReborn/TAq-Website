@@ -38,7 +38,7 @@ async function postDiscordUpdate(entry: {
           title: 'Guild Funds Update',
           color: entry.action.trim().startsWith('-') ? 0xef4444 : 0x42c983,
           fields: [
-            { name: 'Action', value: entry.action || 'No change', inline: true },
+            { name: 'Action', value: entry.action ? escapeDiscordMarkdown(entry.action) : 'No change', inline: true },
             { name: 'Updated Balance', value: formatBalance(entry.balance), inline: true },
             { name: 'Reason', value: entry.reason ? escapeDiscordMarkdown(entry.reason) : 'N/A', inline: false },
             { name: 'Author', value: escapeDiscordMarkdown(entry.author), inline: false },
