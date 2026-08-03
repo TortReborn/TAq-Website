@@ -19,6 +19,61 @@ interface LandViewOverlayProps {
   opaqueFill?: boolean;
 }
 
+let verboseDataPromise: Promise<Record<string, TerritoryVerboseData>> | null = null;
+
+const fetchVerboseData = (): Promise<Record<string, TerritoryVerboseData>> => {
+  if (!verboseDataPromise) {
+    verboseDataPromise = fetch("/territories_verbose.json").then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    });
+    // Reset on failure so a later mount can retry instead of reusing the rejection
+    verboseDataPromise.catch(() => { verboseDataPromise = null; });
+  }
+  return verboseDataPromise;
+};
+
+const hasEntries = (obj: Record<string, unknown>): boolean => {
+  for (const key in obj) {
+    return true;
+  }
+  return false;
+};
+
+interface ExclusionRect {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  clusterIndex: number;
+}
+
+// Check if a label bounding box overlaps with any rectangle belonging to another cluster
+const labelOverlapsRects = (
+  labelX: number,
+  labelY: number,
+  labelWidth: number,
+  labelHeight: number,
+  rects: ExclusionRect[],
+  ownClusterIndex: number
+): boolean => {
+  const halfW = labelWidth / 2;
+  const halfH = labelHeight / 2;
+  const labelMinX = labelX - halfW;
+  const labelMaxX = labelX + halfW;
+  const labelMinY = labelY - halfH;
+  const labelMaxY = labelY + halfH;
+
+  for (const rect of rects) {
+    if (rect.clusterIndex !== ownClusterIndex &&
+        labelMinX < rect.maxX && labelMaxX > rect.minX &&
+        labelMinY < rect.maxY && labelMaxY > rect.minY) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const LandViewOverlay = React.memo(function LandViewOverlay({
   territories,
   verboseData: propVerboseData,
@@ -38,18 +93,21 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
 
   useEffect(() => {
     // If propVerboseData is null or empty, load it directly
-    if (!propVerboseData || Object.keys(propVerboseData).length === 0) {
-      fetch("/territories_verbose.json")
-        .then((res) => res.json())
+    if (!propVerboseData || !hasEntries(propVerboseData)) {
+      let cancelled = false;
+      fetchVerboseData()
         .then((data) => {
-          setLocalVerboseData(data);
+          if (!cancelled) setLocalVerboseData(data);
         })
         .catch((err) => console.error("LandViewOverlay: Failed to load verbose data", err));
+      return () => {
+        cancelled = true;
+      };
     }
   }, [propVerboseData]);
 
   // Use prop data if available, otherwise use locally loaded data
-  const verboseData = propVerboseData && Object.keys(propVerboseData).length > 0
+  const verboseData = propVerboseData && hasEntries(propVerboseData)
     ? propVerboseData
     : localVerboseData;
 
@@ -127,35 +185,24 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
 
   const zoom = scale;
 
+  // Flat list of every cluster's rectangles, tagged with the owning cluster index,
+  // so overlap checks can skip a cluster's own rectangles without rebuilding
+  // a per-cluster exclusion array
+  const exclusionRects = useMemo(() => {
+    const rects: ExclusionRect[] = [];
+    clusters.forEach((cluster, clusterIndex) => {
+      for (const rect of cluster.rectangles) {
+        rects.push({ minX: rect.minX, maxX: rect.maxX, minY: rect.minY, maxY: rect.maxY, clusterIndex });
+      }
+    });
+    return rects;
+  }, [clusters]);
+
   // Pre-compute rendered elements to avoid recalculation
   const renderedClusters = useMemo(() => {
     const charWidthFactor = 0.65;
     const heightFactor = 1.2;
     const padding = 8;
-
-    // Helper function to check if a label bounding box overlaps with any rectangle
-    const labelOverlapsRects = (
-      labelX: number,
-      labelY: number,
-      labelWidth: number,
-      labelHeight: number,
-      rects: { minX: number; maxX: number; minY: number; maxY: number }[]
-    ): boolean => {
-      const halfW = labelWidth / 2;
-      const halfH = labelHeight / 2;
-      const labelMinX = labelX - halfW;
-      const labelMaxX = labelX + halfW;
-      const labelMinY = labelY - halfH;
-      const labelMaxY = labelY + halfH;
-
-      for (const rect of rects) {
-        if (labelMinX < rect.maxX && labelMaxX > rect.minX &&
-            labelMinY < rect.maxY && labelMaxY > rect.minY) {
-          return true;
-        }
-      }
-      return false;
-    };
 
     // Helper function to get the center of a territory by name
     const getTerritoryCenter = (name: string): { x: number; y: number; width: number; height: number } | null => {
@@ -177,7 +224,7 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
 
     // First pass: calculate font sizes and actual label dimensions
     const clustersWithFonts = clusters.map((cluster, index) => {
-      const { boundingBox, labelPosition, labelMaxWidth, labelMaxHeight, guildPrefix, guildColor, unionPath, guildName, rectangles, territoryNames } = cluster;
+      const { boundingBox, labelPosition, labelMaxWidth, labelMaxHeight, guildPrefix, guildColor, unionPath, guildName, territoryNames } = cluster;
 
       // Calculate font size to fit within the inscribed rectangle
       const boxWidth = boundingBox.maxX - boundingBox.minX;
@@ -212,7 +259,6 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
         fontSize,
         actualLabelWidth,
         actualLabelHeight,
-        rectangles,
         territoryNames,
       };
     });
@@ -221,18 +267,10 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
     return clustersWithFonts.map((cluster) => {
       const { index, guildName, guildColor, guildPrefix, unionPath, labelPosition, fontSize, actualLabelWidth, actualLabelHeight, territoryNames } = cluster;
 
-      // Collect all rectangles from OTHER clusters (not this one)
-      const excludedRects: { minX: number; maxX: number; minY: number; maxY: number }[] = [];
-      for (const otherCluster of clustersWithFonts) {
-        if (otherCluster.index !== index) {
-          excludedRects.push(...otherCluster.rectangles);
-        }
-      }
-
       let finalLabelPosition = labelPosition;
 
       // Check if the label overlaps with any other cluster's territory
-      if (labelOverlapsRects(labelPosition[0], labelPosition[1], actualLabelWidth, actualLabelHeight, excludedRects)) {
+      if (labelOverlapsRects(labelPosition[0], labelPosition[1], actualLabelWidth, actualLabelHeight, exclusionRects, index)) {
         // Try to find a territory in this cluster where the label doesn't overlap
         let bestFallback: { x: number; y: number; dist: number } | null = null;
 
@@ -241,7 +279,7 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
           if (!terrCenter) continue;
 
           // Check if this territory center would cause an overlap
-          if (!labelOverlapsRects(terrCenter.x, terrCenter.y, actualLabelWidth, actualLabelHeight, excludedRects)) {
+          if (!labelOverlapsRects(terrCenter.x, terrCenter.y, actualLabelWidth, actualLabelHeight, exclusionRects, index)) {
             const dist = Math.sqrt(
               Math.pow(terrCenter.x - labelPosition[0], 2) +
               Math.pow(terrCenter.y - labelPosition[1], 2)
@@ -270,7 +308,7 @@ const LandViewOverlay = React.memo(function LandViewOverlay({
         strokeWidth,
       };
     });
-  }, [clusters, zoom, territories]);
+  }, [clusters, exclusionRects, zoom, territories]);
 
   return (
     <>

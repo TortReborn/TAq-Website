@@ -29,8 +29,13 @@ const CACHE_VERSION = '1';
 // IndexedDB helpers
 // ---------------------------------------------------------------------------
 
+// Single shared connection — opening a fresh IDBDatabase per operation is
+// wasteful; reset on failure so later calls can retry.
+let dbPromise: Promise<IDBDatabase> | null = null;
+
 function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
@@ -41,6 +46,8 @@ function openDB(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+  dbPromise.catch(() => { dbPromise = null; });
+  return dbPromise;
 }
 
 async function idbGet<T>(key: string): Promise<T | undefined> {
@@ -162,15 +169,42 @@ export async function loadCachedHistory(): Promise<CachedHistoryData | null> {
   }
 }
 
+// Pending debounced save — serializing the full multi-MB blob into IndexedDB
+// on every chunk arrival blocks the main thread, so writes are coalesced:
+// only the latest requested save runs, once the chunk stream goes quiet.
+const SAVE_DEBOUNCE_MS = 2000;
+let pendingSave: {
+  exchangeData: ExchangeEventData;
+  allRanges: Array<[number, number]>;
+  gaps?: Array<{ start: string; end: string }>;
+} | null = null;
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
 /**
- * Save exchange data and range metadata to persistent cache.
- * Call this after merging new chunks into the store.
+ * Save exchange data and range metadata to persistent cache (debounced).
+ * Call this after merging new chunks into the store; rapid successive calls
+ * coalesce into a single write of the latest data.
  *
  * @param exchangeData The full merged ExchangeEventData
  * @param allRanges    All loaded ranges [startMs, endMs][]
  * @param gaps         Known data gaps from the API bounds response
  */
-export async function saveHistoryCache(
+export function saveHistoryCache(
+  exchangeData: ExchangeEventData,
+  allRanges: Array<[number, number]>,
+  gaps?: Array<{ start: string; end: string }>,
+): void {
+  pendingSave = { exchangeData, allRanges, gaps };
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    const args = pendingSave;
+    pendingSave = null;
+    if (args) void writeHistoryCache(args.exchangeData, args.allRanges, args.gaps);
+  }, SAVE_DEBOUNCE_MS);
+}
+
+async function writeHistoryCache(
   exchangeData: ExchangeEventData,
   allRanges: Array<[number, number]>,
   gaps?: Array<{ start: string; end: string }>,
@@ -221,6 +255,12 @@ export async function saveHistoryCache(
  */
 export async function clearHistoryCache(): Promise<void> {
   try {
+    // Drop any pending debounced save so it can't resurrect cleared data
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    pendingSave = null;
     await idbDelete(DATA_KEY);
     localStorage.removeItem(LS_DATA_RANGES);
     localStorage.removeItem(LS_EMPTY_RANGES);

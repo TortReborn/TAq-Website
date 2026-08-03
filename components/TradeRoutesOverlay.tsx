@@ -1,80 +1,93 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { coordToPixel, Territory } from '@/lib/utils';
 import { shouldRenderTradeRoute } from '@/lib/retired-territories';
-
-interface TerritoryVerbose {
-  "Trading Routes": string[];
-  Location: {
-    start: [number, number];
-    end: [number, number];
-  };
-}
-
-interface TerritoriesVerboseData {
-  [key: string]: TerritoryVerbose;
-}
+import { TerritoryVerboseData } from '@/lib/connection-calculator';
 
 interface TradeRoute {
+  key: string;
   from: [number, number];
   to: [number, number];
 }
 
 interface TradeRoutesOverlayProps {
   territories: Record<string, Territory>;
+  verboseData?: Record<string, TerritoryVerboseData> | null;
 }
 
-const TradeRoutesOverlay = ({ territories }: TradeRoutesOverlayProps) => {
-  const [tradeRoutes, setTradeRoutes] = useState<TradeRoute[]>([]);
+let verboseDataPromise: Promise<Record<string, TerritoryVerboseData>> | null = null;
 
+const fetchVerboseData = (): Promise<Record<string, TerritoryVerboseData>> => {
+  if (!verboseDataPromise) {
+    verboseDataPromise = fetch('/territories_verbose.json').then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    });
+    // Reset on failure so a later mount can retry instead of reusing the rejection
+    verboseDataPromise.catch(() => { verboseDataPromise = null; });
+  }
+  return verboseDataPromise;
+};
+
+const centerPixel = (location: { start: [number, number]; end: [number, number] }): [number, number] =>
+  coordToPixel([
+    (location.start[0] + location.end[0]) / 2,
+    (location.start[1] + location.end[1]) / 2,
+  ]);
+
+const TradeRoutesOverlay = ({ territories, verboseData }: TradeRoutesOverlayProps) => {
+  const [fetchedData, setFetchedData] = useState<Record<string, TerritoryVerboseData> | null>(null);
+
+  // Fallback: load verbose data directly if not provided via props
   useEffect(() => {
-    const fetchAndProcessTradeRoutes = async () => {
-      try {
-        const response = await fetch('/territories_verbose.json');
-        const territoriesData: TerritoriesVerboseData = await response.json();
-        const routes: TradeRoute[] = [];
-
-        for (const territoryName in territoriesData) {
-          if (!shouldRenderTradeRoute(territoryName, territoryName, territories)) continue;
-
-          const territory = territoriesData[territoryName];
-          if (territory["Trading Routes"]) {
-            const fromCoord = [
-              (territory.Location.start[0] + territory.Location.end[0]) / 2,
-              (territory.Location.start[1] + territory.Location.end[1]) / 2
-            ] as [number, number];
-            const fromPixel = coordToPixel(fromCoord);
-
-            territory["Trading Routes"].forEach(partnerName => {
-              if (!shouldRenderTradeRoute(territoryName, partnerName, territories)) return;
-
-              const partner = territoriesData[partnerName];
-              if (partner) {
-                const toCoord = [
-                  (partner.Location.start[0] + partner.Location.end[0]) / 2,
-                  (partner.Location.start[1] + partner.Location.end[1]) / 2
-                ] as [number, number];
-                const toPixel = coordToPixel(toCoord);
-
-                // Avoid duplicate lines by only adding one for each pair
-                if (!routes.some(r =>
-                    (r.from[0] === toPixel[0] && r.from[1] === toPixel[1] && r.to[0] === fromPixel[0] && r.to[1] === fromPixel[1])
-                )) {
-                    routes.push({ from: fromPixel, to: toPixel });
-                }
-              }
-            });
-          }
-        }
-        setTradeRoutes(routes);
-      } catch (error) {
-        console.error("Failed to fetch or process trade routes:", error);
-      }
+    if (verboseData) return;
+    let cancelled = false;
+    fetchVerboseData()
+      .then((data) => {
+        if (!cancelled) setFetchedData(data);
+      })
+      .catch((error) => console.error("Failed to fetch trade routes:", error));
+    return () => {
+      cancelled = true;
     };
+  }, [verboseData]);
 
-    fetchAndProcessTradeRoutes();
-  }, [territories]);
+  const territoriesData = verboseData ?? fetchedData;
+
+  const tradeRoutes = useMemo(() => {
+    if (!territoriesData) return [];
+
+    const routes: TradeRoute[] = [];
+    // Avoid duplicate lines by only adding one for each pair, regardless of orientation
+    const seenPairs = new Set<string>();
+
+    for (const territoryName in territoriesData) {
+      if (!shouldRenderTradeRoute(territoryName, territoryName, territories)) continue;
+
+      const territory = territoriesData[territoryName];
+      if (!territory["Trading Routes"]) continue;
+
+      const fromPixel = centerPixel(territory.Location);
+
+      territory["Trading Routes"].forEach(partnerName => {
+        if (!shouldRenderTradeRoute(territoryName, partnerName, territories)) return;
+
+        const partner = territoriesData[partnerName];
+        if (!partner) return;
+
+        const pairKey = territoryName < partnerName
+          ? `${territoryName}|${partnerName}`
+          : `${partnerName}|${territoryName}`;
+        if (seenPairs.has(pairKey)) return;
+        seenPairs.add(pairKey);
+
+        routes.push({ key: pairKey, from: fromPixel, to: centerPixel(partner.Location) });
+      });
+    }
+
+    return routes;
+  }, [territoriesData, territories]);
 
   return (
     <svg
@@ -89,9 +102,9 @@ const TradeRoutesOverlay = ({ territories }: TradeRoutesOverlayProps) => {
       }}
     >
       <g>
-        {tradeRoutes.map((route, index) => (
+        {tradeRoutes.map((route) => (
           <line
-            key={index}
+            key={route.key}
             x1={route.from[0]}
             y1={route.from[1]}
             x2={route.to[0]}
@@ -105,4 +118,4 @@ const TradeRoutesOverlay = ({ territories }: TradeRoutesOverlayProps) => {
   );
 };
 
-export default TradeRoutesOverlay;
+export default React.memo(TradeRoutesOverlay);

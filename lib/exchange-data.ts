@@ -43,7 +43,7 @@ export function _resetPrefixCache() {
   gapCacheTime = 0;
 }
 
-async function getGuildPrefixes(pool: Pool): Promise<Map<string, string>> {
+export async function getGuildPrefixes(pool: Pool): Promise<Map<string, string>> {
   if (prefixCache && Date.now() - prefixCacheTime < PREFIX_CACHE_TTL) {
     return prefixCache;
   }
@@ -124,6 +124,60 @@ export async function getExchangeGaps(
 }
 
 // ---------------------------------------------------------------------------
+// Loose index scan helpers.  DISTINCT ON over the whole multi-million-row
+// table forces a full scan (and, with a CASE tiebreaker in ORDER BY, an
+// external disk sort).  Instead: enumerate the ~750 distinct territories via
+// a recursive CTE (each step is one index hop on the (territory, ...) index),
+// then probe each territory's slice with an index lookup.
+// ---------------------------------------------------------------------------
+const DISTINCT_TERRITORIES_CTE = `RECURSIVE terrs AS (
+    (SELECT territory FROM territory_exchanges ORDER BY territory LIMIT 1)
+    UNION ALL
+    SELECT (
+      SELECT te.territory FROM territory_exchanges te
+      WHERE te.territory > t.territory
+      ORDER BY te.territory LIMIT 1
+    )
+    FROM terrs t
+    WHERE t.territory IS NOT NULL
+  )`;
+
+/**
+ * Latest owner per territory at or before `timestamp`.  Equivalent to
+ * `SELECT DISTINCT ON (territory) ... WHERE exchange_time <= $1
+ *  ORDER BY territory, exchange_time DESC, CASE attacker='None'...` —
+ * per territory: the row at the max exchange_time <= timestamp, preferring
+ * non-'None' among same-timestamp rows — but via O(territories) index
+ * probes instead of a full-table scan + sort.
+ */
+export async function queryLatestOwnersAsOf(
+  pool: Pool,
+  timestamp: Date,
+): Promise<Array<{ territory: string; attacker_name: string; exchange_time: Date }>> {
+  const result = await pool.query(
+    `WITH ${DISTINCT_TERRITORIES_CTE}
+     SELECT t.territory, l.attacker_name, l.exchange_time
+     FROM terrs t
+     CROSS JOIN LATERAL (
+       SELECT te.attacker_name, te.exchange_time
+       FROM territory_exchanges te
+       WHERE te.territory = t.territory
+         AND te.exchange_time = (
+           SELECT max(te2.exchange_time)
+           FROM territory_exchanges te2
+           WHERE te2.territory = t.territory
+             AND te2.exchange_time <= $1
+         )
+       ORDER BY CASE WHEN te.attacker_name = 'None' THEN 1 ELSE 0 END
+       LIMIT 1
+     ) l
+     WHERE t.territory IS NOT NULL`,
+    [timestamp.toISOString()]
+  );
+  return result.rows;
+}
+
+// ---------------------------------------------------------------------------
 // Initial owners — for each territory, the guild that held it before the
 // first recorded exchange.  Uses the defender of the first exchange when
 // available; falls back to the attacker (first guild to take ownership)
@@ -145,15 +199,21 @@ export async function getInitialOwners(
     // a real guild (they held the territory before data collection started).
     // If the defender is 'None', use the attacker (first guild to claim it).
     const result = await pool.query(`
-      SELECT DISTINCT ON (territory)
-        territory,
-        CASE
-          WHEN defender_name != 'None' THEN defender_name
-          ELSE attacker_name
+      WITH ${DISTINCT_TERRITORIES_CTE}
+      SELECT t.territory, l.initial_guild
+      FROM terrs t
+      CROSS JOIN LATERAL (
+        SELECT CASE
+          WHEN te.defender_name != 'None' THEN te.defender_name
+          ELSE te.attacker_name
         END AS initial_guild
-      FROM territory_exchanges
-      WHERE attacker_name != 'None' OR defender_name != 'None'
-      ORDER BY territory, exchange_time ASC
+        FROM territory_exchanges te
+        WHERE te.territory = t.territory
+          AND (te.attacker_name != 'None' OR te.defender_name != 'None')
+        ORDER BY te.exchange_time ASC
+        LIMIT 1
+      ) l
+      WHERE t.territory IS NOT NULL
     `);
     initialOwnersCache = result.rows
       .filter((row: { territory: string; initial_guild: string }) => row.initial_guild !== 'None')
@@ -232,17 +292,10 @@ export async function reconstructSingleSnapshot(
 
   // When multiple exchanges share the same timestamp for a territory
   // (a "None" entry for the old owner + a guild entry for the new owner),
-  // the CASE tiebreaker ensures DISTINCT ON picks the non-None entry.
-  const result = await pool.query(
-    `SELECT DISTINCT ON (territory) territory, attacker_name
-     FROM territory_exchanges
-     WHERE exchange_time <= $1
-     ORDER BY territory, exchange_time DESC,
-              CASE WHEN attacker_name = 'None' THEN 1 ELSE 0 END`,
-    [timestamp.toISOString()]
-  );
+  // the tiebreaker picks the non-None entry.
+  const rows = await queryLatestOwnersAsOf(pool, timestamp);
 
-  for (const row of result.rows) {
+  for (const row of rows) {
     state.set(row.territory, row.attacker_name);
   }
 
@@ -281,17 +334,10 @@ export async function reconstructSnapshotsFromExchanges(
 
   // 2. Populate with latest state at startDate for territories
   //    that have exchanged at or before startDate
-  // CASE tiebreaker: prefer non-None when multiple exchanges share a timestamp
-  const initialResult = await pool.query(
-    `SELECT DISTINCT ON (territory) territory, attacker_name
-     FROM territory_exchanges
-     WHERE exchange_time <= $1
-     ORDER BY territory, exchange_time DESC,
-              CASE WHEN attacker_name = 'None' THEN 1 ELSE 0 END`,
-    [startDate.toISOString()]
-  );
+  //    (tiebreaker: prefer non-None when multiple exchanges share a timestamp)
+  const initialRows = await queryLatestOwnersAsOf(pool, startDate);
 
-  for (const row of initialResult.rows) {
+  for (const row of initialRows) {
     state.set(row.territory, row.attacker_name);
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useSyncExternalStore } from "react";
 import { Territory, coordToPixel } from "@/lib/utils";
 import { TerritoryVerboseData } from "@/lib/connection-calculator";
 
@@ -34,43 +34,139 @@ const RESOURCE_COLORS: Record<string, string> = {
   fish: "#2196F3",     // Blue
 };
 
+const HEX_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
 
-// Get outline style based on time held
-function getTimeBasedOutline(acquiredTime: string, currentTime: number): {
-  stroke: string;
-  strokeDasharray: string;
-  animate: boolean;
-} | null {
-  const acquired = new Date(acquiredTime).getTime();
-  const diffSeconds = Math.floor((currentTime - acquired) / 1000);
-
-  if (isNaN(diffSeconds) || diffSeconds < 0) return null;
-
-  // 0-60 seconds: dashed red
-  if (diffSeconds < 60) {
-    return { stroke: '#ff0000', strokeDasharray: '12 6', animate: false };
-  }
-  // 1-5 minutes: dashed orange
-  if (diffSeconds < 300) {
-    return { stroke: '#ff8c00', strokeDasharray: '12 6', animate: false };
-  }
-  // 5-9 minutes: dashed yellow
-  if (diffSeconds < 540) {
-    return { stroke: '#ffff00', strokeDasharray: '12 6', animate: false };
-  }
-  // 9:00-9:45 minutes: dashed lime green
-  if (diffSeconds < 585) {
-    return { stroke: '#32cd32', strokeDasharray: '12 6', animate: false };
-  }
-  // 9:45-10:00 minutes: flashing red/white
-  if (diffSeconds < 600) {
-    return { stroke: '#ff0000', strokeDasharray: '12 6', animate: true };
-  }
-  // 10:00+ minutes: no special outline
-  return null;
+function isValidHexColor(color: string | undefined): boolean {
+  return !!color && HEX_COLOR_RE.test(color);
 }
 
-export default function TerritoryOverlay({
+// ---------------------------------------------------------------------------
+// Shared 1 Hz clock. All overlays subscribe to a single interval; each
+// component re-renders only when its derived time snapshot string changes
+// (useSyncExternalStore compares snapshots with Object.is).
+// ---------------------------------------------------------------------------
+const clockListeners = new Set<() => void>();
+let clockNow = Date.now();
+let clockInterval: ReturnType<typeof setInterval> | null = null;
+
+function subscribeClock(listener: () => void): () => void {
+  clockListeners.add(listener);
+  if (!clockInterval) {
+    clockNow = Date.now();
+    clockInterval = setInterval(() => {
+      clockNow = Date.now();
+      clockListeners.forEach((l) => l());
+    }, 1000);
+  }
+  return () => {
+    clockListeners.delete(listener);
+    if (clockListeners.size === 0 && clockInterval) {
+      clearInterval(clockInterval);
+      clockInterval = null;
+    }
+  };
+}
+
+// Time-outline style buckets (dashed outline during the first 10 minutes held)
+const OUTLINE_STYLES: Record<string, { stroke: string; strokeDasharray: string; animate: boolean }> = {
+  red: { stroke: "#ff0000", strokeDasharray: "12 6", animate: false },
+  orange: { stroke: "#ff8c00", strokeDasharray: "12 6", animate: false },
+  yellow: { stroke: "#ffff00", strokeDasharray: "12 6", animate: false },
+  lime: { stroke: "#32cd32", strokeDasharray: "12 6", animate: false },
+  flash: { stroke: "#ff0000", strokeDasharray: "12 6", animate: true },
+};
+
+function outlineBucket(diffSeconds: number): string {
+  if (diffSeconds < 60) return "red";
+  if (diffSeconds < 300) return "orange";
+  if (diffSeconds < 540) return "yellow";
+  if (diffSeconds < 585) return "lime";
+  if (diffSeconds < 600) return "flash";
+  return "";
+}
+
+// Format held duration; pure function of (now, acquired)
+function formatHeldDuration(acquired: string, now: number): { text: string; color: string } {
+  const acquiredDate = new Date(acquired);
+  let diff = Math.floor((now - acquiredDate.getTime()) / 1000); // seconds
+  if (isNaN(diff) || diff < 0) return { text: "", color: "" };
+  const days = Math.floor(diff / 86400);
+  diff -= days * 86400;
+  const hours = Math.floor(diff / 3600);
+  diff -= hours * 3600;
+  const minutes = Math.floor(diff / 60);
+  const seconds = diff - minutes * 60;
+  let text = "";
+  if (days > 0) {
+    text = `${days}d`;
+    if (hours > 0) text += `${hours}h`;
+  } else if (hours > 0) {
+    text = `${hours}h`;
+    if (minutes > 0) text += `${minutes}m`;
+  } else if (minutes > 0) {
+    text = `${minutes}m`;
+    if (seconds > 0) text += `${seconds}s`;
+  } else {
+    text = `${seconds}s`;
+  }
+  // Color logic
+  let color = "#b71c1c"; // dark red
+  if (days >= 5) color = "#43a047"; // green
+  else if (days >= 1) color = "#fbc02d"; // yellow
+  else if (hours >= 1) color = "#fb8c00"; // orange
+  else if (minutes >= 10) color = "#e57373"; // light red
+  return { text, color };
+}
+
+// Derived per-territory time state, encoded as a string so unchanged values
+// skip re-rendering. Format: "outlineBucket|timerText|timerColor".
+function computeTimeSnapshot(
+  acquired: string | undefined,
+  needOutline: boolean,
+  needTimer: boolean,
+): string {
+  if (!acquired || (!needOutline && !needTimer)) return "||";
+  let bucket = "";
+  if (needOutline) {
+    const diffSeconds = Math.floor((clockNow - new Date(acquired).getTime()) / 1000);
+    if (!isNaN(diffSeconds) && diffSeconds >= 0) bucket = outlineBucket(diffSeconds);
+  }
+  let timerText = "";
+  let timerColor = "";
+  if (needTimer) {
+    const t = formatHeldDuration(acquired, clockNow);
+    timerText = t.text;
+    timerColor = t.color;
+  }
+  return `${bucket}|${timerText}|${timerColor}`;
+}
+
+const EMPTY_SNAPSHOT = "||";
+const getServerTimeSnapshot = () => EMPTY_SNAPSHOT;
+
+// ---------------------------------------------------------------------------
+// Closed-form font fitting (replaces the old decrement-until-fit loops).
+// Text stroke is min(0.25*f, strokeCap); width ≈ charW*f + stroke;
+// height ≈ f + 2*stroke. Both are monotonic in f, so the largest fitting f
+// has a closed form split at f = 4*strokeCap (where the stroke saturates).
+// ---------------------------------------------------------------------------
+function maxFontForConstraints(
+  maxW: number | null,
+  maxH: number,
+  strokeCap: number,
+  charW: number,
+): number {
+  // Regime A: f <= 4*strokeCap, stroke = 0.25*f
+  let fA = maxH / 1.5;
+  if (maxW !== null) fA = Math.min(fA, maxW / (charW + 0.25));
+  fA = Math.min(fA, 4 * strokeCap);
+  // Regime B: f > 4*strokeCap, stroke = strokeCap
+  let fB = maxH - 2 * strokeCap;
+  if (maxW !== null) fB = Math.min(fB, (maxW - strokeCap) / charW);
+  return Math.max(fA, fB > 4 * strokeCap ? fB : 0);
+}
+
+function TerritoryOverlay({
   name,
   territory,
   scale = 1,
@@ -90,22 +186,6 @@ export default function TerritoryOverlay({
   const zoom = scale;
   // Local drag detection
   const dragState = React.useRef({ down: false, moved: false, startX: 0, startY: 0 });
-
-  // Continuous time updates for accurate timer display
-  const [currentTime, setCurrentTime] = useState(Date.now());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Validate hex color format
-  const isValidHexColor = (color: string | undefined): boolean => {
-    if (!color) return false;
-    return /^#[0-9A-Fa-f]{6}$/.test(color);
-  };
 
   // Get guild color from props, with fallback to white (gray for unclaimed)
   const guildColor = useMemo(() => {
@@ -176,27 +256,37 @@ export default function TerritoryOverlay({
     return total >= 7200;
   }, [verboseData]);
 
-  // Get four corners in pixel coordinates
-  const start = coordToPixel(territory.location.start);
-  const end = coordToPixel(territory.location.end);
-  // Rectangle: topLeft, topRight, bottomRight, bottomLeft
-  // Inset corners so stroke stays within territory bounds (doesn't overlap neighbors)
-  const topLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.min(start[1], end[1]) + STROKE_INSET];
-  const topRight = [Math.max(start[0], end[0]) - STROKE_INSET, Math.min(start[1], end[1]) + STROKE_INSET];
-  const bottomRight = [Math.max(start[0], end[0]) - STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
-  const bottomLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
+  const startX = territory.location.start[0];
+  const startY = territory.location.start[1];
+  const endX = territory.location.end[0];
+  const endY = territory.location.end[1];
 
-  const points = [topLeft, topRight, bottomRight, bottomLeft].map(p => p.join(",")).join(" ");
+  // Corner pixel geometry — keyed on primitive coordinates so the memo holds
+  // across renders even when the territory object identity changes.
+  const geometry = useMemo(() => {
+    const start = coordToPixel([startX, startY]);
+    const end = coordToPixel([endX, endY]);
+    // Rectangle: topLeft, topRight, bottomRight, bottomLeft
+    // Inset corners so stroke stays within territory bounds (doesn't overlap neighbors)
+    const topLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.min(start[1], end[1]) + STROKE_INSET];
+    const topRight = [Math.max(start[0], end[0]) - STROKE_INSET, Math.min(start[1], end[1]) + STROKE_INSET];
+    const bottomRight = [Math.max(start[0], end[0]) - STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
+    const bottomLeft = [Math.min(start[0], end[0]) + STROKE_INSET, Math.max(start[1], end[1]) - STROKE_INSET];
+    const points = [topLeft, topRight, bottomRight, bottomLeft].map(p => p.join(",")).join(" ");
+    return { topLeft, topRight, bottomRight, bottomLeft, points };
+  }, [startX, startY, endX, endY]);
+
+  const { topLeft, topRight, bottomRight, points } = geometry;
 
   // Calculate resource fill sections (quadrants/corners)
   const resourceFillData = useMemo(() => {
     if (!showResourceOutlines || activeResources.length === 0) return null;
 
-    const inset = STROKE_INSET;
-    const minX = Math.min(start[0], end[0]) + inset;
-    const maxX = Math.max(start[0], end[0]) - inset;
-    const minY = Math.min(start[1], end[1]) + inset;
-    const maxY = Math.max(start[1], end[1]) - inset;
+    const { topLeft, bottomRight } = geometry;
+    const minX = topLeft[0];
+    const maxX = bottomRight[0];
+    const minY = topLeft[1];
+    const maxY = bottomRight[1];
 
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
@@ -267,72 +357,41 @@ export default function TerritoryOverlay({
     });
 
     return sections;
-  }, [showResourceOutlines, activeResources, start, end]);
+  }, [showResourceOutlines, activeResources, geometry]);
+
+  // Shared-clock time state: outline bucket + held-duration text/color.
+  // Only re-renders this overlay when the derived snapshot string changes.
+  const needTimer = showGuildNames && !!territory.guild.prefix && zoom >= 0.3 && !!territory.acquired;
+  const needOutline = showTimeOutlines && !!territory.acquired;
+  const acquired = territory.acquired;
+  const timeSnapshot = useSyncExternalStore(
+    subscribeClock,
+    () => computeTimeSnapshot(acquired, needOutline, needTimer),
+    getServerTimeSnapshot,
+  );
+  const firstSep = timeSnapshot.indexOf("|");
+  const lastSep = timeSnapshot.lastIndexOf("|");
+  const timeOutline = OUTLINE_STYLES[timeSnapshot.slice(0, firstSep)] ?? null;
+  const timerText = timeSnapshot.slice(firstSep + 1, lastSep);
+  const timerColor = timeSnapshot.slice(lastSep + 1);
 
   // SVG overlay positioned absolutely over the map
   // Dynamically size the guild tag so it fits inside the territory box
-  let maxFontSize = 64;
+  const maxFontSize = 64;
   const margin = 12;
   const boxWidth = Math.abs(bottomRight[0] - topLeft[0]) - margin * 2;
   const boxHeight = Math.abs(bottomRight[1] - topLeft[1]) - margin * 2;
-  // zoom is already defined above, do not redeclare
   // Font size scales down as zoom increases
   // At zoom 1, use maxFontSize; at zoom 2, use maxFontSize/2, etc. Clamp to min 12
-    let fontSize = Math.max(12, maxFontSize / zoom);
-    // Allow text and outline to use up to 98% of box width (1% gap), but keep height at 90%
-    if (territory.guild.prefix) {
-      const chars = territory.guild.prefix.length;
-      // Use a higher widthFactor to account for bold, outline, and letter spacing
-  const widthFactor = 1.2;
-      const maxAllowedWidth = boxWidth * 0.98;
-      const maxAllowedHeight = boxHeight * 0.9;
-      // Estimate outline thickness for this font size
-      let estStroke = Math.min(fontSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)));
-      // Iteratively shrink font size until text + outline fits left-right and box height
-      while (fontSize > 12) {
-        estStroke = Math.min(fontSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)));
-  const estTextWidth = chars * fontSize * widthFactor + estStroke;
-        const estTextHeight = fontSize + estStroke * 2;
-        if (estTextWidth <= maxAllowedWidth && estTextHeight <= maxAllowedHeight) break;
-        fontSize--;
-      }
-    }
-
-  // Show held duration under guild prefix if zoom >= 30%
-  // Get zoom from window/global (passed as prop in a real app, but we can use window for now)
-  // Use scale prop for zoom
-
-  // Helper to format duration using currentTime for continuous updates
-  function formatHeldDuration(acquired: string): { text: string, color: string } {
-    const acquiredDate = new Date(acquired);
-    let diff = Math.floor((currentTime - acquiredDate.getTime()) / 1000); // seconds
-    if (isNaN(diff) || diff < 0) return { text: '', color: '' };
-    let days = Math.floor(diff / 86400);
-    diff -= days * 86400;
-    let hours = Math.floor(diff / 3600);
-    diff -= hours * 3600;
-    let minutes = Math.floor(diff / 60);
-    let seconds = diff - minutes * 60;
-    let text = '';
-    if (days > 0) {
-      text = `${days}d`;
-      if (hours > 0) text += `${hours}h`;
-    } else if (hours > 0) {
-      text = `${hours}h`;
-      if (minutes > 0) text += `${minutes}m`;
-    } else if (minutes > 0) {
-      text = `${minutes}m`;
-      if (seconds > 0) text += `${seconds}s`;
-    } else {
-      text = `${seconds}s`;
-    }
-    // Color logic
-    let color = '#b71c1c'; // dark red
-    if (days >= 5) color = '#43a047'; // green
-    else if (days >= 1) color = '#fbc02d'; // yellow
-    else if (hours >= 1) color = '#fb8c00'; // orange
-    else if (minutes >= 10) color = '#e57373'; // light red
-    return { text, color };
+  const startFontSize = Math.max(12, maxFontSize / zoom);
+  const prefixStrokeCap = Math.max(2, Math.min(8 / zoom, 8 / 0.45));
+  let fontSize = startFontSize;
+  // Allow text and outline to use up to 98% of box width (1% gap), but keep height at 90%
+  if (territory.guild.prefix) {
+    const chars = territory.guild.prefix.length;
+    // widthFactor 1.2 accounts for bold, outline, and letter spacing
+    const fit = maxFontForConstraints(boxWidth * 0.98, boxHeight * 0.9, prefixStrokeCap, chars * 1.2);
+    fontSize = Math.min(startFontSize, Math.max(12, fit));
   }
 
   return (
@@ -370,10 +429,10 @@ export default function TerritoryOverlay({
             }
           }
         }}
-        onPointerUp={e => {
+        onPointerUp={() => {
           dragState.current.down = false;
         }}
-        onClick={e => {
+        onClick={() => {
           // Only trigger onClick if not dragging and if pointer didn't move
           if (isDragging || dragState.current.moved) return;
           onClick?.(name, territory);
@@ -382,32 +441,25 @@ export default function TerritoryOverlay({
         onMouseLeave={onMouseLeave}
       />
       {/* Time-based dashed outline */}
-      {showTimeOutlines && territory.acquired && (() => {
-        const outline = getTimeBasedOutline(territory.acquired, currentTime);
-        if (!outline) return null;
-
-        return (
-          <>
-            <polygon
-              points={points}
-              fill="none"
-              stroke={outline.animate ? undefined : outline.stroke}
-              strokeWidth={STROKE_WIDTH}
-              strokeDasharray={outline.strokeDasharray}
-              style={{ pointerEvents: "none" }}
-            >
-              {outline.animate && (
-                <animate
-                  attributeName="stroke"
-                  values="#ff0000;#ffffff;#ff0000"
-                  dur="0.5s"
-                  repeatCount="indefinite"
-                />
-              )}
-            </polygon>
-          </>
-        );
-      })()}
+      {timeOutline && (
+        <polygon
+          points={points}
+          fill="none"
+          stroke={timeOutline.animate ? undefined : timeOutline.stroke}
+          strokeWidth={STROKE_WIDTH}
+          strokeDasharray={timeOutline.strokeDasharray}
+          style={{ pointerEvents: "none" }}
+        >
+          {timeOutline.animate && (
+            <animate
+              attributeName="stroke"
+              values="#ff0000;#ffffff;#ff0000"
+              dur="0.5s"
+              repeatCount="indefinite"
+            />
+          )}
+        </polygon>
+      )}
       {/* Resource fill sections */}
       {resourceFillData && resourceFillData.map((section, index) => (
         <polygon
@@ -457,7 +509,7 @@ export default function TerritoryOverlay({
             fill="#fff"
             pointerEvents="none"
             stroke="#000"
-            strokeWidth={Math.min(fontSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)))}
+            strokeWidth={Math.min(fontSize * 0.25, prefixStrokeCap)}
             style={{
               fontFamily: 'Arial Black, Arial, sans-serif',
               letterSpacing: '2px',
@@ -469,71 +521,56 @@ export default function TerritoryOverlay({
             {territory.guild.prefix}
           </text>
           {/* Held duration below prefix if zoom >= 0.3 (strictly, so 0.3 and above only) */}
-          {zoom >= 0.3 && territory.acquired && (() => {
-            const { text, color } = formatHeldDuration(territory.acquired);
-            if (!text) return null;
-            
-            // For timer font size, use a more balanced approach
-            // Start with a base size that's closer to the guild prefix size
-            // Use the minimum of: 90% of guild size, or a size based on territory dimensions
+          {needTimer && timerText && (() => {
+            const timerStrokeCap = Math.max(1, Math.min(5 / zoom, 5 / 0.45));
+            // For timer font size, use a more balanced approach:
+            // minimum of 90% of guild size, or a size based on territory dimensions
             const baseSizeFromGuild = fontSize * 0.9;
             const baseSizeFromTerritory = Math.min(
-              (boxWidth * 0.98) / (text.length * 0.65), // Width-based sizing
+              (boxWidth * 0.98) / (timerText.length * 0.65), // Width-based sizing
               boxHeight * 0.25 // Height-based sizing (use 25% of available height)
             );
-            let timerFontSize = Math.max(8, Math.min(baseSizeFromGuild, baseSizeFromTerritory));
-            
-            const maxAllowedWidth = boxWidth * 0.98;
+            const startTimerSize = Math.max(8, Math.min(baseSizeFromGuild, baseSizeFromTerritory));
+
             const maxAllowedHeight = boxHeight * 0.9;
-            
-            // Estimate stroke thickness for timer text
-            let estTimerStroke = Math.min(timerFontSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)));
-            
-            // For timer text, only constrain by height and bottom position, not width
-            // This prevents tiny timer text in wide territories
             const centerY = (topLeft[1] + bottomRight[1]) / 2;
             const boxBottom = bottomRight[1] - margin - boxHeight * 0.05;
             let timerY = centerY + fontSize + 8;
-            while (timerFontSize > 8) { // Lower minimum for timer text
-              estTimerStroke = Math.min(timerFontSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)));
-              const estTimerHeight = timerFontSize + estTimerStroke * 2;
-              // Only check height and bottom position, not width for timer
-              if (
-                estTimerHeight <= maxAllowedHeight &&
-                timerY + estTimerHeight / 2 <= boxBottom
-              ) break;
-              timerFontSize--;
-            }
-            
-            // Balance check: If there's a large disparity between prefix and timer sizes, balance them
-            const sizeRatio = fontSize / timerFontSize;
+
+            // Timer is only constrained by height and bottom position, not width —
+            // this prevents tiny timer text in wide territories.
+            const heightCap = Math.min(maxAllowedHeight, 2 * (boxBottom - timerY));
+            const fit = maxFontForConstraints(null, heightCap, timerStrokeCap, 0);
+            let timerFontSize = Math.min(startTimerSize, Math.max(8, fit));
+            let prefixFontSize = fontSize;
+
+            // Balance check: if there's a large disparity between prefix and timer sizes, balance them
+            const sizeRatio = prefixFontSize / timerFontSize;
             if (sizeRatio > 2.5) { // If prefix is more than 2.5x larger than timer
-              // Calculate a more balanced pair of sizes based on the larger font size
-              const baseSize = Math.max(fontSize, timerFontSize);
+              const baseSize = Math.max(prefixFontSize, timerFontSize);
               const balancedPrefixSize = baseSize * 0.7; // 70% of the larger size
               const balancedTimerSize = baseSize * 0.3;  // 30% of the larger size
-              
+
               // Only apply if the balanced sizes still fit within constraints
-              const newPrefixStroke = Math.min(balancedPrefixSize * 0.25, Math.max(2, Math.min(8 / zoom, 8 / 0.45)));
-              const newTimerStroke = Math.min(balancedTimerSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)));
-              
+              const newPrefixStroke = Math.min(balancedPrefixSize * 0.25, prefixStrokeCap);
               if (territory.guild.prefix) {
                 const chars = territory.guild.prefix.length;
                 const widthFactor = 1.2;
                 const estNewPrefixWidth = chars * balancedPrefixSize * widthFactor + newPrefixStroke;
                 const estNewPrefixHeight = balancedPrefixSize + newPrefixStroke * 2;
-                
+
                 if (estNewPrefixWidth <= boxWidth * 0.98 && estNewPrefixHeight <= boxHeight * 0.9) {
-                  fontSize = Math.max(12, balancedPrefixSize);
+                  prefixFontSize = Math.max(12, balancedPrefixSize);
                   timerFontSize = Math.max(8, balancedTimerSize);
                 }
               }
             }
-            
+
             // Final constraint: timer should be at most 80% of prefix size
-            timerFontSize = Math.min(timerFontSize, fontSize * 0.8);
-            
+            timerFontSize = Math.min(timerFontSize, prefixFontSize * 0.8);
+
             // If timer would extend past bottom, move it up
+            const estTimerStroke = Math.min(timerFontSize * 0.25, timerStrokeCap);
             const estTimerHeight = timerFontSize + estTimerStroke * 2;
             if (timerY + estTimerHeight / 2 > boxBottom) {
               timerY = boxBottom - estTimerHeight / 2;
@@ -546,10 +583,10 @@ export default function TerritoryOverlay({
                 alignmentBaseline="middle"
                 fontSize={timerFontSize}
                 fontWeight="bold"
-                fill={color}
+                fill={timerColor}
                 pointerEvents="none"
                 stroke="#000"
-                strokeWidth={Math.min(timerFontSize * 0.25, Math.max(1, Math.min(5 / zoom, 5 / 0.45)))}
+                strokeWidth={estTimerStroke}
                 style={{
                   fontFamily: 'Arial Black, Arial, sans-serif',
                   letterSpacing: '1px',
@@ -558,7 +595,7 @@ export default function TerritoryOverlay({
                   shapeRendering: 'geometricPrecision',
                 }}
               >
-                {text}
+                {timerText}
               </text>
             );
           })()}
@@ -592,3 +629,7 @@ export default function TerritoryOverlay({
     </svg>
   );
 }
+
+// Memoized: with stable props from the parent, overlays skip re-rendering
+// during panning/hover entirely; zoom still re-renders (font sizes depend on it).
+export default React.memo(TerritoryOverlay);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { memo, useState, useRef, useCallback, useEffect, useMemo } from "react";
 import HistoryTimeline from "./HistoryTimeline";
 import { SeasonPeriod } from "@/lib/seasons";
 import HistoryDatePicker from "./HistoryDatePicker";
@@ -35,6 +35,7 @@ interface MapHistoryControlsProps {
 
 const SPEED_OPTIONS = [1, 2, 10, 50];
 const FAST_SPEED = -1;
+const ALL_SPEED_OPTIONS = [...SPEED_OPTIONS, FAST_SPEED];
 
 function speedLabel(s: number): string {
   return s === FAST_SPEED ? 'Fast' : `${s}x`;
@@ -63,7 +64,7 @@ function vBtnStyle(enabled: boolean): React.CSSProperties {
   };
 }
 
-export default function MapHistoryControls({
+function MapHistoryControls({
   earliest,
   latest,
   current,
@@ -103,6 +104,23 @@ export default function MapHistoryControls({
   const resizeStartRef = useRef({ x: 0, y: 0, width: 1200, height: DEFAULT_VERTICAL_HEIGHT, posX: 0, posY: 0 });
 
   const panelWidth = isVertical ? VERTICAL_WIDTH : width;
+
+  // Display strings derived from `current` — recomputed only when the timestamp changes
+  const currentMs = current.getTime();
+  const currentDisplay = useMemo(() => {
+    const d = new Date(currentMs);
+    return {
+      dateTimeLabel: d.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      dateValue: d.toISOString().split('T')[0],
+      timeValue: `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`,
+    };
+  }, [currentMs]);
 
   // Layout breakpoints based on component widths (horizontal mode only)
   const showSpeedInPlayback = panelWidth >= 540;
@@ -601,7 +619,7 @@ export default function MapHistoryControls({
                     boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                   }}
                 >
-                  {[...SPEED_OPTIONS, FAST_SPEED].map((s) => (
+                  {ALL_SPEED_OPTIONS.map((s) => (
                     <button
                       key={s}
                       type="button"
@@ -732,13 +750,7 @@ export default function MapHistoryControls({
                 color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
               }}>
-                {current.toLocaleString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {currentDisplay.dateTimeLabel}
               </div>
 
               {/* Row 2: Jump to start / jump to end */}
@@ -859,7 +871,7 @@ export default function MapHistoryControls({
                       minWidth: '3.5rem',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                     }}>
-                      {[...SPEED_OPTIONS, FAST_SPEED].map((s) => (
+                      {ALL_SPEED_OPTIONS.map((s) => (
                         <button
                           key={s}
                           type="button"
@@ -894,7 +906,7 @@ export default function MapHistoryControls({
               <input
                 type="date"
                 className="history-date-input"
-                defaultValue={current.toISOString().split('T')[0]}
+                defaultValue={currentDisplay.dateValue}
                 min={earliest.toISOString().split('T')[0]}
                 max={latest.toISOString().split('T')[0]}
                 onClick={(e) => e.stopPropagation()}
@@ -924,7 +936,7 @@ export default function MapHistoryControls({
               {/* Row 6: Time picker */}
               <input
                 type="time"
-                defaultValue={`${current.getHours().toString().padStart(2, '0')}:${current.getMinutes().toString().padStart(2, '0')}`}
+                defaultValue={currentDisplay.timeValue}
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
                 onChange={(e) => {
@@ -1053,3 +1065,5 @@ export default function MapHistoryControls({
     </div>
   );
 }
+
+export default memo(MapHistoryControls);

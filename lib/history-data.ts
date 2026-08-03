@@ -35,6 +35,17 @@ export interface HistoryBounds {
 // object reference for zero-cost lookup. Auto-evicts when snapshots are GC'd.
 const expandWeakCache = new WeakMap<Record<string, SnapshotTerritory>, Record<string, Territory>>();
 
+// Previous expansion, kept so consecutive calls (e.g. scrub ticks, where the
+// snapshot object is always freshly built) can reuse Territory object
+// identities for territories whose owner didn't change. Stable identities let
+// memoized overlay components skip re-rendering.
+let _lastExpansion: {
+  verboseData: unknown;
+  snapshot: Record<string, SnapshotTerritory>;
+  result: Record<string, Territory>;
+  size: number;
+} | null = null;
+
 // Dev-only: track which "missing location" warnings we've already logged
 // so we only log each territory name once per session.
 const _warnedTerritories = new Set<string>();
@@ -42,12 +53,12 @@ const _warnedTerritories = new Set<string>();
 /**
  * Expand a condensed snapshot into full Territory format.
  * Uses verbose data for location info since snapshots don't store coordinates.
- * Results are cached by object reference via WeakMap.
+ * Results are cached by object reference via WeakMap, and per-territory object
+ * identities are reused across calls when a territory's owner is unchanged.
  */
 export function expandSnapshot(
   snapshotTerritories: Record<string, SnapshotTerritory>,
-  verboseData: Record<string, { Location: { start: [number, number]; end: [number, number] } }> | null,
-  guildColors?: Record<string, string>
+  verboseData: Record<string, { Location: { start: [number, number]; end: [number, number] } }> | null
 ): Record<string, Territory> {
   // Only use cache when verboseData is available — without it, all territories
   // are skipped and caching the empty result would be permanently stale.
@@ -56,7 +67,10 @@ export function expandSnapshot(
     if (cached) return cached;
   }
 
+  const prev = _lastExpansion && _lastExpansion.verboseData === verboseData ? _lastExpansion : null;
   const territories: Record<string, Territory> = {};
+  let reused = 0;
+  let size = 0;
 
   for (const [abbrev, data] of Object.entries(snapshotTerritories)) {
     const fullName = fromAbbrev(abbrev);
@@ -74,6 +88,17 @@ export function expandSnapshot(
       continue;
     }
 
+    size++;
+    const prevSnap = prev?.snapshot[abbrev];
+    if (prevSnap && prevSnap.g === data.g && prevSnap.n === data.n) {
+      const prevTerr = prev!.result[fullName];
+      if (prevTerr) {
+        territories[fullName] = prevTerr;
+        reused++;
+        continue;
+      }
+    }
+
     territories[fullName] = {
       guild: {
         uuid: "",  // Not stored in snapshots
@@ -88,8 +113,18 @@ export function expandSnapshot(
     };
   }
 
+  // Nothing changed since the previous expansion → return the previous result
+  // object itself so downstream memos keyed on it skip entirely.
+  if (prev && reused === size && size === prev.size) {
+    if (verboseData) {
+      expandWeakCache.set(snapshotTerritories, prev.result);
+    }
+    return prev.result;
+  }
+
   if (verboseData) {
     expandWeakCache.set(snapshotTerritories, territories);
+    _lastExpansion = { verboseData, snapshot: snapshotTerritories, result: territories, size };
   }
   return territories;
 }
@@ -283,7 +318,7 @@ export function getAllTerritoryNames(): string[] {
 // Client-side exchange data reconstruction
 // ---------------------------------------------------------------------------
 
-/** Compact exchange data returned by /api/map-history/exchanges */
+/** Compact exchange event data — the ExchangeStore's flat storage format */
 export interface ExchangeEventData {
   territories: string[];     // index → territory full name
   guilds: string[];          // index → guild name
@@ -304,6 +339,8 @@ export interface ExchangeStore {
   territoryEvents: Array<[number, number]>[];
   /** Per-territory era classification derived from actual exchange timestamps */
   territoryEras: Array<'old' | 'new' | 'both'>;
+  /** terrIdx → abbreviation (precomputed so snapshot builds skip toAbbrev lookups) */
+  abbrevs: string[];
   /** Unix seconds of the earliest exchange across all territories */
   dataStartSec: number;
 }
@@ -314,6 +351,12 @@ export function buildExchangeStore(data: ExchangeEventData): ExchangeStore {
   const territoryEvents: Array<[number, number]>[] = new Array(data.territories.length);
   for (let i = 0; i < data.territories.length; i++) {
     territoryEvents[i] = [];
+  }
+
+  // Precompute abbreviations per territory index
+  const abbrevs: string[] = new Array(data.territories.length);
+  for (let i = 0; i < data.territories.length; i++) {
+    abbrevs[i] = toAbbrev(data.territories[i]);
   }
 
   for (const evt of data.events) {
@@ -374,7 +417,7 @@ export function buildExchangeStore(data: ExchangeEventData): ExchangeStore {
   }
   if (!isFinite(dataStartSec)) dataStartSec = 0;
 
-  return { data, territoryEvents, territoryEras, dataStartSec };
+  return { data, territoryEvents, territoryEras, abbrevs, dataStartSec };
 }
 
 /**
@@ -507,20 +550,16 @@ export function buildSnapshotAt(
       }
 
       if (backfillGIdx !== -1) {
-        const terrName = data.territories[tIdx];
-        const abbrev = toAbbrev(terrName);
-        territories[abbrev] = {
+        territories[store.abbrevs[tIdx]] = {
           g: data.prefixes[backfillGIdx],
           n: data.guilds[backfillGIdx],
         };
         count++;
       } else if (initialOwners) {
         // Fallback to initialOwners (defender from first exchange in DB)
-        const terrName = data.territories[tIdx];
-        const owner = initialOwners.get(terrName);
+        const owner = initialOwners.get(data.territories[tIdx]);
         if (owner) {
-          const abbrev = toAbbrev(terrName);
-          territories[abbrev] = { g: owner.prefix, n: owner.guild };
+          territories[store.abbrevs[tIdx]] = { g: owner.prefix, n: owner.guild };
           count++;
         }
       }
@@ -530,9 +569,7 @@ export function buildSnapshotAt(
     const guildName = data.guilds[gIdx];
     if (guildName === 'None') continue;
 
-    const terrName = data.territories[tIdx];
-
-    const abbrev = toAbbrev(terrName);
+    const abbrev = store.abbrevs[tIdx];
 
     territories[abbrev] = {
       g: data.prefixes[gIdx],
@@ -619,7 +656,7 @@ export function buildSnapshotsInRange(
         const era = store.territoryEras[tIdx];
         if (isPostRekindled && era === 'old') continue;
         if (!isPostRekindled && era === 'new') continue;
-        const abbrev = toAbbrev(data.territories[tIdx]);
+        const abbrev = store.abbrevs[tIdx];
         territories[abbrev] = {
           g: data.prefixes[gIdx],
           n: guildName,
@@ -678,10 +715,9 @@ export function buildExchangeStoreFromRanged(data: RangedExchangeEventData): Exc
  * Merge a new ranged response into an existing ExchangeStore.
  *
  * Handles index remapping: incoming data may use different indices for the
- * same territory/guild names. We build a mapping, translate all events,
- * then rebuild the store from the merged event list.
- *
- * Runs in ~50ms for 100K events — only called on background chunk completion.
+ * same territory/guild names. We build a mapping via hash lookups, translate
+ * the incoming events, then merge the two already-sorted event arrays in
+ * O(existing + incoming) — no global re-sort.
  */
 export function mergeExchangeStores(
   existing: ExchangeStore,
@@ -691,39 +727,55 @@ export function mergeExchangeStores(
   const territories = [...existing.data.territories];
   const guilds = [...existing.data.guilds];
   const prefixes = [...existing.data.prefixes];
-  const events = [...existing.data.events]; // shallow copy of outer array
 
-  // Build index maps: incoming index → merged index
+  // Build index maps: incoming index → merged index (hash lookup, not indexOf)
+  const terrIndex = new Map<string, number>();
+  for (let i = 0; i < territories.length; i++) terrIndex.set(territories[i], i);
   const terrMap: number[] = incoming.territories.map(name => {
-    const idx = territories.indexOf(name);
-    if (idx !== -1) return idx;
+    const idx = terrIndex.get(name);
+    if (idx !== undefined) return idx;
     const newIdx = territories.length;
     territories.push(name);
+    terrIndex.set(name, newIdx);
     return newIdx;
   });
 
+  const guildIndex = new Map<string, number>();
+  for (let i = 0; i < guilds.length; i++) guildIndex.set(guilds[i], i);
   const guildMap: number[] = incoming.guilds.map((name, i) => {
-    const idx = guilds.indexOf(name);
-    if (idx !== -1) return idx;
+    const idx = guildIndex.get(name);
+    if (idx !== undefined) return idx;
     const newIdx = guilds.length;
     guilds.push(name);
     prefixes.push(incoming.prefixes[i]);
+    guildIndex.set(name, newIdx);
     return newIdx;
   });
 
-  // Add synthetic initial-state events (ownership at range start)
+  // Translated incoming events: synthetic initial-state events (all at
+  // startSec, which precedes every real event in the range) followed by the
+  // range's real events — the result is sorted ascending by construction.
   const startSec = Math.floor(new Date(incoming.earliest).getTime() / 1000) - 1;
+  const incomingEvents: number[][] = new Array(incoming.initialState.length + incoming.events.length);
+  let w = 0;
   for (const [tIdx, gIdx] of incoming.initialState) {
-    events.push([startSec, terrMap[tIdx], guildMap[gIdx]]);
+    incomingEvents[w++] = [startSec, terrMap[tIdx], guildMap[gIdx]];
   }
-
-  // Add translated real events
   for (const [sec, tIdx, gIdx] of incoming.events) {
-    events.push([sec, terrMap[tIdx], guildMap[gIdx]]);
+    incomingEvents[w++] = [sec, terrMap[tIdx], guildMap[gIdx]];
   }
 
-  // Re-sort by time (merging two sorted ranges)
-  events.sort((a, b) => a[0] - b[0]);
+  // Merge the two sorted arrays in linear time
+  const existingEvents = existing.data.events;
+  const events: number[][] = new Array(existingEvents.length + incomingEvents.length);
+  let i = 0, j = 0, k = 0;
+  while (i < existingEvents.length && j < incomingEvents.length) {
+    events[k++] = existingEvents[i][0] <= incomingEvents[j][0]
+      ? existingEvents[i++]
+      : incomingEvents[j++];
+  }
+  while (i < existingEvents.length) events[k++] = existingEvents[i++];
+  while (j < incomingEvents.length) events[k++] = incomingEvents[j++];
 
   // Update bounds
   const mergedData: ExchangeEventData = {

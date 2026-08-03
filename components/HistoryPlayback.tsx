@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 
 interface HistoryPlaybackProps {
   isPlaying: boolean;
@@ -23,7 +23,7 @@ function speedLabel(s: number): string {
   return s === FAST_SPEED ? 'Fast' : `${s}x`;
 }
 
-export default function HistoryPlayback({
+function HistoryPlayback({
   isPlaying,
   speed,
   onPlayPause,
@@ -239,3 +239,5 @@ export default function HistoryPlayback({
     </div>
   );
 }
+
+export default memo(HistoryPlayback);

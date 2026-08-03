@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Territory, getContrastColor, currentGenerationByKey, fmtInt } from "@/lib/utils";
 import { getTreasuryTier, getRatingDisplay, formatTimeHeld } from "@/lib/tower-stats";
 import { TerritoryVerboseData } from "@/lib/connection-calculator";
@@ -17,7 +17,7 @@ function isValidHexColor(color: string | undefined): boolean {
   return /^#[0-9A-Fa-f]{6}$/.test(color);
 }
 
-export default function TerritoryHoverPanel({ territory, guildColors, verboseData }: TerritoryHoverPanelProps) {
+function TerritoryHoverPanel({ territory, guildColors, verboseData }: TerritoryHoverPanelProps) {
   const [timeHeld, setTimeHeld] = useState<number>(0);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
@@ -254,3 +254,5 @@ export default function TerritoryHoverPanel({ territory, guildColors, verboseDat
     </div>
   );
 }
+
+export default React.memo(TerritoryHoverPanel);
