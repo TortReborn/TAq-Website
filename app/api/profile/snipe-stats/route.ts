@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const stats = await getPlayerSnipeStats(session.ign);
+    // Identify by uuid (stable across renames); ign is only a display/fallback
+    const stats = await getPlayerSnipeStats(session.ign, session.uuid || null);
     if (!stats) {
       return NextResponse.json({ error: 'No snipes found' }, { status: 404 });
     }

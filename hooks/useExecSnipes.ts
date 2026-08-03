@@ -6,6 +6,9 @@ import { fetcher } from './fetcher';
 export interface SnipeParticipant {
   ign: string;
   role: 'Tank' | 'Healer' | 'DPS';
+  // Stable identity when resolvable; old rows may have none. Not required
+  // when submitting participants — write paths resolve it server-side.
+  uuid?: string | null;
 }
 
 export interface SnipeLog {
@@ -45,6 +48,9 @@ export interface SnipeMetaData {
 }
 
 export interface LeaderboardPlayer {
+  // Stable identity: the player's uuid, or an ign-derived key for old
+  // participant rows with no resolvable uuid.
+  key: string;
   ign: string;
   total: number;
   bestDifficulty: number;

@@ -8,7 +8,7 @@ export default function ExecBlacklistPage() {
 
   const [newIgn, setNewIgn] = useState('');
   const [newReason, setNewReason] = useState('');
-  const [editingIgn, setEditingIgn] = useState<string | null>(null);
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
   const [editReason, setEditReason] = useState('');
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -26,19 +26,19 @@ export default function ExecBlacklistPage() {
   };
 
   const handleEditSave = async () => {
-    if (!editingIgn) return;
+    if (!editingUuid) return;
     setActionError(null);
     try {
-      await updateReason(editingIgn, editReason);
-      setEditingIgn(null);
+      await updateReason(editingUuid, editReason);
+      setEditingUuid(null);
       setEditReason('');
     } catch (e: any) {
       setActionError(e.message);
     }
   };
 
-  const handleRemove = async (ign: string) => {
-    await removeFromBlacklist(ign);
+  const handleRemove = async (uuid: string) => {
+    await removeFromBlacklist(uuid);
     setConfirmRemove(null);
   };
 
@@ -159,12 +159,12 @@ export default function ExecBlacklistPage() {
               </tr>
             )}
             {entries.map((entry, idx) => (
-              <tr key={entry.ign} style={{ borderBottom: '1px solid var(--border-card)', background: idx % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
+              <tr key={entry.uuid} style={{ borderBottom: '1px solid var(--border-card)', background: idx % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent' }}>
                 <td style={{ padding: '0.75rem 1rem', color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: '500' }}>
                   {entry.ign}
                 </td>
                 <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                  {editingIgn === entry.ign ? (
+                  {editingUuid === entry.uuid ? (
                     <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}>
                       <input
                         value={editReason}
@@ -177,13 +177,13 @@ export default function ExecBlacklistPage() {
                       <button onClick={handleEditSave} style={{ ...btnStyle, background: '#22c55e', color: '#fff', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
                         Save
                       </button>
-                      <button onClick={() => setEditingIgn(null)} style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                      <button onClick={() => setEditingUuid(null)} style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
                         Cancel
                       </button>
                     </div>
                   ) : (
                     <span
-                      onClick={() => { setEditingIgn(entry.ign); setEditReason(entry.reason || ''); }}
+                      onClick={() => { setEditingUuid(entry.uuid); setEditReason(entry.reason || ''); }}
                       style={{ cursor: 'pointer', borderBottom: '1px dashed var(--text-secondary)' }}
                       title="Click to edit reason"
                     >
@@ -195,9 +195,9 @@ export default function ExecBlacklistPage() {
                   {new Date(entry.createdAt).toLocaleDateString()}
                 </td>
                 <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
-                  {confirmRemove === entry.ign ? (
+                  {confirmRemove === entry.uuid ? (
                     <div style={{ display: 'flex', gap: '0.375rem', justifyContent: 'flex-end' }}>
-                      <button onClick={() => handleRemove(entry.ign)} style={{ ...btnStyle, background: '#ef4444', color: '#fff', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                      <button onClick={() => handleRemove(entry.uuid)} style={{ ...btnStyle, background: '#ef4444', color: '#fff', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
                         Confirm
                       </button>
                       <button onClick={() => setConfirmRemove(null)} style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
@@ -206,7 +206,7 @@ export default function ExecBlacklistPage() {
                     </div>
                   ) : (
                     <button
-                      onClick={() => setConfirmRemove(entry.ign)}
+                      onClick={() => setConfirmRemove(entry.uuid)}
                       style={{ ...btnStyle, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
                     >
                       Remove

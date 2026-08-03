@@ -117,18 +117,20 @@ export function clearExecSessionCookie(response: NextResponse): void {
 /**
  * Helper for protected exec API routes.
  * Verifies the session cookie, then re-checks the user's rank from
- * discord_links to ensure they haven't been demoted since login.
+ * discord_links to ensure they haven't been demoted since login. The same
+ * query also refreshes the ign, so consumers never see the cookie's stale
+ * name after a rename.
  * Returns the session data or null. If null, the caller should return a 401 response.
  */
 export async function requireExecSession(request: NextRequest): Promise<ExecSessionData | null> {
   const session = getExecSession(request);
   if (!session) return null;
 
-  // Re-verify rank from database on every request
+  // Re-verify rank (and refresh ign) from database on every request
   const rankCheck = await checkDiscordLinkRank(session.discord_id);
   if (!rankCheck.ok) return null;
 
-  return { ...session, rank: rankCheck.rank };
+  return { ...session, rank: rankCheck.rank, ign: rankCheck.ign };
 }
 
 /**
@@ -293,7 +295,7 @@ export async function requireGuildSession(request: NextRequest): Promise<ExecSes
   const inGuild = await checkGuildMembership(session.uuid);
   if (!inGuild) return null;
 
-  return { ...session, role: linkCheck.role, rank: linkCheck.rank };
+  return { ...session, role: linkCheck.role, rank: linkCheck.rank, ign: linkCheck.ign };
 }
 
 /**

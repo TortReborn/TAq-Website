@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import { fetcher } from './fetcher';
 
 export interface BlacklistEntry {
+  uuid: string;
   ign: string;
   reason: string | null;
   createdAt: string;
@@ -29,22 +30,22 @@ export function useExecBlacklist() {
     mutate();
   };
 
-  const updateReason = async (ign: string, reason: string) => {
+  const updateReason = async (uuid: string, reason: string) => {
     const res = await fetch('/api/exec/blacklist', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ign, reason }),
+      body: JSON.stringify({ uuid, reason }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to update reason');
     mutate();
   };
 
-  const removeFromBlacklist = async (ign: string) => {
+  const removeFromBlacklist = async (uuid: string) => {
     await fetch('/api/exec/blacklist', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ign }),
+      body: JSON.stringify({ uuid }),
     });
     mutate();
   };

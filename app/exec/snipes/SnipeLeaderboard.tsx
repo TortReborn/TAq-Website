@@ -79,7 +79,7 @@ export default function SnipeLeaderboard({ meta, onViewStats }: Props) {
               </thead>
               <tbody>
                 {sortedPlayers.map((p, idx) => (
-                  <tr key={p.ign} style={{ borderBottom: '1px solid var(--border-card)', cursor: 'pointer' }} onClick={() => onViewStats(p.ign)}>
+                  <tr key={p.key} style={{ borderBottom: '1px solid var(--border-card)', cursor: 'pointer' }} onClick={() => onViewStats(p.ign)}>
                     <td style={{ ...tdStyle, textAlign: 'center', color: idx < 3 ? '#f59e0b' : 'var(--text-secondary)', fontWeight: idx < 3 ? '700' : '400' }}>
                       {idx + 1}
                     </td>

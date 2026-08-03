@@ -21,6 +21,7 @@ export default function EventTable({
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { user } = useExecSession();
+  const myUuid = user?.uuid ?? null;
   const myUsername = user?.ign?.toLowerCase() ?? null;
 
   const handleRefresh = async () => {
@@ -135,7 +136,11 @@ export default function EventTable({
           ) : (() => {
             const lastMinIdx = rows.map(r => r.meetsMin).lastIndexOf(true);
             return rows.map((r, i) => {
-              const isMe = myUsername !== null && r.username.toLowerCase() === myUsername;
+              // Match on uuid when both sides have one (stable across
+              // renames); fall back to name comparison for legacy rows
+              const isMe = myUuid !== null && r.uuid
+                ? r.uuid === myUuid
+                : myUsername !== null && r.username.toLowerCase() === myUsername;
               const baseBackground = isMe
                 ? 'rgba(56, 169, 207, 0.14)'
                 : i % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'var(--table-row-bg)';

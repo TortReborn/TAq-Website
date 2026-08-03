@@ -75,23 +75,44 @@ export async function GET(request: NextRequest) {
       seasonClause = `WHERE sl.season = $1`;
     }
 
-    // Get all participants with their snipe data
+    // Get all participants with their snipe data. discord_links.uuid is not
+    // unique (relinks, unlinked history) — pick one best link per participant
+    // or the join fans out and inflates snipe counts.
     const result = await pool.query(
-      `SELECT sp.ign, sl.difficulty, sl.hq, sl.sniped_at
+      `SELECT sp.ign, sp.uuid, sp.snipe_id, dl.ign AS link_ign, sl.difficulty, sl.hq, sl.sniped_at
        FROM snipe_participants sp
        JOIN snipe_logs sl ON sp.snipe_id = sl.id
+       LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = sp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        ${seasonClause}
        ORDER BY sp.ign, sl.sniped_at`,
       params
     );
 
-    // Aggregate per player
-    const playerMap = new Map<string, { total: number; bestDiff: number; bestHq: string; dates: string[] }>();
+    // Aggregate per identity: uuid when known, ign-fallback for old rows with
+    // no uuid. Display the discord_links name for uuid players, otherwise the
+    // most recent ign snapshot.
+    const playerMap = new Map<string, {
+      ign: string; latestSnipeId: number;
+      total: number; bestDiff: number; bestHq: string; dates: string[];
+    }>();
     for (const row of result.rows) {
-      let data = playerMap.get(row.ign);
+      const key = row.uuid ? String(row.uuid) : `ign:${row.ign.toLowerCase()}`;
+      let data = playerMap.get(key);
       if (!data) {
-        data = { total: 0, bestDiff: 0, bestHq: '', dates: [] };
-        playerMap.set(row.ign, data);
+        data = { ign: row.ign, latestSnipeId: row.snipe_id, total: 0, bestDiff: 0, bestHq: '', dates: [] };
+        playerMap.set(key, data);
+      }
+      if (row.link_ign) {
+        data.ign = row.link_ign;
+      } else if (row.snipe_id >= data.latestSnipeId) {
+        data.ign = row.ign;
+        data.latestSnipeId = row.snipe_id;
       }
       data.total++;
       if (row.difficulty > data.bestDiff) {
@@ -101,10 +122,11 @@ export async function GET(request: NextRequest) {
       data.dates.push(row.sniped_at);
     }
 
-    const players = Array.from(playerMap.entries()).map(([ign, data]) => {
+    const players = Array.from(playerMap.entries()).map(([key, data]) => {
       const streaks = computeStreaks(data.dates);
       return {
-        ign,
+        key,
+        ign: data.ign,
         total: data.total,
         bestDifficulty: data.bestDiff,
         bestHq: data.bestHq,

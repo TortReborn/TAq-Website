@@ -94,15 +94,15 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const { ign, reason } = await request.json();
-    if (!ign) {
-      return NextResponse.json({ error: 'IGN is required' }, { status: 400 });
+    const { uuid, reason } = await request.json();
+    if (!uuid) {
+      return NextResponse.json({ error: 'UUID is required' }, { status: 400 });
     }
 
     const pool = getPool();
     await pool.query(
-      `UPDATE blacklist SET reason = $1 WHERE ign = $2`,
-      [reason?.trim() || null, ign]
+      `UPDATE blacklist SET reason = $1 WHERE uuid = $2`,
+      [reason?.trim() || null, uuid]
     );
 
     return NextResponse.json({ success: true });
@@ -119,13 +119,13 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const { ign } = await request.json();
-    if (!ign) {
-      return NextResponse.json({ error: 'IGN is required' }, { status: 400 });
+    const { uuid } = await request.json();
+    if (!uuid) {
+      return NextResponse.json({ error: 'UUID is required' }, { status: 400 });
     }
 
     const pool = getPool();
-    await pool.query(`DELETE FROM blacklist WHERE ign = $1`, [ign]);
+    await pool.query(`DELETE FROM blacklist WHERE uuid = $1`, [uuid]);
 
     return NextResponse.json({ success: true });
   } catch (error) {

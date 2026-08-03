@@ -1,8 +1,10 @@
 import { getPool } from '@/lib/db';
 import { isDry } from '@/lib/snipe-constants';
+import { resolveUuidByIgn, lookupIgnByUuid } from '@/lib/discord-links';
 
 export interface PlayerSnipeStats {
   ign: string;
+  uuid: string | null;
   total: number;
   bestDifficulty: number;
   bestHq: string;
@@ -61,19 +63,31 @@ function computeStreaks(dates: string[]): { best: number; current: number } {
 }
 
 /**
- * Fetch comprehensive snipe stats for a single player by IGN.
- * Returns null if no snipes found.
+ * Fetch comprehensive snipe stats for a single player.
+ * Identity is the player's uuid when known (passed directly, or resolved from
+ * the ign via discord_links); old participant rows with no uuid keep
+ * ign-fallback identity. Returns null if no snipes found.
  */
-export async function getPlayerSnipeStats(ign: string): Promise<PlayerSnipeStats | null> {
+export async function getPlayerSnipeStats(ign: string, uuid?: string | null): Promise<PlayerSnipeStats | null> {
   const pool = getPool();
 
+  const playerUuid = uuid ?? await resolveUuidByIgn(pool, ign);
+  const identityKey = playerUuid ? String(playerUuid) : `ign:${ign.toLowerCase()}`;
+
+  // Match the player's rows: by uuid where recorded, by name for old
+  // NULL-uuid rows. Name-only fallback when the uuid is unknown.
+  const matchClause = playerUuid
+    ? `(sp.uuid = $1 OR (sp.uuid IS NULL AND LOWER(sp.ign) = LOWER($2)))`
+    : `LOWER(sp.ign) = LOWER($1)`;
+  const matchParams = playerUuid ? [playerUuid, ign] : [ign];
+
   const snipesResult = await pool.query(
-    `SELECT sl.id, sl.hq, sl.difficulty, sl.sniped_at, sl.guild_tag, sl.conns, sl.season, sp.role
+    `SELECT sl.id, sl.hq, sl.difficulty, sl.sniped_at, sl.guild_tag, sl.conns, sl.season, sp.role, sp.ign
      FROM snipe_participants sp
      JOIN snipe_logs sl ON sp.snipe_id = sl.id
-     WHERE LOWER(sp.ign) = LOWER($1)
+     WHERE ${matchClause}
      ORDER BY sl.sniped_at DESC`,
-    [ign]
+    matchParams
   );
 
   if (snipesResult.rows.length === 0) return null;
@@ -89,15 +103,19 @@ export async function getPlayerSnipeStats(ign: string): Promise<PlayerSnipeStats
     if (r.difficulty > bestDiff) { bestDiff = r.difficulty; bestHq = r.hq; }
   }
 
-  // Ranking
+  // Ranking (grouped by stable identity so renames don't split players)
   const rankResult = await pool.query(
-    `SELECT sp.ign, COUNT(*) as cnt
+    `SELECT COALESCE(sp.uuid::text, 'ign:' || LOWER(sp.ign)) AS key, COUNT(*) as cnt
      FROM snipe_participants sp
      JOIN snipe_logs sl ON sp.snipe_id = sl.id
-     GROUP BY sp.ign
+     GROUP BY COALESCE(sp.uuid::text, 'ign:' || LOWER(sp.ign))
      ORDER BY cnt DESC`
   );
-  const ranking = rankResult.rows.findIndex((r: any) => r.ign.toLowerCase() === ign.toLowerCase()) + 1;
+  let ranking = rankResult.rows.findIndex((r: any) => r.key === identityKey) + 1;
+  if (ranking === 0 && playerUuid) {
+    // All of the player's rows may predate the uuid backfill
+    ranking = rankResult.rows.findIndex((r: any) => r.key === `ign:${ign.toLowerCase()}`) + 1;
+  }
 
   // Unique guilds, HQs
   const uniqueGuilds = new Set(rows.map((r: any) => r.guild_tag)).size;
@@ -145,20 +163,35 @@ export async function getPlayerSnipeStats(ign: string): Promise<PlayerSnipeStats
     .sort((a, b) => b[1] - a[1])
     .map(([role, count]) => ({ role, count }));
 
-  // Top teammates
+  // Top teammates and duo partners, grouped by stable identity. Display the
+  // discord_links name for uuid players, otherwise the latest ign snapshot.
+  // Self-exclusion mirrors the player match above.
   const snipeIds = rows.map((r: any) => r.id);
   const uniqueSnipeIds = [...new Set(snipeIds)];
+  const excludeClause = playerUuid
+    ? `NOT (sp.uuid = $1 OR (sp.uuid IS NULL AND LOWER(sp.ign) = LOWER($2)))`
+    : `LOWER(sp.ign) != LOWER($1)`;
+  const teammateNameSql = `COALESCE(MAX(dl.ign), (array_agg(sp.ign ORDER BY sp.snipe_id DESC))[1])`;
+  const teammateLateralSql = `LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = sp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE`;
+
   let topTeammates: { ign: string; count: number }[] = [];
   if (uniqueSnipeIds.length > 0) {
-    const placeholders = uniqueSnipeIds.map((_: any, i: number) => `$${i + 2}`).join(',');
+    const placeholders = uniqueSnipeIds.map((_: any, i: number) => `$${i + matchParams.length + 1}`).join(',');
     const tmResult = await pool.query(
-      `SELECT ign, COUNT(*) as cnt
-       FROM snipe_participants
-       WHERE snipe_id IN (${placeholders}) AND LOWER(ign) != LOWER($1)
-       GROUP BY ign
+      `SELECT ${teammateNameSql} AS ign, COUNT(*) as cnt
+       FROM snipe_participants sp
+       ${teammateLateralSql}
+       WHERE sp.snipe_id IN (${placeholders}) AND ${excludeClause}
+       GROUP BY COALESCE(sp.uuid::text, 'ign:' || LOWER(sp.ign))
        ORDER BY cnt DESC
        LIMIT 10`,
-      [ign, ...uniqueSnipeIds]
+      [...matchParams, ...uniqueSnipeIds]
     );
     topTeammates = tmResult.rows.map((r: any) => ({ ign: r.ign, count: parseInt(r.cnt, 10) }));
   }
@@ -166,16 +199,17 @@ export async function getPlayerSnipeStats(ign: string): Promise<PlayerSnipeStats
   // Duo partners (with best difficulty)
   let duoPartners: { ign: string; count: number; bestDifficulty: number }[] = [];
   if (uniqueSnipeIds.length > 0) {
-    const placeholders = uniqueSnipeIds.map((_: any, i: number) => `$${i + 2}`).join(',');
+    const placeholders = uniqueSnipeIds.map((_: any, i: number) => `$${i + matchParams.length + 1}`).join(',');
     const duoResult = await pool.query(
-      `SELECT sp.ign, COUNT(*) as cnt, MAX(sl.difficulty) as best_diff
+      `SELECT ${teammateNameSql} AS ign, COUNT(*) as cnt, MAX(sl.difficulty) as best_diff
        FROM snipe_participants sp
        JOIN snipe_logs sl ON sp.snipe_id = sl.id
-       WHERE sp.snipe_id IN (${placeholders}) AND LOWER(sp.ign) != LOWER($1)
-       GROUP BY sp.ign
+       ${teammateLateralSql}
+       WHERE sp.snipe_id IN (${placeholders}) AND ${excludeClause}
+       GROUP BY COALESCE(sp.uuid::text, 'ign:' || LOWER(sp.ign))
        ORDER BY cnt DESC, best_diff DESC
        LIMIT 10`,
-      [ign, ...uniqueSnipeIds]
+      [...matchParams, ...uniqueSnipeIds]
     );
     duoPartners = duoResult.rows.map((r: any) => ({ ign: r.ign, count: parseInt(r.cnt, 10), bestDifficulty: r.best_diff }));
   }
@@ -222,8 +256,15 @@ export async function getPlayerSnipeStats(ign: string): Promise<PlayerSnipeStats
     }));
   }
 
+  // Display name: current discord_links name when the uuid is known,
+  // otherwise the most recent ign snapshot (rows are sorted newest-first).
+  const displayName = (playerUuid ? await lookupIgnByUuid(pool, playerUuid) : null)
+    || rows[0].ign
+    || ign;
+
   return {
-    ign: rows[0].ign || ign,
+    ign: displayName,
+    uuid: playerUuid,
     total,
     bestDifficulty: bestDiff,
     bestHq,

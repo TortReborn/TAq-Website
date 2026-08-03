@@ -53,14 +53,22 @@ export async function GET(request: NextRequest) {
     );
     const uniqueParticipants = parseInt(partResult.rows[0].cnt, 10);
 
-    // Most active player (UUID-first)
+    // Most active player (grouped by stable identity so renames don't split;
+    // display the discord_links name for uuid players, else latest snapshot)
     const topPlayerResult = await pool.query(
-      `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, COUNT(*) as cnt
+      `SELECT COALESCE(MAX(dl.ign), (array_agg(glp.ign ORDER BY glp.log_id DESC) FILTER (WHERE glp.ign IS NOT NULL))[1]) AS display_name,
+              COUNT(*) as cnt
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
-       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+       LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = glp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        ${whereClause}
-       GROUP BY glp.uuid, COALESCE(dl.ign, glp.ign) ORDER BY cnt DESC LIMIT 1`,
+       GROUP BY COALESCE(glp.uuid::text, 'ign:' || LOWER(glp.ign)) ORDER BY cnt DESC LIMIT 1`,
       params
     );
     let mostActivePlayer = topPlayerResult.rows.length > 0
@@ -102,19 +110,27 @@ export async function GET(request: NextRequest) {
     }
     const raidsOverTime = Array.from(weekMap.values()).sort((a, b) => a.week.localeCompare(b.week));
 
-    // Top 10 players, broken down by raid type
+    // Top 10 players, broken down by raid type (same identity grouping)
     const topPlayersResult = await pool.query(
-      `SELECT COALESCE(dl.ign, glp.ign) AS display_name, glp.uuid, gl.raid_type, COUNT(*) as cnt
+      `SELECT COALESCE(glp.uuid::text, 'ign:' || LOWER(glp.ign)) AS key,
+              COALESCE(MAX(dl.ign), (array_agg(glp.ign ORDER BY glp.log_id DESC) FILTER (WHERE glp.ign IS NOT NULL))[1]) AS display_name,
+              gl.raid_type, COUNT(*) as cnt
        FROM graid_log_participants glp
        JOIN graid_logs gl ON glp.log_id = gl.id
-       LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+       LEFT JOIN LATERAL (
+         SELECT ign
+         FROM discord_links
+         WHERE uuid = glp.uuid
+         ORDER BY linked DESC, (rank <> '') DESC, discord_id
+         LIMIT 1
+       ) dl ON TRUE
        ${whereClause}
-       GROUP BY glp.uuid, COALESCE(dl.ign, glp.ign), gl.raid_type`,
+       GROUP BY COALESCE(glp.uuid::text, 'ign:' || LOWER(glp.ign)), gl.raid_type`,
       params
     );
     const playerMap = new Map<string, { ign: string; count: number; types: Record<string, number> }>();
     for (const r of topPlayersResult.rows) {
-      const key = r.uuid || r.display_name;
+      const key = r.key;
       const cnt = parseInt(r.cnt, 10);
       const short = getRaidShort(r.raid_type);
       let entry = playerMap.get(key);

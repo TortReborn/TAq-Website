@@ -47,6 +47,7 @@ export interface GraidLogLeaderboardPlayer {
 
 export interface GraidLogPlayerStats {
   ign: string;
+  uuid: string | null;
   total: number;
   raidTypeCounts: Record<string, number>;
   bestStreak: number;

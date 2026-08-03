@@ -218,7 +218,7 @@ export default function GraidLogStats({ meta, initialIgn }: Props) {
                         <td style={{ padding: '0.4rem 0.5rem', color: 'var(--text-secondary)' }}>{formatDate(r.completedAt)}</td>
                         <td style={{ padding: '0.4rem 0.5rem', color, fontWeight: '700' }}>{short}</td>
                         <td style={{ padding: '0.4rem 0.5rem' }}>
-                          {r.participants.filter(p => p.ign !== stats.ign).map((p, i) => (
+                          {r.participants.filter(p => (stats.uuid && p.uuid ? p.uuid !== stats.uuid : p.ign.toLowerCase() !== stats.ign.toLowerCase())).map((p, i) => (
                             <span key={i}>
                               {i > 0 && ', '}
                               <span style={{ color: 'var(--text-primary)' }}>{p.ign}</span>

@@ -18,7 +18,13 @@ export async function GET(request: NextRequest) {
       pool.query(`
         SELECT DISTINCT COALESCE(dl.ign, glp.ign) AS ign
         FROM graid_log_participants glp
-        LEFT JOIN discord_links dl ON glp.uuid = dl.uuid
+        LEFT JOIN LATERAL (
+          SELECT ign
+          FROM discord_links
+          WHERE uuid = glp.uuid
+          ORDER BY linked DESC, (rank <> '') DESC, discord_id
+          LIMIT 1
+        ) dl ON TRUE
         WHERE glp.ign IS NOT NULL
         ORDER BY ign
       `),

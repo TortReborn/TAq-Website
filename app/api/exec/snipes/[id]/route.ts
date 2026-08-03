@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { normalizeHq } from '@/lib/snipe-constants';
+import { resolveUuidsByIgns } from '@/lib/discord-links';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     const row = logResult.rows[0];
     const partResult = await pool.query(
-      `SELECT ign, role FROM snipe_participants WHERE snipe_id = $1 ORDER BY role, ign`,
+      `SELECT ign, role, uuid FROM snipe_participants WHERE snipe_id = $1 ORDER BY role, ign`,
       [id]
     );
 
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         conns: row.conns,
         loggedBy: row.logged_by,
         season: row.season,
-        participants: partResult.rows.map((r: any) => ({ ign: r.ign, role: r.role })),
+        participants: partResult.rows.map((r: any) => ({ ign: r.ign, role: r.role, uuid: r.uuid })),
       },
     });
   } catch (error) {
@@ -137,12 +138,14 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         }
       }
 
-      // Delete old and insert new (within implicit transaction per query)
+      // Delete old and insert new (within implicit transaction per query),
+      // carrying the stable uuid identity when resolvable
+      const uuidByIgn = await resolveUuidsByIgns(pool, participants.map((p: any) => p.ign));
       await pool.query(`DELETE FROM snipe_participants WHERE snipe_id = $1`, [id]);
       for (const p of participants) {
         await pool.query(
-          `INSERT INTO snipe_participants (snipe_id, ign, role) VALUES ($1, $2, $3)`,
-          [id, p.ign, p.role]
+          `INSERT INTO snipe_participants (snipe_id, ign, role, uuid) VALUES ($1, $2, $3, $4)`,
+          [id, p.ign, p.role, uuidByIgn.get(p.ign.toLowerCase()) ?? null]
         );
       }
     }
