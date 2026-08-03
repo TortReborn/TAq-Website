@@ -20,7 +20,12 @@ let verboseDataPromise: Promise<Record<string, TerritoryVerboseData>> | null = n
 
 const fetchVerboseData = (): Promise<Record<string, TerritoryVerboseData>> => {
   if (!verboseDataPromise) {
-    verboseDataPromise = fetch('/territories_verbose.json').then((response) => response.json());
+    verboseDataPromise = fetch('/territories_verbose.json').then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    });
+    // Reset on failure so a later mount can retry instead of reusing the rejection
+    verboseDataPromise.catch(() => { verboseDataPromise = null; });
   }
   return verboseDataPromise;
 };
