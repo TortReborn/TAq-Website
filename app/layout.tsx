@@ -1,5 +1,6 @@
 "use client";
 import "./globals.css";
+import { Roboto } from "next/font/google";
 import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import Link from 'next/link';
@@ -12,6 +13,14 @@ import { Analytics } from "@vercel/analytics/react";
 import { useExecSession } from '@/hooks/useExecSession';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
 import { ViewAsContext } from '@/hooks/useViewAs';
+
+const roboto = Roboto({
+  weight: ['400', '500', '700', '900'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+});
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -114,7 +123,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, []);
   
   return (
-    <html lang="en">
+    <html lang="en" className={roboto.variable}>
       <head>
         {/* Blocking script to prevent dark mode flash */}
         <script
@@ -171,9 +180,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
       </head>
       <body className={usesFixedBg ? 'site-fixed-bg-active' : undefined} style={{
         display: 'flex',
@@ -182,7 +188,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         margin: 0,
         color: 'var(--text-primary)',
         background: 'var(--bg-gradient)',
-        fontFamily: "'Roboto', ui-sans-serif, system-ui, sans-serif"
+        fontFamily: "var(--font-roboto), ui-sans-serif, system-ui, sans-serif"
       }}>
         {/* Site fixed background — rendered here, as a sibling of
             PageTransition rather than inside it, so it's never a descendant

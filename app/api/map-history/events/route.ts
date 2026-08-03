@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { canonicalTerrName } from '@/lib/territory-abbreviations';
+import { getGuildPrefixes, queryLatestOwnersAsOf } from '@/lib/exchange-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,25 +55,12 @@ export async function GET(request: NextRequest) {
   const pool = getPool();
 
   try {
-    // Fetch guild prefixes (small table, cached by connection pool)
-    const prefixResult = await pool.query(
-      'SELECT guild_name, guild_prefix FROM guild_prefixes'
-    );
-    const guildPrefixMap = new Map<string, string>();
-    for (const row of prefixResult.rows) {
-      guildPrefixMap.set(row.guild_name, row.guild_prefix);
-    }
+    // Fetch guild prefixes (small table, cached in-module for 1 hour)
+    const guildPrefixMap = await getGuildPrefixes(pool);
 
     // 1. Initial state: latest owner per territory at or before startDate.
-    //    Select exchange_time so we can deduplicate after apostrophe normalisation.
-    const initialResult = await pool.query(
-      `SELECT DISTINCT ON (territory) territory, attacker_name, exchange_time
-       FROM territory_exchanges
-       WHERE exchange_time <= $1
-       ORDER BY territory, exchange_time DESC,
-                CASE WHEN attacker_name = 'None' THEN 1 ELSE 0 END`,
-      [startDate.toISOString()]
-    );
+    //    Includes exchange_time so we can deduplicate after apostrophe normalisation.
+    const initialRows = await queryLatestOwnersAsOf(pool, startDate);
 
     // 2. Events within the range (simple range scan, fast with index)
     const eventsResult = await pool.query(
@@ -90,8 +78,7 @@ export async function GET(request: NextRequest) {
     const guilds: string[] = [];
     const prefixes: string[] = [];
 
-    function getOrCreateTerrIdx(territory: string): number {
-      const norm = canonicalTerrName(territory);
+    function getOrCreateTerrIdx(norm: string): number {
       let tIdx = territoryIndex.get(norm);
       if (tIdx === undefined) {
         tIdx = territories.length;
@@ -121,8 +108,8 @@ export async function GET(request: NextRequest) {
     // stale 2021 Fox entry can never overwrite a 2026 Polish Hussars entry — the ghost
     // territory is simply discarded and never renders again.
     const initialStateByTIdx = new Map<number, { gIdx: number; time: Date }>();
-    for (const row of initialResult.rows) {
-      const tIdx = getOrCreateTerrIdx(row.territory);
+    for (const row of initialRows) {
+      const tIdx = getOrCreateTerrIdx(canonicalTerrName(row.territory));
       const gIdx = getOrCreateGuildIdx(row.attacker_name);
       const existing = initialStateByTIdx.get(tIdx);
       if (!existing || row.exchange_time > existing.time) {
@@ -134,8 +121,8 @@ export async function GET(request: NextRequest) {
       initialState.push([tIdx, gIdx]);
     }
 
-    // Encode events with buffer/flush None-dedup (same pattern as /exchanges)
-    type Row = { exchange_time: Date; territory: string; attacker_name: string };
+    // Encode events with buffer/flush None-dedup
+    type Row = { exchange_time: Date; territory: string; attacker_name: string; canonTerritory: string };
     let buffer: Row[] = [];
     const events: number[][] = [];
 
@@ -145,19 +132,20 @@ export async function GET(request: NextRequest) {
       for (const r of buffer) {
         if (hasNonNone && r.attacker_name === 'None') continue;
         const unixSec = Math.floor(r.exchange_time.getTime() / 1000);
-        events.push([unixSec, getOrCreateTerrIdx(r.territory), getOrCreateGuildIdx(r.attacker_name)]);
+        events.push([unixSec, getOrCreateTerrIdx(r.canonTerritory), getOrCreateGuildIdx(r.attacker_name)]);
       }
       buffer = [];
     }
 
     for (const row of eventsResult.rows) {
+      const canonTerritory = canonicalTerrName(row.territory);
       const unixSec = Math.floor(row.exchange_time.getTime() / 1000);
       const bufSec = buffer.length > 0 ? Math.floor(buffer[0].exchange_time.getTime() / 1000) : -1;
 
-      if (buffer.length > 0 && (unixSec !== bufSec || canonicalTerrName(row.territory) !== canonicalTerrName(buffer[0].territory))) {
+      if (buffer.length > 0 && (unixSec !== bufSec || canonTerritory !== buffer[0].canonTerritory)) {
         flushBuffer();
       }
-      buffer.push(row);
+      buffer.push({ ...row, canonTerritory });
     }
     flushBuffer();
 

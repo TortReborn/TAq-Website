@@ -14,7 +14,10 @@ interface ConflictFinderProps {
   isOpen: boolean;
   onClose: () => void;
   exchangeStore: ExchangeStore | null;
+  /** Loads the full timeline into the shared exchange store and resolves with it. */
   ensureExchangeData: () => Promise<ExchangeStore | null>;
+  /** Timeline coverage 0..1 while the full load is in progress. */
+  loadProgress?: number;
   onJumpToTime: (start: Date, end: Date) => void;
   onCreateFactions: (factionGuilds: string[][]) => void;
 }
@@ -94,6 +97,7 @@ export default function ConflictFinder({
   onClose,
   exchangeStore,
   ensureExchangeData,
+  loadProgress,
   onJumpToTime,
   onCreateFactions,
 }: ConflictFinderProps) {
@@ -117,15 +121,11 @@ export default function ConflictFinder({
   const isResizing = useRef<"top" | "bottom" | false>(false);
   const resizeStart = useRef({ y: 0, height: DEFAULT_HEIGHT, posY: 0 });
 
-  // Sync external store changes
-  useEffect(() => {
-    if (exchangeStore) setStore(exchangeStore);
-  }, [exchangeStore]);
-
-  // Load exchange data when panel opens
+  // Load the full timeline when the panel opens. The store is only synced
+  // from the resolved promise (not from the prop on every chunk merge) so
+  // conflict detection runs once on complete data instead of per chunk.
   useEffect(() => {
     if (!isOpen) return;
-    if (store) return;
 
     let cancelled = false;
     setLoading(true);
@@ -136,7 +136,7 @@ export default function ConflictFinder({
       }
     });
     return () => { cancelled = true; };
-  }, [isOpen, store, ensureExchangeData]);
+  }, [isOpen, ensureExchangeData]);
 
   // Initialize position on first open
   useEffect(() => {
@@ -497,7 +497,9 @@ export default function ConflictFinder({
             color: "var(--text-secondary)",
             fontSize: "0.8rem",
           }}>
-            {loading ? "Loading exchange data..." : "Analyzing conflicts..."}
+            {loading
+              ? `Loading exchange data...${loadProgress !== undefined && loadProgress < 1 ? ` ${Math.round(loadProgress * 100)}%` : ''}`
+              : "Analyzing conflicts..."}
           </div>
         )}
 

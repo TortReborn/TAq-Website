@@ -20,7 +20,6 @@ import {
   HistoryBounds,
   expandSnapshot,
   ParsedSnapshot,
-  ExchangeEventData,
   ExchangeStore,
   buildExchangeStore,
   buildSnapshotAt,
@@ -33,13 +32,40 @@ import {
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 import { shouldRenderTerritory, shouldRenderTradeRoute } from "@/lib/retired-territories";
 
+/**
+ * Merge fresh territory data into the previous record, reusing the previous
+ * object for any territory whose content is unchanged. Preserved identities
+ * let memoized overlays skip re-rendering on the periodic live poll.
+ */
+function mergePreservingIdentity(
+  prev: Record<string, Territory>,
+  next: Record<string, Territory>,
+): Record<string, Territory> {
+  const nextKeys = Object.keys(next);
+  // Never wipe the map on a transient fetch failure (empty payload)
+  if (nextKeys.length === 0) return prev;
+  let changed = Object.keys(prev).length !== nextKeys.length;
+  const out: Record<string, Territory> = {};
+  for (const name of nextKeys) {
+    const p = prev[name];
+    const n = next[name];
+    if (p && JSON.stringify(p) === JSON.stringify(n)) {
+      out[name] = p;
+    } else {
+      out[name] = n;
+      changed = true;
+    }
+  }
+  return changed ? out : prev;
+}
+
 export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'history' } = {}) {
   // Store minimum scale in a ref
   const minScaleRef = useRef(0.1);
   
   // Touch state for mobile
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
-  const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
+  const lastTouchDistanceRef = useRef<number | null>(null);
   const [isTouching, setIsTouching] = useState(false);
   
   // Check if device is mobile
@@ -69,6 +95,26 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
+
+  // Latest transform lives in refs; state is flushed at most once per animation
+  // frame so pan/zoom doesn't re-render the tree once per raw input event.
+  const scaleRef = useRef(1);
+  const positionRef = useRef({ x: 0, y: 0 });
+  const transformRafRef = useRef<number | null>(null);
+  const applyTransform = useCallback((pos: { x: number; y: number } | null, scl: number | null) => {
+    if (pos) positionRef.current = pos;
+    if (scl !== null) scaleRef.current = scl;
+    if (transformRafRef.current === null) {
+      transformRafRef.current = requestAnimationFrame(() => {
+        transformRafRef.current = null;
+        setPosition(positionRef.current);
+        setScale(scaleRef.current);
+      });
+    }
+  }, []);
+  useEffect(() => () => {
+    if (transformRafRef.current !== null) cancelAnimationFrame(transformRafRef.current);
+  }, []);
   const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
   const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [hoveredTerritory, setHoveredTerritory] = useState<{ name: string; territory: Territory } | null>(null);
@@ -96,6 +142,23 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
 
+  // Container dimensions tracked as state so children get a stable object
+  // (reading containerRef.current during render produced a new object per render)
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number } | undefined>(undefined);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const width = el.clientWidth;
+      const height = el.clientHeight;
+      setContainerSize(prev => (prev && prev.width === width && prev.height === height) ? prev : { width, height });
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // History mode state
   const [viewMode, setViewMode] = useState<'live' | 'history'>(initialMode ?? 'live');
 
@@ -112,7 +175,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // buildSnapshotAt(store, timestamp) reconstructs any snapshot in <1ms.
   const exchangeStoreRef = useRef<ExchangeStore | null>(null);
   const [storeVersion, setStoreVersion] = useState(0); // bumped when store changes to trigger useMemo
-  const exchangePromiseRef = useRef<Promise<ExchangeStore | null> | null>(null);
+  // In-flight full-timeline load (Conflict Finder) — deduped across calls
+  const fullLoadPromiseRef = useRef<Promise<ExchangeStore | null> | null>(null);
   // Initial owner map — defenders from each territory's first exchange (backfill early data)
   const initialOwnerMapRef = useRef<InitialOwnerMap | null>(null);
 
@@ -184,7 +248,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     if (cachedPosition) {
       try {
         const parsed = JSON.parse(cachedPosition);
-        setPosition(parsed);
+        applyTransform(parsed, null);
       } catch (error) {
         console.error('Failed to parse cached position:', error);
       }
@@ -194,7 +258,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       try {
         const parsed = parseFloat(cachedScale);
         if (!isNaN(parsed)) {
-          setScale(clampScale(parsed));
+          applyTransform(null, clampScale(parsed));
         }
       } catch (error) {
         console.error('Failed to parse cached scale:', error);
@@ -236,20 +300,19 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       setOpaqueFill(cachedOpaqueFill === 'true');
     }
     setIsInitialized(true);
-  }, [clampScale]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clampScale, applyTransform]);
 
-  // Save position and scale to localStorage whenever they change
+  // Save position and scale to localStorage, debounced — these change every
+  // frame during pan/zoom and synchronous writes per frame add jank
   useEffect(() => {
-    if (isInitialized) {
+    if (!isInitialized) return;
+    const timer = setTimeout(() => {
       localStorage.setItem('map-position', JSON.stringify(position));
-    }
-  }, [position, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
       localStorage.setItem('map-scale', scale.toString());
-    }
-  }, [scale, isInitialized]);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [position, scale, isInitialized]);
 
   // Save map settings to localStorage
   useEffect(() => {
@@ -390,8 +453,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         const territoryData = await loadTerritories();
 
         if (isMounted) {
-          setTerritories({ ...territoryData });
-          console.log('🗺️ Updated territories data:', Object.keys(territoryData).length, 'territories');
+          setTerritories(prev => mergePreservingIdentity(prev, territoryData));
         }
       } catch (error) {
         console.error('Failed to load live territory data:', error);
@@ -432,43 +494,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   }, []);
 
   // -----------------------------------------------------------------------
-  // Exchange data: load once, reconstruct snapshots client-side
-  // -----------------------------------------------------------------------
-
-  /** Fetch all exchange events if not already loaded. Returns the store. */
-  const ensureExchangeData = useCallback(async (): Promise<ExchangeStore | null> => {
-    if (exchangeStoreRef.current) return exchangeStoreRef.current;
-    if (exchangePromiseRef.current) return exchangePromiseRef.current; // wait for in-flight
-
-    const promise = (async () => {
-      try {
-        const response = await fetch('/api/map-history/exchanges');
-        if (!response.ok) return null;
-        const data: ExchangeEventData = await response.json();
-        const store = buildExchangeStore(data);
-        exchangeStoreRef.current = store;
-        return store;
-      } catch (error) {
-        console.error('Failed to load exchange data:', error);
-        return null;
-      } finally {
-        exchangePromiseRef.current = null;
-      }
-    })();
-
-    exchangePromiseRef.current = promise;
-    return promise;
-  }, []);
-
-  // -----------------------------------------------------------------------
   // Event-based history loading with client-side reconstruction
   // -----------------------------------------------------------------------
   const CHUNK_MS = 3 * 30 * 24 * 60 * 60 * 1000; // 3 months per chunk
   const HALF_CHUNK_MS = CHUNK_MS / 2;
   const STEP_MS = 10 * 60 * 1000; // 10 minutes — snapshot interval
 
-  // Track whether we've attempted cache restoration this session
-  const cacheRestoredRef = useRef(false);
+  // One-time cache restoration shared by loadEvents and ensureExchangeData
+  const cacheRestorePromiseRef = useRef<Promise<void> | null>(null);
 
   /** Check if a date range is already fully covered by loaded event ranges */
   const isRangeCovered = useCallback((startMs: number, endMs: number): boolean => {
@@ -495,6 +528,32 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     eventRangesRef.current = merged;
     setLoadedRanges([...merged]);
   }, []);
+
+  const restoreCacheOnce = useCallback((): Promise<void> => {
+    if (!cacheRestorePromiseRef.current) {
+      cacheRestorePromiseRef.current = (async () => {
+        try {
+          const cached = await loadCachedHistory();
+          if (cached) {
+            // Restore the store from cached data (non-empty segments)
+            exchangeStoreRef.current = buildExchangeStore(cached.exchangeData);
+
+            // Mark non-empty ranges as covered (these never need re-fetching)
+            for (const [s, e] of cached.dataRanges) {
+              recordRange(s, e);
+            }
+            setStoreVersion(v => v + 1);
+
+            // Note: empty ranges are NOT recorded — they'll be re-fetched
+            // by the background fetcher, which checks for uncovered ranges.
+          }
+        } catch (e) {
+          console.error('Failed to restore history cache:', e);
+        }
+      })();
+    }
+    return cacheRestorePromiseRef.current;
+  }, [recordRange]);
 
   /** Fetch exchange events for a date range from /api/map-history/events */
   const fetchEventRange = useCallback(async (
@@ -654,28 +713,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
    */
   const loadEvents = useCallback(async (centerDate: Date) => {
     // Try restoring from persistent cache on first call
-    if (!cacheRestoredRef.current) {
-      cacheRestoredRef.current = true;
-      try {
-        const cached = await loadCachedHistory();
-        if (cached) {
-          // Restore the store from cached data (non-empty segments)
-          const store = buildExchangeStore(cached.exchangeData);
-          exchangeStoreRef.current = store;
-
-          // Mark non-empty ranges as covered (these never need re-fetching)
-          for (const [s, e] of cached.dataRanges) {
-            recordRange(s, e);
-          }
-          setStoreVersion(v => v + 1);
-
-          // Note: empty ranges are NOT recorded — they'll be re-fetched
-          // by the background fetcher, which checks for uncovered ranges.
-        }
-      } catch (e) {
-        console.error('Failed to restore history cache:', e);
-      }
-    }
+    await restoreCacheOnce();
 
     const startMs = centerDate.getTime() - HALF_CHUNK_MS;
     const endMs = centerDate.getTime() + HALF_CHUNK_MS;
@@ -715,7 +753,101 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     } finally {
       setIsLoadingHistory(false);
     }
-  }, [isRangeCovered, fetchEventRange, recordRange, startBackgroundFetch, historyBounds]);
+  }, [isRangeCovered, fetchEventRange, recordRange, startBackgroundFetch, historyBounds, restoreCacheOnce]);
+
+  /**
+   * Ensure the ENTIRE history timeline is loaded into the shared exchange
+   * store (the Conflict Finder analyzes all-time data). Fetches uncovered
+   * chunks through /api/map-history/events with limited concurrency and
+   * merges them in as they arrive — same store history mode scrubs against.
+   */
+  const ensureExchangeData = useCallback(async (): Promise<ExchangeStore | null> => {
+    if (fullLoadPromiseRef.current) return fullLoadPromiseRef.current;
+
+    const promise = (async (): Promise<ExchangeStore | null> => {
+      try {
+        // Resolve bounds (normally already fetched on mount)
+        let bounds = historyBounds;
+        if (!bounds) {
+          const res = await fetch('/api/map-history/bounds');
+          if (!res.ok) return null;
+          const data = await res.json();
+          if (!data.earliest || !data.latest) return null;
+          bounds = {
+            earliest: data.earliest,
+            latest: data.latest,
+            gaps: data.gaps,
+            initialOwners: data.initialOwners,
+          };
+          setHistoryBounds(bounds);
+        }
+
+        await restoreCacheOnce();
+
+        const boundsStart = new Date(bounds.earliest).getTime();
+        const boundsEnd = new Date(bounds.latest).getTime();
+
+        // Pause the alternating background fetcher so the same chunks aren't
+        // fetched twice; nothing remains for it once the full load finishes.
+        bgAbortRef.current?.abort();
+
+        const gaps = findUncoveredGaps(boundsStart, boundsEnd);
+        const chunks: Array<[number, number]> = [];
+        for (const [gapStart, gapEnd] of gaps) {
+          for (let s = gapStart; s < gapEnd; s += CHUNK_MS) {
+            chunks.push([s, Math.min(s + CHUNK_MS, gapEnd)]);
+          }
+        }
+
+        const CONCURRENCY = 4;
+        let next = 0;
+        const worker = async () => {
+          while (next < chunks.length) {
+            const [chunkStart, chunkEnd] = chunks[next++];
+            const data = await fetchEventRange(new Date(chunkStart), new Date(chunkEnd));
+            if (exchangeStoreRef.current) {
+              exchangeStoreRef.current = mergeExchangeStores(exchangeStoreRef.current, data);
+            } else {
+              exchangeStoreRef.current = buildExchangeStoreFromRanged(data);
+            }
+            recordRange(chunkStart, chunkEnd);
+            setStoreVersion(v => v + 1);
+          }
+        };
+        await Promise.all(
+          Array.from({ length: Math.min(CONCURRENCY, chunks.length) }, worker)
+        );
+
+        if (exchangeStoreRef.current) {
+          saveHistoryCache(exchangeStoreRef.current.data, eventRangesRef.current, bounds.gaps);
+        }
+        return exchangeStoreRef.current;
+      } catch (error) {
+        console.error('Failed to load full exchange history:', error);
+        return exchangeStoreRef.current; // partial data is still usable
+      } finally {
+        fullLoadPromiseRef.current = null;
+      }
+    })();
+
+    fullLoadPromiseRef.current = promise;
+    return promise;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyBounds, restoreCacheOnce, findUncoveredGaps, fetchEventRange, recordRange]);
+
+  // Timeline coverage 0..1 — drives the Conflict Finder's loading indicator
+  const historyLoadProgress = useMemo(() => {
+    if (!historyBounds) return 0;
+    const start = new Date(historyBounds.earliest).getTime();
+    const end = new Date(historyBounds.latest).getTime();
+    const total = end - start;
+    if (total <= 0) return 1;
+    let covered = 0;
+    for (const [s, e] of loadedRanges) {
+      covered += Math.max(0, Math.min(e, end) - Math.max(s, start));
+    }
+    return Math.min(1, covered / total);
+  }, [historyBounds, loadedRanges]);
 
   // Keep timestamp ref in sync (for playback interval) and cache to sessionStorage
   useEffect(() => {
@@ -847,7 +979,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     setStoreVersion(0);
     eventRangesRef.current = [];
     setLoadedRanges([]);
-    cacheRestoredRef.current = false;
+    cacheRestorePromiseRef.current = null;
     bgAbortRef.current?.abort();
     clearHistoryCache();
 
@@ -973,7 +1105,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       }
       const snapshot = buildSnapshotAt(store, historyTimestamp, initialOwnerMapRef.current ?? undefined);
       if (snapshot) {
-        return expandSnapshot(snapshot.territories, verboseData, effectiveGuildColors);
+        return expandSnapshot(snapshot.territories, verboseData);
       }
       // Store exists but no snapshot (e.g. timestamp is before all exchange events).
       // Return empty territories instead of null to avoid a false "loading" state.
@@ -982,13 +1114,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
     // Fall back to initial snapshot (before events have loaded)
     if (initialSnapshot) {
-      return expandSnapshot(initialSnapshot.territories, verboseData, effectiveGuildColors);
+      return expandSnapshot(initialSnapshot.territories, verboseData);
     }
 
     return null;
   // storeVersion triggers recompute when the exchange store is updated
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode, historyTimestamp, storeVersion, initialSnapshot, verboseData, effectiveGuildColors, historyBounds]);
+  }, [viewMode, historyTimestamp, storeVersion, initialSnapshot, verboseData, historyBounds]);
 
   // Step forward/backward handlers — time-based stepping (10 minutes)
   const handleStepForward = useCallback(() => {
@@ -1109,6 +1241,27 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     ? historyTerritories
     : territories;
 
+  // Stable render list — avoids re-allocating the entries array every frame
+  const territoryEntries = useMemo(
+    () => Object.entries(displayTerritories).filter(([name]) => shouldRenderTerritory(name, viewMode)),
+    [displayTerritories, viewMode]
+  );
+
+  // Stable Date/gap objects for MapHistoryControls — fresh objects per render
+  // would defeat every useMemo inside the timeline
+  const historyEarliestDate = useMemo(
+    () => (historyBounds ? new Date(historyBounds.earliest) : null),
+    [historyBounds]
+  );
+  const historyLatestDate = useMemo(
+    () => (historyBounds ? new Date(historyBounds.latest) : null),
+    [historyBounds]
+  );
+  const historyGapDates = useMemo(
+    () => historyBounds?.gaps?.map(g => ({ start: new Date(g.start), end: new Date(g.end) })),
+    [historyBounds]
+  );
+
   // No longer need snapshotTimestamps — timeline snaps to 10-min boundaries
 
   // Prevent body scrolling and overscroll on this page
@@ -1147,38 +1300,38 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     // Only set initial position and scale if not cached or if cached values are invalid
     const hasValidCache = localStorage.getItem('map-position') && localStorage.getItem('map-scale');
     if (!hasValidCache || !isInitialized) {
-      setScale(clampScale(fitScale));
       // Center the map
       const scaledWidth = img.naturalWidth * fitScale;
       const scaledHeight = img.naturalHeight * fitScale;
-      setPosition({
+      applyTransform({
         x: (containerRect.width - scaledWidth) / 2,
         y: (containerRect.height - scaledHeight) / 2
-      });
+      }, clampScale(fitScale));
     }
-  }, [isInitialized]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized, applyTransform, clampScale]);
 
   // Handle mouse down for dragging
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return; // Only left click
     setIsDragging(true);
     setDragStart({ x: e.clientX, y: e.clientY });
-    setLastPanPoint({ x: position.x, y: position.y });
+    setLastPanPoint({ x: positionRef.current.x, y: positionRef.current.y });
     e.preventDefault();
-  }, [position]);
+  }, []);
 
   // Handle mouse move for dragging
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isDragging) return;
-    
+
     const deltaX = e.clientX - dragStart.x;
     const deltaY = e.clientY - dragStart.y;
-    
-    setPosition({
+
+    applyTransform({
       x: lastPanPoint.x + deltaX,
       y: lastPanPoint.y + deltaY
-    });
-  }, [isDragging, dragStart, lastPanPoint]);
+    }, null);
+  }, [isDragging, dragStart, lastPanPoint, applyTransform]);
 
   // Handle mouse up
   const handleMouseUp = useCallback(() => {
@@ -1191,84 +1344,86 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       // Single touch - start panning
       setIsTouching(true);
       setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-      setLastPanPoint({ x: position.x, y: position.y });
+      setLastPanPoint({ x: positionRef.current.x, y: positionRef.current.y });
     } else if (e.touches.length === 2) {
       // Two touches - start pinch zoom
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.sqrt(
-        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
         Math.pow(touch2.clientY - touch1.clientY, 2)
       );
-      setLastTouchDistance(distance);
+      lastTouchDistanceRef.current = distance;
       setIsTouching(false); // Disable panning during pinch
     }
-  }, [position]);
+  }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (e.touches.length === 1 && isTouching && touchStart) {
       // Single touch - pan
       const deltaX = e.touches[0].clientX - touchStart.x;
       const deltaY = e.touches[0].clientY - touchStart.y;
-      
-      setPosition({
+
+      applyTransform({
         x: lastPanPoint.x + deltaX,
         y: lastPanPoint.y + deltaY
-      });
-    } else if (e.touches.length === 2 && lastTouchDistance && containerRef.current) {
+      }, null);
+    } else if (e.touches.length === 2 && lastTouchDistanceRef.current && containerRef.current) {
       // Two touches - pinch zoom
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.sqrt(
-        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
         Math.pow(touch2.clientY - touch1.clientY, 2)
       );
-      
+
       const rect = containerRef.current.getBoundingClientRect();
       const centerX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
       const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
-      
-      const zoomFactor = distance / lastTouchDistance;
-      const newScale = clampScale(scale * zoomFactor);
-      
+
+      const prevScale = scaleRef.current;
+      const prevPosition = positionRef.current;
+      const zoomFactor = distance / lastTouchDistanceRef.current;
+      const newScale = clampScale(prevScale * zoomFactor);
+
       // Zoom towards pinch center
-      const scaleChange = newScale / scale;
-      setPosition({
-        x: centerX - (centerX - position.x) * scaleChange,
-        y: centerY - (centerY - position.y) * scaleChange
-      });
-      setScale(newScale);
-      setLastTouchDistance(distance);
+      const scaleChange = newScale / prevScale;
+      applyTransform({
+        x: centerX - (centerX - prevPosition.x) * scaleChange,
+        y: centerY - (centerY - prevPosition.y) * scaleChange
+      }, newScale);
+      lastTouchDistanceRef.current = distance;
     }
-  }, [isTouching, touchStart, lastPanPoint, lastTouchDistance, scale, position, clampScale]);
+  }, [isTouching, touchStart, lastPanPoint, clampScale, applyTransform]);
 
   const handleTouchEnd = useCallback(() => {
     setIsTouching(false);
     setTouchStart(null);
-    setLastTouchDistance(null);
+    lastTouchDistanceRef.current = null;
   }, []);
 
   // Handle wheel zoom
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (!containerRef.current || !mapImageRef.current) return;
-    
+
     e.preventDefault();
-    
+
     const rect = containerRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
+
+    const prevScale = scaleRef.current;
+    const prevPosition = positionRef.current;
     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = clampScale(scale * zoomFactor);
+    const newScale = clampScale(prevScale * zoomFactor);
 
     // Zoom towards mouse position
-    const scaleChange = newScale / scale;
-    setPosition({
-      x: mouseX - (mouseX - position.x) * scaleChange,
-      y: mouseY - (mouseY - position.y) * scaleChange
-    });
-    setScale(newScale);
-  }, [scale, position, clampScale]);
+    const scaleChange = newScale / prevScale;
+    applyTransform({
+      x: mouseX - (mouseX - prevPosition.x) * scaleChange,
+      y: mouseY - (mouseY - prevPosition.y) * scaleChange
+    }, newScale);
+  }, [clampScale, applyTransform]);
 
   // Zoom controls
   const zoomIn = useCallback(() => {
@@ -1276,16 +1431,17 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    
-    const newScale = clampScale(scale * 1.2);
-    const scaleChange = newScale / scale;
-    
-    setPosition({
-      x: centerX - (centerX - position.x) * scaleChange,
-      y: centerY - (centerY - position.y) * scaleChange
-    });
-    setScale(newScale);
-  }, [scale, position, clampScale]);
+
+    const prevScale = scaleRef.current;
+    const prevPosition = positionRef.current;
+    const newScale = clampScale(prevScale * 1.2);
+    const scaleChange = newScale / prevScale;
+
+    applyTransform({
+      x: centerX - (centerX - prevPosition.x) * scaleChange,
+      y: centerY - (centerY - prevPosition.y) * scaleChange
+    }, newScale);
+  }, [clampScale, applyTransform]);
 
   const zoomOut = useCallback(() => {
     if (!containerRef.current) return;
@@ -1293,15 +1449,16 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const newScale = clampScale(scale * 0.8);
-    const scaleChange = newScale / scale;
+    const prevScale = scaleRef.current;
+    const prevPosition = positionRef.current;
+    const newScale = clampScale(prevScale * 0.8);
+    const scaleChange = newScale / prevScale;
 
-    setPosition({
-      x: centerX - (centerX - position.x) * scaleChange,
-      y: centerY - (centerY - position.y) * scaleChange
-    });
-    setScale(newScale);
-  }, [scale, position, clampScale]);
+    applyTransform({
+      x: centerX - (centerX - prevPosition.x) * scaleChange,
+      y: centerY - (centerY - prevPosition.y) * scaleChange
+    }, newScale);
+  }, [clampScale, applyTransform]);
 
   const resetView = useCallback(() => {
     if (!containerRef.current || !mapImageRef.current) return;
@@ -1322,11 +1479,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: (containerRect.height - scaledHeight) / 2
     };
 
-    setScale(clampScale(fitScale));
-    setPosition(newPosition);
+    applyTransform(newPosition, clampScale(fitScale));
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 1000);
-  }, [clampScale]);
+  }, [clampScale, applyTransform]);
 
   // Handle window resize
   useEffect(() => {
@@ -1411,15 +1567,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: containerRect.height / 2 - boundingCenterY * newScale
     };
 
-    setScale(newScale);
-    setPosition(newPosition);
+    applyTransform(newPosition, newScale);
     setIsAnimating(true);
-    
+
     // Clear animation state after transition completes with a slight buffer
     setTimeout(() => {
       setIsAnimating(false);
     }, 2000); // Slightly longer than transition duration to avoid jerky end
-  }, [territories, clampScale]);
+  }, [territories, clampScale, applyTransform]);
 
   // Region zoom presets (game coordinates: [minX, minZ, maxX, maxZ])
   // Region zoom presets — game coords [X, Z] where more negative Z = further north on map
@@ -1455,12 +1610,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: containerRect.height / 2 - boundingCenterY * newScale,
     };
 
-    setScale(newScale);
-    setPosition(newPosition);
+    applyTransform(newPosition, newScale);
     setIsAnimating(true);
     setShowRegionMenu(false);
     setTimeout(() => setIsAnimating(false), 2000);
-  }, [clampScale]);
+  }, [clampScale, applyTransform]);
 
   return (
     <main style={{
@@ -1559,7 +1713,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
           >
             <img
               ref={mapImageRef}
-              src="/images/map/fruma_map.png"
+              src="/images/map/fruma_map.v2.webp"
               alt="Wynncraft Map"
               style={{
                 position: 'absolute',
@@ -1575,7 +1729,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               draggable={false}
             />
             {/* Territory Overlays - positioned in map pixel coordinates */}
-            {showTerritories && !showLandView && Object.entries(displayTerritories).filter(([name]) => shouldRenderTerritory(name, viewMode)).map(([name, territory]) => (
+            {showTerritories && !showLandView && territoryEntries.map(([name, territory]) => (
               <TerritoryOverlay
                 key={name}
                 name={name}
@@ -1607,7 +1761,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               />
             )}
             {/* Trade routes - only show when enabled, territories are visible, and Land View is off */}
-            {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay territories={territories} />}
+            {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay territories={territories} verboseData={verboseData} />}
           </div>
 
           {/* History loading overlay - shown when loading history data (initial restore or scrubbing) */}
@@ -1942,6 +2096,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             onClose={() => setShowConflictFinder(false)}
             exchangeStore={exchangeStoreRef.current}
             ensureExchangeData={ensureExchangeData}
+            loadProgress={historyLoadProgress}
             onJumpToTime={handleConflictJump}
             onCreateFactions={(factionGuilds) => {
               const factionColors = ["#1e88e5", "#e53935", "#43a047", "#fb8c00"];
@@ -2128,8 +2283,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             }}
           >
             <MapHistoryControls
-              earliest={isConflictFocused && conflictBounds ? conflictBounds.start : new Date(historyBounds.earliest)}
-              latest={isConflictFocused && conflictBounds ? conflictBounds.end : new Date(historyBounds.latest)}
+              earliest={isConflictFocused && conflictBounds ? conflictBounds.start : historyEarliestDate!}
+              latest={isConflictFocused && conflictBounds ? conflictBounds.end : historyLatestDate!}
               current={historyTimestamp}
               onTimeChange={handleTimeChange}
               onJump={handleJumpToDate}
@@ -2145,14 +2300,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               canStepBackward={!!(historyTimestamp && historyBounds && historyTimestamp.getTime() > new Date(historyBounds.earliest).getTime())}
               isLoading={isLoadingHistory}
               onRefresh={handleHistoryRefresh}
-              containerBounds={containerRef.current ? {
-                width: containerRef.current.clientWidth,
-                height: containerRef.current.clientHeight
-              } : undefined}
-              gaps={isConflictFocused && conflictBounds ? undefined : historyBounds.gaps?.map(g => ({
-                start: new Date(g.start),
-                end: new Date(g.end),
-              }))}
+              containerBounds={containerSize}
+              gaps={isConflictFocused && conflictBounds ? undefined : historyGapDates}
               conflictBounds={conflictBounds}
               isConflictFocused={isConflictFocused}
               onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}

@@ -10,8 +10,8 @@ function isTestMode(): boolean {
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
-const MAX_REQUESTS_PER_WINDOW = 30; // Maximum requests per window
-const MAX_REQUESTS_PER_ENDPOINT = 10; // Maximum requests per specific endpoint per window
+const MAX_REQUESTS_PER_WINDOW = 120; // Maximum requests per window
+const MAX_REQUESTS_PER_ENDPOINT = 40; // Maximum requests per specific endpoint per window
 
 // In-memory store for rate limiting (use Redis in production)
 const requestCounts = new Map<string, { count: number; endpointCounts: Map<string, number>; resetTime: number }>();

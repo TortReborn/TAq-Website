@@ -133,10 +133,10 @@ export async function loadTerritories(): Promise<Record<string, Territory>> {
 }
 
 // Coordinate conversion utility - maps game coordinates to pixel coordinates
-// Calibrated for fruma_map.png (4262x6644) using Detlas as reference.
+// Calibrated for the fruma map image (4262x6644) using Detlas as reference.
 export function coordToPixel(coord: [number, number]): [number, number] {
   // Using Detlas as reference point:
-  // Game coordinate [402, -1657] maps to pixel [3049, 5052] on fruma_map.png
+  // Game coordinate [402, -1657] maps to pixel [3049, 5052] on the fruma map image
   const refGameCoord = [402, -1657];
   const refPixelCoord = [3049, 5052];
 

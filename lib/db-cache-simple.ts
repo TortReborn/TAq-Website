@@ -127,12 +127,14 @@ class SimpleDatabaseCache {
   }
 
   // Get cached data regardless of expiration (database-only approach)
-  async get<T>(key: string, requestId?: string): Promise<T | null> {
-    // Check rate limit
-    const rateCheck = this.checkRateLimit('default', requestId);
-    if (!rateCheck.allowed) {
-      console.warn(`🚫 Rate limit exceeded for cache key: ${key}`);
-      return null;
+  async get<T>(key: string, requestId?: string, skipRateLimit = false): Promise<T | null> {
+    // Check rate limit (skipped when the caller already checked its own bucket)
+    if (!skipRateLimit) {
+      const rateCheck = this.checkRateLimit('default', requestId);
+      if (!rateCheck.allowed) {
+        console.warn(`🚫 Rate limit exceeded for cache key: ${key}`);
+        return null;
+      }
     }
 
     const client = await this.pool.connect();
@@ -163,7 +165,7 @@ class SimpleDatabaseCache {
       console.warn('🚫 Rate limit exceeded for territories');
       return null;
     }
-    return this.get('territories', requestId);
+    return this.get('territories', requestId, true);
   }
 
   async getGuildData(requestId?: string) {

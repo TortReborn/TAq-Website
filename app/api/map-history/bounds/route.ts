@@ -19,7 +19,11 @@ export async function GET(request: NextRequest) {
   const pool = getPool();
 
   try {
-    const exchangeBounds = await getExchangeBounds(pool);
+    const [exchangeBounds, gaps, initialOwners] = await Promise.all([
+      getExchangeBounds(pool),
+      getExchangeGaps(pool),
+      getInitialOwners(pool),
+    ]);
 
     if (!exchangeBounds) {
       return NextResponse.json(
@@ -27,9 +31,6 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
-
-    const gaps = await getExchangeGaps(pool);
-    const initialOwners = await getInitialOwners(pool);
 
     return NextResponse.json({
       earliest: exchangeBounds.earliest.toISOString(),

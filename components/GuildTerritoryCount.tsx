@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Territory, getContrastColor, coordToPixel } from "@/lib/utils";
 
 interface GuildTerritoryCountProps {
@@ -16,9 +16,26 @@ interface GuildStats {
   count: number;
   area: number; // Area in pixels (1 pixel = 1 meter)
   color: string;
+  contrastColor: string;
 }
 
-export default function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandView = false }: GuildTerritoryCountProps) {
+// Validate hex color format
+const isValidHexColor = (color: string | undefined): boolean => {
+  if (!color) return false;
+  return /^#[0-9A-Fa-f]{6}$/.test(color);
+};
+
+// Format area for display (e.g., "1.2M m²" or "500K m²")
+const formatArea = (area: number): string => {
+  if (area >= 1_000_000) {
+    return `${(area / 1_000_000).toFixed(1)}M m²`;
+  } else if (area >= 1_000) {
+    return `${(area / 1_000).toFixed(0)}K m²`;
+  }
+  return `${area.toFixed(0)} m²`;
+};
+
+function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandView = false }: GuildTerritoryCountProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -89,12 +106,6 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
       }
     });
 
-    // Validate hex color format
-    const isValidHexColor = (color: string | undefined): boolean => {
-      if (!color) return false;
-      return /^#[0-9A-Fa-f]{6}$/.test(color);
-    };
-
     const stats: GuildStats[] = Object.entries(counts).map(([name, data]) => {
       // Try multiple key matching strategies like in TerritoryOverlay
       // Only use color if it's a valid hex color
@@ -118,7 +129,8 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
         originalName: name,
         count: data.count,
         area: data.area,
-        color: color
+        color: color,
+        contrastColor: getContrastColor(color, isDarkMode)
       };
     });
 
@@ -130,19 +142,9 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
     }
 
     return stats;
-  }, [territories, guildColors, showLandView]);
+  }, [territories, guildColors, showLandView, isDarkMode]);
 
   const fontSize = 0.875; // Fixed font size in rem
-
-  // Format area for display (e.g., "1.2M m²" or "500K m²")
-  const formatArea = (area: number): string => {
-    if (area >= 1_000_000) {
-      return `${(area / 1_000_000).toFixed(1)}M m²`;
-    } else if (area >= 1_000) {
-      return `${(area / 1_000).toFixed(0)}K m²`;
-    }
-    return `${area.toFixed(0)} m²`;
-  };
 
   return (
     <>
@@ -350,7 +352,7 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
             >
               <span
                 style={{
-                  color: getContrastColor(guild.color, isDarkMode),
+                  color: guild.contrastColor,
                   fontWeight: 'bold',
                   cursor: onGuildClick ? 'pointer' : 'default',
                   textDecoration: 'none',
@@ -423,3 +425,5 @@ export default function GuildTerritoryCount({ territories, onGuildClick, guildCo
     </>
   );
 }
+
+export default React.memo(GuildTerritoryCount);

@@ -1,7 +1,51 @@
 "use client";
 
-import { useMemo, useCallback, useRef, useState, useEffect } from "react";
+import { memo, useMemo, useCallback, useRef, useState, useEffect } from "react";
 import { SeasonPeriod, seasonAtDate, seasonColor } from "@/lib/seasons";
+
+// Cached formatters — creating Intl.DateTimeFormat instances is expensive,
+// and toLocale* calls construct one per invocation.
+const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+
+const DATE_TIME_FORMAT = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+// Format date for display
+const formatDate = (date: Date) => DATE_FORMAT.format(date);
+const formatDateTime = (date: Date) => DATE_TIME_FORMAT.format(date);
+
+// Helper to convert percentage to CSS position that keeps thumb within bounds
+// At 0%: 12px from start, at 100%: 12px from end (for 24px thumb)
+const percentToPosition = (percent: number) => {
+  const offset = 12 - 0.24 * percent;
+  return `calc(${percent}% + ${offset}px)`;
+};
+
+// Convert a percentage to a padded CSS position (accounting for 12px track padding)
+// Used for gap bars and other overlay elements so they align with the thumb
+const percentToPaddedStart = (percent: number) => {
+  return `calc(12px + ${percent} * (100% - 24px) / 100)`;
+};
+const percentToPaddedWidth = (startPct: number, endPct: number) => {
+  return `calc(${endPct - startPct} * (100% - 24px) / 100)`;
+};
+
+// Snap to nearest 10-minute boundary (matching server snapshot interval)
+const SNAP_INTERVAL_MS = 10 * 60 * 1000;
+const snapTo10Min = (targetDate: Date): Date => {
+  const ms = targetDate.getTime();
+  const snapped = ms - (ms % SNAP_INTERVAL_MS);
+  return new Date(snapped);
+};
 
 interface HistoryTimelineProps {
   earliest: Date;
@@ -15,7 +59,7 @@ interface HistoryTimelineProps {
   seasons?: SeasonPeriod[]; // On/off-season periods to overlay as context
 }
 
-export default function HistoryTimeline({
+function HistoryTimeline({
   earliest: earliestProp,
   latest: latestProp,
   current,
@@ -68,13 +112,18 @@ export default function HistoryTimeline({
         const clampedStart = Math.max(earliestMs, period.start.getTime());
         const clampedEnd = Math.min(latestMs, period.end.getTime());
         if (clampedStart >= clampedEnd) return null;
+        const title = (period.type === 'season'
+          ? `Season ${period.season} (${formatDate(period.start)} – ${formatDate(period.end)})`
+          : `Off-season (${formatDate(period.start)} – ${formatDate(period.end)})`) +
+          ' — click to zoom';
         return {
           period,
+          title,
           startPct: ((clampedStart - earliestMs) / totalRange) * 100,
           endPct: ((clampedEnd - earliestMs) / totalRange) * 100,
         };
       })
-      .filter((r): r is { period: SeasonPeriod; startPct: number; endPct: number } => r !== null);
+      .filter((r): r is { period: SeasonPeriod; title: string; startPct: number; endPct: number } => r !== null);
   }, [seasons, earliest, latest, totalRange]);
 
   // Precompute loaded-range positions as percentages of the total range
@@ -131,22 +180,6 @@ export default function HistoryTimeline({
     return Math.max(0, Math.min(100, raw));
   }, [current, earliest, totalRange]);
 
-  // Helper to convert percentage to CSS position that keeps thumb within bounds
-  // At 0%: 12px from start, at 100%: 12px from end (for 24px thumb)
-  const percentToPosition = (percent: number) => {
-    const offset = 12 - 0.24 * percent;
-    return `calc(${percent}% + ${offset}px)`;
-  };
-
-  // Convert a percentage to a padded CSS position (accounting for 12px track padding)
-  // Used for gap bars and other overlay elements so they align with the thumb
-  const percentToPaddedStart = (percent: number) => {
-    return `calc(12px + ${percent} * (100% - 24px) / 100)`;
-  };
-  const percentToPaddedWidth = (startPct: number, endPct: number) => {
-    return `calc(${endPct - startPct} * (100% - 24px) / 100)`;
-  };
-
   // Convert a percentage position to a date
   const percentToDate = useCallback((percent: number): Date => {
     const clampedPercent = Math.max(0, Math.min(100, percent));
@@ -154,16 +187,13 @@ export default function HistoryTimeline({
     return new Date(timestamp);
   }, [earliest, totalRange]);
 
-  // Snap to nearest 10-minute boundary (matching server snapshot interval)
-  const SNAP_INTERVAL_MS = 10 * 60 * 1000;
-  const snapTo10Min = useCallback((targetDate: Date): Date => {
-    const ms = targetDate.getTime();
-    const snapped = ms - (ms % SNAP_INTERVAL_MS);
-    return new Date(snapped);
-  }, []);
-
   // Throttle ref for drag interactions (16ms = ~60fps)
   const lastDragUpdateRef = useRef<number>(0);
+
+  // rAF throttle for hover tracking — latest pointer position is stored here
+  // and flushed once per frame
+  const hoverRafRef = useRef<number | null>(null);
+  const hoverPointRef = useRef({ clientX: 0, clientY: 0 });
 
   // Check if a percentage falls within a gap region
   const isInGap = useCallback((percent: number): boolean => {
@@ -198,30 +228,48 @@ export default function HistoryTimeline({
     const rawDate = percentToDate(percent);
     const newDate = snapTo10Min(rawDate);
     onChange(newDate);
-  }, [vertical, percentToDate, snapTo10Min, onChange, isInGap]);
+  }, [vertical, percentToDate, onChange, isInGap]);
 
-  // Hover tracking for tooltip
+  const cancelHoverFrame = useCallback(() => {
+    if (hoverRafRef.current !== null) {
+      cancelAnimationFrame(hoverRafRef.current);
+      hoverRafRef.current = null;
+    }
+  }, []);
+
+  // Cancel any pending hover frame on unmount
+  useEffect(() => cancelHoverFrame, [cancelHoverFrame]);
+
+  // Hover tracking for tooltip — throttled to one state update per frame
   const handleTrackHover = useCallback((e: React.MouseEvent) => {
-    const track = trackRef.current;
-    if (!track || isDragging) return;
-    const rect = track.getBoundingClientRect();
-    const padding = 12;
+    if (isDragging) return;
+    hoverPointRef.current = { clientX: e.clientX, clientY: e.clientY };
+    if (hoverRafRef.current !== null) return;
+    hoverRafRef.current = requestAnimationFrame(() => {
+      hoverRafRef.current = null;
+      const track = trackRef.current;
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      const padding = 12;
 
-    const pos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
-    const trackSize = vertical ? rect.height : rect.width;
-    const usableSize = trackSize - padding * 2;
-    const adjustedPos = Math.max(0, Math.min(usableSize, pos - padding));
-    const percent = usableSize > 0 ? (adjustedPos / usableSize) * 100 : 0;
+      const { clientX, clientY } = hoverPointRef.current;
+      const pos = vertical ? clientY - rect.top : clientX - rect.left;
+      const trackSize = vertical ? rect.height : rect.width;
+      const usableSize = trackSize - padding * 2;
+      const adjustedPos = Math.max(0, Math.min(usableSize, pos - padding));
+      const percent = usableSize > 0 ? (adjustedPos / usableSize) * 100 : 0;
 
-    setHoverPercent(percent);
-    setHoverPos(pos);
+      setHoverPercent(percent);
+      setHoverPos(pos);
+    });
   }, [isDragging, vertical]);
 
   const handleTrackLeave = useCallback(() => {
+    cancelHoverFrame();
     if (!isDragging) {
       setHoverPercent(null);
     }
-  }, [isDragging]);
+  }, [isDragging, cancelHoverFrame]);
 
   // Whether the hover is over a gap, and which gap
   const hoverInGap = useMemo(() => {
@@ -258,11 +306,12 @@ export default function HistoryTimeline({
     const pct = totalRange === 0 ? 0 : ((snapped.getTime() - earliest.getTime()) / totalRange) * 100;
     if (isInGap(pct)) return;
     onChange(snapped);
-  }, [earliest, latest, totalRange, snapTo10Min, isInGap, onChange]);
+  }, [earliest, latest, totalRange, isInGap, onChange]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    cancelHoverFrame();
     setIsDragging(true);
     setHoverPercent(null);
     handleTrackInteraction(e.clientX, e.clientY, true);
@@ -289,25 +338,6 @@ export default function HistoryTimeline({
       };
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
-
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const formatDateTime = (date: Date) => {
-    return date.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   // ── Shared sub-elements ──────────────────────────────────────────────
 
@@ -471,13 +501,9 @@ export default function HistoryTimeline({
           overflow: 'hidden',
         }}
       >
-        {seasonRegions.map(({ period, startPct, endPct }, i) => {
+        {seasonRegions.map(({ period, title, startPct, endPct }, i) => {
           const isSeason = period.type === 'season';
           const widthPct = endPct - startPct;
-          const title = (isSeason
-            ? `Season ${period.season} (${formatDate(period.start)} – ${formatDate(period.end)})`
-            : `Off-season (${formatDate(period.start)} – ${formatDate(period.end)})`) +
-            ' — click to zoom';
           return (
             <div
               key={i}
@@ -849,3 +875,5 @@ export default function HistoryTimeline({
     </div>
   );
 }
+
+export default memo(HistoryTimeline);

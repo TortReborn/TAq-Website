@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
       {
         status: 200,
         headers: {
+          'Cache-Control': 'public, max-age=300, s-maxage=300',
           'X-Cache': cacheStatus,
           'X-Cache-Source': 'PostgreSQL'
         }
