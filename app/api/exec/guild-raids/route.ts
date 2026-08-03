@@ -192,15 +192,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Resolve UUIDs from IGNs (once per distinct player) so the queue carries
-    // everything the bot needs and we don't have to hit discord_links again
-    // at processing time.
-    const uuidByIgn = new Map<string, string | null>();
-    for (const [key, ign] of distinctIgns) {
+    // Resolve UUIDs from IGNs in one query so the queue carries everything the
+    // bot needs and we don't have to hit discord_links again at processing
+    // time. discord_links can hold several rows per ign (relinks, unlinked
+    // history) — prefer the live linked row.
+    const uuidByIgn = new Map<string, string | null>(
+      [...distinctIgns.keys()].map(key => [key, null])
+    );
+    if (distinctIgns.size > 0) {
       const uuidResult = await pool.query(
-        `SELECT uuid FROM discord_links WHERE LOWER(ign) = LOWER($1)`, [ign]
+        `SELECT DISTINCT ON (LOWER(ign)) LOWER(ign) AS key, uuid
+         FROM discord_links
+         WHERE LOWER(ign) = ANY($1::text[])
+         ORDER BY LOWER(ign), linked DESC, (rank <> '') DESC, discord_id`,
+        [[...distinctIgns.keys()]]
       );
-      uuidByIgn.set(key, uuidResult.rows.length > 0 ? uuidResult.rows[0].uuid : null);
+      for (const row of uuidResult.rows) {
+        uuidByIgn.set(row.key, row.uuid);
+      }
     }
 
     // Insert all raids into the queue atomically — a failed batch queues
@@ -245,7 +254,7 @@ export async function POST(request: NextRequest) {
       id: queueIds[0],
       ids: queueIds,
       count: queueIds.length,
-      mode: entries[0].mode,
+      modes: entries.map(e => e.mode),
       status: 'pending',
       warning: 'Queued for the bot — will appear in Discord on the next bot tick (within ~3 minutes).',
     });

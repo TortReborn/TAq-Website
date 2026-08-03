@@ -156,6 +156,8 @@ export default function GraidLogForm({ meta, onLogged }: Props) {
                   type="button"
                   onClick={() => setRaidType(selected ? '' : t.value)}
                   title={t.label}
+                  aria-label={t.label}
+                  aria-pressed={selected}
                   style={{
                     padding: '0.5rem 0.25rem',
                     borderRadius: '0.375rem',
