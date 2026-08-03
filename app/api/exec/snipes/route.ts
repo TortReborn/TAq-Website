@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { normalizeHq, isDry, LIST_ORDER_SQL } from '@/lib/snipe-constants';
+import { escapeDiscordMarkdown } from '@/lib/discord-markdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +33,7 @@ function formatParticipantsLog(participants: { ign: string; role: string }[]): s
   const parts: string[] = [];
   for (const role of roleOrder) {
     if (grouped[role]?.length) {
-      parts.push(`${grouped[role].join(' ')} ${role}`);
+      parts.push(`${grouped[role].map(escapeDiscordMarkdown).join(' ')} ${role}`);
     }
   }
   return parts.join(' / ');
