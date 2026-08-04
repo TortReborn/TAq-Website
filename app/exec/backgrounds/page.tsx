@@ -348,7 +348,7 @@ export default function ExecBackgroundsPage() {
           </div>
 
           {/* Backgrounds table */}
-          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflowX: 'auto', overflowY: 'hidden' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-card)' }}>
               <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                 All Backgrounds
@@ -709,7 +709,7 @@ export default function ExecBackgroundsPage() {
 
       {/* ═══ Audit Log Tab ═══ */}
       {activeTab === 'audit' && (
-        <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-card)', overflowX: 'auto', overflowY: 'hidden' }}>
           <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-card)' }}>
             <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               Recent Background Actions

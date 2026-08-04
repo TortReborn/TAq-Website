@@ -253,7 +253,10 @@ export default function ExecDashboardPage() {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      height: 'calc(100vh - 80px - 4rem)',
+      // minHeight, not height: on a tall window this still fills the viewport so
+      // the quick links sit at the bottom, but on a short one it grows and the
+      // page scrolls instead of the columns being crushed to nothing.
+      minHeight: 'calc(100vh - 80px - 4rem)',
     }}>
       <h1 style={{
         fontSize: '1.75rem',
@@ -292,11 +295,17 @@ export default function ExecDashboardPage() {
       {/* Three-column layout: Notes | Events | Recent Apps */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
+        // Reflows to 2 then 1 column instead of crushing three columns into a
+        // narrow window.
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: '0.75rem',
         marginBottom: '1rem',
         flex: 1,
-        minHeight: 0,
+        // Was minHeight: 0, which let this collapse to literally 0px on a short
+        // window while the quick links below kept their full height. The panels
+        // inside still rendered at natural size and overflowed visibly, landing
+        // on top of the quick links and burying their controls.
+        minHeight: '18rem',
       }}>
         {/* Left: Shared Notes */}
         <div style={{
@@ -850,7 +859,8 @@ export default function ExecDashboardPage() {
       {/* Quick Links — pinned to bottom */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
+        // Wraps to 2x2 rather than squeezing four columns into a narrow window.
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gap: '0.75rem',
         flexShrink: 0,
       }}>

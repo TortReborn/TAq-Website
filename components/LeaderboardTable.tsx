@@ -193,7 +193,12 @@ export default function LeaderboardTable({ members, timeFrame, searchTerm }: Lea
           background: 'var(--bg-card)',
           borderRadius: '0.75rem',
           border: '1px solid var(--border-card)',
-          overflow: 'hidden'
+          // overflow:hidden here was for the rounded corners, but it also clipped
+          // the table on a narrow window — the right-hand columns were cut off
+          // with no way to scroll to them. Horizontal scroll instead; vertical
+          // stays clipped so the corners are still rounded.
+          overflowX: 'auto',
+          overflowY: 'hidden'
         }}>
           <table style={{
             width: '100%',
