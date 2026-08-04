@@ -113,7 +113,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, []);
   useEffect(() => () => {
-    if (transformRafRef.current !== null) cancelAnimationFrame(transformRafRef.current);
+    if (transformRafRef.current !== null) {
+      cancelAnimationFrame(transformRafRef.current);
+      // Must clear the ref, not just cancel. Under StrictMode's mount/unmount/
+      // remount the same ref object survives, so leaving a stale id here makes
+      // applyTransform's `=== null` guard permanently false and every pan, zoom
+      // and region-jump silently stops updating.
+      transformRafRef.current = null;
+    }
   }, []);
   const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
   const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
@@ -1617,7 +1624,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   }, [clampScale, applyTransform]);
 
   return (
-    <main style={{
+    <main className="map-opaque-chrome" style={{
       position: 'fixed',
       top: '5.5rem',
       left: 0,
@@ -1906,7 +1913,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             display: 'flex',
             flexDirection: 'column',
             gap: '0.5rem',
-            zIndex: 10
+            // Above the history panel (z-index 15): that panel is draggable and
+            // wide, so it can sit over this column. The map's own chrome has to
+            // stay reachable no matter where the user parks the panel.
+            zIndex: 20
           }}>
             {/* Region Zoom Button */}
             <div style={{ position: 'relative' }}>
@@ -2123,7 +2133,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             flexDirection: 'row',
             alignItems: 'flex-end',
             gap: '0.5rem',
-            zIndex: 15,
+            // Was 15 — the same as the history panel, which renders later and so
+            // won the tie and swallowed clicks on Live/History/Factions.
+            zIndex: 20,
           }}>
             {/* Mode Selector - always to the left */}
             <MapModeSelector
