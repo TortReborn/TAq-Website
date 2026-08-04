@@ -1913,7 +1913,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             display: 'flex',
             flexDirection: 'column',
             gap: '0.5rem',
-            zIndex: 10
+            // Above the history panel (z-index 15): that panel is draggable and
+            // wide, so it can sit over this column. The map's own chrome has to
+            // stay reachable no matter where the user parks the panel.
+            zIndex: 20
           }}>
             {/* Region Zoom Button */}
             <div style={{ position: 'relative' }}>
@@ -2130,7 +2133,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             flexDirection: 'row',
             alignItems: 'flex-end',
             gap: '0.5rem',
-            zIndex: 15,
+            // Was 15 — the same as the history panel, which renders later and so
+            // won the tie and swallowed clicks on Live/History/Factions.
+            zIndex: 20,
           }}>
             {/* Mode Selector - always to the left */}
             <MapModeSelector

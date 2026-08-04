@@ -33,6 +33,13 @@ interface MapHistoryControlsProps {
   seasons?: SeasonPeriod[]; // On/off-season periods for timeline context
 }
 
+// Widths of the map's bottom-corner control clusters, kept clear so the
+// draggable panel can't be parked underneath them (they render above it).
+// Left is the zoom stack (40px button + 16px inset); right also carries the
+// Live/History switch, Factions and Conflict Finder, so it is far wider.
+const CHROME_GUTTER = 60;
+const CHROME_GUTTER_RIGHT = 310;
+
 const SPEED_OPTIONS = [1, 2, 10, 50];
 const FAST_SPEED = -1;
 const ALL_SPEED_OPTIONS = [...SPEED_OPTIONS, FAST_SPEED];
@@ -103,7 +110,15 @@ function MapHistoryControls({
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const resizeStartRef = useRef({ x: 0, y: 0, width: 1200, height: DEFAULT_VERTICAL_HEIGHT, posX: 0, posY: 0 });
 
-  const panelWidth = isVertical ? VERTICAL_WIDTH : width;
+  // Cap the horizontal panel to the space between the map's corner control
+  // columns. The stored width (default 1200) is wider than a laptop viewport
+  // once both columns are accounted for, which pushed the panel's own edge
+  // buttons underneath them. Purely a display cap — the user's chosen width is
+  // still what gets persisted, so it comes back on a wider window.
+  const maxUsableWidth = containerBounds
+    ? Math.max(MIN_WIDTH, containerBounds.width - CHROME_GUTTER - CHROME_GUTTER_RIGHT)
+    : MAX_WIDTH;
+  const panelWidth = isVertical ? VERTICAL_WIDTH : Math.min(width, maxUsableWidth);
 
   // Display strings derived from `current` — recomputed only when the timestamp changes
   const currentMs = current.getTime();
@@ -126,13 +141,20 @@ function MapHistoryControls({
   const showSpeedInPlayback = panelWidth >= 540;
   const stackDateRow = panelWidth < 420;
 
-  // Clamp position to keep panel within container bounds
+  // Clamp position to keep panel within container bounds.
+  // The gutter reserves the map's bottom-corner control columns (zoom stack on
+  // the left, mode/settings cluster on the right) so the panel can't be parked
+  // on top of them. Those controls sit above the panel, so any overlap would
+  // bury the panel's own edge buttons underneath them.
   const clampPosition = useCallback((x: number, y: number) => {
     if (!containerRef.current || !containerBounds) return { x, y };
     const halfWidth = panelWidth / 2;
     const panelHeight = containerRef.current.offsetHeight;
-    const maxX = containerBounds.width / 2 - halfWidth;
-    const minX = -containerBounds.width / 2 + halfWidth;
+    // Never let the gutter exceed the slack available, or minX would exceed
+    // maxX and the panel would snap to a corner on narrow viewports.
+    const slack = Math.max(0, containerBounds.width / 2 - halfWidth);
+    const maxX = containerBounds.width / 2 - halfWidth - Math.min(CHROME_GUTTER_RIGHT, slack);
+    const minX = -containerBounds.width / 2 + halfWidth + Math.min(CHROME_GUTTER, slack);
     const maxY = 0;
     const minY = -(containerBounds.height - panelHeight - 16);
     return {
@@ -177,6 +199,22 @@ function MapHistoryControls({
     }
     setIsInitialized(true);
   }, []);
+
+  // Keep the panel inside the map container.
+  //
+  // The restore above deliberately does not clamp: on mount neither the
+  // container bounds nor the panel's own height are known yet. This runs once
+  // they are, and again whenever the container resizes or the panel changes
+  // shape — so an offset saved on a wide window can't strand the panel over
+  // the map's control column (or off-screen entirely) on a smaller one.
+  // Without it the bad offset is re-saved on every visit and never recovers.
+  useEffect(() => {
+    if (!isInitialized || !containerBounds) return;
+    setPosition((prev) => {
+      const next = clampPosition(prev.x, prev.y);
+      return next.x === prev.x && next.y === prev.y ? prev : next;
+    });
+  }, [isInitialized, containerBounds, clampPosition, isVertical, width, verticalHeight]);
 
   // Save position when it changes
   useEffect(() => {
