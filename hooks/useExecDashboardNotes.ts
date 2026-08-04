@@ -14,11 +14,14 @@ interface NotesData {
 }
 
 async function errorFrom(res: Response, fallback: string): Promise<Error> {
+  // Checked before parsing: the exec API returns a JSON 401 ({ error: 'Unauthorized' }),
+  // which is accurate but not actionable — tell the user what to actually do about it.
+  if (res.status === 401) return new Error('Session expired — reload and sign in again.');
   try {
     const d = await res.json();
     return new Error(d.error || fallback);
   } catch {
-    return new Error(res.status === 401 ? 'Session expired — reload and sign in again.' : `${fallback} (HTTP ${res.status})`);
+    return new Error(`${fallback} (HTTP ${res.status})`);
   }
 }
 

@@ -341,7 +341,7 @@ export default function ExecDashboardPage() {
               </button>
             </div>
             {noteError && (
-              <div style={{ fontSize: '0.72rem', color: '#ef4444', lineHeight: 1.3, marginTop: '0.4rem' }}>
+              <div role="alert" aria-live="polite" style={{ fontSize: '0.72rem', color: '#ef4444', lineHeight: 1.3, marginTop: '0.4rem' }}>
                 {noteError}
               </div>
             )}
@@ -503,7 +503,7 @@ export default function ExecDashboardPage() {
                 }}
               />
               {eventError && (
-                <div style={{ fontSize: '0.72rem', color: '#ef4444', lineHeight: 1.3 }}>
+                <div role="alert" aria-live="polite" style={{ fontSize: '0.72rem', color: '#ef4444', lineHeight: 1.3 }}>
                   {eventError}
                 </div>
               )}
@@ -587,7 +587,7 @@ export default function ExecDashboardPage() {
                             }}
                           />
                           {editEventError && (
-                            <div style={{ fontSize: '0.7rem', color: '#ef4444', lineHeight: 1.3 }}>
+                            <div role="alert" aria-live="polite" style={{ fontSize: '0.7rem', color: '#ef4444', lineHeight: 1.3 }}>
                               {editEventError}
                             </div>
                           )}
