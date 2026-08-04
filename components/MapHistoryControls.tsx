@@ -404,6 +404,10 @@ function MapHistoryControls({
       display: 'flex',
       alignItems: 'center',
       gap: '0.25rem',
+      // Rendered before HistoryTimeline, so without an explicit z-index the
+      // timeline's tick-label row paints over these buttons and swallows their
+      // clicks — the lower half of each 24px button became unclickable.
+      zIndex: 2,
     }}>
       {isLoading && (
         <div style={{

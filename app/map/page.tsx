@@ -113,7 +113,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, []);
   useEffect(() => () => {
-    if (transformRafRef.current !== null) cancelAnimationFrame(transformRafRef.current);
+    if (transformRafRef.current !== null) {
+      cancelAnimationFrame(transformRafRef.current);
+      // Must clear the ref, not just cancel. Under StrictMode's mount/unmount/
+      // remount the same ref object survives, so leaving a stale id here makes
+      // applyTransform's `=== null` guard permanently false and every pan, zoom
+      // and region-jump silently stops updating.
+      transformRafRef.current = null;
+    }
   }, []);
   const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
   const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
