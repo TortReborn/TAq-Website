@@ -165,16 +165,37 @@ export default function ExecDashboardPage() {
   const events = useExecDashboardEvents();
 
   const [newNote, setNewNote] = useState('');
+  const [noteError, setNoteError] = useState<string | null>(null);
+  const [savingNote, setSavingNote] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
   const [editingNoteContent, setEditingNoteContent] = useState('');
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [eventDesc, setEventDesc] = useState('');
+  const [eventError, setEventError] = useState<string | null>(null);
+  const [savingEvent, setSavingEvent] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
   const [editEventTitle, setEditEventTitle] = useState('');
   const [editEventDate, setEditEventDate] = useState('');
   const [editEventDesc, setEditEventDesc] = useState('');
+  const [editEventError, setEditEventError] = useState<string | null>(null);
+  const [savingEditEvent, setSavingEditEvent] = useState(false);
+
+  const submitNote = async () => {
+    if (savingNote) return;
+    if (!newNote.trim()) { setNoteError('Note cannot be empty.'); return; }
+    setNoteError(null);
+    setSavingNote(true);
+    try {
+      await notes.addNote(newNote.trim());
+      setNewNote('');
+    } catch (err) {
+      setNoteError(err instanceof Error ? err.message : 'Failed to add note.');
+    } finally {
+      setSavingNote(false);
+    }
+  };
 
   if (loading && !data) {
     return (
@@ -297,13 +318,8 @@ export default function ExecDashboardPage() {
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input
                 value={newNote}
-                onChange={e => setNewNote(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && newNote.trim()) {
-                    notes.addNote(newNote.trim());
-                    setNewNote('');
-                  }
-                }}
+                onChange={e => { setNewNote(e.target.value); if (noteError) setNoteError(null); }}
+                onKeyDown={e => { if (e.key === 'Enter') submitNote(); }}
                 placeholder="Add a note..."
                 style={{
                   flex: 1, background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
@@ -312,16 +328,23 @@ export default function ExecDashboardPage() {
                 }}
               />
               <button
-                onClick={() => { if (newNote.trim()) { notes.addNote(newNote.trim()); setNewNote(''); } }}
+                disabled={savingNote}
+                onClick={submitNote}
                 style={{
                   background: '#22c55e', color: '#fff', border: 'none', borderRadius: '0.375rem',
-                  padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer',
+                  padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '600',
+                  cursor: savingNote ? 'default' : 'pointer', opacity: savingNote ? 0.6 : 1,
                   flexShrink: 0,
                 }}
               >
-                Add
+                {savingNote ? 'Adding...' : 'Add'}
               </button>
             </div>
+            {noteError && (
+              <div style={{ fontSize: '0.72rem', color: '#ef4444', lineHeight: 1.3, marginTop: '0.4rem' }}>
+                {noteError}
+              </div>
+            )}
           </div>
           <div className="themed-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
             {notes.notes.length === 0 ? (
@@ -436,7 +459,7 @@ export default function ExecDashboardPage() {
           }}>
             <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Planned Events</h2>
             <button
-              onClick={() => setShowAddEvent(!showAddEvent)}
+              onClick={() => { setShowAddEvent(!showAddEvent); setEventError(null); }}
               style={{
                 background: showAddEvent ? 'var(--bg-primary)' : 'rgba(59, 130, 246, 0.1)',
                 color: showAddEvent ? 'var(--text-secondary)' : '#3b82f6',
@@ -479,20 +502,36 @@ export default function ExecDashboardPage() {
                   fontSize: '0.8rem', outline: 'none', width: '100%',
                 }}
               />
+              {eventError && (
+                <div style={{ fontSize: '0.72rem', color: '#ef4444', lineHeight: 1.3 }}>
+                  {eventError}
+                </div>
+              )}
               <button
+                disabled={savingEvent}
                 onClick={async () => {
-                  if (eventTitle.trim() && eventDate) {
-                    await events.addEvent(eventTitle.trim(), new Date(eventDate).toISOString(), eventDesc.trim() || undefined);
+                  if (!eventTitle.trim()) { setEventError('Title is required.'); return; }
+                  const parsed = new Date(eventDate);
+                  if (!eventDate || isNaN(parsed.getTime())) { setEventError('Pick a date and time.'); return; }
+                  setEventError(null);
+                  setSavingEvent(true);
+                  try {
+                    await events.addEvent(eventTitle.trim(), parsed.toISOString(), eventDesc.trim() || undefined);
                     setEventTitle(''); setEventDate(''); setEventDesc(''); setShowAddEvent(false);
+                  } catch (err) {
+                    setEventError(err instanceof Error ? err.message : 'Failed to add event.');
+                  } finally {
+                    setSavingEvent(false);
                   }
                 }}
                 style={{
                   background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '0.375rem',
-                  padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer',
+                  padding: '0.4rem 0.75rem', fontSize: '0.75rem', fontWeight: '600',
+                  cursor: savingEvent ? 'default' : 'pointer', opacity: savingEvent ? 0.6 : 1,
                   alignSelf: 'flex-start',
                 }}
               >
-                Save Event
+                {savingEvent ? 'Saving...' : 'Save Event'}
               </button>
             </div>
           )}
@@ -547,24 +586,40 @@ export default function ExecDashboardPage() {
                               fontSize: '0.8rem', outline: 'none', width: '100%',
                             }}
                           />
+                          {editEventError && (
+                            <div style={{ fontSize: '0.7rem', color: '#ef4444', lineHeight: 1.3 }}>
+                              {editEventError}
+                            </div>
+                          )}
                           <div style={{ display: 'flex', gap: '0.375rem' }}>
                             <button
+                              disabled={savingEditEvent}
                               onClick={async () => {
-                                if (editEventTitle.trim() && editEventDate) {
+                                if (!editEventTitle.trim()) { setEditEventError('Title is required.'); return; }
+                                const parsed = new Date(editEventDate);
+                                if (!editEventDate || isNaN(parsed.getTime())) { setEditEventError('Pick a date and time.'); return; }
+                                setEditEventError(null);
+                                setSavingEditEvent(true);
+                                try {
                                   await events.editEvent(ev.id, {
                                     title: editEventTitle.trim(),
-                                    eventDate: new Date(editEventDate).toISOString(),
+                                    eventDate: parsed.toISOString(),
                                     description: editEventDesc.trim() || '',
                                   });
                                   setEditingEventId(null);
+                                } catch (err) {
+                                  setEditEventError(err instanceof Error ? err.message : 'Failed to save event.');
+                                } finally {
+                                  setSavingEditEvent(false);
                                 }
                               }}
                               style={{
                                 background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '0.25rem',
-                                padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: '600', cursor: 'pointer',
+                                padding: '0.25rem 0.5rem', fontSize: '0.7rem', fontWeight: '600',
+                                cursor: savingEditEvent ? 'default' : 'pointer', opacity: savingEditEvent ? 0.6 : 1,
                               }}
                             >
-                              Save
+                              {savingEditEvent ? 'Saving...' : 'Save'}
                             </button>
                             <button
                               onClick={() => setEditingEventId(null)}
@@ -615,6 +670,7 @@ export default function ExecDashboardPage() {
                                 const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
                                 setEditEventDate(local.toISOString().slice(0, 16));
                                 setEditEventDesc(ev.description || '');
+                                setEditEventError(null);
                               }}
                               style={{
                                 background: 'none', border: 'none', color: 'var(--text-secondary)',

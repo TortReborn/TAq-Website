@@ -14,6 +14,15 @@ interface EventsData {
   events: DashboardEvent[];
 }
 
+async function errorFrom(res: Response, fallback: string): Promise<Error> {
+  try {
+    const d = await res.json();
+    return new Error(d.error || fallback);
+  } catch {
+    return new Error(res.status === 401 ? 'Session expired — reload and sign in again.' : `${fallback} (HTTP ${res.status})`);
+  }
+}
+
 export function useExecDashboardEvents() {
   const { data, error, isLoading, mutate } = useSWR<EventsData>(
     '/api/exec/dashboard/events',
@@ -28,8 +37,7 @@ export function useExecDashboardEvents() {
       body: JSON.stringify({ title, eventDate, description }),
     });
     if (!res.ok) {
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to add event');
+      throw await errorFrom(res, 'Failed to add event');
     }
     mutate();
   };
@@ -48,8 +56,7 @@ export function useExecDashboardEvents() {
     });
     if (!res.ok) {
       mutate();
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to edit event');
+      throw await errorFrom(res, 'Failed to edit event');
     }
   };
 
@@ -67,8 +74,7 @@ export function useExecDashboardEvents() {
     });
     if (!res.ok) {
       mutate();
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to delete event');
+      throw await errorFrom(res, 'Failed to delete event');
     }
   };
 

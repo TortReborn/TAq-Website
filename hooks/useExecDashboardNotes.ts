@@ -13,6 +13,15 @@ interface NotesData {
   notes: DashboardNote[];
 }
 
+async function errorFrom(res: Response, fallback: string): Promise<Error> {
+  try {
+    const d = await res.json();
+    return new Error(d.error || fallback);
+  } catch {
+    return new Error(res.status === 401 ? 'Session expired — reload and sign in again.' : `${fallback} (HTTP ${res.status})`);
+  }
+}
+
 export function useExecDashboardNotes() {
   const { data, error, isLoading, mutate } = useSWR<NotesData>(
     '/api/exec/dashboard/notes',
@@ -27,8 +36,7 @@ export function useExecDashboardNotes() {
       body: JSON.stringify({ content }),
     });
     if (!res.ok) {
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to add note');
+      throw await errorFrom(res, 'Failed to add note');
     }
     mutate();
   };
@@ -47,8 +55,7 @@ export function useExecDashboardNotes() {
     });
     if (!res.ok) {
       mutate();
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to toggle note');
+      throw await errorFrom(res, 'Failed to toggle note');
     }
   };
 
@@ -66,8 +73,7 @@ export function useExecDashboardNotes() {
     });
     if (!res.ok) {
       mutate();
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to edit note');
+      throw await errorFrom(res, 'Failed to edit note');
     }
   };
 
@@ -85,8 +91,7 @@ export function useExecDashboardNotes() {
     });
     if (!res.ok) {
       mutate();
-      const d = await res.json();
-      throw new Error(d.error || 'Failed to delete note');
+      throw await errorFrom(res, 'Failed to delete note');
     }
   };
 
