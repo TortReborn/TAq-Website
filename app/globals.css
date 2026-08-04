@@ -280,6 +280,8 @@ select option {
   --text-muted: rgba(32, 74, 95, 0.7);
   --bg-card: rgba(255, 255, 255, 0.75);
   --bg-card-solid: #ffffff;
+  /* Opaque hover partner for --bg-card-solid, for chrome over imagery */
+  --bg-card-solid-hover: #e8f4f8;
   --card-bg-secondary: rgba(232, 251, 255, 0.5);
   --card-border: rgba(255, 255, 255, 0.4);
   --bg-nav: var(--color-ocean-100);
@@ -318,6 +320,8 @@ select option {
   --text-muted: rgba(226, 232, 240, 0.7);
   --bg-card: rgba(30, 41, 59, 0.8);
   --bg-card-solid: #1e293b;
+  /* Opaque hover partner for --bg-card-solid, for chrome over imagery */
+  --bg-card-solid-hover: #334155;
   --card-bg-secondary: rgba(51, 65, 85, 0.6);
   --card-border: rgba(71, 85, 105, 0.4);
   --bg-nav: #1e293b;
@@ -1495,4 +1499,17 @@ body.site-fixed-bg-active > footer {
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
   font-size: 0.9em;
+}
+
+/*
+ * Map page chrome sits directly on top of the map image, where --bg-card's
+ * 75-80% alpha (and --bg-secondary's 30-40% hover tint) let the map bleed
+ * through and wash the controls out — hovering actually made them *more*
+ * see-through. Re-point the two surface tokens at their opaque equivalents
+ * for this subtree, so every control inherits the fix rather than each of
+ * the ~47 inline styles having to opt in individually.
+ */
+.map-opaque-chrome {
+  --bg-card: var(--bg-card-solid);
+  --bg-secondary: var(--bg-card-solid-hover);
 }

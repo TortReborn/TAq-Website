@@ -1624,7 +1624,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   }, [clampScale, applyTransform]);
 
   return (
-    <main style={{
+    <main className="map-opaque-chrome" style={{
       position: 'fixed',
       top: '5.5rem',
       left: 0,
