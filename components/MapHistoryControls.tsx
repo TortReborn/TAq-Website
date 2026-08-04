@@ -116,9 +116,14 @@ function MapHistoryControls({
   // buttons underneath them. Purely a display cap — the user's chosen width is
   // still what gets persisted, so it comes back on a wider window.
   const maxUsableWidth = containerBounds
-    ? Math.max(MIN_WIDTH, containerBounds.width - CHROME_GUTTER - CHROME_GUTTER_RIGHT)
+    ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, containerBounds.width - CHROME_GUTTER - CHROME_GUTTER_RIGHT))
     : MAX_WIDTH;
-  const panelWidth = isVertical ? VERTICAL_WIDTH : Math.min(width, maxUsableWidth);
+  // Deliberately not Math.min(width, maxUsableWidth): capping only the rendered
+  // value pins the panel's size while the resize handler keeps shifting
+  // position.x by half the width delta, so dragging an edge slid the panel
+  // sideways instead of resizing it. The cap is enforced on the width state
+  // itself (in the resize handler and the fit effect below) instead.
+  const panelWidth = isVertical ? VERTICAL_WIDTH : width;
 
   // Display strings derived from `current` — recomputed only when the timestamp changes
   const currentMs = current.getTime();
@@ -210,11 +215,20 @@ function MapHistoryControls({
   // Without it the bad offset is re-saved on every visit and never recovers.
   useEffect(() => {
     if (!isInitialized || !containerBounds) return;
+    // Never clamp mid-gesture. Resizing updates width and position.x together to
+    // keep the dragged edge anchored; re-clamping on each width tick recomputes
+    // a narrower x-range and pulls x back toward centre, so the panel slides
+    // sideways instead of resizing. The handlers own position while active —
+    // this runs once the gesture ends.
+    if (isDragging || isResizing) return;
+    // Shrink to fit first — a width saved on a wide window would otherwise keep
+    // the panel wider than the space between the map's corner controls.
+    setWidth((w) => Math.min(w, maxUsableWidth));
     setPosition((prev) => {
       const next = clampPosition(prev.x, prev.y);
       return next.x === prev.x && next.y === prev.y ? prev : next;
     });
-  }, [isInitialized, containerBounds, clampPosition, isVertical, width, verticalHeight]);
+  }, [isInitialized, containerBounds, clampPosition, maxUsableWidth, isVertical, width, verticalHeight, isDragging, isResizing]);
 
   // Save position when it changes
   useEffect(() => {
@@ -335,20 +349,19 @@ function MapHistoryControls({
     }
 
     const delta = e.clientX - resizeStartRef.current.x;
-    if (isResizing === 'right') {
-      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStartRef.current.width + delta));
-      const widthDelta = newWidth - resizeStartRef.current.width;
-      const newPosX = resizeStartRef.current.posX + widthDelta / 2;
-      setWidth(newWidth);
-      setPosition(prev => ({ ...prev, x: newPosX }));
-    } else {
-      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStartRef.current.width - delta));
-      const widthDelta = newWidth - resizeStartRef.current.width;
-      const newPosX = resizeStartRef.current.posX - widthDelta / 2;
-      setWidth(newWidth);
-      setPosition(prev => ({ ...prev, x: newPosX }));
-    }
-  }, [isResizing, containerBounds]);
+    // Bound by the space actually available, not the absolute MAX_WIDTH, so the
+    // panel can't be grown out past the edge of the map.
+    const sign = isResizing === 'right' ? 1 : -1;
+    const newWidth = Math.max(MIN_WIDTH, Math.min(maxUsableWidth, resizeStartRef.current.width + sign * delta));
+    const widthDelta = newWidth - resizeStartRef.current.width;
+    setWidth(newWidth);
+    // Half the growth keeps the dragged edge anchored (the panel is centred),
+    // then clamp so resizing can't shove it off-screen the way dragging can't.
+    setPosition(prev => ({
+      ...prev,
+      x: clampPosition(resizeStartRef.current.posX + sign * (widthDelta / 2), prev.y).x,
+    }));
+  }, [isResizing, maxUsableWidth, clampPosition]);
 
   useEffect(() => {
     if (isDragging) {
