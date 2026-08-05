@@ -7,6 +7,10 @@ import styles from './inventory.module.css';
 type Kind = 'ingredient' | 'consumable' | 'material';
 type Bucket = 'misc_bucket' | 'account_bank' | 'character_bank' | 'materials_bucket';
 type View = Kind | 'archive';
+// Recipe difficulty tiers 
+type Difficulty = 'conns' | 'hq';
+type Role = 'dps' | 'healer' | 'tank' | 'any';
+type ConsuType = 'potion' | 'scroll' | 'food';
 
 interface Category {
   id: number;
@@ -44,6 +48,11 @@ interface InventoryItem {
     toggled: boolean;
     imageUrl: string;
   } | null;
+  difficulty: Difficulty | null;
+  isDry: boolean;
+  roles: Role[];
+  consuTypes: ConsuType[];
+  level: number | null;
   sortOrder: number;
   archived: boolean;
   archivedAt: string | null;
@@ -112,6 +121,11 @@ interface ItemDraft {
   storageBucket: Bucket;
   notes: string;
   texturePath: string;
+  difficulty: Difficulty | '';
+  isDry: boolean;
+  roles: Role[];
+  consuTypes: ConsuType[];
+  level: string;
   archived: boolean;
 }
 
@@ -155,6 +169,32 @@ const SCAN_GROUPS: Array<{ label: string; buckets: Bucket[] }> = [
   { label: 'Consu', buckets: ['account_bank', 'character_bank'] },
   { label: 'Materials', buckets: ['materials_bucket'] },
 ];
+
+const ROLE_OPTIONS: Array<{ value: Role; label: string }> = [
+  { value: 'dps', label: 'DPS' },
+  { value: 'healer', label: 'Healer' },
+  { value: 'tank', label: 'Tank' },
+  { value: 'any', label: 'Any' },
+];
+const DIFFICULTY_OPTIONS: Array<{ value: Difficulty; label: string }> = [
+  { value: 'conns', label: 'Conns' },
+  { value: 'hq', label: 'HQ' },
+];
+const DIFFICULTY_COLORS: Record<Difficulty, string> = { conns: '#4cb80f', hq: '#ffcd35' };
+const DRY_COLOR = '#e6473f'; // Was HardHQ's color before it merged into HQ + is_dry.
+const CONSU_TYPE_OPTIONS: Array<{ value: ConsuType | 'equipment'; label: string }> = [
+  { value: 'potion', label: 'Potion' },
+  { value: 'scroll', label: 'Scroll' },
+  { value: 'food', label: 'Food' },
+  { value: 'equipment', label: 'Equipment' },
+];
+const LEVEL_OPTIONS = [100, 105, 115];
+
+function toggleSetValue<T>(set: Set<T>, value: T): Set<T> {
+  const next = new Set(set);
+  if (next.has(value)) next.delete(value); else next.add(value);
+  return next;
+}
 
 function stackAmount(quantity: number): string {
   const stacks = Math.floor(quantity / 64);
@@ -235,6 +275,11 @@ function itemDraft(item: InventoryItem): ItemDraft {
     storageBucket: item.storageBucket,
     notes: item.notes ?? '',
     texturePath: item.texturePath ?? '',
+    difficulty: item.difficulty ?? '',
+    isDry: item.isDry,
+    roles: item.roles,
+    consuTypes: item.consuTypes,
+    level: item.level === null ? '' : String(item.level),
     archived: item.archived,
   };
 }
@@ -258,6 +303,13 @@ export default function InventoryPage() {
   const [scanProfilesOpen, setScanProfilesOpen] = useState(false);
   const [materialGroupDialog, setMaterialGroupDialog] = useState<MaterialGroupDraft | null>(null);
   const [deleteMaterialGroupDialog, setDeleteMaterialGroupDialog] = useState<MaterialGroup | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<Set<number>>(new Set());
+  const [roleFilter, setRoleFilter] = useState<Set<Role>>(new Set());
+  const [difficultyFilter, setDifficultyFilter] = useState<Set<Difficulty>>(new Set());
+  const [dryOnly, setDryOnly] = useState(false);
+  const [consuTypeFilter, setConsuTypeFilter] = useState<Set<ConsuType | 'equipment'>>(new Set());
+  const [levelFilter, setLevelFilter] = useState<Set<number>>(new Set());
+  const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
   const [textureDialog, setTextureDialog] = useState(false);
   const [textureLibrary, setTextureLibrary] = useState<TextureAsset[]>([]);
   const [textureSearch, setTextureSearch] = useState('');
@@ -282,6 +334,15 @@ export default function InventoryPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    setCategoryFilter(new Set());
+    setRoleFilter(new Set());
+    setDifficultyFilter(new Set());
+    setDryOnly(false);
+    setConsuTypeFilter(new Set());
+    setLevelFilter(new Set());
+  }, [view]);
+
   const activeItems = useMemo(() => data.items.filter(item => !item.archived), [data.items]);
   const enough = activeItems.filter(item => item.enough === true).length;
   const low = activeItems.filter(item => item.enough === false).length;
@@ -298,15 +359,36 @@ export default function InventoryPage() {
     const query = search.trim().toLocaleLowerCase('en-US');
     return data.items.filter(item => {
       const rightView = view === 'archive' ? item.archived : !item.archived && item.kind === view;
-      return rightView && (!query || [item.name, item.usedBy, item.bankPage, item.notes]
-        .some(value => value?.toLocaleLowerCase('en-US').includes(query)));
+      if (!rightView) return false;
+      if (query && ![item.name, item.usedBy, item.bankPage, item.notes].some(value => value?.toLocaleLowerCase('en-US').includes(query))) {
+        return false;
+      }
+      if (categoryFilter.size > 0 && !categoryFilter.has(item.categoryId)) return false;
+      if (item.kind === 'consumable') {
+        if (roleFilter.size > 0 && !item.roles.includes('any') && !item.roles.some(role => roleFilter.has(role))) return false;
+        if (difficultyFilter.size > 0 && (!item.difficulty || !difficultyFilter.has(item.difficulty))) return false;
+        if (dryOnly && !item.isDry) return false;
+      }
+      if (item.kind === 'material') {
+        if (consuTypeFilter.size > 0) {
+          const tags: (ConsuType | 'equipment')[] = item.consuTypes.length > 0 ? item.consuTypes : ['equipment'];
+          if (!tags.some(tag => consuTypeFilter.has(tag))) return false;
+        }
+        if (levelFilter.size > 0 && (item.level === null || !levelFilter.has(item.level))) return false;
+      }
+      return true;
     });
-  }, [data.items, search, view]);
+  }, [data.items, search, view, categoryFilter, roleFilter, difficultyFilter, dryOnly, consuTypeFilter, levelFilter]);
 
-  const categories = useMemo(() => data.categories
-    .filter(category => !category.archived && (view === 'archive' || category.kind === view))
-    .filter(category => visibleItems.some(item => item.categoryId === category.id) || view !== 'archive')
-    .sort((a, b) => a.sortOrder - b.sortOrder), [data.categories, view, visibleItems]);
+  // Categories for the current view's filter chips / manager - not a display grouping anymore.
+  const viewCategories = useMemo(() => data.categories
+    .filter(category => !category.archived && category.kind === view)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.categories, view]);
+
+  const categoryById = useMemo(() => new Map(data.categories.map(category => [category.id, category])), [data.categories]);
+
+  const sortedVisibleItems = useMemo(() => [...visibleItems].sort((a, b) => a.sortOrder - b.sortOrder), [visibleItems]);
+  const visibleMaterialGroups = useMemo(() => groupMaterialItems(sortedVisibleItems), [sortedVisibleItems]);
 
   async function post(body: Record<string, unknown>) {
     setSaving(true);
@@ -349,6 +431,11 @@ export default function InventoryPage() {
       storageBucket: draft.storageBucket,
       notes: draft.notes,
       texturePath: draft.texturePath,
+      difficulty: draft.difficulty || null,
+      isDry: draft.isDry,
+      roles: draft.roles,
+      consuTypes: draft.consuTypes,
+      level: draft.level === '' ? null : Number(draft.level),
     };
     setSaving(true);
     setError('');
@@ -445,6 +532,8 @@ export default function InventoryPage() {
             storageBucket: item.storageBucket,
             notes: null,
             texturePath: item.texturePath,
+            consuTypes: item.consuTypes,
+            level: item.level,
           }),
         });
         const payload = await response.json();
@@ -647,6 +736,11 @@ export default function InventoryPage() {
       storageBucket: category.kind === 'ingredient' ? 'misc_bucket' : category.kind === 'material' ? 'materials_bucket' : 'account_bank',
       notes: '',
       texturePath: '',
+      difficulty: '',
+      isDry: false,
+      roles: [],
+      consuTypes: [],
+      level: '',
       archived: false,
     });
   }
@@ -769,6 +863,69 @@ export default function InventoryPage() {
         </div>
       )}
 
+      {categoryManagerOpen && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setCategoryManagerOpen(false);
+        }}>
+          <section className={`${styles.modal} ${styles.smallModal}`} role="dialog" aria-modal="true" aria-label="Manage categories">
+            <div className={styles.modalHeader}>
+              <h2>{view !== 'archive' ? `${view.charAt(0).toUpperCase()}${view.slice(1)} categories` : 'Categories'}</h2>
+              <button type="button" className={styles.closeButton} onClick={() => setCategoryManagerOpen(false)} aria-label="Close">×</button>
+            </div>
+            {canEdit && view !== 'archive' && (
+              <div className={styles.categoryActions}>
+                <button className={styles.primaryButton} onClick={() => setCategoryDialog({ kind: view, name: '' })}>
+                  Add category
+                </button>
+              </div>
+            )}
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {viewCategories.map(category => (
+                    <tr key={category.id}>
+                      <td>{category.name}</td>
+                      {canEdit && (
+                        <td>
+                          <div className={styles.rowActions}>
+                            <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
+                            <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
+                            <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
+                            <button
+                              className={styles.dangerText}
+                              onClick={() => {
+                                const replacement = data.categories.find(candidate => (
+                                  candidate.kind === category.kind && candidate.id !== category.id && !candidate.archived
+                                ));
+                                setDeleteCategoryDialog({
+                                  category,
+                                  replacementId: replacement ? String(replacement.id) : '',
+                                });
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                  {viewCategories.length === 0 && (
+                    <tr><td colSpan={2}>No categories yet.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error} role="alert">
           <span>{error}</span>
@@ -801,16 +958,115 @@ export default function InventoryPage() {
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
             <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search stock…" />
           </label>
-          {canEdit && view !== 'archive' && (
-            <button
-              className={styles.secondaryButton}
-              onClick={() => setCategoryDialog({ kind: view, name: '' })}
-            >
-              Add category
+          {view !== 'archive' && (
+            <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
+              Manage categories
+            </button>
+          )}
+          {canAddItems && view !== 'archive' && viewCategories.length > 0 && (
+            <button className={styles.primaryButton} onClick={() => newItem(viewCategories[0])}>
+              Add item
             </button>
           )}
         </div>
       </div>
+
+      {view !== 'archive' && (
+        <div className={styles.filterBar} aria-label="Filters">
+          <div className={styles.filterGroup}>
+            <span className={styles.filterGroupLabel}>Type</span>
+            <div className={styles.filterChips}>
+              {viewCategories.map(category => (
+                <button
+                  key={category.id}
+                  type="button"
+                  className={categoryFilter.has(category.id) ? styles.filterChipActive : styles.filterChip}
+                  onClick={() => setCategoryFilter(current => toggleSetValue(current, category.id))}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          {view === 'consumable' && (
+            <>
+              <div className={styles.filterGroup}>
+                <span className={styles.filterGroupLabel}>Difficulty</span>
+                <div className={styles.filterChips}>
+                  {DIFFICULTY_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={difficultyFilter.has(option.value) ? styles.filterChipActive : styles.filterChip}
+                      style={{ '--chip-color': DIFFICULTY_COLORS[option.value] } as CSSProperties}
+                      onClick={() => setDifficultyFilter(current => toggleSetValue(current, option.value))}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className={dryOnly ? styles.filterChipActive : styles.filterChip}
+                    style={{ '--chip-color': DRY_COLOR } as CSSProperties}
+                    onClick={() => setDryOnly(current => !current)}
+                  >
+                    Dry
+                  </button>
+                </div>
+              </div>
+              <div className={styles.filterGroup}>
+                <span className={styles.filterGroupLabel}>Role</span>
+                <div className={styles.filterChips}>
+                  {ROLE_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={roleFilter.has(option.value) ? styles.filterChipActive : styles.filterChip}
+                      onClick={() => setRoleFilter(current => toggleSetValue(current, option.value))}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+          {view === 'material' && (
+            <>
+              <div className={styles.filterGroup}>
+                <span className={styles.filterGroupLabel}>Used for</span>
+                <div className={styles.filterChips}>
+                  {CONSU_TYPE_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={consuTypeFilter.has(option.value) ? styles.filterChipActive : styles.filterChip}
+                      onClick={() => setConsuTypeFilter(current => toggleSetValue(current, option.value))}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.filterGroup}>
+                <span className={styles.filterGroupLabel}>Level</span>
+                <div className={styles.filterChips}>
+                  {LEVEL_OPTIONS.map(level => (
+                    <button
+                      key={level}
+                      type="button"
+                      className={levelFilter.has(level) ? styles.filterChipActive : styles.filterChip}
+                      onClick={() => setLevelFilter(current => toggleSetValue(current, level))}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {!canEdit && (
         <p className={styles.readOnlyNote}>You can add inventory items. Narwhal, Hydra, and Leader ranks can edit existing items and manage categories.</p>
@@ -820,210 +1076,209 @@ export default function InventoryPage() {
         <div className={styles.skeletons} aria-label="Loading inventory">
           {[0, 1, 2].map(value => <div key={value} />)}
         </div>
-      ) : categories.length === 0 ? (
+      ) : sortedVisibleItems.length === 0 ? (
         <div className={styles.empty}>No inventory entries match this view.</div>
       ) : (
-        <div className={styles.categoryList}>
-          {categories.map(category => {
-            const items = visibleItems
-              .filter(item => item.categoryId === category.id)
-              .sort((a, b) => a.sortOrder - b.sortOrder);
-            const entryCount = category.kind === 'material' ? groupMaterialItems(items).length : items.length;
-            return (
-              <section className={styles.category} key={`${view}-${category.id}`}>
-                <div className={styles.categoryHeader}>
-                  <div>
-                    <h2>{category.name}</h2>
-                    <span>{entryCount} {entryCount === 1 ? 'entry' : 'entries'}</span>
-                  </div>
-                  {canAddItems && view !== 'archive' && (
-                    <div className={styles.categoryActions}>
-                      {canEdit && (
-                        <>
-                          <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
-                          <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
-                          <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
-                          <button
-                            className={styles.dangerText}
-                            onClick={() => {
-                              const replacement = data.categories.find(candidate => (
-                                candidate.kind === category.kind && candidate.id !== category.id && !candidate.archived
-                              ));
-                              setDeleteCategoryDialog({
-                                category,
-                                replacementId: replacement ? String(replacement.id) : '',
-                              });
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
-                      <button className={styles.primaryButton} onClick={() => newItem(category)}>Add item</button>
-                    </div>
-                  )}
-                </div>
-
-                <div className={styles.tableWrap}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        {view !== 'archive' && <th>Inventory</th>}
-                        {view !== 'archive' && category.kind === 'consumable' && <th>Reserve</th>}
-                        {view !== 'archive' && <th>Target</th>}
-                        {category.kind === 'consumable' && <th>Used by</th>}
-                        <th>Location</th>
-                        {view !== 'archive' && category.kind === 'consumable' && <th>Reserve Location</th>}
-                        {category.kind === 'consumable' && <th>Charges</th>}
-                        {view !== 'archive' && <th>Status</th>}
-                        {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {category.kind === 'material' ? groupMaterialItems(items).map(group => {
-                        const representative = group.tiers.find((item): item is InventoryItem => Boolean(item));
-                        if (!representative) return null;
-                        const totalQuantity = group.tiers.reduce((sum, item) => sum + (item?.quantity ?? 0), 0);
-                        const targets = group.tiers.map(item => item?.desiredQuantity ?? null);
-                        const totalTarget = targets.some(target => target !== null)
-                          ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
-                          : null;
-                        const enough = totalTarget === null ? null : totalQuantity >= totalTarget;
-                        return (
-                          <tr key={group.baseName}>
-                            <td>
-                              <div className={styles.itemIdentity}>
-                                <div className={styles.texture}>
-                                  {representative.texturePath ? <img src={representative.texturePath} alt="" /> : <span>?</span>}
-                                </div>
-                                <div><strong>{group.baseName}</strong></div>
-                              </div>
-                            </td>
-                            {view !== 'archive' && (
-                              <td className={styles.number}>
-                                <div className={styles.tierBreakdown}>
-                                  {group.tiers.map((item, index) => (
-                                    <span key={index} className={styles.tierChip} style={{ '--tier-color': TIER_COLORS[index + 1] } as CSSProperties}>
-                                      T{index + 1}: {item?.quantity ?? 0}
-                                    </span>
-                                  ))}
-                                </div>
-                              </td>
-                            )}
-                            {view !== 'archive' && (
-                              <td className={styles.number}>{totalTarget === null ? '—' : totalTarget}</td>
-                            )}
-                            <td>
-                              <div className={styles.tierBreakdown}>
-                                {group.tiers.map((item, index) => (
-                                  <span key={index} className={styles.tierChip} style={{ '--tier-color': TIER_COLORS[index + 1] } as CSSProperties}>
-                                    T{index + 1}: {item?.bankPage || '—'}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-                            {view !== 'archive' && (
-                              <td>
-                                {enough === null ? (
-                                  <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
-                                ) : enough ? (
-                                  <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
-                                ) : (
-                                  <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
-                                )}
-                              </td>
-                            )}
-                            {canEdit && (
-                              <td>
-                                <div className={styles.rowActions}>
-                                  <button onClick={() => setMaterialGroupDialog(materialGroupDraft(group))}>Edit</button>
-                                  <button
-                                    className={representative.archived ? '' : styles.dangerText}
-                                    onClick={() => void toggleArchiveGroup(group)}
-                                    disabled={saving}
-                                  >
-                                    {representative.archived ? 'Restore' : 'Archive'}
-                                  </button>
-                                  <button className={styles.dangerText} onClick={() => setDeleteMaterialGroupDialog(group)} disabled={saving}>
-                                    Delete
-                                  </button>
-                                </div>
-                              </td>
-                            )}
-                          </tr>
-                        );
-                      }) : items.map(item => (
-                        <tr key={item.id}>
+        <div className={styles.tableWrap}>
+          <table>
+            {view === 'material' ? (
+              <>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Profession</th>
+                    <th>Used for</th>
+                    <th>Level</th>
+                    <th>Inventory</th>
+                    <th>Target</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleMaterialGroups.map(group => {
+                    const representative = group.tiers.find((item): item is InventoryItem => Boolean(item));
+                    if (!representative) return null;
+                    const totalQuantity = group.tiers.reduce((sum, item) => sum + (item?.quantity ?? 0), 0);
+                    const targets = group.tiers.map(item => item?.desiredQuantity ?? null);
+                    const totalTarget = targets.some(target => target !== null)
+                      ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
+                      : null;
+                    const enough = totalTarget === null ? null : totalQuantity >= totalTarget;
+                    return (
+                      <tr key={group.baseName}>
+                        <td>
+                          <div className={styles.itemIdentity}>
+                            <div className={styles.texture}>
+                              {representative.texturePath ? <img src={representative.texturePath} alt="" /> : <span>?</span>}
+                            </div>
+                            <div><strong>{group.baseName}</strong></div>
+                          </div>
+                        </td>
+                        <td>{categoryById.get(representative.categoryId)?.name ?? '—'}</td>
+                        <td>
+                          {representative.consuTypes.length > 0
+                            ? representative.consuTypes
+                                .map(value => CONSU_TYPE_OPTIONS.find(option => option.value === value)?.label ?? value)
+                                .join(' + ')
+                            : 'Equipment'}
+                        </td>
+                        <td className={styles.number}>{representative.level ?? '—'}</td>
+                        <td className={styles.number}>
+                          <div className={styles.tierBreakdown}>
+                            {group.tiers.map((item, index) => (
+                              <span key={index} className={styles.tierChip} style={{ '--tier-color': TIER_COLORS[index + 1] } as CSSProperties}>
+                                T{index + 1}: {item?.quantity ?? 0}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className={styles.number}>{totalTarget === null ? '—' : totalTarget}</td>
+                        <td>
+                          <div className={styles.tierBreakdown}>
+                            {group.tiers.map((item, index) => (
+                              <span key={index} className={styles.tierChip} style={{ '--tier-color': TIER_COLORS[index + 1] } as CSSProperties}>
+                                T{index + 1}: {item?.bankPage || '—'}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td>
+                          {enough === null ? (
+                            <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
+                          ) : enough ? (
+                            <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
+                          ) : (
+                            <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
+                          )}
+                        </td>
+                        {canEdit && (
                           <td>
-                            <div className={styles.itemIdentity}>
-                              <div className={styles.texture}>
-                                {item.texturePath ? <img src={item.texturePath} alt="" /> : <span>?</span>}
-                              </div>
-                              <div>
-                                {item.recipeUrl
-                                  ? <a className={styles.itemNameLink} href={item.recipeUrl} target="_blank" rel="noreferrer"><strong>{item.name}</strong></a>
-                                  : <strong>{item.name}</strong>}
-                                {item.exchange && (
-                                  <span className={`${styles.exchangeRate} ${item.exchange.toggled ? '' : styles.exchangeDisabled}`}>
-                                    {item.exchange.shells} {item.exchange.shells === 1 ? 'shell' : 'shells'} / {item.exchange.per}
-                                  </span>
-                                )}
-                                {item.notes && <small>{item.notes}</small>}
-                              </div>
+                            <div className={styles.rowActions}>
+                              <button onClick={() => setMaterialGroupDialog(materialGroupDraft(group))}>Edit</button>
+                              <button
+                                className={representative.archived ? '' : styles.dangerText}
+                                onClick={() => void toggleArchiveGroup(group)}
+                                disabled={saving}
+                              >
+                                {representative.archived ? 'Restore' : 'Archive'}
+                              </button>
+                              <button className={styles.dangerText} onClick={() => setDeleteMaterialGroupDialog(group)} disabled={saving}>
+                                Delete
+                              </button>
                             </div>
                           </td>
-                          {view !== 'archive' && (
-                            <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </>
+            ) : (
+              <>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    {view !== 'archive' && <th>Inventory</th>}
+                    {view === 'consumable' && <th>Reserve</th>}
+                    {view !== 'archive' && <th>Target</th>}
+                    {view === 'consumable' && <th>Difficulty</th>}
+                    {view === 'consumable' && <th>Role</th>}
+                    <th>Location</th>
+                    {view === 'consumable' && <th>Reserve Location</th>}
+                    {(view === 'consumable' || view === 'archive') && <th>Charges</th>}
+                    {view !== 'archive' && <th>Status</th>}
+                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedVisibleItems.map(item => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className={styles.itemIdentity}>
+                          <div className={styles.texture}>
+                            {item.texturePath ? <img src={item.texturePath} alt="" /> : <span>?</span>}
+                          </div>
+                          <div>
+                            {item.recipeUrl
+                              ? <a className={styles.itemNameLink} href={item.recipeUrl} target="_blank" rel="noreferrer"><strong>{item.name}</strong></a>
+                              : <strong>{item.name}</strong>}
+                            {item.exchange && (
+                              <span className={`${styles.exchangeRate} ${item.exchange.toggled ? '' : styles.exchangeDisabled}`}>
+                                {item.exchange.shells} {item.exchange.shells === 1 ? 'shell' : 'shells'} / {item.exchange.per}
+                              </span>
+                            )}
+                            {item.notes && <small>{item.notes}</small>}
+                          </div>
+                        </div>
+                      </td>
+                      <td>{categoryById.get(item.categoryId)?.name ?? '—'}</td>
+                      {view !== 'archive' && (
+                        <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
+                      )}
+                      {view === 'consumable' && (
+                        <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
+                      )}
+                      {view !== 'archive' && (
+                        <td className={styles.number}>
+                          {item.desiredQuantity === null ? '—' : item.kind === 'ingredient'
+                            ? stackAmount(item.desiredQuantity)
+                            : item.desiredQuantity}
+                        </td>
+                      )}
+                      {view === 'consumable' && (
+                        <td>
+                          {item.difficulty && (
+                            <span className={styles.difficultyBadge} style={{ '--chip-color': DIFFICULTY_COLORS[item.difficulty] } as CSSProperties}>
+                              {DIFFICULTY_OPTIONS.find(option => option.value === item.difficulty)?.label}
+                            </span>
                           )}
-                          {view !== 'archive' && item.kind === 'consumable' && (
-                            <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
+                          {item.isDry && (
+                            <span className={styles.dryBadge} style={{ '--chip-color': DRY_COLOR } as CSSProperties}>Dry</span>
                           )}
-                          {view !== 'archive' && (
-                            <td className={styles.number}>
-                              {item.desiredQuantity === null ? '—' : item.kind === 'ingredient'
-                                ? stackAmount(item.desiredQuantity)
-                                : item.desiredQuantity}
-                            </td>
+                          {!item.difficulty && !item.isDry && '—'}
+                        </td>
+                      )}
+                      {view === 'consumable' && (
+                        <td>{item.roles.length > 0 ? item.roles.map(role => ROLE_OPTIONS.find(option => option.value === role)?.label ?? role).join(', ') : '—'}</td>
+                      )}
+                      <td>{item.bankPage || '—'}</td>
+                      {view === 'consumable' && <td>{item.reserveBankPage || '—'}</td>}
+                      {(view === 'consumable' || view === 'archive') && <td className={styles.number}>{item.charges ?? '—'}</td>}
+                      {view !== 'archive' && (
+                        <td>
+                          {item.enough === null ? (
+                            <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
+                          ) : item.enough ? (
+                            <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
+                          ) : (
+                            <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
                           )}
-                          {item.kind === 'consumable' && <td>{item.usedBy || '—'}</td>}
-                          <td>{item.bankPage || '—'}</td>
-                          {view !== 'archive' && item.kind === 'consumable' && <td>{item.reserveBankPage || '—'}</td>}
-                          {item.kind === 'consumable' && <td className={styles.number}>{item.charges ?? '—'}</td>}
-                          {view !== 'archive' && (
-                            <td>
-                              {item.enough === null ? (
-                                <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
-                              ) : item.enough ? (
-                                <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
-                              ) : (
-                                <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
-                              )}
-                            </td>
-                          )}
-                          {canEdit && (
-                            <td>
-                              <div className={styles.rowActions}>
-                                {!item.archived && <button onClick={() => void moveItem(item, -1)} aria-label={`Move ${item.name} up`}>↑</button>}
-                                {!item.archived && <button onClick={() => void moveItem(item, 1)} aria-label={`Move ${item.name} down`}>↓</button>}
-                                <button onClick={() => setDraft(itemDraft(item))}>Edit</button>
-                                <button className={item.archived ? '' : styles.dangerText} onClick={() => void toggleArchive(item)} disabled={saving}>
-                                  {item.archived ? 'Restore' : 'Archive'}
-                                </button>
-                                <button className={styles.dangerText} onClick={() => setDeleteItemDialog(item)} disabled={saving}>
-                                  Delete
-                                </button>
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            );
-          })}
+                        </td>
+                      )}
+                      {canEdit && (
+                        <td>
+                          <div className={styles.rowActions}>
+                            {!item.archived && <button onClick={() => void moveItem(item, -1)} aria-label={`Move ${item.name} up`}>↑</button>}
+                            {!item.archived && <button onClick={() => void moveItem(item, 1)} aria-label={`Move ${item.name} down`}>↓</button>}
+                            <button onClick={() => setDraft(itemDraft(item))}>Edit</button>
+                            <button className={item.archived ? '' : styles.dangerText} onClick={() => void toggleArchive(item)} disabled={saving}>
+                              {item.archived ? 'Restore' : 'Archive'}
+                            </button>
+                            <button className={styles.dangerText} onClick={() => setDeleteItemDialog(item)} disabled={saving}>
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </>
+            )}
+          </table>
         </div>
       )}
 
@@ -1066,7 +1321,63 @@ export default function InventoryPage() {
                 </>
               )}
               {draft.kind === 'consumable' && (
-                <label>Used by<input value={draft.usedBy} onChange={event => setDraft({ ...draft, usedBy: event.target.value })} placeholder="DPS / Healer" /></label>
+                <>
+                  <label>Difficulty
+                    <select value={draft.difficulty} onChange={event => setDraft({ ...draft, difficulty: event.target.value as Difficulty | '' })}>
+                      <option value="">Unclassified</option>
+                      {DIFFICULTY_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </label>
+                  <label className={styles.checkboxField}>
+                    <input type="checkbox" checked={draft.isDry} onChange={event => setDraft({ ...draft, isDry: event.target.checked })} />
+                    Dry recipe
+                  </label>
+                  <div className={styles.fullField}>
+                    <span>Roles</span>
+                    <div className={styles.roleChips}>
+                      {ROLE_OPTIONS.map(option => (
+                        <label key={option.value} className={styles.checkboxField}>
+                          <input
+                            type="checkbox"
+                            checked={draft.roles.includes(option.value)}
+                            onChange={event => setDraft({
+                              ...draft,
+                              roles: event.target.checked
+                                ? [...draft.roles, option.value]
+                                : draft.roles.filter(role => role !== option.value),
+                            })}
+                          />
+                          {option.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+              {draft.kind === 'material' && (
+                <>
+                  <div className={styles.fullField}>
+                    <span>Used for</span>
+                    <div className={styles.roleChips}>
+                      {CONSU_TYPE_OPTIONS.filter(option => option.value !== 'equipment').map(option => (
+                        <label key={option.value} className={styles.checkboxField}>
+                          <input
+                            type="checkbox"
+                            checked={draft.consuTypes.includes(option.value as ConsuType)}
+                            onChange={event => setDraft({
+                              ...draft,
+                              consuTypes: event.target.checked
+                                ? [...draft.consuTypes, option.value as ConsuType]
+                                : draft.consuTypes.filter(value => value !== option.value),
+                            })}
+                          />
+                          {option.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <label>Gather level<input type="number" min="0" value={draft.level} onChange={event => setDraft({ ...draft, level: event.target.value })} /></label>
+                </>
               )}
               {draft.kind !== 'material' && (
                 <label>Location

@@ -44,6 +44,7 @@ async function loadInventory() {
     pool.query(
       `SELECT id, kind, category_id, name, scan_key, aliases, quantity, reserve_quantity, desired_quantity,
               used_by, bank_page, reserve_bank_page, charges, recipe_url, storage_bucket, notes, texture_path,
+              difficulty, is_dry, roles, consu_types, level,
               sort_order, archived, archived_at, updated_by, updated_at
        FROM inventory_items
        ORDER BY kind, archived, sort_order, name`
@@ -114,6 +115,11 @@ async function loadInventory() {
         storageBucket: row.storage_bucket,
         notes: row.notes,
         texturePath: row.texture_path,
+        difficulty: row.difficulty,
+        isDry: row.is_dry,
+        roles: row.roles ?? [],
+        consuTypes: row.consu_types ?? [],
+        level: row.level,
         exchange: exchange ? {
           key: exchange.key,
           shells: Number(exchange.shells ?? 1),

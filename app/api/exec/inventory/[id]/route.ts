@@ -5,9 +5,24 @@ import { getPool } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 
 const VALID_BUCKETS = new Set(['misc_bucket', 'account_bank', 'character_bank', 'materials_bucket']);
+const VALID_DIFFICULTIES = new Set(['conns', 'hq']);
+const VALID_CONSU_TYPES = new Set(['potion', 'scroll', 'food']);
+const VALID_ROLES = new Set(['dps', 'healer', 'tank', 'any']);
 
 function nullableString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function nullableEnum(value: unknown, allowed: Set<string>): string | null {
+  return typeof value === 'string' && allowed.has(value) ? value : null;
+}
+
+function roleArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter(role => typeof role === 'string' && VALID_ROLES.has(role)) : [];
+}
+
+function enumArray(value: unknown, allowed: Set<string>): string[] {
+  return Array.isArray(value) ? value.filter(entry => typeof entry === 'string' && allowed.has(entry)) : [];
 }
 
 function nonNegativeInteger(value: unknown, nullable = false): number | null {
@@ -66,8 +81,9 @@ export async function PATCH(
          SET category_id = $1, name = $2, scan_key = $3, aliases = $4,
              quantity = $5, reserve_quantity = $6, desired_quantity = $7, used_by = $8, bank_page = $9,
              reserve_bank_page = $10, charges = $11, recipe_url = $12, storage_bucket = $13, notes = $14,
-             texture_path = $15, updated_at = NOW(), updated_by = $16
-         WHERE id = $17`,
+             texture_path = $15, difficulty = $16, is_dry = $17, roles = $18, consu_types = $19, level = $20,
+             updated_at = NOW(), updated_by = $21
+         WHERE id = $22`,
         [
           categoryId, name, nullableString(body.scanKey) ?? name,
           Array.isArray(body.aliases) ? body.aliases.filter(value => typeof value === 'string') : [],
@@ -76,6 +92,8 @@ export async function PATCH(
           nullableString(body.usedBy), nullableString(body.bankPage), nullableString(body.reserveBankPage),
           nonNegativeInteger(body.charges, true), nullableString(body.recipeUrl),
           storageBucket, nullableString(body.notes), nullableString(body.texturePath),
+          nullableEnum(body.difficulty, VALID_DIFFICULTIES), body.isDry === true, roleArray(body.roles),
+          enumArray(body.consuTypes, VALID_CONSU_TYPES), nonNegativeInteger(body.level, true),
           session.ign, id,
         ]
       );
