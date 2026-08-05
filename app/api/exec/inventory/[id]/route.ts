@@ -4,7 +4,7 @@ import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_BUCKETS = new Set(['misc_bucket', 'account_bank', 'character_bank']);
+const VALID_BUCKETS = new Set(['misc_bucket', 'account_bank', 'character_bank', 'materials_bucket']);
 
 function nullableString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
@@ -85,5 +85,30 @@ export async function PATCH(
   } catch (error) {
     console.error('Inventory item update error:', error);
     return NextResponse.json({ error: 'Failed to update inventory item.' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const session = await requireNarwhalSession(request);
+  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+
+  const id = Number(params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return NextResponse.json({ error: 'Invalid inventory item.' }, { status: 400 });
+  }
+
+  try {
+    const pool = getPool();
+    const result = await pool.query(`DELETE FROM inventory_items WHERE id = $1`, [id]);
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: 'Item not found.' }, { status: 404 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Inventory item delete error:', error);
+    return NextResponse.json({ error: 'Failed to delete inventory item.' }, { status: 500 });
   }
 }

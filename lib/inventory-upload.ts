@@ -6,15 +6,18 @@ import {
   isReserveInventorySource,
   matchInventorySnapshot,
 } from '@/lib/inventory-snapshots';
+import { isAuthorizedInventoryClient } from '@/lib/inventory-auth';
 
-const ALLOWED_UPLOADER = 'woealer';
-const VALID_SCAN_TYPES = new Set(['misc_bucket', 'account_bank', 'character_bank']);
+// One entry per scan_type the mod can upload. Adding a new trackable kind (as with
+// 'materials_bucket') means adding one row here rather than hunting down every ternary
+// that used to branch on scanType individually.
+const SCAN_TYPE_CONFIG: Record<string, { itemKind: string; field: 'ingredients' | 'consumables' | 'materials'; sourceBuckets: string[] }> = {
+  misc_bucket: { itemKind: 'ingredient', field: 'ingredients', sourceBuckets: ['misc_bucket'] },
+  account_bank: { itemKind: 'consumable', field: 'consumables', sourceBuckets: ['account_bank', 'character_bank'] },
+  character_bank: { itemKind: 'consumable', field: 'consumables', sourceBuckets: ['account_bank', 'character_bank'] },
+  materials_bucket: { itemKind: 'material', field: 'materials', sourceBuckets: ['materials_bucket'] },
+};
 const SOURCE_KEY_PATTERN = /^[a-z0-9:_-]{1,120}$/;
-
-function readBearer(request: NextRequest): string {
-  const header = request.headers.get('authorization') ?? '';
-  return header.startsWith('Bearer ') ? header.slice(7).trim() : '';
-}
 
 function asCountMap(value: unknown): Record<string, number> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
@@ -32,10 +35,10 @@ function parseJsonCountMap(value: unknown): Record<string, number> {
 }
 
 export async function handleInventoryUpload(request: NextRequest) {
-  const uploader = readBearer(request);
-  if (uploader.toLocaleLowerCase('en-US') !== ALLOWED_UPLOADER) {
+  if (!isAuthorizedInventoryClient(request)) {
     return NextResponse.json({ error: 'Only Woealer can upload inventory snapshots.' }, { status: 403 });
   }
+  const uploader = 'Woealer';
 
   let body: Record<string, unknown>;
   try {
@@ -45,7 +48,8 @@ export async function handleInventoryUpload(request: NextRequest) {
   }
 
   const scanType = typeof body.scanType === 'string' ? body.scanType : '';
-  if (!VALID_SCAN_TYPES.has(scanType)) {
+  const scanConfig = SCAN_TYPE_CONFIG[scanType];
+  if (!scanConfig) {
     return NextResponse.json({ error: 'Invalid scan type.' }, { status: 400 });
   }
 
@@ -54,9 +58,8 @@ export async function handleInventoryUpload(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid inventory source key.' }, { status: 400 });
   }
   const sourceName = (typeof body.sourceName === 'string' && body.sourceName.trim() ? body.sourceName.trim() : scanType).slice(0, 120);
-  const primary = scanType === 'misc_bucket' ? asCountMap(body.ingredients) : asCountMap(body.consumables);
-  const itemKind = scanType === 'misc_bucket' ? 'ingredient' : 'consumable';
-  const reported = primary;
+  const itemKind = scanConfig.itemKind;
+  const reported = asCountMap(body[scanConfig.field]);
   const reserveSource = itemKind === 'consumable' && isReserveInventorySource(requestedSourceKey);
   const clientTimestamp = typeof body.timestamp === 'number' && Number.isFinite(body.timestamp)
     ? new Date(body.timestamp)
@@ -81,11 +84,10 @@ export async function handleInventoryUpload(request: NextRequest) {
       aliases: row.aliases ?? [],
       storageBucket: row.storage_bucket,
     }));
-    const sourceItems = itemKind === 'ingredient' || reserveSource
+    const sourceItems = itemKind !== 'consumable' || reserveSource
       ? items
       : items.filter(item => item.storageBucket === scanType);
-    const { matchedCounts, matched } = matchInventorySnapshot(reported, sourceItems);
-    const unmatched = {};
+    const { matchedCounts, unmatched, matched } = matchInventorySnapshot(reported, sourceItems);
 
     await client.query(
       `INSERT INTO inventory_scan_sources (
@@ -106,7 +108,7 @@ export async function handleInventoryUpload(request: NextRequest) {
       `SELECT source_key, item_counts
        FROM inventory_scan_sources
        WHERE storage_bucket = ANY($1::text[])`,
-      [itemKind === 'consumable' ? ['account_bank', 'character_bank'] : ['misc_bucket']]
+      [scanConfig.sourceBuckets]
     );
     const stockTotals = aggregateInventorySnapshots(
       snapshotResult.rows
@@ -152,6 +154,7 @@ export async function handleInventoryUpload(request: NextRequest) {
       sourceKey: requestedSourceKey,
       sourceName,
       matched,
+      unmatched: Object.keys(unmatched),
     });
   } catch (error) {
     await client.query('ROLLBACK');

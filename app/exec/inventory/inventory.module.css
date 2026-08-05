@@ -23,6 +23,12 @@
   margin-bottom: 1.25rem;
 }
 
+.headerActions {
+  display: flex;
+  flex: none;
+  gap: 0.5rem;
+}
+
 .header h1 {
   margin: 0.2rem 0 0.4rem;
   font-size: clamp(1.65rem, 2.5vw, 2.35rem);
@@ -449,6 +455,27 @@
   color: #fcd34d !important;
 }
 
+.tierBreakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tierChip {
+  padding: 0.15rem 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--tier-color) 45%, transparent);
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--tier-color) 16%, transparent);
+  color: var(--tier-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tierLabel {
+  color: var(--tier-color, var(--text-secondary));
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -532,6 +559,9 @@
 
 .smallModal { width: min(430px, 100%); }
 
+.scanProfilesModal { width: min(820px, 100%); }
+.scanProfilesModal .categoryActions { justify-content: flex-end; margin: 0.6rem 0; }
+
 .modalHeader {
   display: flex;
   align-items: flex-start;
@@ -560,6 +590,17 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
+}
+
+.checkboxField {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}
+
+.checkboxField input {
+  width: auto;
+  min-height: auto;
 }
 
 .modal label {
