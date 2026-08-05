@@ -1,15 +1,11 @@
 #!/usr/bin/env node
-// Diffs the mod's hardcoded ConsumableType/IngredientType names against the website's
-// item catalog, so the two don't silently drift apart. Exits non-zero on any mismatch.
+// Diffs the mod's item names against the website catalog. Exits non-zero on mismatch.
 //
 // Usage:
 //   node scripts/check-inventory-catalog-sync.js \
-//     --base-url https://www.the-aquarium.com \
-//     --token Woealer \
-//     --mod-path ../taq-management-utils
+//     --base-url https://www.the-aquarium.com --token Woealer --mod-path ../taq-management-utils
 //
-// Flags fall back to env vars (CATALOG_BASE_URL, CATALOG_TOKEN, MOD_REPO_PATH) and then
-// to defaults for this workspace's sibling-checkout layout.
+// Flags fall back to env vars (CATALOG_BASE_URL, CATALOG_TOKEN, MOD_REPO_PATH).
 
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -37,9 +33,7 @@ function normalizeInventoryName(value) {
     .toLocaleLowerCase('en-US');
 }
 
-// Pulls the first string literal argument out of each enum constant declaration, e.g.
-//   FAIRY_POT("Fairy Pot", Pattern.compile(...), ...),
-// -> "Fairy Pot"
+// Pulls the first string literal out of each enum constant, e.g. FAIRY_POT("Fairy Pot", ...) -> "Fairy Pot"
 function extractEnumDisplayNames(source) {
   const names = [];
   const constantPattern = /^\s*[A-Z][A-Z0-9_]*\s*\(\s*"((?:[^"\\]|\\.)*)"/gm;

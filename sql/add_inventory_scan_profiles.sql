@@ -1,9 +1,6 @@
--- Character-bank scan profiles for taq-management-utils.
--- Previously hardcoded as a Java switch statement in the mod (InventoryScanProfile.java),
--- which meant onboarding a new character bank (e.g. "Bonus Consu 4") required a mod
--- rebuild + redistribution. This table lets exec manage them from the website instead;
--- the mod fetches the active list from GET /api/inventory/catalog and falls back to its
--- built-in defaults if the fetch fails or the mod is running offline.
+-- Character-bank scan profiles. Previously hardcoded in the mod; now managed here so
+-- adding a bank doesn't need a mod rebuild. Mod fetches via GET /api/inventory/catalog
+-- and falls back to built-in defaults if unreachable.
 
 CREATE TABLE IF NOT EXISTS inventory_scan_profiles (
   id           BIGSERIAL   PRIMARY KEY,

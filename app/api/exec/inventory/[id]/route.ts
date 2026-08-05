@@ -65,15 +65,15 @@ export async function PATCH(
          `UPDATE inventory_items
          SET category_id = $1, name = $2, scan_key = $3, aliases = $4,
              quantity = $5, reserve_quantity = $6, desired_quantity = $7, used_by = $8, bank_page = $9,
-             charges = $10, recipe_url = $11, storage_bucket = $12, notes = $13,
-             texture_path = $14, updated_at = NOW(), updated_by = $15
-         WHERE id = $16`,
+             reserve_bank_page = $10, charges = $11, recipe_url = $12, storage_bucket = $13, notes = $14,
+             texture_path = $15, updated_at = NOW(), updated_by = $16
+         WHERE id = $17`,
         [
           categoryId, name, nullableString(body.scanKey) ?? name,
           Array.isArray(body.aliases) ? body.aliases.filter(value => typeof value === 'string') : [],
           nonNegativeInteger(body.quantity ?? 0), nonNegativeInteger(body.reserveQuantity ?? 0),
           nonNegativeInteger(body.desiredQuantity, true),
-          nullableString(body.usedBy), nullableString(body.bankPage),
+          nullableString(body.usedBy), nullableString(body.bankPage), nullableString(body.reserveBankPage),
           nonNegativeInteger(body.charges, true), nullableString(body.recipeUrl),
           storageBucket, nullableString(body.notes), nullableString(body.texturePath),
           session.ign, id,

@@ -1,16 +1,28 @@
+import { Pool, PoolClient } from 'pg';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import {
   aggregateInventorySnapshots,
   InventoryMatchItem,
   isReserveInventorySource,
+  matchInventoryLocations,
   matchInventorySnapshot,
 } from '@/lib/inventory-snapshots';
 import { isAuthorizedInventoryClient } from '@/lib/inventory-auth';
 
-// One entry per scan_type the mod can upload. Adding a new trackable kind (as with
-// 'materials_bucket') means adding one row here rather than hunting down every ternary
-// that used to branch on scanType individually.
+// Non-character-bank sources; everything else looks up location_prefix by source_key.
+const FIXED_LOCATION_PREFIXES: Record<string, string> = {
+  misc_bucket: 'B',
+  account_bank: '',
+};
+
+async function resolveLocationPrefix(client: Pool | PoolClient, scanType: string, sourceKey: string): Promise<string> {
+  if (scanType in FIXED_LOCATION_PREFIXES) return FIXED_LOCATION_PREFIXES[scanType];
+  const result = await client.query(`SELECT location_prefix FROM inventory_scan_profiles WHERE source_key = $1`, [sourceKey]);
+  return result.rows[0]?.location_prefix ?? '';
+}
+
+// One entry per scan_type the mod can upload; add a row here for new kinds.
 const SCAN_TYPE_CONFIG: Record<string, { itemKind: string; field: 'ingredients' | 'consumables' | 'materials'; sourceBuckets: string[] }> = {
   misc_bucket: { itemKind: 'ingredient', field: 'ingredients', sourceBuckets: ['misc_bucket'] },
   account_bank: { itemKind: 'consumable', field: 'consumables', sourceBuckets: ['account_bank', 'character_bank'] },
@@ -60,7 +72,8 @@ export async function handleInventoryUpload(request: NextRequest) {
   const sourceName = (typeof body.sourceName === 'string' && body.sourceName.trim() ? body.sourceName.trim() : scanType).slice(0, 120);
   const itemKind = scanConfig.itemKind;
   const reported = asCountMap(body[scanConfig.field]);
-  const reserveSource = itemKind === 'consumable' && isReserveInventorySource(requestedSourceKey);
+  const reportedPages = asCountMap(body.pages);
+  const reserveSource = isReserveInventorySource(requestedSourceKey);
   const clientTimestamp = typeof body.timestamp === 'number' && Number.isFinite(body.timestamp)
     ? new Date(body.timestamp)
     : null;
@@ -88,6 +101,8 @@ export async function handleInventoryUpload(request: NextRequest) {
       ? items
       : items.filter(item => item.storageBucket === scanType);
     const { matchedCounts, unmatched, matched } = matchInventorySnapshot(reported, sourceItems);
+    const locationPrefix = await resolveLocationPrefix(client, scanType, requestedSourceKey);
+    const locations = matchInventoryLocations(reportedPages, sourceItems);
 
     await client.query(
       `INSERT INTO inventory_scan_sources (
@@ -132,11 +147,15 @@ export async function handleInventoryUpload(request: NextRequest) {
       [itemKind, uploader]
     );
     for (const item of items) {
+      const page = locations.get(item.id);
+      const location = page !== undefined ? `${locationPrefix}${page}` : null;
       await client.query(
         `UPDATE inventory_items
-         SET quantity = $1, reserve_quantity = $2, updated_at = NOW(), updated_by = $3
+         SET quantity = $1, reserve_quantity = $2, updated_at = NOW(), updated_by = $3,
+             bank_page = CASE WHEN $5::text IS NOT NULL AND NOT $6 THEN $5 ELSE bank_page END,
+             reserve_bank_page = CASE WHEN $5::text IS NOT NULL AND $6 THEN $5 ELSE reserve_bank_page END
          WHERE id = $4`,
-        [stockTotals.get(item.id) ?? 0, reserveTotals.get(item.id) ?? 0, uploader, item.id]
+        [stockTotals.get(item.id) ?? 0, reserveTotals.get(item.id) ?? 0, uploader, item.id, location, reserveSource]
       );
     }
 

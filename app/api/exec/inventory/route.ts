@@ -43,7 +43,7 @@ async function loadInventory() {
     ),
     pool.query(
       `SELECT id, kind, category_id, name, scan_key, aliases, quantity, reserve_quantity, desired_quantity,
-              used_by, bank_page, charges, recipe_url, storage_bucket, notes, texture_path,
+              used_by, bank_page, reserve_bank_page, charges, recipe_url, storage_bucket, notes, texture_path,
               sort_order, archived, archived_at, updated_by, updated_at
        FROM inventory_items
        ORDER BY kind, archived, sort_order, name`
@@ -108,6 +108,7 @@ async function loadInventory() {
         enough: row.desired_quantity === null ? null : row.quantity >= row.desired_quantity,
         usedBy: row.used_by,
         bankPage: row.bank_page,
+        reserveBankPage: row.reserve_bank_page,
         charges: row.charges,
         recipeUrl: row.recipe_url,
         storageBucket: row.storage_bucket,
@@ -303,6 +304,7 @@ export async function POST(request: NextRequest) {
       }
       const startPage = nonNegativeInteger(body.startPage ?? 1) || 1;
       const totalPages = nonNegativeInteger(body.totalPages ?? 12) || 12;
+      const locationPrefix = nullableString(body.locationPrefix) ?? '';
       const sourceKey = nullableString(body.sourceKey)
         ?? `character_bank:${normalizeNickname(nickname).replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
       const sortResult = await pool.query(
@@ -310,9 +312,9 @@ export async function POST(request: NextRequest) {
       );
       await pool.query(
         `INSERT INTO inventory_scan_profiles
-           (nickname, content_type, source_key, display_name, start_page, total_pages, sort_order, updated_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [normalizeNickname(nickname), contentType, sourceKey, displayName, startPage, totalPages, sortResult.rows[0].next_order, session.ign]
+           (nickname, content_type, source_key, display_name, start_page, total_pages, location_prefix, sort_order, updated_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [normalizeNickname(nickname), contentType, sourceKey, displayName, startPage, totalPages, locationPrefix, sortResult.rows[0].next_order, session.ign]
       );
     } else if (action === 'updateScanProfile') {
       const id = nonNegativeInteger(body.id);
@@ -324,12 +326,12 @@ export async function POST(request: NextRequest) {
       await pool.query(
         `UPDATE inventory_scan_profiles
          SET nickname = $1, display_name = $2, start_page = $3, total_pages = $4,
-             archived = $5, updated_at = NOW(), updated_by = $6
-         WHERE id = $7`,
+             location_prefix = $5, archived = $6, updated_at = NOW(), updated_by = $7
+         WHERE id = $8`,
         [
           normalizeNickname(nickname), displayName,
           nonNegativeInteger(body.startPage ?? 1) || 1, nonNegativeInteger(body.totalPages ?? 12) || 12,
-          body.archived === true, session.ign, id,
+          nullableString(body.locationPrefix) ?? '', body.archived === true, session.ign, id,
         ]
       );
     } else if (action === 'deleteScanProfile') {

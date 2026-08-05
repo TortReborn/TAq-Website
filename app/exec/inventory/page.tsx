@@ -30,6 +30,7 @@ interface InventoryItem {
   enough: boolean | null;
   usedBy: string | null;
   bankPage: string | null;
+  reserveBankPage: string | null;
   charges: number | null;
   recipeUrl: string | null;
   storageBucket: Bucket;
@@ -67,6 +68,7 @@ interface ScanProfile {
   displayName: string;
   startPage: number;
   totalPages: number;
+  locationPrefix: string;
   sortOrder: number;
   archived: boolean;
 }
@@ -104,6 +106,7 @@ interface ItemDraft {
   desiredQuantity: string;
   usedBy: string;
   bankPage: string;
+  reserveBankPage: string;
   charges: string;
   recipeUrl: string;
   storageBucket: Bucket;
@@ -119,11 +122,11 @@ interface ScanProfileDraft {
   displayName: string;
   startPage: string;
   totalPages: string;
+  locationPrefix: string;
   archived: boolean;
 }
 
-// Materials are seeded as three rows per family+kind ("Dernic Gem T1/T2/T3") so each
-// quality tier can hold its own stock/target - the table groups them back into one row.
+// Materials are 3 rows per family+kind (T1/T2/T3); grouped back into one row here.
 interface MaterialGroup {
   baseName: string;
   tiers: (InventoryItem | undefined)[]; // index 0 = T1, 1 = T2, 2 = T3
@@ -134,6 +137,7 @@ interface MaterialTierDraft {
   tier: number;
   quantity: string;
   desiredQuantity: string;
+  bankPage: string;
 }
 
 interface MaterialGroupDraft {
@@ -143,10 +147,9 @@ interface MaterialGroupDraft {
 
 const EMPTY: InventoryData = { categories: [], items: [], scans: [], scanProfiles: [], exchangeMaterials: [] };
 const NARWHAL_RANKS = new Set(['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader']);
-// Same colors the mod reads off the item's lore to tell tiers apart in-game.
+// Matches the tier colors the mod reads from item lore.
 const TIER_COLORS: Record<number, string> = { 1: '#E6E647', 2: '#E647E6', 3: '#47E6E6' };
-// Grouped for the scan strip: Global Consu (account_bank) and Dry Consu/Bonus Consu
-// (character_bank) collapse into one "Consu" tile showing whichever synced most recently.
+// Scan strip groups: account_bank + character_bank collapse into one "Consu" tile.
 const SCAN_GROUPS: Array<{ label: string; buckets: Bucket[] }> = [
   { label: 'Ingredients', buckets: ['misc_bucket'] },
   { label: 'Consu', buckets: ['account_bank', 'character_bank'] },
@@ -194,6 +197,7 @@ function materialGroupDraft(group: MaterialGroup): MaterialGroupDraft {
         tier: index + 1,
         quantity: String(item.quantity),
         desiredQuantity: item.desiredQuantity === null ? '' : String(item.desiredQuantity),
+        bankPage: item.bankPage ?? '',
       })
       .filter((tier): tier is MaterialTierDraft => Boolean(tier)),
   };
@@ -207,6 +211,7 @@ function scanProfileDraft(profile: ScanProfile): ScanProfileDraft {
     displayName: profile.displayName,
     startPage: String(profile.startPage),
     totalPages: String(profile.totalPages),
+    locationPrefix: profile.locationPrefix,
     archived: profile.archived,
   };
 }
@@ -224,6 +229,7 @@ function itemDraft(item: InventoryItem): ItemDraft {
     desiredQuantity: item.desiredQuantity === null ? '' : String(item.desiredQuantity),
     usedBy: item.usedBy ?? '',
     bankPage: item.bankPage ?? '',
+    reserveBankPage: item.reserveBankPage ?? '',
     charges: item.charges === null ? '' : String(item.charges),
     recipeUrl: item.recipeUrl ?? '',
     storageBucket: item.storageBucket,
@@ -337,6 +343,7 @@ export default function InventoryPage() {
       desiredQuantity: draft.desiredQuantity === '' ? null : Number(draft.desiredQuantity),
       usedBy: draft.usedBy,
       bankPage: draft.bankPage,
+      reserveBankPage: draft.reserveBankPage,
       charges: draft.charges === '' ? null : Number(draft.charges),
       recipeUrl: draft.recipeUrl,
       storageBucket: draft.storageBucket,
@@ -402,7 +409,7 @@ export default function InventoryPage() {
     }
   }
 
-  function updateMaterialTier(index: number, field: 'quantity' | 'desiredQuantity', value: string) {
+  function updateMaterialTier(index: number, field: 'quantity' | 'desiredQuantity' | 'bankPage', value: string) {
     setMaterialGroupDialog(current => {
       if (!current) return current;
       const tiers = current.tiers.slice();
@@ -432,7 +439,7 @@ export default function InventoryPage() {
             reserveQuantity: 0,
             desiredQuantity: tier.desiredQuantity === '' ? null : Number(tier.desiredQuantity),
             usedBy: null,
-            bankPage: null,
+            bankPage: tier.bankPage || null,
             charges: null,
             recipeUrl: null,
             storageBucket: item.storageBucket,
@@ -523,6 +530,7 @@ export default function InventoryPage() {
         displayName: scanProfileDialog.displayName,
         startPage: Number(scanProfileDialog.startPage || 1),
         totalPages: Number(scanProfileDialog.totalPages || 12),
+        locationPrefix: scanProfileDialog.locationPrefix,
         archived: scanProfileDialog.archived,
       });
       setScanProfileDialog(null);
@@ -633,6 +641,7 @@ export default function InventoryPage() {
       desiredQuantity: '',
       usedBy: '',
       bankPage: '',
+      reserveBankPage: '',
       charges: '',
       recipeUrl: '',
       storageBucket: category.kind === 'ingredient' ? 'misc_bucket' : category.kind === 'material' ? 'materials_bucket' : 'account_bank',
@@ -714,7 +723,7 @@ export default function InventoryPage() {
               <button
                 className={styles.primaryButton}
                 onClick={() => setScanProfileDialog({
-                  nickname: '', contentType: 'consumables', displayName: '', startPage: '1', totalPages: '12', archived: false,
+                  nickname: '', contentType: 'consumables', displayName: '', startPage: '1', totalPages: '12', locationPrefix: '', archived: false,
                 })}
               >
                 Add profile
@@ -728,6 +737,7 @@ export default function InventoryPage() {
                     <th>Scans as</th>
                     <th>Content</th>
                     <th>Pages</th>
+                    <th>Location prefix</th>
                     <th><span className={styles.visuallyHidden}>Actions</span></th>
                   </tr>
                 </thead>
@@ -738,6 +748,7 @@ export default function InventoryPage() {
                       <td>{profile.displayName}</td>
                       <td>{profile.contentType}</td>
                       <td>{profile.startPage}–{profile.totalPages}</td>
+                      <td>{profile.locationPrefix || '—'}</td>
                       <td>
                         <div className={styles.rowActions}>
                           <button onClick={() => void moveScanProfile(profile, -1)} aria-label={`Move ${profile.nickname} up`}>↑</button>
@@ -749,7 +760,7 @@ export default function InventoryPage() {
                     </tr>
                   ))}
                   {data.scanProfiles.length === 0 && (
-                    <tr><td colSpan={5}>No character bank profiles configured yet.</td></tr>
+                    <tr><td colSpan={6}>No character bank profiles configured yet.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -862,7 +873,8 @@ export default function InventoryPage() {
                         {view !== 'archive' && category.kind === 'consumable' && <th>Reserve</th>}
                         {view !== 'archive' && <th>Target</th>}
                         {category.kind === 'consumable' && <th>Used by</th>}
-                        {category.kind === 'consumable' && <th>Woealer page</th>}
+                        <th>Location</th>
+                        {view !== 'archive' && category.kind === 'consumable' && <th>Reserve Location</th>}
                         {category.kind === 'consumable' && <th>Charges</th>}
                         {view !== 'archive' && <th>Status</th>}
                         {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
@@ -902,6 +914,15 @@ export default function InventoryPage() {
                             {view !== 'archive' && (
                               <td className={styles.number}>{totalTarget === null ? '—' : totalTarget}</td>
                             )}
+                            <td>
+                              <div className={styles.tierBreakdown}>
+                                {group.tiers.map((item, index) => (
+                                  <span key={index} className={styles.tierChip} style={{ '--tier-color': TIER_COLORS[index + 1] } as CSSProperties}>
+                                    T{index + 1}: {item?.bankPage || '—'}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
                             {view !== 'archive' && (
                               <td>
                                 {enough === null ? (
@@ -966,7 +987,8 @@ export default function InventoryPage() {
                             </td>
                           )}
                           {item.kind === 'consumable' && <td>{item.usedBy || '—'}</td>}
-                          {item.kind === 'consumable' && <td>{item.bankPage || '—'}</td>}
+                          <td>{item.bankPage || '—'}</td>
+                          {view !== 'archive' && item.kind === 'consumable' && <td>{item.reserveBankPage || '—'}</td>}
                           {item.kind === 'consumable' && <td className={styles.number}>{item.charges ?? '—'}</td>}
                           {view !== 'archive' && (
                             <td>
@@ -1044,9 +1066,26 @@ export default function InventoryPage() {
                 </>
               )}
               {draft.kind === 'consumable' && (
+                <label>Used by<input value={draft.usedBy} onChange={event => setDraft({ ...draft, usedBy: event.target.value })} placeholder="DPS / Healer" /></label>
+              )}
+              {draft.kind !== 'material' && (
+                <label>Location
+                  <input
+                    value={draft.bankPage}
+                    onChange={event => setDraft({ ...draft, bankPage: event.target.value })}
+                    placeholder={draft.kind === 'ingredient' ? 'e.g. B3 or IA5' : 'e.g. 7 or D4'}
+                  />
+                </label>
+              )}
+              {draft.kind === 'consumable' && (
                 <>
-                  <label>Used by<input value={draft.usedBy} onChange={event => setDraft({ ...draft, usedBy: event.target.value })} placeholder="DPS / Healer" /></label>
-                  <label>Woealer page<input value={draft.bankPage} onChange={event => setDraft({ ...draft, bankPage: event.target.value })} placeholder="7 or D4" /></label>
+                  <label>Reserve Location
+                    <input
+                      value={draft.reserveBankPage}
+                      onChange={event => setDraft({ ...draft, reserveBankPage: event.target.value })}
+                      placeholder="e.g. BA2"
+                    />
+                  </label>
                   <label>Charges<input type="number" min="0" value={draft.charges} onChange={event => setDraft({ ...draft, charges: event.target.value })} /></label>
                   <label>WynnCrafter link<input type="url" value={draft.recipeUrl} onChange={event => setDraft({ ...draft, recipeUrl: event.target.value })} /></label>
                 </>
@@ -1201,6 +1240,14 @@ export default function InventoryPage() {
                       placeholder="No target"
                     />
                   </label>
+                  <label style={{ '--tier-color': TIER_COLORS[tier.tier] } as CSSProperties}>
+                    <span className={styles.tierLabel}>T{tier.tier} Location</span>
+                    <input
+                      value={tier.bankPage}
+                      onChange={event => updateMaterialTier(index, 'bankPage', event.target.value)}
+                      placeholder="e.g. M4"
+                    />
+                  </label>
                 </Fragment>
               ))}
             </div>
@@ -1274,6 +1321,13 @@ export default function InventoryPage() {
               </label>
               <label>Start page<input type="number" min="1" required value={scanProfileDialog.startPage} onChange={event => setScanProfileDialog({ ...scanProfileDialog, startPage: event.target.value })} /></label>
               <label>Total pages<input type="number" min="1" required value={scanProfileDialog.totalPages} onChange={event => setScanProfileDialog({ ...scanProfileDialog, totalPages: event.target.value })} /></label>
+              <label>Location prefix
+                <input
+                  value={scanProfileDialog.locationPrefix}
+                  onChange={event => setScanProfileDialog({ ...scanProfileDialog, locationPrefix: event.target.value })}
+                  placeholder="e.g. D, BA, IA, M"
+                />
+              </label>
               {scanProfileDialog.id && (
                 <label className={styles.checkboxField}>
                   <input

@@ -1,8 +1,6 @@
 import { NextRequest } from 'next/server';
 
-// Shared bearer-token auth for the machine-to-machine inventory endpoints hit by the
-// taq-management-utils Minecraft mod (upload + catalog fetch). This is intentionally
-// separate from the human exec-session auth in lib/exec-auth.ts.
+// Bearer-token auth for the mod's upload/catalog endpoints (separate from exec-auth.ts).
 
 const ALLOWED_UPLOADER = 'woealer';
 
