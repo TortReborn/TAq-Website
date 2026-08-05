@@ -275,6 +275,81 @@
   font-size: 0.72rem;
 }
 
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin: -0.2rem 0 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--bg-card) 75%, transparent);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filterGroupLabel {
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.filterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.filterChip,
+.filterChipActive {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--chip-color, var(--border-card));
+  border-radius: 99px;
+  background: transparent;
+  color: var(--chip-color, var(--text-secondary));
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filterChipActive {
+  background: color-mix(in srgb, var(--chip-color, var(--color-ocean-500)) 22%, transparent);
+  color: var(--chip-color, var(--text-primary));
+}
+
+.difficultyBadge {
+  display: inline-flex;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--chip-color) 18%, transparent);
+  color: var(--chip-color);
+  font-size: 0.65rem;
+  font-weight: 750;
+}
+
+.dryBadge {
+  display: inline-flex;
+  margin-left: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--chip-color) 18%, transparent);
+  color: var(--chip-color);
+  font-size: 0.65rem;
+  font-weight: 750;
+}
+
+.roleChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
 .categoryList {
   display: flex;
   flex-direction: column;

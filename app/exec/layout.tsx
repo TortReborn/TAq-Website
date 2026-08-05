@@ -67,9 +67,10 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
   return (
     <div style={{
       display: 'flex',
-      minHeight: 'calc(100vh - 80px)',
+      height: 'calc(100vh - 80px)',
+      overflow: 'hidden',
     }}>
-      {/* Sidebar */}
+      {/* Sidebar - fixed to viewport height, scrolls independently if its own content overflows */}
       <aside style={{
         width: 'clamp(180px, 12vw, 260px)',
         background: 'var(--bg-card)',
@@ -78,6 +79,7 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
         display: 'flex',
         flexDirection: 'column',
         flexShrink: 0,
+        overflowY: 'auto',
       }}>
         {/* User info */}
         {user && (
@@ -241,7 +243,7 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* Main content - the only part that scrolls; navbar and sidebar stay put */}
       <main style={{
         flex: 1,
         padding: '2rem',
