@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isNarwhalRank, requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { listScanProfiles, normalizeNickname } from '@/lib/inventory-scan-profiles';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_KINDS = new Set(['ingredient', 'consumable']);
-const VALID_BUCKETS = new Set(['misc_bucket', 'account_bank', 'character_bank']);
+const VALID_KINDS = new Set(['ingredient', 'consumable', 'material']);
+const VALID_BUCKETS = new Set(['misc_bucket', 'account_bank', 'character_bank', 'materials_bucket']);
 
 function nullableString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
@@ -34,7 +35,7 @@ function exchangeKey(value: string): string {
 
 async function loadInventory() {
   const pool = getPool();
-  const [categoryResult, itemResult, scanResult, exchangeResult] = await Promise.all([
+  const [categoryResult, itemResult, scanResult, exchangeResult, scanProfiles] = await Promise.all([
     pool.query(
       `SELECT id, kind, name, slug, sort_order, archived
        FROM inventory_categories
@@ -59,6 +60,7 @@ async function loadInventory() {
        FROM cache_entries
        WHERE cache_key IN ('shellExchangeIngs', 'shellExchangeMats')`
     ),
+    listScanProfiles(pool),
   ]);
 
   const exchangeData = new Map<string, Record<string, any>>();
@@ -138,6 +140,7 @@ async function loadInventory() {
       reportedItems: row.reported_items,
       matchedItems: row.matched_items,
     })),
+    scanProfiles,
   };
 }
 
@@ -291,15 +294,59 @@ export async function POST(request: NextRequest) {
           sortResult.rows[0].next_order, session.ign,
         ]
       );
+    } else if (action === 'createScanProfile') {
+      const nickname = nullableString(body.nickname);
+      const displayName = nullableString(body.displayName);
+      const contentType = typeof body.contentType === 'string' ? body.contentType : '';
+      if (!nickname || !displayName || !['consumables', 'ingredients', 'materials'].includes(contentType)) {
+        return NextResponse.json({ error: 'Nickname, display name, and content type are required.' }, { status: 400 });
+      }
+      const startPage = nonNegativeInteger(body.startPage ?? 1) || 1;
+      const totalPages = nonNegativeInteger(body.totalPages ?? 12) || 12;
+      const sourceKey = nullableString(body.sourceKey)
+        ?? `character_bank:${normalizeNickname(nickname).replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
+      const sortResult = await pool.query(
+        `SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order FROM inventory_scan_profiles`
+      );
+      await pool.query(
+        `INSERT INTO inventory_scan_profiles
+           (nickname, content_type, source_key, display_name, start_page, total_pages, sort_order, updated_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [normalizeNickname(nickname), contentType, sourceKey, displayName, startPage, totalPages, sortResult.rows[0].next_order, session.ign]
+      );
+    } else if (action === 'updateScanProfile') {
+      const id = nonNegativeInteger(body.id);
+      const nickname = nullableString(body.nickname);
+      const displayName = nullableString(body.displayName);
+      if (!id || !nickname || !displayName) {
+        return NextResponse.json({ error: 'Profile, nickname, and display name are required.' }, { status: 400 });
+      }
+      await pool.query(
+        `UPDATE inventory_scan_profiles
+         SET nickname = $1, display_name = $2, start_page = $3, total_pages = $4,
+             archived = $5, updated_at = NOW(), updated_by = $6
+         WHERE id = $7`,
+        [
+          normalizeNickname(nickname), displayName,
+          nonNegativeInteger(body.startPage ?? 1) || 1, nonNegativeInteger(body.totalPages ?? 12) || 12,
+          body.archived === true, session.ign, id,
+        ]
+      );
+    } else if (action === 'deleteScanProfile') {
+      const id = nonNegativeInteger(body.id);
+      if (!id) {
+        return NextResponse.json({ error: 'A scan profile is required.' }, { status: 400 });
+      }
+      await pool.query(`DELETE FROM inventory_scan_profiles WHERE id = $1`, [id]);
     } else if (action === 'reorder') {
       const entity = body.entity;
       const ids = Array.isArray(body.ids)
         ? body.ids.map(Number).filter(id => Number.isInteger(id) && id > 0)
         : [];
-      if (!['item', 'category'].includes(String(entity)) || ids.length === 0) {
+      if (!['item', 'category', 'scanProfile'].includes(String(entity)) || ids.length === 0) {
         return NextResponse.json({ error: 'A reorder entity and ordered IDs are required.' }, { status: 400 });
       }
-      const table = entity === 'item' ? 'inventory_items' : 'inventory_categories';
+      const table = entity === 'item' ? 'inventory_items' : entity === 'category' ? 'inventory_categories' : 'inventory_scan_profiles';
       const client = await pool.connect();
       try {
         await client.query('BEGIN');
@@ -325,7 +372,7 @@ export async function POST(request: NextRequest) {
     console.error('Inventory create error:', error);
     const code = (error as { code?: string }).code;
     return NextResponse.json(
-      { error: code === '23505' ? 'That category already exists.' : 'Failed to update inventory.' },
+      { error: code === '23505' ? 'That name is already in use.' : 'Failed to update inventory.' },
       { status: code === '23505' ? 409 : 500 }
     );
   }

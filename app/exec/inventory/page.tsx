@@ -1,11 +1,11 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, Fragment, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useExecSession } from '@/hooks/useExecSession';
 import styles from './inventory.module.css';
 
-type Kind = 'ingredient' | 'consumable';
-type Bucket = 'misc_bucket' | 'account_bank' | 'character_bank';
+type Kind = 'ingredient' | 'consumable' | 'material';
+type Bucket = 'misc_bucket' | 'account_bank' | 'character_bank' | 'materials_bucket';
 type View = Kind | 'archive';
 
 interface Category {
@@ -59,10 +59,23 @@ interface InventoryScan {
   matchedItems: number;
 }
 
+interface ScanProfile {
+  id: number;
+  nickname: string;
+  contentType: 'consumables' | 'ingredients' | 'materials';
+  sourceKey: string;
+  displayName: string;
+  startPage: number;
+  totalPages: number;
+  sortOrder: number;
+  archived: boolean;
+}
+
 interface InventoryData {
   categories: Category[];
   items: InventoryItem[];
   scans: InventoryScan[];
+  scanProfiles: ScanProfile[];
   exchangeMaterials: Array<{
     key: string;
     name: string;
@@ -99,13 +112,46 @@ interface ItemDraft {
   archived: boolean;
 }
 
-const EMPTY: InventoryData = { categories: [], items: [], scans: [], exchangeMaterials: [] };
+interface ScanProfileDraft {
+  id?: number;
+  nickname: string;
+  contentType: 'consumables' | 'ingredients' | 'materials';
+  displayName: string;
+  startPage: string;
+  totalPages: string;
+  archived: boolean;
+}
+
+// Materials are seeded as three rows per family+kind ("Dernic Gem T1/T2/T3") so each
+// quality tier can hold its own stock/target - the table groups them back into one row.
+interface MaterialGroup {
+  baseName: string;
+  tiers: (InventoryItem | undefined)[]; // index 0 = T1, 1 = T2, 2 = T3
+}
+
+interface MaterialTierDraft {
+  id: number;
+  tier: number;
+  quantity: string;
+  desiredQuantity: string;
+}
+
+interface MaterialGroupDraft {
+  baseName: string;
+  tiers: MaterialTierDraft[];
+}
+
+const EMPTY: InventoryData = { categories: [], items: [], scans: [], scanProfiles: [], exchangeMaterials: [] };
 const NARWHAL_RANKS = new Set(['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader']);
-const BUCKET_LABELS: Record<Bucket, string> = {
-  misc_bucket: 'Ingredient bucket',
-  account_bank: 'Global Consu',
-  character_bank: 'Dry Consu',
-};
+// Same colors the mod reads off the item's lore to tell tiers apart in-game.
+const TIER_COLORS: Record<number, string> = { 1: '#E6E647', 2: '#E647E6', 3: '#47E6E6' };
+// Grouped for the scan strip: Global Consu (account_bank) and Dry Consu/Bonus Consu
+// (character_bank) collapse into one "Consu" tile showing whichever synced most recently.
+const SCAN_GROUPS: Array<{ label: string; buckets: Bucket[] }> = [
+  { label: 'Ingredients', buckets: ['misc_bucket'] },
+  { label: 'Consu', buckets: ['account_bank', 'character_bank'] },
+  { label: 'Materials', buckets: ['materials_bucket'] },
+];
 
 function stackAmount(quantity: number): string {
   const stacks = Math.floor(quantity / 64);
@@ -120,6 +166,49 @@ function formatDate(value: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+function parseMaterialTier(name: string): { baseName: string; tier: number } | null {
+  const match = name.match(/^(.*) T([1-3])$/);
+  return match ? { baseName: match[1], tier: Number(match[2]) } : null;
+}
+
+function groupMaterialItems(items: InventoryItem[]): MaterialGroup[] {
+  const groups = new Map<string, MaterialGroup>();
+  for (const item of items) {
+    const parsed = parseMaterialTier(item.name);
+    if (!parsed) continue;
+    const group = groups.get(parsed.baseName) ?? { baseName: parsed.baseName, tiers: [undefined, undefined, undefined] };
+    group.tiers[parsed.tier - 1] = item;
+    groups.set(parsed.baseName, group);
+  }
+  return Array.from(groups.values());
+}
+
+function materialGroupDraft(group: MaterialGroup): MaterialGroupDraft {
+  return {
+    baseName: group.baseName,
+    tiers: group.tiers
+      .map((item, index) => item && {
+        id: item.id,
+        tier: index + 1,
+        quantity: String(item.quantity),
+        desiredQuantity: item.desiredQuantity === null ? '' : String(item.desiredQuantity),
+      })
+      .filter((tier): tier is MaterialTierDraft => Boolean(tier)),
+  };
+}
+
+function scanProfileDraft(profile: ScanProfile): ScanProfileDraft {
+  return {
+    id: profile.id,
+    nickname: profile.nickname,
+    contentType: profile.contentType,
+    displayName: profile.displayName,
+    startPage: String(profile.startPage),
+    totalPages: String(profile.totalPages),
+    archived: profile.archived,
+  };
 }
 
 function itemDraft(item: InventoryItem): ItemDraft {
@@ -157,6 +246,12 @@ export default function InventoryPage() {
   const [draft, setDraft] = useState<ItemDraft | null>(null);
   const [categoryDialog, setCategoryDialog] = useState<{ id?: number; kind: Kind; name: string } | null>(null);
   const [deleteCategoryDialog, setDeleteCategoryDialog] = useState<{ category: Category; replacementId: string } | null>(null);
+  const [deleteItemDialog, setDeleteItemDialog] = useState<InventoryItem | null>(null);
+  const [scanProfileDialog, setScanProfileDialog] = useState<ScanProfileDraft | null>(null);
+  const [deleteScanProfileDialog, setDeleteScanProfileDialog] = useState<ScanProfile | null>(null);
+  const [scanProfilesOpen, setScanProfilesOpen] = useState(false);
+  const [materialGroupDialog, setMaterialGroupDialog] = useState<MaterialGroupDraft | null>(null);
+  const [deleteMaterialGroupDialog, setDeleteMaterialGroupDialog] = useState<MaterialGroup | null>(null);
   const [textureDialog, setTextureDialog] = useState(false);
   const [textureLibrary, setTextureLibrary] = useState<TextureAsset[]>([]);
   const [textureSearch, setTextureSearch] = useState('');
@@ -289,6 +384,111 @@ export default function InventoryPage() {
     }
   }
 
+  async function deleteItem(event: FormEvent) {
+    event.preventDefault();
+    if (!deleteItemDialog) return;
+    setSaving(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/exec/inventory/${deleteItemDialog.id}`, { method: 'DELETE' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Could not delete item.');
+      setDeleteItemDialog(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not delete item.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function updateMaterialTier(index: number, field: 'quantity' | 'desiredQuantity', value: string) {
+    setMaterialGroupDialog(current => {
+      if (!current) return current;
+      const tiers = current.tiers.slice();
+      tiers[index] = { ...tiers[index], [field]: value };
+      return { ...current, tiers };
+    });
+  }
+
+  async function saveMaterialGroup(event: FormEvent) {
+    event.preventDefault();
+    if (!materialGroupDialog) return;
+    setSaving(true);
+    setError('');
+    try {
+      await Promise.all(materialGroupDialog.tiers.map(async tier => {
+        const item = data.items.find(candidate => candidate.id === tier.id);
+        if (!item) return;
+        const response = await fetch(`/api/exec/inventory/${tier.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            categoryId: item.categoryId,
+            name: item.name,
+            scanKey: item.scanKey,
+            aliases: item.aliases,
+            quantity: Number(tier.quantity || 0),
+            reserveQuantity: 0,
+            desiredQuantity: tier.desiredQuantity === '' ? null : Number(tier.desiredQuantity),
+            usedBy: null,
+            bankPage: null,
+            charges: null,
+            recipeUrl: null,
+            storageBucket: item.storageBucket,
+            notes: null,
+            texturePath: item.texturePath,
+          }),
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error ?? 'Could not save material.');
+      }));
+      setMaterialGroupDialog(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not save material.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function toggleArchiveGroup(group: MaterialGroup) {
+    const items = group.tiers.filter((item): item is InventoryItem => Boolean(item));
+    if (items.length === 0) return;
+    const archived = !items[0].archived;
+    setSaving(true);
+    setError('');
+    try {
+      await Promise.all(items.map(item => fetch(`/api/exec/inventory/${item.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: archived ? 'archive' : 'restore' }),
+      })));
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not update archive.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteMaterialGroup(event: FormEvent) {
+    event.preventDefault();
+    if (!deleteMaterialGroupDialog) return;
+    const items = deleteMaterialGroupDialog.tiers.filter((item): item is InventoryItem => Boolean(item));
+    setSaving(true);
+    setError('');
+    try {
+      await Promise.all(items.map(item => fetch(`/api/exec/inventory/${item.id}`, { method: 'DELETE' })));
+      setDeleteMaterialGroupDialog(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not delete material.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function moveItem(item: InventoryItem, direction: -1 | 1) {
     const siblings = data.items
       .filter(candidate => candidate.categoryId === item.categoryId && candidate.archived === item.archived)
@@ -309,6 +509,48 @@ export default function InventoryPage() {
     if (target < 0 || target >= siblings.length) return;
     [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
     await post({ action: 'reorder', entity: 'category', ids: siblings.map(candidate => candidate.id) });
+  }
+
+  async function saveScanProfile(event: FormEvent) {
+    event.preventDefault();
+    if (!scanProfileDialog) return;
+    try {
+      await post({
+        action: scanProfileDialog.id ? 'updateScanProfile' : 'createScanProfile',
+        id: scanProfileDialog.id,
+        nickname: scanProfileDialog.nickname,
+        contentType: scanProfileDialog.contentType,
+        displayName: scanProfileDialog.displayName,
+        startPage: Number(scanProfileDialog.startPage || 1),
+        totalPages: Number(scanProfileDialog.totalPages || 12),
+        archived: scanProfileDialog.archived,
+      });
+      setScanProfileDialog(null);
+    } catch {
+      // The persistent error banner contains the actionable message.
+    }
+  }
+
+  async function deleteScanProfile(event: FormEvent) {
+    event.preventDefault();
+    if (!deleteScanProfileDialog) return;
+    try {
+      await post({ action: 'deleteScanProfile', id: deleteScanProfileDialog.id });
+      setDeleteScanProfileDialog(null);
+    } catch {
+      // The persistent error banner contains the actionable message.
+    }
+  }
+
+  async function moveScanProfile(profile: ScanProfile, direction: -1 | 1) {
+    const siblings = data.scanProfiles
+      .filter(candidate => candidate.archived === profile.archived)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+    const index = siblings.findIndex(candidate => candidate.id === profile.id);
+    const target = index + direction;
+    if (target < 0 || target >= siblings.length) return;
+    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
+    await post({ action: 'reorder', entity: 'scanProfile', ids: siblings.map(candidate => candidate.id) });
   }
 
   async function saveCategory(event: FormEvent) {
@@ -393,7 +635,7 @@ export default function InventoryPage() {
       bankPage: '',
       charges: '',
       recipeUrl: '',
-      storageBucket: category.kind === 'ingredient' ? 'misc_bucket' : 'account_bank',
+      storageBucket: category.kind === 'ingredient' ? 'misc_bucket' : category.kind === 'material' ? 'materials_bucket' : 'account_bank',
       notes: '',
       texturePath: '',
       archived: false,
@@ -405,14 +647,21 @@ export default function InventoryPage() {
       <header className={styles.header}>
         <div>
           <div className={styles.eyebrow}>Management inventory</div>
-          <h1>Ingredient & consumable stock</h1>
+          <h1>Ingredient, consumable & material inventory</h1>
         </div>
-        <button className={styles.secondaryButton} onClick={() => void load()} disabled={loading}>
-          Refresh
-        </button>
+        <div className={styles.headerActions}>
+          {canEdit && (
+            <button className={styles.secondaryButton} onClick={() => setScanProfilesOpen(true)}>
+              Scan profiles
+            </button>
+          )}
+          <button className={styles.secondaryButton} onClick={() => void load()} disabled={loading}>
+            Refresh
+          </button>
+        </div>
       </header>
 
-      <section className={styles.stats} aria-label="Stock status">
+      <section className={styles.stats} aria-label="Inventory status">
         <div className={styles.stat}>
           <span>Tracked</span>
           <strong>{activeItems.length}</strong>
@@ -432,19 +681,82 @@ export default function InventoryPage() {
       </section>
 
       <section className={styles.scanStrip} aria-label="Latest uploads">
-        {(Object.keys(BUCKET_LABELS) as Bucket[]).map(bucket => {
-          const scan = latestScans.get(bucket);
+        {SCAN_GROUPS.map(group => {
+          const scan = group.buckets
+            .map(bucket => latestScans.get(bucket))
+            .filter((candidate): candidate is InventoryScan => Boolean(candidate))
+            .sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime())[0];
           return (
-            <div key={bucket}>
+            <div key={group.label}>
               <span className={styles.scanDot} data-live={scan ? 'true' : 'false'} />
               <span>
-                <strong>{BUCKET_LABELS[bucket]}</strong>
-                {scan ? `${formatDate(scan.receivedAt)} · ${scan.matchedItems}/${scan.reportedItems} matched` : 'No upload yet'}
+                <strong>{group.label}</strong>
+                {scan ? formatDate(scan.receivedAt) : 'No upload yet'}
               </span>
             </div>
           );
         })}
       </section>
+
+      {canEdit && scanProfilesOpen && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setScanProfilesOpen(false);
+        }}>
+          <section className={`${styles.modal} ${styles.scanProfilesModal}`} role="dialog" aria-modal="true" aria-label="Character bank scan profiles">
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={styles.eyebrow}>Character bank scan profiles</span>
+                <h2>Woealer Class Nickname Layout</h2>
+              </div>
+              <button type="button" className={styles.closeButton} onClick={() => setScanProfilesOpen(false)} aria-label="Close">×</button>
+            </div>
+            <div className={styles.categoryActions}>
+              <button
+                className={styles.primaryButton}
+                onClick={() => setScanProfileDialog({
+                  nickname: '', contentType: 'consumables', displayName: '', startPage: '1', totalPages: '12', archived: false,
+                })}
+              >
+                Add profile
+              </button>
+            </div>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Character nickname</th>
+                    <th>Scans as</th>
+                    <th>Content</th>
+                    <th>Pages</th>
+                    <th><span className={styles.visuallyHidden}>Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.scanProfiles.map(profile => (
+                    <tr key={profile.id}>
+                      <td>{profile.nickname}{profile.archived && ' (archived)'}</td>
+                      <td>{profile.displayName}</td>
+                      <td>{profile.contentType}</td>
+                      <td>{profile.startPage}–{profile.totalPages}</td>
+                      <td>
+                        <div className={styles.rowActions}>
+                          <button onClick={() => void moveScanProfile(profile, -1)} aria-label={`Move ${profile.nickname} up`}>↑</button>
+                          <button onClick={() => void moveScanProfile(profile, 1)} aria-label={`Move ${profile.nickname} down`}>↓</button>
+                          <button onClick={() => setScanProfileDialog(scanProfileDraft(profile))}>Edit</button>
+                          <button className={styles.dangerText} onClick={() => setDeleteScanProfileDialog(profile)}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {data.scanProfiles.length === 0 && (
+                    <tr><td colSpan={5}>No character bank profiles configured yet.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      )}
 
       {error && (
         <div className={styles.error} role="alert">
@@ -458,6 +770,7 @@ export default function InventoryPage() {
           {([
             ['ingredient', 'Ingredients'],
             ['consumable', 'Consumables'],
+            ['material', 'Materials'],
             ['archive', `Recipe archive (${data.items.filter(item => item.archived).length})`],
           ] as [View, string][]).map(([value, label]) => (
             <button
@@ -504,12 +817,13 @@ export default function InventoryPage() {
             const items = visibleItems
               .filter(item => item.categoryId === category.id)
               .sort((a, b) => a.sortOrder - b.sortOrder);
+            const entryCount = category.kind === 'material' ? groupMaterialItems(items).length : items.length;
             return (
               <section className={styles.category} key={`${view}-${category.id}`}>
                 <div className={styles.categoryHeader}>
                   <div>
                     <h2>{category.name}</h2>
-                    <span>{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
+                    <span>{entryCount} {entryCount === 1 ? 'entry' : 'entries'}</span>
                   </div>
                   {canAddItems && view !== 'archive' && (
                     <div className={styles.categoryActions}>
@@ -544,7 +858,7 @@ export default function InventoryPage() {
                     <thead>
                       <tr>
                         <th>Item</th>
-                        {view !== 'archive' && <th>Stock</th>}
+                        {view !== 'archive' && <th>Inventory</th>}
                         {view !== 'archive' && category.kind === 'consumable' && <th>Reserve</th>}
                         {view !== 'archive' && <th>Target</th>}
                         {category.kind === 'consumable' && <th>Used by</th>}
@@ -555,7 +869,70 @@ export default function InventoryPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map(item => (
+                      {category.kind === 'material' ? groupMaterialItems(items).map(group => {
+                        const representative = group.tiers.find((item): item is InventoryItem => Boolean(item));
+                        if (!representative) return null;
+                        const totalQuantity = group.tiers.reduce((sum, item) => sum + (item?.quantity ?? 0), 0);
+                        const targets = group.tiers.map(item => item?.desiredQuantity ?? null);
+                        const totalTarget = targets.some(target => target !== null)
+                          ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
+                          : null;
+                        const enough = totalTarget === null ? null : totalQuantity >= totalTarget;
+                        return (
+                          <tr key={group.baseName}>
+                            <td>
+                              <div className={styles.itemIdentity}>
+                                <div className={styles.texture}>
+                                  {representative.texturePath ? <img src={representative.texturePath} alt="" /> : <span>?</span>}
+                                </div>
+                                <div><strong>{group.baseName}</strong></div>
+                              </div>
+                            </td>
+                            {view !== 'archive' && (
+                              <td className={styles.number}>
+                                <div className={styles.tierBreakdown}>
+                                  {group.tiers.map((item, index) => (
+                                    <span key={index} className={styles.tierChip} style={{ '--tier-color': TIER_COLORS[index + 1] } as CSSProperties}>
+                                      T{index + 1}: {item?.quantity ?? 0}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                            )}
+                            {view !== 'archive' && (
+                              <td className={styles.number}>{totalTarget === null ? '—' : totalTarget}</td>
+                            )}
+                            {view !== 'archive' && (
+                              <td>
+                                {enough === null ? (
+                                  <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
+                                ) : enough ? (
+                                  <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
+                                ) : (
+                                  <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
+                                )}
+                              </td>
+                            )}
+                            {canEdit && (
+                              <td>
+                                <div className={styles.rowActions}>
+                                  <button onClick={() => setMaterialGroupDialog(materialGroupDraft(group))}>Edit</button>
+                                  <button
+                                    className={representative.archived ? '' : styles.dangerText}
+                                    onClick={() => void toggleArchiveGroup(group)}
+                                    disabled={saving}
+                                  >
+                                    {representative.archived ? 'Restore' : 'Archive'}
+                                  </button>
+                                  <button className={styles.dangerText} onClick={() => setDeleteMaterialGroupDialog(group)} disabled={saving}>
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      }) : items.map(item => (
                         <tr key={item.id}>
                           <td>
                             <div className={styles.itemIdentity}>
@@ -611,6 +988,9 @@ export default function InventoryPage() {
                                 <button className={item.archived ? '' : styles.dangerText} onClick={() => void toggleArchive(item)} disabled={saving}>
                                   {item.archived ? 'Restore' : 'Archive'}
                                 </button>
+                                <button className={styles.dangerText} onClick={() => setDeleteItemDialog(item)} disabled={saving}>
+                                  Delete
+                                </button>
                               </div>
                             </td>
                           )}
@@ -646,13 +1026,14 @@ export default function InventoryPage() {
                   ))}
                 </select>
               </label>
-              <label>Storage area
-                <select value={draft.storageBucket} onChange={event => setDraft({ ...draft, storageBucket: event.target.value as Bucket })}>
-                  <option value="misc_bucket">Ingredient bucket</option>
-                  <option value="account_bank">Global Consu</option>
-                  <option value="character_bank">Dry Consu</option>
-                </select>
-              </label>
+              {draft.kind === 'consumable' && (
+                <label>Storage area
+                  <select value={draft.storageBucket} onChange={event => setDraft({ ...draft, storageBucket: event.target.value as Bucket })}>
+                    <option value="account_bank">Account bank (Global Consu)</option>
+                    <option value="character_bank">Character bank (Dry Consu / Bonus Consu)</option>
+                  </select>
+                </label>
+              )}
               {!draft.archived && (
                 <>
                   <label>Stock<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
@@ -759,6 +1140,177 @@ export default function InventoryPage() {
             <div className={styles.modalActions}>
               <button type="button" className={styles.secondaryButton} onClick={() => setDeleteCategoryDialog(null)}>Cancel</button>
               <button type="submit" className={styles.dangerButton} disabled={saving}>Delete category</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {deleteItemDialog && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setDeleteItemDialog(null);
+        }}>
+          <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={deleteItem}>
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={styles.eyebrow}>Delete entry</span>
+                <h2>{deleteItemDialog.name}</h2>
+              </div>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteItemDialog(null)} aria-label="Close">×</button>
+            </div>
+            <p className={styles.modalCopy}>
+              This permanently removes {deleteItemDialog.name} and its scan history matching, unlike Archive this cannot be undone.
+              Use Archive instead if you just want to hide it from the active list.
+            </p>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.secondaryButton} onClick={() => setDeleteItemDialog(null)}>Cancel</button>
+              <button type="submit" className={styles.dangerButton} disabled={saving}>Delete permanently</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {materialGroupDialog && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setMaterialGroupDialog(null);
+        }}>
+          <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveMaterialGroup}>
+            <div className={styles.modalHeader}>
+              <h2>{materialGroupDialog.baseName}</h2>
+              <button type="button" className={styles.closeButton} onClick={() => setMaterialGroupDialog(null)} aria-label="Close">×</button>
+            </div>
+            <div className={styles.formGrid}>
+              {materialGroupDialog.tiers.map((tier, index) => (
+                <Fragment key={tier.id}>
+                  <label style={{ '--tier-color': TIER_COLORS[tier.tier] } as CSSProperties}>
+                    <span className={styles.tierLabel}>T{tier.tier} stock</span>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={tier.quantity}
+                      onChange={event => updateMaterialTier(index, 'quantity', event.target.value)}
+                    />
+                  </label>
+                  <label style={{ '--tier-color': TIER_COLORS[tier.tier] } as CSSProperties}>
+                    <span className={styles.tierLabel}>T{tier.tier} target</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={tier.desiredQuantity}
+                      onChange={event => updateMaterialTier(index, 'desiredQuantity', event.target.value)}
+                      placeholder="No target"
+                    />
+                  </label>
+                </Fragment>
+              ))}
+            </div>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.secondaryButton} onClick={() => setMaterialGroupDialog(null)}>Cancel</button>
+              <button type="submit" className={styles.primaryButton} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {deleteMaterialGroupDialog && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setDeleteMaterialGroupDialog(null);
+        }}>
+          <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={deleteMaterialGroup}>
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={styles.eyebrow}>Delete material</span>
+                <h2>{deleteMaterialGroupDialog.baseName}</h2>
+              </div>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteMaterialGroupDialog(null)} aria-label="Close">×</button>
+            </div>
+            <p className={styles.modalCopy}>
+              This permanently removes all three tiers of {deleteMaterialGroupDialog.baseName}, unlike Archive this cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.secondaryButton} onClick={() => setDeleteMaterialGroupDialog(null)}>Cancel</button>
+              <button type="submit" className={styles.dangerButton} disabled={saving}>Delete permanently</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {scanProfileDialog && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setScanProfileDialog(null);
+        }}>
+          <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveScanProfile}>
+            <div className={styles.modalHeader}>
+              <h2>{scanProfileDialog.id ? 'Edit scan profile' : 'Add scan profile'}</h2>
+              <button type="button" className={styles.closeButton} onClick={() => setScanProfileDialog(null)} aria-label="Close">×</button>
+            </div>
+            <div className={styles.formGrid}>
+              <label>Character nickname
+                <input
+                  autoFocus
+                  required
+                  value={scanProfileDialog.nickname}
+                  onChange={event => setScanProfileDialog({ ...scanProfileDialog, nickname: event.target.value })}
+                  placeholder="Bonus Consu 4"
+                />
+              </label>
+              <label>Scans as (display name)
+                <input
+                  required
+                  value={scanProfileDialog.displayName}
+                  onChange={event => setScanProfileDialog({ ...scanProfileDialog, displayName: event.target.value })}
+                />
+              </label>
+              <label>Content type
+                <select
+                  disabled={Boolean(scanProfileDialog.id)}
+                  value={scanProfileDialog.contentType}
+                  onChange={event => setScanProfileDialog({ ...scanProfileDialog, contentType: event.target.value as 'consumables' | 'ingredients' | 'materials' })}
+                >
+                  <option value="consumables">Consumables</option>
+                  <option value="ingredients">Ingredients</option>
+                  <option value="materials">Materials</option>
+                </select>
+              </label>
+              <label>Start page<input type="number" min="1" required value={scanProfileDialog.startPage} onChange={event => setScanProfileDialog({ ...scanProfileDialog, startPage: event.target.value })} /></label>
+              <label>Total pages<input type="number" min="1" required value={scanProfileDialog.totalPages} onChange={event => setScanProfileDialog({ ...scanProfileDialog, totalPages: event.target.value })} /></label>
+              {scanProfileDialog.id && (
+                <label className={styles.checkboxField}>
+                  <input
+                    type="checkbox"
+                    checked={scanProfileDialog.archived}
+                    onChange={event => setScanProfileDialog({ ...scanProfileDialog, archived: event.target.checked })}
+                  />
+                  Archived (mod stops offering this scan)
+                </label>
+              )}
+            </div>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.secondaryButton} onClick={() => setScanProfileDialog(null)}>Cancel</button>
+              <button type="submit" className={styles.primaryButton} disabled={saving}>Save profile</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {deleteScanProfileDialog && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setDeleteScanProfileDialog(null);
+        }}>
+          <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={deleteScanProfile}>
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={styles.eyebrow}>Delete scan profile</span>
+                <h2>{deleteScanProfileDialog.nickname}</h2>
+              </div>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteScanProfileDialog(null)} aria-label="Close">×</button>
+            </div>
+            <p className={styles.modalCopy}>
+              The mod will stop recognizing this character nickname as a scannable bank. Consider archiving instead if this character might come back.
+            </p>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.secondaryButton} onClick={() => setDeleteScanProfileDialog(null)}>Cancel</button>
+              <button type="submit" className={styles.dangerButton} disabled={saving}>Delete profile</button>
             </div>
           </form>
         </div>
