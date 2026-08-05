@@ -8,6 +8,7 @@ export interface ScanProfile {
   displayName: string;
   startPage: number;
   totalPages: number;
+  locationPrefix: string;
   sortOrder: number;
   archived: boolean;
   updatedBy: string | null;
@@ -23,6 +24,7 @@ function mapRow(row: Record<string, any>): ScanProfile {
     displayName: row.display_name,
     startPage: row.start_page,
     totalPages: row.total_pages,
+    locationPrefix: row.location_prefix,
     sortOrder: row.sort_order,
     archived: row.archived,
     updatedBy: row.updated_by,
@@ -33,7 +35,7 @@ function mapRow(row: Record<string, any>): ScanProfile {
 export async function listScanProfiles(pool: Pool, includeArchived = true): Promise<ScanProfile[]> {
   const result = await pool.query(
     `SELECT id, nickname, content_type, source_key, display_name, start_page, total_pages,
-            sort_order, archived, updated_by, updated_at
+            location_prefix, sort_order, archived, updated_by, updated_at
      FROM inventory_scan_profiles
      ${includeArchived ? '' : 'WHERE archived = FALSE'}
      ORDER BY archived, sort_order, nickname`

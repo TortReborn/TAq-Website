@@ -1,19 +1,7 @@
--- Adds a third inventory_items kind, 'material', for profession-gathered crafting
--- materials (see ticket "woealer tracking again" from igasingularity). Scope for now is
--- the three level brackets the guild actually stockpiles: 100, 105, 115 - 8 raw
--- materials per level (4 professions x 2 kinds) x 3 quality tiers = 72 rows.
---
--- Naming note: the raw gathered item is called "<Family> Plank"/"<Family> Paper" for
--- Woodcutting (NOT "Wood" - that's only the *refined* crafting-input name). Level/family
--- pairing confirmed from in-game NBT dumps (Dernic = level 105 across all four
--- professions) and cross-checked against https://wynncraft.wiki.gg Mining/Woodcutting/
--- Farming/Fishing pages.
---
--- Quality tiers (T1/T2/T3) are invisible in the item's display name - only the
--- custom_model_data component's "profession_tier_N" string distinguishes them - so the
--- mod encodes the tier into the reported name itself (e.g. "Dernic Gem T1") rather than
--- relying on the display name alone, same pattern the website already expects from
--- ConsumableType/IngredientType.
+-- Adds a third inventory_items kind, 'material'. Scope: level 100/105/115 brackets only
+-- (4 professions x 2 kinds x 3 tiers = 72 rows). Woodcutting's raw item is "Plank", not
+-- "Wood" (that's the refined name). Tier (T1/T2/T3) is invisible in the display name, so
+-- the mod encodes it into the reported name itself (e.g. "Dernic Gem T1").
 
 ALTER TABLE inventory_categories DROP CONSTRAINT inventory_categories_kind_check;
 ALTER TABLE inventory_categories ADD CONSTRAINT inventory_categories_kind_check

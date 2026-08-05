@@ -5,9 +5,7 @@ import { listScanProfiles } from '@/lib/inventory-scan-profiles';
 
 export const dynamic = 'force-dynamic';
 
-// Read-only catalog for the mod and scripts/check-inventory-catalog-sync.js.
-// `items` is what the sync-check script diffs against; `scanProfiles` is what the mod
-// fetches on login to know which character banks it can scan.
+// Read-only: `items` for the sync-check script, `scanProfiles` for the mod's login fetch.
 export async function GET(request: NextRequest) {
   if (!isAuthorizedInventoryClient(request)) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 403 });

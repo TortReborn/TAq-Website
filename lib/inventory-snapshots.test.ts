@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateInventorySnapshots,
   isReserveInventorySource,
+  matchInventoryLocations,
   matchInventorySnapshot,
 } from './inventory-snapshots';
 
@@ -40,5 +41,12 @@ describe('inventory source snapshots', () => {
     expect(isReserveInventorySource('character_bank:bonus-consu-3')).toBe(true);
     expect(isReserveInventorySource('character_bank:dry-consu')).toBe(false);
     expect(isReserveInventorySource('account_bank')).toBe(false);
+  });
+
+  it('maps reported pages onto matched item ids and skips unknown names', () => {
+    const locations = matchInventoryLocations({ 'Golden Avia Feather': 3, Mystery: 1 }, items);
+    expect(locations.get(1)).toBe(3);
+    expect(locations.has(2)).toBe(false);
+    expect(locations.size).toBe(1);
   });
 });

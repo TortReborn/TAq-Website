@@ -18,17 +18,21 @@ export function isReserveInventorySource(sourceKey: string): boolean {
   return sourceKey.startsWith('character_bank:bonus-consu-');
 }
 
-export function matchInventorySnapshot(
-  reported: Record<string, number>,
-  items: InventoryMatchItem[]
-): { matchedCounts: Record<string, number>; unmatched: Record<string, number>; matched: number } {
+function buildNameIndex(items: InventoryMatchItem[]): Map<string, InventoryMatchItem> {
   const byName = new Map<string, InventoryMatchItem>();
   for (const item of items) {
     for (const candidate of [item.name, item.scanKey, ...item.aliases]) {
       byName.set(normalizeInventoryName(candidate), item);
     }
   }
+  return byName;
+}
 
+export function matchInventorySnapshot(
+  reported: Record<string, number>,
+  items: InventoryMatchItem[]
+): { matchedCounts: Record<string, number>; unmatched: Record<string, number>; matched: number } {
+  const byName = buildNameIndex(items);
   const matchedCounts: Record<string, number> = {};
   const unmatched: Record<string, number> = {};
   let matched = 0;
@@ -43,6 +47,20 @@ export function matchInventorySnapshot(
   }
 
   return { matchedCounts, unmatched, matched };
+}
+
+// Maps matched item ids to their reported page; unmatched names are skipped.
+export function matchInventoryLocations(
+  reportedPages: Record<string, number>,
+  items: InventoryMatchItem[]
+): Map<number, number> {
+  const byName = buildNameIndex(items);
+  const locations = new Map<number, number>();
+  for (const [name, page] of Object.entries(reportedPages)) {
+    const item = byName.get(normalizeInventoryName(name));
+    if (item) locations.set(item.id, page);
+  }
+  return locations;
 }
 
 export function aggregateInventorySnapshots(
