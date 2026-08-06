@@ -3,9 +3,44 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import AnimatedCounter from '@/components/AnimatedCounter';
+
+interface PublicStats {
+  guild: {
+    level: number | null;
+    levelPlacement: number | null;
+    wars: number | null;
+    warsPlacement: number | null;
+    raids: number | null;
+    raidsPlacement: number | null;
+    territories: number | null;
+  };
+  hqSnipes: {
+    season: number | null;
+    count: number;
+  };
+}
 
 export default function HomePage() {
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  const [stats, setStats] = useState<PublicStats | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/public-stats')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setStats(data);
+      })
+      .catch(() => {
+        // stats tiles just stay in their loading state
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     // Check if user has already scrolled this session
@@ -45,9 +80,10 @@ export default function HomePage() {
           <div className="home-hero-right">
             <h1 className="home-hero-title">The Aquarium</h1>
             <p className="home-hero-description">
-              Dive into Wynncraft's most active aquatic guild! Whether it be sniping the most
-              powerful guilds on the map, slaying raid bosses, or just
-              hanging out with an active and welcoming community, there's a place for you here.
+              Dive into Wynncraft's most established aquatic guild! Whether it's sniping HQs,
+              wiping claims, completing guild raids, participating in events, or just hanging
+              out with an active, welcoming and stress-free community, there's a place for
+              you here.
             </p>
             <a
               href="https://discord.gg/njRpZwKVaa"
@@ -71,6 +107,55 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* Stats Section - animated counters */}
+      <section className="home-section home-stats-section">
+        <div className="home-section-content">
+          <h2 className="home-section-title">Our Numbers</h2>
+          <div className="home-stats-grid">
+            <div className="home-stat-card">
+              <AnimatedCounter
+                value={stats?.guild.wars ?? null}
+                className="home-stat-value"
+              />
+              <span className="home-stat-label">Total Wars</span>
+              {stats?.guild.warsPlacement && (
+                <span className="home-stat-badge">Server Rank #{stats.guild.warsPlacement}</span>
+              )}
+            </div>
+            <div className="home-stat-card">
+              <AnimatedCounter
+                value={stats?.guild.raids ?? null}
+                className="home-stat-value"
+              />
+              <span className="home-stat-label">Guild Raids Done</span>
+              {stats?.guild.raidsPlacement && (
+                <span className="home-stat-badge">Server Rank #{stats.guild.raidsPlacement}</span>
+              )}
+            </div>
+            <div className="home-stat-card">
+              <AnimatedCounter
+                value={stats?.guild.level ?? null}
+                className="home-stat-value"
+              />
+              <span className="home-stat-label">Guild Level</span>
+              {stats?.guild.levelPlacement && (
+                <span className="home-stat-badge">Server Rank #{stats.guild.levelPlacement}</span>
+              )}
+            </div>
+            <div className="home-stat-card">
+              <AnimatedCounter
+                value={stats?.hqSnipes.count ?? null}
+                className="home-stat-value"
+              />
+              <span className="home-stat-label">HQ Snipes</span>
+              <span className="home-stat-badge">
+                {stats?.hqSnipes.season ? `Season ${stats.hqSnipes.season}` : 'This Season'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="home-section home-section-dark">
         <div className="home-section-content">
@@ -79,38 +164,48 @@ export default function HomePage() {
             <div className="home-feature">
               <div className="home-feature-icon">
                 <Image
-                  src="/images/mythics/spear.fire3.png"
-                  alt="Territory Wars"
+                  src="/images/home/tort-reborn-avatar.webp"
+                  alt="Tort Reborn"
                   width={64}
                   height={64}
-                  style={{ objectFit: 'contain' }}
+                  style={{ objectFit: 'contain', borderRadius: '50%' }}
                 />
               </div>
-              <h3>Guild Wars</h3>
-              <p>Fight for honor and glory across the map of Wynncraft! We still require members
-                to get a healthy amount of sleep.
+              <h3>Advanced Ecosystem</h3>
+              <p>A big, established ecosystem including this website and our very own
+                bot Tort plus regular events with huge payouts and contribution that's
+                rewarded properly and many statistics that our members can easily access.
               </p>
             </div>
             <div className="home-feature">
               <div className="home-feature-icon">
                 <Image
-                  src="/images/raids/aspect_warrior.png"
-                  alt="Guild Raids"
+                  src="/images/mythics/spear.fire3.png"
+                  alt="Wars & Raids"
                   width={64}
                   height={64}
                   style={{ objectFit: 'contain' }}
                 />
               </div>
-              <h3>Guild Raids</h3>
-              <p>Join our seasoned veterans in consistent graids! Regardless of if it's pummelling the 
-                grootslang or outrunning Greg, we got your back.
+              <h3>Wars &amp; Raids</h3>
+              <p>A dedicated core of warriors and raiders, ready to help you deep dive into
+                either area, with a big forum for optimal raid builds and guides for them,
+                as well as cutting edge war tech and builds.
               </p>
             </div>
             <div className="home-feature">
-              <div className="home-feature-icon">👥</div>
+              <div className="home-feature-icon">
+                <Image
+                  src="/images/home/community-icon.png"
+                  alt="Active Community"
+                  width={64}
+                  height={64}
+                  style={{ objectFit: 'contain', imageRendering: 'pixelated' }}
+                />
+              </div>
               <h3>Active Community</h3>
-              <p>150 members, experienced leadership, and (semi)regular events to fulfill 
-                all your community needs!
+              <p>150 members, stable leadership, a welcoming community, and an easy way
+                for you to find new friends.
               </p>
             </div>
           </div>
