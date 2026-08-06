@@ -5,6 +5,7 @@ import { useExecSession } from '@/hooks/useExecSession';
 import { getRankColor } from '@/lib/rank-constants';
 import { getNavGroups } from '@/lib/exec-nav';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo } from 'react';
 import OnboardingTour from '@/components/OnboardingTour';
 import OnboardingTrigger from '@/components/OnboardingTrigger';
@@ -181,9 +182,30 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
                       }
                     }}
                   >
-                    <svg style={{ width: 'clamp(18px, 1.2vw, 24px)', height: 'clamp(18px, 1.2vw, 24px)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d={item.icon} />
-                    </svg>
+                    {item.iconImage ? (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 'clamp(18px, 1.2vw, 24px)',
+                        height: 'clamp(18px, 1.2vw, 24px)',
+                        flexShrink: 0,
+                      }}>
+                        <Image
+                          src={item.iconImage}
+                          alt=""
+                          width={30}
+                          height={30}
+                          style={item.iconLarge
+                            ? { width: 'clamp(22px, 1.5vw, 30px)', height: 'clamp(22px, 1.5vw, 30px)', imageRendering: 'pixelated' }
+                            : { width: '100%', height: '100%', imageRendering: 'pixelated' }}
+                        />
+                      </span>
+                    ) : (
+                      <svg style={{ width: 'clamp(18px, 1.2vw, 24px)', height: 'clamp(18px, 1.2vw, 24px)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d={item.icon} />
+                      </svg>
+                    )}
                     {item.label}
                   </Link>
                 );
@@ -235,9 +257,24 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
               e.currentTarget.style.color = 'var(--text-secondary)';
             }}
           >
-            <svg style={{ width: 'clamp(18px, 1.2vw, 24px)', height: 'clamp(18px, 1.2vw, 24px)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
-            </svg>
+            <span
+              aria-hidden="true"
+              style={{
+                width: 'clamp(18px, 1.2vw, 24px)',
+                height: 'clamp(18px, 1.2vw, 24px)',
+                flexShrink: 0,
+                display: 'inline-block',
+                backgroundColor: '#ef4444',
+                WebkitMaskImage: 'url(/images/icons/logout.png)',
+                maskImage: 'url(/images/icons/logout.png)',
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskPosition: 'center',
+              }}
+            />
             Logout
           </a>
         </div>

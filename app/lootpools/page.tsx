@@ -7,6 +7,14 @@ import Image from 'next/image';
 import PageHeader from '@/components/PageHeader';
 import { useLootruns, useAspects } from '@/hooks/useLootpools';
 import LootpoolSkeleton from '@/components/skeletons/LootpoolSkeleton';
+import {
+  LOOT_RESET_WEEKDAY_UTC,
+  LOOT_RESET_HOUR_UTC,
+  RAID_RESET_WEEKDAY_UTC,
+  RAID_RESET_HOUR_UTC,
+  nextWeeklyReset,
+  formatCountdown,
+} from '@/lib/lootpool-reset';
 
 interface LootRegion {
   Mythic?: string[];
@@ -39,6 +47,13 @@ export default function LootpoolsPage() {
 
   const loading = lootrunsLoading || aspectsLoading;
   const error = lootrunsError || aspectsError;
+
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -101,10 +116,10 @@ export default function LootpoolsPage() {
     );
   }
 
-  // Get next rotation time based on active tab
-  const nextRotation = activeTab === 'lootruns'
-    ? (lootrunsData ? formatNextRotation(lootrunsData.Timestamp) : null)
-    : (aspectsData ? formatNextRotation(aspectsData.Timestamp) : null);
+  const resetTarget = activeTab === 'lootruns'
+    ? nextWeeklyReset(LOOT_RESET_WEEKDAY_UTC, LOOT_RESET_HOUR_UTC, now)
+    : nextWeeklyReset(RAID_RESET_WEEKDAY_UTC, RAID_RESET_HOUR_UTC, now);
+  const nextRotation = formatCountdown(resetTarget, now);
 
   return (
     <div style={{
@@ -133,24 +148,28 @@ export default function LootpoolsPage() {
           width: '90%',
         }}>
           {/* Next Rotation (Left) */}
-          {nextRotation && (
-            <div style={{
-              fontSize: '0.875rem',
-              color: 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              background: 'var(--bg-secondary)',
-              borderRadius: '0.5rem',
-              padding: '0.75rem 1rem'
-            }}>
-              <span style={{ fontSize: '1.125rem' }}>🔄</span>
-              <div>
-                <div style={{ fontWeight: '600' }}>Next Rotation</div>
-                <div>{nextRotation}</div>
-              </div>
+          <div style={{
+            fontSize: '0.875rem',
+            color: 'var(--text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: 'var(--bg-secondary)',
+            borderRadius: '0.5rem',
+            padding: '0.75rem 1rem'
+          }}>
+            <Image
+              src="/images/icons/refresh.png"
+              alt=""
+              width={18}
+              height={18}
+              style={{ imageRendering: 'pixelated', flexShrink: 0 }}
+            />
+            <div>
+              <div style={{ fontWeight: '600' }}>Resets In</div>
+              <div>{nextRotation}</div>
             </div>
-          )}
+          </div>
 
           {/* Title (Center) */}
           <div style={{
@@ -187,7 +206,8 @@ export default function LootpoolsPage() {
               className={`lootpools-tab-button ${activeTab === 'lootruns' ? 'is-active' : ''}`}
               onClick={() => switchTab('lootruns')}
             >
-              🏃 Lootruns
+              <Image src="/images/icons/lootrun-sigil.png" alt="" width={34} height={34} style={{ imageRendering: 'pixelated' }} />
+              Lootruns
             </button>
             <button
               type="button"
@@ -196,28 +216,31 @@ export default function LootpoolsPage() {
               className={`lootpools-tab-button ${activeTab === 'raids' ? 'is-active' : ''}`}
               onClick={() => switchTab('raids')}
             >
-              ⚔️ Raids
+              <Image src="/images/icons/raid.png" alt="" width={34} height={34} style={{ imageRendering: 'pixelated' }} />
+              Raids
             </button>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="lootpools-content-stage">
-        {exitingTab && (
+      <div className="lootpools-scroll-area themed-scrollbar">
+        <div className="lootpools-content-stage">
+          {exitingTab && (
+            <div
+              key={`exiting-${exitingTab}`}
+              className="lootpools-content-pane is-exiting"
+              aria-hidden="true"
+            >
+              {renderTabContent(exitingTab)}
+            </div>
+          )}
           <div
-            key={`exiting-${exitingTab}`}
-            className="lootpools-content-pane is-exiting"
-            aria-hidden="true"
+            key={`active-${activeTab}`}
+            className={`lootpools-content-pane ${exitingTab ? 'is-entering' : ''}`}
           >
-            {renderTabContent(exitingTab)}
+            {renderTabContent(activeTab)}
           </div>
-        )}
-        <div
-          key={`active-${activeTab}`}
-          className={`lootpools-content-pane ${exitingTab ? 'is-entering' : ''}`}
-        >
-          {renderTabContent(activeTab)}
         </div>
       </div>
     </div>
@@ -235,7 +258,7 @@ function LootrunsView({ data }: { data: LootData }) {
       justifyContent: 'center'
     }}>
       {/* Lootrun Regions Grid */}
-      <div className="lootpools-grid-container lootpools-grid-7" style={{
+      <div className="lootpools-grid-container" style={{
         width: '90%',
       }}>
         {regions.map(regionName => (
@@ -268,7 +291,7 @@ function RaidsView({ data }: { data: LootData }) {
       justifyContent: 'center'
     }}>
       {/* Raid Aspects Grid */}
-      <div className="lootpools-grid-container lootpools-grid-5" style={{
+      <div className="lootpools-grid-container" style={{
         width: '90%',
         maxWidth: '1200px'
       }}>
@@ -285,11 +308,6 @@ function RaidsView({ data }: { data: LootData }) {
   );
 }
 
-// Helper function
-function formatNextRotation(timestamp: number) {
-  const nextRotation = new Date((timestamp + 604800) * 1000);
-  return nextRotation.toLocaleString();
-}
 
 function ShinySparkleIcon({ style }: { style?: React.CSSProperties }) {
   return (

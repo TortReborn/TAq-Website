@@ -117,7 +117,7 @@ export default function GraidEventPage() {
 
           {isFallback && (
             <p style={{ textAlign: 'center', color: '#ef4444', fontWeight: '700', marginBottom: '1rem', marginTop: 0 }}>
-              No active event — showing the most recent event below.
+              No active event. Showing the most recent event below.
             </p>
           )}
 
