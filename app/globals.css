@@ -38,83 +38,48 @@ select option {
 }
 
 /* Lootpools page responsive styles */
-.lootpools-grid-7 {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+.lootpools-grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
   gap: 1.5rem;
 }
 
-.lootpools-grid-5 {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.5rem;
+.lootpools-grid-container > * {
+  flex: 1 1 220px;
+  min-width: 200px;
+  max-width: 260px;
 }
 
-.lootpools-grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+.lootpools-scroll-area {
+  overflow-y: auto;
+  max-height: clamp(420px, calc(100dvh - 300px), 1400px);
+  padding: 0.25rem 0.5rem 1.5rem;
+  margin: 0 -0.5rem;
 }
 
-/* Large tablets and small desktops */
-@media (max-width: 1400px) {
-  .lootpools-grid-7 {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-@media (max-width: 1200px) {
-  .lootpools-grid-7 {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .lootpools-grid-5 {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  .lootpools-grid-4 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Tablets */
 @media (max-width: 900px) {
-  .lootpools-grid-7 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .lootpools-grid-5 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .lootpools-grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .lootpools-header-container,
   .lootpools-grid-container {
     width: 95% !important;
   }
 }
 
-/* Small tablets */
-@media (max-width: 700px) {
-  .lootpools-grid-7 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .lootpools-grid-5 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .lootpools-grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 /* Mobile */
 @media (max-width: 500px) {
-  .lootpools-grid-7,
-  .lootpools-grid-5,
-  .lootpools-grid-4 {
-    grid-template-columns: 1fr;
-  }
   .lootpools-header-container,
   .lootpools-grid-container {
     width: 100% !important;
+  }
+
+  .lootpools-grid-container > * {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .lootpools-scroll-area {
+    max-height: clamp(360px, calc(100dvh - 260px), 1400px);
   }
 
   /* Stack header elements vertically on mobile */
@@ -164,7 +129,8 @@ select option {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.25rem;
+  gap: 0.5rem;
+  min-height: 3.25rem;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;

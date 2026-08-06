@@ -35,7 +35,7 @@ export default function LootpoolSkeleton() {
         display: 'flex',
         justifyContent: 'center'
       }}>
-        <div className="lootpools-grid-container lootpools-grid-7" style={{
+        <div className="lootpools-grid-container" style={{
           width: '90%',
           maxWidth: '1200px'
         }}>
