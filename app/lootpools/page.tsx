@@ -259,7 +259,7 @@ function LootrunsView({ data }: { data: LootData }) {
     }}>
       {/* Lootrun Regions Grid */}
       <div className="lootpools-grid-container" style={{
-        width: '90%',
+        width: '96%',
       }}>
         {regions.map(regionName => (
           <LootrunColumn
@@ -292,7 +292,7 @@ function RaidsView({ data }: { data: LootData }) {
     }}>
       {/* Raid Aspects Grid */}
       <div className="lootpools-grid-container" style={{
-        width: '90%',
+        width: '96%',
         maxWidth: '1200px'
       }}>
         {RAID_DISPLAY_ORDER.map(raid => (
@@ -361,10 +361,10 @@ function LootrunColumn({ regionName, regionData, icons }: {
   const shinyTracker = regionData.Shiny?.Tracker;
 
   return (
-    <div style={{
+    <div className="lootpool-card" style={{
       background: 'var(--bg-card)',
       borderRadius: '1rem',
-      padding: '1.5rem',
+      padding: 'var(--lootpool-card-padding)',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
       border: '3px solid var(--border-emphasis)',
       height: 'fit-content'
@@ -401,8 +401,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
         )}
       </div>
       
-      <h3 style={{
-        fontSize: '1.25rem',
+      <h3 className="lootpool-card-title" style={{
+        fontSize: 'var(--lootpool-title-size)',
         fontWeight: '700',
         color: 'var(--text-primary)',
         textAlign: 'center',
@@ -428,18 +428,20 @@ function LootrunColumn({ regionName, regionData, icons }: {
             return (
             <div
               key={`item-${index}`}
+              className="lootpool-entry"
             style={{
               display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem',
+              alignItems: 'flex-start',
+              gap: 'var(--lootpool-entry-gap)',
+              padding: 'var(--lootpool-entry-padding)',
               background: 'var(--bg-card)',
               borderRadius: '0.5rem',
               border: '1px solid var(--border-card)',
               backdropFilter: 'blur(8px)',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               transition: 'all 0.2s ease',
-              position: 'relative'
+              position: 'relative',
+              paddingRight: isShiny ? '1.5rem' : 'var(--lootpool-entry-padding)'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-1px)';
@@ -457,7 +459,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
               borderRadius: '0.25rem',
               flexShrink: 0,
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              marginTop: '0.0625rem'
             }}>
               {itemIsWard ? (
                 <Image
@@ -502,9 +505,9 @@ function LootrunColumn({ regionName, regionData, icons }: {
               }} />
             )}
 
-            <div style={{ flex: 1 }}>
-              <span style={{
-                fontSize: '0.875rem',
+            <div className="lootpool-entry-content" style={{ flex: 1 }}>
+              <span className="lootpool-entry-label" style={{
+                fontSize: 'var(--lootpool-entry-text-size)',
                 color: isShiny ? '#f5c842' : (itemIsWard ? wardColor : '#aa00aa'),
                 fontWeight: '500'
               }}>
@@ -512,8 +515,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
               </span>
               {/* Shiny tracker */}
               {isShiny && shinyTracker && (
-                <div style={{
-                  fontSize: '0.75rem',
+                <div className="lootpool-entry-meta" style={{
+                  fontSize: 'var(--lootpool-entry-meta-size)',
                   color: '#f5c842',
                   fontWeight: '400',
                   marginTop: '0.25rem'
@@ -544,10 +547,10 @@ function RaidColumn({ raid, iconKey, aspects }: {
   };
 
   return (
-    <div style={{
+    <div className="lootpool-card" style={{
       background: 'var(--bg-card)',
       borderRadius: '1rem',
-      padding: '1.5rem',
+      padding: 'var(--lootpool-card-padding)',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
       border: '3px solid var(--border-emphasis)',
       height: 'fit-content'
@@ -599,8 +602,8 @@ function RaidColumn({ raid, iconKey, aspects }: {
         </div>
       </div>
       
-      <h3 style={{
-        fontSize: '1.25rem',
+      <h3 className="lootpool-card-title" style={{
+        fontSize: 'var(--lootpool-title-size)',
         fontWeight: '700',
         color: 'var(--text-primary)',
         textAlign: 'center',
@@ -626,11 +629,12 @@ function RaidColumn({ raid, iconKey, aspects }: {
             return (
               <div
                 key={`${rarity}-${index}`}
+                className="lootpool-entry"
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem',
+                  alignItems: 'flex-start',
+                  gap: 'var(--lootpool-entry-gap)',
+                  padding: 'var(--lootpool-entry-padding)',
                   background: 'var(--bg-card)',
                   borderRadius: '0.5rem',
                   border: '1px solid var(--border-card)',
@@ -654,7 +658,8 @@ function RaidColumn({ raid, iconKey, aspects }: {
                   borderRadius: '0.25rem',
                   flexShrink: 0,
                   position: 'relative',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  marginTop: '0.0625rem'
                 }}>
                   {(() => {
                     const aspectClass = getClassForAspect(aspect);
@@ -681,13 +686,15 @@ function RaidColumn({ raid, iconKey, aspects }: {
                   })()}
                 </div>
 
-                <span style={{
-                  fontSize: '0.875rem',
-                  color,
-                  fontWeight: '500'
-                }}>
-                  {displayName}
-                </span>
+                <div className="lootpool-entry-content" style={{ flex: 1 }}>
+                  <span className="lootpool-entry-label" style={{
+                    fontSize: 'var(--lootpool-entry-text-size)',
+                    color,
+                    fontWeight: '500'
+                  }}>
+                    {displayName}
+                  </span>
+                </div>
               </div>
             );
           });

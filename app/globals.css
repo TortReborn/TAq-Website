@@ -39,17 +39,50 @@ select option {
 
 /* Lootpools page responsive styles */
 .lootpools-grid-container {
+  --lootpool-card-min: 150px;
+  --lootpool-card-max: 200px;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
 .lootpools-grid-container > * {
-  flex: 1 1 220px;
-  min-width: 200px;
-  max-width: 260px;
+  flex: 1 1 var(--lootpool-card-min);
+  min-width: var(--lootpool-card-min);
+  max-width: var(--lootpool-card-max);
+  container-type: inline-size;
+}
+
+.lootpool-card {
+  --lootpool-card-padding: clamp(1rem, 10%, 1.5rem);
+  --lootpool-title-size: clamp(1.05rem, 0.9rem + 1.4cqw, 1.25rem);
+  --lootpool-entry-padding: clamp(0.55rem, 0.35rem + 1.3cqw, 0.75rem);
+  --lootpool-entry-gap: clamp(0.35rem, 0.25rem + 0.8cqw, 0.5rem);
+  --lootpool-entry-text-size: clamp(0.78rem, 0.66rem + 0.8cqw, 0.875rem);
+  --lootpool-entry-meta-size: clamp(0.7rem, 0.62rem + 0.55cqw, 0.75rem);
+}
+
+.lootpool-card-title {
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.lootpool-entry-content,
+.lootpool-entry-label,
+.lootpool-entry-meta {
+  min-width: 0;
+}
+
+.lootpool-entry-label,
+.lootpool-entry-meta {
+  display: block;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lootpools-scroll-area {
@@ -59,10 +92,26 @@ select option {
   margin: 0 -0.5rem;
 }
 
+@media (min-width: 1500px) {
+  .lootpools-grid-container {
+    --lootpool-card-min: 170px;
+    --lootpool-card-max: 220px;
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 900px) {
   .lootpools-header-container,
   .lootpools-grid-container {
     width: 95% !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .lootpools-grid-container {
+    --lootpool-card-min: 200px;
+    --lootpool-card-max: 260px;
+    gap: 1rem;
   }
 }
 

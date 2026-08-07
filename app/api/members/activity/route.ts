@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
 
@@ -169,9 +170,12 @@ export async function GET(request: NextRequest) {
         discordLinks[row.uuid] = row;
       });
 
+      const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
+
       // Calculate time-based stats for ALL time periods for each member
       const membersWithAllTimeStats = allMembers.map(member => {
         const discord = discordLinks[member.uuid];
+        const allTimeRaids = allTimeGraidRaids.get(member.uuid) || 0;
 
         // Calculate stats for each time period
         const timeFrames: Record<string, TimeFrameStats> = {};
@@ -184,7 +188,7 @@ export async function GET(request: NextRequest) {
         // Add "all" time frame (current values)
         timeFrames['all'] = {
           wars: member.wars,
-          raids: member.raids,
+          raids: allTimeRaids,
           shells: member.shells,
           contributed: member.contributed,
           playtime: member.playtime,
@@ -196,6 +200,7 @@ export async function GET(request: NextRequest) {
           discordRank: discord ? discord.rank : '',
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',
+          raids: allTimeRaids,
           timeFrames
         };
       });
