@@ -30,43 +30,22 @@ export default function LootpoolSkeleton() {
         </div>
       </div>
 
-      {/* Grid of 7 columns */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center'
-      }}>
-        <div className="lootpools-grid-container" style={{
-          width: '90%',
-          maxWidth: '1200px'
-        }}>
-          {[1, 2, 3, 4, 5, 6, 7].map(i => (
-            <div key={i} style={{
-              background: 'var(--bg-card)',
-              borderRadius: '1rem',
-              padding: '1.5rem',
-              border: '3px solid var(--border-emphasis)'
-            }}>
-              <div className="skeleton" style={{
-                width: '120px',
-                height: '120px',
-                borderRadius: '0.5rem',
-                margin: '0 auto 1rem'
-              }} />
-              <div className="skeleton" style={{
-                width: '80%',
-                height: '1.25rem',
-                margin: '0 auto 1rem'
-              }} />
-              {[1, 2, 3].map(j => (
-                <div key={j} className="skeleton" style={{
-                  height: '2.5rem',
-                  marginBottom: '0.5rem',
-                  borderRadius: '0.5rem'
-                }} />
-              ))}
+      <div className="lootpools-window">
+        <div className="lootpools-cycle-button lootpools-cycle-button--skeleton" aria-hidden="true" />
+        <div className="lootpools-grid-container lootpools-grid-container--windowed lootpool-skeleton-grid">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="lootpool-card lootpool-skeleton-card">
+              <div className="skeleton lootpool-skeleton-image" />
+              <div className="skeleton lootpool-skeleton-title" />
+              <div className="lootpool-entry-list">
+                {[1, 2, 3, 4, 5].map(j => (
+                  <div key={j} className="skeleton lootpool-skeleton-entry" />
+                ))}
+              </div>
             </div>
           ))}
         </div>
+        <div className="lootpools-cycle-button lootpools-cycle-button--skeleton" aria-hidden="true" />
       </div>
     </div>
   );

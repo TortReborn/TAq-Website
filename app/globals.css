@@ -38,14 +38,24 @@ select option {
 }
 
 /* Lootpools page responsive styles */
+.lootpools-window {
+  --lootpool-card-height: clamp(430px, calc(100dvh - 310px), 720px);
+
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 .lootpools-grid-container {
   --lootpool-card-min: 150px;
-  --lootpool-card-max: 200px;
+  --lootpool-card-max: 220px;
 
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 0.75rem;
 }
 
@@ -56,6 +66,74 @@ select option {
   container-type: inline-size;
 }
 
+.lootpools-window > .lootpools-grid-container,
+.lootpools-cycle-stage {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto !important;
+  max-width: 1200px;
+}
+
+.lootpools-cycle-stage {
+  --lootpool-visible-count: 5;
+  --lootpool-cycle-gap: 0.75rem;
+  --lootpool-card-slot: 20%;
+  --lootpool-cycle-step: calc(var(--lootpool-card-slot) + var(--lootpool-cycle-gap));
+
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding-inline: 0.25rem;
+}
+
+.lootpools-cycle-track {
+  width: max-content;
+  transform: translateX(0);
+  transition: none;
+  will-change: transform;
+}
+
+.lootpools-grid-container--windowed {
+  flex-wrap: nowrap;
+}
+
+.lootpools-cycle-track .lootpools-grid-container--windowed {
+  display: grid;
+  gap: var(--lootpool-cycle-gap);
+  justify-content: start;
+  width: max-content !important;
+  max-width: none;
+}
+
+.lootpools-cycle-stage.is-static .lootpools-cycle-track,
+.lootpools-cycle-stage.is-static .lootpools-grid-container--windowed {
+  width: 100% !important;
+}
+
+.lootpools-grid-container--windowed > * {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+}
+
+.lootpools-cycle-stage.is-cycle-ready .lootpools-cycle-track {
+  transition: none;
+}
+
+.lootpools-cycle-stage.is-cycle-active .lootpools-cycle-track {
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lootpools-cycle-stage.is-sliding-next.is-cycle-active .lootpools-cycle-track,
+.lootpools-cycle-stage.is-sliding-previous .lootpools-cycle-track {
+  transform: translateX(calc(-1 * var(--lootpool-cycle-step)));
+}
+
+.lootpools-cycle-stage.is-sliding-previous.is-cycle-active .lootpools-cycle-track {
+  transform: translateX(0);
+}
+
 .lootpool-card {
   --lootpool-card-padding: clamp(1rem, 10%, 1.5rem);
   --lootpool-title-size: clamp(1.05rem, 0.9rem + 1.4cqw, 1.25rem);
@@ -63,6 +141,10 @@ select option {
   --lootpool-entry-gap: clamp(0.35rem, 0.25rem + 0.8cqw, 0.5rem);
   --lootpool-entry-text-size: clamp(0.78rem, 0.66rem + 0.8cqw, 0.875rem);
   --lootpool-entry-meta-size: clamp(0.7rem, 0.62rem + 0.55cqw, 0.75rem);
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .lootpool-card-title {
@@ -85,11 +167,98 @@ select option {
   word-break: break-word;
 }
 
-.lootpools-scroll-area {
+.lootpool-entry-list {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.5rem;
   overflow-y: auto;
-  max-height: clamp(420px, calc(100dvh - 300px), 1400px);
+  overscroll-behavior: contain;
+  padding-right: 0.125rem;
+}
+
+.lootpools-scroll-area {
+  overflow: visible;
+  max-height: none;
   padding: 0.25rem 0.5rem 1.5rem;
   margin: 0 -0.5rem;
+}
+
+.lootpools-cycle-button {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.375rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.lootpools-cycle-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  image-rendering: pixelated;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(74%)
+    sepia(26%)
+    saturate(909%)
+    hue-rotate(154deg)
+    brightness(98%)
+    contrast(94%)
+    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+.lootpools-cycle-button:hover {
+  background: color-mix(in srgb, var(--color-ocean-700) 45%, var(--bg-secondary));
+  border-color: var(--color-ocean-400);
+  transform: translateY(-1px);
+}
+
+.lootpools-cycle-button:focus-visible {
+  outline: 2px solid var(--color-ocean-400);
+  outline-offset: 2px;
+}
+
+.lootpools-cycle-button--skeleton {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.lootpool-skeleton-card {
+  height: var(--lootpool-card-height);
+  background: var(--bg-card);
+  border-radius: 1rem;
+  padding: var(--lootpool-card-padding);
+  border: 3px solid var(--border-emphasis);
+}
+
+.lootpool-skeleton-image {
+  width: 100%;
+  aspect-ratio: 1920 / 991;
+  border-radius: 0.5rem;
+  margin: 0 auto 1rem;
+}
+
+.lootpool-skeleton-title {
+  width: 80%;
+  height: 1.25rem;
+  margin: 0 auto 1rem;
+}
+
+.lootpool-skeleton-entry {
+  flex: 0 0 2.5rem;
+  border-radius: 0.5rem;
 }
 
 @media (min-width: 1500px) {
@@ -107,16 +276,53 @@ select option {
   }
 }
 
+@media (max-width: 1180px) {
+  .lootpool-skeleton-grid > *:nth-child(n + 5) {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .lootpool-skeleton-grid > *:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .lootpool-skeleton-grid > *:nth-child(n + 3) {
+    display: none;
+  }
+}
+
 @media (max-width: 700px) {
+  .lootpools-window {
+    --lootpool-card-height: clamp(420px, calc(100dvh - 270px), 680px);
+  }
+
   .lootpools-grid-container {
     --lootpool-card-min: 200px;
     --lootpool-card-max: 260px;
     gap: 1rem;
   }
+
+  .lootpools-grid-container--windowed > * {
+    max-width: 100%;
+  }
 }
 
 /* Mobile */
+@media (max-width: 520px) {
+  .lootpool-skeleton-grid > *:nth-child(n + 2) {
+    display: none;
+  }
+}
+
 @media (max-width: 500px) {
+  .lootpools-window {
+    --lootpool-card-height: clamp(390px, calc(100dvh - 245px), 640px);
+    gap: 0.5rem;
+  }
+
   .lootpools-header-container,
   .lootpools-grid-container {
     width: 100% !important;
@@ -127,8 +333,16 @@ select option {
     max-width: 100%;
   }
 
-  .lootpools-scroll-area {
-    max-height: clamp(360px, calc(100dvh - 260px), 1400px);
+  .lootpools-cycle-button {
+    flex-basis: 2.25rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.35rem;
+  }
+
+  .lootpools-cycle-icon {
+    width: 1.1rem;
+    height: 1.1rem;
   }
 
   /* Stack header elements vertically on mobile */
@@ -215,41 +429,6 @@ select option {
   z-index: 1;
 }
 
-.lootpools-content-pane.is-entering {
-  animation: lootpools-content-enter 320ms cubic-bezier(0.25, 1, 0.5, 1) both;
-}
-
-.lootpools-content-pane.is-exiting {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  pointer-events: none;
-  animation: lootpools-content-exit 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-@keyframes lootpools-content-enter {
-  from {
-    opacity: 0;
-    transform: translateY(0.4rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes lootpools-content-exit {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-0.25rem);
-  }
-}
-
 @media (max-width: 500px) {
   .lootpools-tab-selector {
     width: 100%;
@@ -259,13 +438,14 @@ select option {
 
 @media (prefers-reduced-motion: reduce) {
   .lootpools-tab-indicator,
-  .lootpools-tab-button {
+  .lootpools-tab-button,
+  .lootpools-cycle-button {
     transition-duration: 0.01ms;
   }
 
-  .lootpools-content-pane.is-entering,
-  .lootpools-content-pane.is-exiting {
+  .lootpools-cycle-track {
     animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
   }
 }
 

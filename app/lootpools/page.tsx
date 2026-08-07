@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { getImageForItem, raidImageMap, classImageMap, isWard, getWardImage, getWardColor } from '@/lib/lootpool-images';
 import { getClassForAspect } from '@/lib/aspect-class-map';
 import Image from 'next/image';
-import PageHeader from '@/components/PageHeader';
 import { useLootruns, useAspects } from '@/hooks/useLootpools';
 import LootpoolSkeleton from '@/components/skeletons/LootpoolSkeleton';
 import {
@@ -37,11 +36,50 @@ interface LootData {
 }
 
 type LootpoolTab = 'lootruns' | 'raids';
+const LOOTRUN_VISIBLE_CARD_COUNT = 5;
+const LOOTPOOL_CYCLE_DURATION_MS = 320;
+type CycleDirection = 'previous' | 'next';
+
+function getCircularWindow<T>(items: T[], startIndex: number, count: number) {
+  if (items.length <= count) {
+    return items;
+  }
+
+  return Array.from({ length: count }, (_, index) => items[(startIndex + index) % items.length]);
+}
+
+function getVisibleLootpoolCardCount(width: number) {
+  if (width < 520) {
+    return 1;
+  }
+  if (width < 760) {
+    return 2;
+  }
+  if (width < 980) {
+    return 3;
+  }
+  if (width < 1180) {
+    return 4;
+  }
+  return LOOTRUN_VISIBLE_CARD_COUNT;
+}
+
+function useResponsiveLootpoolCardCount() {
+  const [count, setCount] = useState(LOOTRUN_VISIBLE_CARD_COUNT);
+
+  useEffect(() => {
+    const updateCount = () => setCount(getVisibleLootpoolCardCount(window.innerWidth));
+
+    updateCount();
+    window.addEventListener('resize', updateCount);
+    return () => window.removeEventListener('resize', updateCount);
+  }, []);
+
+  return count;
+}
 
 export default function LootpoolsPage() {
   const [activeTab, setActiveTab] = useState<LootpoolTab>('lootruns');
-  const [exitingTab, setExitingTab] = useState<LootpoolTab | null>(null);
-  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: lootrunsData, loading: lootrunsLoading, error: lootrunsError } = useLootruns();
   const { data: aspectsData, loading: aspectsLoading, error: aspectsError } = useAspects();
 
@@ -55,29 +93,12 @@ export default function LootpoolsPage() {
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const switchTab = (tab: LootpoolTab) => {
     if (tab === activeTab) {
       return;
     }
 
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
-
-    setExitingTab(activeTab);
     setActiveTab(tab);
-    transitionTimeoutRef.current = setTimeout(() => {
-      setExitingTab(null);
-      transitionTimeoutRef.current = null;
-    }, 320);
   };
 
   const renderTabContent = (tab: LootpoolTab) => {
@@ -226,18 +247,9 @@ export default function LootpoolsPage() {
       {/* Content */}
       <div className="lootpools-scroll-area themed-scrollbar">
         <div className="lootpools-content-stage">
-          {exitingTab && (
-            <div
-              key={`exiting-${exitingTab}`}
-              className="lootpools-content-pane is-exiting"
-              aria-hidden="true"
-            >
-              {renderTabContent(exitingTab)}
-            </div>
-          )}
           <div
             key={`active-${activeTab}`}
-            className={`lootpools-content-pane ${exitingTab ? 'is-entering' : ''}`}
+            className="lootpools-content-pane"
           >
             {renderTabContent(activeTab)}
           </div>
@@ -253,24 +265,19 @@ function LootrunsView({ data }: { data: LootData }) {
   const regions = Object.keys(loot);
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center'
-    }}>
-      {/* Lootrun Regions Grid */}
-      <div className="lootpools-grid-container" style={{
-        width: '96%',
-      }}>
-        {regions.map(regionName => (
+    <WindowedLootpoolGrid
+      items={regions}
+      previousLabel="Show previous lootrun regions"
+      nextLabel="Show next lootrun regions"
+      renderItem={(regionName) => (
           <LootrunColumn
             key={regionName}
             regionName={regionName}
             regionData={loot[regionName] || {}}
             icons={data.Icon}
           />
-        ))}
-      </div>
-    </div>
+      )}
+    />
   );
 }
 
@@ -286,24 +293,225 @@ function RaidsView({ data }: { data: LootData }) {
   const loot = data.Aspects || data.Loot || {};
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center'
-    }}>
-      {/* Raid Aspects Grid */}
-      <div className="lootpools-grid-container" style={{
-        width: '96%',
-        maxWidth: '1200px'
-      }}>
-        {RAID_DISPLAY_ORDER.map(raid => (
+    <WindowedLootpoolGrid
+      items={RAID_DISPLAY_ORDER}
+      previousLabel="Show previous raids"
+      nextLabel="Show next raids"
+      renderItem={(raid) => (
           <RaidColumn
             key={raid}
             raid={RAID_DISPLAY_NAMES[raid] || raid}
             iconKey={RAID_ICON_MAP[raid] || raid}
             aspects={loot[raid] || {}}
           />
-        ))}
+      )}
+    />
+  );
+}
+
+function WindowedLootpoolGrid<T>({
+  items,
+  previousLabel,
+  nextLabel,
+  renderItem,
+}: {
+  items: T[];
+  previousLabel: string;
+  nextLabel: string;
+  renderItem: (item: T) => ReactNode;
+}) {
+  const visibleCount = Math.min(useResponsiveLootpoolCardCount(), Math.max(items.length, 1));
+  const [startIndex, setStartIndex] = useState(0);
+  const [transition, setTransition] = useState<{
+    direction: CycleDirection;
+    nextStart: number;
+    phase: 'ready' | 'active';
+  } | null>(null);
+  const [geometry, setGeometry] = useState<{
+    cardSlotPx: number;
+    cycleStepPx: number;
+  } | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const cycleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cycleFrameRef = useRef<number | null>(null);
+  const canCycle = items.length > visibleCount;
+  const currentItems = getCircularWindow(items, startIndex, visibleCount);
+  const trackStart = transition?.direction === 'previous'
+    ? (startIndex - 1 + items.length) % items.length
+    : startIndex;
+  const trackItems = transition && canCycle
+    ? getCircularWindow(items, trackStart, visibleCount + 1)
+    : currentItems;
+  const cycleGapRem = 0.75;
+  const visibleGapWidth = (visibleCount - 1) * cycleGapRem;
+  const cardSlotValue = canCycle && geometry
+    ? `${geometry.cardSlotPx}px`
+    : `calc((100% - ${visibleGapWidth}rem) / ${visibleCount})`;
+  const trackStyle = {
+    gridTemplateColumns: `repeat(${trackItems.length}, minmax(0, var(--lootpool-card-slot)))`,
+  } as React.CSSProperties;
+
+  useEffect(() => {
+    if (startIndex >= items.length) {
+      setStartIndex(0);
+    }
+  }, [items.length, startIndex]);
+
+  useEffect(() => {
+    const measureGeometry = () => {
+      const stage = stageRef.current;
+      if (!stage) {
+        return;
+      }
+
+      const stageStyle = getComputedStyle(stage);
+      const rootStyle = getComputedStyle(document.documentElement);
+      const rootFontSize = parseFloat(rootStyle.fontSize || '16');
+      const gapPx = cycleGapRem * rootFontSize;
+      const inlinePadding =
+        parseFloat(stageStyle.paddingLeft || '0') +
+        parseFloat(stageStyle.paddingRight || '0');
+      const availableWidth = stage.clientWidth - inlinePadding;
+      const cardSlotPx = (availableWidth - (visibleCount - 1) * gapPx) / visibleCount;
+
+      setGeometry({
+        cardSlotPx: Math.max(0, cardSlotPx),
+        cycleStepPx: Math.max(0, cardSlotPx + gapPx),
+      });
+    };
+
+    measureGeometry();
+
+    const resizeObserver = new ResizeObserver(measureGeometry);
+    if (stageRef.current) {
+      resizeObserver.observe(stageRef.current);
+    }
+    window.addEventListener('resize', measureGeometry);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', measureGeometry);
+    };
+  }, [visibleCount]);
+
+  useEffect(() => {
+    return () => {
+      if (cycleTimeoutRef.current) {
+        clearTimeout(cycleTimeoutRef.current);
+      }
+      if (cycleFrameRef.current) {
+        cancelAnimationFrame(cycleFrameRef.current);
+      }
+    };
+  }, []);
+
+  const completeCycle = (nextStart: number) => {
+    setStartIndex(nextStart);
+    setTransition(null);
+    if (cycleTimeoutRef.current) {
+      clearTimeout(cycleTimeoutRef.current);
+      cycleTimeoutRef.current = null;
+    }
+  };
+
+  const cycle = (direction: CycleDirection) => {
+    if (!items.length) {
+      return;
+    }
+
+    if (transition) {
+      return;
+    }
+
+    const offset = direction === 'previous' ? -1 : 1;
+    const nextStart = (startIndex + offset + items.length) % items.length;
+    setTransition({
+      direction,
+      nextStart,
+      phase: 'ready',
+    });
+
+    cycleFrameRef.current = requestAnimationFrame(() => {
+      cycleFrameRef.current = requestAnimationFrame(() => {
+        setTransition((currentTransition) => (
+          currentTransition?.nextStart === nextStart
+            ? { ...currentTransition, phase: 'active' }
+            : currentTransition
+        ));
+      });
+    });
+
+    cycleTimeoutRef.current = setTimeout(() => {
+      completeCycle(nextStart);
+    }, LOOTPOOL_CYCLE_DURATION_MS + 80);
+  };
+
+  return (
+    <div className="lootpools-window">
+      {canCycle && (
+        <button
+          type="button"
+          className="lootpools-cycle-button"
+          aria-label={previousLabel}
+          onClick={() => cycle('previous')}
+        >
+          <Image
+            src="/images/icons/wynn/arrow-short-left.png"
+            alt=""
+            width={16}
+            height={16}
+            className="lootpools-cycle-icon"
+          />
+        </button>
+      )}
+
+      <div
+        ref={stageRef}
+        className={`lootpools-cycle-stage${canCycle ? '' : ' is-static'}${transition ? ` is-sliding-${transition.direction} is-cycle-${transition.phase}` : ''}`}
+        style={{
+          '--lootpool-visible-count': visibleCount,
+          '--lootpool-card-slot': cardSlotValue,
+          '--lootpool-cycle-step': canCycle && geometry
+            ? `${geometry.cycleStepPx}px`
+            : `calc(var(--lootpool-card-slot) + var(--lootpool-cycle-gap))`,
+        } as React.CSSProperties}
+      >
+        <div
+          className="lootpools-cycle-track"
+          onTransitionEnd={(event) => {
+            if (event.currentTarget !== event.target || !transition || transition.phase !== 'active') {
+              return;
+            }
+            completeCycle(transition.nextStart);
+          }}
+        >
+          <div
+            ref={gridRef}
+            className="lootpools-grid-container lootpools-grid-container--windowed"
+            style={trackStyle}
+          >
+            {trackItems.map((item) => renderItem(item))}
+          </div>
+        </div>
       </div>
+
+      {canCycle && (
+        <button
+          type="button"
+          className="lootpools-cycle-button"
+          aria-label={nextLabel}
+          onClick={() => cycle('next')}
+        >
+          <Image
+            src="/images/icons/wynn/arrow-short-right.png"
+            alt=""
+            width={16}
+            height={16}
+            className="lootpools-cycle-icon"
+          />
+        </button>
+      )}
     </div>
   );
 }
@@ -367,7 +575,7 @@ function LootrunColumn({ regionName, regionData, icons }: {
       padding: 'var(--lootpool-card-padding)',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
       border: '3px solid var(--border-emphasis)',
-      height: 'fit-content'
+      height: 'var(--lootpool-card-height)'
     }}>
       {/* Region image */}
       <div style={{
@@ -383,7 +591,8 @@ function LootrunColumn({ regionName, regionData, icons }: {
         background: 'var(--bg-secondary)',
         color: 'var(--text-muted)',
         fontSize: '3rem',
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)'
+        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
+        flexShrink: 0
       }}>
         {regionInfo.image ? (
           <Image
@@ -412,7 +621,7 @@ function LootrunColumn({ regionName, regionData, icons }: {
       </h3>
 
       {/* Items by rarity - Mythic and Shiny */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div className="lootpool-entry-list themed-scrollbar">
         {(() => {
           const mythicItems = regionData.Mythic || [];
           const shinyItem = regionData.Shiny?.Item;
@@ -553,7 +762,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
       padding: 'var(--lootpool-card-padding)',
       boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
       border: '3px solid var(--border-emphasis)',
-      height: 'fit-content'
+      height: 'var(--lootpool-card-height)'
     }}>
       {/* Raid icon */}
       <div style={{
@@ -565,7 +774,8 @@ function RaidColumn({ raid, iconKey, aspects }: {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        flex: '0 0 120px'
       }}>
         <Image
           src={`/images/raids/${raidImageMap[iconKey] || iconKey + '.png'}`}
@@ -613,7 +823,7 @@ function RaidColumn({ raid, iconKey, aspects }: {
       </h3>
 
       {/* Aspects by rarity */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div className="lootpool-entry-list themed-scrollbar">
         {Object.entries(rarityColors).map(([rarity, color]) => {
           const aspectList = (aspects[rarity] || []).filter((aspect: string) => !isWard(aspect));
           return aspectList.map((aspect: string, index: number) => {
