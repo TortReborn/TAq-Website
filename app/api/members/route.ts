@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,6 +133,7 @@ export async function GET(request: NextRequest) {
       discordLinksResult.rows.forEach((row: any) => {
         discordLinks[row.uuid] = row;
       });
+      const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
 
       // Convert guild ranks to readable names
       const guildRankNames: Record<string, string> = {
@@ -148,6 +150,7 @@ export async function GET(request: NextRequest) {
         const discord = discordLinks[member.uuid];
         return {
           ...member,
+          raids: allTimeGraidRaids.get(member.uuid) || 0,
           discordRank: discord ? discord.rank : '',
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',

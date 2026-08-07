@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireGuildSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { getAllTimeGraidRaidTotal } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +79,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch weekly threshold setting
     const weeklyRequirement = await simpleDatabaseCache.getSetting<number>('weekly_threshold', 4.0);
+    const allTimeGraidRaids = await getAllTimeGraidRaidTotal(pool, uuid);
 
     // Fetch profile customization (gradient), shells balance, and kick list status in parallel
     const [graidResult, customizationResult, shellsResult, kickListResult] = await Promise.all([
@@ -159,7 +161,7 @@ export async function GET(request: NextRequest) {
       stats: {
         playtime: memberData.playtime || 0,
         wars: memberData.wars || 0,
-        raids: memberData.raids || 0,
+        raids: allTimeGraidRaids,
         shells: memberData.shells || 0,
         contributed: memberData.contributed || 0,
         online: memberData.online || false,

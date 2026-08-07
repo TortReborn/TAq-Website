@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,6 +101,7 @@ export async function GET(request: NextRequest) {
       discordLinksResult.rows.forEach((row: any) => {
         discordLinks[row.uuid] = row;
       });
+      const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
 
       const now = Date.now();
 
@@ -162,7 +164,7 @@ export async function GET(request: NextRequest) {
           contributed: member.contributed,
           totalPlaytime: member.playtime,
           totalWars: member.wars,
-          totalRaids: member.raids,
+          totalRaids: allTimeGraidRaids.get(member.uuid) || 0,
           joined: member.joined,
           lastJoin: member.lastJoin,
           inactiveDays,
