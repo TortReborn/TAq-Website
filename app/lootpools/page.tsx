@@ -38,6 +38,7 @@ interface LootData {
 type LootpoolTab = 'lootruns' | 'raids';
 const LOOTRUN_VISIBLE_CARD_COUNT = 5;
 const LOOTPOOL_CYCLE_DURATION_MS = 320;
+const LOOTPOOL_TAB_ORDER: LootpoolTab[] = ['lootruns', 'raids'];
 type CycleDirection = 'previous' | 'next';
 
 function getCircularWindow<T>(items: T[], startIndex: number, count: number) {
@@ -107,6 +108,17 @@ export default function LootpoolsPage() {
     }
 
     return aspectsData ? <RaidsView data={aspectsData} /> : null;
+  };
+
+  const getPanePosition = (tab: LootpoolTab) => {
+    const tabIndex = LOOTPOOL_TAB_ORDER.indexOf(tab);
+    const activeIndex = LOOTPOOL_TAB_ORDER.indexOf(activeTab);
+
+    if (tabIndex === activeIndex) {
+      return 'active';
+    }
+
+    return tabIndex < activeIndex ? 'before' : 'after';
   };
 
   if (loading) {
@@ -223,6 +235,8 @@ export default function LootpoolsPage() {
             <button
               type="button"
               role="tab"
+              id="lootpools-tab-lootruns"
+              aria-controls="lootpools-panel-lootruns"
               aria-selected={activeTab === 'lootruns'}
               className={`lootpools-tab-button ${activeTab === 'lootruns' ? 'is-active' : ''}`}
               onClick={() => switchTab('lootruns')}
@@ -233,6 +247,8 @@ export default function LootpoolsPage() {
             <button
               type="button"
               role="tab"
+              id="lootpools-tab-raids"
+              aria-controls="lootpools-panel-raids"
               aria-selected={activeTab === 'raids'}
               className={`lootpools-tab-button ${activeTab === 'raids' ? 'is-active' : ''}`}
               onClick={() => switchTab('raids')}
@@ -247,14 +263,59 @@ export default function LootpoolsPage() {
       {/* Content */}
       <div className="lootpools-scroll-area themed-scrollbar">
         <div className="lootpools-content-stage">
-          <div
-            key={`active-${activeTab}`}
-            className="lootpools-content-pane"
-          >
-            {renderTabContent(activeTab)}
-          </div>
+          {LOOTPOOL_TAB_ORDER.map((tab) => {
+            const panePosition = getPanePosition(tab);
+            const isActive = panePosition === 'active';
+
+            return (
+              <LootpoolContentPane
+                key={tab}
+                tab={tab}
+                panePosition={panePosition}
+                isActive={isActive}
+              >
+                {renderTabContent(tab)}
+              </LootpoolContentPane>
+            );
+          })}
         </div>
       </div>
+    </div>
+  );
+}
+
+function LootpoolContentPane({
+  tab,
+  panePosition,
+  isActive,
+  children,
+}: {
+  tab: LootpoolTab;
+  panePosition: 'active' | 'before' | 'after';
+  isActive: boolean;
+  children: ReactNode;
+}) {
+  const paneRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const pane = paneRef.current;
+    if (!pane) {
+      return;
+    }
+
+    pane.inert = !isActive;
+  }, [isActive]);
+
+  return (
+    <div
+      ref={paneRef}
+      id={`lootpools-panel-${tab}`}
+      role="tabpanel"
+      aria-labelledby={`lootpools-tab-${tab}`}
+      aria-hidden={!isActive}
+      className={`lootpools-content-pane is-${panePosition}`}
+    >
+      {children}
     </div>
   );
 }
