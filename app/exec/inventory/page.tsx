@@ -2,6 +2,13 @@
 
 import { CSSProperties, Fragment, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useExecSession } from '@/hooks/useExecSession';
+import { ROLE_COLORS } from '@/lib/snipe-constants';
+import {
+  INVENTORY_SORT_OPTIONS,
+  InventorySort,
+  isSortAvailable,
+  sortInventoryRows,
+} from '@/lib/inventory-sort';
 import WoealerPanel from './WoealerPanel';
 import { WynnIcon } from './WynnIcon';
 import styles from './inventory.module.css';
@@ -84,11 +91,28 @@ interface ScanProfile {
   archived: boolean;
 }
 
+interface InventoryEditor {
+  discordId: string;
+  ign: string | null;
+  rank: string | null;
+  grantedBy: string;
+  grantedByIgn: string;
+  note: string;
+  grantedAt: string;
+}
+
+interface EditorCandidate {
+  discordId: string;
+  ign: string;
+  rank: string;
+}
+
 interface InventoryData {
   categories: Category[];
   items: InventoryItem[];
   scans: InventoryScan[];
   scanProfiles: ScanProfile[];
+  permissions: { canEdit: boolean; canManageEditors: boolean };
   exchangeMaterials: Array<{
     key: string;
     name: string;
@@ -161,8 +185,14 @@ interface MaterialGroupDraft {
   tiers: MaterialTierDraft[];
 }
 
-const EMPTY: InventoryData = { categories: [], items: [], scans: [], scanProfiles: [], exchangeMaterials: [] };
-const NARWHAL_RANKS = new Set(['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader']);
+const EMPTY: InventoryData = {
+  categories: [],
+  items: [],
+  scans: [],
+  scanProfiles: [],
+  permissions: { canEdit: false, canManageEditors: false },
+  exchangeMaterials: [],
+};
 // Matches the tier colors the mod reads from item lore.
 const TIER_COLORS: Record<number, string> = { 1: '#E6E647', 2: '#E647E6', 3: '#47E6E6' };
 // Scan strip groups: account_bank + character_bank collapse into one "Consu" tile.
@@ -172,11 +202,12 @@ const SCAN_GROUPS: Array<{ label: string; buckets: Bucket[] }> = [
   { label: 'Materials', buckets: ['materials_bucket'] },
 ];
 
-const ROLE_OPTIONS: Array<{ value: Role; label: string }> = [
-  { value: 'dps', label: 'DPS' },
-  { value: 'healer', label: 'Healer' },
-  { value: 'tank', label: 'Tank' },
-  { value: 'any', label: 'Any' },
+// Role tints come from the snipe palette so the two systems agree (TAQ-62).
+const ROLE_OPTIONS: Array<{ value: Role; label: string; color: string | null }> = [
+  { value: 'dps', label: 'DPS', color: ROLE_COLORS.DPS },
+  { value: 'healer', label: 'Healer', color: ROLE_COLORS.Healer },
+  { value: 'tank', label: 'Tank', color: ROLE_COLORS.Tank },
+  { value: 'any', label: 'Any', color: null },
 ];
 const DIFFICULTY_OPTIONS: Array<{ value: Difficulty; label: string }> = [
   { value: 'conns', label: 'Conns' },
@@ -288,11 +319,14 @@ function itemDraft(item: InventoryItem): ItemDraft {
 
 export default function InventoryPage() {
   const { user } = useExecSession();
-  const canEdit = NARWHAL_RANKS.has(user?.rank ?? '');
   const canAddItems = Boolean(user);
   const [data, setData] = useState<InventoryData>(EMPTY);
+  // Edit rights are narwhal rank *or* a per-user grant, so the server decides.
+  const canEdit = data.permissions.canEdit;
+  const canManageEditors = data.permissions.canManageEditors;
   const [view, setView] = useState<View>('ingredient');
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<InventorySort>('manual');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -316,6 +350,11 @@ export default function InventoryPage() {
   const [textureLibrary, setTextureLibrary] = useState<TextureAsset[]>([]);
   const [textureSearch, setTextureSearch] = useState('');
   const [textureLoading, setTextureLoading] = useState(false);
+  const [editorsOpen, setEditorsOpen] = useState(false);
+  const [editors, setEditors] = useState<InventoryEditor[]>([]);
+  const [editorCandidates, setEditorCandidates] = useState<EditorCandidate[]>([]);
+  const [editorsLoading, setEditorsLoading] = useState(false);
+  const [editorGrant, setEditorGrant] = useState({ discordId: '', note: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -343,6 +382,9 @@ export default function InventoryPage() {
     setDryOnly(false);
     setConsuTypeFilter(new Set());
     setLevelFilter(new Set());
+    // Filters are per-view, but the sort choice carries over — unless it only
+    // exists on the tab you just left (Reserve).
+    setSort(current => (isSortAvailable(current, view === 'consumable') ? current : 'manual'));
   }, [view]);
 
   const activeItems = useMemo(() => data.items.filter(item => !item.archived), [data.items]);
@@ -389,8 +431,28 @@ export default function InventoryPage() {
 
   const categoryById = useMemo(() => new Map(data.categories.map(category => [category.id, category])), [data.categories]);
 
-  const sortedVisibleItems = useMemo(() => [...visibleItems].sort((a, b) => a.sortOrder - b.sortOrder), [visibleItems]);
-  const visibleMaterialGroups = useMemo(() => groupMaterialItems(sortedVisibleItems), [sortedVisibleItems]);
+  const sortedVisibleItems = useMemo(() => sortInventoryRows(visibleItems, sort), [visibleItems, sort]);
+  // Materials display one row per family, so the sort has to run on the group
+  // totals — hence grouping the manually-ordered rows first, then sorting.
+  const visibleMaterialGroups = useMemo(() => {
+    const groups = groupMaterialItems([...visibleItems].sort((a, b) => a.sortOrder - b.sortOrder));
+    const rows = groups.map(group => {
+      const tiers = group.tiers.filter((item): item is InventoryItem => Boolean(item));
+      const targets = tiers.map(item => item.desiredQuantity);
+      return {
+        group,
+        name: group.baseName,
+        quantity: tiers.reduce((sum, item) => sum + item.quantity, 0),
+        reserveQuantity: tiers.reduce((sum, item) => sum + item.reserveQuantity, 0),
+        desiredQuantity: targets.some(target => target !== null)
+          ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
+          : null,
+        sortOrder: tiers.length > 0 ? Math.min(...tiers.map(item => item.sortOrder)) : 0,
+        updatedAt: tiers.map(item => item.updatedAt).sort().at(-1) ?? '',
+      };
+    });
+    return sortInventoryRows(rows, sort).map(row => row.group);
+  }, [visibleItems, sort]);
 
   async function post(body: Record<string, unknown>) {
     setSaving(true);
@@ -682,6 +744,45 @@ export default function InventoryPage() {
     }
   }
 
+  async function editorRequest(init?: RequestInit, query = '') {
+    setEditorsLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/exec/inventory/editors${query}`, { cache: 'no-store', ...init });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Could not load inventory editors.');
+      setEditors(payload.editors ?? []);
+      setEditorCandidates(payload.candidates ?? []);
+      return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not load inventory editors.');
+      return false;
+    } finally {
+      setEditorsLoading(false);
+    }
+  }
+
+  async function openEditors() {
+    setEditorsOpen(true);
+    setEditorGrant({ discordId: '', note: '' });
+    await editorRequest();
+  }
+
+  async function grantEditor(event: FormEvent) {
+    event.preventDefault();
+    if (!editorGrant.discordId) return;
+    const ok = await editorRequest({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editorGrant),
+    });
+    if (ok) setEditorGrant({ discordId: '', note: '' });
+  }
+
+  async function revokeEditor(editor: InventoryEditor) {
+    await editorRequest({ method: 'DELETE' }, `?discordId=${encodeURIComponent(editor.discordId)}`);
+  }
+
   async function openTextureLibrary() {
     setTextureDialog(true);
     if (textureLibrary.length > 0) return;
@@ -755,7 +856,12 @@ export default function InventoryPage() {
           <h1>Ingredient, consumable & material inventory</h1>
         </div>
         <div className={styles.headerActions}>
-          {canEdit && (
+          {canManageEditors && (
+            <button className={styles.secondaryButton} onClick={() => void openEditors()}>
+              Manage editors
+            </button>
+          )}
+          {canManageEditors && (
             <button className={styles.secondaryButton} onClick={() => setScanProfilesOpen(true)}>
               Scan profiles
             </button>
@@ -807,7 +913,7 @@ export default function InventoryPage() {
         </>
       )}
 
-      {canEdit && scanProfilesOpen && (
+      {canManageEditors && scanProfilesOpen && (
         <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
           if (event.currentTarget === event.target) setScanProfilesOpen(false);
         }}>
@@ -861,6 +967,90 @@ export default function InventoryPage() {
                   ))}
                   {data.scanProfiles.length === 0 && (
                     <tr><td colSpan={6}>No character bank profiles configured yet.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {canManageEditors && editorsOpen && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setEditorsOpen(false);
+        }}>
+          <section className={`${styles.modal} ${styles.scanProfilesModal}`} role="dialog" aria-modal="true" aria-label="Inventory editors">
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={styles.eyebrow}>Inventory access</span>
+                <h2>Who can edit the inventory</h2>
+              </div>
+              <button type="button" className={styles.closeButton} onClick={() => setEditorsOpen(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
+            </div>
+            <p className={styles.modalCopy}>
+              Narwhal, Hydra, and Leader always have edit access. Grant it to anyone else with exec access and they get
+              the same powers on this page — items, categories, ordering, and the Woealer map. Scan profiles and this
+              list stay Narwhal-only.
+            </p>
+            <form className={styles.editorGrantRow} onSubmit={grantEditor}>
+              <label>
+                <span className={styles.visuallyHidden}>Member</span>
+                <select
+                  required
+                  value={editorGrant.discordId}
+                  onChange={event => setEditorGrant({ ...editorGrant, discordId: event.target.value })}
+                >
+                  <option value="">Choose a member…</option>
+                  {editorCandidates.map(candidate => (
+                    <option key={candidate.discordId} value={candidate.discordId}>
+                      {candidate.ign} ({candidate.rank})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span className={styles.visuallyHidden}>Note</span>
+                <input
+                  value={editorGrant.note}
+                  onChange={event => setEditorGrant({ ...editorGrant, note: event.target.value })}
+                  placeholder="Why (optional)"
+                />
+              </label>
+              <button type="submit" className={styles.primaryButton} disabled={editorsLoading || !editorGrant.discordId}>
+                Grant access
+              </button>
+            </form>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Rank</th>
+                    <th>Granted by</th>
+                    <th>Granted</th>
+                    <th>Note</th>
+                    <th><span className={styles.visuallyHidden}>Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {editors.map(editor => (
+                    <tr key={editor.discordId}>
+                      <td>{editor.ign ?? `Discord ${editor.discordId}`}</td>
+                      <td>{editor.rank ?? 'No longer linked'}</td>
+                      <td>{editor.grantedByIgn}</td>
+                      <td>{formatDate(editor.grantedAt)}</td>
+                      <td>{editor.note || '—'}</td>
+                      <td>
+                        <div className={styles.rowActions}>
+                          <button className={styles.dangerText} onClick={() => void revokeEditor(editor)} disabled={editorsLoading}>
+                            Revoke
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {editors.length === 0 && (
+                    <tr><td colSpan={6}>{editorsLoading ? 'Loading…' : 'Nobody outside Narwhal+ has edit access.'}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -966,6 +1156,16 @@ export default function InventoryPage() {
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
               <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search inventory…" />
             </label>
+            <label className={styles.sortControl}>
+              <span className={styles.visuallyHidden}>Sort inventory</span>
+              <select value={sort} onChange={event => setSort(event.target.value as InventorySort)}>
+                {INVENTORY_SORT_OPTIONS
+                  .filter(option => !option.consumableOnly || view === 'consumable')
+                  .map(option => (
+                    <option key={option.value} value={option.value}>Sort: {option.label}</option>
+                  ))}
+              </select>
+            </label>
             {view !== 'archive' && (
               <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
                 Manage categories
@@ -1031,6 +1231,7 @@ export default function InventoryPage() {
                       key={option.value}
                       type="button"
                       className={roleFilter.has(option.value) ? styles.filterChipActive : styles.filterChip}
+                      style={option.color ? { '--chip-color': option.color } as CSSProperties : undefined}
                       onClick={() => setRoleFilter(current => toggleSetValue(current, option.value))}
                     >
                       {option.label}
@@ -1078,19 +1279,22 @@ export default function InventoryPage() {
       )}
 
       {!canEdit && view !== 'woealer' && (
-        <p className={styles.readOnlyNote}>You can add inventory items. Narwhal, Hydra, and Leader ranks can edit existing items and manage categories.</p>
+        <p className={styles.readOnlyNote}>
+          You can add inventory items. Narwhal, Hydra, and Leader ranks — plus anyone a narwhal has granted inventory
+          edit access — can edit existing items and manage categories.
+        </p>
       )}
 
       {view === 'woealer' ? (
         <WoealerPanel canEdit={canEdit} />
       ) : loading ? (
-        <div className={styles.skeletons} aria-label="Loading inventory">
+        <div className={`${styles.listSurface} ${styles.skeletons}`} aria-label="Loading inventory">
           {[0, 1, 2].map(value => <div key={value} />)}
         </div>
       ) : sortedVisibleItems.length === 0 ? (
-        <div className={styles.empty}>No inventory entries match this view.</div>
+        <div className={`${styles.listSurface} ${styles.empty}`}>No inventory entries match this view.</div>
       ) : (
-        <div className={styles.tableWrap}>
+        <div className={`${styles.listSurface} ${styles.tableWrap}`}>
           <table>
             {view === 'material' ? (
               <>
@@ -1193,8 +1397,8 @@ export default function InventoryPage() {
                     <th>Item</th>
                     <th>Type</th>
                     {view !== 'archive' && <th>Inventory</th>}
-                    {view === 'consumable' && <th>Reserve</th>}
                     {view !== 'archive' && <th>Target</th>}
+                    {view === 'consumable' && <th>Reserve</th>}
                     {view === 'consumable' && <th>Difficulty</th>}
                     {view === 'consumable' && <th>Role</th>}
                     <th>Location</th>
@@ -1229,15 +1433,15 @@ export default function InventoryPage() {
                       {view !== 'archive' && (
                         <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
                       )}
-                      {view === 'consumable' && (
-                        <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
-                      )}
                       {view !== 'archive' && (
                         <td className={styles.number}>
                           {item.desiredQuantity === null ? '—' : item.kind === 'ingredient'
                             ? stackAmount(item.desiredQuantity)
                             : item.desiredQuantity}
                         </td>
+                      )}
+                      {view === 'consumable' && (
+                        <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
                       )}
                       {view === 'consumable' && (
                         <td>
@@ -1253,7 +1457,24 @@ export default function InventoryPage() {
                         </td>
                       )}
                       {view === 'consumable' && (
-                        <td>{item.roles.length > 0 ? item.roles.map(role => ROLE_OPTIONS.find(option => option.value === role)?.label ?? role).join(', ') : '—'}</td>
+                        <td>
+                          {item.roles.length === 0 ? '—' : (
+                            <div className={styles.roleBadges}>
+                              {item.roles.map(role => {
+                                const option = ROLE_OPTIONS.find(candidate => candidate.value === role);
+                                return (
+                                  <span
+                                    key={role}
+                                    className={styles.roleBadge}
+                                    style={option?.color ? { '--chip-color': option.color } as CSSProperties : undefined}
+                                  >
+                                    {option?.label ?? role}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </td>
                       )}
                       <td>{item.bankPage || '—'}</td>
                       {view === 'consumable' && <td>{item.reserveBankPage || '—'}</td>}

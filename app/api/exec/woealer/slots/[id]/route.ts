@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireNarwhalSession } from '@/lib/exec-auth';
+import { requireInventoryEditorSession } from '@/lib/inventory-access';
 import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -8,8 +8,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await requireNarwhalSession(request);
-  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+  const session = await requireInventoryEditorSession(request);
+  if (!session) return NextResponse.json({ error: 'Inventory edit access required.' }, { status: 403 });
 
   const id = Number(params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -49,8 +49,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await requireNarwhalSession(request);
-  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+  const session = await requireInventoryEditorSession(request);
+  if (!session) return NextResponse.json({ error: 'Inventory edit access required.' }, { status: 403 });
 
   const id = Number(params.id);
   if (!Number.isInteger(id) || id <= 0) {

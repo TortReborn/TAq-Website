@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession, requireNarwhalSession } from '@/lib/exec-auth';
+import { requireExecSession } from '@/lib/exec-auth';
+import { requireInventoryEditorSession } from '@/lib/inventory-access';
 import { getPool } from '@/lib/db';
 import { loadWoealer, slugifyPageName } from '@/lib/woealer';
 
@@ -31,8 +32,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await requireNarwhalSession(request);
-  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+  const session = await requireInventoryEditorSession(request);
+  if (!session) return NextResponse.json({ error: 'Inventory edit access required.' }, { status: 403 });
 
   let body: Record<string, unknown>;
   try {
