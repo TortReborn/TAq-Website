@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isNarwhalRank, requireExecSession } from '@/lib/exec-auth';
+import { ExecSessionData, isNarwhalRank, requireExecSession } from '@/lib/exec-auth';
+import { canEditInventory } from '@/lib/inventory-access';
 import { getPool } from '@/lib/db';
 import { listScanProfiles, normalizeNickname } from '@/lib/inventory-scan-profiles';
 
@@ -151,12 +152,19 @@ async function loadInventory() {
   };
 }
 
+// The client derives every edit affordance from these flags rather than from
+// the rank string, so a granted editor sees the same UI as a narwhal (TAQ-62).
+async function inventoryPayload(session: ExecSessionData) {
+  const [inventory, canEdit] = await Promise.all([loadInventory(), canEditInventory(session)]);
+  return { ...inventory, permissions: { canEdit, canManageEditors: isNarwhalRank(session.rank) } };
+}
+
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    return NextResponse.json(await loadInventory());
+    return NextResponse.json(await inventoryPayload(session));
   } catch (error) {
     console.error('Inventory fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch inventory.' }, { status: 500 });
@@ -175,8 +183,18 @@ export async function POST(request: NextRequest) {
   }
 
   const action = body.action;
-  if (action !== 'createItem' && !isNarwhalRank(session.rank)) {
-    return NextResponse.json({ error: 'Narwhal access required for this action.' }, { status: 403 });
+  // Scan profiles configure the mod's upload pipeline, so they stay narwhal-only;
+  // everything else opens up to granted inventory editors. Item creation stays
+  // open to anyone with exec access, as it always has.
+  const narwhalOnly = typeof action === 'string' && action.endsWith('ScanProfile');
+  if (action !== 'createItem') {
+    const allowed = narwhalOnly ? isNarwhalRank(session.rank) : await canEditInventory(session);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: narwhalOnly ? 'Narwhal access required for this action.' : 'Inventory edit access required for this action.' },
+        { status: 403 }
+      );
+    }
   }
 
   const pool = getPool();
@@ -375,7 +393,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unknown inventory action.' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, ...(await loadInventory()) });
+    return NextResponse.json({ success: true, ...(await inventoryPayload(session)) });
   } catch (error) {
     console.error('Inventory create error:', error);
     const code = (error as { code?: string }).code;

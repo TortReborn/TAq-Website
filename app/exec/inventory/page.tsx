@@ -2,11 +2,20 @@
 
 import { CSSProperties, Fragment, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useExecSession } from '@/hooks/useExecSession';
+import { ROLE_COLORS } from '@/lib/snipe-constants';
+import {
+  INVENTORY_SORT_OPTIONS,
+  InventorySort,
+  isSortAvailable,
+  sortInventoryRows,
+} from '@/lib/inventory-sort';
+import WoealerPanel from './WoealerPanel';
+import { CloseButton, WynnIcon } from './WynnIcon';
 import styles from './inventory.module.css';
 
 type Kind = 'ingredient' | 'consumable' | 'material';
 type Bucket = 'misc_bucket' | 'account_bank' | 'character_bank' | 'materials_bucket';
-type View = Kind | 'archive';
+type View = Kind | 'archive' | 'woealer';
 // Recipe difficulty tiers 
 type Difficulty = 'conns' | 'hq';
 type Role = 'dps' | 'healer' | 'tank' | 'any';
@@ -82,11 +91,28 @@ interface ScanProfile {
   archived: boolean;
 }
 
+interface InventoryEditor {
+  discordId: string;
+  ign: string | null;
+  rank: string | null;
+  grantedBy: string;
+  grantedByIgn: string;
+  note: string;
+  grantedAt: string;
+}
+
+interface EditorCandidate {
+  discordId: string;
+  ign: string;
+  rank: string;
+}
+
 interface InventoryData {
   categories: Category[];
   items: InventoryItem[];
   scans: InventoryScan[];
   scanProfiles: ScanProfile[];
+  permissions: { canEdit: boolean; canManageEditors: boolean };
   exchangeMaterials: Array<{
     key: string;
     name: string;
@@ -159,8 +185,14 @@ interface MaterialGroupDraft {
   tiers: MaterialTierDraft[];
 }
 
-const EMPTY: InventoryData = { categories: [], items: [], scans: [], scanProfiles: [], exchangeMaterials: [] };
-const NARWHAL_RANKS = new Set(['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader']);
+const EMPTY: InventoryData = {
+  categories: [],
+  items: [],
+  scans: [],
+  scanProfiles: [],
+  permissions: { canEdit: false, canManageEditors: false },
+  exchangeMaterials: [],
+};
 // Matches the tier colors the mod reads from item lore.
 const TIER_COLORS: Record<number, string> = { 1: '#E6E647', 2: '#E647E6', 3: '#47E6E6' };
 // Scan strip groups: account_bank + character_bank collapse into one "Consu" tile.
@@ -170,11 +202,12 @@ const SCAN_GROUPS: Array<{ label: string; buckets: Bucket[] }> = [
   { label: 'Materials', buckets: ['materials_bucket'] },
 ];
 
-const ROLE_OPTIONS: Array<{ value: Role; label: string }> = [
-  { value: 'dps', label: 'DPS' },
-  { value: 'healer', label: 'Healer' },
-  { value: 'tank', label: 'Tank' },
-  { value: 'any', label: 'Any' },
+// Role tints come from the snipe palette so the two systems agree (TAQ-62).
+const ROLE_OPTIONS: Array<{ value: Role; label: string; color: string | null }> = [
+  { value: 'dps', label: 'DPS', color: ROLE_COLORS.DPS },
+  { value: 'healer', label: 'Healer', color: ROLE_COLORS.Healer },
+  { value: 'tank', label: 'Tank', color: ROLE_COLORS.Tank },
+  { value: 'any', label: 'Any', color: null },
 ];
 const DIFFICULTY_OPTIONS: Array<{ value: Difficulty; label: string }> = [
   { value: 'conns', label: 'Conns' },
@@ -286,11 +319,16 @@ function itemDraft(item: InventoryItem): ItemDraft {
 
 export default function InventoryPage() {
   const { user } = useExecSession();
-  const canEdit = NARWHAL_RANKS.has(user?.rank ?? '');
   const canAddItems = Boolean(user);
   const [data, setData] = useState<InventoryData>(EMPTY);
+  // Edit rights are narwhal rank *or* a per-user grant, so the server decides.
+  const canEdit = data.permissions.canEdit;
+  const canManageEditors = data.permissions.canManageEditors;
   const [view, setView] = useState<View>('ingredient');
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<InventorySort>('manual');
+
+  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -314,6 +352,11 @@ export default function InventoryPage() {
   const [textureLibrary, setTextureLibrary] = useState<TextureAsset[]>([]);
   const [textureSearch, setTextureSearch] = useState('');
   const [textureLoading, setTextureLoading] = useState(false);
+  const [editorsOpen, setEditorsOpen] = useState(false);
+  const [editors, setEditors] = useState<InventoryEditor[]>([]);
+  const [editorCandidates, setEditorCandidates] = useState<EditorCandidate[]>([]);
+  const [editorsLoading, setEditorsLoading] = useState(false);
+  const [editorGrant, setEditorGrant] = useState({ discordId: '', note: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -335,12 +378,18 @@ export default function InventoryPage() {
   }, [load]);
 
   useEffect(() => {
+    if (!canEdit) setEditing(false);
+  }, [canEdit]);
+
+  useEffect(() => {
     setCategoryFilter(new Set());
     setRoleFilter(new Set());
     setDifficultyFilter(new Set());
     setDryOnly(false);
     setConsuTypeFilter(new Set());
     setLevelFilter(new Set());
+
+    setSort(current => (isSortAvailable(current, view === 'consumable') ? current : 'manual'));
   }, [view]);
 
   const activeItems = useMemo(() => data.items.filter(item => !item.archived), [data.items]);
@@ -387,8 +436,28 @@ export default function InventoryPage() {
 
   const categoryById = useMemo(() => new Map(data.categories.map(category => [category.id, category])), [data.categories]);
 
-  const sortedVisibleItems = useMemo(() => [...visibleItems].sort((a, b) => a.sortOrder - b.sortOrder), [visibleItems]);
-  const visibleMaterialGroups = useMemo(() => groupMaterialItems(sortedVisibleItems), [sortedVisibleItems]);
+  const sortedVisibleItems = useMemo(() => sortInventoryRows(visibleItems, sort), [visibleItems, sort]);
+  // Materials display one row per family, so the sort has to run on the group
+  // totals — hence grouping the manually-ordered rows first, then sorting.
+  const visibleMaterialGroups = useMemo(() => {
+    const groups = groupMaterialItems([...visibleItems].sort((a, b) => a.sortOrder - b.sortOrder));
+    const rows = groups.map(group => {
+      const tiers = group.tiers.filter((item): item is InventoryItem => Boolean(item));
+      const targets = tiers.map(item => item.desiredQuantity);
+      return {
+        group,
+        name: group.baseName,
+        quantity: tiers.reduce((sum, item) => sum + item.quantity, 0),
+        reserveQuantity: tiers.reduce((sum, item) => sum + item.reserveQuantity, 0),
+        desiredQuantity: targets.some(target => target !== null)
+          ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
+          : null,
+        sortOrder: tiers.length > 0 ? Math.min(...tiers.map(item => item.sortOrder)) : 0,
+        updatedAt: tiers.map(item => item.updatedAt).sort().at(-1) ?? '',
+      };
+    });
+    return sortInventoryRows(rows, sort).map(row => row.group);
+  }, [visibleItems, sort]);
 
   async function post(body: Record<string, unknown>) {
     setSaving(true);
@@ -585,26 +654,38 @@ export default function InventoryPage() {
     }
   }
 
-  async function moveItem(item: InventoryItem, direction: -1 | 1) {
-    const siblings = data.items
-      .filter(candidate => candidate.categoryId === item.categoryId && candidate.archived === item.archived)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = siblings.findIndex(candidate => candidate.id === item.id);
+  const itemSiblings = useCallback((item: InventoryItem) => data.items
+    .filter(candidate => candidate.categoryId === item.categoryId && candidate.archived === item.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.items]);
+
+  const categorySiblings = useCallback((category: Category) => data.categories
+    .filter(candidate => candidate.kind === category.kind && !candidate.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.categories]);
+
+  const scanProfileSiblings = useCallback((profile: ScanProfile) => data.scanProfiles
+    .filter(candidate => candidate.archived === profile.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.scanProfiles]);
+
+  function atEdge<T extends { id: number }>(siblings: T[], entry: T, direction: -1 | 1): boolean {
+    const target = siblings.findIndex(candidate => candidate.id === entry.id) + direction;
+    return target < 0 || target >= siblings.length;
+  }
+
+  async function reorder(entity: 'item' | 'category' | 'scanProfile', siblings: Array<{ id: number }>, id: number, direction: -1 | 1) {
+    const ordered = [...siblings];
+    const index = ordered.findIndex(candidate => candidate.id === id);
     const target = index + direction;
-    if (target < 0 || target >= siblings.length) return;
-    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-    await post({ action: 'reorder', entity: 'item', ids: siblings.map(candidate => candidate.id) });
+    if (index < 0 || target < 0 || target >= ordered.length) return;
+    [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
+    await post({ action: 'reorder', entity, ids: ordered.map(candidate => candidate.id) });
+  }
+
+  async function moveItem(item: InventoryItem, direction: -1 | 1) {
+    await reorder('item', itemSiblings(item), item.id, direction);
   }
 
   async function moveCategory(category: Category, direction: -1 | 1) {
-    const siblings = data.categories
-      .filter(candidate => candidate.kind === category.kind && !candidate.archived)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = siblings.findIndex(candidate => candidate.id === category.id);
-    const target = index + direction;
-    if (target < 0 || target >= siblings.length) return;
-    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-    await post({ action: 'reorder', entity: 'category', ids: siblings.map(candidate => candidate.id) });
+    await reorder('category', categorySiblings(category), category.id, direction);
   }
 
   async function saveScanProfile(event: FormEvent) {
@@ -640,14 +721,7 @@ export default function InventoryPage() {
   }
 
   async function moveScanProfile(profile: ScanProfile, direction: -1 | 1) {
-    const siblings = data.scanProfiles
-      .filter(candidate => candidate.archived === profile.archived)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = siblings.findIndex(candidate => candidate.id === profile.id);
-    const target = index + direction;
-    if (target < 0 || target >= siblings.length) return;
-    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-    await post({ action: 'reorder', entity: 'scanProfile', ids: siblings.map(candidate => candidate.id) });
+    await reorder('scanProfile', scanProfileSiblings(profile), profile.id, direction);
   }
 
   async function saveCategory(event: FormEvent) {
@@ -678,6 +752,45 @@ export default function InventoryPage() {
     } catch {
       // The persistent error banner contains the actionable message.
     }
+  }
+
+  async function editorRequest(init?: RequestInit, query = '') {
+    setEditorsLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/exec/inventory/editors${query}`, { cache: 'no-store', ...init });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Could not load inventory editors.');
+      setEditors(payload.editors ?? []);
+      setEditorCandidates(payload.candidates ?? []);
+      return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not load inventory editors.');
+      return false;
+    } finally {
+      setEditorsLoading(false);
+    }
+  }
+
+  async function openEditors() {
+    setEditorsOpen(true);
+    setEditorGrant({ discordId: '', note: '' });
+    await editorRequest();
+  }
+
+  async function grantEditor(event: FormEvent) {
+    event.preventDefault();
+    if (!editorGrant.discordId) return;
+    const ok = await editorRequest({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editorGrant),
+    });
+    if (ok) setEditorGrant({ discordId: '', note: '' });
+  }
+
+  async function revokeEditor(editor: InventoryEditor) {
+    await editorRequest({ method: 'DELETE' }, `?discordId=${encodeURIComponent(editor.discordId)}`);
   }
 
   async function openTextureLibrary() {
@@ -753,7 +866,12 @@ export default function InventoryPage() {
           <h1>Ingredient, consumable & material inventory</h1>
         </div>
         <div className={styles.headerActions}>
-          {canEdit && (
+          {canManageEditors && (
+            <button className={styles.secondaryButton} onClick={() => void openEditors()}>
+              Manage editors
+            </button>
+          )}
+          {canManageEditors && (
             <button className={styles.secondaryButton} onClick={() => setScanProfilesOpen(true)}>
               Scan profiles
             </button>
@@ -764,44 +882,48 @@ export default function InventoryPage() {
         </div>
       </header>
 
-      <section className={styles.stats} aria-label="Inventory status">
-        <div className={styles.stat}>
-          <span>Tracked</span>
-          <strong>{activeItems.length}</strong>
-        </div>
-        <div className={`${styles.stat} ${styles.good}`}>
-          <span>Enough</span>
-          <strong>{enough}</strong>
-        </div>
-        <div className={`${styles.stat} ${styles.low}`}>
-          <span>Below target</span>
-          <strong>{low}</strong>
-        </div>
-        <div className={styles.stat}>
-          <span>No target</span>
-          <strong>{unconfigured}</strong>
-        </div>
-      </section>
-
-      <section className={styles.scanStrip} aria-label="Latest uploads">
-        {SCAN_GROUPS.map(group => {
-          const scan = group.buckets
-            .map(bucket => latestScans.get(bucket))
-            .filter((candidate): candidate is InventoryScan => Boolean(candidate))
-            .sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime())[0];
-          return (
-            <div key={group.label}>
-              <span className={styles.scanDot} data-live={scan ? 'true' : 'false'} />
-              <span>
-                <strong>{group.label}</strong>
-                {scan ? formatDate(scan.receivedAt) : 'No upload yet'}
-              </span>
+      {view !== 'woealer' && (
+        <>
+          <section className={styles.stats} aria-label="Inventory status">
+            <div className={styles.stat}>
+              <span>Tracked</span>
+              <strong>{activeItems.length}</strong>
             </div>
-          );
-        })}
-      </section>
+            <div className={`${styles.stat} ${styles.good}`}>
+              <span>Enough</span>
+              <strong>{enough}</strong>
+            </div>
+            <div className={`${styles.stat} ${styles.low}`}>
+              <span>Below target</span>
+              <strong>{low}</strong>
+            </div>
+            <div className={styles.stat}>
+              <span>No target</span>
+              <strong>{unconfigured}</strong>
+            </div>
+          </section>
 
-      {canEdit && scanProfilesOpen && (
+          <section className={styles.scanStrip} aria-label="Latest uploads">
+            {SCAN_GROUPS.map(group => {
+              const scan = group.buckets
+                .map(bucket => latestScans.get(bucket))
+                .filter((candidate): candidate is InventoryScan => Boolean(candidate))
+                .sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime())[0];
+              return (
+                <div key={group.label}>
+                  <span className={styles.scanDot} data-live={scan ? 'true' : 'false'} />
+                  <span>
+                    <strong>{group.label}</strong>
+                    {scan ? formatDate(scan.receivedAt) : 'No upload yet'}
+                  </span>
+                </div>
+              );
+            })}
+          </section>
+        </>
+      )}
+
+      {canManageEditors && scanProfilesOpen && (
         <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
           if (event.currentTarget === event.target) setScanProfilesOpen(false);
         }}>
@@ -811,7 +933,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Character bank scan profiles</span>
                 <h2>Woealer Class Nickname Layout</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setScanProfilesOpen(false)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setScanProfilesOpen(false)} />
             </div>
             <div className={styles.categoryActions}>
               <button
@@ -845,8 +967,22 @@ export default function InventoryPage() {
                       <td>{profile.locationPrefix || '—'}</td>
                       <td>
                         <div className={styles.rowActions}>
-                          <button onClick={() => void moveScanProfile(profile, -1)} aria-label={`Move ${profile.nickname} up`}>↑</button>
-                          <button onClick={() => void moveScanProfile(profile, 1)} aria-label={`Move ${profile.nickname} down`}>↓</button>
+                          <button
+                            className={styles.iconButton}
+                            onClick={() => void moveScanProfile(profile, -1)}
+                            disabled={saving || atEdge(scanProfileSiblings(profile), profile, -1)}
+                            aria-label={`Move ${profile.nickname} up`}
+                          >
+                            <WynnIcon name="arrow-up" />
+                          </button>
+                          <button
+                            className={styles.iconButton}
+                            onClick={() => void moveScanProfile(profile, 1)}
+                            disabled={saving || atEdge(scanProfileSiblings(profile), profile, 1)}
+                            aria-label={`Move ${profile.nickname} down`}
+                          >
+                            <WynnIcon name="arrow-down" />
+                          </button>
                           <button onClick={() => setScanProfileDialog(scanProfileDraft(profile))}>Edit</button>
                           <button className={styles.dangerText} onClick={() => setDeleteScanProfileDialog(profile)}>Delete</button>
                         </div>
@@ -863,6 +999,85 @@ export default function InventoryPage() {
         </div>
       )}
 
+      {canManageEditors && editorsOpen && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
+          if (event.currentTarget === event.target) setEditorsOpen(false);
+        }}>
+          <section className={`${styles.modal} ${styles.scanProfilesModal}`} role="dialog" aria-modal="true" aria-label="Inventory editors">
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={styles.eyebrow}>Inventory access</span>
+                <h2>Who can edit the inventory</h2>
+              </div>
+              <CloseButton onClick={() => setEditorsOpen(false)} />
+            </div>
+            <form className={styles.editorGrantRow} onSubmit={grantEditor}>
+              <label>
+                <span className={styles.visuallyHidden}>Member</span>
+                <select
+                  required
+                  value={editorGrant.discordId}
+                  onChange={event => setEditorGrant({ ...editorGrant, discordId: event.target.value })}
+                >
+                  <option value="">Choose a member…</option>
+                  {editorCandidates.map(candidate => (
+                    <option key={candidate.discordId} value={candidate.discordId}>
+                      {candidate.ign} ({candidate.rank})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span className={styles.visuallyHidden}>Note</span>
+                <input
+                  value={editorGrant.note}
+                  onChange={event => setEditorGrant({ ...editorGrant, note: event.target.value })}
+                  placeholder="Why (optional)"
+                />
+              </label>
+              <button type="submit" className={styles.primaryButton} disabled={editorsLoading || !editorGrant.discordId}>
+                Grant access
+              </button>
+            </form>
+            <div className={styles.tableWrap}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Rank</th>
+                    <th>Granted by</th>
+                    <th>Granted</th>
+                    <th>Note</th>
+                    <th><span className={styles.visuallyHidden}>Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {editors.map(editor => (
+                    <tr key={editor.discordId}>
+                      <td>{editor.ign ?? `Discord ${editor.discordId}`}</td>
+                      <td>{editor.rank ?? 'No longer linked'}</td>
+                      <td>{editor.grantedByIgn}</td>
+                      <td>{formatDate(editor.grantedAt)}</td>
+                      <td>{editor.note || '—'}</td>
+                      <td>
+                        <div className={styles.rowActions}>
+                          <button className={styles.dangerText} onClick={() => void revokeEditor(editor)} disabled={editorsLoading}>
+                            Revoke
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {editors.length === 0 && (
+                    <tr><td colSpan={6}>{editorsLoading ? 'Loading…' : 'Nobody outside Narwhal+ has edit access.'}</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      )}
+
       {categoryManagerOpen && (
         <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
           if (event.currentTarget === event.target) setCategoryManagerOpen(false);
@@ -870,9 +1085,9 @@ export default function InventoryPage() {
           <section className={`${styles.modal} ${styles.smallModal}`} role="dialog" aria-modal="true" aria-label="Manage categories">
             <div className={styles.modalHeader}>
               <h2>{view !== 'archive' ? `${view.charAt(0).toUpperCase()}${view.slice(1)} categories` : 'Categories'}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setCategoryManagerOpen(false)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setCategoryManagerOpen(false)} />
             </div>
-            {canEdit && view !== 'archive' && (
+            {canEdit && view !== 'archive' && view !== 'woealer' && (
               <div className={styles.categoryActions}>
                 <button className={styles.primaryButton} onClick={() => setCategoryDialog({ kind: view, name: '' })}>
                   Add category
@@ -894,8 +1109,22 @@ export default function InventoryPage() {
                       {canEdit && (
                         <td>
                           <div className={styles.rowActions}>
-                            <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
-                            <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
+                            <button
+                              className={styles.iconButton}
+                              onClick={() => void moveCategory(category, -1)}
+                              disabled={saving || atEdge(categorySiblings(category), category, -1)}
+                              aria-label={`Move ${category.name} up`}
+                            >
+                              <WynnIcon name="arrow-up" />
+                            </button>
+                            <button
+                              className={styles.iconButton}
+                              onClick={() => void moveCategory(category, 1)}
+                              disabled={saving || atEdge(categorySiblings(category), category, 1)}
+                              aria-label={`Move ${category.name} down`}
+                            >
+                              <WynnIcon name="arrow-down" />
+                            </button>
                             <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
                             <button
                               className={styles.dangerText}
@@ -929,7 +1158,7 @@ export default function InventoryPage() {
       {error && (
         <div className={styles.error} role="alert">
           <span>{error}</span>
-          <button onClick={() => setError('')} aria-label="Dismiss error">×</button>
+          <button onClick={() => setError('')} aria-label="Dismiss error"><WynnIcon name="cancel" /></button>
         </div>
       )}
 
@@ -940,6 +1169,7 @@ export default function InventoryPage() {
             ['consumable', 'Consumables'],
             ['material', 'Materials'],
             ['archive', `Recipe archive (${data.items.filter(item => item.archived).length})`],
+            ['woealer', 'Woealer'],
           ] as [View, string][]).map(([value, label]) => (
             <button
               key={value}
@@ -952,26 +1182,46 @@ export default function InventoryPage() {
             </button>
           ))}
         </div>
-        <div className={styles.controlActions}>
-          <label className={styles.search}>
-            <span className={styles.visuallyHidden}>Search inventory</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
-            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search stock…" />
-          </label>
-          {view !== 'archive' && (
-            <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
-              Manage categories
-            </button>
-          )}
-          {canAddItems && view !== 'archive' && viewCategories.length > 0 && (
-            <button className={styles.primaryButton} onClick={() => newItem(viewCategories[0])}>
-              Add item
-            </button>
-          )}
-        </div>
+        {view !== 'woealer' && (
+          <div className={styles.controlActions}>
+            <label className={styles.search}>
+              <span className={styles.visuallyHidden}>Search inventory</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+              <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search inventory…" />
+            </label>
+            <label className={styles.sortControl}>
+              <span className={styles.visuallyHidden}>Sort inventory</span>
+              <select value={sort} onChange={event => setSort(event.target.value as InventorySort)}>
+                {INVENTORY_SORT_OPTIONS
+                  .filter(option => !option.consumableOnly || view === 'consumable')
+                  .map(option => (
+                    <option key={option.value} value={option.value}>Sort: {option.label}</option>
+                  ))}
+              </select>
+            </label>
+            {view !== 'archive' && (
+              <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
+                Manage categories
+              </button>
+            )}
+            {canAddItems && viewCategories.length > 0 && (!canEdit || editing) && (
+              <button className={styles.primaryButton} onClick={() => newItem(viewCategories[0])}>
+                Add item
+              </button>
+            )}
+            {canEdit && (
+              <button
+                className={editing ? styles.primaryButton : styles.secondaryButton}
+                onClick={() => setEditing(current => !current)}
+              >
+                {editing ? 'Done' : 'Edit items'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {view !== 'archive' && (
+      {view !== 'archive' && view !== 'woealer' && (
         <div className={styles.filterBar} aria-label="Filters">
           <div className={styles.filterGroup}>
             <span className={styles.filterGroupLabel}>Type</span>
@@ -1022,6 +1272,7 @@ export default function InventoryPage() {
                       key={option.value}
                       type="button"
                       className={roleFilter.has(option.value) ? styles.filterChipActive : styles.filterChip}
+                      style={option.color ? { '--chip-color': option.color } as CSSProperties : undefined}
                       onClick={() => setRoleFilter(current => toggleSetValue(current, option.value))}
                     >
                       {option.label}
@@ -1068,18 +1319,16 @@ export default function InventoryPage() {
         </div>
       )}
 
-      {!canEdit && (
-        <p className={styles.readOnlyNote}>You can add inventory items. Narwhal, Hydra, and Leader ranks can edit existing items and manage categories.</p>
-      )}
-
-      {loading ? (
-        <div className={styles.skeletons} aria-label="Loading inventory">
+      {view === 'woealer' ? (
+        <WoealerPanel canEdit={canEdit} />
+      ) : loading ? (
+        <div className={`${styles.listSurface} ${styles.skeletons}`} aria-label="Loading inventory">
           {[0, 1, 2].map(value => <div key={value} />)}
         </div>
       ) : sortedVisibleItems.length === 0 ? (
-        <div className={styles.empty}>No inventory entries match this view.</div>
+        <div className={`${styles.listSurface} ${styles.empty}`}>No inventory entries match this view.</div>
       ) : (
-        <div className={styles.tableWrap}>
+        <div className={`${styles.listSurface} ${styles.tableWrap}`}>
           <table>
             {view === 'material' ? (
               <>
@@ -1093,7 +1342,7 @@ export default function InventoryPage() {
                     <th>Target</th>
                     <th>Location</th>
                     <th>Status</th>
-                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                    {canEdit && editing && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1153,7 +1402,7 @@ export default function InventoryPage() {
                             <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
                           )}
                         </td>
-                        {canEdit && (
+                        {canEdit && editing && (
                           <td>
                             <div className={styles.rowActions}>
                               <button onClick={() => setMaterialGroupDialog(materialGroupDraft(group))}>Edit</button>
@@ -1180,17 +1429,17 @@ export default function InventoryPage() {
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th>Type</th>
                     {view !== 'archive' && <th>Inventory</th>}
-                    {view === 'consumable' && <th>Reserve</th>}
                     {view !== 'archive' && <th>Target</th>}
+                    {view === 'consumable' && <th>Reserve</th>}
+                    {view !== 'archive' && <th>Status</th>}
                     {view === 'consumable' && <th>Difficulty</th>}
                     {view === 'consumable' && <th>Role</th>}
                     <th>Location</th>
                     {view === 'consumable' && <th>Reserve Location</th>}
                     {(view === 'consumable' || view === 'archive') && <th>Charges</th>}
-                    {view !== 'archive' && <th>Status</th>}
-                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                    <th>Type</th>
+                    {canEdit && editing && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1214,18 +1463,28 @@ export default function InventoryPage() {
                           </div>
                         </div>
                       </td>
-                      <td>{categoryById.get(item.categoryId)?.name ?? '—'}</td>
                       {view !== 'archive' && (
                         <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
-                      )}
-                      {view === 'consumable' && (
-                        <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
                       )}
                       {view !== 'archive' && (
                         <td className={styles.number}>
                           {item.desiredQuantity === null ? '—' : item.kind === 'ingredient'
                             ? stackAmount(item.desiredQuantity)
                             : item.desiredQuantity}
+                        </td>
+                      )}
+                      {view === 'consumable' && (
+                        <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
+                      )}
+                      {view !== 'archive' && (
+                        <td>
+                          {item.enough === null ? (
+                            <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
+                          ) : item.enough ? (
+                            <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
+                          ) : (
+                            <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
+                          )}
                         </td>
                       )}
                       {view === 'consumable' && (
@@ -1242,27 +1501,45 @@ export default function InventoryPage() {
                         </td>
                       )}
                       {view === 'consumable' && (
-                        <td>{item.roles.length > 0 ? item.roles.map(role => ROLE_OPTIONS.find(option => option.value === role)?.label ?? role).join(', ') : '—'}</td>
+                        <td>
+                          {item.roles.length === 0 ? '—' : (
+                            <div className={styles.roleBadges}>
+                              {item.roles.map(role => {
+                                const option = ROLE_OPTIONS.find(candidate => candidate.value === role);
+                                return (
+                                  <span
+                                    key={role}
+                                    className={styles.roleBadge}
+                                    style={option?.color ? { '--chip-color': option.color } as CSSProperties : undefined}
+                                  >
+                                    {option?.label ?? role}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </td>
                       )}
                       <td>{item.bankPage || '—'}</td>
                       {view === 'consumable' && <td>{item.reserveBankPage || '—'}</td>}
                       {(view === 'consumable' || view === 'archive') && <td className={styles.number}>{item.charges ?? '—'}</td>}
-                      {view !== 'archive' && (
-                        <td>
-                          {item.enough === null ? (
-                            <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
-                          ) : item.enough ? (
-                            <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
-                          ) : (
-                            <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
-                          )}
-                        </td>
-                      )}
-                      {canEdit && (
+                      <td>{categoryById.get(item.categoryId)?.name ?? '—'}</td>
+                      {canEdit && editing && (
                         <td>
                           <div className={styles.rowActions}>
-                            {!item.archived && <button onClick={() => void moveItem(item, -1)} aria-label={`Move ${item.name} up`}>↑</button>}
-                            {!item.archived && <button onClick={() => void moveItem(item, 1)} aria-label={`Move ${item.name} down`}>↓</button>}
+                            {!item.archived && ([-1, 1] as const).map(direction => (
+                              <button
+                                key={direction}
+                                className={styles.iconButton}
+                                onClick={() => void moveItem(item, direction)}
+
+                                disabled={saving || sort !== 'manual' || atEdge(itemSiblings(item), item, direction)}
+                                title={sort === 'manual' ? undefined : 'Switch back to manual order to reorder items'}
+                                aria-label={`Move ${item.name} ${direction === -1 ? 'up' : 'down'}`}
+                              >
+                                <WynnIcon name={direction === -1 ? 'arrow-up' : 'arrow-down'} />
+                              </button>
+                            ))}
                             <button onClick={() => setDraft(itemDraft(item))}>Edit</button>
                             <button className={item.archived ? '' : styles.dangerText} onClick={() => void toggleArchive(item)} disabled={saving}>
                               {item.archived ? 'Restore' : 'Archive'}
@@ -1292,7 +1569,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>{draft.id ? 'Edit entry' : 'New entry'}</span>
                 <h2>{draft.id ? draft.name : `Add ${draft.kind}`}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDraft(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setDraft(null)} />
             </div>
             <div className={styles.formGrid}>
               <label className={styles.fullField}>Name<input required value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} /></label>
@@ -1313,7 +1590,7 @@ export default function InventoryPage() {
               )}
               {!draft.archived && (
                 <>
-                  <label>Stock<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
+                  <label>Inventory<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
                   {draft.kind === 'consumable' && (
                     <label>Reserve<input type="number" min="0" required value={draft.reserveQuantity} onChange={event => setDraft({ ...draft, reserveQuantity: event.target.value })} /></label>
                   )}
@@ -1442,7 +1719,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveCategory}>
             <div className={styles.modalHeader}>
               <h2>{categoryDialog.id ? 'Rename category' : `Add ${categoryDialog.kind} category`}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setCategoryDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setCategoryDialog(null)} />
             </div>
             <label>Category name
               <input autoFocus required value={categoryDialog.name} onChange={event => setCategoryDialog({ ...categoryDialog, name: event.target.value })} />
@@ -1465,7 +1742,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete category</span>
                 <h2>{deleteCategoryDialog.category.name}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteCategoryDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setDeleteCategoryDialog(null)} />
             </div>
             {data.items.some(item => item.categoryId === deleteCategoryDialog.category.id) ? (
               <label>Move its entries to
@@ -1505,7 +1782,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete entry</span>
                 <h2>{deleteItemDialog.name}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteItemDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setDeleteItemDialog(null)} />
             </div>
             <p className={styles.modalCopy}>
               This permanently removes {deleteItemDialog.name} and its scan history matching, unlike Archive this cannot be undone.
@@ -1526,13 +1803,13 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveMaterialGroup}>
             <div className={styles.modalHeader}>
               <h2>{materialGroupDialog.baseName}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setMaterialGroupDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setMaterialGroupDialog(null)} />
             </div>
             <div className={styles.formGrid}>
               {materialGroupDialog.tiers.map((tier, index) => (
                 <Fragment key={tier.id}>
                   <label style={{ '--tier-color': TIER_COLORS[tier.tier] } as CSSProperties}>
-                    <span className={styles.tierLabel}>T{tier.tier} stock</span>
+                    <span className={styles.tierLabel}>T{tier.tier} inventory</span>
                     <input
                       type="number"
                       min="0"
@@ -1580,7 +1857,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete material</span>
                 <h2>{deleteMaterialGroupDialog.baseName}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteMaterialGroupDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setDeleteMaterialGroupDialog(null)} />
             </div>
             <p className={styles.modalCopy}>
               This permanently removes all three tiers of {deleteMaterialGroupDialog.baseName}, unlike Archive this cannot be undone.
@@ -1600,7 +1877,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveScanProfile}>
             <div className={styles.modalHeader}>
               <h2>{scanProfileDialog.id ? 'Edit scan profile' : 'Add scan profile'}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setScanProfileDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setScanProfileDialog(null)} />
             </div>
             <div className={styles.formGrid}>
               <label>Character nickname
@@ -1668,7 +1945,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete scan profile</span>
                 <h2>{deleteScanProfileDialog.nickname}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteScanProfileDialog(null)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setDeleteScanProfileDialog(null)} />
             </div>
             <p className={styles.modalCopy}>
               The mod will stop recognizing this character nickname as a scannable bank. Consider archiving instead if this character might come back.
@@ -1691,7 +1968,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Texture library</span>
                 <h2>Choose artwork</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setTextureDialog(false)} aria-label="Close">×</button>
+              <CloseButton onClick={() => setTextureDialog(false)} />
             </div>
             <div className={styles.textureToolbar}>
               <input
