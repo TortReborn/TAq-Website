@@ -10,7 +10,7 @@ import {
   sortInventoryRows,
 } from '@/lib/inventory-sort';
 import WoealerPanel from './WoealerPanel';
-import { WynnIcon } from './WynnIcon';
+import { CloseButton, WynnIcon } from './WynnIcon';
 import styles from './inventory.module.css';
 
 type Kind = 'ingredient' | 'consumable' | 'material';
@@ -327,6 +327,8 @@ export default function InventoryPage() {
   const [view, setView] = useState<View>('ingredient');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<InventorySort>('manual');
+
+  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -376,14 +378,17 @@ export default function InventoryPage() {
   }, [load]);
 
   useEffect(() => {
+    if (!canEdit) setEditing(false);
+  }, [canEdit]);
+
+  useEffect(() => {
     setCategoryFilter(new Set());
     setRoleFilter(new Set());
     setDifficultyFilter(new Set());
     setDryOnly(false);
     setConsuTypeFilter(new Set());
     setLevelFilter(new Set());
-    // Filters are per-view, but the sort choice carries over — unless it only
-    // exists on the tab you just left (Reserve).
+
     setSort(current => (isSortAvailable(current, view === 'consumable') ? current : 'manual'));
   }, [view]);
 
@@ -649,26 +654,38 @@ export default function InventoryPage() {
     }
   }
 
-  async function moveItem(item: InventoryItem, direction: -1 | 1) {
-    const siblings = data.items
-      .filter(candidate => candidate.categoryId === item.categoryId && candidate.archived === item.archived)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = siblings.findIndex(candidate => candidate.id === item.id);
+  const itemSiblings = useCallback((item: InventoryItem) => data.items
+    .filter(candidate => candidate.categoryId === item.categoryId && candidate.archived === item.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.items]);
+
+  const categorySiblings = useCallback((category: Category) => data.categories
+    .filter(candidate => candidate.kind === category.kind && !candidate.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.categories]);
+
+  const scanProfileSiblings = useCallback((profile: ScanProfile) => data.scanProfiles
+    .filter(candidate => candidate.archived === profile.archived)
+    .sort((a, b) => a.sortOrder - b.sortOrder), [data.scanProfiles]);
+
+  function atEdge<T extends { id: number }>(siblings: T[], entry: T, direction: -1 | 1): boolean {
+    const target = siblings.findIndex(candidate => candidate.id === entry.id) + direction;
+    return target < 0 || target >= siblings.length;
+  }
+
+  async function reorder(entity: 'item' | 'category' | 'scanProfile', siblings: Array<{ id: number }>, id: number, direction: -1 | 1) {
+    const ordered = [...siblings];
+    const index = ordered.findIndex(candidate => candidate.id === id);
     const target = index + direction;
-    if (target < 0 || target >= siblings.length) return;
-    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-    await post({ action: 'reorder', entity: 'item', ids: siblings.map(candidate => candidate.id) });
+    if (index < 0 || target < 0 || target >= ordered.length) return;
+    [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
+    await post({ action: 'reorder', entity, ids: ordered.map(candidate => candidate.id) });
+  }
+
+  async function moveItem(item: InventoryItem, direction: -1 | 1) {
+    await reorder('item', itemSiblings(item), item.id, direction);
   }
 
   async function moveCategory(category: Category, direction: -1 | 1) {
-    const siblings = data.categories
-      .filter(candidate => candidate.kind === category.kind && !candidate.archived)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = siblings.findIndex(candidate => candidate.id === category.id);
-    const target = index + direction;
-    if (target < 0 || target >= siblings.length) return;
-    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-    await post({ action: 'reorder', entity: 'category', ids: siblings.map(candidate => candidate.id) });
+    await reorder('category', categorySiblings(category), category.id, direction);
   }
 
   async function saveScanProfile(event: FormEvent) {
@@ -704,14 +721,7 @@ export default function InventoryPage() {
   }
 
   async function moveScanProfile(profile: ScanProfile, direction: -1 | 1) {
-    const siblings = data.scanProfiles
-      .filter(candidate => candidate.archived === profile.archived)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    const index = siblings.findIndex(candidate => candidate.id === profile.id);
-    const target = index + direction;
-    if (target < 0 || target >= siblings.length) return;
-    [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-    await post({ action: 'reorder', entity: 'scanProfile', ids: siblings.map(candidate => candidate.id) });
+    await reorder('scanProfile', scanProfileSiblings(profile), profile.id, direction);
   }
 
   async function saveCategory(event: FormEvent) {
@@ -923,7 +933,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Character bank scan profiles</span>
                 <h2>Woealer Class Nickname Layout</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setScanProfilesOpen(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setScanProfilesOpen(false)} />
             </div>
             <div className={styles.categoryActions}>
               <button
@@ -957,8 +967,22 @@ export default function InventoryPage() {
                       <td>{profile.locationPrefix || '—'}</td>
                       <td>
                         <div className={styles.rowActions}>
-                          <button onClick={() => void moveScanProfile(profile, -1)} aria-label={`Move ${profile.nickname} up`}>↑</button>
-                          <button onClick={() => void moveScanProfile(profile, 1)} aria-label={`Move ${profile.nickname} down`}>↓</button>
+                          <button
+                            className={styles.iconButton}
+                            onClick={() => void moveScanProfile(profile, -1)}
+                            disabled={saving || atEdge(scanProfileSiblings(profile), profile, -1)}
+                            aria-label={`Move ${profile.nickname} up`}
+                          >
+                            <WynnIcon name="arrow-up" />
+                          </button>
+                          <button
+                            className={styles.iconButton}
+                            onClick={() => void moveScanProfile(profile, 1)}
+                            disabled={saving || atEdge(scanProfileSiblings(profile), profile, 1)}
+                            aria-label={`Move ${profile.nickname} down`}
+                          >
+                            <WynnIcon name="arrow-down" />
+                          </button>
                           <button onClick={() => setScanProfileDialog(scanProfileDraft(profile))}>Edit</button>
                           <button className={styles.dangerText} onClick={() => setDeleteScanProfileDialog(profile)}>Delete</button>
                         </div>
@@ -985,13 +1009,8 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Inventory access</span>
                 <h2>Who can edit the inventory</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setEditorsOpen(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setEditorsOpen(false)} />
             </div>
-            <p className={styles.modalCopy}>
-              Narwhal, Hydra, and Leader always have edit access. Grant it to anyone else with exec access and they get
-              the same powers on this page — items, categories, ordering, and the Woealer map. Scan profiles and this
-              list stay Narwhal-only.
-            </p>
             <form className={styles.editorGrantRow} onSubmit={grantEditor}>
               <label>
                 <span className={styles.visuallyHidden}>Member</span>
@@ -1066,7 +1085,7 @@ export default function InventoryPage() {
           <section className={`${styles.modal} ${styles.smallModal}`} role="dialog" aria-modal="true" aria-label="Manage categories">
             <div className={styles.modalHeader}>
               <h2>{view !== 'archive' ? `${view.charAt(0).toUpperCase()}${view.slice(1)} categories` : 'Categories'}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setCategoryManagerOpen(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setCategoryManagerOpen(false)} />
             </div>
             {canEdit && view !== 'archive' && view !== 'woealer' && (
               <div className={styles.categoryActions}>
@@ -1090,8 +1109,22 @@ export default function InventoryPage() {
                       {canEdit && (
                         <td>
                           <div className={styles.rowActions}>
-                            <button onClick={() => void moveCategory(category, -1)} aria-label={`Move ${category.name} up`}>↑</button>
-                            <button onClick={() => void moveCategory(category, 1)} aria-label={`Move ${category.name} down`}>↓</button>
+                            <button
+                              className={styles.iconButton}
+                              onClick={() => void moveCategory(category, -1)}
+                              disabled={saving || atEdge(categorySiblings(category), category, -1)}
+                              aria-label={`Move ${category.name} up`}
+                            >
+                              <WynnIcon name="arrow-up" />
+                            </button>
+                            <button
+                              className={styles.iconButton}
+                              onClick={() => void moveCategory(category, 1)}
+                              disabled={saving || atEdge(categorySiblings(category), category, 1)}
+                              aria-label={`Move ${category.name} down`}
+                            >
+                              <WynnIcon name="arrow-down" />
+                            </button>
                             <button onClick={() => setCategoryDialog({ id: category.id, kind: category.kind, name: category.name })}>Rename</button>
                             <button
                               className={styles.dangerText}
@@ -1171,9 +1204,17 @@ export default function InventoryPage() {
                 Manage categories
               </button>
             )}
-            {canAddItems && viewCategories.length > 0 && (
+            {canAddItems && viewCategories.length > 0 && (!canEdit || editing) && (
               <button className={styles.primaryButton} onClick={() => newItem(viewCategories[0])}>
                 Add item
+              </button>
+            )}
+            {canEdit && (
+              <button
+                className={editing ? styles.primaryButton : styles.secondaryButton}
+                onClick={() => setEditing(current => !current)}
+              >
+                {editing ? 'Done' : 'Edit items'}
               </button>
             )}
           </div>
@@ -1278,13 +1319,6 @@ export default function InventoryPage() {
         </div>
       )}
 
-      {!canEdit && view !== 'woealer' && (
-        <p className={styles.readOnlyNote}>
-          You can add inventory items. Narwhal, Hydra, and Leader ranks — plus anyone a narwhal has granted inventory
-          edit access — can edit existing items and manage categories.
-        </p>
-      )}
-
       {view === 'woealer' ? (
         <WoealerPanel canEdit={canEdit} />
       ) : loading ? (
@@ -1308,7 +1342,7 @@ export default function InventoryPage() {
                     <th>Target</th>
                     <th>Location</th>
                     <th>Status</th>
-                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                    {canEdit && editing && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1368,7 +1402,7 @@ export default function InventoryPage() {
                             <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
                           )}
                         </td>
-                        {canEdit && (
+                        {canEdit && editing && (
                           <td>
                             <div className={styles.rowActions}>
                               <button onClick={() => setMaterialGroupDialog(materialGroupDraft(group))}>Edit</button>
@@ -1395,17 +1429,17 @@ export default function InventoryPage() {
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th>Type</th>
                     {view !== 'archive' && <th>Inventory</th>}
                     {view !== 'archive' && <th>Target</th>}
                     {view === 'consumable' && <th>Reserve</th>}
+                    {view !== 'archive' && <th>Status</th>}
                     {view === 'consumable' && <th>Difficulty</th>}
                     {view === 'consumable' && <th>Role</th>}
                     <th>Location</th>
                     {view === 'consumable' && <th>Reserve Location</th>}
                     {(view === 'consumable' || view === 'archive') && <th>Charges</th>}
-                    {view !== 'archive' && <th>Status</th>}
-                    {canEdit && <th><span className={styles.visuallyHidden}>Actions</span></th>}
+                    <th>Type</th>
+                    {canEdit && editing && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1429,7 +1463,6 @@ export default function InventoryPage() {
                           </div>
                         </div>
                       </td>
-                      <td>{categoryById.get(item.categoryId)?.name ?? '—'}</td>
                       {view !== 'archive' && (
                         <td className={styles.number}>{item.kind === 'ingredient' ? stackAmount(item.quantity) : item.quantity}</td>
                       )}
@@ -1442,6 +1475,17 @@ export default function InventoryPage() {
                       )}
                       {view === 'consumable' && (
                         <td className={`${styles.number} ${styles.reserveNumber}`}>{item.reserveQuantity}</td>
+                      )}
+                      {view !== 'archive' && (
+                        <td>
+                          {item.enough === null ? (
+                            <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
+                          ) : item.enough ? (
+                            <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
+                          ) : (
+                            <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
+                          )}
+                        </td>
                       )}
                       {view === 'consumable' && (
                         <td>
@@ -1479,22 +1523,23 @@ export default function InventoryPage() {
                       <td>{item.bankPage || '—'}</td>
                       {view === 'consumable' && <td>{item.reserveBankPage || '—'}</td>}
                       {(view === 'consumable' || view === 'archive') && <td className={styles.number}>{item.charges ?? '—'}</td>}
-                      {view !== 'archive' && (
-                        <td>
-                          {item.enough === null ? (
-                            <span className={`${styles.badge} ${styles.neutralBadge}`}>No target</span>
-                          ) : item.enough ? (
-                            <span className={`${styles.badge} ${styles.goodBadge}`}><i /> Enough</span>
-                          ) : (
-                            <span className={`${styles.badge} ${styles.lowBadge}`}><i /> Not enough</span>
-                          )}
-                        </td>
-                      )}
-                      {canEdit && (
+                      <td>{categoryById.get(item.categoryId)?.name ?? '—'}</td>
+                      {canEdit && editing && (
                         <td>
                           <div className={styles.rowActions}>
-                            {!item.archived && <button onClick={() => void moveItem(item, -1)} aria-label={`Move ${item.name} up`}>↑</button>}
-                            {!item.archived && <button onClick={() => void moveItem(item, 1)} aria-label={`Move ${item.name} down`}>↓</button>}
+                            {!item.archived && ([-1, 1] as const).map(direction => (
+                              <button
+                                key={direction}
+                                className={styles.iconButton}
+                                onClick={() => void moveItem(item, direction)}
+
+                                disabled={saving || sort !== 'manual' || atEdge(itemSiblings(item), item, direction)}
+                                title={sort === 'manual' ? undefined : 'Switch back to manual order to reorder items'}
+                                aria-label={`Move ${item.name} ${direction === -1 ? 'up' : 'down'}`}
+                              >
+                                <WynnIcon name={direction === -1 ? 'arrow-up' : 'arrow-down'} />
+                              </button>
+                            ))}
                             <button onClick={() => setDraft(itemDraft(item))}>Edit</button>
                             <button className={item.archived ? '' : styles.dangerText} onClick={() => void toggleArchive(item)} disabled={saving}>
                               {item.archived ? 'Restore' : 'Archive'}
@@ -1524,7 +1569,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>{draft.id ? 'Edit entry' : 'New entry'}</span>
                 <h2>{draft.id ? draft.name : `Add ${draft.kind}`}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDraft(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setDraft(null)} />
             </div>
             <div className={styles.formGrid}>
               <label className={styles.fullField}>Name<input required value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} /></label>
@@ -1674,7 +1719,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveCategory}>
             <div className={styles.modalHeader}>
               <h2>{categoryDialog.id ? 'Rename category' : `Add ${categoryDialog.kind} category`}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setCategoryDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setCategoryDialog(null)} />
             </div>
             <label>Category name
               <input autoFocus required value={categoryDialog.name} onChange={event => setCategoryDialog({ ...categoryDialog, name: event.target.value })} />
@@ -1697,7 +1742,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete category</span>
                 <h2>{deleteCategoryDialog.category.name}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteCategoryDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setDeleteCategoryDialog(null)} />
             </div>
             {data.items.some(item => item.categoryId === deleteCategoryDialog.category.id) ? (
               <label>Move its entries to
@@ -1737,7 +1782,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete entry</span>
                 <h2>{deleteItemDialog.name}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteItemDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setDeleteItemDialog(null)} />
             </div>
             <p className={styles.modalCopy}>
               This permanently removes {deleteItemDialog.name} and its scan history matching, unlike Archive this cannot be undone.
@@ -1758,7 +1803,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveMaterialGroup}>
             <div className={styles.modalHeader}>
               <h2>{materialGroupDialog.baseName}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setMaterialGroupDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setMaterialGroupDialog(null)} />
             </div>
             <div className={styles.formGrid}>
               {materialGroupDialog.tiers.map((tier, index) => (
@@ -1812,7 +1857,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete material</span>
                 <h2>{deleteMaterialGroupDialog.baseName}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteMaterialGroupDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setDeleteMaterialGroupDialog(null)} />
             </div>
             <p className={styles.modalCopy}>
               This permanently removes all three tiers of {deleteMaterialGroupDialog.baseName}, unlike Archive this cannot be undone.
@@ -1832,7 +1877,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveScanProfile}>
             <div className={styles.modalHeader}>
               <h2>{scanProfileDialog.id ? 'Edit scan profile' : 'Add scan profile'}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setScanProfileDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setScanProfileDialog(null)} />
             </div>
             <div className={styles.formGrid}>
               <label>Character nickname
@@ -1900,7 +1945,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete scan profile</span>
                 <h2>{deleteScanProfileDialog.nickname}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteScanProfileDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setDeleteScanProfileDialog(null)} />
             </div>
             <p className={styles.modalCopy}>
               The mod will stop recognizing this character nickname as a scannable bank. Consider archiving instead if this character might come back.
@@ -1923,7 +1968,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Texture library</span>
                 <h2>Choose artwork</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setTextureDialog(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
+              <CloseButton onClick={() => setTextureDialog(false)} />
             </div>
             <div className={styles.textureToolbar}>
               <input
