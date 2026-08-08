@@ -2,11 +2,13 @@
 
 import { CSSProperties, Fragment, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useExecSession } from '@/hooks/useExecSession';
+import WoealerPanel from './WoealerPanel';
+import { WynnIcon } from './WynnIcon';
 import styles from './inventory.module.css';
 
 type Kind = 'ingredient' | 'consumable' | 'material';
 type Bucket = 'misc_bucket' | 'account_bank' | 'character_bank' | 'materials_bucket';
-type View = Kind | 'archive';
+type View = Kind | 'archive' | 'woealer';
 // Recipe difficulty tiers 
 type Difficulty = 'conns' | 'hq';
 type Role = 'dps' | 'healer' | 'tank' | 'any';
@@ -764,42 +766,46 @@ export default function InventoryPage() {
         </div>
       </header>
 
-      <section className={styles.stats} aria-label="Inventory status">
-        <div className={styles.stat}>
-          <span>Tracked</span>
-          <strong>{activeItems.length}</strong>
-        </div>
-        <div className={`${styles.stat} ${styles.good}`}>
-          <span>Enough</span>
-          <strong>{enough}</strong>
-        </div>
-        <div className={`${styles.stat} ${styles.low}`}>
-          <span>Below target</span>
-          <strong>{low}</strong>
-        </div>
-        <div className={styles.stat}>
-          <span>No target</span>
-          <strong>{unconfigured}</strong>
-        </div>
-      </section>
-
-      <section className={styles.scanStrip} aria-label="Latest uploads">
-        {SCAN_GROUPS.map(group => {
-          const scan = group.buckets
-            .map(bucket => latestScans.get(bucket))
-            .filter((candidate): candidate is InventoryScan => Boolean(candidate))
-            .sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime())[0];
-          return (
-            <div key={group.label}>
-              <span className={styles.scanDot} data-live={scan ? 'true' : 'false'} />
-              <span>
-                <strong>{group.label}</strong>
-                {scan ? formatDate(scan.receivedAt) : 'No upload yet'}
-              </span>
+      {view !== 'woealer' && (
+        <>
+          <section className={styles.stats} aria-label="Inventory status">
+            <div className={styles.stat}>
+              <span>Tracked</span>
+              <strong>{activeItems.length}</strong>
             </div>
-          );
-        })}
-      </section>
+            <div className={`${styles.stat} ${styles.good}`}>
+              <span>Enough</span>
+              <strong>{enough}</strong>
+            </div>
+            <div className={`${styles.stat} ${styles.low}`}>
+              <span>Below target</span>
+              <strong>{low}</strong>
+            </div>
+            <div className={styles.stat}>
+              <span>No target</span>
+              <strong>{unconfigured}</strong>
+            </div>
+          </section>
+
+          <section className={styles.scanStrip} aria-label="Latest uploads">
+            {SCAN_GROUPS.map(group => {
+              const scan = group.buckets
+                .map(bucket => latestScans.get(bucket))
+                .filter((candidate): candidate is InventoryScan => Boolean(candidate))
+                .sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime())[0];
+              return (
+                <div key={group.label}>
+                  <span className={styles.scanDot} data-live={scan ? 'true' : 'false'} />
+                  <span>
+                    <strong>{group.label}</strong>
+                    {scan ? formatDate(scan.receivedAt) : 'No upload yet'}
+                  </span>
+                </div>
+              );
+            })}
+          </section>
+        </>
+      )}
 
       {canEdit && scanProfilesOpen && (
         <div className={styles.modalBackdrop} role="presentation" onMouseDown={event => {
@@ -811,7 +817,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Character bank scan profiles</span>
                 <h2>Woealer Class Nickname Layout</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setScanProfilesOpen(false)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setScanProfilesOpen(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <div className={styles.categoryActions}>
               <button
@@ -870,9 +876,9 @@ export default function InventoryPage() {
           <section className={`${styles.modal} ${styles.smallModal}`} role="dialog" aria-modal="true" aria-label="Manage categories">
             <div className={styles.modalHeader}>
               <h2>{view !== 'archive' ? `${view.charAt(0).toUpperCase()}${view.slice(1)} categories` : 'Categories'}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setCategoryManagerOpen(false)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setCategoryManagerOpen(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
-            {canEdit && view !== 'archive' && (
+            {canEdit && view !== 'archive' && view !== 'woealer' && (
               <div className={styles.categoryActions}>
                 <button className={styles.primaryButton} onClick={() => setCategoryDialog({ kind: view, name: '' })}>
                   Add category
@@ -929,7 +935,7 @@ export default function InventoryPage() {
       {error && (
         <div className={styles.error} role="alert">
           <span>{error}</span>
-          <button onClick={() => setError('')} aria-label="Dismiss error">×</button>
+          <button onClick={() => setError('')} aria-label="Dismiss error"><WynnIcon name="cancel" /></button>
         </div>
       )}
 
@@ -940,6 +946,7 @@ export default function InventoryPage() {
             ['consumable', 'Consumables'],
             ['material', 'Materials'],
             ['archive', `Recipe archive (${data.items.filter(item => item.archived).length})`],
+            ['woealer', 'Woealer'],
           ] as [View, string][]).map(([value, label]) => (
             <button
               key={value}
@@ -952,26 +959,28 @@ export default function InventoryPage() {
             </button>
           ))}
         </div>
-        <div className={styles.controlActions}>
-          <label className={styles.search}>
-            <span className={styles.visuallyHidden}>Search inventory</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
-            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search stock…" />
-          </label>
-          {view !== 'archive' && (
-            <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
-              Manage categories
-            </button>
-          )}
-          {canAddItems && view !== 'archive' && viewCategories.length > 0 && (
-            <button className={styles.primaryButton} onClick={() => newItem(viewCategories[0])}>
-              Add item
-            </button>
-          )}
-        </div>
+        {view !== 'woealer' && (
+          <div className={styles.controlActions}>
+            <label className={styles.search}>
+              <span className={styles.visuallyHidden}>Search inventory</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+              <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search inventory…" />
+            </label>
+            {view !== 'archive' && (
+              <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
+                Manage categories
+              </button>
+            )}
+            {canAddItems && viewCategories.length > 0 && (
+              <button className={styles.primaryButton} onClick={() => newItem(viewCategories[0])}>
+                Add item
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {view !== 'archive' && (
+      {view !== 'archive' && view !== 'woealer' && (
         <div className={styles.filterBar} aria-label="Filters">
           <div className={styles.filterGroup}>
             <span className={styles.filterGroupLabel}>Type</span>
@@ -1068,11 +1077,13 @@ export default function InventoryPage() {
         </div>
       )}
 
-      {!canEdit && (
+      {!canEdit && view !== 'woealer' && (
         <p className={styles.readOnlyNote}>You can add inventory items. Narwhal, Hydra, and Leader ranks can edit existing items and manage categories.</p>
       )}
 
-      {loading ? (
+      {view === 'woealer' ? (
+        <WoealerPanel canEdit={canEdit} />
+      ) : loading ? (
         <div className={styles.skeletons} aria-label="Loading inventory">
           {[0, 1, 2].map(value => <div key={value} />)}
         </div>
@@ -1292,7 +1303,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>{draft.id ? 'Edit entry' : 'New entry'}</span>
                 <h2>{draft.id ? draft.name : `Add ${draft.kind}`}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDraft(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setDraft(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <div className={styles.formGrid}>
               <label className={styles.fullField}>Name<input required value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} /></label>
@@ -1313,7 +1324,7 @@ export default function InventoryPage() {
               )}
               {!draft.archived && (
                 <>
-                  <label>Stock<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
+                  <label>Inventory<input type="number" min="0" required value={draft.quantity} onChange={event => setDraft({ ...draft, quantity: event.target.value })} /></label>
                   {draft.kind === 'consumable' && (
                     <label>Reserve<input type="number" min="0" required value={draft.reserveQuantity} onChange={event => setDraft({ ...draft, reserveQuantity: event.target.value })} /></label>
                   )}
@@ -1442,7 +1453,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveCategory}>
             <div className={styles.modalHeader}>
               <h2>{categoryDialog.id ? 'Rename category' : `Add ${categoryDialog.kind} category`}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setCategoryDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setCategoryDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <label>Category name
               <input autoFocus required value={categoryDialog.name} onChange={event => setCategoryDialog({ ...categoryDialog, name: event.target.value })} />
@@ -1465,7 +1476,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete category</span>
                 <h2>{deleteCategoryDialog.category.name}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteCategoryDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteCategoryDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             {data.items.some(item => item.categoryId === deleteCategoryDialog.category.id) ? (
               <label>Move its entries to
@@ -1505,7 +1516,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete entry</span>
                 <h2>{deleteItemDialog.name}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteItemDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteItemDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <p className={styles.modalCopy}>
               This permanently removes {deleteItemDialog.name} and its scan history matching, unlike Archive this cannot be undone.
@@ -1526,13 +1537,13 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveMaterialGroup}>
             <div className={styles.modalHeader}>
               <h2>{materialGroupDialog.baseName}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setMaterialGroupDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setMaterialGroupDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <div className={styles.formGrid}>
               {materialGroupDialog.tiers.map((tier, index) => (
                 <Fragment key={tier.id}>
                   <label style={{ '--tier-color': TIER_COLORS[tier.tier] } as CSSProperties}>
-                    <span className={styles.tierLabel}>T{tier.tier} stock</span>
+                    <span className={styles.tierLabel}>T{tier.tier} inventory</span>
                     <input
                       type="number"
                       min="0"
@@ -1580,7 +1591,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete material</span>
                 <h2>{deleteMaterialGroupDialog.baseName}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteMaterialGroupDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteMaterialGroupDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <p className={styles.modalCopy}>
               This permanently removes all three tiers of {deleteMaterialGroupDialog.baseName}, unlike Archive this cannot be undone.
@@ -1600,7 +1611,7 @@ export default function InventoryPage() {
           <form className={`${styles.modal} ${styles.smallModal}`} onSubmit={saveScanProfile}>
             <div className={styles.modalHeader}>
               <h2>{scanProfileDialog.id ? 'Edit scan profile' : 'Add scan profile'}</h2>
-              <button type="button" className={styles.closeButton} onClick={() => setScanProfileDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setScanProfileDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <div className={styles.formGrid}>
               <label>Character nickname
@@ -1668,7 +1679,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Delete scan profile</span>
                 <h2>{deleteScanProfileDialog.nickname}</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setDeleteScanProfileDialog(null)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setDeleteScanProfileDialog(null)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <p className={styles.modalCopy}>
               The mod will stop recognizing this character nickname as a scannable bank. Consider archiving instead if this character might come back.
@@ -1691,7 +1702,7 @@ export default function InventoryPage() {
                 <span className={styles.eyebrow}>Texture library</span>
                 <h2>Choose artwork</h2>
               </div>
-              <button type="button" className={styles.closeButton} onClick={() => setTextureDialog(false)} aria-label="Close">×</button>
+              <button type="button" className={styles.closeButton} onClick={() => setTextureDialog(false)} aria-label="Close"><WynnIcon name="cancel" /></button>
             </div>
             <div className={styles.textureToolbar}>
               <input

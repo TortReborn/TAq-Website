@@ -54,7 +54,7 @@ export const EXEC_NAV: ExecNavGroup[] = [
   {
     category: 'Economy',
     items: [
-      { href: '/exec/inventory', label: 'Inventory', desc: 'Track ingredient, consumable, and material stock', iconImage: '/images/icons/exec/inventory.png', iconLarge: true },
+      { href: '/exec/inventory', label: 'Inventory', desc: 'Track ingredient, consumable, and material inventory', iconImage: '/images/icons/exec/inventory.png', iconLarge: true },
       { href: '/exec/accounting', label: 'Accounting', desc: 'Track guild funds and transactions', iconImage: '/images/icons/exec/accounting.png' },
       { href: '/exec/shells', label: 'Shells', desc: 'Manage member shell balances', iconImage: '/images/icons/exec/shells.png' },
       { href: '/exec/shell-exchange', label: 'Shell Exchange', desc: 'Update exchange rates', iconImage: '/images/icons/exec/shell-exchange.png' },

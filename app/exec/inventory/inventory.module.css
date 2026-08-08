@@ -651,14 +651,28 @@
 }
 
 .closeButton {
+  display: inline-flex;
   width: 2.25rem;
   height: 2.25rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border-card);
   border-radius: 50%;
   background: transparent;
   color: var(--text-secondary);
   font-size: 1.25rem;
   cursor: pointer;
+}
+
+.closeButton:hover {
+  border-color: var(--color-ocean-400);
+  color: var(--text-primary);
+}
+
+.error button {
+  display: inline-flex;
+  align-items: center;
 }
 
 .formGrid {
@@ -863,6 +877,258 @@
   text-align: center;
 }
 
+/* --- Woealer storage map (TAQ-59) --- */
+
+.woealer {
+  display: flex;
+  flex-direction: column;
+}
+
+.wynnIcon {
+  display: block;
+  width: 0.95rem;
+  height: 0.95rem;
+  background: currentColor;
+  -webkit-mask: var(--wynn-icon) center / contain no-repeat;
+  mask: var(--wynn-icon) center / contain no-repeat;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--bg-card) 88%, #fff 4%);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.iconButton:hover:not(:disabled) {
+  border-color: var(--color-ocean-400);
+  color: var(--text-primary);
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.woealerSurface {
+  padding: 0.9rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.8rem;
+  background: color-mix(in srgb, var(--bg-card) 62%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.08);
+}
+
+.woealerPageStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin-bottom: 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--bg-card) 75%, transparent);
+}
+
+.woealerPageGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.woealerNotes {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-card);
+  border-left: 3px solid color-mix(in srgb, var(--gold-accent, #f5c842) 55%, transparent);
+  border-radius: 0.7rem;
+  background: var(--bg-card);
+}
+
+.woealerNotes > div { min-width: 0; }
+
+.woealerNotes p {
+  margin: 0.25rem 0 0;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.woealerNotesEmpty { color: var(--text-secondary) !important; font-style: italic; }
+
+.woealerNotes form {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.woealerNotes textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.5rem;
+  outline: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.78rem;
+  resize: vertical;
+}
+
+.woealerNotes textarea:focus {
+  border-color: var(--color-ocean-400);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ocean-400) 12%, transparent);
+}
+
+.woealerNotes .modalActions {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.woealerTableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.woealerTableHeader h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.tableWrap .woealerTable { min-width: 520px; }
+
+/* Contents absorbs the slack so row actions sit hard right. */
+.woealerGripCell,
+.woealerLabelCell { width: 1%; white-space: nowrap; }
+.woealerSlotContents { width: 100%; }
+.woealerActionsCell { width: 1%; }
+.woealerActionsCell .rowActions { justify-content: flex-end; }
+
+.woealerSlotLabel {
+  display: inline-flex;
+  min-width: 2rem;
+  justify-content: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--color-ocean-500) 16%, transparent);
+  color: var(--text-primary);
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.woealerSlotContents {
+  color: var(--text-primary) !important;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.woealerHighlight {
+  animation: woealerFlash 2.4s ease-out;
+}
+
+.woealerDraggable { cursor: grab; }
+.woealerDraggable:active { cursor: grabbing; }
+.woealerDragging { opacity: 0.4; }
+
+.woealerDropBefore td { box-shadow: inset 0 2px 0 var(--color-ocean-400); }
+.woealerDropAfter td { box-shadow: inset 0 -2px 0 var(--color-ocean-400); }
+
+.woealerGripCell { width: 1%; }
+
+.woealerGrip {
+  display: block;
+  width: 0.65rem;
+  height: 1rem;
+  background-image: radial-gradient(currentColor 40%, transparent 42%);
+  background-size: 0.32rem 0.32rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+@keyframes woealerFlash {
+  0%, 55% { background: color-mix(in srgb, var(--gold-accent, #f5c842) 22%, transparent); }
+  100% { background: transparent; }
+}
+
+.woealerResults {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.woealerResultsCount {
+  margin: 0 0 0.2rem;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.woealerResult {
+  display: grid;
+  align-items: baseline;
+  gap: 0.5rem 0.9rem;
+  grid-template-columns: minmax(9rem, auto) auto minmax(0, 1fr);
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.6rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.woealerResult:hover {
+  border-color: var(--color-ocean-400);
+  background: color-mix(in srgb, var(--color-ocean-400) 6%, var(--bg-card));
+}
+
+.woealerResultPage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-weight: 750;
+}
+
+.woealerResultPage em {
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.woealerResultSlot {
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--color-ocean-500) 16%, transparent);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.woealerResultContents {
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
 @media (max-width: 1050px) {
   .controls { align-items: stretch; flex-direction: column; }
   .controlActions { justify-content: space-between; }
@@ -883,4 +1149,8 @@
   .formGrid { grid-template-columns: 1fr; }
   .fullField { grid-column: auto; }
   .textureToolbar { flex-direction: column; }
+  .woealerNotes { align-items: stretch; flex-direction: column; }
+  .woealerTableHeader { align-items: stretch; flex-direction: column; }
+  .woealerResult { grid-template-columns: minmax(0, 1fr) auto; }
+  .woealerResultContents { grid-column: 1 / -1; }
 }
