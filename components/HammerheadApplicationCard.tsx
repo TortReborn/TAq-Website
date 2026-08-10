@@ -203,12 +203,15 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '1rem',
+          // See ApplicationCard — the right-hand group does not shrink, so the
+          // identity group needs to be able to wrap onto its own line.
+          flexWrap: 'wrap',
           transition: 'background 0.15s ease',
         }}
         onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: '1 1 auto' }}>
           <img
             src={avatarUrl}
             alt={app.discordUsername}
@@ -221,7 +224,7 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
             }}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', overflowWrap: 'anywhere' }}>
               <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                 {ign}
               </span>

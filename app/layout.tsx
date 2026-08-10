@@ -980,6 +980,31 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 }}
               >Hammerhead Application (Angler only)</button>
               )}
+              {/* The nav-bar Apply button is hidden under 480px so the hamburger
+                  still fits, so the dropdown has to carry it. */}
+              {!(authenticated && isAngler) && !isBelowAngler && !(authenticated && isExecRank) && (
+              <a
+                href="https://discord.gg/njRpZwKVaa"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  color: '#5865f2',
+                  fontWeight: 'bold',
+                  fontSize: '1.125rem',
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(88,101,242,0.15) 0%, rgba(88,101,242,0.05) 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >Apply</a>
+              )}
               {!authenticated && (
               <NavLink
                 href="/login"

@@ -232,8 +232,8 @@ export default function ExecShellsPage() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-card)', paddingBottom: '0' }}>
+      {/* Tabs — wrap on narrow screens so the last tabs don't hang outside */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-card)', paddingBottom: '0' }}>
         {TABS.map(t => (
           <button
             key={t.key}

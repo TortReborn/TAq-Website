@@ -88,7 +88,21 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       }
     };
     window.addEventListener("wheel", preventZoom, { passive: false });
-    return () => window.removeEventListener("wheel", preventZoom);
+
+    // Safari (iOS and macOS) ignores `touch-action: none` for pinch and instead
+    // fires these non-standard gesture events, zooming the whole page. They are
+    // the only way to stop it, and they must be non-passive to be preventable.
+    const preventGesture = (e: Event) => e.preventDefault();
+    document.addEventListener("gesturestart", preventGesture, { passive: false });
+    document.addEventListener("gesturechange", preventGesture, { passive: false });
+    document.addEventListener("gestureend", preventGesture, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", preventZoom);
+      document.removeEventListener("gesturestart", preventGesture);
+      document.removeEventListener("gesturechange", preventGesture);
+      document.removeEventListener("gestureend", preventGesture);
+    };
   }, []);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -1403,7 +1417,17 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, [isTouching, touchStart, lastPanPoint, clampScale, applyTransform]);
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      // Lifting one finger out of a pinch. Re-seat the pan baseline on the
+      // finger still down, otherwise panning stayed dead until the user lifted
+      // off entirely and touched again.
+      lastTouchDistanceRef.current = null;
+      setIsTouching(true);
+      setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      setLastPanPoint({ x: positionRef.current.x, y: positionRef.current.y });
+      return;
+    }
     setIsTouching(false);
     setTouchStart(null);
     lastTouchDistanceRef.current = null;
@@ -1624,12 +1648,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   }, [clampScale, applyTransform]);
 
   return (
-    <main className="map-opaque-chrome" style={{
+    <main className="map-opaque-chrome map-viewport" style={{
       position: 'fixed',
       top: '5.5rem',
       left: 0,
-      width: '100vw',
-      height: 'calc(100vh - 5.5rem)',
+      width: '100%',
       overflow: 'hidden',
       userSelect: 'none',
       WebkitUserSelect: 'none',
@@ -1644,18 +1667,20 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         padding: '0.25rem'
       }}>
         {/* Map Container */}
-        <div 
+        <div
           ref={containerRef}
+          className="map-container"
           style={{
             width: 'calc(100vw - 0.5rem)',
-            height: 'calc(100vh - 6rem)',
+            height: '100%',
             border: '2px solid var(--border-color)',
             borderRadius: '0.5rem',
             overflow: 'hidden',
             position: 'relative',
             cursor: isDragging ? 'grabbing' : 'grab',
             background: 'var(--bg-card)'
-            // Remove touchAction: 'none' to allow touch events in child components
+            // touch-action: none comes from .map-container so the browser
+            // stops claiming pinch/pan before our handlers see them.
           }}
           onMouseDown={(e) => {
             // Only handle mouse events if they're not from the guild territory panel
@@ -1702,7 +1727,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
           onTouchEnd={(e) => {
             // Only handle touch events if they're not from the guild territory panel
             if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
-              handleTouchEnd();
+              handleTouchEnd(e);
             }
           }}
         >
