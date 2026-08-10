@@ -4,9 +4,12 @@ import { CSSProperties, Fragment, FormEvent, useCallback, useEffect, useMemo, us
 import { useExecSession } from '@/hooks/useExecSession';
 import { ROLE_COLORS } from '@/lib/snipe-constants';
 import {
-  INVENTORY_SORT_OPTIONS,
   InventorySort,
+  InventorySortColumn,
+  inventorySortColumn,
+  inventorySortDirection,
   isSortAvailable,
+  nextInventorySort,
   sortInventoryRows,
 } from '@/lib/inventory-sort';
 import WoealerPanel from './WoealerPanel';
@@ -389,7 +392,11 @@ export default function InventoryPage() {
     setConsuTypeFilter(new Set());
     setLevelFilter(new Set());
 
-    setSort(current => (isSortAvailable(current, view === 'consumable') ? current : 'manual'));
+    setSort(current => (
+      (view === 'archive' && inventorySortColumn(current) === 'status') || !isSortAvailable(current, view === 'consumable')
+        ? 'manual'
+        : current
+    ));
   }, [view]);
 
   const activeItems = useMemo(() => data.items.filter(item => !item.archived), [data.items]);
@@ -436,7 +443,13 @@ export default function InventoryPage() {
 
   const categoryById = useMemo(() => new Map(data.categories.map(category => [category.id, category])), [data.categories]);
 
-  const sortedVisibleItems = useMemo(() => sortInventoryRows(visibleItems, sort), [visibleItems, sort]);
+  const sortedVisibleItems = useMemo(
+    () => sortInventoryRows(visibleItems.map(item => ({
+      ...item,
+      categoryName: categoryById.get(item.categoryId)?.name ?? null,
+    })), sort),
+    [visibleItems, sort, categoryById]
+  );
   // Materials display one row per family, so the sort has to run on the group
   // totals — hence grouping the manually-ordered rows first, then sorting.
   const visibleMaterialGroups = useMemo(() => {
@@ -444,20 +457,44 @@ export default function InventoryPage() {
     const rows = groups.map(group => {
       const tiers = group.tiers.filter((item): item is InventoryItem => Boolean(item));
       const targets = tiers.map(item => item.desiredQuantity);
+      const quantity = tiers.reduce((sum, item) => sum + item.quantity, 0);
+      const desiredQuantity = targets.some(target => target !== null)
+        ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
+        : null;
       return {
         group,
         name: group.baseName,
-        quantity: tiers.reduce((sum, item) => sum + item.quantity, 0),
+        quantity,
         reserveQuantity: tiers.reduce((sum, item) => sum + item.reserveQuantity, 0),
-        desiredQuantity: targets.some(target => target !== null)
-          ? targets.reduce((sum: number, target) => sum + (target ?? 0), 0)
-          : null,
+        desiredQuantity,
+        enough: desiredQuantity === null ? null : quantity >= desiredQuantity,
+        bankPage: tiers.map(item => item.bankPage).filter(Boolean).sort((a, b) => String(a).localeCompare(String(b), 'en-US', { numeric: true })).at(0) ?? null,
+        categoryId: tiers[0]?.categoryId,
+        categoryName: tiers[0] ? categoryById.get(tiers[0].categoryId)?.name ?? null : null,
         sortOrder: tiers.length > 0 ? Math.min(...tiers.map(item => item.sortOrder)) : 0,
         updatedAt: tiers.map(item => item.updatedAt).sort().at(-1) ?? '',
       };
     });
     return sortInventoryRows(rows, sort).map(row => row.group);
-  }, [visibleItems, sort]);
+  }, [visibleItems, sort, categoryById]);
+
+  const activeSortColumn = inventorySortColumn(sort);
+  const activeSortDirection = inventorySortDirection(sort);
+  const sortHeader = (label: string, column: InventorySortColumn) => {
+    const active = activeSortColumn === column;
+    const arrow = active ? (activeSortDirection === 'asc' ? '▲' : '▼') : '↕';
+    return (
+      <button
+        type="button"
+        className={active ? styles.sortHeaderActive : styles.sortHeader}
+        onClick={() => setSort(current => nextInventorySort(current, column))}
+        aria-label={`Sort by ${label}`}
+      >
+        <span>{label}</span>
+        <span aria-hidden="true">{arrow}</span>
+      </button>
+    );
+  };
 
   async function post(body: Record<string, unknown>) {
     setSaving(true);
@@ -655,7 +692,7 @@ export default function InventoryPage() {
   }
 
   const itemSiblings = useCallback((item: InventoryItem) => data.items
-    .filter(candidate => candidate.categoryId === item.categoryId && candidate.archived === item.archived)
+    .filter(candidate => candidate.kind === item.kind && candidate.archived === item.archived)
     .sort((a, b) => a.sortOrder - b.sortOrder), [data.items]);
 
   const categorySiblings = useCallback((category: Category) => data.categories
@@ -1189,16 +1226,13 @@ export default function InventoryPage() {
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
               <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search inventory…" />
             </label>
-            <label className={styles.sortControl}>
-              <span className={styles.visuallyHidden}>Sort inventory</span>
-              <select value={sort} onChange={event => setSort(event.target.value as InventorySort)}>
-                {INVENTORY_SORT_OPTIONS
-                  .filter(option => !option.consumableOnly || view === 'consumable')
-                  .map(option => (
-                    <option key={option.value} value={option.value}>Sort: {option.label}</option>
-                  ))}
-              </select>
-            </label>
+            <button
+              className={sort === 'manual' ? styles.primaryButton : styles.secondaryButton}
+              onClick={() => setSort('manual')}
+              disabled={sort === 'manual'}
+            >
+              Manual order
+            </button>
             {view !== 'archive' && (
               <button className={styles.secondaryButton} onClick={() => setCategoryManagerOpen(true)}>
                 Manage categories
@@ -1334,14 +1368,14 @@ export default function InventoryPage() {
               <>
                 <thead>
                   <tr>
-                    <th>Item</th>
-                    <th>Profession</th>
+                    <th>{sortHeader('Item', 'name')}</th>
+                    <th>{sortHeader('Profession', 'category')}</th>
                     <th>Used for</th>
                     <th>Level</th>
-                    <th>Inventory</th>
-                    <th>Target</th>
-                    <th>Location</th>
-                    <th>Status</th>
+                    <th>{sortHeader('Inventory', 'quantity')}</th>
+                    <th>{sortHeader('Target', 'target')}</th>
+                    <th>{sortHeader('Location', 'location')}</th>
+                    <th>{sortHeader('Status', 'status')}</th>
                     {canEdit && editing && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                   </tr>
                 </thead>
@@ -1428,17 +1462,17 @@ export default function InventoryPage() {
               <>
                 <thead>
                   <tr>
-                    <th>Item</th>
-                    {view !== 'archive' && <th>Inventory</th>}
-                    {view !== 'archive' && <th>Target</th>}
-                    {view === 'consumable' && <th>Reserve</th>}
-                    {view !== 'archive' && <th>Status</th>}
+                    <th>{sortHeader('Item', 'name')}</th>
+                    {view !== 'archive' && <th>{sortHeader('Inventory', 'quantity')}</th>}
+                    {view !== 'archive' && <th>{sortHeader('Target', 'target')}</th>}
+                    {view === 'consumable' && <th>{sortHeader('Reserve', 'reserve')}</th>}
+                    {view !== 'archive' && <th>{sortHeader('Status', 'status')}</th>}
                     {view === 'consumable' && <th>Difficulty</th>}
                     {view === 'consumable' && <th>Role</th>}
-                    <th>Location</th>
+                    <th>{sortHeader('Location', 'location')}</th>
                     {view === 'consumable' && <th>Reserve Location</th>}
-                    {(view === 'consumable' || view === 'archive') && <th>Charges</th>}
-                    <th>Type</th>
+                    {(view === 'consumable' || view === 'archive') && <th>{sortHeader('Charges', 'charges')}</th>}
+                    <th>{sortHeader('Type', 'category')}</th>
                     {canEdit && editing && <th><span className={styles.visuallyHidden}>Actions</span></th>}
                   </tr>
                 </thead>

@@ -5,6 +5,12 @@ export interface InventoryMatchItem {
   aliases: string[];
 }
 
+export interface InventoryLocationReport {
+  name: string;
+  page: number;
+  quantity: number;
+}
+
 export function normalizeInventoryName(value: string): string {
   return value
     .normalize('NFKD')
@@ -61,6 +67,28 @@ export function matchInventoryLocations(
     if (item) locations.set(item.id, page);
   }
   return locations;
+}
+
+export function matchInventoryLocationReports(
+  reportedLocations: InventoryLocationReport[],
+  items: InventoryMatchItem[]
+): Map<number, number> {
+  const byName = buildNameIndex(items);
+  const bestByItem = new Map<number, { page: number; quantity: number }>();
+  for (const report of reportedLocations) {
+    const item = byName.get(normalizeInventoryName(report.name));
+    if (!item) continue;
+    const current = bestByItem.get(item.id);
+    if (
+      !current
+      || report.quantity > current.quantity
+      || (report.quantity === current.quantity && report.page < current.page)
+    ) {
+      bestByItem.set(item.id, { page: report.page, quantity: report.quantity });
+    }
+  }
+
+  return new Map([...bestByItem.entries()].map(([id, location]) => [id, location.page]));
 }
 
 export function aggregateInventorySnapshots(

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { INVENTORY_SORT_OPTIONS, isSortAvailable, sortInventoryRows } from './inventory-sort';
+import {
+  INVENTORY_SORT_OPTIONS,
+  inventorySortColumn,
+  inventorySortDirection,
+  isSortAvailable,
+  nextInventorySort,
+  sortInventoryRows,
+} from './inventory-sort';
 
 interface Row {
   name: string;
@@ -8,6 +15,8 @@ interface Row {
   desiredQuantity: number | null;
   sortOrder: number;
   updatedAt: string;
+  enough?: boolean | null;
+  bankPage?: string | null;
 }
 
 function row(overrides: Partial<Row> & { name: string }): Row {
@@ -61,12 +70,32 @@ describe('sortInventoryRows', () => {
     expect(names(sortInventoryRows(rows, 'updated_desc'))).toEqual(['Alpha', 'Bravo', 'Charlie']);
   });
 
+  it('sorts by status and natural location labels', () => {
+    const statusRows = [
+      row({ name: 'Enough', enough: true, bankPage: 'IA10', sortOrder: 10 }),
+      row({ name: 'Low', enough: false, bankPage: 'IA2', sortOrder: 20 }),
+      row({ name: 'No target', enough: null, bankPage: null, sortOrder: 30 }),
+    ];
+    expect(names(sortInventoryRows(statusRows, 'status_asc'))).toEqual(['Low', 'Enough', 'No target']);
+    expect(names(sortInventoryRows(statusRows, 'status_desc'))).toEqual(['Enough', 'Low', 'No target']);
+    expect(names(sortInventoryRows(statusRows, 'location_asc'))).toEqual(['Low', 'Enough', 'No target']);
+  });
+
   it('breaks ties on the curated order', () => {
     const tied = [
       row({ name: 'Second', quantity: 5, sortOrder: 20 }),
       row({ name: 'First', quantity: 5, sortOrder: 10 }),
     ];
     expect(names(sortInventoryRows(tied, 'quantity_desc'))).toEqual(['First', 'Second']);
+  });
+});
+
+describe('column sort helpers', () => {
+  it('toggles the active column and exposes state for table headers', () => {
+    expect(nextInventorySort('manual', 'location')).toBe('location_asc');
+    expect(nextInventorySort('location_asc', 'location')).toBe('location_desc');
+    expect(inventorySortColumn('location_desc')).toBe('location');
+    expect(inventorySortDirection('location_desc')).toBe('desc');
   });
 });
 
