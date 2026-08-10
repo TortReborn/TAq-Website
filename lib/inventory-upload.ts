@@ -5,6 +5,7 @@ import {
   aggregateInventorySnapshots,
   InventoryMatchItem,
   isReserveInventorySource,
+  matchInventoryLocationReports,
   matchInventoryLocations,
   matchInventorySnapshot,
 } from '@/lib/inventory-snapshots';
@@ -17,9 +18,10 @@ const FIXED_LOCATION_PREFIXES: Record<string, string> = {
 };
 
 async function resolveLocationPrefix(client: Pool | PoolClient, scanType: string, sourceKey: string): Promise<string> {
-  if (scanType in FIXED_LOCATION_PREFIXES) return FIXED_LOCATION_PREFIXES[scanType];
   const result = await client.query(`SELECT location_prefix FROM inventory_scan_profiles WHERE source_key = $1`, [sourceKey]);
-  return result.rows[0]?.location_prefix ?? '';
+  if (result.rows.length > 0) return result.rows[0]?.location_prefix ?? '';
+  if (scanType in FIXED_LOCATION_PREFIXES) return FIXED_LOCATION_PREFIXES[scanType];
+  return '';
 }
 
 // One entry per scan_type the mod can upload; add a row here for new kinds.
@@ -44,6 +46,21 @@ function parseJsonCountMap(value: unknown): Record<string, number> {
   if (!value) return {};
   const parsed = typeof value === 'string' ? JSON.parse(value) : value;
   return asCountMap(parsed);
+}
+
+function asLocationReports(value: unknown): Array<{ name: string; page: number; quantity: number }> {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap(entry => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [];
+    const record = entry as Record<string, unknown>;
+    const name = typeof record.name === 'string' ? record.name.trim() : '';
+    const page = Number(record.page);
+    const quantity = Number(record.quantity);
+    if (!name || !Number.isInteger(page) || page <= 0 || !Number.isInteger(quantity) || quantity <= 0) {
+      return [];
+    }
+    return [{ name, page, quantity }];
+  });
 }
 
 export async function handleInventoryUpload(request: NextRequest) {
@@ -73,6 +90,7 @@ export async function handleInventoryUpload(request: NextRequest) {
   const itemKind = scanConfig.itemKind;
   const reported = asCountMap(body[scanConfig.field]);
   const reportedPages = asCountMap(body.pages);
+  const reportedLocations = asLocationReports(body.locations);
   const reserveSource = isReserveInventorySource(requestedSourceKey);
   const clientTimestamp = typeof body.timestamp === 'number' && Number.isFinite(body.timestamp)
     ? new Date(body.timestamp)
@@ -102,7 +120,9 @@ export async function handleInventoryUpload(request: NextRequest) {
       : items.filter(item => item.storageBucket === scanType);
     const { matchedCounts, unmatched, matched } = matchInventorySnapshot(reported, sourceItems);
     const locationPrefix = await resolveLocationPrefix(client, scanType, requestedSourceKey);
-    const locations = matchInventoryLocations(reportedPages, sourceItems);
+    const locations = reportedLocations.length > 0
+      ? matchInventoryLocationReports(reportedLocations, sourceItems)
+      : matchInventoryLocations(reportedPages, sourceItems);
 
     await client.query(
       `INSERT INTO inventory_scan_sources (

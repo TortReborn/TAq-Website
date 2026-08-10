@@ -297,8 +297,8 @@ export async function POST(request: NextRequest) {
       }
       const sortResult = await pool.query(
         `SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order
-         FROM inventory_items WHERE category_id = $1`,
-        [categoryId]
+         FROM inventory_items WHERE kind = $1 AND archived = FALSE`,
+        [kind]
       );
       await pool.query(
         `INSERT INTO inventory_items (

@@ -481,6 +481,33 @@
   white-space: nowrap;
 }
 
+.sortHeader,
+.sortHeaderActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.sortHeader:hover,
+.sortHeaderActive {
+  color: var(--color-ocean-400);
+}
+
+.sortHeader:focus-visible,
+.sortHeaderActive:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid var(--color-ocean-400);
+  outline-offset: 3px;
+}
+
 .tableWrap td {
   padding: 0.55rem 0.7rem;
   border-top: 1px solid color-mix(in srgb, var(--border-card) 62%, transparent);

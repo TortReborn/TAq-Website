@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateInventorySnapshots,
   isReserveInventorySource,
+  matchInventoryLocationReports,
   matchInventoryLocations,
   matchInventorySnapshot,
 } from './inventory-snapshots';
@@ -48,5 +49,16 @@ describe('inventory source snapshots', () => {
     expect(locations.get(1)).toBe(3);
     expect(locations.has(2)).toBe(false);
     expect(locations.size).toBe(1);
+  });
+
+  it('chooses the page where the matched item was seen most often', () => {
+    const locations = matchInventoryLocationReports([
+      { name: 'Golden Avia Feather', page: 7, quantity: 12 },
+      { name: 'Golden Avia Feathers', page: 4, quantity: 80 },
+      { name: 'Golden Avia Feathers', page: 2, quantity: 80 },
+      { name: 'Mystery', page: 1, quantity: 99 },
+    ], items);
+    expect(locations.get(1)).toBe(2);
+    expect(locations.has(2)).toBe(false);
   });
 });
