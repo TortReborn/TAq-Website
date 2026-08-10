@@ -83,6 +83,10 @@ export default function ApplicationCard({ app, onVoteChange, onDecision }: Props
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '1rem',
+          // The right-hand group does not shrink, so without wrapping the
+          // identity group got squeezed to nothing and its avatar and name
+          // spilled outside the card on a phone.
+          flexWrap: 'wrap',
           transition: 'background 0.15s ease',
         }}
         onMouseEnter={(e) => {
@@ -92,7 +96,7 @@ export default function ApplicationCard({ app, onVoteChange, onDecision }: Props
           e.currentTarget.style.background = 'transparent';
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: '1 1 auto' }}>
           <img
             src={avatarUrl}
             alt={app.discordUsername}
@@ -110,6 +114,9 @@ export default function ApplicationCard({ app, onVoteChange, onDecision }: Props
               alignItems: 'center',
               gap: '0.5rem',
               flexWrap: 'wrap',
+              // Long IGNs are a single unbreakable word; without this they
+              // punch out of the card rather than wrapping.
+              overflowWrap: 'anywhere',
             }}>
               <span style={{
                 fontSize: '0.95rem',

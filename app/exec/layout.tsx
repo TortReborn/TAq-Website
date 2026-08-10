@@ -66,13 +66,13 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div style={{
+    <div className="exec-shell" style={{
       display: 'flex',
       height: 'calc(100vh - 80px)',
       overflow: 'hidden',
     }}>
       {/* Sidebar - fixed to viewport height, scrolls independently if its own content overflows */}
-      <aside style={{
+      <aside className="exec-sidebar" style={{
         width: 'clamp(180px, 12vw, 260px)',
         background: 'var(--bg-card)',
         borderRight: '1px solid var(--border-card)',
@@ -125,7 +125,7 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
         )}
 
         {/* Navigation */}
-        <nav style={{
+        <nav className="exec-nav" style={{
           display: 'flex',
           flexDirection: 'column',
           gap: '0.125rem',
@@ -281,10 +281,11 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
       </aside>
 
       {/* Main content - the only part that scrolls; navbar and sidebar stay put */}
-      <main style={{
+      <main className="exec-main" style={{
         flex: 1,
         padding: '2rem',
         overflow: 'auto',
+        minWidth: 0,
       }}>
         {children}
       </main>

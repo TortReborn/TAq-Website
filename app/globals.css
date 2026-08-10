@@ -603,6 +603,18 @@ body, #__next {
   font-family: 'GameFont', var(--font-roboto), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+/* Safety net for narrow screens. A form control with a fixed px width sits in a
+   flex row as an unshrinkable item (flex items default to min-width: auto), so
+   on a phone the row keeps its full content width and the sibling button gets
+   pushed outside the card — visibly hanging over the border. Capping controls
+   at their container's width stops a fixed width from ever exceeding the box
+   that holds it. Cells are excluded: table layout depends on their widths. */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  max-width: 100%;
+}
+
 /* Ensure all elements use the Wynncraft game font unless specifically overridden */
 body, body *, html, html * {
   font-family: 'GameFont', var(--font-roboto), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
@@ -793,11 +805,22 @@ body, body *, html, html * {
   background: transparent;
 }
 
-body.site-fixed-bg-active .site-nav,
 body.site-fixed-bg-active .site-content,
 body.site-fixed-bg-active > footer {
   position: relative;
   z-index: 1;
+}
+
+/* The nav must out-stack page content on every page, not just the ones with
+   the fixed background. `position: relative` + a z-index makes the nav its own
+   stacking context, which traps the mobile dropdown's z-index inside it — with
+   the nav at z-index 1 and .site-content also at z-index 1, the later sibling
+   won and the dropdown rendered *behind* the page, making every item
+   unclickable. On /map the nav had no z-index at all and the fixed <main>
+   covered it for the same reason. One high value fixes both. */
+.site-nav {
+  position: relative;
+  z-index: 50;
 }
 
 /* Fixed background photo — mounted in the root layout so it
@@ -1251,30 +1274,121 @@ body.site-fixed-bg-active > footer {
   }
 }
 
+/* ========== EXEC PANEL RESPONSIVE SHELL ========== */
+/* The exec shell is a flex row with a fixed-width sidebar. On a 390px phone
+   that left 146px of usable content width. Below 900px, stack it: the sidebar
+   becomes a full-width header and its links wrap into a grid instead of a
+   single tall column. */
+@media (max-width: 900px) {
+  /* On desktop the shell is pinned to viewport height with .exec-main as the
+     only scroller. Stacked, that would trap both the nav and the content in a
+     short box, so let the shell grow and hand scrolling back to the page. */
+  .exec-shell {
+    flex-direction: column;
+    height: auto !important;
+    min-height: calc(100vh - 80px);
+    overflow: visible !important;
+  }
+
+  .exec-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-card);
+    padding-bottom: 0.75rem !important;
+    overflow-y: visible !important;
+  }
+
+  .exec-main {
+    overflow: visible !important;
+  }
+
+  .exec-nav {
+    flex: none !important;
+  }
+
+  /* Each nav group lays its links out as a grid; the category heading spans
+     the full row so grouping is still readable. */
+  .exec-nav > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.25rem;
+  }
+
+  .exec-nav > div > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .exec-main {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .exec-nav > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exec-main {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Side-by-side exec columns have px minimums that together exceed a phone's
+   width, so the narrow first column could not hold its own buttons and they
+   hung outside it. Stack them and let the page scroll instead of pinning the
+   row to viewport height. */
+@media (max-width: 900px) {
+  .exec-columns {
+    flex-direction: column;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .exec-columns > div {
+    width: 100%;
+    min-width: 0 !important;
+    height: auto !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+/* Map viewport height. 100vh on mobile is the *large* viewport — it ignores the
+   browser's URL bar, so the bottom row of map controls sat underneath it and
+   was unreachable. dvh tracks the actually-visible area; vh is the fallback for
+   browsers without dvh. */
+.map-viewport {
+  height: calc(100vh - 5.5rem);
+  height: calc(100dvh - 5.5rem);
+}
+
+/* The map owns every touch gesture inside its own box. Without this the
+   browser claims pinch/pan first, so pinching to zoom the map zoomed the whole
+   page instead. This must NOT be scoped to a media query — touch laptops and
+   tablets hit it at desktop widths too. */
+.map-container {
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 @media (max-width: 800px) {
   .desktop-nav {
     display: none !important;
   }
-  
+
   .mobile-menu-button {
     display: flex !important;
   }
-  
-  /* Improve touch performance for map */
-  .map-container {
-    touch-action: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  
+
   /* Territory info panel mobile adjustments */
   .territory-info-panel {
     max-width: 90vw;
     font-size: 0.9rem;
   }
-  
+
   /* Guild territory count mobile adjustments */
   .guild-territory-count {
     max-width: 90vw;
@@ -1282,9 +1396,13 @@ body.site-fixed-bg-active > footer {
   }
 }
 
+/* Below this width the nav bar cannot fit logo + Apply + Login + theme toggle
+   + hamburger on one line. It does not wrap, and html/body clip overflow-x, so
+   the hamburger was pushed off-screen and mobile navigation became impossible.
+   Drop the two link-buttons — both are duplicated inside the dropdown. */
 @media (max-width: 480px) {
   .mobile-apply-button {
-    display: block !important;
+    display: none !important;
   }
 }
 

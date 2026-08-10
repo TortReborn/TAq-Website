@@ -322,7 +322,7 @@ export default function ExecPromotionsPage() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', height: 'calc(100vh - 11.9rem)', minHeight: '425px' }}>
+      <div className="exec-columns" style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', height: 'calc(100vh - 11.9rem)', minHeight: '425px' }}>
         {/* Column 1: Member roster */}
         <div style={{ flex: '5 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Controls */}

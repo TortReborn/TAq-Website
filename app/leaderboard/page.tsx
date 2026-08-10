@@ -213,7 +213,11 @@ export default function LeaderboardPage() {
               <div style={{
                 display: 'flex',
                 gap: '0.5rem',
-                alignItems: 'center'
+                alignItems: 'center',
+                // Without these the group keeps its 263px content width on a
+                // narrow card and pushes Refresh outside the border.
+                flex: '0 1 auto',
+                minWidth: 0
               }}>
                 <input
                   type="text"
@@ -227,7 +231,11 @@ export default function LeaderboardPage() {
                     background: 'var(--bg-primary)',
                     color: 'var(--text-primary)',
                     fontSize: '0.875rem',
-                    width: '180px'
+                    // Keeps its 180px on desktop (no grow), but minWidth:0 lets
+                    // it shrink on a narrow card instead of shoving the button
+                    // outside the border.
+                    flex: '0 1 180px',
+                    minWidth: 0
                   }}
                 />
                 <button
@@ -241,7 +249,9 @@ export default function LeaderboardPage() {
                     cursor: 'pointer',
                     fontSize: '0.875rem',
                     fontWeight: '600',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0,
+                    whiteSpace: 'nowrap'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'var(--bg-secondary)';
