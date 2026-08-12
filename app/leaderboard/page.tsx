@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import LeaderboardTable from "@/components/LeaderboardTable";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
+import { useExecSession } from "@/hooks/useExecSession";
 import LeaderboardSkeleton from "@/components/skeletons/LeaderboardSkeleton";
 
 interface Guild {
@@ -52,6 +54,7 @@ interface MembersData {
 }
 
 export default function LeaderboardPage() {
+  const { authenticated, loading: sessionLoading } = useExecSession();
   const { membersData, loading, error, refresh } = useLeaderboard();
   const [searchTerm, setSearchTerm] = useState('');
   const [timeFrame, setTimeFrame] = useState(() => {
@@ -67,6 +70,71 @@ export default function LeaderboardPage() {
       localStorage.setItem('leaderboardTimeFrame', newTimeFrame);
     }
   };
+
+  if (sessionLoading) {
+    return <LeaderboardSkeleton />;
+  }
+
+  if (!authenticated) {
+    return (
+      <main style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 80px)',
+        padding: '2rem',
+      }}>
+        <div style={{
+          background: 'var(--bg-card)',
+          borderRadius: '1rem',
+          padding: '3rem',
+          maxWidth: '420px',
+          width: '100%',
+          textAlign: 'center',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+          border: '1px solid var(--border-card)',
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔒</div>
+          <h1 style={{
+            fontSize: '1.5rem',
+            fontWeight: '800',
+            background: 'linear-gradient(135deg, var(--color-ocean-400), var(--color-ocean-600))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            margin: '0 0 1rem',
+          }}>
+            Members Only
+          </h1>
+          <p style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.9rem',
+            margin: '0 0 2rem',
+            lineHeight: '1.5',
+          }}>
+            The guild leaderboard is only visible to logged-in members of The Aquarium. Sign in with Discord to view it.
+          </p>
+          <Link
+            href="/login?redirect=/leaderboard"
+            style={{
+              display: 'inline-block',
+              padding: '0.75rem 1.5rem',
+              background: 'var(--color-ocean-500)',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '0.5rem',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Sign in with Discord
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   if (loading && !membersData) {
     return <LeaderboardSkeleton />;
