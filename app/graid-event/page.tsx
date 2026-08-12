@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import Image from "next/image";
 import EventTable from "@/components/EventTable";
 import EventSkeleton from "@/components/skeletons/EventSkeleton";
 import { useGraidEvent } from "@/hooks/useGraidEvent";
@@ -11,6 +13,9 @@ interface EventData {
   event: ActiveEvent | null;
   rows: Row[];
   isFallback: boolean;
+  authorized: boolean;
+  highestPayout?: number;
+  totalPayout?: number;
 }
 
 function ordinal(n: number) {
@@ -105,7 +110,7 @@ export default function GraidEventPage() {
 
   if (!eventData) return null;
 
-  const { event: showEvent, rows: showRows, isFallback } = eventData as EventData;
+  const { event: showEvent, rows: showRows, isFallback, authorized, highestPayout, totalPayout } = eventData as EventData;
   const isLegacy = showEvent?.rewardMode === 'legacy';
   const lePerPoint = showEvent?.lePerPoint ?? 1;
 
@@ -117,7 +122,7 @@ export default function GraidEventPage() {
 
           {isFallback && (
             <p style={{ textAlign: 'center', color: '#ef4444', fontWeight: '700', marginBottom: '1rem', marginTop: 0 }}>
-              No active event. Showing the most recent event below.
+              There is no ongoing event, check the latest one below
             </p>
           )}
 
@@ -250,15 +255,78 @@ export default function GraidEventPage() {
           )}
         </div>
 
-        <div style={{ width: '100%', border: '3px solid var(--border-emphasis)', borderRadius: '1rem', overflow: 'hidden' }}>
-          <EventTable
-            rows={showRows}
-            minPoints={isLegacy ? showEvent?.minc ?? 0 : showEvent?.minPoints ?? 0}
-            valueLabel={isLegacy ? 'Completions' : 'Points'}
-            minimumLabel={isLegacy ? 'completions' : 'points'}
-            onRefresh={refresh}
-          />
-        </div>
+        {authorized ? (
+          <div style={{ width: '100%', border: '3px solid var(--border-emphasis)', borderRadius: '1rem', overflow: 'hidden' }}>
+            <EventTable
+              rows={showRows}
+              minPoints={isLegacy ? showEvent?.minc ?? 0 : showEvent?.minPoints ?? 0}
+              valueLabel={isLegacy ? 'Completions' : 'Points'}
+              minimumLabel={isLegacy ? 'completions' : 'points'}
+              onRefresh={refresh}
+            />
+          </div>
+        ) : (
+          <div className="card" style={{
+            width: '100%',
+            border: '3px solid var(--border-emphasis)',
+            borderRadius: '1rem',
+            padding: '2rem',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}>
+            <Image
+              src="/images/icons/locked.png"
+              alt=""
+              width={40}
+              height={40}
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+              Participant list hidden
+            </h2>
+            <p style={{ margin: 0, maxWidth: '30rem', color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+              The participant list and individual payouts are only visible to logged-in members of The Aquarium.
+            </p>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '1.5rem',
+              margin: '0.5rem 0',
+            }}>
+              <div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Highest payout this event</div>
+                <div style={{ fontWeight: '800', fontSize: '1.25rem', color: 'var(--text-primary)' }}>
+                  {formatLePayout(highestPayout ?? 0)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Total payout this event</div>
+                <div style={{ fontWeight: '800', fontSize: '1.25rem', color: 'var(--text-primary)' }}>
+                  {formatLePayout(totalPayout ?? 0)}
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/login?redirect=/graid-event"
+              style={{
+                display: 'inline-block',
+                padding: '0.6rem 1.25rem',
+                background: 'var(--color-ocean-500)',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+              }}
+            >
+              Sign in with Discord
+            </Link>
+          </div>
+        )}
 
         <div style={{ width: '100%', paddingBottom: '2rem' }}>
           <p style={{ fontSize: '0.875rem', textAlign: 'center', color: 'var(--text-muted)', margin: 0 }}>

@@ -3,6 +3,7 @@ import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
+import { requireGuildSession } from '@/lib/exec-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,6 +104,11 @@ function calculateTimeFrameStats(
 }
 
 export async function GET(request: NextRequest) {
+  const session = await requireGuildSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   // Check rate limit
   const rateLimitCheck = checkRateLimit(request, 'members');
 
