@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import LeaderboardTable from "@/components/LeaderboardTable";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
 import { useExecSession } from "@/hooks/useExecSession";
@@ -95,7 +96,13 @@ export default function LeaderboardPage() {
           boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
           border: '1px solid var(--border-card)',
         }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔒</div>
+          <Image
+            src="/images/icons/locked.png"
+            alt=""
+            width={40}
+            height={40}
+            style={{ imageRendering: 'pixelated', marginBottom: '1rem' }}
+          />
           <h1 style={{
             fontSize: '1.5rem',
             fontWeight: '800',
