@@ -11,6 +11,7 @@ import {
   btnSecondary,
   timeAgo,
   ASSIGNEE_FILTER_IGNS,
+  SITE_NAV_HEIGHT,
 } from './constants';
 
 function MultiToggleGroup({ options, value, onChange, colors }: {
@@ -180,19 +181,22 @@ export default function TicketDetailPanel({
         onClick={onClose}
         style={{
           position: 'fixed',
-          inset: 0,
+          top: SITE_NAV_HEIGHT,
+          left: 0,
+          right: 0,
+          bottom: 0,
           background: visible ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0)',
           zIndex: 99,
           transition: 'background 0.25s ease',
         }}
       />
 
-      {/* Panel */}
+      {/* Panel — starts below the navbar so its header is never hidden under it */}
       <div style={{
         position: 'fixed',
-        top: 0,
+        top: SITE_NAV_HEIGHT,
         right: 0,
-        height: '100vh',
+        height: `calc(100vh - ${SITE_NAV_HEIGHT})`,
         width: '480px',
         maxWidth: '90vw',
         background: 'var(--bg-card-solid)',
@@ -724,7 +728,10 @@ export default function TicketDetailPanel({
           onClick={() => setLightboxUrl(null)}
           style={{
             position: 'fixed',
-            inset: 0,
+            top: SITE_NAV_HEIGHT,
+            left: 0,
+            right: 0,
+            bottom: 0,
             background: 'rgba(0,0,0,0.85)',
             display: 'flex',
             alignItems: 'center',
@@ -739,7 +746,7 @@ export default function TicketDetailPanel({
             onClick={(e) => e.stopPropagation()}
             style={{
               maxWidth: '90vw',
-              maxHeight: '90vh',
+              maxHeight: `calc(90vh - ${SITE_NAV_HEIGHT})`,
               objectFit: 'contain',
               borderRadius: '0.5rem',
               cursor: 'default',
@@ -776,7 +783,10 @@ export default function TicketDetailPanel({
           onClick={(e) => { if (e.target === e.currentTarget) setShowDeleteConfirm(false); }}
           style={{
             position: 'fixed',
-            inset: 0,
+            top: SITE_NAV_HEIGHT,
+            left: 0,
+            right: 0,
+            bottom: 0,
             background: 'rgba(0,0,0,0.6)',
             display: 'flex',
             alignItems: 'center',
