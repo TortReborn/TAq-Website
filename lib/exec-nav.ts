@@ -38,7 +38,9 @@ export const EXEC_NAV: ExecNavGroup[] = [
     category: 'Members',
     items: [
       { href: '/exec/applications', label: 'Applications', desc: 'Review and vote on applications', iconImage: '/images/icons/exec/applications.png' },
-      { href: '/exec/activity', label: 'Activity', desc: 'Track activity and update kick list', iconImage: '/images/icons/exec/activity.png' },
+      // Trends is a tab inside Activity rather than its own entry: same
+      // subject, different zoom level.
+      { href: '/exec/activity', label: 'Activity', desc: 'Member activity, kick list, and guild trends', iconImage: '/images/icons/exec/activity.png' },
       { href: '/exec/promotions', label: 'Promotions', desc: 'Manage and suggest promotions', iconImage: '/images/icons/exec/promotions.png' },
       { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and add banned players', iconImage: '/images/icons/exec/blacklist.png' },
     ],

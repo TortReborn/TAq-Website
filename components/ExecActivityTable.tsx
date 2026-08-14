@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import type { ExecMember } from '@/hooks/useExecActivity';
 import { RANK_ORDER, RANK_COLORS } from '@/lib/rank-constants';
 
@@ -285,7 +286,20 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                         background: '#22c55e', flexShrink: 0,
                       }} title={`Online: ${member.server || 'unknown'}`} />
                     )}
-                    {member.username}
+                    {/* Opens this member's own history on the Trends tab. The
+                        name carries the link so the row's kick controls stay
+                        clickable. */}
+                    <Link
+                      href={`/exec/activity/trends?uuid=${member.uuid}&name=${encodeURIComponent(member.username)}`}
+                      title={`View ${member.username}'s activity over time`}
+                      style={{
+                        color: 'inherit',
+                        textDecoration: isHovered ? 'underline' : 'none',
+                        textUnderlineOffset: '2px',
+                      }}
+                    >
+                      {member.username}
+                    </Link>
                   </div>
                 </td>
                 <td style={{
