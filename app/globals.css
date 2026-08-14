@@ -511,6 +511,25 @@ select option {
   --text-muted: rgba(32, 74, 95, 0.7);
   --bg-card: rgba(255, 255, 255, 0.75);
   --bg-card-solid: #ffffff;
+
+  /* Chart tokens - Light mode.
+     Steps off the ocean ramp, chosen by measurement rather than eye:
+     the sequential ramp starts at ocean-400 because ocean-100..300 fall
+     below the 2:1 light-end floor against a white card, and skips ocean-800
+     because 700/800/900 sit closer than the 0.06 lightness step gap.
+     --chart-line is ocean-600 (4.13:1); ocean-500 misses the 3:1 mark floor. */
+  --chart-line: var(--color-ocean-600);
+  --chart-area: rgba(42, 134, 170, 0.10);
+  --chart-grid: rgba(32, 74, 95, 0.14);
+  --chart-gap: #64748b;
+  --chart-seq-1: var(--color-ocean-400);
+  --chart-seq-2: var(--color-ocean-500);
+  --chart-seq-3: var(--color-ocean-600);
+  --chart-seq-4: var(--color-ocean-700);
+  --chart-seq-5: var(--color-ocean-900);
+  --chart-empty: rgba(32, 74, 95, 0.06);
+  --chart-spark: rgba(32, 74, 95, 0.35);
+  --chart-tile-active: color-mix(in srgb, var(--color-ocean-100) 55%, var(--bg-card-solid));
   /* Opaque hover partner for --bg-card-solid, for chrome over imagery */
   --bg-card-solid-hover: #e8f4f8;
   --card-bg-secondary: rgba(232, 251, 255, 0.5);
@@ -551,6 +570,23 @@ select option {
   --text-muted: rgba(226, 232, 240, 0.7);
   --bg-card: rgba(30, 41, 59, 0.8);
   --bg-card-solid: #1e293b;
+
+  /* Chart tokens - Dark mode. Not a flip of the light ramp: the sequential
+     anchor moves to the dark end (low magnitude sits near the surface, high
+     magnitude reads bright), and the steps are re-picked against #1e293b —
+     ocean-800 fails the light-end floor there, ocean-700 clears it at 2.50:1. */
+  --chart-line: var(--color-ocean-400);
+  --chart-area: rgba(84, 195, 231, 0.10);
+  --chart-grid: rgba(226, 232, 240, 0.14);
+  --chart-gap: #94a3b8;
+  --chart-seq-1: var(--color-ocean-700);
+  --chart-seq-2: var(--color-ocean-600);
+  --chart-seq-3: var(--color-ocean-500);
+  --chart-seq-4: var(--color-ocean-400);
+  --chart-seq-5: var(--color-ocean-300);
+  --chart-empty: rgba(226, 232, 240, 0.07);
+  --chart-spark: rgba(226, 232, 240, 0.35);
+  --chart-tile-active: color-mix(in srgb, var(--color-ocean-700) 35%, var(--bg-card-solid));
   /* Opaque hover partner for --bg-card-solid, for chrome over imagery */
   --bg-card-solid-hover: #334155;
   --card-bg-secondary: rgba(51, 65, 85, 0.6);

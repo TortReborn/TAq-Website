@@ -115,14 +115,7 @@ export default function ExecActivityPage() {
 
   return (
     <div>
-      <h1 style={{
-        fontSize: '1.75rem',
-        fontWeight: '800',
-        color: 'var(--text-primary)',
-        marginBottom: '0.5rem',
-      }}>
-        Player Activity
-      </h1>
+      {/* The heading lives in the tab layout — this view is one of two. */}
       <p style={{
         color: 'var(--text-secondary)',
         fontSize: '0.85rem',
@@ -173,8 +166,13 @@ export default function ExecActivityPage() {
           borderRadius: '0.75rem',
           border: '1px solid var(--border-card)',
         }}>
-          {/* Time frame */}
-          <div style={{ display: 'flex', gap: '0.375rem' }}>
+          {/* Time frame. Labelled to distinguish it from the Trends tab's
+              period control: this one sets the baseline each member's activity
+              is measured against, and drives the kick threshold. */}
+          <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginRight: '0.15rem' }}>
+              Compare against
+            </span>
             {timeFrames.map(tf => (
               <button
                 key={tf.value}
