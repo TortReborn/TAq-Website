@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import type { TicketType, TicketSystem, TicketPriority } from '@/hooks/useExecTracker';
-import { inputStyle, selectStyle, btnStyle, btnPrimary, btnSecondary } from './constants';
+import { inputStyle, selectStyle, btnStyle, btnPrimary, btnSecondary, SITE_NAV_HEIGHT } from './constants';
 
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -90,7 +90,10 @@ export default function CreateTicketModal({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{
         position: 'fixed',
-        inset: 0,
+        top: SITE_NAV_HEIGHT,
+        left: 0,
+        right: 0,
+        bottom: 0,
         background: 'rgba(0,0,0,0.6)',
         display: 'flex',
         alignItems: 'center',

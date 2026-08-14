@@ -20,6 +20,12 @@ export const VISIBLE_COLUMN_COUNT = 5;
    the next list fetch. Kept in sync with server-side archival logic. */
 export const AUTO_ARCHIVE_DAYS = 7;
 
+/* Height of the site navbar in the root layout. Fixed-position overlays on
+   exec pages must start below it — the navbar sits in a stacking context that
+   paints over them, so anything drawn under it is invisible and unclickable.
+   Matches the `calc(100vh - 80px)` the exec shell reserves for itself. */
+export const SITE_NAV_HEIGHT = '80px';
+
 /* ─── Labels ─── */
 
 export const STATUS_LABELS: Record<string, string> = {
