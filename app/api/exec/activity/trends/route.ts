@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
       // The underlying figure is still worth showing on hover: for an average
       // it is the hours behind it, for a participation-weighted count it is the
       // number of events, which makes the average party size recoverable.
-      ...((isAveragedMetric(metric, scope) || PARTICIPATION_WEIGHTED[metric]) && r.raw_total !== undefined
+      ...((isAveragedMetric(effective, scope) || PARTICIPATION_WEIGHTED[metric]) && r.raw_total !== undefined
         ? { rawTotal: Number(r.raw_total) } : {}),
     }));
 
@@ -133,8 +133,12 @@ export async function GET(request: NextRequest) {
               : hourly ? 'hourly-samples'
               : isSnapshotMetric(metric) ? 'daily-snapshot'
               : 'events',
-      unit: unitFor(metric, scope),
-      averaged: isAveragedMetric(metric, scope),
+      // Labelled by the source that actually answered, not the one requested.
+      // A single member's playtime served from presence is observed minutes
+      // online, not Wynncraft's playtime counter — close, but not the same
+      // quantity, and "hours played" would misname it.
+      unit: unitFor(effective, scope),
+      averaged: isAveragedMetric(effective, scope),
       points,
       // Computed over the whole window, not summed from the buckets: for an
       // averaged metric those are different numbers and only this one is right.

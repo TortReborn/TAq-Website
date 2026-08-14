@@ -234,7 +234,9 @@ export default function TrendChart({
           viewBox={`0 0 ${VIEW_W} ${HEIGHT}`}
           style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
           role="img"
-          aria-label={`${title}: ${formatValue(total)} ${unit} total`}
+          aria-label={averaged
+            ? `${title}: ${formatValue(total)} ${unit} across the period`
+            : `${title}: ${formatValue(total)} ${unit} total`}
           onMouseLeave={() => setHover(null)}
         >
           <defs>

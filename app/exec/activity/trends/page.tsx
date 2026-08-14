@@ -492,7 +492,11 @@ export default function ExecTrendsPage() {
           loading={charted.loading}
           latest={charted.data?.latest}
           averaged={charted.data?.averaged}
-          rawUnit={effectiveChart === 'presence' ? 'member-hours online'
+          // Names the figure behind the average, so it has to follow the source
+          // that answered: playtime served from presence samples is time
+          // observed online, not the playtime counter.
+          rawUnit={effectiveChart === 'presence' || charted.data?.source === 'presence-samples'
+                   ? (uuid ? 'hours online' : 'member-hours online')
                    : effectiveChart === 'raids' ? 'raids'
                    : 'hours played'}
           total={charted.data?.total}
