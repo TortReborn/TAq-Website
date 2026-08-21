@@ -18,6 +18,9 @@ export interface BuildVersion {
   notes: string | null;
   createdAt: string;
   createdBy: string | null;
+  archived: boolean;
+  archivedAt: string | null;
+  archivedBy: string | null;
 }
 
 // Build definition as returned from the API
@@ -27,7 +30,13 @@ export interface BuildDefinition {
   role: BuildRole;
   color: string;
   sortOrder: number;
+  archived: boolean;
+  archivedAt: string | null;
+  archivedBy: string | null;
   versions: BuildVersion[];                                 // newest first
+  // Latest non-archived version — what new assignments and upgrades target.
+  // Null when every version is archived. Independent of the definition's own
+  // archived flag; callers gate assignment on `!archived` separately.
   latestVersion: { major: number; minor: number } | null;
 }
 

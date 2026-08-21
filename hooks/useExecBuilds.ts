@@ -10,6 +10,9 @@ export interface MemberBuildRef {
   // Null if they've never been re-assigned. Used to render an undo button.
   prevMajor: number | null;
   prevMinor: number | null;
+  // Effective archived state (definition OR pinned version). Archived refs
+  // are hidden from the main table and listed in the archived-builds table.
+  archived: boolean;
 }
 
 export interface MemberWithBuilds {
@@ -136,6 +139,24 @@ export function useExecBuilds() {
     mutate();
   };
 
+  // Archive or restore a whole build (no version) or a single version.
+  // Assignments are untouched; the Discord role follows on the bot's next
+  // sync sweep. Returns the API payload so callers can surface affectedMembers.
+  const setArchived = async (
+    key: string,
+    action: 'archive' | 'restore',
+    version?: VersionRef
+  ) => {
+    const payload = await postJson('/api/exec/builds/archive', 'POST', {
+      scope: version ? 'version' : 'definition',
+      key,
+      ...(version ? { major: version.major, minor: version.minor } : {}),
+      action,
+    });
+    mutate();
+    return payload;
+  };
+
   const deleteBuildVersion = async (buildKey: string, version: VersionRef) => {
     await postJson('/api/exec/builds/versions', 'DELETE', {
       buildKey,
@@ -162,5 +183,6 @@ export function useExecBuilds() {
     bumpBuildVersion,
     editBuildVersion,
     deleteBuildVersion,
+    setArchived,
   };
 }

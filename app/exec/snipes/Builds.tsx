@@ -81,7 +81,11 @@ function BuildDefForm({
   onCancel: () => void;
   submitLabel: string;
 }) {
-  const initialLatest = initial?.versions[0];
+  // Latest ACTIVE version — link edits from this form must never silently
+  // target an archived version that happens to be numerically newest.
+  const initialLatest = initial
+    ? initial.versions.find(v => !v.archived) ?? initial.versions[0]
+    : undefined;
   const [key, setKey] = useState(initial?.key ?? '');
   const [name, setName] = useState(initial?.name ?? '');
   const [role, setRole] = useState<BuildRole>(initial?.role ?? 'DPS');
@@ -224,7 +228,7 @@ export default function Builds() {
     members, allGuildMembers, buildDefinitions, lastUpdated, loading, error, refresh,
     assignBuild, removeBuild, toggleFlag,
     createBuildDefinition, updateBuildDefinition, deleteBuildDefinition,
-    bumpBuildVersion, editBuildVersion, deleteBuildVersion,
+    bumpBuildVersion, editBuildVersion, deleteBuildVersion, setArchived,
   } = useExecBuilds();
 
   const [rankFilter, setRankFilter] = useState<string | null>(null);
@@ -237,6 +241,8 @@ export default function Builds() {
   const [showAddBuild, setShowAddBuild] = useState(false);
   const [editingBuild, setEditingBuild] = useState<BuildDefinition | null>(null);
   const [deletingBuild, setDeletingBuild] = useState<string | null>(null);
+  const [archivingBuild, setArchivingBuild] = useState<string | null>(null);
+  const [sidebarView, setSidebarView] = useState<'active' | 'archive'>('active');
   const [defError, setDefError] = useState<string | null>(null);
 
   // Per-build sidebar UI state
@@ -272,15 +278,27 @@ export default function Builds() {
     return map;
   }, [buildDefinitions]);
 
-  // Group definitions by role
+  // Split active from archived. Everything that hands out builds works off
+  // the active list; archived definitions live in the sidebar's Archive view
+  // and the archived-builds member table.
+  const activeDefinitions = useMemo(
+    () => buildDefinitions.filter(def => !def.archived),
+    [buildDefinitions]
+  );
+  const archivedDefinitions = useMemo(
+    () => buildDefinitions.filter(def => def.archived),
+    [buildDefinitions]
+  );
+
+  // Group active definitions by role
   const defsByRole = useMemo(() => {
     const groups: Record<string, BuildDefinition[]> = { DPS: [], HEALER: [], TANK: [] };
-    for (const def of buildDefinitions) {
+    for (const def of activeDefinitions) {
       if (!groups[def.role]) groups[def.role] = [];
       groups[def.role].push(def);
     }
     return groups;
-  }, [buildDefinitions]);
+  }, [activeDefinitions]);
 
   // Unique ranks present for filter buttons
   const memberRanks = useMemo(() => {
@@ -296,6 +314,22 @@ export default function Builds() {
     }
     return list;
   }, [members, rankFilter]);
+
+  // Members with at least one active assignment fill the main table; members
+  // still holding archived assignments (possibly the same people) fill the
+  // archived-builds table below it. The rank filter applies to both.
+  const activeMembers = useMemo(
+    () => filteredMembers.filter(m => m.builds.some(b => !b.archived)),
+    [filteredMembers]
+  );
+  const archivedHolders = useMemo(
+    () =>
+      filteredMembers
+        .map(m => ({ member: m, archivedBuilds: m.builds.filter(b => b.archived) }))
+        .filter(x => x.archivedBuilds.length > 0),
+    [filteredMembers]
+  );
+  const archivedRefCount = archivedHolders.reduce((sum, x) => sum + x.archivedBuilds.length, 0);
 
   // Filter guild members for add-member dropdown
   const addMemberResults = useMemo(() => {
@@ -348,8 +382,11 @@ export default function Builds() {
         role: data.role,
         color: data.color,
       });
-      // Also push the link/notes changes to the latest version, if one exists.
-      const latest = editingBuild?.versions[0];
+      // Also push the link/notes changes to the latest active version, if one
+      // exists (fall back to the newest overall for all-archived edge cases).
+      const latest = editingBuild
+        ? editingBuild.versions.find(v => !v.archived) ?? editingBuild.versions[0]
+        : undefined;
       if (latest) {
         await editBuildVersion(
           data.key,
@@ -368,6 +405,22 @@ export default function Builds() {
     try {
       await deleteBuildDefinition(key);
       setDeletingBuild(null);
+    } catch (e: any) {
+      setDefError(e.message);
+    }
+  };
+
+  // Archive/restore a whole build (no version) or one version. Assignments
+  // are untouched; TAqCord roles follow on the bot's next sync sweep.
+  const handleSetArchived = async (
+    key: string,
+    action: 'archive' | 'restore',
+    version?: VersionRef
+  ) => {
+    setDefError(null);
+    try {
+      await setArchived(key, action, version);
+      setArchivingBuild(null);
     } catch (e: any) {
       setDefError(e.message);
     }
@@ -545,7 +598,7 @@ export default function Builds() {
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '0.21rem', flexShrink: 0 }}>
-                            {buildDefinitions.map(def => (
+                            {activeDefinitions.map(def => (
                               <button
                                 key={def.key}
                                 onClick={() => handleAddMember(m.uuid, def.key)}
@@ -593,17 +646,19 @@ export default function Builds() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMembers.length === 0 && (
+                  {activeMembers.length === 0 && (
                     <tr><td colSpan={3} style={{ padding: '1.7rem', textAlign: 'center', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
                       {members.length === 0 ? 'No members tracked yet. Use "+ Add Member" to get started.' : 'No members match filters'}
                     </td></tr>
                   )}
-                  {filteredMembers.map((member, idx) => {
+                  {activeMembers.map((member, idx) => {
                     const isOdd = idx % 2 === 1;
                     // A member can only have one version of a build at a time,
-                    // so "missing" is "not present at all by buildKey".
+                    // so "missing" is "not present at all by buildKey" —
+                    // archived holdings count, since re-assigning the same key
+                    // is an upgrade and belongs to the archived table below.
                     const memberKeys = new Set(member.builds.map(b => b.buildKey));
-                    const missingBuilds = buildDefinitions.filter(d => !memberKeys.has(d.key));
+                    const missingBuilds = activeDefinitions.filter(d => !memberKeys.has(d.key));
 
                     return (
                       <tr
@@ -641,7 +696,7 @@ export default function Builds() {
                         {/* Builds */}
                         <td style={{ padding: '0.425rem 0.64rem' }}>
                           <div style={{ display: 'flex', gap: '0.32rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                            {member.builds.map(memberBuild => {
+                            {member.builds.filter(b => !b.archived).map(memberBuild => {
                               const def = buildDefMap[memberBuild.buildKey];
                               if (!def) return null;
                               const memberVersion: VersionRef = { major: memberBuild.major, minor: memberBuild.minor };
@@ -765,7 +820,7 @@ export default function Builds() {
                                     ref={dropdownRef}
                                     style={{
                                       position: 'absolute',
-                                      ...(idx >= filteredMembers.length - 3
+                                      ...(idx >= activeMembers.length - 3
                                         ? { bottom: '100%', marginBottom: '0.21rem' }
                                         : { top: '100%', marginTop: '0.21rem' }),
                                       left: 0,
@@ -819,30 +874,162 @@ export default function Builds() {
               </table>
             </div>
           </div>
+
+          {/* ── Archived builds: members still holding archived assignments.
+                 Kept as the record of who had what (TAQ-29); each chip offers
+                 a one-click upgrade to the build's latest active version. ── */}
+          {archivedHolders.length > 0 && (
+            <div style={{ background: 'var(--bg-card-solid)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', overflow: 'hidden', flexShrink: 0, marginTop: '0.64rem', maxHeight: '35%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '0.53rem 0.64rem', borderBottom: '1px solid var(--border-card)', fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', flexShrink: 0 }}>
+                Archived builds ({archivedRefCount})
+              </div>
+              <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {archivedHolders.map(({ member, archivedBuilds }, idx) => (
+                      <tr
+                        key={member.uuid}
+                        className="builds-row"
+                        style={{
+                          borderBottom: '1px solid var(--border-card)',
+                          background: idx % 2 === 1 ? 'rgba(255, 255, 255, 0.025)' : 'transparent',
+                          transition: 'background 0.1s',
+                        }}
+                      >
+                        <td style={{ padding: '0.425rem 0.64rem', whiteSpace: 'nowrap', width: '1%' }}>
+                          {member.discordRank && (
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '0.12rem 0.425rem',
+                              borderRadius: '0.21rem',
+                              fontSize: '0.64rem',
+                              fontWeight: '700',
+                              color: '#fff',
+                              background: getRankColor(member.discordRank),
+                            }}>
+                              {member.discordRank}
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+                          <MemberName ign={member.ign} flags={member.flags} />
+                        </td>
+                        <td style={{ padding: '0.425rem 0.64rem', width: '99%' }}>
+                          <div style={{ display: 'flex', gap: '0.32rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            {archivedBuilds.map(ref => {
+                              const def = buildDefMap[ref.buildKey];
+                              if (!def) return null;
+                              // Upgrade target: the build's latest active
+                              // version. Gone when the whole build is archived.
+                              const target = !def.archived && def.latestVersion ? def.latestVersion : null;
+                              return (
+                                <span
+                                  key={`${ref.buildKey}-${ref.major}-${ref.minor}`}
+                                  title={def.archived ? `${def.name} — build archived` : `${def.name} v${formatVersion(ref)} — version archived`}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.21rem',
+                                    padding: '0.15rem 0.425rem',
+                                    borderRadius: '9999px',
+                                    fontSize: '0.68rem',
+                                    fontWeight: '600',
+                                    color: 'var(--text-secondary)',
+                                    background: 'rgba(148, 163, 184, 0.12)',
+                                    border: `1px dashed ${def.color}66`,
+                                  }}
+                                >
+                                  {def.name} v{formatVersion(ref)}
+                                  {target && (
+                                    <button
+                                      onClick={() => assignBuild(member.uuid, ref.buildKey, target)}
+                                      title={`Upgrade to v${formatVersion(target)}`}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#22c55e',
+                                        cursor: 'pointer',
+                                        fontSize: '0.66rem',
+                                        fontWeight: '700',
+                                        lineHeight: 1,
+                                        padding: 0,
+                                        marginLeft: '0.1rem',
+                                      }}
+                                    >
+                                      ↑ v{formatVersion(target)}
+                                    </button>
+                                  )}
+                                  <span
+                                    onClick={() => removeBuild(member.uuid, ref.buildKey)}
+                                    style={{
+                                      fontSize: '0.62rem',
+                                      opacity: 0.5,
+                                      marginLeft: '0.1rem',
+                                      cursor: 'pointer',
+                                      lineHeight: 1,
+                                    }}
+                                    title={`Remove — erases the record that ${member.ign} had ${def.name}`}
+                                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                                    onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
+                                  >
+                                    &times;
+                                  </span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Right sidebar: HQ Builds ── */}
         <div className="themed-scrollbar" style={{ flex: '1.5 1 0', minWidth: '220px', position: 'sticky', top: '2rem', alignSelf: 'flex-start', maxHeight: 'calc(100vh - 11.9rem)', overflowY: 'auto' }}>
           <div style={{ background: 'var(--bg-card)', borderRadius: '0.64rem', border: '1px solid var(--border-card)', padding: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{
-                fontSize: '1rem',
-                fontWeight: '800',
-                color: 'var(--text-primary)',
-                margin: 0,
-                padding: '0.32rem 0.64rem',
-                background: 'rgba(34, 197, 94, 0.12)',
-                borderRadius: '0.32rem',
-              }}>
-                HQ Builds:
-              </h2>
-              <button
-                onClick={() => { setShowAddBuild(!showAddBuild); setEditingBuild(null); setDefError(null); }}
-                style={{ ...btnStyle, background: '#22c55e', color: '#fff', fontSize: '0.62rem' }}
-                title="Add new build"
-              >
-                + New
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.32rem', marginBottom: '1rem' }}>
+              {/* Segmented control, shaped like the Inventory page's archive tab */}
+              <div style={{ display: 'flex', gap: '0.17rem', background: 'var(--bg-primary)', borderRadius: '0.32rem', padding: '0.17rem', border: '1px solid var(--border-card)' }}>
+                <button
+                  onClick={() => { setSidebarView('active'); setDefError(null); }}
+                  style={{
+                    ...btnStyle,
+                    background: sidebarView === 'active' ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                    color: sidebarView === 'active' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontWeight: sidebarView === 'active' ? '800' : '600',
+                  }}
+                >
+                  HQ Builds
+                </button>
+                <button
+                  onClick={() => {
+                    setSidebarView('archive');
+                    setShowAddBuild(false); setEditingBuild(null); setArchivingBuild(null);
+                    setNewVersionFor(null); setEditingVersion(null); setDefError(null);
+                  }}
+                  style={{
+                    ...btnStyle,
+                    background: sidebarView === 'archive' ? 'rgba(148, 163, 184, 0.18)' : 'transparent',
+                    color: sidebarView === 'archive' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontWeight: sidebarView === 'archive' ? '800' : '600',
+                  }}
+                >
+                  Archive ({archivedDefinitions.length})
+                </button>
+              </div>
+              {sidebarView === 'active' && (
+                <button
+                  onClick={() => { setShowAddBuild(!showAddBuild); setEditingBuild(null); setDefError(null); }}
+                  style={{ ...btnStyle, background: '#22c55e', color: '#fff', fontSize: '0.62rem' }}
+                  title="Add new build"
+                >
+                  + New
+                </button>
+              )}
             </div>
 
             {defError && (
@@ -864,7 +1051,7 @@ export default function Builds() {
             )}
 
             {/* Build definitions grouped by role */}
-            {BUILD_ROLE_OPTIONS.map(role => {
+            {sidebarView === 'active' && BUILD_ROLE_OPTIONS.map(role => {
               const defs = defsByRole[role];
               if (!defs || defs.length === 0) return null;
               return (
@@ -883,8 +1070,12 @@ export default function Builds() {
                   </div>
 
                   {defs.map(def => {
-                    const latestVersion = def.versions[0] ?? null;
-                    const olderVersions = def.versions.slice(1);
+                    // The build's face is its latest ACTIVE version — an
+                    // archived version can't be it even if numerically newest.
+                    const latestVersion = def.latestVersion
+                      ? def.versions.find(v => v.major === def.latestVersion!.major && v.minor === def.latestVersion!.minor) ?? null
+                      : null;
+                    const otherVersions = def.versions.filter(v => v !== latestVersion);
                     const isExpanded = expandedVersions.has(def.key);
                     const isAddingVersion = newVersionFor?.buildKey === def.key;
 
@@ -900,6 +1091,35 @@ export default function Builds() {
                               submitLabel="Save"
                             />
                           </div>
+                        ) : archivingBuild === def.key ? (
+                          /* Archive confirmation */
+                          <div style={{ padding: '0.53rem', background: 'rgba(148, 163, 184, 0.08)', borderRadius: '0.425rem', border: '1px solid rgba(148, 163, 184, 0.25)' }}>
+                            <div style={{ fontSize: '0.68rem', color: 'var(--text-primary)', fontWeight: '600', marginBottom: '0.32rem' }}>
+                              Archive &quot;{def.name}&quot;?
+                            </div>
+                            <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
+                              {(() => {
+                                const n = members.filter(m => m.builds.some(b => b.buildKey === def.key && !b.archived)).length;
+                                return n === 1
+                                  ? `1 member keeps the assignment but loses the ${def.role} role in TAqCord unless another active build covers them. Restore any time.`
+                                  : `${n} members keep their assignments but lose the ${def.role} role in TAqCord unless another active build covers them. Restore any time.`;
+                              })()}
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.32rem' }}>
+                              <button
+                                onClick={() => handleSetArchived(def.key, 'archive')}
+                                style={{ ...btnStyle, background: '#94a3b8', color: '#fff', fontSize: '0.62rem' }}
+                              >
+                                Yes, Archive
+                              </button>
+                              <button
+                                onClick={() => { setArchivingBuild(null); setDefError(null); }}
+                                style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)', fontSize: '0.62rem' }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
                         ) : deletingBuild === def.key ? (
                           /* Delete confirmation */
                           <div style={{ padding: '0.53rem', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '0.425rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
@@ -907,7 +1127,7 @@ export default function Builds() {
                               Delete &quot;{def.name}&quot;?
                             </div>
                             <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
-                              This will remove this build (all versions) from all members. This cannot be undone.
+                              This will remove this build (all versions) from all members and erase who had it — unlike Archive, this cannot be undone.
                             </div>
                             <div style={{ display: 'flex', gap: '0.32rem' }}>
                               <button
@@ -938,14 +1158,21 @@ export default function Builds() {
                               </div>
                               <div style={{ display: 'flex', gap: '0.21rem' }}>
                                 <button
-                                  onClick={() => { setEditingBuild(def); setDeletingBuild(null); setShowAddBuild(false); setDefError(null); }}
+                                  onClick={() => { setEditingBuild(def); setDeletingBuild(null); setArchivingBuild(null); setShowAddBuild(false); setDefError(null); }}
                                   title="Edit"
                                   style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)' }}
                                 >
                                   Edit
                                 </button>
                                 <button
-                                  onClick={() => { setDeletingBuild(def.key); setEditingBuild(null); setShowAddBuild(false); setDefError(null); }}
+                                  onClick={() => { setArchivingBuild(def.key); setEditingBuild(null); setDeletingBuild(null); setShowAddBuild(false); setDefError(null); }}
+                                  title="Archive — members keep the assignment but stop getting the role"
+                                  style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8' }}
+                                >
+                                  Arc
+                                </button>
+                                <button
+                                  onClick={() => { setDeletingBuild(def.key); setEditingBuild(null); setArchivingBuild(null); setShowAddBuild(false); setDefError(null); }}
                                   title="Delete"
                                   style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
                                 >
@@ -990,7 +1217,7 @@ export default function Builds() {
                               </div>
                             ) : (
                               <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '0.32rem' }}>
-                                No versions yet
+                                {def.versions.length === 0 ? 'No versions yet' : 'No active versions — all archived'}
                               </div>
                             )}
 
@@ -1010,12 +1237,21 @@ export default function Builds() {
                               >
                                 + Major Update
                               </button>
-                              {olderVersions.length > 0 && (
+                              {latestVersion && (
+                                <button
+                                  onClick={() => handleSetArchived(def.key, 'archive', { major: latestVersion.major, minor: latestVersion.minor })}
+                                  style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8' }}
+                                  title={`Archive v${formatVersion(latestVersion)} — members on it lose the role until upgraded; the next active version becomes latest`}
+                                >
+                                  Archive v{formatVersion(latestVersion)}
+                                </button>
+                              )}
+                              {otherVersions.length > 0 && (
                                 <button
                                   onClick={() => toggleVersionsExpanded(def.key)}
                                   style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' }}
                                 >
-                                  {isExpanded ? 'Hide' : 'Show'} {olderVersions.length} older
+                                  {isExpanded ? 'Hide' : 'Show'} {otherVersions.length} more
                                 </button>
                               )}
                             </div>
@@ -1058,10 +1294,10 @@ export default function Builds() {
                               </div>
                             )}
 
-                            {/* Older versions list */}
-                            {isExpanded && olderVersions.length > 0 && (
+                            {/* Other versions list (older actives + archived) */}
+                            {isExpanded && otherVersions.length > 0 && (
                               <div style={{ marginTop: '0.425rem', display: 'flex', flexDirection: 'column', gap: '0.32rem' }}>
-                                {olderVersions.map(v => {
+                                {otherVersions.map(v => {
                                   const versionRef: VersionRef = { major: v.major, minor: v.minor };
                                   const isEditingThis =
                                     editingVersion?.buildKey === def.key &&
@@ -1100,9 +1336,19 @@ export default function Builds() {
                                       }}
                                     >
                                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.425rem', flexWrap: 'wrap' }}>
-                                        <span style={{ fontSize: '0.64rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                        <span style={{
+                                          fontSize: '0.64rem',
+                                          fontWeight: '700',
+                                          color: v.archived ? 'var(--text-secondary)' : 'var(--text-primary)',
+                                          textDecoration: v.archived ? 'line-through' : 'none',
+                                        }}>
                                           v{formatVersion(versionRef)}
                                         </span>
+                                        {v.archived && (
+                                          <span style={{ fontSize: '0.55rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', background: 'rgba(148, 163, 184, 0.15)', padding: '0.06rem 0.3rem', borderRadius: '9999px' }}>
+                                            archived
+                                          </span>
+                                        )}
                                         <a
                                           href={v.connsUrl}
                                           target="_blank"
@@ -1126,11 +1372,20 @@ export default function Builds() {
                                         )}
                                       </div>
                                       <div style={{ display: 'flex', gap: '0.17rem' }}>
+                                        {!v.archived && (
+                                          <button
+                                            onClick={() => { setEditingVersion({ buildKey: def.key, version: versionRef }); setDefError(null); }}
+                                            style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)' }}
+                                          >
+                                            Edit
+                                          </button>
+                                        )}
                                         <button
-                                          onClick={() => { setEditingVersion({ buildKey: def.key, version: versionRef }); setDefError(null); }}
-                                          style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-ocean-400)' }}
+                                          onClick={() => handleSetArchived(def.key, v.archived ? 'restore' : 'archive', versionRef)}
+                                          title={v.archived ? 'Restore this version' : 'Archive — members on it lose the role until upgraded'}
+                                          style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8' }}
                                         >
-                                          Edit
+                                          {v.archived ? 'Restore' : 'Arc'}
                                         </button>
                                         <button
                                           onClick={() => handleDeleteVersion(def.key, versionRef)}
@@ -1150,6 +1405,98 @@ export default function Builds() {
                       </div>
                     );
                   })}
+                </div>
+              );
+            })}
+
+            {/* ── Archive view: retired builds, read-only + Restore ── */}
+            {sidebarView === 'archive' && archivedDefinitions.length === 0 && (
+              <div style={{ fontSize: '0.64rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                Nothing archived yet. Use a build&apos;s Arc button to retire it without losing who had it.
+              </div>
+            )}
+            {sidebarView === 'archive' && archivedDefinitions.map(def => {
+              const holderCount = members.filter(m => m.builds.some(b => b.buildKey === def.key)).length;
+              return (
+                <div key={def.key} style={{ marginBottom: '0.85rem', padding: '0.53rem', background: 'var(--bg-primary)', borderRadius: '0.425rem', border: '1px solid var(--border-card)' }}>
+                  {deletingBuild === def.key ? (
+                    /* Permanent delete confirmation */
+                    <div>
+                      <div style={{ fontSize: '0.68rem', color: '#ef4444', fontWeight: '600', marginBottom: '0.32rem' }}>
+                        Delete &quot;{def.name}&quot; permanently?
+                      </div>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
+                        This removes the build, all versions, and every member&apos;s assignment record — unlike Archive, this cannot be undone.
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.32rem' }}>
+                        <button
+                          onClick={() => handleDeleteBuild(def.key)}
+                          style={{ ...btnStyle, background: '#ef4444', color: '#fff', fontSize: '0.62rem' }}
+                        >
+                          Yes, Delete
+                        </button>
+                        <button
+                          onClick={() => { setDeletingBuild(null); setDefError(null); }}
+                          style={{ ...btnStyle, background: 'var(--bg-primary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)', fontSize: '0.62rem' }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.32rem', marginBottom: '0.21rem' }}>
+                        <div style={{ fontSize: '0.74rem', fontWeight: '700', color: def.color }}>
+                          {def.name}
+                          <span style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', fontWeight: '600', marginLeft: '0.32rem', textTransform: 'uppercase' }}>
+                            {def.role}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.21rem' }}>
+                          <button
+                            onClick={() => handleSetArchived(def.key, 'restore')}
+                            title="Restore — the build becomes assignable again and roles come back on the next sync"
+                            style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}
+                          >
+                            Restore
+                          </button>
+                          <button
+                            onClick={() => { setDeletingBuild(def.key); setDefError(null); }}
+                            title="Delete permanently"
+                            style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}
+                          >
+                            Del
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', marginBottom: '0.32rem' }}>
+                        Archived {def.archivedAt ? new Date(def.archivedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                        {def.archivedBy ? ` by ${def.archivedBy}` : ''}
+                        {' · '}
+                        {holderCount === 1 ? '1 member still holds it' : `${holderCount} members still hold it`}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.21rem' }}>
+                        {def.versions.map(v => (
+                          <div key={`${v.major}.${v.minor}`} style={{ display: 'flex', alignItems: 'center', gap: '0.425rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.6rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
+                              v{formatVersion(v)}
+                            </span>
+                            <a href={v.connsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.56rem', color: 'var(--color-ocean-400)', textDecoration: 'none' }}>
+                              Conns
+                            </a>
+                            <a href={v.hqUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.56rem', color: 'var(--color-ocean-400)', textDecoration: 'none' }}>
+                              HQ
+                            </a>
+                            {v.notes && (
+                              <span style={{ fontSize: '0.54rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                                {v.notes}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               );
             })}

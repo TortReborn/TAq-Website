@@ -55,9 +55,9 @@ export async function GET(request: NextRequest) {
     try {
       // Fetch definitions, versions, discord links, builds, and flags in parallel
       const [defsResult, versionsResult, discordLinksResult, buildsResult, flagsResult] = await Promise.all([
-        client.query('SELECT key, name, role, color, sort_order FROM build_definitions ORDER BY sort_order'),
+        client.query('SELECT key, name, role, color, sort_order, archived, archived_at, archived_by FROM build_definitions ORDER BY sort_order'),
         client.query(
-          'SELECT build_key, major, minor, conns_url, hq_url, notes, created_at, created_by FROM build_versions ORDER BY build_key, major DESC, minor DESC'
+          'SELECT build_key, major, minor, conns_url, hq_url, notes, created_at, created_by, archived, archived_at, archived_by FROM build_versions ORDER BY build_key, major DESC, minor DESC'
         ),
         client.query('SELECT uuid, rank, discord_id, ign FROM discord_links'),
         client.query('SELECT uuid, build_key, version_major, version_minor, prev_version_major, prev_version_minor, created_at FROM member_builds'),
@@ -76,25 +76,41 @@ export async function GET(request: NextRequest) {
           notes: row.notes,
           createdAt: row.created_at,
           createdBy: row.created_by,
+          archived: row.archived,
+          archivedAt: row.archived_at,
+          archivedBy: row.archived_by,
         });
       }
 
-      // Build definitions with attached versions
+      // Build definitions with attached versions.
+      // latestVersion is the newest NON-archived version — the target for new
+      // assignments and upgrades. Null when every version is archived.
       const buildDefinitions = defsResult.rows.map(row => {
         const versions = versionsByKey[row.key] ?? [];
-        const latest = versions[0]
-          ? { major: versions[0].major, minor: versions[0].minor }
-          : null;
+        const latestActive = versions.find(v => !v.archived);
         return {
           key: row.key,
           name: row.name,
           role: row.role,
           color: row.color,
           sortOrder: row.sort_order,
+          archived: row.archived,
+          archivedAt: row.archived_at,
+          archivedBy: row.archived_by,
           versions,
-          latestVersion: latest,
+          latestVersion: latestActive
+            ? { major: latestActive.major, minor: latestActive.minor }
+            : null,
         };
       });
+
+      // Effective-archived lookup for member refs: a definition-level flag
+      // archives every version; otherwise it's the version's own flag.
+      const defArchived = new Map(buildDefinitions.map(d => [d.key, d.archived]));
+      const versionArchived = new Set<string>();
+      for (const row of versionsResult.rows) {
+        if (row.archived) versionArchived.add(`${row.build_key}:${row.major}.${row.minor}`);
+      }
 
       // Valid build keys from DB
       const validBuildKeys = new Set(buildDefinitions.map(d => d.key));
@@ -108,6 +124,9 @@ export async function GET(request: NextRequest) {
       // Index builds by uuid — only these members will be shown.
       // Each entry includes the current version and (optionally) the previous
       // version, so the UI can render an "undo" button after a version change.
+      // `archived` is the effective state (definition OR pinned version), so
+      // the client can split active chips from the archived-builds table
+      // without recomputing the join.
       const buildsByUuid: Record<
         string,
         {
@@ -116,6 +135,7 @@ export async function GET(request: NextRequest) {
           minor: number;
           prevMajor: number | null;
           prevMinor: number | null;
+          archived: boolean;
         }[]
       > = {};
       for (const row of buildsResult.rows) {
@@ -127,6 +147,9 @@ export async function GET(request: NextRequest) {
           minor: row.version_minor,
           prevMajor: row.prev_version_major,
           prevMinor: row.prev_version_minor,
+          archived:
+            (defArchived.get(row.build_key) ?? false) ||
+            versionArchived.has(`${row.build_key}:${row.version_major}.${row.version_minor}`),
         });
       }
 
@@ -212,32 +235,41 @@ export async function POST(request: NextRequest) {
 
     const pool = getPool();
 
-    // Validate build definition exists
-    const defCheck = await pool.query('SELECT 1 FROM build_definitions WHERE key = $1', [buildKey]);
+    // Validate build definition exists and is not archived. Archived builds
+    // cannot receive assignments — the archived-builds table only upgrades
+    // members *off* them (onto a different, active build key).
+    const defCheck = await pool.query('SELECT archived FROM build_definitions WHERE key = $1', [buildKey]);
     if (defCheck.rowCount === 0) {
       return NextResponse.json({ error: 'Invalid build key' }, { status: 400 });
     }
+    if (defCheck.rows[0].archived) {
+      return NextResponse.json({ error: 'Build is archived' }, { status: 400 });
+    }
 
-    // Resolve the target version. If caller didn't specify, default to latest.
+    // Resolve the target version. If caller didn't specify, default to the
+    // latest non-archived version. Explicitly archived versions are rejected.
     let resolvedMajor: number | null = null;
     let resolvedMinor: number | null = null;
     if (typeof major === 'number' && typeof minor === 'number') {
       const versionCheck = await pool.query(
-        'SELECT 1 FROM build_versions WHERE build_key = $1 AND major = $2 AND minor = $3',
+        'SELECT archived FROM build_versions WHERE build_key = $1 AND major = $2 AND minor = $3',
         [buildKey, major, minor]
       );
       if (versionCheck.rowCount === 0) {
         return NextResponse.json({ error: 'Invalid build version' }, { status: 400 });
       }
+      if (versionCheck.rows[0].archived) {
+        return NextResponse.json({ error: 'That version is archived' }, { status: 400 });
+      }
       resolvedMajor = major;
       resolvedMinor = minor;
     } else {
       const latest = await pool.query(
-        'SELECT major, minor FROM build_versions WHERE build_key = $1 ORDER BY major DESC, minor DESC LIMIT 1',
+        'SELECT major, minor FROM build_versions WHERE build_key = $1 AND NOT archived ORDER BY major DESC, minor DESC LIMIT 1',
         [buildKey]
       );
       if (latest.rowCount === 0) {
-        return NextResponse.json({ error: 'Build has no versions' }, { status: 400 });
+        return NextResponse.json({ error: 'Build has no active versions' }, { status: 400 });
       }
       resolvedMajor = latest.rows[0].major;
       resolvedMinor = latest.rows[0].minor;
