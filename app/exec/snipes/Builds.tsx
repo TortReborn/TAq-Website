@@ -290,6 +290,14 @@ export default function Builds() {
     [buildDefinitions]
   );
 
+  // Assignable = active AND has at least one active version to pin to.
+  // Assignment affordances list only these — a build whose every version is
+  // archived can't be handed out, so offering it (even disabled) is clutter.
+  const assignableDefinitions = useMemo(
+    () => activeDefinitions.filter(def => def.latestVersion !== null),
+    [activeDefinitions]
+  );
+
   // Group active definitions by role
   const defsByRole = useMemo(() => {
     const groups: Record<string, BuildDefinition[]> = { DPS: [], HEALER: [], TANK: [] };
@@ -598,20 +606,17 @@ export default function Builds() {
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '0.21rem', flexShrink: 0 }}>
-                            {activeDefinitions.map(def => (
+                            {assignableDefinitions.map(def => (
                               <button
                                 key={def.key}
                                 onClick={() => handleAddMember(m.uuid, def.key)}
                                 title={`Add with ${def.name}${def.latestVersion ? ` v${formatVersion(def.latestVersion)}` : ''}`}
-                                disabled={!def.latestVersion}
                                 style={{
                                   ...btnStyle,
                                   padding: '0.1rem 0.32rem',
                                   fontSize: '0.58rem',
                                   background: `${def.color}1a`,
                                   color: def.color,
-                                  opacity: def.latestVersion ? 1 : 0.4,
-                                  cursor: def.latestVersion ? 'pointer' : 'not-allowed',
                                 }}
                               >
                                 {def.name}
@@ -658,7 +663,7 @@ export default function Builds() {
                     // archived holdings count, since re-assigning the same key
                     // is an upgrade and belongs to the archived table below.
                     const memberKeys = new Set(member.builds.map(b => b.buildKey));
-                    const missingBuilds = activeDefinitions.filter(d => !memberKeys.has(d.key));
+                    const missingBuilds = assignableDefinitions.filter(d => !memberKeys.has(d.key));
 
                     return (
                       <tr
@@ -840,7 +845,6 @@ export default function Builds() {
                                           assignBuild(member.uuid, def.key);
                                           setAddDropdownUuid(null);
                                         }}
-                                        disabled={!def.latestVersion}
                                         style={{
                                           display: 'block',
                                           width: '100%',
@@ -852,8 +856,7 @@ export default function Builds() {
                                           color: def.color,
                                           fontSize: '0.68rem',
                                           fontWeight: '600',
-                                          cursor: def.latestVersion ? 'pointer' : 'not-allowed',
-                                          opacity: def.latestVersion ? 1 : 0.4,
+                                          cursor: 'pointer',
                                         }}
                                         onMouseEnter={e => (e.currentTarget.style.background = `${def.color}1a`)}
                                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
@@ -959,9 +962,15 @@ export default function Builds() {
                                       ↑ v{formatVersion(target)}
                                     </button>
                                   )}
-                                  <span
+                                  <button
+                                    type="button"
                                     onClick={() => removeBuild(member.uuid, ref.buildKey)}
+                                    aria-label={`Remove ${def.name} from ${member.ign} — erases the record that they had it`}
                                     style={{
+                                      background: 'transparent',
+                                      border: 'none',
+                                      color: 'inherit',
+                                      padding: 0,
                                       fontSize: '0.62rem',
                                       opacity: 0.5,
                                       marginLeft: '0.1rem',
@@ -973,7 +982,7 @@ export default function Builds() {
                                     onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
                                   >
                                     &times;
-                                  </span>
+                                  </button>
                                 </span>
                               );
                             })}

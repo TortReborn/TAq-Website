@@ -236,8 +236,9 @@ export async function POST(request: NextRequest) {
     const pool = getPool();
 
     // Validate build definition exists and is not archived. Archived builds
-    // cannot receive assignments — the archived-builds table only upgrades
-    // members *off* them (onto a different, active build key).
+    // cannot receive assignments of any kind. (When only a *version* is
+    // archived, the archived-builds table upgrades members within the same
+    // build key onto its latest active version — that passes this check.)
     const defCheck = await pool.query('SELECT archived FROM build_definitions WHERE key = $1', [buildKey]);
     if (defCheck.rowCount === 0) {
       return NextResponse.json({ error: 'Invalid build key' }, { status: 400 });
