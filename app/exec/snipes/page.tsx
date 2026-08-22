@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useExecSnipeMeta } from '@/hooks/useExecSnipes';
+import { useExecSession } from '@/hooks/useExecSession';
+import { canViewWarBuilds } from '@/lib/rank-constants';
 import SnipeLogForm from './SnipeLogForm';
 import SnipeBrowse from './SnipeBrowse';
 import SnipeLeaderboard from './SnipeLeaderboard';
@@ -27,6 +29,24 @@ export default function ExecSnipesPage() {
   const [pendingSeason, setPendingSeason] = useState<number | null>(null);
   const [seasonSaving, setSeasonSaving] = useState(false);
   const meta = useExecSnipeMeta();
+
+  // Builds is Dolphin+ only — lower HR ranks don't see the tab at all.
+  // The API enforces the same rule; this just hides a door they can't open.
+  const { user, loading: sessionLoading } = useExecSession();
+  const showBuilds = canViewWarBuilds(user?.rank);
+  const visibleTabs = useMemo(
+    () => TABS.filter(tab => tab !== 'Builds' || showBuilds),
+    [showBuilds]
+  );
+
+  // A remembered 'Builds' tab (or a demotion) must not strand the user on a
+  // tab they can no longer see.
+  useEffect(() => {
+    if (!sessionLoading && activeTab === 'Builds' && !showBuilds) {
+      setActiveTab('Browse');
+      localStorage.setItem('snipes_active_tab', 'Browse');
+    }
+  }, [sessionLoading, activeTab, showBuilds]);
 
   const changeTab = useCallback((tab: Tab) => {
     setActiveTab(tab);
@@ -166,7 +186,7 @@ export default function ExecSnipesPage() {
         background: 'var(--bg-card)', borderRadius: '0.5rem', padding: '0.25rem',
         border: '1px solid var(--border-card)',
       }}>
-        {TABS.map(tab => (
+        {visibleTabs.map(tab => (
           <button key={tab} style={tabStyle(tab)} onClick={() => changeTab(tab)}>
             {tab}
           </button>
@@ -179,7 +199,7 @@ export default function ExecSnipesPage() {
       {activeTab === 'Leaderboard' && <SnipeLeaderboard meta={meta} onViewStats={navigateToStats} />}
       {activeTab === 'Stats' && <SnipeStats meta={meta} initialIgn={statsIgn} />}
       {activeTab === 'Dashboard' && <SnipeDashboard meta={meta} />}
-      {activeTab === 'Builds' && <Builds />}
+      {activeTab === 'Builds' && showBuilds && <Builds />}
     </div>
   );
 }

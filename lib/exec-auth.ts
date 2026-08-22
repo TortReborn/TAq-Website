@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual, randomBytes } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { DOLPHIN_PLUS_RANKS } from '@/lib/rank-constants';
 
 // --- Exec session cookie management ---
 
@@ -151,15 +152,25 @@ const DISCORD_API_BASE = 'https://discord.com/api/v10';
 // Ranks that are allowed to access the exec dashboard (Hammerhead or higher)
 export const EXEC_RANKS = ['Hammerhead', 'Sailfish', 'Dolphin', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
 export const NARWHAL_RANKS = ['Narwhal', 'Hydra', '✫✪✫ Hydra - Leader'];
+export const DOLPHIN_RANKS = DOLPHIN_PLUS_RANKS;
 const ALLOWED_RANKS = EXEC_RANKS;
 
 export function isNarwhalRank(rank?: string | null): boolean {
   return !!rank && NARWHAL_RANKS.includes(rank);
 }
 
+export function isDolphinRank(rank?: string | null): boolean {
+  return !!rank && DOLPHIN_RANKS.includes(rank);
+}
+
 export async function requireNarwhalSession(request: NextRequest): Promise<ExecSessionData | null> {
   const session = await requireExecSession(request);
   return session && isNarwhalRank(session.rank) ? session : null;
+}
+
+export async function requireDolphinSession(request: NextRequest): Promise<ExecSessionData | null> {
+  const session = await requireExecSession(request);
+  return session && isDolphinRank(session.rank) ? session : null;
 }
 
 export function getDiscordOAuthUrl(state: string): string {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireDolphinSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { computeNextVersion } from '@/lib/build-constants';
 
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 // Existing member_builds rows are intentionally NOT touched — they stay
 // pinned to their current version until an exec moves them.
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 // PATCH: edit metadata of an existing version.
 //   { buildKey, major, minor, connsUrl?, hqUrl?, notes? }
 export async function PATCH(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -148,7 +148,7 @@ export async function PATCH(request: NextRequest) {
 // references it (the FK is ON DELETE CASCADE, but we don't want to silently
 // drop members from a build by deleting their version).
 export async function DELETE(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
