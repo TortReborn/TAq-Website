@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireDolphinSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 // still-archived definition is allowed but inert until the definition is
 // restored too (the UI communicates this).
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

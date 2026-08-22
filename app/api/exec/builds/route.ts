@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireDolphinSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { isValidFlagKey } from '@/lib/build-constants';
@@ -7,7 +7,7 @@ import { isValidFlagKey } from '@/lib/build-constants';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -219,7 +219,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -311,7 +311,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -339,7 +339,7 @@ export async function DELETE(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

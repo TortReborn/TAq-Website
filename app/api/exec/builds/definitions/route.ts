@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireDolphinSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,7 @@ const VALID_ROLES = ['DPS', 'HEALER', 'TANK'];
 const KEY_REGEX = /^[a-z0-9_]+$/;
 
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -117,7 +117,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const session = await requireExecSession(request);
+  const session = await requireDolphinSession(request);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
