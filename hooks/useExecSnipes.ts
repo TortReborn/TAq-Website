@@ -263,6 +263,13 @@ export function useExecSnipeMutations() {
     return data;
   };
 
+  const getLastTeam = async (): Promise<SnipeParticipant[]> => {
+    const res = await fetch('/api/exec/snipes/last-team');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to fetch last team');
+    return data.participants;
+  };
+
   const bulkAction = async (action: 'delete' | 'update_season', ids: number[], season?: number) => {
     const res = await fetch('/api/exec/snipes/bulk', {
       method: 'POST',
@@ -274,5 +281,5 @@ export function useExecSnipeMutations() {
     return data;
   };
 
-  return { createSnipe, updateSnipe, deleteSnipe, bulkAction };
+  return { createSnipe, updateSnipe, deleteSnipe, bulkAction, getLastTeam };
 }
