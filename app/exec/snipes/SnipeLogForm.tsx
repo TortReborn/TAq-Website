@@ -139,6 +139,7 @@ export default function SnipeLogForm({ meta }: Props) {
 
   const guildMemberSet = useMemo(() => new Set(meta.guildMembers.map(m => m.toLowerCase())), [meta.guildMembers]);
   const [ignDropdownIdx, setIgnDropdownIdx] = useState<number | null>(null);
+  const [ignHighlight, setIgnHighlight] = useState(0);
   const ignInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [ignDropdownPos, setIgnDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
@@ -150,10 +151,40 @@ export default function SnipeLogForm({ meta }: Props) {
 
   const openIgnDropdown = (idx: number) => {
     setIgnDropdownIdx(idx);
+    setIgnHighlight(0);
     const el = ignInputRefs.current[idx];
     if (el) {
       const rect = el.getBoundingClientRect();
       setIgnDropdownPos({ top: rect.bottom + 2, left: rect.left, width: rect.width });
+    }
+  };
+
+  // Keep the keyboard-highlighted suggestion visible in the scrollable dropdown
+  useEffect(() => {
+    if (ignDropdownIdx !== null) {
+      document.getElementById(`snipe-ign-option-${ignHighlight}`)?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [ignHighlight, ignDropdownIdx]);
+
+  const handleIgnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+    if (ignDropdownIdx !== idx) return;
+    const suggestions = getIgnSuggestions(participants[idx]?.ign || '');
+    if (suggestions.length === 0) return;
+    const highlight = Math.min(ignHighlight, suggestions.length - 1);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setIgnHighlight(Math.min(highlight + 1, suggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setIgnHighlight(Math.max(highlight - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      selectIgn(idx, suggestions[highlight]);
+    } else if (e.key === 'Tab') {
+      // Complete, then let Tab move focus on to the role select
+      selectIgn(idx, suggestions[highlight]);
+    } else if (e.key === 'Escape') {
+      setIgnDropdownIdx(null);
     }
   };
 
@@ -364,6 +395,7 @@ export default function SnipeLogForm({ meta }: Props) {
                   onChange={e => updateParticipant(idx, 'ign', e.target.value)}
                   onFocus={() => openIgnDropdown(idx)}
                   onBlur={() => setTimeout(() => setIgnDropdownIdx(null), 200)}
+                  onKeyDown={e => handleIgnKeyDown(e, idx)}
                   placeholder="IGN"
                 />
                 {p.ign.trim() && !ignValid && (
@@ -393,13 +425,16 @@ export default function SnipeLogForm({ meta }: Props) {
               maxHeight: '200px', overflowY: 'auto',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}>
-              {getIgnSuggestions(participants[ignDropdownIdx]?.ign || '').map(m => (
+              {getIgnSuggestions(participants[ignDropdownIdx]?.ign || '').map((m, i, suggestions) => (
                 <div
                   key={m}
-                  style={{ padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)', background: 'var(--bg-card-solid)' }}
+                  id={`snipe-ign-option-${i}`}
+                  style={{
+                    padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)',
+                    background: i === Math.min(ignHighlight, suggestions.length - 1) ? '#273548' : 'var(--bg-card-solid)',
+                  }}
                   onMouseDown={() => selectIgn(ignDropdownIdx, m)}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#273548')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-card-solid)')}
+                  onMouseEnter={() => setIgnHighlight(i)}
                 >
                   {m}
                 </div>
