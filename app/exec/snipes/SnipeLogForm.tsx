@@ -38,6 +38,7 @@ export default function SnipeLogForm({ meta }: Props) {
   const [hq, setHq] = useState('');
   const [hqSearch, setHqSearch] = useState('');
   const [showHqDropdown, setShowHqDropdown] = useState(false);
+  const [hqHighlight, setHqHighlight] = useState(0);
   const [difficulty, setDifficulty] = useState('');
   const [guildTag, setGuildTag] = useState('');
   const [conns, setConns] = useState('0');
@@ -51,6 +52,11 @@ export default function SnipeLogForm({ meta }: Props) {
     { ign: '', role: 'Healer' },
   ];
   const [participants, setParticipants] = useState<SnipeParticipant[]>(defaultSlots);
+
+  // Track the current season if it changes (e.g. via the header picker) while the form is mounted
+  useEffect(() => {
+    setSeason(String(meta.currentSeason));
+  }, [meta.currentSeason]);
   const [logToChannel, setLogToChannel] = useState(true);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -131,6 +137,39 @@ export default function SnipeLogForm({ meta }: Props) {
       .slice(0, 25);
   }, [hqSearch, hqTerritories, snipedHqSet]);
 
+  // Keep the keyboard-highlighted territory visible in the scrollable dropdown
+  useEffect(() => {
+    if (showHqDropdown) {
+      document.getElementById(`snipe-hq-option-${hqHighlight}`)?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [hqHighlight, showHqDropdown]);
+
+  const selectHq = (t: string) => {
+    setHq(t);
+    setHqSearch('');
+    setShowHqDropdown(false);
+  };
+
+  const handleHqKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showHqDropdown || hq || filteredTerritories.length === 0) return;
+    const highlight = Math.min(hqHighlight, filteredTerritories.length - 1);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHqHighlight(Math.min(highlight + 1, filteredTerritories.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHqHighlight(Math.max(highlight - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      selectHq(filteredTerritories[highlight]);
+    } else if (e.key === 'Tab') {
+      // Complete, then let Tab move focus on to the next field
+      selectHq(filteredTerritories[highlight]);
+    } else if (e.key === 'Escape') {
+      setShowHqDropdown(false);
+    }
+  };
+
   const maxConns = hq ? getMaxConns(hq) : null;
   const drySnipe = hq && conns ? isDry(hq, parseInt(conns, 10)) : false;
 
@@ -146,7 +185,10 @@ export default function SnipeLogForm({ meta }: Props) {
   const getIgnSuggestions = (search: string) => {
     if (!search) return [];
     const lower = search.toLowerCase();
-    return meta.guildMembers.filter(m => m.toLowerCase().includes(lower)).slice(0, 10);
+    const matches = meta.guildMembers.filter(m => m.toLowerCase().includes(lower)).slice(0, 10);
+    // Already completed — no dropdown, so Up/Down move between rows instead
+    if (matches.length === 1 && matches[0].toLowerCase() === lower) return [];
+    return matches;
   };
 
   const openIgnDropdown = (idx: number) => {
@@ -167,23 +209,35 @@ export default function SnipeLogForm({ meta }: Props) {
   }, [ignHighlight, ignDropdownIdx]);
 
   const handleIgnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
-    if (ignDropdownIdx !== idx) return;
-    const suggestions = getIgnSuggestions(participants[idx]?.ign || '');
-    if (suggestions.length === 0) return;
-    const highlight = Math.min(ignHighlight, suggestions.length - 1);
-    if (e.key === 'ArrowDown') {
+    const suggestions = ignDropdownIdx === idx ? getIgnSuggestions(participants[idx]?.ign || '') : [];
+    if (suggestions.length > 0) {
+      const highlight = Math.min(ignHighlight, suggestions.length - 1);
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setIgnHighlight(Math.min(highlight + 1, suggestions.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setIgnHighlight(Math.max(highlight - 1, 0));
+      } else if (e.key === 'Enter') {
+        // Complete and stay on the row (dropdown closed) so Up/Down then move between rows
+        e.preventDefault();
+        selectIgn(idx, suggestions[highlight]);
+      } else if (e.key === 'Tab') {
+        // Complete, then let Tab move focus on to the role select
+        selectIgn(idx, suggestions[highlight]);
+      } else if (e.key === 'Escape') {
+        setIgnDropdownIdx(null);
+      }
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      // No dropdown showing: Up/Down move focus between participant rows
       e.preventDefault();
-      setIgnHighlight(Math.min(highlight + 1, suggestions.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setIgnHighlight(Math.max(highlight - 1, 0));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      selectIgn(idx, suggestions[highlight]);
-    } else if (e.key === 'Tab') {
-      // Complete, then let Tab move focus on to the role select
-      selectIgn(idx, suggestions[highlight]);
-    } else if (e.key === 'Escape') {
+      const next = e.key === 'ArrowDown' ? Math.min(idx + 1, participants.length - 1) : Math.max(idx - 1, 0);
+      const el = ignInputRefs.current[next];
+      if (el) {
+        el.focus();
+        el.select();
+      }
+      // focus reopens the dropdown for the target row; keep it closed while row-hopping
       setIgnDropdownIdx(null);
     }
   };
@@ -271,9 +325,10 @@ export default function SnipeLogForm({ meta }: Props) {
             ref={hqInputRef}
             style={inputStyle}
             value={hq || hqSearch}
-            onChange={e => { setHqSearch(e.target.value); setHq(''); setShowHqDropdown(true); }}
-            onFocus={() => { setShowHqDropdown(true); updateHqDropdownPos(); }}
+            onChange={e => { setHqSearch(e.target.value); setHq(''); setShowHqDropdown(true); setHqHighlight(0); }}
+            onFocus={() => { setShowHqDropdown(true); setHqHighlight(0); updateHqDropdownPos(); }}
             onBlur={() => setTimeout(() => setShowHqDropdown(false), 200)}
+            onKeyDown={handleHqKeyDown}
             placeholder="Search territory..."
           />
           {showHqDropdown && filteredTerritories.length > 0 && !hq && dropdownPos && (
@@ -287,20 +342,20 @@ export default function SnipeLogForm({ meta }: Props) {
               maxHeight: '450px', overflowY: 'auto',
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}>
-              {filteredTerritories.map(t => {
+              {filteredTerritories.map((t, i) => {
                 const isSniped = snipedHqSet.has(t.toLowerCase());
                 return (
                   <div
                     key={t}
+                    id={`snipe-hq-option-${i}`}
                     style={{
                       padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.85rem',
                       color: isSniped ? '#f59e0b' : 'var(--text-primary)',
                       fontWeight: isSniped ? '600' : '400',
-                      background: 'var(--bg-card-solid)',
+                      background: i === Math.min(hqHighlight, filteredTerritories.length - 1) ? '#273548' : 'var(--bg-card-solid)',
                     }}
-                    onMouseDown={() => { setHq(t); setHqSearch(''); setShowHqDropdown(false); }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#273548')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-card-solid)')}
+                    onMouseDown={() => selectHq(t)}
+                    onMouseEnter={() => setHqHighlight(i)}
                   >
                     {t} <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>({meta.routeCounts[t]} routes)</span>
                   </div>
