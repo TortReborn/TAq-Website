@@ -3,6 +3,7 @@ import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
+import { countPendingJoins } from '@/lib/pending-joins';
 
 export const dynamic = 'force-dynamic';
 
@@ -177,14 +178,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Count accepted guild applicants who haven't joined yet
-      const pendingJoinResult = await client.query(
-        `SELECT COUNT(*) as count FROM applications a
-         JOIN discord_links dl ON dl.discord_id = CAST(a.discord_id AS BIGINT)
-         WHERE a.status = 'accepted'
-           AND a.application_type = 'guild'
-           AND dl.linked = FALSE`
-      );
-      const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
+      const pendingJoins = await countPendingJoins(client);
 
       return NextResponse.json({
         members: enrichedMembers,

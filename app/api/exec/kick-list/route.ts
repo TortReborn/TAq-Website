@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { countPendingJoins } from '@/lib/pending-joins';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [result, lastUpdatedResult, pendingJoinResult] = await Promise.all([
+    const [result, lastUpdatedResult, pendingJoins] = await Promise.all([
       pool.query(
         `SELECT uuid, ign, tier, added_by, created_at
          FROM kick_list
@@ -38,17 +39,10 @@ export async function GET(request: NextRequest) {
       pool.query(
         `SELECT created_at, added_by FROM kick_list ORDER BY created_at DESC LIMIT 1`
       ),
-      pool.query(
-        `SELECT COUNT(*) as count FROM applications a
-         JOIN discord_links dl ON dl.discord_id = CAST(a.discord_id AS BIGINT)
-         WHERE a.status = 'accepted'
-           AND a.application_type = 'guild'
-           AND dl.linked = FALSE`
-      ),
+      countPendingJoins(pool),
     ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
-    const pendingJoins = parseInt(pendingJoinResult.rows[0]?.count || '0', 10);
     const memberCount = guildUUIDs.size;
 
     return NextResponse.json({
