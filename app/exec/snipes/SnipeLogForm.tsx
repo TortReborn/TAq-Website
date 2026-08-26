@@ -33,7 +33,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 export default function SnipeLogForm({ meta }: Props) {
-  const { createSnipe } = useExecSnipeMutations();
+  const { createSnipe, getLastTeam } = useExecSnipeMutations();
 
   const [hq, setHq] = useState('');
   const [hqSearch, setHqSearch] = useState('');
@@ -253,6 +253,28 @@ export default function SnipeLogForm({ meta }: Props) {
     if (field === 'ign') openIgnDropdown(idx);
   };
 
+  const [reusingTeam, setReusingTeam] = useState(false);
+
+  const reuseLastTeam = async () => {
+    setReusingTeam(true);
+    setError(null);
+    try {
+      const team = (await getLastTeam()).slice(0, defaultSlots.length);
+      if (team.length === 0) {
+        setError('No previously logged snipe found');
+        return;
+      }
+      setParticipants(defaultSlots.map((s, i) =>
+        team[i] ? { ign: team[i].ign, role: team[i].role } : { ...s }
+      ));
+      setIgnDropdownIdx(null);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setReusingTeam(false);
+    }
+  };
+
   const selectIgn = (idx: number, ign: string) => {
     const updated = [...participants];
     updated[idx] = { ...updated[idx], ign };
@@ -441,7 +463,23 @@ export default function SnipeLogForm({ meta }: Props) {
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-end' }}>
         {/* Participants */}
         <div style={{ flex: 'none' }}>
-          <label style={{ ...labelStyle, marginBottom: '0.5rem' }}>Participants ({filledCount}/5)</label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <label style={{ ...labelStyle, marginBottom: 0 }}>Participants ({filledCount}/5)</label>
+            <button
+              type="button"
+              onClick={reuseLastTeam}
+              disabled={reusingTeam}
+              title="Refill participants from your last logged snipe"
+              style={{
+                fontSize: '0.7rem', fontWeight: '600', color: 'var(--text-secondary)',
+                background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)',
+                borderRadius: '0.375rem', padding: '0.2rem 0.5rem',
+                cursor: reusingTeam ? 'wait' : 'pointer', opacity: reusingTeam ? 0.6 : 1,
+              }}
+            >
+              {reusingTeam ? 'Loading…' : 'Reuse Last Team'}
+            </button>
+          </div>
           {participants.map((p, idx) => {
             const ignValid = !p.ign.trim() || guildMemberSet.has(p.ign.trim().toLowerCase());
             return (
@@ -455,7 +493,7 @@ export default function SnipeLogForm({ meta }: Props) {
                   maxLength={16}
                   onChange={e => updateParticipant(idx, 'ign', e.target.value)}
                   onFocus={() => openIgnDropdown(idx)}
-                  onBlur={() => setTimeout(() => setIgnDropdownIdx(null), 200)}
+                  onBlur={() => setTimeout(() => setIgnDropdownIdx(cur => (cur === idx ? null : cur)), 200)}
                   onKeyDown={e => handleIgnKeyDown(e, idx)}
                   placeholder="IGN"
                 />
