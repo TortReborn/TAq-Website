@@ -477,7 +477,7 @@ export default function SnipeLogForm({ meta }: Props) {
                 cursor: reusingTeam ? 'wait' : 'pointer', opacity: reusingTeam ? 0.6 : 1,
               }}
             >
-              {reusingTeam ? 'Loading…' : '↺ Reuse Last Team'}
+              {reusingTeam ? 'Loading…' : 'Reuse Last Team'}
             </button>
           </div>
           {participants.map((p, idx) => {
