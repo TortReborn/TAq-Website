@@ -9,7 +9,7 @@ export const TOWER_STATS = {
   // Damage max values per level
   damageMax: [1500, 2100, 2700, 3300, 3900, 4500, 5100, 5700, 6300, 6900, 7500, 8100],
   // Attack speed multipliers per level
-  attackSpeed: [0.5, 0.75, 1.0, 1.25, 1.61, 2.0, 2.5, 3.0, 3.1, 4.2, 4.35, 4.7]
+  attackSpeed: [0.5, 0.75, 1.0, 1.25, 1.6, 2.0, 2.5, 3.0, 3.6, 3.8, 4.2, 4.7]
 };
 
 // Aura cooldown by level (0-3), 0 = disabled
