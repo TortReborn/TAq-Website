@@ -137,11 +137,13 @@ export default function SnipeLogForm({ meta }: Props) {
       .slice(0, 25);
   }, [hqSearch, hqTerritories, snipedHqSet]);
 
-  // Keep the keyboard-highlighted territory visible in the scrollable dropdown
+  // Keep the keyboard-highlighted territory visible in the scrollable dropdown.
+  // Clamp against the rendered options: the list can shrink while open.
   useEffect(() => {
-    if (showHqDropdown) {
-      document.getElementById(`snipe-hq-option-${hqHighlight}`)?.scrollIntoView({ block: 'nearest' });
-    }
+    if (!showHqDropdown) return;
+    const opts = document.querySelectorAll('[id^="snipe-hq-option-"]');
+    if (opts.length === 0) return;
+    opts[Math.min(hqHighlight, opts.length - 1)].scrollIntoView({ block: 'nearest' });
   }, [hqHighlight, showHqDropdown]);
 
   const selectHq = (t: string) => {
@@ -201,11 +203,13 @@ export default function SnipeLogForm({ meta }: Props) {
     }
   };
 
-  // Keep the keyboard-highlighted suggestion visible in the scrollable dropdown
+  // Keep the keyboard-highlighted suggestion visible in the scrollable dropdown.
+  // Clamp against the rendered options: the list can shrink while open.
   useEffect(() => {
-    if (ignDropdownIdx !== null) {
-      document.getElementById(`snipe-ign-option-${ignHighlight}`)?.scrollIntoView({ block: 'nearest' });
-    }
+    if (ignDropdownIdx === null) return;
+    const opts = document.querySelectorAll('[id^="snipe-ign-option-"]');
+    if (opts.length === 0) return;
+    opts[Math.min(ignHighlight, opts.length - 1)].scrollIntoView({ block: 'nearest' });
   }, [ignHighlight, ignDropdownIdx]);
 
   const handleIgnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
@@ -332,7 +336,7 @@ export default function SnipeLogForm({ meta }: Props) {
             placeholder="Search territory..."
           />
           {showHqDropdown && filteredTerritories.length > 0 && !hq && dropdownPos && (
-            <div style={{
+            <div role="listbox" aria-label="Territory suggestions" style={{
               position: 'fixed',
               top: dropdownPos.top,
               left: dropdownPos.left,
@@ -348,6 +352,8 @@ export default function SnipeLogForm({ meta }: Props) {
                   <div
                     key={t}
                     id={`snipe-hq-option-${i}`}
+                    role="option"
+                    aria-selected={i === Math.min(hqHighlight, filteredTerritories.length - 1)}
                     style={{
                       padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.85rem',
                       color: isSniped ? '#f59e0b' : 'var(--text-primary)',
@@ -470,7 +476,7 @@ export default function SnipeLogForm({ meta }: Props) {
             );
           })}
           {ignDropdownIdx !== null && ignDropdownPos && getIgnSuggestions(participants[ignDropdownIdx]?.ign || '').length > 0 && (
-            <div style={{
+            <div role="listbox" aria-label="Guild member suggestions" style={{
               position: 'fixed',
               top: ignDropdownPos.top,
               left: ignDropdownPos.left,
@@ -484,6 +490,8 @@ export default function SnipeLogForm({ meta }: Props) {
                 <div
                   key={m}
                   id={`snipe-ign-option-${i}`}
+                  role="option"
+                  aria-selected={i === Math.min(ignHighlight, suggestions.length - 1)}
                   style={{
                     padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)',
                     background: i === Math.min(ignHighlight, suggestions.length - 1) ? '#273548' : 'var(--bg-card-solid)',
