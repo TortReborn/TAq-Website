@@ -54,6 +54,15 @@ export interface SeasonZoom {
   label: string;
 }
 
+/** Chronicle event surfaced as a timeline marker */
+export interface TimelineEventMarker {
+  id: number;
+  title: string;
+  color: string;
+  startMs: number;
+  endMs: number | null;
+}
+
 interface HistoryTimelineProps {
   earliest: Date;
   latest: Date;
@@ -67,6 +76,8 @@ interface HistoryTimelineProps {
   // panel's season selector and the track's right-click zoom share one state
   seasonZoom?: SeasonZoom | null;
   onSeasonZoomChange?: (zoom: SeasonZoom | null) => void;
+  /** Chronicle events — markers on the track, click jumps to the event start */
+  eventMarkers?: TimelineEventMarker[];
 }
 
 function HistoryTimeline({
@@ -80,6 +91,7 @@ function HistoryTimeline({
   seasons,
   seasonZoom: seasonZoomProp,
   onSeasonZoomChange,
+  eventMarkers,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -138,6 +150,21 @@ function HistoryTimeline({
       })
       .filter((r): r is { period: SeasonPeriod; title: string; startPct: number; endPct: number } => r !== null);
   }, [seasons, earliest, latest, totalRange]);
+
+  // Chronicle event markers clipped to the visible range
+  const visibleEventMarkers = useMemo(() => {
+    if (!eventMarkers || eventMarkers.length === 0 || totalRange === 0) return [];
+    const eMs = earliest.getTime();
+    const lMs = latest.getTime();
+    return eventMarkers
+      .filter(ev => ev.startMs <= lMs && (ev.endMs !== null ? ev.endMs >= eMs : ev.startMs >= eMs))
+      .map(ev => ({
+        ev,
+        startPct: ((Math.min(Math.max(ev.startMs, eMs), lMs) - eMs) / totalRange) * 100,
+        endPct: ev.endMs !== null ? ((Math.min(Math.max(ev.endMs, eMs), lMs) - eMs) / totalRange) * 100 : null,
+        markerInRange: ev.startMs >= eMs && ev.startMs <= lMs,
+      }));
+  }, [eventMarkers, earliest, latest, totalRange]);
 
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
@@ -376,6 +403,48 @@ function HistoryTimeline({
           transition: isDragging ? 'none' : 'left 0.1s ease',
         }),
   };
+
+  // ── Chronicle event markers ──────────────────────────────────────────
+  // A dot at the event's start (click = jump there) plus a thin bar spanning
+  // ranged events. Rendered inside the track, above gaps, below the thumb.
+
+  const eventMarkerElements = (isVert: boolean) => visibleEventMarkers.map(({ ev, startPct, endPct, markerInRange }) => (
+    <div key={`ev-${ev.id}`} style={{ pointerEvents: 'none' }}>
+      {endPct !== null && endPct > startPct && (
+        <div style={{
+          position: 'absolute',
+          ...(isVert
+            ? { left: '2px', width: '4px', top: percentToPaddedStart(startPct), height: percentToPaddedWidth(startPct, endPct) }
+            : { top: '2px', height: '4px', left: percentToPaddedStart(startPct), width: percentToPaddedWidth(startPct, endPct) }),
+          background: ev.color,
+          opacity: 0.75,
+          borderRadius: '2px',
+          zIndex: 1,
+        }} />
+      )}
+      {markerInRange && (
+        <div
+          title={ev.title}
+          onMouseDown={(e) => { e.stopPropagation(); }}
+          onClick={(e) => { e.stopPropagation(); jumpToDate(new Date(ev.startMs)); }}
+          style={{
+            position: 'absolute',
+            ...(isVert
+              ? { left: '-3px', top: `calc(${percentToPaddedStart(startPct)} - 5px)` }
+              : { top: '-3px', left: `calc(${percentToPaddedStart(startPct)} - 5px)` }),
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+            background: ev.color,
+            border: '2px solid var(--bg-card-solid)',
+            cursor: 'pointer',
+            pointerEvents: 'auto',
+            zIndex: 3,
+          }}
+        />
+      )}
+    </div>
+  ));
 
   // ── Season ribbon ────────────────────────────────────────────────────
   // A thin strip flush against the track showing on-season (colored) vs
@@ -630,6 +699,9 @@ function HistoryTimeline({
               );
             })}
 
+            {/* Chronicle event markers */}
+            {eventMarkerElements(true)}
+
             {/* Thumb */}
             <div data-testid="timeline-thumb" style={thumbStyle} />
           </div>
@@ -763,6 +835,9 @@ function HistoryTimeline({
             />
           );
         })}
+
+        {/* Chronicle event markers */}
+        {eventMarkerElements(false)}
 
         {/* Thumb */}
         <div data-testid="timeline-thumb" style={thumbStyle} />

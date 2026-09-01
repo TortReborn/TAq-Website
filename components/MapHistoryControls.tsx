@@ -14,7 +14,7 @@ import {
   Play,
   Pause,
 } from "lucide-react";
-import HistoryTimeline, { SeasonZoom } from "./HistoryTimeline";
+import HistoryTimeline, { SeasonZoom, TimelineEventMarker } from "./HistoryTimeline";
 import { SeasonPeriod } from "@/lib/seasons";
 import HistoryDatePicker from "./HistoryDatePicker";
 import HistoryPlayback from "./HistoryPlayback";
@@ -45,6 +45,7 @@ interface MapHistoryControlsProps {
   onConflictFocusToggle?: () => void;
   seasons?: SeasonPeriod[]; // On/off-season periods for timeline context
   loadProgress?: number; // 0..1 — fraction of the timeline covered by loaded events
+  eventMarkers?: TimelineEventMarker[]; // Chronicle events shown on the track
 }
 
 // Widths of the map's bottom-corner control clusters, kept clear so the
@@ -114,6 +115,7 @@ function MapHistoryControls({
   onConflictFocusToggle,
   seasons,
   loadProgress,
+  eventMarkers,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -1002,6 +1004,7 @@ function MapHistoryControls({
                 seasons={seasons}
                 seasonZoom={seasonZoom}
                 onSeasonZoomChange={setSeasonZoom}
+                eventMarkers={eventMarkers}
               />
             </div>
 
@@ -1274,6 +1277,7 @@ function MapHistoryControls({
             seasons={seasons}
             seasonZoom={seasonZoom}
             onSeasonZoomChange={setSeasonZoom}
+            eventMarkers={eventMarkers}
           />
           {controlsSection}
         </>

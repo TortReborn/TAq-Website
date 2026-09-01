@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { Globe, Home, Plus, Minus, Flag, Settings } from "lucide-react";
+import { Globe, Home, Plus, Minus, Flag, Settings, BookOpen } from "lucide-react";
 import { loadTerritories, Territory, coordToPixel } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import LandViewOverlay from "@/components/LandViewOverlay";
@@ -13,6 +13,9 @@ import MapSettings from "@/components/MapSettings";
 import MapModeSelector from "@/components/MapModeSelector";
 import MapHistoryControls from "@/components/MapHistoryControls";
 import FactionPanel from "@/components/FactionPanel";
+import ChroniclePanel from "@/components/ChroniclePanel";
+import { ChronicleData, allianceColorsAt, chronicleEventColor } from "@/lib/chronicle";
+import { TimelineEventMarker } from "@/components/HistoryTimeline";
 import ConflictFinder from "@/components/ConflictFinder";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
@@ -209,6 +212,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const [showSettings, setShowSettings] = useState(false);
   const [opaqueFill, setOpaqueFill] = useState(false);
   const [showFactions, setShowFactions] = useState(false);
+  // Chronicle layer — community-maintained alliances & events (see lib/chronicle).
+  // One toggle drives everything: the panel, the alliance coloring and the
+  // timeline event markers.
+  const [showChronicle, setShowChronicle] = useState(false);
+  const [chronicleData, setChronicleData] = useState<ChronicleData | null>(null);
   const [showConflictFinder, setShowConflictFinder] = useState(false);
   const [conflictBounds, setConflictBounds] = useState<{ start: Date; end: Date } | null>(null);
   const [isConflictFocused, setIsConflictFocused] = useState(false);
@@ -249,6 +257,38 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // out of the already-busy moment when the user switches to the history tab.
   const seasons = useSeasons(true);
   const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
+
+  // Fetch chronicle data the first time the layer is opened
+  useEffect(() => {
+    if (!showChronicle || chronicleData) return;
+    let cancelled = false;
+    timedFetch('static', '/api/chronicle')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setChronicleData(data);
+      })
+      .catch((error) => mapError('static', 'Failed to load chronicle data', error));
+    return () => { cancelled = true; };
+  }, [showChronicle, chronicleData]);
+
+  // The moment the chronicle should describe: the history cursor, or "now" live
+  const chronicleTimeMs = useMemo(() => {
+    if (viewMode === 'history' && historyTimestamp) return historyTimestamp.getTime();
+    return Date.now();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, historyTimestamp, showChronicle]);
+
+  // Chronicle events → timeline markers
+  const chronicleEventMarkers = useMemo<TimelineEventMarker[]>(() => {
+    if (!showChronicle || !chronicleData) return [];
+    return chronicleData.events.map((e) => ({
+      id: e.id,
+      title: `${e.title} (${e.eventType})`,
+      color: chronicleEventColor(e.eventType),
+      startMs: Date.parse(e.startsAt),
+      endMs: e.endsAt ? Date.parse(e.endsAt) : null,
+    }));
+  }, [showChronicle, chronicleData]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -386,6 +426,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     if (cachedOpaqueFill !== null) {
       setOpaqueFill(cachedOpaqueFill === 'true');
     }
+    const cachedShowChronicle = localStorage.getItem('mapShowChronicle');
+    if (cachedShowChronicle !== null) {
+      setShowChronicle(cachedShowChronicle === 'true');
+    }
     setIsInitialized(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clampScale, applyTransform]);
@@ -449,6 +493,12 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       localStorage.setItem('mapOpaqueFill', String(opaqueFill));
     }
   }, [opaqueFill, isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('mapShowChronicle', String(showChronicle));
+    }
+  }, [showChronicle, isInitialized]);
 
 
   // Load guild colors from cached database
@@ -1231,10 +1281,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [territories, factions, allKnownGuilds]);
 
-  // Compute effective guild colors (overridden by faction colors when active)
-  // Unaffiliated guilds become gray when factions mode is on
+  // Compute effective guild colors, overridden by the Chronicle's alliance
+  // colors (time-aware) or the user's local faction colors when either layer
+  // is active. Unaffiliated guilds become gray so the groups stand out.
   const effectiveGuildColors = useMemo(() => {
-    if (!showFactions || Object.keys(factions).length === 0) return guildColors;
+    const chronicleActive = showChronicle && !!chronicleData && chronicleData.alliances.length > 0;
+    const factionsActive = showFactions && Object.keys(factions).length > 0;
+    if (!chronicleActive && !factionsActive) return guildColors;
 
     // Start by setting ALL known guild color entries to gray.
     // This covers guilds in both live AND history mode snapshots,
@@ -1254,20 +1307,30 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       }
     }
 
-    // Override faction guilds with their faction color
-    for (const faction of Object.values(factions)) {
-      for (const guildName of faction.guilds) {
-        overridden[guildName] = faction.color;
-        // Find prefix from live data or exchange store history
-        const guild = availableGuilds.find(g => g.name === guildName);
-        const prefix = guild?.prefix || exchangePrefixMap.get(guildName) || '';
-        if (prefix) {
-          overridden[prefix] = faction.color;
+    const paint = (guildName: string, color: string) => {
+      overridden[guildName] = color;
+      // Find prefix from live data or exchange store history
+      const guild = availableGuilds.find(g => g.name === guildName);
+      const prefix = guild?.prefix || exchangePrefixMap.get(guildName) || '';
+      if (prefix) {
+        overridden[prefix] = color;
+      }
+    };
+
+    if (chronicleActive) {
+      // Alliance membership evaluated at the moment the map is showing
+      for (const [guildName, color] of allianceColorsAt(chronicleData!.alliances, chronicleTimeMs)) {
+        paint(guildName, color);
+      }
+    } else {
+      for (const faction of Object.values(factions)) {
+        for (const guildName of faction.guilds) {
+          paint(guildName, faction.color);
         }
       }
     }
     return overridden;
-  }, [showFactions, factions, guildColors, availableGuilds]);
+  }, [showFactions, factions, guildColors, availableGuilds, showChronicle, chronicleData, chronicleTimeMs]);
 
   // Precompute land view clusters in background (always running, even when not visible)
   // Uses effectiveGuildColors so faction overrides apply to land view
@@ -2326,6 +2389,16 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             availableGuilds={availableGuilds}
           />
 
+          {/* Chronicle Panel — alliances & events at the shown moment */}
+          <ChroniclePanel
+            isOpen={showChronicle}
+            onClose={() => setShowChronicle(false)}
+            data={chronicleData}
+            timestampMs={chronicleTimeMs}
+            onJumpToDate={viewMode === 'history' ? handleJumpToDate : undefined}
+            availableGuilds={availableGuilds}
+          />
+
           {/* Conflict Finder Panel */}
           <ConflictFinder
             isOpen={showConflictFinder}
@@ -2370,9 +2443,50 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               historyAvailable={!!historyBounds}
             />
 
+            {/* Chronicle Button — community alliances & events layer */}
+            <button
+              data-testid="chronicle-toggle"
+              onClick={() => {
+                setShowChronicle(prev => !prev);
+                setShowFactions(false);
+              }}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '0.5rem',
+                border: `2px solid ${showChronicle ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                background: showChronicle ? 'var(--accent-primary)' : 'var(--bg-card)',
+                color: showChronicle ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+              onMouseEnter={(e) => {
+                if (!showChronicle) {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!showChronicle) {
+                  e.currentTarget.style.background = 'var(--bg-card)';
+                }
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              title="Chronicle — alliances & events"
+            >
+              <BookOpen size={20} strokeWidth={2} />
+            </button>
+
             {/* Factions Button */}
             <button
-              onClick={() => setShowFactions(prev => !prev)}
+              onClick={() => {
+                setShowFactions(prev => !prev);
+                setShowChronicle(false);
+              }}
               style={{
                 width: '40px',
                 height: '40px',
@@ -2504,6 +2618,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}
               seasons={seasons}
               loadProgress={historyLoadProgress}
+              eventMarkers={chronicleEventMarkers}
             />
           </div>
         )}
