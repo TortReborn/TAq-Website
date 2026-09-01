@@ -583,7 +583,7 @@ function MapHistoryControls({
           }}
         >
           {seasonZoom ? seasonZoom.label : 'All'}
-          <ChevronDown size={10} strokeWidth={2.5} />
+          <ChevronDown size={12} strokeWidth={2.5} />
         </button>
         {seasonOpen && (
           <div
@@ -871,7 +871,7 @@ function MapHistoryControls({
                 }}
               >
                 {speedLabel(speed)}
-                <ChevronDown size={10} strokeWidth={2.5} />
+                <ChevronDown size={12} strokeWidth={2.5} />
               </button>
               {speedOpen && (
                 <div
@@ -1112,7 +1112,7 @@ function MapHistoryControls({
                     }}
                   >
                     {speedLabel(speed)}
-                    <ChevronDown size={10} strokeWidth={2.5} />
+                    <ChevronDown size={12} strokeWidth={2.5} />
                   </button>
                   {speedOpen && (
                     <div style={{

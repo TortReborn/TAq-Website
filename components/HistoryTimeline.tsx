@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useMemo, useCallback, useRef, useState, useEffect } from "react";
-import { RotateCcw } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { SeasonPeriod, seasonAtDate, seasonColor } from "@/lib/seasons";
 
 // Cached formatters — creating Intl.DateTimeFormat instances is expensive,
@@ -652,7 +652,7 @@ function HistoryTimeline({
         boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
       }}
     >
-      <RotateCcw size={10} strokeWidth={2.5} /> Full range
+      <ArrowLeft size={11} strokeWidth={2.5} /> Full range
     </button>
   ) : null;
 

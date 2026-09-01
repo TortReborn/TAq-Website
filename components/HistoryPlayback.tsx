@@ -177,7 +177,7 @@ function HistoryPlayback({
               }}
             >
               {speedLabel(speed)}
-              <ChevronDown size={10} strokeWidth={2.5} />
+              <ChevronDown size={12} strokeWidth={2.5} />
             </button>
             {speedOpen && (
               <div
