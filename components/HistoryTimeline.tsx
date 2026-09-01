@@ -465,7 +465,7 @@ function HistoryTimeline({
         style={{
           position: 'relative',
           ...(isVert
-            ? { width: '6px', borderRadius: '3px', flex: 1, minHeight: '100px' }
+            ? { width: '6px', borderRadius: '3px', marginRight: '4px', flexShrink: 0 }
             : { height: '6px', borderRadius: '3px', width: '100%', marginTop: '4px' }),
           background: RED,
           overflow: 'hidden',
@@ -693,16 +693,32 @@ function HistoryTimeline({
           {formatDate(earliest)}
         </div>
 
-        {/* Track + loaded indicator side by side */}
+        {/* Track + loaded indicator side by side. Spacing comes from the
+            bar's own margin (not flex gap) so the animated collapse below
+            removes it together with the bar. */}
         <div style={{
           display: 'flex',
-          gap: '4px',
           flex: 1,
           minHeight: '100px',
           alignItems: 'stretch',
         }}>
-          {/* Loaded-data indicator bar (left of track, hidden once fully loaded) */}
-          {loadedRanges && !fullyLoaded && loadedIndicatorBar(true)}
+          {/* Loaded-data indicator bar — kept mounted; width eases to 0 once
+              fully loaded instead of popping out */}
+          {loadedRanges && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                width: fullyLoaded ? '0px' : '10px', // 6px bar + 4px spacing
+                opacity: fullyLoaded ? 0 : 1,
+                overflow: 'hidden',
+                transition: 'width 0.35s ease, opacity 0.35s ease',
+                flexShrink: 0,
+              }}
+            >
+              {loadedIndicatorBar(true)}
+            </div>
+          )}
 
           {/* Season ribbon + vertical track — one shared hitbox */}
           <div
@@ -933,8 +949,21 @@ function HistoryTimeline({
       </div>
       </div>
 
-      {/* Loaded-data indicator bar (below track, hidden once fully loaded) */}
-      {loadedRanges && !fullyLoaded && loadedIndicatorBar(false)}
+      {/* Loaded-data indicator bar (below track). Kept mounted so its
+          appearance (history refresh) and disappearance (fully loaded)
+          ease the panel's height instead of popping. */}
+      {loadedRanges && (
+        <div
+          style={{
+            height: fullyLoaded ? '0px' : '10px', // 6px bar + 4px spacing
+            opacity: fullyLoaded ? 0 : 1,
+            overflow: 'hidden',
+            transition: 'height 0.35s ease, opacity 0.35s ease',
+          }}
+        >
+          {loadedIndicatorBar(false)}
+        </div>
+      )}
     </div>
   );
 }
