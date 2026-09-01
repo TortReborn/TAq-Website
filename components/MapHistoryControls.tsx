@@ -43,7 +43,6 @@ interface MapHistoryControlsProps {
   conflictBounds?: { start: Date; end: Date } | null;
   isConflictFocused?: boolean;
   onConflictFocusToggle?: () => void;
-  loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
   seasons?: SeasonPeriod[]; // On/off-season periods for timeline context
   loadProgress?: number; // 0..1 — fraction of the timeline covered by loaded events
 }
@@ -113,7 +112,6 @@ function MapHistoryControls({
   conflictBounds,
   isConflictFocused,
   onConflictFocusToggle,
-  loadedRanges,
   seasons,
   loadProgress,
 }: MapHistoryControlsProps) {
@@ -1001,7 +999,6 @@ function MapHistoryControls({
                 gaps={gaps}
                 vertical
                 hideCurrentTime
-                loadedRanges={loadedRanges}
                 seasons={seasons}
                 seasonZoom={seasonZoom}
                 onSeasonZoomChange={setSeasonZoom}
@@ -1274,7 +1271,6 @@ function MapHistoryControls({
             current={current}
             onChange={onTimeChange}
             gaps={gaps}
-            loadedRanges={loadedRanges}
             seasons={seasons}
             seasonZoom={seasonZoom}
             onSeasonZoomChange={setSeasonZoom}

@@ -57,7 +57,7 @@ test.describe('map page — history tab', () => {
       .toBe(true);
   });
 
-  test('event chunk requests are aligned to the hour grid (cacheable URLs)', async ({ page }) => {
+  test('event chunk requests are canonical epoch-aligned cells (CDN-shareable URLs)', async ({ page }) => {
     const eventUrls: string[] = [];
     page.on('request', (req) => {
       if (req.url().includes('/api/map-history/events')) eventUrls.push(req.url());
@@ -68,17 +68,21 @@ test.describe('map page — history tab', () => {
     await switchToHistory(page);
 
     await expect.poll(() => eventUrls.length, { timeout: 30_000 }).toBeGreaterThan(0);
+    // Must match the client's grid constants (app/map/page.tsx)
+    const CHUNK_MS = 3 * 30 * 24 * 60 * 60 * 1000;
+    const EPOCH_MS = Date.UTC(2018, 0, 1);
     for (const url of eventUrls) {
       const params = new URL(url).searchParams;
-      for (const key of ['start', 'end'] as const) {
-        const value = params.get(key);
-        expect(value, `missing ${key} in ${url}`).toBeTruthy();
-        const date = new Date(value!);
-        expect(
-          date.getTime() % (60 * 60 * 1000),
-          `${key}=${value} should fall on an hour boundary`,
-        ).toBe(0);
-      }
+      const start = new Date(params.get('start')!);
+      const end = new Date(params.get('end')!);
+      expect(
+        (start.getTime() - EPOCH_MS) % CHUNK_MS,
+        `start=${params.get('start')} should sit on the canonical 90-day grid`,
+      ).toBe(0);
+      expect(
+        end.getTime() - start.getTime(),
+        `${url} should request exactly one grid cell`,
+      ).toBe(CHUNK_MS);
     }
   });
 

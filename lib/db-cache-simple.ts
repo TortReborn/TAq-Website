@@ -168,6 +168,22 @@ class SimpleDatabaseCache {
     return this.get('territories', requestId, true);
   }
 
+  /**
+   * Timestamp of the territories cache row without pulling the payload.
+   * Used for ETag revalidation — a matching If-None-Match can be answered
+   * with a 304 after transferring one timestamp instead of ~300KB of JSON.
+   */
+  async getTerritoriesTimestamp(): Promise<Date | null> {
+    try {
+      const result = await this.pool.query(
+        `SELECT created_at FROM cache_entries WHERE cache_key = 'territories'`,
+      );
+      return result.rows.length > 0 ? new Date(result.rows[0].created_at) : null;
+    } catch {
+      return null;
+    }
+  }
+
   async getGuildData(requestId?: string) {
     const rateCheck = this.checkRateLimit('members', requestId);
     if (!rateCheck.allowed) {

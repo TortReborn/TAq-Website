@@ -713,6 +713,72 @@ export function buildExchangeStoreFromRanged(data: RangedExchangeEventData): Exc
 }
 
 /**
+ * Combine several ranged responses into one, so a batch of fetched chunks
+ * costs a single merge into the (large) ExchangeStore instead of one full
+ * store rebuild per chunk.
+ *
+ * Each chunk's `initialState` is pre-baked into synthetic events at that
+ * chunk's own `earliest - 1s` — exactly what merging the chunk individually
+ * would have produced — so combining preserves semantics even when the
+ * chunks are non-contiguous. The result carries an empty `initialState`.
+ */
+export function combineRangedEventData(list: RangedExchangeEventData[]): RangedExchangeEventData {
+  const territories: string[] = [];
+  const terrIndex = new Map<string, number>();
+  const guilds: string[] = [];
+  const prefixes: string[] = [];
+  const guildIndex = new Map<string, number>();
+  const events: number[][] = [];
+  let earliestMs = Infinity;
+  let latestMs = -Infinity;
+
+  for (const d of list) {
+    const tMap = d.territories.map((name) => {
+      let idx = terrIndex.get(name);
+      if (idx === undefined) {
+        idx = territories.length;
+        territories.push(name);
+        terrIndex.set(name, idx);
+      }
+      return idx;
+    });
+    const gMap = d.guilds.map((name, i) => {
+      let idx = guildIndex.get(name);
+      if (idx === undefined) {
+        idx = guilds.length;
+        guilds.push(name);
+        prefixes.push(d.prefixes[i]);
+        guildIndex.set(name, idx);
+      }
+      return idx;
+    });
+
+    const startSec = Math.floor(new Date(d.earliest).getTime() / 1000) - 1;
+    for (const [tIdx, gIdx] of d.initialState) {
+      events.push([startSec, tMap[tIdx], gMap[gIdx]]);
+    }
+    for (const [sec, tIdx, gIdx] of d.events) {
+      events.push([sec, tMap[tIdx], gMap[gIdx]]);
+    }
+    earliestMs = Math.min(earliestMs, new Date(d.earliest).getTime());
+    latestMs = Math.max(latestMs, new Date(d.latest).getTime());
+  }
+
+  // Chunks may arrive out of order (the background fill alternates directions)
+  events.sort((a, b) => a[0] - b[0]);
+
+  return {
+    territories,
+    guilds,
+    prefixes,
+    events,
+    initialState: [],
+    earliest: new Date(earliestMs === Infinity ? 0 : earliestMs).toISOString(),
+    latest: new Date(latestMs === -Infinity ? 0 : latestMs).toISOString(),
+  };
+}
+
+/**
  * Merge a new ranged response into an existing ExchangeStore.
  *
  * Handles index remapping: incoming data may use different indices for the

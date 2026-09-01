@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   buildExchangeStore,
   buildExchangeStoreFromRanged,
+  combineRangedEventData,
   mergeExchangeStores,
   buildSnapshotAt,
   expandSnapshot,
@@ -165,6 +166,56 @@ describe('mergeExchangeStores', () => {
       const a = buildSnapshotAt(merged, new Date(probeSec * 1000));
       const b = buildSnapshotAt(reference, new Date(probeSec * 1000));
       expect(a?.territories).toEqual(b?.territories);
+    }
+  });
+});
+
+describe('combineRangedEventData', () => {
+  it('one merge of a combined batch equals merging each chunk sequentially', () => {
+    const base = rangedChunk(
+      ['Detlas', 'Ragni'],
+      [[T0 + HOUR, 0, 2]],
+      [[0, 1], [1, 1]],
+      T0,
+      T0 + 2 * HOUR,
+    );
+
+    // Two non-contiguous later chunks, out of chronological order and with
+    // differing index assignments — the shape the background fill produces
+    const chunkLate = rangedChunk(
+      ['Ragni', 'Detlas Suburbs'],
+      [[T0 + 20 * HOUR, 1, 1]],
+      [[0, 2]],
+      T0 + 19 * HOUR,
+      T0 + 21 * HOUR,
+    );
+    const chunkMid = rangedChunk(
+      ['Detlas Suburbs', 'Detlas'],
+      [[T0 + 11 * HOUR, 0, 2]],
+      [[1, 2]],
+      T0 + 10 * HOUR,
+      T0 + 12 * HOUR,
+    );
+
+    const sequential = mergeExchangeStores(
+      mergeExchangeStores(buildExchangeStoreFromRanged(base), chunkLate),
+      chunkMid,
+    );
+    const batched = mergeExchangeStores(
+      buildExchangeStoreFromRanged(base),
+      combineRangedEventData([chunkLate, chunkMid]),
+    );
+
+    // Combined events must be sorted ascending
+    for (let i = 1; i < batched.data.events.length; i++) {
+      expect(batched.data.events[i][0]).toBeGreaterThanOrEqual(batched.data.events[i - 1][0]);
+    }
+
+    // Snapshots agree at times inside and between every chunk window
+    for (const sec of [T0 + HOUR / 2, T0 + 5 * HOUR, T0 + 11.5 * HOUR, T0 + 15 * HOUR, T0 + 21 * HOUR]) {
+      const a = buildSnapshotAt(sequential, new Date(sec * 1000));
+      const b = buildSnapshotAt(batched, new Date(sec * 1000));
+      expect(b?.territories).toEqual(a?.territories);
     }
   });
 });

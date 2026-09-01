@@ -62,7 +62,6 @@ interface HistoryTimelineProps {
   gaps?: Array<{ start: Date; end: Date }>; // Time ranges with no data
   vertical?: boolean;
   hideCurrentTime?: boolean; // Hide the current time display (shown externally)
-  loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
   seasons?: SeasonPeriod[]; // On/off-season periods to overlay as context
   // Season zoom is controlled by the parent when these are provided, so the
   // panel's season selector and the track's right-click zoom share one state
@@ -78,7 +77,6 @@ function HistoryTimeline({
   gaps,
   vertical,
   hideCurrentTime,
-  loadedRanges,
   seasons,
   seasonZoom: seasonZoomProp,
   onSeasonZoomChange,
@@ -140,60 +138,6 @@ function HistoryTimeline({
       })
       .filter((r): r is { period: SeasonPeriod; title: string; startPct: number; endPct: number } => r !== null);
   }, [seasons, earliest, latest, totalRange]);
-
-  // Precompute loaded-range positions as percentages of the total range
-  const loadedRegions = useMemo(() => {
-    if (!loadedRanges || loadedRanges.length === 0 || totalRange === 0) return [];
-    const earliestMs = earliest.getTime();
-    const latestMs = latest.getTime();
-    return loadedRanges
-      .map(([startMs, endMs]) => {
-        const clampedStart = Math.max(earliestMs, startMs);
-        const clampedEnd = Math.min(latestMs, endMs);
-        if (clampedStart >= clampedEnd) return null;
-        const startPct = ((clampedStart - earliestMs) / totalRange) * 100;
-        const endPct = ((clampedEnd - earliestMs) / totalRange) * 100;
-        return { startPct, endPct };
-      })
-      .filter((r): r is { startPct: number; endPct: number } => r !== null);
-  }, [loadedRanges, earliest, latest, totalRange]);
-
-  // Green regions = loaded regions with gap regions subtracted (has real data)
-  const loadedGreenRegions = useMemo(() => {
-    if (loadedRegions.length === 0) return [];
-    if (gapRegions.length === 0) return loadedRegions;
-
-    const result: Array<{ startPct: number; endPct: number }> = [];
-    for (const loaded of loadedRegions) {
-      let remaining: Array<{ startPct: number; endPct: number }> = [{ ...loaded }];
-      for (const gap of gapRegions) {
-        const next: Array<{ startPct: number; endPct: number }> = [];
-        for (const seg of remaining) {
-          if (gap.endPct <= seg.startPct || gap.startPct >= seg.endPct) {
-            next.push(seg);
-            continue;
-          }
-          if (gap.startPct > seg.startPct) {
-            next.push({ startPct: seg.startPct, endPct: gap.startPct });
-          }
-          if (gap.endPct < seg.endPct) {
-            next.push({ startPct: gap.endPct, endPct: seg.endPct });
-          }
-        }
-        remaining = next;
-      }
-      result.push(...remaining);
-    }
-    return result;
-  }, [loadedRegions, gapRegions]);
-
-  // Once loaded ranges cover the whole visible span there is nothing left to
-  // communicate — the indicator bar is hidden entirely.
-  const fullyLoaded = useMemo(() => {
-    if (loadedRegions.length === 0) return false;
-    const covered = loadedRegions.reduce((sum, r) => sum + (r.endPct - r.startPct), 0);
-    return covered >= 99.9;
-  }, [loadedRegions]);
 
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
@@ -433,110 +377,6 @@ function HistoryTimeline({
         }),
   };
 
-  // ── Loaded-data indicator bar ────────────────────────────────────────
-  // Shows a thin bar next to the slider: green = data loaded, red = not loaded.
-  // In vertical mode it sits to the left; in horizontal mode it sits below.
-
-  const loadedIndicatorBar = (isVert: boolean) => {
-    // Determine cap colors: match the nearest segment's color at each edge
-    const RED = 'rgb(130, 30, 30)';
-    const GRAY = 'rgb(100, 100, 100)';
-    const GREEN = 'rgb(40, 167, 69)';
-
-    const capColor = (edge: 'start' | 'end') => {
-      const threshold = 0.5; // within 0.5% of edge
-      if (edge === 'start') {
-        if (loadedGreenRegions.some(r => r.startPct <= threshold)) return GREEN;
-        if (loadedRegions.some(r => r.startPct <= threshold)) return GRAY;
-        return RED;
-      } else {
-        if (loadedGreenRegions.some(r => r.endPct >= 100 - threshold)) return GREEN;
-        if (loadedRegions.some(r => r.endPct >= 100 - threshold)) return GRAY;
-        return RED;
-      }
-    };
-
-    const startColor = capColor('start');
-    const endColor = capColor('end');
-
-    return (
-      <div
-        title="Data loading status"
-        style={{
-          position: 'relative',
-          ...(isVert
-            ? { width: '6px', borderRadius: '3px', marginRight: '4px', flexShrink: 0 }
-            : { height: '6px', borderRadius: '3px', width: '100%', marginTop: '4px' }),
-          background: RED,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Start cap — matches nearest segment color */}
-        <div style={{
-          position: 'absolute',
-          ...(isVert
-            ? { left: 0, right: 0, top: 0, height: '12px' }
-            : { top: 0, bottom: 0, left: 0, width: '12px' }),
-          background: startColor,
-        }} />
-        {/* End cap — matches nearest segment color */}
-        <div style={{
-          position: 'absolute',
-          ...(isVert
-            ? { left: 0, right: 0, bottom: 0, height: '12px' }
-            : { top: 0, bottom: 0, right: 0, width: '12px' }),
-          background: endColor,
-        }} />
-        {/* Gray segments for loaded-but-empty ranges (loaded region that overlaps gaps) */}
-        {loadedRegions.map((region, i) => (
-          <div
-            key={`gray-${i}`}
-            style={{
-              position: 'absolute',
-              ...(isVert
-                ? {
-                    left: 0,
-                    right: 0,
-                    top: percentToPaddedStart(region.startPct),
-                    height: percentToPaddedWidth(region.startPct, region.endPct),
-                  }
-                : {
-                    top: 0,
-                    bottom: 0,
-                    left: percentToPaddedStart(region.startPct),
-                    width: percentToPaddedWidth(region.startPct, region.endPct),
-                  }),
-              background: GRAY,
-            }}
-          />
-        ))}
-        {/* Green segments for loaded ranges with actual data (gaps subtracted) */}
-        {loadedGreenRegions.map((region, i) => (
-          <div
-            key={`green-${i}`}
-            style={{
-              position: 'absolute',
-              ...(isVert
-                ? {
-                    left: 0,
-                    right: 0,
-                    top: percentToPaddedStart(region.startPct),
-                    height: percentToPaddedWidth(region.startPct, region.endPct),
-                  }
-                : {
-                    top: 0,
-                    bottom: 0,
-                    left: percentToPaddedStart(region.startPct),
-                    width: percentToPaddedWidth(region.startPct, region.endPct),
-                  }),
-              background: GREEN,
-            }}
-          />
-        ))}
-      </div>
-    );
-  };
-
   // ── Season ribbon ────────────────────────────────────────────────────
   // A thin strip flush against the track showing on-season (colored) vs
   // off-season (hatched) periods. It is part of the track's hitbox: left-click
@@ -693,33 +533,13 @@ function HistoryTimeline({
           {formatDate(earliest)}
         </div>
 
-        {/* Track + loaded indicator side by side. Spacing comes from the
-            bar's own margin (not flex gap) so the animated collapse below
-            removes it together with the bar. */}
+        {/* Ribbon + track row */}
         <div style={{
           display: 'flex',
           flex: 1,
           minHeight: '100px',
           alignItems: 'stretch',
         }}>
-          {/* Loaded-data indicator bar — kept mounted; width eases to 0 once
-              fully loaded instead of popping out */}
-          {loadedRanges && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'stretch',
-                width: fullyLoaded ? '0px' : '10px', // 6px bar + 4px spacing
-                opacity: fullyLoaded ? 0 : 1,
-                overflow: 'hidden',
-                transition: 'width 0.35s ease, opacity 0.35s ease',
-                flexShrink: 0,
-              }}
-            >
-              {loadedIndicatorBar(true)}
-            </div>
-          )}
-
           {/* Season ribbon + vertical track — one shared hitbox */}
           <div
             data-timeline-track
@@ -949,21 +769,6 @@ function HistoryTimeline({
       </div>
       </div>
 
-      {/* Loaded-data indicator bar (below track). Kept mounted so its
-          appearance (history refresh) and disappearance (fully loaded)
-          ease the panel's height instead of popping. */}
-      {loadedRanges && (
-        <div
-          style={{
-            height: fullyLoaded ? '0px' : '10px', // 6px bar + 4px spacing
-            opacity: fullyLoaded ? 0 : 1,
-            overflow: 'hidden',
-            transition: 'height 0.35s ease, opacity 0.35s ease',
-          }}
-        >
-          {loadedIndicatorBar(false)}
-        </div>
-      )}
     </div>
   );
 }

@@ -26,6 +26,7 @@ import {
   buildSnapshotAt,
   RangedExchangeEventData,
   buildExchangeStoreFromRanged,
+  combineRangedEventData,
   mergeExchangeStores,
   InitialOwnerMap,
   buildInitialOwnerMap,
@@ -535,17 +536,17 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // -----------------------------------------------------------------------
   // Event-based history loading with client-side reconstruction
   // -----------------------------------------------------------------------
-  const CHUNK_MS = 3 * 30 * 24 * 60 * 60 * 1000; // 3 months per chunk
+  const CHUNK_MS = 3 * 30 * 24 * 60 * 60 * 1000; // 90 days per chunk cell
   const HALF_CHUNK_MS = CHUNK_MS / 2;
   const STEP_MS = 10 * 60 * 1000; // 10 minutes — snapshot interval
-  // Chunk boundaries snap to this grid. Requests keyed by scrub position used
-  // ms-precision ISO timestamps, so no two requests ever shared a URL — the
-  // events route's 1h CDN cache could never hit and near-identical ranges were
-  // re-fetched. Hour alignment makes URLs stable across scrubs and users while
-  // keeping the tip of the timeline at most an hour behind the request time.
-  const CHUNK_ALIGN_MS = 60 * 60 * 1000;
-  const alignDown = (ms: number) => ms - (ms % CHUNK_ALIGN_MS);
-  const alignUp = (ms: number) => ms % CHUNK_ALIGN_MS === 0 ? ms : alignDown(ms) + CHUNK_ALIGN_MS;
+  // Canonical chunk grid: 90-day cells anchored at a fixed epoch. Every
+  // request covers exactly one whole cell, so every client asks for identical
+  // URLs — the CDN can then serve historical cells to first-time visitors
+  // without touching the database (the events route marks fully-past ranges
+  // immutable). The cell containing "now" naturally stays on a stable URL too;
+  // its 1h cache lifetime bounds how stale the timeline tip can get.
+  const CHUNK_EPOCH_MS = Date.UTC(2018, 0, 1);
+  const cellStart = (ms: number) => CHUNK_EPOCH_MS + Math.floor((ms - CHUNK_EPOCH_MS) / CHUNK_MS) * CHUNK_MS;
 
   // One-time cache restoration shared by loadEvents and ensureExchangeData
   const cacheRestorePromiseRef = useRef<Promise<void> | null>(null);
@@ -626,9 +627,29 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
    * Find all uncovered gaps within [boundsStart, boundsEnd] given the
    * current loaded ranges.  Returns an array of [start, end] gaps sorted
    * by start time.
+   *
+   * `extraRanges` — additional ranges to treat as covered (fetched chunks
+   * whose store merge is still batched and not yet recorded).
    */
-  const findUncoveredGaps = useCallback((boundsStart: number, boundsEnd: number): Array<[number, number]> => {
-    const ranges = eventRangesRef.current;
+  const findUncoveredGaps = useCallback((
+    boundsStart: number,
+    boundsEnd: number,
+    extraRanges?: Array<[number, number]>,
+  ): Array<[number, number]> => {
+    let ranges = eventRangesRef.current;
+    if (extraRanges && extraRanges.length > 0) {
+      const combined = [...ranges, ...extraRanges].sort((a, b) => a[0] - b[0]);
+      const merged: Array<[number, number]> = [[combined[0][0], combined[0][1]]];
+      for (let i = 1; i < combined.length; i++) {
+        const last = merged[merged.length - 1];
+        if (combined[i][0] <= last[1]) {
+          last[1] = Math.max(last[1], combined[i][1]);
+        } else {
+          merged.push([combined[i][0], combined[i][1]]);
+        }
+      }
+      ranges = merged;
+    }
     if (ranges.length === 0) return [[boundsStart, boundsEnd]];
 
     const gaps: Array<[number, number]> = [];
@@ -681,12 +702,42 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       const boundsEnd = new Date(bounds.latest).getTime();
       mapLog('events', 'background fetch started');
 
+      // Merge batching: each store merge rebuilds the whole store on the main
+      // thread (~hundreds of ms once the store is large), so merging per chunk
+      // stalled rendering ~37 times during the initial fill. Fetched chunks
+      // accumulate here and merge/record/persist in batches instead.
+      const pendingData: RangedExchangeEventData[] = [];
+      const pendingRanges: Array<[number, number]> = [];
+      const FLUSH_AFTER = 4;
+      const flushPending = () => {
+        if (pendingData.length === 0) return;
+        const doneMerge = mapTime('store', `merge ${pendingData.length} chunk(s) into store`);
+        // Combine the batch first (cheap — chunks are small), then pay the
+        // full-store merge cost once instead of once per chunk
+        const combined = pendingData.length === 1 ? pendingData[0] : combineRangedEventData(pendingData);
+        if (exchangeStoreRef.current) {
+          exchangeStoreRef.current = mergeExchangeStores(exchangeStoreRef.current, combined);
+        } else {
+          exchangeStoreRef.current = buildExchangeStoreFromRanged(combined);
+        }
+        doneMerge();
+        for (const [s, e] of pendingRanges) recordRange(s, e);
+        pendingData.length = 0;
+        pendingRanges.length = 0;
+        setStoreVersion(v => v + 1);
+        if (exchangeStoreRef.current) {
+          saveHistoryCache(exchangeStoreRef.current.data, eventRangesRef.current, bounds.gaps);
+        }
+      };
+
       // Alternate: true = try forward first, false = try backward first
       let preferForward = true;
 
       while (!abort.signal.aborted) {
         const cursorMs = historyTimestampRef.current?.getTime() ?? (boundsStart + boundsEnd) / 2;
-        const gaps = findUncoveredGaps(boundsStart, boundsEnd);
+        // Pending (fetched-but-unmerged) ranges count as covered so the loop
+        // doesn't re-fetch a batched chunk
+        const gaps = findUncoveredGaps(boundsStart, boundsEnd, pendingRanges);
         if (gaps.length === 0) break; // fully loaded
 
         // Split gaps into forward (start >= cursor) and backward (end <= cursor),
@@ -723,52 +774,35 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         if (!chosenGap) break;
         preferForward = !preferForward; // alternate next iteration
 
-        // For forward gaps, fetch from the start of the gap.
-        // For backward gaps, fetch the end of the gap (working backward).
+        // Fetch the whole canonical grid cell at the near edge of the gap —
+        // forward gaps advance from their start, backward gaps from their end.
+        // Whole cells keep URLs identical across users for CDN reuse; any
+        // already-covered overlap within the cell is merged away harmlessly.
         const isForward = chosenGap[0] >= cursorMs || (chosenGap === forwardGap);
-        let chunkStart: number;
-        let chunkEnd: number;
-
-        if (isForward) {
-          chunkStart = chosenGap[0];
-          chunkEnd = Math.min(chosenGap[0] + CHUNK_MS, chosenGap[1]);
-        } else {
-          chunkEnd = chosenGap[1];
-          chunkStart = Math.max(chosenGap[1] - CHUNK_MS, chosenGap[0]);
-        }
-        // Keep request URLs on the shared hour grid (over-fetching a partial
-        // hour at the edges is harmless — recordRange merges overlaps)
-        chunkStart = alignDown(chunkStart);
-        chunkEnd = alignUp(chunkEnd);
+        const chunkStart = isForward ? cellStart(chosenGap[0]) : cellStart(chosenGap[1] - 1);
+        const chunkEnd = chunkStart + CHUNK_MS;
 
         try {
           const data = await fetchEventRange(
             new Date(chunkStart), new Date(chunkEnd), abort.signal,
           );
-          if (abort.signal.aborted) break;
-
-          recordRange(chunkStart, chunkEnd);
-          if (exchangeStoreRef.current) {
-            exchangeStoreRef.current = mergeExchangeStores(exchangeStoreRef.current, data);
-          } else {
-            exchangeStoreRef.current = buildExchangeStoreFromRanged(data);
+          if (abort.signal.aborted) {
+            // Merge what already arrived before exiting
+            pendingData.push(data);
+            pendingRanges.push([chunkStart, chunkEnd]);
+            break;
           }
-          setStoreVersion(v => v + 1);
 
-          // Persist to cache after each chunk
-          if (exchangeStoreRef.current) {
-            saveHistoryCache(
-              exchangeStoreRef.current.data,
-              eventRangesRef.current,
-              bounds.gaps,
-            );
-          }
+          pendingData.push(data);
+          pendingRanges.push([chunkStart, chunkEnd]);
+          if (pendingData.length >= FLUSH_AFTER) flushPending();
         } catch (err: unknown) {
           if (err instanceof Error && err.name === 'AbortError') break;
           mapError('events', 'Background event fetch failed', err);
           await new Promise(r => setTimeout(r, 5000));
         }
       }
+      flushPending();
       if (!abort.signal.aborted && findUncoveredGaps(boundsStart, boundsEnd).length === 0) {
         mapLog('events', 'background fetch complete — full timeline loaded');
       }
@@ -786,10 +820,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     // Try restoring from persistent cache on first call
     await restoreCacheOnce();
 
-    const startMs = alignDown(centerDate.getTime() - HALF_CHUNK_MS);
-    const endMs = alignUp(centerDate.getTime() + HALF_CHUNK_MS);
+    // Grid cells overlapping [center - 45d, center + 45d] — one or two cells
+    const windowStart = centerDate.getTime() - HALF_CHUNK_MS;
+    const windowEnd = centerDate.getTime() + HALF_CHUNK_MS;
+    const cells: number[] = [];
+    for (let c = cellStart(windowStart); c < windowEnd; c += CHUNK_MS) cells.push(c);
+    const uncovered = cells.filter((c) => !isRangeCovered(c, c + CHUNK_MS));
 
-    if (isRangeCovered(startMs, endMs)) {
+    if (uncovered.length === 0) {
       // Range is covered, but still start background fetch
       // to fill in any remaining gaps (including re-checking empty ranges)
       setTimeout(() => startBackgroundFetch(), 0);
@@ -798,18 +836,20 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
     setIsLoadingHistory(true);
     try {
-      const data = await fetchEventRange(new Date(startMs), new Date(endMs));
+      await Promise.all(uncovered.map(async (c) => {
+        const data = await fetchEventRange(new Date(c), new Date(c + CHUNK_MS));
 
-      recordRange(startMs, endMs);
+        recordRange(c, c + CHUNK_MS);
 
-      const doneMerge = mapTime('store', 'merge event chunk into store');
-      if (exchangeStoreRef.current) {
-        exchangeStoreRef.current = mergeExchangeStores(exchangeStoreRef.current, data);
-      } else {
-        exchangeStoreRef.current = buildExchangeStoreFromRanged(data);
-      }
-      doneMerge();
-      setStoreVersion(v => v + 1);
+        const doneMerge = mapTime('store', 'merge event chunk into store');
+        if (exchangeStoreRef.current) {
+          exchangeStoreRef.current = mergeExchangeStores(exchangeStoreRef.current, data);
+        } else {
+          exchangeStoreRef.current = buildExchangeStoreFromRanged(data);
+        }
+        doneMerge();
+        setStoreVersion(v => v + 1);
+      }));
 
       // Save to persistent cache
       if (exchangeStoreRef.current && historyBounds) {
@@ -865,12 +905,15 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         bgAbortRef.current?.abort();
 
         const gaps = findUncoveredGaps(boundsStart, boundsEnd);
-        const chunks: Array<[number, number]> = [];
+        // Whole canonical grid cells covering each gap (deduped) so the URLs
+        // match what the map's own loading uses and the CDN can serve them
+        const cellSet = new Set<number>();
         for (const [gapStart, gapEnd] of gaps) {
-          for (let s = gapStart; s < gapEnd; s += CHUNK_MS) {
-            chunks.push([s, Math.min(s + CHUNK_MS, gapEnd)]);
+          for (let s = cellStart(gapStart); s < gapEnd; s += CHUNK_MS) {
+            cellSet.add(s);
           }
         }
+        const chunks: Array<[number, number]> = [...cellSet].sort((a, b) => a - b).map((s) => [s, s + CHUNK_MS]);
 
         const CONCURRENCY = 4;
         let next = 0;
@@ -2354,7 +2397,6 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               conflictBounds={conflictBounds}
               isConflictFocused={isConflictFocused}
               onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}
-              loadedRanges={loadedRanges}
               seasons={seasons}
               loadProgress={historyLoadProgress}
             />

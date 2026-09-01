@@ -26,6 +26,12 @@ export const dynamic = 'force-dynamic';
 // Maximum allowed range per request (6 months)
 const MAX_RANGE_MS = 6 * 30 * 24 * 60 * 60 * 1000;
 
+// Ranges ending this far in the past can never gain new exchanges — the
+// response is immutable and the CDN may keep it forever. The client requests
+// canonical epoch-aligned 90-day cells, so all users share these URLs and
+// first-time visitors get historical chunks from the CDN without a DB query.
+const IMMUTABLE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const startParam = searchParams.get('start');
@@ -175,7 +181,9 @@ export async function GET(request: NextRequest) {
       latest,
     }, {
       headers: {
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        'Cache-Control': endDate.getTime() < Date.now() - IMMUTABLE_AFTER_MS
+          ? 'public, max-age=31536000, s-maxage=31536000, immutable'
+          : 'public, max-age=3600, s-maxage=3600',
         ...timing.header(),
       },
     });
