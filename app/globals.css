@@ -49,20 +49,18 @@ select option {
 }
 
 .lootpools-grid-container {
-  --lootpool-card-min: 150px;
-  --lootpool-card-max: 220px;
+  /* Min must fit the longest single mythic word (e.g. "Transfiguration")
+     on one line; multi-word names may wrap between words. */
+  --lootpool-card-min: 210px;
 
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--lootpool-card-min), 1fr));
   align-items: stretch;
   gap: 0.75rem;
 }
 
 .lootpools-grid-container > * {
-  flex: 1 1 var(--lootpool-card-min);
-  min-width: var(--lootpool-card-min);
-  max-width: var(--lootpool-card-max);
+  min-width: 0;
   container-type: inline-size;
 }
 
@@ -102,8 +100,6 @@ select option {
 .lootpool-entry-meta {
   display: block;
   line-height: 1.2;
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .lootpool-entry-list {
@@ -152,8 +148,6 @@ select option {
 
 @media (min-width: 1500px) {
   .lootpools-grid-container {
-    --lootpool-card-min: 170px;
-    --lootpool-card-max: 220px;
     gap: 1rem;
   }
 }
@@ -171,8 +165,6 @@ select option {
   }
 
   .lootpools-grid-container {
-    --lootpool-card-min: 200px;
-    --lootpool-card-max: 260px;
     gap: 1rem;
   }
 }
@@ -186,11 +178,6 @@ select option {
   .lootpools-header-container,
   .lootpools-grid-container {
     width: 100% !important;
-  }
-
-  .lootpools-grid-container > * {
-    flex: 1 1 100%;
-    max-width: 100%;
   }
 
   /* Stack header elements vertically on mobile */
