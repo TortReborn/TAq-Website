@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { canonicalTerrName } from '@/lib/territory-abbreviations';
 import { getGuildPrefixes, queryLatestOwnersAsOf } from '@/lib/exchange-data';
+import { createTiming } from '@/lib/server-timing';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,23 +54,24 @@ export async function GET(request: NextRequest) {
   }
 
   const pool = getPool();
+  const timing = createTiming('map-history/events');
 
   try {
     // Fetch guild prefixes (small table, cached in-module for 1 hour)
-    const guildPrefixMap = await getGuildPrefixes(pool);
+    const guildPrefixMap = await timing.span('prefixes', () => getGuildPrefixes(pool));
 
     // 1. Initial state: latest owner per territory at or before startDate.
     //    Includes exchange_time so we can deduplicate after apostrophe normalisation.
-    const initialRows = await queryLatestOwnersAsOf(pool, startDate);
+    const initialRows = await timing.span('initialOwners', () => queryLatestOwnersAsOf(pool, startDate));
 
     // 2. Events within the range (simple range scan, fast with index)
-    const eventsResult = await pool.query(
+    const eventsResult = await timing.span('rangeScan', () => pool.query(
       `SELECT exchange_time, territory, attacker_name
        FROM territory_exchanges
        WHERE exchange_time > $1 AND exchange_time <= $2
        ORDER BY exchange_time ASC, territory, attacker_name`,
       [startDate.toISOString(), endDate.toISOString()]
-    );
+    ));
 
     // Build compact indexed representation
     const territoryIndex = new Map<string, number>();
@@ -156,6 +158,13 @@ export async function GET(request: NextRequest) {
       ? new Date(events[events.length - 1][0] * 1000).toISOString()
       : endDate.toISOString();
 
+    timing.log({
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      events: events.length,
+      territories: territories.length,
+    });
+
     return NextResponse.json({
       territories,
       guilds,
@@ -167,6 +176,7 @@ export async function GET(request: NextRequest) {
     }, {
       headers: {
         'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        ...timing.header(),
       },
     });
   } catch (error) {

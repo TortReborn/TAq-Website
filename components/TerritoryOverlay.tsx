@@ -396,6 +396,7 @@ function TerritoryOverlay({
 
   return (
     <svg
+      data-territory-name={name}
       style={{
         position: "absolute",
         left: 0,

@@ -722,7 +722,7 @@ function HistoryTimeline({
             ))}
 
             {/* Thumb */}
-            <div style={thumbStyle} />
+            <div data-testid="timeline-thumb" style={thumbStyle} />
           </div>
         </div>
 
@@ -745,12 +745,14 @@ function HistoryTimeline({
     <div style={{ position: 'relative', width: '100%', padding: '0.25rem 0' }}>
       {resetZoomButton}
       {/* Current time display - above the slider */}
-      <div style={{
+      <div data-testid="timeline-current-time" style={{
         textAlign: 'center',
         marginBottom: '0.25rem',
         fontSize: '0.875rem',
         fontWeight: '500',
         color: 'var(--text-primary)',
+        // Keeps the text from jittering horizontally during playback
+        fontVariantNumeric: 'tabular-nums',
       }}>
         {formatDateTime(current)}
       </div>
@@ -867,7 +869,7 @@ function HistoryTimeline({
         ))}
 
         {/* Thumb */}
-        <div style={thumbStyle} />
+        <div data-testid="timeline-thumb" style={thumbStyle} />
       </div>
 
       {/* Loaded-data indicator bar (below track) */}

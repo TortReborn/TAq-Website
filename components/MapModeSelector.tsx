@@ -24,6 +24,7 @@ export default function MapModeSelector({
     >
       <button
         type="button"
+        data-testid="map-mode-live"
         onClick={() => onModeChange('live')}
         style={{
           padding: '0.5rem 1rem',
@@ -41,6 +42,7 @@ export default function MapModeSelector({
       </button>
       <button
         type="button"
+        data-testid="map-mode-history"
         onClick={() => historyAvailable && onModeChange('history')}
         disabled={!historyAvailable}
         style={{

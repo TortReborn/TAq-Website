@@ -84,7 +84,8 @@ function HistoryPlayback({
         onClick={onJumpToStart}
         disabled={!canStepBackward}
         style={canStepBackward ? buttonStyle : disabledStyle}
-        title="Jump to start"
+        title="Jump to start (Home)"
+        data-testid="playback-jump-start"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="17,17 11,12 17,7" />
@@ -98,7 +99,8 @@ function HistoryPlayback({
         onClick={onStepBackward}
         disabled={!canStepBackward}
         style={canStepBackward ? buttonStyle : disabledStyle}
-        title="Previous snapshot"
+        title="Previous snapshot (←)"
+        data-testid="playback-step-back"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15,17 9,12 15,7" />
@@ -115,7 +117,8 @@ function HistoryPlayback({
           background: isPlaying ? 'var(--accent-primary)' : 'var(--bg-secondary)',
           color: isPlaying ? 'var(--text-on-accent)' : 'var(--text-primary)',
         }}
-        title={isPlaying ? 'Pause' : 'Play'}
+        title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+        data-testid="playback-play"
       >
         {isPlaying ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -135,7 +138,8 @@ function HistoryPlayback({
         onClick={onStepForward}
         disabled={!canStepForward}
         style={canStepForward ? buttonStyle : disabledStyle}
-        title="Next snapshot"
+        title="Next snapshot (→)"
+        data-testid="playback-step-forward"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="9,17 15,12 9,7" />
@@ -148,7 +152,8 @@ function HistoryPlayback({
         onClick={onJumpToEnd}
         disabled={!canStepForward}
         style={canStepForward ? buttonStyle : disabledStyle}
-        title="Jump to end"
+        title="Jump to end (End)"
+        data-testid="playback-jump-end"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="7,17 13,12 7,7" />

@@ -22,5 +22,10 @@ nul
 # --- Build artifacts ---
 tsconfig.tsbuildinfo
 
+# --- Playwright ---
+test-results/
+playwright-report/
+.playwright-mcp/
+
 # --- Claude Code local settings ---
 .claude/settings.local.json

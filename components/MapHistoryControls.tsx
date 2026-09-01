@@ -31,6 +31,7 @@ interface MapHistoryControlsProps {
   onConflictFocusToggle?: () => void;
   loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
   seasons?: SeasonPeriod[]; // On/off-season periods for timeline context
+  loadProgress?: number; // 0..1 — fraction of the timeline covered by loaded events
 }
 
 // Widths of the map's bottom-corner control clusters, kept clear so the
@@ -96,6 +97,7 @@ function MapHistoryControls({
   onConflictFocusToggle,
   loadedRanges,
   seasons,
+  loadProgress,
 }: MapHistoryControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -167,6 +169,56 @@ function MapHistoryControls({
       y: Math.max(minY, Math.min(maxY, y)),
     };
   }, [panelWidth, containerBounds]);
+
+  // Keyboard shortcuts — active while the history panel is mounted.
+  // Ignored when the user is typing in an input/select (date pickers etc.).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'SELECT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      const DAY_MS = 24 * 60 * 60 * 1000;
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          onPlayPause();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (e.shiftKey) {
+            onJump(new Date(Math.min(latest.getTime(), current.getTime() + DAY_MS)));
+          } else if (canStepForward) {
+            onStepForward();
+          }
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (e.shiftKey) {
+            onJump(new Date(Math.max(earliest.getTime(), current.getTime() - DAY_MS)));
+          } else if (canStepBackward) {
+            onStepBackward();
+          }
+          break;
+        case 'Home':
+          e.preventDefault();
+          onJumpToStart();
+          break;
+        case 'End':
+          e.preventDefault();
+          onJumpToEnd();
+          break;
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onPlayPause, onStepForward, onStepBackward, onJumpToStart, onJumpToEnd, onJump, canStepForward, canStepBackward, current, earliest, latest]);
 
   // Close speed dropdown on outside click
   useEffect(() => {
@@ -460,7 +512,7 @@ function MapHistoryControls({
       // clicks — the lower half of each 24px button became unclickable.
       zIndex: 2,
     }}>
-      {isLoading && (
+      {isLoading ? (
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -480,7 +532,33 @@ function MapHistoryControls({
           />
           Loading...
         </div>
-      )}
+      ) : (loadProgress !== undefined && loadProgress < 1) ? (
+        // Background gap-filling still running — show unobtrusive coverage %
+        <div
+          data-testid="history-load-progress"
+          title="Timeline events loading in the background — scrubbing works everywhere, already-loaded ranges respond instantly"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.375rem',
+            fontSize: '0.7rem',
+            color: 'var(--text-secondary)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <div
+            style={{
+              width: '10px',
+              height: '10px',
+              border: '2px solid var(--border-color)',
+              borderTopColor: 'var(--accent-primary)',
+              borderRadius: '50%',
+              animation: 'spin 1.2s linear infinite',
+            }}
+          />
+          {Math.round(loadProgress * 100)}% loaded
+        </div>
+      ) : null}
       {conflictBounds && onConflictFocusToggle && (
         <button
           type="button"
@@ -718,6 +796,7 @@ function MapHistoryControls({
   return (
     <div
       ref={containerRef}
+      data-testid="history-controls-panel"
       onMouseDown={handleMouseDown}
       style={{
         position: 'relative',
@@ -799,11 +878,12 @@ function MapHistoryControls({
               paddingRight: '0.75rem',
             }}>
               {/* Row 1: Current time */}
-              <div style={{
+              <div data-testid="timeline-current-time" style={{
                 fontSize: '0.8rem',
                 fontWeight: '500',
                 color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
+                fontVariantNumeric: 'tabular-nums',
               }}>
                 {currentDisplay.dateTimeLabel}
               </div>

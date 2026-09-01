@@ -31,6 +31,7 @@ import {
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 import { shouldRenderTerritory, shouldRenderTradeRoute } from "@/lib/retired-territories";
+import { mapLog, mapError, mapTime, timedFetch } from "@/lib/map-logger";
 
 /**
  * Merge fresh territory data into the previous record, reusing the previous
@@ -183,8 +184,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // History mode state
   const [viewMode, setViewMode] = useState<'live' | 'history'>(initialMode ?? 'live');
 
-  // Guild seasons for history-timeline context (fetched only when the history tab is active)
-  const seasons = useSeasons(viewMode === 'history');
+  // Guild seasons for history-timeline context. Fetched eagerly: the payload is
+  // tiny and server-cached for 1h, and fetching it up front takes one request
+  // out of the already-busy moment when the user switches to the history tab.
+  const seasons = useSeasons(true);
   const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -211,6 +214,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const eventRangesRef = useRef<Array<[number, number]>>([]); // [startMs, endMs][]
   const [loadedRanges, setLoadedRanges] = useState<Array<[number, number]>>([]);
   const bgAbortRef = useRef<AbortController | null>(null);
+  // True while the background gap-filling loop is running — lets loadEvents
+  // skip restarting it on every scrub tick
+  const bgActiveRef = useRef(false);
 
   // All known guilds from guild_prefixes table (fetched once on mount)
   const [allKnownGuilds, setAllKnownGuilds] = useState<{ name: string; prefix: string }[]>([]);
@@ -436,6 +442,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     let isMounted = true;
 
     const loadStaticData = async () => {
+      const doneStatic = mapTime('static', 'guild colors + verbose + externals');
       try {
         const [guildColorData, verboseDataResult, externalsDataResult] = await Promise.all([
           loadGuildColorsData(),
@@ -447,12 +454,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
           setGuildColors({ ...guildColorData });
           setVerboseData(verboseDataResult);
           setExternalsData(externalsDataResult);
-          console.log('🎨 Loaded guild colors:', Object.keys(guildColorData).length, 'guilds');
-          console.log('📊 Loaded verbose data:', Object.keys(verboseDataResult).length, 'territories');
-          console.log('🔗 Loaded externals data:', Object.keys(externalsDataResult).length, 'territories');
+          doneStatic({
+            guildColors: Object.keys(guildColorData).length,
+            verboseTerritories: Object.keys(verboseDataResult).length,
+            externalsTerritories: Object.keys(externalsDataResult).length,
+          });
         }
       } catch (error) {
-        console.error('Failed to load static map data:', error);
+        mapError('static', 'Failed to load static map data', error);
       }
     };
 
@@ -470,14 +479,16 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
     const loadLiveData = async () => {
       setIsLoadingTerritories(true);
+      const doneLive = mapTime('live', 'territory poll');
       try {
         const territoryData = await loadTerritories();
 
         if (isMounted) {
           setTerritories(prev => mergePreservingIdentity(prev, territoryData));
+          doneLive({ territories: Object.keys(territoryData).length });
         }
       } catch (error) {
-        console.error('Failed to load live territory data:', error);
+        mapError('live', 'Failed to load live territory data', error);
       } finally {
         if (isMounted) setIsLoadingTerritories(false);
       }
@@ -495,7 +506,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   useEffect(() => {
     const fetchHistoryBounds = async () => {
       try {
-        const response = await fetch('/api/map-history/bounds');
+        const response = await timedFetch('bounds', '/api/map-history/bounds');
         if (response.ok) {
           const data = await response.json();
           if (data.earliest && data.latest) {
@@ -505,10 +516,16 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               gaps: data.gaps,
               initialOwners: data.initialOwners,
             });
+            mapLog('bounds', 'history bounds ready', {
+              earliest: data.earliest,
+              latest: data.latest,
+              gaps: data.gaps?.length ?? 0,
+              initialOwners: data.initialOwners ? Object.keys(data.initialOwners).length : 0,
+            });
           }
         }
       } catch (error) {
-        console.error('Failed to fetch history bounds:', error);
+        mapError('bounds', 'Failed to fetch history bounds', error);
       }
     };
     fetchHistoryBounds();
@@ -520,6 +537,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const CHUNK_MS = 3 * 30 * 24 * 60 * 60 * 1000; // 3 months per chunk
   const HALF_CHUNK_MS = CHUNK_MS / 2;
   const STEP_MS = 10 * 60 * 1000; // 10 minutes — snapshot interval
+  // Chunk boundaries snap to this grid. Requests keyed by scrub position used
+  // ms-precision ISO timestamps, so no two requests ever shared a URL — the
+  // events route's 1h CDN cache could never hit and near-identical ranges were
+  // re-fetched. Hour alignment makes URLs stable across scrubs and users while
+  // keeping the tip of the timeline at most an hour behind the request time.
+  const CHUNK_ALIGN_MS = 60 * 60 * 1000;
+  const alignDown = (ms: number) => ms - (ms % CHUNK_ALIGN_MS);
+  const alignUp = (ms: number) => ms % CHUNK_ALIGN_MS === 0 ? ms : alignDown(ms) + CHUNK_ALIGN_MS;
 
   // One-time cache restoration shared by loadEvents and ensureExchangeData
   const cacheRestorePromiseRef = useRef<Promise<void> | null>(null);
@@ -553,8 +578,12 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const restoreCacheOnce = useCallback((): Promise<void> => {
     if (!cacheRestorePromiseRef.current) {
       cacheRestorePromiseRef.current = (async () => {
+        const doneRestore = mapTime('cache', 'restore history cache');
         try {
           const cached = await loadCachedHistory();
+          if (!cached) {
+            doneRestore({ hit: false });
+          }
           if (cached) {
             // Restore the store from cached data (non-empty segments)
             exchangeStoreRef.current = buildExchangeStore(cached.exchangeData);
@@ -564,12 +593,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               recordRange(s, e);
             }
             setStoreVersion(v => v + 1);
+            doneRestore({ hit: true, ranges: cached.dataRanges.length });
 
             // Note: empty ranges are NOT recorded — they'll be re-fetched
             // by the background fetcher, which checks for uncovered ranges.
           }
         } catch (e) {
-          console.error('Failed to restore history cache:', e);
+          mapError('cache', 'Failed to restore history cache', e);
         }
       })();
     }
@@ -582,7 +612,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     endDate: Date,
     signal?: AbortSignal,
   ): Promise<RangedExchangeEventData> => {
-    const response = await fetch(
+    const response = await timedFetch(
+      'events',
       `/api/map-history/events?start=${startDate.toISOString()}&end=${endDate.toISOString()}`,
       signal ? { signal } : undefined,
     );
@@ -630,15 +661,24 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
    * evenly in both directions from where the user is looking.
    */
   const startBackgroundFetch = useCallback(() => {
-    bgAbortRef.current?.abort();
+    // A loop is already draining the gap list — it re-derives the gaps on
+    // every iteration, so it will pick up any newly relevant range on its own.
+    // Restarting here (the old behavior) aborted the in-flight chunk request
+    // on every scrub tick, so background loading never finished while the
+    // user was interacting and each abandoned request still cost the server
+    // a full range query.
+    if (bgActiveRef.current) return;
+
     const abort = new AbortController();
     bgAbortRef.current = abort;
+    bgActiveRef.current = true;
 
     (async () => {
       const bounds = historyBounds;
       if (!bounds) return;
       const boundsStart = new Date(bounds.earliest).getTime();
       const boundsEnd = new Date(bounds.latest).getTime();
+      mapLog('events', 'background fetch started');
 
       // Alternate: true = try forward first, false = try backward first
       let preferForward = true;
@@ -695,6 +735,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
           chunkEnd = chosenGap[1];
           chunkStart = Math.max(chosenGap[1] - CHUNK_MS, chosenGap[0]);
         }
+        // Keep request URLs on the shared hour grid (over-fetching a partial
+        // hour at the edges is harmless — recordRange merges overlaps)
+        chunkStart = alignDown(chunkStart);
+        chunkEnd = alignUp(chunkEnd);
 
         try {
           const data = await fetchEventRange(
@@ -720,11 +764,16 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
           }
         } catch (err: unknown) {
           if (err instanceof Error && err.name === 'AbortError') break;
-          console.error('Background event fetch failed:', err);
+          mapError('events', 'Background event fetch failed', err);
           await new Promise(r => setTimeout(r, 5000));
         }
       }
-    })();
+      if (!abort.signal.aborted && findUncoveredGaps(boundsStart, boundsEnd).length === 0) {
+        mapLog('events', 'background fetch complete — full timeline loaded');
+      }
+    })().finally(() => {
+      bgActiveRef.current = false;
+    });
   }, [historyBounds, findUncoveredGaps, recordRange, fetchEventRange]);
 
   /**
@@ -736,8 +785,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     // Try restoring from persistent cache on first call
     await restoreCacheOnce();
 
-    const startMs = centerDate.getTime() - HALF_CHUNK_MS;
-    const endMs = centerDate.getTime() + HALF_CHUNK_MS;
+    const startMs = alignDown(centerDate.getTime() - HALF_CHUNK_MS);
+    const endMs = alignUp(centerDate.getTime() + HALF_CHUNK_MS);
 
     if (isRangeCovered(startMs, endMs)) {
       // Range is covered, but still start background fetch
@@ -752,11 +801,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
       recordRange(startMs, endMs);
 
+      const doneMerge = mapTime('store', 'merge event chunk into store');
       if (exchangeStoreRef.current) {
         exchangeStoreRef.current = mergeExchangeStores(exchangeStoreRef.current, data);
       } else {
         exchangeStoreRef.current = buildExchangeStoreFromRanged(data);
       }
+      doneMerge();
       setStoreVersion(v => v + 1);
 
       // Save to persistent cache
@@ -770,7 +821,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
       setTimeout(() => startBackgroundFetch(), 0);
     } catch (error) {
-      console.error('Failed to load events:', error);
+      mapError('events', 'Failed to load events', error);
     } finally {
       setIsLoadingHistory(false);
     }
@@ -844,7 +895,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         }
         return exchangeStoreRef.current;
       } catch (error) {
-        console.error('Failed to load full exchange history:', error);
+        mapError('events', 'Failed to load full exchange history', error);
         return exchangeStoreRef.current; // partial data is still usable
       } finally {
         fullLoadPromiseRef.current = null;
@@ -933,22 +984,30 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         targetDate = historyBounds?.latest ? new Date(historyBounds.latest) : new Date();
       }
       setHistoryTimestamp(targetDate); // set ONCE, synchronously
+      mapLog('mode', 'switched to history', { target: targetDate.toISOString() });
 
-      // Instant first paint: fetch a single snapshot from the server
-      try {
-        const snapRes = await fetch(`/api/map-history/snapshot?timestamp=${targetDate.toISOString()}`);
-        if (snapRes.ok) {
+      // Instant first paint: fetch a single snapshot from the server.
+      // Runs CONCURRENTLY with loadEvents below — awaiting it first serialized
+      // two independent DB round-trips and delayed event loading by the full
+      // snapshot latency. The timestamp is snapped to the 10-minute snapshot
+      // grid so the URL is stable and can be served from the route's CDN cache.
+      const snapMs = targetDate.getTime() - (targetDate.getTime() % (10 * 60 * 1000));
+      fetch(`/api/map-history/snapshot?timestamp=${new Date(snapMs).toISOString()}`)
+        .then(async (snapRes) => {
+          if (!snapRes.ok) return;
           const snapData = await snapRes.json();
           if (snapData.territories) {
             setInitialSnapshot({
               timestamp: new Date(snapData.timestamp),
               territories: snapData.territories,
             });
+            mapLog('snapshot', 'initial snapshot ready', {
+              timestamp: snapData.timestamp,
+              territories: Object.keys(snapData.territories).length,
+            });
           }
-        }
-      } catch (e) {
-        console.error('Failed to load initial snapshot:', e);
-      }
+        })
+        .catch((e) => mapError('snapshot', 'Failed to load initial snapshot', e));
 
       // Load events in background (never mutates historyTimestamp)
       loadEvents(targetDate);
@@ -1021,7 +1080,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
         }
       }
     } catch (error) {
-      console.error('Failed to refresh history:', error);
+      mapError('bounds', 'Failed to refresh history', error);
     }
   }, [loadEvents]);
 
@@ -2344,6 +2403,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               onConflictFocusToggle={() => setIsConflictFocused(prev => !prev)}
               loadedRanges={loadedRanges}
               seasons={seasons}
+              loadProgress={historyLoadProgress}
             />
           </div>
         )}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { USE_TEST_DATA, getTestSnapshots } from '@/lib/test-history-data';
 import { reconstructSingleSnapshot } from '@/lib/exchange-data';
+import { createTiming } from '@/lib/server-timing';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,9 +52,11 @@ export async function GET(request: NextRequest) {
   }
 
   const pool = getPool();
+  const timing = createTiming('map-history/snapshot');
 
   try {
-    const exchangeSnapshot = await reconstructSingleSnapshot(pool, targetDate);
+    const exchangeSnapshot = await timing.span('reconstruct', () => reconstructSingleSnapshot(pool, targetDate));
+    timing.log({ timestamp: targetDate.toISOString(), found: !!exchangeSnapshot });
 
     if (exchangeSnapshot) {
       return NextResponse.json({
@@ -64,6 +67,7 @@ export async function GET(request: NextRequest) {
       }, {
         headers: {
           'Cache-Control': 'public, max-age=300, s-maxage=300',
+          ...timing.header(),
         },
       });
     }
