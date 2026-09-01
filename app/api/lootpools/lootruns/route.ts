@@ -188,7 +188,7 @@ function addToGroup(groups: Map<LootGroupName, RawLootItem[]>, group: LootGroupN
 }
 
 function isWardItem(item: RawLootItem): boolean {
-  return item.type === 'WARD' || item.itemType === 'WardItem' || /Ward$/i.test(item.name || '');
+  return item.type === 'WARD' || item.itemType === 'WardItem' || /\sWard$/.test(item.name || '');
 }
 
 function moveWardsToEnd(groups: Map<LootGroupName, RawLootItem[]>) {

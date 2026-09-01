@@ -54,7 +54,7 @@ interface RawLootPayload {
 }
 
 const RARITIES = new Set<Rarity>(['Mythic', 'Fabled', 'Legendary', 'Rare', 'Unique']);
-const WARD_PATTERN = /Ward$/i;
+const WARD_PATTERN = /\sWard$/;
 
 const LOOTRUN_REGION_KEYS: Record<string, string> = {
   'Silent Expanse': 'SE',
