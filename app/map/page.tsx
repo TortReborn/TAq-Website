@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { Globe, Home, Plus, Minus, Flag, Settings } from "lucide-react";
 import { loadTerritories, Territory, coordToPixel } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import LandViewOverlay from "@/components/LandViewOverlay";
@@ -2032,11 +2033,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
                 }}
                 title="Zoom to region"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
+                <Globe size={20} strokeWidth={2} />
               </button>
               {showRegionMenu && (
                 <div style={{
@@ -2107,10 +2104,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               }}
               title="Reset View"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
+              <Home size={20} strokeWidth={2} />
             </button>
             <button
               onClick={zoomIn}
@@ -2140,7 +2134,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               }}
               title="Zoom In"
             >
-              +
+              <Plus size={20} strokeWidth={2} />
             </button>
             <button
               onClick={zoomOut}
@@ -2170,7 +2164,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               }}
               title="Zoom Out"
             >
-              −
+              <Minus size={20} strokeWidth={2} />
             </button>
             
           </div>
@@ -2261,53 +2255,12 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               }}
               title="Factions"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                <line x1="4" y1="22" x2="4" y2="15" />
-              </svg>
+              <Flag size={20} strokeWidth={2} />
             </button>
 
-            {/* Conflict Finder Button */}
-            <button
-              onClick={() => setShowConflictFinder(prev => !prev)}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '0.5rem',
-                border: `2px solid ${showConflictFinder ? 'var(--accent-primary)' : 'var(--border-color)'}`,
-                background: showConflictFinder ? 'var(--accent-primary)' : 'var(--bg-card)',
-                color: showConflictFinder ? 'var(--text-on-accent)' : 'var(--text-primary)',
-                fontSize: '1.25rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              }}
-              onMouseEnter={(e) => {
-                if (!showConflictFinder) {
-                  e.currentTarget.style.background = 'var(--bg-secondary)';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!showConflictFinder) {
-                  e.currentTarget.style.background = 'var(--bg-card)';
-                }
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-              title="Conflict Finder"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="22" y1="12" x2="18" y2="12" />
-                <line x1="6" y1="12" x2="2" y2="12" />
-                <line x1="12" y1="6" x2="12" y2="2" />
-                <line x1="12" y1="22" x2="12" y2="18" />
-              </svg>
-            </button>
+            {/* Conflict Finder entry point removed for now — the panel code and
+                its wiring (showConflictFinder, ensureExchangeData, handleConflictJump)
+                are kept so it can be re-added later. */}
 
             {/* Settings Button or Panel */}
             {showSettings ? (
@@ -2359,7 +2312,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
                 }}
                 title="Map Settings"
               >
-                ⚙
+                <Settings size={20} strokeWidth={2} />
               </button>
             )}
           </div>

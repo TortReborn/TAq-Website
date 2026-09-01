@@ -61,11 +61,22 @@ export function buildSeasonPeriods(raw: RawSeason[]): SeasonPeriod[] {
   return periods;
 }
 
-/** Find the period (season or off-season) covering a given date, or null if outside all seasons. */
+/**
+ * Find the period (season or off-season) covering a given date, or null if
+ * outside all seasons.
+ *
+ * Boundary instants belong to the SEASON: an off-season's start is exactly the
+ * previous season's end, so with a plain half-open scan a date landing exactly
+ * on a season's end (e.g. the last pixel of a timeline zoomed to that season)
+ * would report "Off-season".
+ */
 export function seasonAtDate(periods: SeasonPeriod[], date: Date): SeasonPeriod | null {
   const t = date.getTime();
   for (const p of periods) {
-    if (t >= p.start.getTime() && t < p.end.getTime()) return p;
+    if (p.type === 'season' && t >= p.start.getTime() && t <= p.end.getTime()) return p;
+  }
+  for (const p of periods) {
+    if (p.type === 'off' && t >= p.start.getTime() && t < p.end.getTime()) return p;
   }
   return null;
 }

@@ -142,6 +142,23 @@ test.describe('map page — history tab', () => {
     await expect.poll(() => currentTimeLabel(page)).not.toBe(before);
   });
 
+  test('right-clicking the track zooms to that season, reset returns to full range', async ({ page }) => {
+    await gotoMapFresh(page);
+    await waitForLiveTerritories(page);
+    await switchToHistory(page);
+
+    const track = page.locator('[data-timeline-track]');
+    const box = (await track.boundingBox())!;
+
+    // Right-click near the end of the track — always inside some season/off-season period
+    await track.click({ button: 'right', position: { x: box.width * 0.9, y: box.height / 2 } });
+    const resetButton = page.getByTestId('timeline-reset-zoom');
+    await expect(resetButton).toBeVisible();
+
+    await resetButton.click();
+    await expect(resetButton).toHaveCount(0);
+  });
+
   test('playback advances time and pauses again', async ({ page }) => {
     await gotoMapFresh(page);
     await waitForLiveTerritories(page);

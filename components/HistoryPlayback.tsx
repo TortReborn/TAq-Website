@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState, useRef, useEffect } from "react";
+import { SkipBack, SkipForward, ChevronLeft, ChevronRight, ChevronDown, Play, Pause } from "lucide-react";
 
 interface HistoryPlaybackProps {
   isPlaying: boolean;
@@ -51,8 +52,11 @@ function HistoryPlayback({
     return () => document.removeEventListener("mousedown", handler);
   }, [speedOpen]);
 
+  // Uniform 32px control height — matches the date/time/jump controls
   const buttonStyle: React.CSSProperties = {
-    padding: '0.5rem',
+    height: '32px',
+    boxSizing: 'border-box',
+    padding: '0 0.5rem',
     borderRadius: '0.375rem',
     border: '1px solid var(--border-color)',
     background: 'var(--bg-secondary)',
@@ -87,10 +91,7 @@ function HistoryPlayback({
         title="Jump to start (Home)"
         data-testid="playback-jump-start"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="17,17 11,12 17,7" />
-          <line x1="7" y1="7" x2="7" y2="17" />
-        </svg>
+        <SkipBack size={16} strokeWidth={2} />
       </button>
 
       {/* Step backward */}
@@ -102,9 +103,7 @@ function HistoryPlayback({
         title="Previous snapshot (←)"
         data-testid="playback-step-back"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="15,17 9,12 15,7" />
-        </svg>
+        <ChevronLeft size={16} strokeWidth={2} />
       </button>
 
       {/* Play/Pause */}
@@ -113,7 +112,7 @@ function HistoryPlayback({
         onClick={onPlayPause}
         style={{
           ...buttonStyle,
-          padding: '0.5rem 1rem',
+          padding: '0 1rem',
           background: isPlaying ? 'var(--accent-primary)' : 'var(--bg-secondary)',
           color: isPlaying ? 'var(--text-on-accent)' : 'var(--text-primary)',
         }}
@@ -121,14 +120,9 @@ function HistoryPlayback({
         data-testid="playback-play"
       >
         {isPlaying ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="4" width="4" height="16" />
-            <rect x="14" y="4" width="4" height="16" />
-          </svg>
+          <Pause size={16} fill="currentColor" strokeWidth={0} />
         ) : (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5,3 19,12 5,21" />
-          </svg>
+          <Play size={16} fill="currentColor" strokeWidth={0} />
         )}
       </button>
 
@@ -141,9 +135,7 @@ function HistoryPlayback({
         title="Next snapshot (→)"
         data-testid="playback-step-forward"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="9,17 15,12 9,7" />
-        </svg>
+        <ChevronRight size={16} strokeWidth={2} />
       </button>
 
       {/* Jump to end */}
@@ -155,10 +147,7 @@ function HistoryPlayback({
         title="Jump to end (End)"
         data-testid="playback-jump-end"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="7,17 13,12 7,7" />
-          <line x1="17" y1="7" x2="17" y2="17" />
-        </svg>
+        <SkipForward size={16} strokeWidth={2} />
       </button>
 
       {/* Custom speed dropdown - hidden when in compact mode */}
@@ -182,16 +171,13 @@ function HistoryPlayback({
               onMouseDown={(e) => e.stopPropagation()}
               style={{
                 ...buttonStyle,
-                padding: '0.25rem 0.5rem',
                 fontSize: '0.875rem',
                 gap: '0.25rem',
                 minWidth: '3.5rem',
               }}
             >
               {speedLabel(speed)}
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="6,9 12,15 18,9" />
-              </svg>
+              <ChevronDown size={10} strokeWidth={2.5} />
             </button>
             {speedOpen && (
               <div

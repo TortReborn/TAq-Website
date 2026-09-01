@@ -1,10 +1,24 @@
 "use client";
 
 import { memo, useState, useRef, useCallback, useEffect, useMemo } from "react";
-import HistoryTimeline from "./HistoryTimeline";
+import {
+  MoveHorizontal,
+  MoveVertical,
+  RefreshCw,
+  Crosshair,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  SkipBack,
+  SkipForward,
+  Play,
+  Pause,
+} from "lucide-react";
+import HistoryTimeline, { SeasonZoom } from "./HistoryTimeline";
 import { SeasonPeriod } from "@/lib/seasons";
 import HistoryDatePicker from "./HistoryDatePicker";
 import HistoryPlayback from "./HistoryPlayback";
+import PickerField from "./PickerField";
 
 interface MapHistoryControlsProps {
   earliest: Date;
@@ -37,9 +51,9 @@ interface MapHistoryControlsProps {
 // Widths of the map's bottom-corner control clusters, kept clear so the
 // draggable panel can't be parked underneath them (they render above it).
 // Left is the zoom stack (40px button + 16px inset); right also carries the
-// Live/History switch, Factions and Conflict Finder, so it is far wider.
+// Live/History switch, Factions and Settings, so it is far wider.
 const CHROME_GUTTER = 60;
-const CHROME_GUTTER_RIGHT = 310;
+const CHROME_GUTTER_RIGHT = 262;
 
 const SPEED_OPTIONS = [1, 2, 10, 50];
 const FAST_SPEED = -1;
@@ -50,14 +64,18 @@ function speedLabel(s: number): string {
 }
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 1800;
-const VERTICAL_WIDTH = 248;
+// Wide enough for the 10rem control rows next to the slider column — at 248
+// the date/time inputs and Jump button were clipped at the panel edge.
+const VERTICAL_WIDTH = 276;
 const DEFAULT_VERTICAL_HEIGHT = 350;
 const MIN_VERTICAL_HEIGHT = 242;
 const MAX_VERTICAL_HEIGHT = 1040;
 
 function vBtnStyle(enabled: boolean): React.CSSProperties {
   return {
-    padding: '0.5rem',
+    height: '32px',
+    boxSizing: 'border-box',
+    padding: '0 0.5rem',
     borderRadius: '0.375rem',
     border: '1px solid var(--border-color)',
     background: 'var(--bg-secondary)',
@@ -109,6 +127,10 @@ function MapHistoryControls({
   const [isInitialized, setIsInitialized] = useState(false);
   const [speedOpen, setSpeedOpen] = useState(false);
   const speedRef = useRef<HTMLDivElement>(null);
+  // Season zoom shared between the track (right-click) and the selector below
+  const [seasonZoom, setSeasonZoom] = useState<SeasonZoom | null>(null);
+  const [seasonOpen, setSeasonOpen] = useState(false);
+  const seasonSelRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const resizeStartRef = useRef({ x: 0, y: 0, width: 1200, height: DEFAULT_VERTICAL_HEIGHT, posX: 0, posY: 0 });
 
@@ -231,6 +253,61 @@ function MapHistoryControls({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [speedOpen]);
+
+  // Close season dropdown on outside click
+  useEffect(() => {
+    if (!seasonOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (seasonSelRef.current && !seasonSelRef.current.contains(e.target as Node)) {
+        setSeasonOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [seasonOpen]);
+
+  // Seasons newest-first for the selector (off-season periods are reachable
+  // by right-clicking the track, so the list stays short)
+  const seasonOptions = useMemo(
+    () => (seasons ?? []).filter((p) => p.type === 'season').slice().reverse(),
+    [seasons]
+  );
+
+  // Leave season view automatically when the current time moves outside the
+  // zoomed window (date-picker jump, playback running past the season end...).
+  // The zoom only arms once the scrubber has actually been inside the window —
+  // otherwise selecting a season would cancel itself before its own jump lands.
+  const zoomEnteredRef = useRef(false);
+  useEffect(() => {
+    if (!seasonZoom) return;
+    zoomEnteredRef.current = false;
+  }, [seasonZoom]);
+  useEffect(() => {
+    if (!seasonZoom) return;
+    const zs = Math.max(earliest.getTime(), seasonZoom.start.getTime());
+    const ze = Math.min(latest.getTime(), seasonZoom.end.getTime());
+    const cur = current.getTime();
+    if (cur >= zs && cur <= ze) {
+      zoomEnteredRef.current = true;
+    } else if (zoomEnteredRef.current) {
+      setSeasonZoom(null);
+    }
+  }, [current, seasonZoom, earliest, latest]);
+
+  const handleSeasonSelect = useCallback((p: SeasonPeriod | null) => {
+    setSeasonOpen(false);
+    if (!p) {
+      setSeasonZoom(null);
+      return;
+    }
+    setSeasonZoom({ start: p.start, end: p.end, label: p.label });
+    // Bring the scrubber into the zoomed range if it's currently outside it
+    const zs = Math.max(earliest.getTime(), p.start.getTime());
+    const ze = Math.min(latest.getTime(), p.end.getTime());
+    if (current.getTime() < zs || current.getTime() > ze) {
+      onJump(new Date(zs));
+    }
+  }, [earliest, latest, current, onJump]);
 
   // Load cached state on mount
   useEffect(() => {
@@ -455,47 +532,124 @@ function MapHistoryControls({
         borderRadius: '0.25rem',
         border: 'none',
         background: 'transparent',
-        color: 'var(--text-secondary)',
+        color: 'var(--text-primary)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'color 0.15s ease',
+        opacity: 0.7,
+        transition: 'opacity 0.15s ease',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
+      onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}
     >
-      {/* Orientation icon: horizontal bars ↔ vertical bars */}
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {isVertical ? (
-          // Show horizontal icon (click to switch to horizontal)
-          <>
-            <line x1="4" y1="8" x2="20" y2="8" />
-            <line x1="4" y1="16" x2="20" y2="16" />
-            <polyline points="7,5 4,8 7,11" />
-            <polyline points="17,13 20,16 17,19" />
-          </>
-        ) : (
-          // Show vertical icon (click to switch to vertical)
-          <>
-            <line x1="8" y1="4" x2="8" y2="20" />
-            <line x1="16" y1="4" x2="16" y2="20" />
-            <polyline points="5,7 8,4 11,7" />
-            <polyline points="13,17 16,20 19,17" />
-          </>
-        )}
-      </svg>
+      {/* Orientation icon: shows the layout you'd switch TO */}
+      {isVertical ? <MoveHorizontal size={16} strokeWidth={2} /> : <MoveVertical size={16} strokeWidth={2} />}
     </button>
   );
+
+  // ── Season selector (shared between layouts) ──────────────────────────
+
+  const seasonSelector = seasonOptions.length > 0 ? (
+    <div
+      ref={seasonSelRef}
+      style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}
+    >
+      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+        Season:
+      </span>
+      <div style={{ position: 'relative' }}>
+        <button
+          type="button"
+          data-testid="season-selector"
+          onClick={(e) => { e.stopPropagation(); setSeasonOpen(prev => !prev); }}
+          onMouseDown={(e) => e.stopPropagation()}
+          title="Zoom the timeline to a season (tip: right-clicking the timeline zooms to the season under the cursor)"
+          style={{
+            height: '32px',
+            boxSizing: 'border-box',
+            padding: '0 0.5rem',
+            borderRadius: '0.375rem',
+            border: '1px solid var(--border-color)',
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.25rem',
+            minWidth: '3.5rem',
+          }}
+        >
+          {seasonZoom ? seasonZoom.label : 'All'}
+          <ChevronDown size={10} strokeWidth={2.5} />
+        </button>
+        {seasonOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginBottom: '0.25rem',
+              background: 'var(--bg-card-solid)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '0.375rem',
+              overflowY: 'auto',
+              maxHeight: '240px',
+              zIndex: 50,
+              minWidth: '4.5rem',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+            }}
+          >
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleSeasonSelect(null); }}
+              onMouseDown={(e) => e.stopPropagation()}
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '0.375rem 0.625rem',
+                border: 'none',
+                background: !seasonZoom ? 'var(--accent-primary)' : 'var(--bg-card-solid)',
+                color: !seasonZoom ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              All
+            </button>
+            {seasonOptions.map((p) => (
+              <button
+                key={p.label}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleSeasonSelect(p); }}
+                onMouseDown={(e) => e.stopPropagation()}
+                title={`${p.start.toLocaleDateString()} – ${p.end.toLocaleDateString()}`}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.375rem 0.625rem',
+                  border: 'none',
+                  background: seasonZoom?.label === p.label ? 'var(--accent-primary)' : 'var(--bg-card-solid)',
+                  color: seasonZoom?.label === p.label ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
 
   // ── Top-right controls (shared) ───────────────────────────────────────
 
@@ -585,11 +739,7 @@ function MapHistoryControls({
             whiteSpace: 'nowrap',
           }}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <circle cx="12" cy="12" r="6" />
-            <circle cx="12" cy="12" r="2" />
-          </svg>
+          <Crosshair size={12} strokeWidth={2.5} />
           Conflict
         </button>
       )}
@@ -611,36 +761,22 @@ function MapHistoryControls({
             borderRadius: '0.25rem',
             border: 'none',
             background: 'transparent',
-            color: 'var(--text-secondary)',
+            color: 'var(--text-primary)',
             cursor: isLoading ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: isLoading ? 0.5 : 1,
-            transition: 'color 0.15s ease, opacity 0.15s ease',
+            opacity: isLoading ? 0.4 : 0.7,
+            transition: 'opacity 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            if (!isLoading) e.currentTarget.style.color = 'var(--text-primary)';
+            if (!isLoading) e.currentTarget.style.opacity = '1';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--text-secondary)';
+            e.currentTarget.style.opacity = isLoading ? '0.4' : '0.7';
           }}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-            <path d="M3 3v5h5" />
-            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-            <path d="M21 21v-5h-5" />
-          </svg>
+          <RefreshCw size={16} strokeWidth={2} />
         </button>
       )}
     </div>
@@ -677,6 +813,7 @@ function MapHistoryControls({
           canStepBackward={canStepBackward}
           hideSpeed={!showSpeedInPlayback}
         />
+        {showSpeedInPlayback && seasonSelector}
         {showSpeedInPlayback && (
           <HistoryDatePicker
             current={current}
@@ -717,7 +854,9 @@ function MapHistoryControls({
                 onClick={(e) => { e.stopPropagation(); setSpeedOpen(prev => !prev); }}
                 onMouseDown={(e) => e.stopPropagation()}
                 style={{
-                  padding: '0.25rem 0.5rem',
+                  height: '32px',
+                  boxSizing: 'border-box',
+                  padding: '0 0.5rem',
                   borderRadius: '0.375rem',
                   border: '1px solid var(--border-color)',
                   background: 'var(--bg-secondary)',
@@ -726,14 +865,13 @@ function MapHistoryControls({
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '0.25rem',
                   minWidth: '3.5rem',
                 }}
               >
                 {speedLabel(speed)}
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6,9 12,15 18,9" />
-                </svg>
+                <ChevronDown size={10} strokeWidth={2.5} />
               </button>
               {speedOpen && (
                 <div
@@ -782,6 +920,7 @@ function MapHistoryControls({
               )}
             </div>
           </div>
+          {seasonSelector}
           <HistoryDatePicker
             current={current}
             earliest={earliest}
@@ -864,18 +1003,20 @@ function MapHistoryControls({
                 hideCurrentTime
                 loadedRanges={loadedRanges}
                 seasons={seasons}
+                seasonZoom={seasonZoom}
+                onSeasonZoomChange={setSeasonZoom}
               />
             </div>
 
             {/* Right: controls grouped in center */}
             <div style={{
               flex: 1,
+              minWidth: 0,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
-              paddingRight: '0.75rem',
             }}>
               {/* Row 1: Current time */}
               <div data-testid="timeline-current-time" style={{
@@ -897,10 +1038,7 @@ function MapHistoryControls({
                   title="Jump to start"
                   style={{ ...vBtnStyle(canStepBackward), flex: 1 }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="17,17 11,12 17,7" />
-                    <line x1="7" y1="7" x2="7" y2="17" />
-                  </svg>
+                  <SkipBack size={16} strokeWidth={2} />
                 </button>
                 <button
                   type="button"
@@ -909,10 +1047,7 @@ function MapHistoryControls({
                   title="Jump to end"
                   style={{ ...vBtnStyle(canStepForward), flex: 1 }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="7,17 13,12 7,7" />
-                    <line x1="17" y1="7" x2="17" y2="17" />
-                  </svg>
+                  <SkipForward size={16} strokeWidth={2} />
                 </button>
               </div>
 
@@ -925,9 +1060,7 @@ function MapHistoryControls({
                   title="Previous snapshot"
                   style={{ ...vBtnStyle(canStepBackward), flex: 1 }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="15,17 9,12 15,7" />
-                  </svg>
+                  <ChevronLeft size={16} strokeWidth={2} />
                 </button>
                 <button
                   type="button"
@@ -942,14 +1075,9 @@ function MapHistoryControls({
                   }}
                 >
                   {isPlaying ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="6" y="4" width="4" height="16" />
-                      <rect x="14" y="4" width="4" height="16" />
-                    </svg>
+                    <Pause size={16} fill="currentColor" strokeWidth={0} />
                   ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5,3 19,12 5,21" />
-                    </svg>
+                    <Play size={16} fill="currentColor" strokeWidth={0} />
                   )}
                 </button>
                 <button
@@ -959,9 +1087,7 @@ function MapHistoryControls({
                   title="Next snapshot"
                   style={{ ...vBtnStyle(canStepForward), flex: 1 }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="9,17 15,12 9,7" />
-                  </svg>
+                  <ChevronRight size={16} strokeWidth={2} />
                 </button>
               </div>
 
@@ -980,16 +1106,13 @@ function MapHistoryControls({
                     onMouseDown={(e) => e.stopPropagation()}
                     style={{
                       ...vBtnStyle(true),
-                      padding: '0.25rem 0.5rem',
                       fontSize: '0.8rem',
                       gap: '0.25rem',
                       minWidth: '3.5rem',
                     }}
                   >
                     {speedLabel(speed)}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="6,9 12,15 18,9" />
-                    </svg>
+                    <ChevronDown size={10} strokeWidth={2.5} />
                   </button>
                   {speedOpen && (
                     <div style={{
@@ -1037,45 +1160,30 @@ function MapHistoryControls({
                 </div>
               </div>
 
+              {/* Row 4b: Season selector */}
+              {seasonSelector}
+
               {/* Row 5: Date picker */}
-              <input
+              <PickerField
                 type="date"
-                className="history-date-input"
                 defaultValue={currentDisplay.dateValue}
                 min={earliest.toISOString().split('T')[0]}
                 max={latest.toISOString().split('T')[0]}
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-                onChange={(e) => {
-                  const val = e.target.value;
+                onChange={(val) => {
                   if (val) {
                     const d = new Date(val + 'T' + current.toTimeString().slice(0, 5));
                     if (!isNaN(d.getTime())) onJump(d);
                   }
                 }}
-                style={{
-                  padding: '0.375rem 0.5rem',
-                  borderRadius: '0.375rem',
-                  border: '1px solid var(--border-color)',
-                  background: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem',
-                  outline: 'none',
-                  colorScheme: 'dark light',
-                  width: '100%',
-                  maxWidth: '10rem',
-                  boxSizing: 'border-box',
-                }}
+                width="100%"
+                maxWidth="10rem"
               />
 
               {/* Row 6: Time picker */}
-              <input
+              <PickerField
                 type="time"
                 defaultValue={currentDisplay.timeValue}
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-                onChange={(e) => {
-                  const val = e.target.value;
+                onChange={(val) => {
                   if (val) {
                     const [h, m] = val.split(':').map(Number);
                     const d = new Date(current);
@@ -1083,19 +1191,8 @@ function MapHistoryControls({
                     if (!isNaN(d.getTime())) onJump(d);
                   }
                 }}
-                style={{
-                  padding: '0.375rem 0.5rem',
-                  borderRadius: '0.375rem',
-                  border: '1px solid var(--border-color)',
-                  background: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem',
-                  outline: 'none',
-                  colorScheme: 'dark light',
-                  width: '100%',
-                  maxWidth: '10rem',
-                  boxSizing: 'border-box',
-                }}
+                width="100%"
+                maxWidth="10rem"
               />
 
               {/* Row 7: Jump button */}
@@ -1116,7 +1213,9 @@ function MapHistoryControls({
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
                 style={{
-                  padding: '0.375rem 0.75rem',
+                  height: '32px',
+                  boxSizing: 'border-box',
+                  padding: '0 0.75rem',
                   borderRadius: '0.375rem',
                   border: 'none',
                   background: 'var(--accent-primary)',
@@ -1136,15 +1235,6 @@ function MapHistoryControls({
             </div>
           </div>
 
-          <style>{`
-            .history-date-input::-webkit-calendar-picker-indicator {
-              filter: var(--calendar-icon-filter, none);
-              cursor: pointer;
-            }
-            [data-theme="dark"] .history-date-input::-webkit-calendar-picker-indicator {
-              filter: invert(1);
-            }
-          `}</style>
         </>
       ) : (
         /* ── Horizontal: resize handles, timeline, controls ─────────── */
@@ -1186,6 +1276,8 @@ function MapHistoryControls({
             gaps={gaps}
             loadedRanges={loadedRanges}
             seasons={seasons}
+            seasonZoom={seasonZoom}
+            onSeasonZoomChange={setSeasonZoom}
           />
           {controlsSection}
         </>

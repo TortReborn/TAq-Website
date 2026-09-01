@@ -4,6 +4,7 @@
 
 import { Territory } from "./utils";
 import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, REKINDLED_WORLD_CUTOFF_MS, OLD_TERRITORY_NAMES } from "./territory-abbreviations";
+import { mapLog } from "./map-logger";
 
 // Condensed snapshot format for database storage
 export interface SnapshotTerritory {
@@ -77,13 +78,13 @@ export function expandSnapshot(
     const verbose = verboseData?.[fullName];
 
     if (!verbose?.Location) {
-      // Skip territories without location data.
-      // Log in dev so we can identify missing territory coordinates.
-      if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-        if (!_warnedTerritories.has(fullName)) {
-          _warnedTerritories.add(fullName);
-          console.warn(`[expandSnapshot] No location data for "${fullName}" (abbrev: ${abbrev})`);
-        }
+      // Skip territories without location data (e.g. one-off event territories
+      // that appear in exchange history but have no coordinates). Logged once
+      // through the structured map logger instead of a bare console.warn so
+      // the console stays clean while the fact remains discoverable.
+      if (typeof window !== 'undefined' && !_warnedTerritories.has(fullName)) {
+        _warnedTerritories.add(fullName);
+        mapLog('store', `no location data for territory "${fullName}"`, { abbrev });
       }
       continue;
     }

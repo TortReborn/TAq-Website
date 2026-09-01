@@ -2,14 +2,10 @@ import { expect, Page, ConsoleMessage } from '@playwright/test';
 
 /**
  * Console errors that are expected in the dev environment and not signals of
- * a map-page defect:
- *  - /api/auth/exec-session 401 — the anonymous visitor probe for exec login
- *  - React hydration warning for the data-theme attribute set by the theme script
+ * a map-page defect. Currently empty — the map page is expected to load with
+ * a fully clean console; add entries only for noise that is truly external.
  */
-const IGNORED_CONSOLE_ERRORS = [
-  /exec-session/,
-  /Extra attributes from the server.*data-theme/s,
-];
+const IGNORED_CONSOLE_ERRORS: RegExp[] = [];
 
 export interface ConsoleCapture {
   errors: string[];

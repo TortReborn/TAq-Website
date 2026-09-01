@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useMemo, useCallback, useRef, useState, useEffect } from "react";
+import { RotateCcw } from "lucide-react";
 import { SeasonPeriod, seasonAtDate, seasonColor } from "@/lib/seasons";
 
 // Cached formatters — creating Intl.DateTimeFormat instances is expensive,
@@ -47,6 +48,12 @@ const snapTo10Min = (targetDate: Date): Date => {
   return new Date(snapped);
 };
 
+export interface SeasonZoom {
+  start: Date;
+  end: Date;
+  label: string;
+}
+
 interface HistoryTimelineProps {
   earliest: Date;
   latest: Date;
@@ -57,6 +64,10 @@ interface HistoryTimelineProps {
   hideCurrentTime?: boolean; // Hide the current time display (shown externally)
   loadedRanges?: Array<[number, number]>; // [startMs, endMs][] — loaded event ranges
   seasons?: SeasonPeriod[]; // On/off-season periods to overlay as context
+  // Season zoom is controlled by the parent when these are provided, so the
+  // panel's season selector and the track's right-click zoom share one state
+  seasonZoom?: SeasonZoom | null;
+  onSeasonZoomChange?: (zoom: SeasonZoom | null) => void;
 }
 
 function HistoryTimeline({
@@ -69,6 +80,8 @@ function HistoryTimeline({
   hideCurrentTime,
   loadedRanges,
   seasons,
+  seasonZoom: seasonZoomProp,
+  onSeasonZoomChange,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -78,7 +91,10 @@ function HistoryTimeline({
   // Season zoom: when set, the timeline is scoped to a single season/off-season period.
   // The effective range is the intersection of that period with the available data bounds,
   // so all downstream math (percentages, ribbon, gaps, labels) re-scopes automatically.
-  const [seasonZoom, setSeasonZoom] = useState<{ start: Date; end: Date; label: string } | null>(null);
+  // Controlled by the parent when seasonZoom/onSeasonZoomChange props are given.
+  const [internalZoom, setInternalZoom] = useState<SeasonZoom | null>(null);
+  const seasonZoom = seasonZoomProp !== undefined ? seasonZoomProp : internalZoom;
+  const setSeasonZoom = onSeasonZoomChange ?? setInternalZoom;
 
   const earliest = useMemo(
     () => (seasonZoom ? new Date(Math.max(earliestProp.getTime(), seasonZoom.start.getTime())) : earliestProp),
@@ -112,10 +128,9 @@ function HistoryTimeline({
         const clampedStart = Math.max(earliestMs, period.start.getTime());
         const clampedEnd = Math.min(latestMs, period.end.getTime());
         if (clampedStart >= clampedEnd) return null;
-        const title = (period.type === 'season'
+        const title = period.type === 'season'
           ? `Season ${period.season} (${formatDate(period.start)} – ${formatDate(period.end)})`
-          : `Off-season (${formatDate(period.start)} – ${formatDate(period.end)})`) +
-          ' — click to zoom';
+          : `Off-season (${formatDate(period.start)} – ${formatDate(period.end)})`;
         return {
           period,
           title,
@@ -171,6 +186,14 @@ function HistoryTimeline({
     }
     return result;
   }, [loadedRegions, gapRegions]);
+
+  // Once loaded ranges cover the whole visible span there is nothing left to
+  // communicate — the indicator bar is hidden entirely.
+  const fullyLoaded = useMemo(() => {
+    if (loadedRegions.length === 0) return false;
+    const covered = loadedRegions.reduce((sum, r) => sum + (r.endPct - r.startPct), 0);
+    return covered >= 99.9;
+  }, [loadedRegions]);
 
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
@@ -309,6 +332,7 @@ function HistoryTimeline({
   }, [earliest, latest, totalRange, isInGap, onChange]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return; // left button only — right button zooms to season
     e.preventDefault();
     e.stopPropagation();
     cancelHoverFrame();
@@ -316,6 +340,34 @@ function HistoryTimeline({
     setHoverPercent(null);
     handleTrackInteraction(e.clientX, e.clientY, true);
   };
+
+  // Right-click on the track (or the season strip above it) zooms the
+  // timeline to the season/off-season period under the cursor.
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!seasons || seasons.length === 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    const rect = track.getBoundingClientRect();
+    const padding = 12;
+    const pos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
+    const trackSize = vertical ? rect.height : rect.width;
+    const usableSize = trackSize - padding * 2;
+    const adjustedPos = Math.max(0, Math.min(usableSize, pos - padding));
+    const percent = usableSize > 0 ? (adjustedPos / usableSize) * 100 : 0;
+
+    const period = seasonAtDate(seasons, percentToDate(percent));
+    if (!period) return;
+    setSeasonZoom({ start: period.start, end: period.end, label: period.label });
+    // Bring the scrubber into the zoomed range if it's currently outside it
+    const zs = Math.max(earliestProp.getTime(), period.start.getTime());
+    const ze = Math.min(latestProp.getTime(), period.end.getTime());
+    if (current.getTime() < zs || current.getTime() > ze) {
+      jumpToDate(new Date(zs));
+    }
+  }, [seasons, vertical, percentToDate, earliestProp, latestProp, current, jumpToDate]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
@@ -363,6 +415,9 @@ function HistoryTimeline({
     borderRadius: '50%',
     border: '3px solid #fff',
     boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+    // Above the gap overlays (zIndex 1) — the scrub thumb must never be
+    // painted over by the no-data stripes
+    zIndex: 2,
     ...(vertical
       ? {
           left: '50%',
@@ -483,83 +538,87 @@ function HistoryTimeline({
   };
 
   // ── Season ribbon ────────────────────────────────────────────────────
-  // A strip alongside the track showing on-season (colored, labeled) vs off-season
-  // (hatched) periods. Each segment is clickable to jump to that period's start.
+  // A thin strip flush against the track showing on-season (colored) vs
+  // off-season (hatched) periods. It is part of the track's hitbox: left-click
+  // scrubs to that spot, right-click zooms the timeline to that period —
+  // the strip itself is passive (pointer-events: none) so events land on the
+  // shared wrapper.
 
   const seasonRibbon = (isVert: boolean) => {
     if (seasonRegions.length === 0) return null;
     const OFF_HATCH = 'repeating-linear-gradient(45deg, rgba(140,140,140,0.30) 0 4px, rgba(140,140,140,0.08) 4px 8px)';
+
+    // Segments use the same thumb-padded positioning as the loaded bar below;
+    // the 12px padding zones at each end are filled by caps that continue
+    // whatever segment touches that edge (colored from the SAME region list,
+    // so the cap can never be a slightly different shade than its neighbor).
+    // No segment at the edge → container background, i.e. invisible.
+    const regionBg = (r: { period: SeasonPeriod }) =>
+      r.period.type === 'season' ? seasonColor(r.period.season!) : OFF_HATCH;
+    const startRegion = seasonRegions.find((r) => r.startPct <= 0.5);
+    const endRegion = seasonRegions.find((r) => r.endPct >= 99.5);
+    const startCap = startRegion ? regionBg(startRegion) : 'var(--bg-tertiary)';
+    const endCap = endRegion ? regionBg(endRegion) : 'var(--bg-tertiary)';
 
     return (
       <div
         style={{
           position: 'relative',
           ...(isVert
-            ? { width: '14px', borderRadius: '3px', flex: 1, minHeight: '100px' }
-            : { height: '16px', borderRadius: '3px', width: '100%', marginBottom: '4px' }),
+            ? { width: '4px', borderRadius: '3px', height: '100%', flexShrink: 0 }
+            : { height: '4px', borderRadius: '3px', width: '100%' }),
           background: 'var(--bg-tertiary)',
           overflow: 'hidden',
+          pointerEvents: 'none',
         }}
       >
-        {seasonRegions.map(({ period, title, startPct, endPct }, i) => {
+        {/* Start / end caps — 13px so they extend 1px under the adjacent
+            segment (rendered after, so it paints on top): without the overlap,
+            fractional-pixel rounding at the junction leaves a dark hairline of
+            the container background showing through */}
+        <div style={{
+          position: 'absolute',
+          ...(isVert
+            ? { left: 0, right: 0, top: 0, height: '13px' }
+            : { top: 0, bottom: 0, left: 0, width: '13px' }),
+          background: startCap,
+        }} />
+        <div style={{
+          position: 'absolute',
+          ...(isVert
+            ? { left: 0, right: 0, bottom: 0, height: '13px' }
+            : { top: 0, bottom: 0, right: 0, width: '13px' }),
+          background: endCap,
+        }} />
+        {seasonRegions.map(({ period, startPct, endPct }, i) => {
           const isSeason = period.type === 'season';
-          const widthPct = endPct - startPct;
+          // No trailing separator on a segment that runs into the end cap —
+          // it would draw a stray 1px line between the segment and the cap
+          const atEnd = endPct >= 99.99;
+          const separator = atEnd ? 'none' : '1px solid var(--bg-card-solid, rgba(0,0,0,0.4))';
           return (
             <div
               key={i}
-              title={title}
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSeasonZoom({ start: period.start, end: period.end, label: period.label });
-                // Bring the scrubber into the zoomed range if it's currently outside it
-                const zs = Math.max(earliestProp.getTime(), period.start.getTime());
-                const ze = Math.min(latestProp.getTime(), period.end.getTime());
-                if (current.getTime() < zs || current.getTime() > ze) {
-                  jumpToDate(new Date(zs));
-                }
-              }}
               style={{
                 position: 'absolute',
-                cursor: 'pointer',
-                // Full-width positioning (not the thumb-padded formula) so segments
-                // fill the ribbon edge-to-edge, including the rounded corners.
                 ...(isVert
                   ? {
                       left: 0,
                       right: 0,
-                      top: `${startPct}%`,
-                      height: `${endPct - startPct}%`,
-                      borderBottom: '1px solid var(--bg-card-solid, rgba(0,0,0,0.4))',
+                      top: percentToPaddedStart(startPct),
+                      height: percentToPaddedWidth(startPct, endPct),
+                      borderBottom: separator,
                     }
                   : {
                       top: 0,
                       bottom: 0,
-                      left: `${startPct}%`,
-                      width: `${endPct - startPct}%`,
-                      borderRight: '1px solid var(--bg-card-solid, rgba(0,0,0,0.4))',
+                      left: percentToPaddedStart(startPct),
+                      width: percentToPaddedWidth(startPct, endPct),
+                      borderRight: separator,
                     }),
                 background: isSeason ? seasonColor(period.season!) : OFF_HATCH,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
               }}
-            >
-              {/* Label only on the horizontal ribbon and only when there's room */}
-              {!isVert && isSeason && widthPct > 4 && (
-                <span style={{
-                  fontSize: '0.6rem',
-                  fontWeight: 700,
-                  color: '#fff',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.85)',
-                  whiteSpace: 'nowrap',
-                  pointerEvents: 'none',
-                }}>
-                  {period.label}
-                </span>
-              )}
-            </div>
+            />
           );
         })}
       </div>
@@ -571,6 +630,7 @@ function HistoryTimeline({
     <button
       onClick={(e) => { e.stopPropagation(); setSeasonZoom(null); }}
       onMouseDown={(e) => e.stopPropagation()}
+      data-testid="timeline-reset-zoom"
       title={`Zoomed to ${seasonZoom.label === 'Off' ? 'off-season' : seasonZoom.label} — back to full range`}
       style={{
         position: 'absolute',
@@ -592,7 +652,7 @@ function HistoryTimeline({
         boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
       }}
     >
-      ↺ Full range
+      <RotateCcw size={10} strokeWidth={2.5} /> Full range
     </button>
   ) : null;
 
@@ -641,27 +701,35 @@ function HistoryTimeline({
           minHeight: '100px',
           alignItems: 'stretch',
         }}>
-          {/* Season ribbon (far left) */}
-          {seasons && seasons.length > 0 && seasonRibbon(true)}
+          {/* Loaded-data indicator bar (left of track, hidden once fully loaded) */}
+          {loadedRanges && !fullyLoaded && loadedIndicatorBar(true)}
 
-          {/* Loaded-data indicator bar (left of track) */}
-          {loadedRanges && loadedIndicatorBar(true)}
-
-          {/* Vertical timeline track */}
+          {/* Season ribbon + vertical track — one shared hitbox */}
           <div
-            ref={trackRef}
             data-timeline-track
             onMouseDown={handleMouseDown}
             onMouseMove={handleTrackHover}
             onMouseLeave={handleTrackLeave}
+            onContextMenu={handleContextMenu}
             onClick={(e) => e.stopPropagation()}
+            style={{
+              display: 'flex',
+              alignItems: 'stretch',
+              height: '100%',
+              cursor: hoverInGap ? 'not-allowed' : 'pointer',
+            }}
+          >
+          {seasons && seasons.length > 0 && seasonRibbon(true)}
+
+          {/* Vertical timeline track */}
+          <div
+            ref={trackRef}
             style={{
               position: 'relative',
               width: '24px',
               height: '100%',
               background: 'var(--bg-tertiary)',
               borderRadius: '12px',
-              cursor: hoverInGap ? 'not-allowed' : 'pointer',
               overflow: 'visible',
             }}
           >
@@ -702,27 +770,33 @@ function HistoryTimeline({
               }}
             />
 
-            {/* Gap regions */}
-            {gapRegions.map((gap, i) => (
-              <div
-                key={i}
-                title="No data available"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: percentToPaddedStart(gap.startPct),
-                  height: percentToPaddedWidth(gap.startPct, gap.endPct),
-                  background: 'rgba(139, 0, 0, 0.55)',
-                  borderRadius: gap.startPct <= 0 ? '12px 12px 0 0' : gap.endPct >= 100 ? '0 0 12px 12px' : '0',
-                  pointerEvents: 'none',
-                  zIndex: 1,
-                }}
-              />
-            ))}
+            {/* Gap regions — bound-touching gaps extend to the track edge (see
+                the horizontal layout note) */}
+            {gapRegions.map((gap, i) => {
+              const startCss = gap.startPct <= 0.01 ? '0px' : percentToPaddedStart(gap.startPct);
+              const endCss = gap.endPct >= 99.99 ? '100%' : percentToPaddedStart(gap.endPct);
+              return (
+                <div
+                  key={i}
+                  title="No data available"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: startCss,
+                    height: `calc(${endCss} - ${startCss})`,
+                    background: 'rgba(139, 0, 0, 0.55)',
+                    borderRadius: gap.startPct <= 0.01 ? '12px 12px 0 0' : gap.endPct >= 99.99 ? '0 0 12px 12px' : '0',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                  }}
+                />
+              );
+            })}
 
             {/* Thumb */}
             <div data-testid="timeline-thumb" style={thumbStyle} />
+          </div>
           </div>
         </div>
 
@@ -769,47 +843,27 @@ function HistoryTimeline({
         <span>{formatDate(latest)}</span>
       </div>
 
-      {/* Season ribbon + legend */}
-      {seasons && seasons.length > 0 && (
-        <>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '0.75rem',
-            marginBottom: '2px',
-            fontSize: '0.65rem',
-            color: 'var(--text-secondary)',
-          }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-              <span style={{ width: '9px', height: '9px', borderRadius: '2px', background: seasonColor(31) }} />
-              Season
-            </span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-              <span style={{
-                width: '9px', height: '9px', borderRadius: '2px',
-                background: 'repeating-linear-gradient(45deg, rgba(140,140,140,0.45) 0 2px, rgba(140,140,140,0.12) 2px 4px)',
-              }} />
-              Off-season
-            </span>
-          </div>
-          {seasonRibbon(false)}
-        </>
-      )}
-
-      {/* Timeline track */}
+      {/* Season ribbon + timeline track — one shared hitbox: left-click scrubs,
+          right-click zooms to the season under the cursor */}
       <div
-        ref={trackRef}
         data-timeline-track
         onMouseDown={handleMouseDown}
         onMouseMove={handleTrackHover}
         onMouseLeave={handleTrackLeave}
+        onContextMenu={handleContextMenu}
         onClick={(e) => e.stopPropagation()}
+        style={{ cursor: hoverInGap ? 'not-allowed' : 'pointer' }}
+      >
+      {seasons && seasons.length > 0 && seasonRibbon(false)}
+
+      {/* Timeline track */}
+      <div
+        ref={trackRef}
         style={{
           position: 'relative',
           height: '24px',
           background: 'var(--bg-tertiary)',
           borderRadius: '12px',
-          cursor: hoverInGap ? 'not-allowed' : 'pointer',
           overflow: 'visible',
         }}
       >
@@ -849,31 +903,38 @@ function HistoryTimeline({
           }}
         />
 
-        {/* Gap regions — dark red overlay for periods with no data */}
-        {gapRegions.map((gap, i) => (
-          <div
-            key={i}
-            title="No data available"
-            style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              left: percentToPaddedStart(gap.startPct),
-              width: percentToPaddedWidth(gap.startPct, gap.endPct),
-              background: 'rgba(139, 0, 0, 0.55)',
-              borderRadius: gap.startPct <= 0 ? '12px 0 0 12px' : gap.endPct >= 100 ? '0 12px 12px 0' : '0',
-              pointerEvents: 'none',
-              zIndex: 1,
-            }}
-          />
-        ))}
+        {/* Gap regions — dark red overlay for periods with no data. Gaps that
+            touch either bound extend through the 12px thumb-padding zone to
+            the actual track edge, so they can't end in a floating blob. */}
+        {gapRegions.map((gap, i) => {
+          const startCss = gap.startPct <= 0.01 ? '0px' : percentToPaddedStart(gap.startPct);
+          const endCss = gap.endPct >= 99.99 ? '100%' : percentToPaddedStart(gap.endPct);
+          return (
+            <div
+              key={i}
+              title="No data available"
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: startCss,
+                width: `calc(${endCss} - ${startCss})`,
+                background: 'rgba(139, 0, 0, 0.55)',
+                borderRadius: gap.startPct <= 0.01 ? '12px 0 0 12px' : gap.endPct >= 99.99 ? '0 12px 12px 0' : '0',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+          );
+        })}
 
         {/* Thumb */}
         <div data-testid="timeline-thumb" style={thumbStyle} />
       </div>
+      </div>
 
-      {/* Loaded-data indicator bar (below track) */}
-      {loadedRanges && loadedIndicatorBar(false)}
+      {/* Loaded-data indicator bar (below track, hidden once fully loaded) */}
+      {loadedRanges && !fullyLoaded && loadedIndicatorBar(false)}
     </div>
   );
 }

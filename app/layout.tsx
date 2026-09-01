@@ -123,7 +123,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, []);
   
   return (
-    <html lang="en" className={roboto.variable}>
+    // suppressHydrationWarning: the blocking <head> script below stamps
+    // data-theme on <html> before hydration, which React would otherwise
+    // report as a server/client attribute mismatch on every load.
+    <html lang="en" className={roboto.variable} suppressHydrationWarning>
       <head>
         {/* Blocking script to prevent dark mode flash */}
         <script
@@ -1039,6 +1042,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </ViewAsContext.Provider>
         </div>
         <Analytics
+          debug={false}
           beforeSend={(event) => {
             // Check if developer mode is enabled (set via console or bookmarklet)
             if (typeof window !== 'undefined' && localStorage.getItem('disableAnalytics') === 'true') {

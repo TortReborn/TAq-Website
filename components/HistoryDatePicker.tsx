@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import PickerField from "./PickerField";
 
 interface HistoryDatePickerProps {
   current: Date;
@@ -55,63 +56,28 @@ export default function HistoryDatePicker({
       flexWrap: vertical ? 'nowrap' : 'wrap',
       justifyContent: 'center',
     }}>
-      <style>{`
-        .history-date-input::-webkit-calendar-picker-indicator {
-          filter: var(--calendar-icon-filter, none);
-          cursor: pointer;
-        }
-        [data-theme="dark"] .history-date-input::-webkit-calendar-picker-indicator {
-          filter: invert(1);
-        }
-      `}</style>
-      <input
+      <PickerField
         type="date"
-        className="history-date-input"
         value={dateValue}
-        onChange={(e) => setDateValue(e.target.value)}
+        onChange={setDateValue}
         min={formatDateInput(earliest)}
         max={formatDateInput(latest)}
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-        style={{
-          padding: '0.375rem 0.5rem',
-          borderRadius: '0.375rem',
-          border: '1px solid var(--border-color)',
-          background: 'var(--bg-secondary)',
-          color: 'var(--text-primary)',
-          fontSize: '0.8rem',
-          outline: 'none',
-          colorScheme: 'dark light',
-          minWidth: 0,
-          flexShrink: 1,
-        }}
+        width="8.5rem"
       />
-      <input
+      <PickerField
         type="time"
         value={timeValue}
-        onChange={(e) => setTimeValue(e.target.value)}
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-        style={{
-          padding: '0.375rem 0.5rem',
-          borderRadius: '0.375rem',
-          border: '1px solid var(--border-color)',
-          background: 'var(--bg-secondary)',
-          color: 'var(--text-primary)',
-          fontSize: '0.8rem',
-          outline: 'none',
-          colorScheme: 'dark light',
-          width: '5rem',
-          minWidth: 0,
-          flexShrink: 1,
-        }}
+        onChange={setTimeValue}
+        width="7rem"
       />
       <button
         type="button"
         onClick={handleJump}
         onMouseDown={(e) => e.stopPropagation()}
         style={{
-          padding: '0.375rem 0.75rem',
+          height: '32px',
+          boxSizing: 'border-box',
+          padding: '0 0.75rem',
           borderRadius: '0.375rem',
           border: 'none',
           background: 'var(--accent-primary)',
