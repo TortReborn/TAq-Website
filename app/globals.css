@@ -66,72 +66,11 @@ select option {
   container-type: inline-size;
 }
 
-.lootpools-window > .lootpools-grid-container,
-.lootpools-cycle-stage {
+.lootpools-window > .lootpools-grid-container {
   flex: 1 1 auto;
   min-width: 0;
   width: auto !important;
-  max-width: 1200px;
-}
-
-.lootpools-cycle-stage {
-  --lootpool-visible-count: 5;
-  --lootpool-cycle-gap: 0.75rem;
-  --lootpool-card-slot: 20%;
-  --lootpool-cycle-step: calc(var(--lootpool-card-slot) + var(--lootpool-cycle-gap));
-
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  padding-inline: 0.25rem;
-}
-
-.lootpools-cycle-track {
-  width: max-content;
-  transform: translateX(0);
-  transition: none;
-  will-change: transform;
-}
-
-.lootpools-grid-container--windowed {
-  flex-wrap: nowrap;
-}
-
-.lootpools-cycle-track .lootpools-grid-container--windowed {
-  display: grid;
-  gap: var(--lootpool-cycle-gap);
-  justify-content: start;
-  width: max-content !important;
-  max-width: none;
-}
-
-.lootpools-cycle-stage.is-static .lootpools-cycle-track,
-.lootpools-cycle-stage.is-static .lootpools-grid-container--windowed {
-  width: 100% !important;
-}
-
-.lootpools-grid-container--windowed > * {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: none;
-}
-
-.lootpools-cycle-stage.is-cycle-ready .lootpools-cycle-track {
-  transition: none;
-}
-
-.lootpools-cycle-stage.is-cycle-active .lootpools-cycle-track {
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lootpools-cycle-stage.is-sliding-next.is-cycle-active .lootpools-cycle-track,
-.lootpools-cycle-stage.is-sliding-previous .lootpools-cycle-track {
-  transform: translateX(calc(-1 * var(--lootpool-cycle-step)));
-}
-
-.lootpools-cycle-stage.is-sliding-previous.is-cycle-active .lootpools-cycle-track {
-  transform: translateX(0);
+  max-width: 1650px;
 }
 
 .lootpool-card {
@@ -185,56 +124,6 @@ select option {
   margin: 0 -0.5rem;
 }
 
-.lootpools-cycle-button {
-  align-self: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 2.75rem;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 1px solid var(--border-card);
-  border-radius: 0.375rem;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 1.75rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-
-.lootpools-cycle-icon {
-  width: 1.35rem;
-  height: 1.35rem;
-  image-rendering: pixelated;
-  filter:
-    brightness(0)
-    saturate(100%)
-    invert(74%)
-    sepia(26%)
-    saturate(909%)
-    hue-rotate(154deg)
-    brightness(98%)
-    contrast(94%)
-    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
-}
-
-.lootpools-cycle-button:hover {
-  background: color-mix(in srgb, var(--color-ocean-700) 45%, var(--bg-secondary));
-  border-color: var(--color-ocean-400);
-  transform: translateY(-1px);
-}
-
-.lootpools-cycle-button:focus-visible {
-  outline: 2px solid var(--color-ocean-400);
-  outline-offset: 2px;
-}
-
-.lootpools-cycle-button--skeleton {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .lootpool-skeleton-card {
   height: var(--lootpool-card-height);
   background: var(--bg-card);
@@ -276,24 +165,6 @@ select option {
   }
 }
 
-@media (max-width: 1180px) {
-  .lootpool-skeleton-grid > *:nth-child(n + 5) {
-    display: none;
-  }
-}
-
-@media (max-width: 980px) {
-  .lootpool-skeleton-grid > *:nth-child(n + 4) {
-    display: none;
-  }
-}
-
-@media (max-width: 760px) {
-  .lootpool-skeleton-grid > *:nth-child(n + 3) {
-    display: none;
-  }
-}
-
 @media (max-width: 700px) {
   .lootpools-window {
     --lootpool-card-height: clamp(420px, calc(100dvh - 270px), 680px);
@@ -303,17 +174,6 @@ select option {
     --lootpool-card-min: 200px;
     --lootpool-card-max: 260px;
     gap: 1rem;
-  }
-
-  .lootpools-grid-container--windowed > * {
-    max-width: 100%;
-  }
-}
-
-/* Mobile */
-@media (max-width: 520px) {
-  .lootpool-skeleton-grid > *:nth-child(n + 2) {
-    display: none;
   }
 }
 
@@ -331,18 +191,6 @@ select option {
   .lootpools-grid-container > * {
     flex: 1 1 100%;
     max-width: 100%;
-  }
-
-  .lootpools-cycle-button {
-    flex-basis: 2.25rem;
-    width: 2.25rem;
-    height: 2.25rem;
-    font-size: 1.35rem;
-  }
-
-  .lootpools-cycle-icon {
-    width: 1.1rem;
-    height: 1.1rem;
   }
 
   /* Stack header elements vertically on mobile */
@@ -469,19 +317,13 @@ select option {
 @media (prefers-reduced-motion: reduce) {
   .lootpools-tab-indicator,
   .lootpools-tab-button,
-  .lootpools-content-pane,
-  .lootpools-cycle-button {
+  .lootpools-content-pane {
     transition-duration: 0.01ms;
   }
 
   .lootpools-content-pane {
     filter: none;
     transform: none;
-  }
-
-  .lootpools-cycle-track {
-    animation-duration: 0.01ms;
-    transition-duration: 0.01ms;
   }
 }
 

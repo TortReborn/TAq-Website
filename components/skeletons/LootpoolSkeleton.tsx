@@ -31,9 +31,8 @@ export default function LootpoolSkeleton() {
       </div>
 
       <div className="lootpools-window">
-        <div className="lootpools-cycle-button lootpools-cycle-button--skeleton" aria-hidden="true" />
-        <div className="lootpools-grid-container lootpools-grid-container--windowed lootpool-skeleton-grid">
-          {[1, 2, 3, 4, 5].map(i => (
+        <div className="lootpools-grid-container lootpool-skeleton-grid">
+          {[1, 2, 3, 4, 5, 6, 7].map(i => (
             <div key={i} className="lootpool-card lootpool-skeleton-card">
               <div className="skeleton lootpool-skeleton-image" />
               <div className="skeleton lootpool-skeleton-title" />
@@ -45,7 +44,6 @@ export default function LootpoolSkeleton() {
             </div>
           ))}
         </div>
-        <div className="lootpools-cycle-button lootpools-cycle-button--skeleton" aria-hidden="true" />
       </div>
     </div>
   );
