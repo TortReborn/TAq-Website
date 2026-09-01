@@ -23,7 +23,7 @@ let verboseDataPromise: Promise<Record<string, TerritoryVerboseData>> | null = n
 
 const fetchVerboseData = (): Promise<Record<string, TerritoryVerboseData>> => {
   if (!verboseDataPromise) {
-    verboseDataPromise = fetch("/territories_verbose.json").then((res) => {
+    verboseDataPromise = fetch("/territories_verbose.json?v=4").then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     });

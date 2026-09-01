@@ -498,6 +498,36 @@ export const TERRITORY_TO_ABBREV: Record<string, string> = {
 /** 2.1 Rekindled World — August 10, 2024 */
 export const REKINDLED_WORLD_CUTOFF_MS = new Date("2024-08-10T00:00:00Z").getTime();
 
+/**
+ * Realm of Light rework — the original 2018-era Realm of Light region (13
+ * territories) was deleted and replaced by the current RoL map. In exchange
+ * data the old territories' events stop between 2020-12-26 and 2021-01-17,
+ * and the new territories (Nexus of Light, Field of Life, Path to Light)
+ * first appear 2021-01-21/22. Old-RoL territories must not render at or
+ * after this cutoff.
+ */
+export const ROL_UPDATE_CUTOFF_MS = new Date("2021-01-21T00:00:00Z").getTime();
+
+/**
+ * The original Realm of Light territories removed by the RoL rework
+ * (canonical names as they appear in exchange data).
+ */
+export const OLD_ROL_TERRITORY_NAMES = new Set<string>([
+  "Light Realm Corruption",
+  "Light Realm East",
+  "Light Realm East Lower",
+  "Light Realm East Mid",
+  "Light Realm East Mid-Upper",
+  "Light Realm East Upper",
+  "Light Realm Entrance",
+  "Light Realm Entrance Upper",
+  "Light Realm Mushrooms",
+  "Orphion's Seal",
+  "Orphion's Seal Upper",
+  "Road to Corruption",
+  "Spiraling Trees",
+]);
+
 // Old territory names that were REMOVED in the 2.1 Rekindled World update.
 // These should not appear on the map for timestamps after REKINDLED_WORLD_CUTOFF_MS.
 const OLD_TERRITORY_TO_ABBREV: Record<string, string> = {
@@ -779,10 +809,16 @@ const OLD_TERRITORY_TO_ABBREV: Record<string, string> = {
   "Green Camp": "GRNC",
   "Gromblins Hideout": "GMH",
   "Imperial Gate": "IMT",
+  "Light Realm Corruption": "LRCO",
   "Light Realm East": "LRE",
+  "Light Realm East Lower": "LREL",
+  "Light Realm East Mid": "LREM",
   "Light Realm East Mid-Upper": "LRMU",
+  "Light Realm East Upper": "LREU",
+  "Light Realm Entrance": "LRET",
   "Light Realm Entrance Upper": "LREN",
   "Light Realm Mushrooms": "LRM",
+  "Road to Corruption": "RTCO",
   "Mt. Wynn": "MTW",
   "Orphion's Seal": "OPS",
   "Orphion's Seal Upper": "OPSU",
@@ -845,15 +881,12 @@ const DB_NAME_ALIASES: Record<string, string> = {
   "North Nivla Forest": "North Nivla Woods",
   "South Nivla Forest": "South Nivla Woods",
 
-  // Light Realm → Light Forest renames (happened pre-Rekindled)
-  "Light Realm East Lower": "Light Forest East Lower",
-  "Light Realm East Mid": "Light Forest East Mid",
-  "Light Realm East Upper": "Light Forest East Upper",
-  "Light Realm Entrance": "Light Forest South Entrance",
-  "Light Realm Corruption": "Light Forest Canyon",
-
-  // Road to Corruption → Road To Light Forest
-  "Road to Corruption": "Road To Light Forest",
+  // NOTE: "Light Realm *" / "Road to Corruption" names are NOT aliased to
+  // Light Forest territories. They are distinct territories of the original
+  // Realm of Light region (2018 → Jan 2021, see OLD_ROL_TERRITORY_NAMES);
+  // the similarly-named Light Forest territories are the Gavel region with
+  // their own exchange history through Rekindled. Aliasing them merged the
+  // old RoL ownership into Gavel Light Forest snapshots.
 
   // Dernal → Dernel spelling (2018-era)
   "Dernal Jungle Lower": "Dernel Jungle Lower",

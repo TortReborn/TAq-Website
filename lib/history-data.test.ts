@@ -170,6 +170,28 @@ describe('mergeExchangeStores', () => {
   });
 });
 
+describe('old Realm of Light cutoff', () => {
+  it('renders old-RoL territories before the Jan 2021 rework and hides them after', () => {
+    const t2019 = Math.floor(new Date('2019-06-01T00:00:00Z').getTime() / 1000);
+    const store = buildExchangeStoreFromRanged(rangedChunk(
+      ['Spiraling Trees', 'Light Realm East Lower'],
+      [[t2019, 0, 1], [t2019 + HOUR, 1, 2]],
+      [],
+      t2019 - HOUR,
+      t2019 + 2 * HOUR,
+    ));
+
+    const before = buildSnapshotAt(store, new Date('2019-07-01T00:00:00Z'));
+    expect(before?.territories[toAbbrev('Spiraling Trees')]).toEqual({ g: 'GDA', n: 'GuildA' });
+    expect(before?.territories[toAbbrev('Light Realm East Lower')]).toEqual({ g: 'GDB', n: 'GuildB' });
+
+    // After the RoL rework (but before Rekindled) the region no longer exists
+    const after = buildSnapshotAt(store, new Date('2021-02-01T00:00:00Z'));
+    expect(after?.territories[toAbbrev('Spiraling Trees')] ?? null).toBeNull();
+    expect(after?.territories[toAbbrev('Light Realm East Lower')] ?? null).toBeNull();
+  });
+});
+
 describe('combineRangedEventData', () => {
   it('one merge of a combined batch equals merging each chunk sequentially', () => {
     const base = rangedChunk(

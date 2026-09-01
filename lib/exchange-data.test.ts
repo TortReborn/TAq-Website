@@ -6,7 +6,7 @@ import {
   exchangesHaveDataNear,
   _resetPrefixCache,
 } from './exchange-data';
-import { TERRITORY_TO_ABBREV } from './territory-abbreviations';
+import { TERRITORY_TO_ABBREV, OLD_ROL_TERRITORY_NAMES } from './territory-abbreviations';
 import type { Pool } from 'pg';
 
 // Reset the module-level caches before each test
@@ -321,13 +321,20 @@ describe('full territory snapshot reconstruction', () => {
     const result = await reconstructSingleSnapshot(pool, new Date('2023-06-01'));
     expect(result).not.toBeNull();
 
+    // 2023-06-01 is after the Jan 2021 RoL rework — the original Realm of
+    // Light territories are excluded from snapshots at this timestamp
     for (const [fullName, abbrev] of Object.entries(TERRITORY_TO_ABBREV)) {
+      if (OLD_ROL_TERRITORY_NAMES.has(fullName)) {
+        expect(result!.territories[abbrev]).toBeUndefined();
+        continue;
+      }
       expect(result!.territories[abbrev]).toBeDefined();
       expect(result!.territories[abbrev]).toEqual({ g: 'TES', n: guildName });
     }
 
+    const expectedCount = allTerritories.filter(n => !OLD_ROL_TERRITORY_NAMES.has(n)).length;
     const snapshotCount = Object.keys(result!.territories).length;
-    expect(snapshotCount).toBe(allTerritories.length);
+    expect(snapshotCount).toBe(expectedCount);
   });
 
   it('handles mixed guilds across all territories', async () => {
@@ -348,8 +355,9 @@ describe('full territory snapshot reconstruction', () => {
     const result = await reconstructSingleSnapshot(pool, new Date('2023-06-01'));
     expect(result).not.toBeNull();
 
+    // Old-RoL territories are excluded post-Jan-2021 (see above)
     const count = Object.keys(result!.territories).length;
-    expect(count).toBe(allTerritories.length);
+    expect(count).toBe(allTerritories.filter(n => !OLD_ROL_TERRITORY_NAMES.has(n)).length);
 
     const firstAbbrev = TERRITORY_TO_ABBREV[allTerritories[0]];
     expect(result!.territories[firstAbbrev].n).toBe('Alpha');

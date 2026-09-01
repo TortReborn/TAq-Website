@@ -13,7 +13,13 @@
  */
 
 import { Pool } from "pg";
-import { toAbbrev, OLD_TERRITORY_NAMES, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
+import {
+  toAbbrev,
+  OLD_TERRITORY_NAMES,
+  REKINDLED_WORLD_CUTOFF_MS,
+  ROL_UPDATE_CUTOFF_MS,
+  OLD_ROL_TERRITORY_NAMES,
+} from "./territory-abbreviations";
 import type { HistorySnapshot, SnapshotTerritory } from "./history-data";
 
 // ---------------------------------------------------------------------------
@@ -244,6 +250,12 @@ function stateToTerritories(
     // Pre-Rekindled: show ALL territories — expandSnapshot on the client will
     // naturally skip any without location data in verboseData.
     if (isPostRekindled && OLD_TERRITORY_NAMES.has(territory)) continue;
+    // The original Realm of Light region was deleted in the Jan 2021 rework
+    if (
+      timestampMs !== undefined &&
+      timestampMs >= ROL_UPDATE_CUTOFF_MS &&
+      OLD_ROL_TERRITORY_NAMES.has(territory)
+    ) continue;
     const abbrev = toAbbrev(territory);
     territories[abbrev] = {
       g: guildPrefix(prefixes, guild),

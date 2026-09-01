@@ -33,7 +33,29 @@ import {
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 import { shouldRenderTerritory, shouldRenderTradeRoute } from "@/lib/retired-territories";
+import { ROL_UPDATE_CUTOFF_MS } from "@/lib/territory-abbreviations";
 import { mapLog, mapError, mapTime, timedFetch } from "@/lib/map-logger";
+
+// ---------------------------------------------------------------------------
+// Old Realm of Light underlay (history mode, pre-Jan-2021 only).
+//
+// The original RoL region was deleted in the Jan 2021 rework; its territory
+// boxes are drawn from archived coordinates, shifted south so they fit the
+// current map image. This art (a period render of the old island, blue
+// background keyed out) is drawn beneath those boxes, and a page-background
+// cover hides the current map's NEW RoL inset art for those timestamps.
+// World-coord boxes: [east/north] → [west/south].
+// ---------------------------------------------------------------------------
+const OLD_ROL_ART_RECT = (() => {
+  const [x1, y1] = coordToPixel([105, -6631]);
+  const [x2, y2] = coordToPixel([-1495, -5981]);
+  return { left: Math.min(x1, x2), top: Math.min(y1, y2), width: Math.abs(x2 - x1), height: Math.abs(y2 - y1) };
+})();
+const NEW_ROL_COVER_RECT = (() => {
+  const [x1, y1] = coordToPixel([-400, -6634]);
+  const [x2, y2] = coordToPixel([-1560, -5620]);
+  return { left: Math.min(x1, x2), top: Math.min(y1, y2), width: Math.abs(x2 - x1), height: Math.abs(y2 - y1) };
+})();
 
 /**
  * Merge fresh territory data into the previous record, reusing the previous
@@ -412,7 +434,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // Load territories verbose data for connection calculations
   const loadVerboseData = async (): Promise<Record<string, TerritoryVerboseData>> => {
     try {
-      const response = await fetch('/territories_verbose.json');
+      // ?v= busts stale browser copies when the file's contents change
+      const response = await fetch('/territories_verbose.json?v=4');
       if (response.ok) {
         return await response.json();
       }
@@ -609,6 +632,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   }, [recordRange]);
 
   /** Fetch exchange events for a date range from /api/map-history/events */
+  // Data-mapping version, appended to chunk URLs purely as a cache buster.
+  // Historical chunks are cached as immutable by the CDN and browser, so any
+  // change to server-side name canonicalization (which alters chunk payloads)
+  // must bump this to re-key every cached copy.
+  // v2: old Realm of Light territories un-aliased from Light Forest.
+  const EVENTS_DATA_VERSION = 2;
+
   const fetchEventRange = useCallback(async (
     startDate: Date,
     endDate: Date,
@@ -616,7 +646,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   ): Promise<RangedExchangeEventData> => {
     const response = await timedFetch(
       'events',
-      `/api/map-history/events?start=${startDate.toISOString()}&end=${endDate.toISOString()}`,
+      `/api/map-history/events?start=${startDate.toISOString()}&end=${endDate.toISOString()}&dv=${EVENTS_DATA_VERSION}`,
       signal ? { signal } : undefined,
     );
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1536,8 +1566,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     lastTouchDistanceRef.current = null;
   }, []);
 
-  // Handle wheel zoom
-  const handleWheel = useCallback((e: React.WheelEvent) => {
+  // Handle wheel zoom. Attached as a NATIVE non-passive listener (effect
+  // below) rather than React's onWheel: React registers wheel handlers as
+  // passive, so the preventDefault() here silently failed and logged
+  // "Unable to preventDefault inside passive event listener" on every tick.
+  const handleWheel = useCallback((e: WheelEvent) => {
     if (!containerRef.current || !mapImageRef.current) return;
 
     e.preventDefault();
@@ -1558,6 +1591,20 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: mouseY - (mouseY - prevPosition.y) * scaleChange
     }, newScale);
   }, [clampScale, applyTransform]);
+
+  // Native non-passive wheel listener on the map container (see handleWheel)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      // Only handle wheel events if they're not from the guild territory panel
+      if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+        handleWheel(e);
+      }
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [handleWheel]);
 
   // Zoom controls
   const zoomIn = useCallback(() => {
@@ -1809,12 +1856,6 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               handleMouseUp();
             }
           }}
-          onWheel={(e) => {
-            // Only handle wheel events if they're not from the guild territory panel
-            if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
-              handleWheel(e);
-            }
-          }}
           onTouchStart={(e) => {
             // Only handle touch events if they're not from the guild territory panel
             if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
@@ -1863,6 +1904,38 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               onLoad={handleImageLoad}
               draggable={false}
             />
+            {/* Old Realm of Light underlay — for pre-Jan-2021 history the
+                current map's new-RoL inset is covered with the page background
+                and the archived old-island render is drawn in its place */}
+            {viewMode === 'history' && historyTimestamp && historyTimestamp.getTime() < ROL_UPDATE_CUTOFF_MS && (
+              <>
+                <div style={{
+                  position: 'absolute',
+                  left: NEW_ROL_COVER_RECT.left,
+                  top: NEW_ROL_COVER_RECT.top,
+                  width: NEW_ROL_COVER_RECT.width,
+                  height: NEW_ROL_COVER_RECT.height,
+                  background: 'var(--bg-card)',
+                  zIndex: 1,
+                  pointerEvents: 'none',
+                }} />
+                <img
+                  src="/images/map/old-realm-of-light.v1.webp"
+                  alt=""
+                  draggable={false}
+                  style={{
+                    position: 'absolute',
+                    left: OLD_ROL_ART_RECT.left,
+                    top: OLD_ROL_ART_RECT.top,
+                    width: OLD_ROL_ART_RECT.width,
+                    height: OLD_ROL_ART_RECT.height,
+                    zIndex: 2,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                  }}
+                />
+              </>
+            )}
             {/* Territory Overlays - positioned in map pixel coordinates */}
             {showTerritories && !showLandView && territoryEntries.map(([name, territory]) => (
               <TerritoryOverlay

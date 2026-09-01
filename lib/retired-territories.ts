@@ -10,12 +10,22 @@
  * To un-retire:           remove it from this set.
  */
 export const RETIRED_TERRITORIES = new Set<string>([
-  // ── Old Realm of Light / Light Forest (removed region) ──────────────────────
+  // ── Old Realm of Light (region deleted in the Jan 2021 RoL rework) ──────────
   "Spiraling Trees",
   "Light Realm Mushrooms",
   "Light Realm East",
+  "Light Realm East Lower",
+  "Light Realm East Mid",
   "Light Realm East Mid-Upper",
+  "Light Realm East Upper",
+  "Light Realm Entrance",
   "Light Realm Entrance Upper",
+  "Light Realm Corruption",
+  "Road to Corruption",
+  "Orphion's Seal",
+  "Orphion's Seal Upper",
+
+  // ── Light Forest (removed in Rekindled) ─────────────────────────────────────
   "Light Forest South Entrance",
   "Light Forest East Lower",
   "Light Forest East Mid",

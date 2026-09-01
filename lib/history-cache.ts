@@ -23,7 +23,9 @@ const DATA_KEY = 'exchange-store';
 const LS_DATA_RANGES = 'historyCache:dataRanges';   // ranges with actual events
 const LS_EMPTY_RANGES = 'historyCache:emptyRanges';  // ranges that were empty (re-check)
 const LS_CACHE_VERSION = 'historyCache:version';
-const CACHE_VERSION = '1';
+// v2: old Realm of Light territories un-aliased from Light Forest — stores
+// built under v1 carry the merged (wrong) ownership and must be rebuilt
+const CACHE_VERSION = '2';
 
 // ---------------------------------------------------------------------------
 // IndexedDB helpers

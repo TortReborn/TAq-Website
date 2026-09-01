@@ -3,7 +3,15 @@
  */
 
 import { Territory } from "./utils";
-import { toAbbrev, fromAbbrev, ABBREV_TO_TERRITORY, REKINDLED_WORLD_CUTOFF_MS, OLD_TERRITORY_NAMES } from "./territory-abbreviations";
+import {
+  toAbbrev,
+  fromAbbrev,
+  ABBREV_TO_TERRITORY,
+  REKINDLED_WORLD_CUTOFF_MS,
+  OLD_TERRITORY_NAMES,
+  ROL_UPDATE_CUTOFF_MS,
+  OLD_ROL_TERRITORY_NAMES,
+} from "./territory-abbreviations";
 import { mapLog } from "./map-logger";
 
 // Condensed snapshot format for database storage
@@ -517,6 +525,10 @@ export function buildSnapshotAt(
     const era = store.territoryEras[tIdx];
     if (isPostRekindled && era === 'old') continue;
     if (!isPostRekindled && era === 'new') continue;
+
+    // The original Realm of Light region was deleted in the Jan 2021 RoL
+    // rework — its territories must not persist past that update
+    if (targetMs >= ROL_UPDATE_CUTOFF_MS && OLD_ROL_TERRITORY_NAMES.has(data.territories[tIdx])) continue;
 
     if (gIdx === -1) {
       // No exchange before this time — forward-looking backfill.
