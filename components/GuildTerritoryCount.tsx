@@ -326,19 +326,23 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
       {guildStats.length > 0 ? (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {guildStats.map((guild, index) => (
-            <li 
-              key={guild.name} 
-              style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
+            <li
+              key={guild.name}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '0.25rem', 
+                marginBottom: '0.25rem',
                 fontSize: `${fontSize}rem`,
                 padding: '0.35rem 0.75rem',
                 borderRadius: '0.5rem',
                 background: 'var(--bg-secondary)',
-                border: '1px solid transparent'
+                border: '1px solid transparent',
+                cursor: onGuildClick ? 'pointer' : 'default',
               }}
+              // Whole pill is the click target — the handler used to live on
+              // the name span only, so the count and row padding were dead
+              onClick={() => onGuildClick && onGuildClick(guild.originalName)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--bg-hover)';
                 e.currentTarget.style.borderColor = 'var(--border-color)';
@@ -354,11 +358,9 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
                 style={{
                   color: guild.contrastColor,
                   fontWeight: 'bold',
-                  cursor: onGuildClick ? 'pointer' : 'default',
                   textDecoration: 'none',
                   flex: 1,
                 }}
-                onClick={() => onGuildClick && onGuildClick(guild.originalName)}
               >
                 {guild.name}
               </span>

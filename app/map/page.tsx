@@ -160,6 +160,42 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       // and region-jump silently stops updating.
       transformRafRef.current = null;
     }
+    if (animTimeoutRef.current) {
+      clearTimeout(animTimeoutRef.current);
+      animTimeoutRef.current = null;
+    }
+  }, []);
+
+  // ── Animated transforms (region/guild zoom, reset view) ────────────────
+  // One tracked timeout for the whole animation lifecycle. Each animated jump
+  // previously scheduled its own untracked setTimeout(…, 2000) against a 0.8s
+  // transition, so a second jump within that window let the FIRST timeout turn
+  // the transition off mid-flight — the map snapped to its target instantly or
+  // partway through the motion. The oversized window also left the transition
+  // active long after the motion ended, so panning/zooming right after a jump
+  // rubber-banded and then snapped.
+  const animTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startAnimatedTransform = useCallback((pos: { x: number; y: number }, scl: number) => {
+    if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current);
+    setIsAnimating(true);
+    applyTransform(pos, scl);
+    // Just past the 0.8s transition — manual control returns as soon as the
+    // motion actually finishes
+    animTimeoutRef.current = setTimeout(() => {
+      setIsAnimating(false);
+      animTimeoutRef.current = null;
+    }, 850);
+  }, [applyTransform]);
+
+  // Direct user input takes over immediately: kill the transition so pans and
+  // wheel zooms track the pointer 1:1 instead of easing toward it
+  const cancelAnimation = useCallback(() => {
+    if (animTimeoutRef.current) {
+      clearTimeout(animTimeoutRef.current);
+      animTimeoutRef.current = null;
+    }
+    setIsAnimating(false);
   }, []);
   const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
   const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
@@ -1468,11 +1504,12 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // Handle mouse down for dragging
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return; // Only left click
+    cancelAnimation();
     setIsDragging(true);
     setDragStart({ x: e.clientX, y: e.clientY });
     setLastPanPoint({ x: positionRef.current.x, y: positionRef.current.y });
     e.preventDefault();
-  }, []);
+  }, [cancelAnimation]);
 
   // Handle mouse move for dragging
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -1494,6 +1531,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
   // Touch event handlers for mobile
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    cancelAnimation();
     if (e.touches.length === 1) {
       // Single touch - start panning
       setIsTouching(true);
@@ -1510,7 +1548,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       lastTouchDistanceRef.current = distance;
       setIsTouching(false); // Disable panning during pinch
     }
-  }, []);
+  }, [cancelAnimation]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (e.touches.length === 1 && isTouching && touchStart) {
@@ -1599,12 +1637,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     const onWheel = (e: WheelEvent) => {
       // Only handle wheel events if they're not from the guild territory panel
       if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+        cancelAnimation();
         handleWheel(e);
       }
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [handleWheel]);
+  }, [handleWheel, cancelAnimation]);
 
   // Zoom controls
   const zoomIn = useCallback(() => {
@@ -1660,10 +1699,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: (containerRect.height - scaledHeight) / 2
     };
 
-    applyTransform(newPosition, clampScale(fitScale));
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 1000);
-  }, [clampScale, applyTransform]);
+    startAnimatedTransform(newPosition, clampScale(fitScale));
+  }, [clampScale, startAnimatedTransform]);
 
   // Handle window resize
   useEffect(() => {
@@ -1703,11 +1740,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     setHoveredTerritory(null);
   }, []);
 
-  // Handle guild click to zoom to guild territories
+  // Handle guild click to zoom to guild territories.
+  // Searches the DISPLAYED territories: in history mode the guild's holdings
+  // come from the historical snapshot, not the live map — filtering the live
+  // set found nothing there and the click silently did nothing.
   const handleGuildZoom = useCallback((guildName: string) => {
     if (!containerRef.current) return;
 
-    const guildTerritories = Object.values(territories).filter(
+    const guildTerritories = Object.values(displayTerritories).filter(
       territory => territory.guild.name === guildName
     );
 
@@ -1748,14 +1788,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: containerRect.height / 2 - boundingCenterY * newScale
     };
 
-    applyTransform(newPosition, newScale);
-    setIsAnimating(true);
-
-    // Clear animation state after transition completes with a slight buffer
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 2000); // Slightly longer than transition duration to avoid jerky end
-  }, [territories, clampScale, applyTransform]);
+    startAnimatedTransform(newPosition, newScale);
+  }, [displayTerritories, clampScale, startAnimatedTransform]);
 
   // Region zoom presets (game coordinates: [minX, minZ, maxX, maxZ])
   // Region zoom presets — game coords [X, Z] where more negative Z = further north on map
@@ -1791,11 +1825,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       y: containerRect.height / 2 - boundingCenterY * newScale,
     };
 
-    applyTransform(newPosition, newScale);
-    setIsAnimating(true);
+    startAnimatedTransform(newPosition, newScale);
     setShowRegionMenu(false);
-    setTimeout(() => setIsAnimating(false), 2000);
-  }, [clampScale, applyTransform]);
+  }, [clampScale, startAnimatedTransform]);
 
   return (
     <main className="map-opaque-chrome map-viewport" style={{
