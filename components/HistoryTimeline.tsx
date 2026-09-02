@@ -55,6 +55,10 @@ const percentToPaddedWidth = (startPct: number, endPct: number) => {
   return `calc(${endPct - startPct} * (100% - 24px) / 100)`;
 };
 
+// Jumping to a chronicle event lands this far before its start, so the
+// viewer gets some leadup instead of arriving mid-kickoff
+export const EVENT_LEADUP_MS = 30 * 60 * 1000;
+
 // Snap to nearest 10-minute boundary (matching server snapshot interval)
 const SNAP_INTERVAL_MS = 10 * 60 * 1000;
 const snapTo10Min = (targetDate: Date): Date => {
@@ -524,7 +528,8 @@ function HistoryTimeline({
 
   // ── Chronicle event markers ──────────────────────────────────────────
   // Each event is a track-height pill at its start; clicking moves the
-  // scrubber to the event's start.
+  // scrubber to shortly before the event starts, so there's some leadup
+  // before things kick off.
 
   const eventMarkerElements = (isVert: boolean) => visibleEventMarkers.map(({ ev, startPct, markerInRange }) => {
     if (!markerInRange) return null;
@@ -532,7 +537,7 @@ function HistoryTimeline({
       <div
         key={`ev-${ev.id}`}
         onMouseDown={(e) => { e.stopPropagation(); }}
-        onClick={(e) => { e.stopPropagation(); jumpToDate(new Date(ev.startMs)); }}
+        onClick={(e) => { e.stopPropagation(); jumpToDate(new Date(ev.startMs - EVENT_LEADUP_MS)); }}
         onMouseEnter={() => { setHoveredEventId(ev.id); setHoverPercent(null); }}
         onMouseLeave={() => setHoveredEventId(null)}
         onMouseMove={(e) => { e.stopPropagation(); }}

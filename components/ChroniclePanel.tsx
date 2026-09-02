@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { X, Plus, Pencil, CornerDownLeft, Check, Maximize2, Minimize2 } from "lucide-react";
 import {
   AlliancePayload,
@@ -21,6 +21,7 @@ import {
 } from "@/lib/chronicle";
 import { useExecSession } from "@/hooks/useExecSession";
 import PickerField from "./PickerField";
+import { EVENT_LEADUP_MS } from "./HistoryTimeline";
 
 interface ChroniclePanelProps {
   isOpen: boolean;
@@ -641,8 +642,10 @@ export default function ChroniclePanel({
 
   // Re-clamp when the container resizes OR the panel itself changes size
   // (expanded view, the submit form, expanded rows) so it can't be pushed
-  // out of bounds by growing while parked near an edge
-  useEffect(() => {
+  // out of bounds by growing while parked near an edge. Layout effect, not
+  // useEffect: after paint, the grown panel overflows the border for one
+  // visible frame before snapping back — a flicker when parked on an edge.
+  useLayoutEffect(() => {
     if (isDragging || !isOpen) return;
     setPosition(prev => {
       const next = clampPosition(prev.x, prev.y);
@@ -770,7 +773,7 @@ export default function ChroniclePanel({
           {e.description && <div style={{ color: 'var(--text-primary)', marginBottom: '0.35rem' }}>{e.description}</div>}
           <div style={{ display: 'flex', gap: '0.4rem' }}>
             {onJumpToDate && (
-              <button type="button" style={smallBtn} onClick={() => onJumpToDate(new Date(e.startsAt))}>
+              <button type="button" style={smallBtn} onClick={() => onJumpToDate(new Date(Date.parse(e.startsAt) - EVENT_LEADUP_MS))}>
                 Jump to start
               </button>
             )}

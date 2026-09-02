@@ -42,6 +42,12 @@ describe('isKnownWarOutage', () => {
     expect(isKnownWarOutage(new Date('2019-04-05'), new Date('2019-05-23'))).toBe(true);
   });
 
+  it('matches precise exchange-timestamp boundaries (the DB scan now returns these)', () => {
+    expect(isKnownWarOutage(new Date('2019-04-06T23:13:32Z'), new Date('2019-05-05T19:25:47Z'))).toBe(true);
+    expect(isKnownWarOutage(new Date('2019-12-08T06:50:47Z'), new Date('2019-12-13T01:37:17Z'))).toBe(true);
+    expect(isKnownWarOutage(new Date('2021-04-25T03:52:45Z'), new Date('2021-05-11T20:01:11Z'))).toBe(false);
+  });
+
   it('does not swallow a gap extending well past an outage window', () => {
     expect(isKnownWarOutage(new Date('2019-12-08'), new Date('2019-12-20'))).toBe(false);
   });

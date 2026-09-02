@@ -106,6 +106,13 @@ export async function getExchangeGaps(
   }
 
   try {
+    // Day-granular scan finds the gaps; the correlated subqueries then
+    // resolve each one to precise boundaries (last exchange before, first
+    // exchange after — both index-only lookups on exchange_time). Precise
+    // ends matter: the UI's "jump to next data" lands on gap_end, which
+    // must be the actual moment logging resumed, not midnight of that day
+    // (e.g. the 2021-05-11 resumption was at 20:01 UTC — a day-granular
+    // end left ~20 hours of unexplained frozen map after the jump).
     const result = await pool.query(`
       WITH daily AS (
         SELECT DISTINCT DATE_TRUNC('day', exchange_time)::date AS d
@@ -113,10 +120,17 @@ export async function getExchangeGaps(
       ), with_next AS (
         SELECT d, LEAD(d) OVER (ORDER BY d) AS next_d
         FROM daily
+      ), day_gaps AS (
+        SELECT d, next_d
+        FROM with_next
+        WHERE next_d - d > $1
       )
-      SELECT d AS gap_start, next_d AS gap_end
-      FROM with_next
-      WHERE next_d - d > $1
+      SELECT
+        (SELECT MAX(te.exchange_time) FROM territory_exchanges te
+          WHERE te.exchange_time < (g.d + interval '1 day')) AS gap_start,
+        (SELECT MIN(te.exchange_time) FROM territory_exchanges te
+          WHERE te.exchange_time >= g.next_d) AS gap_end
+      FROM day_gaps g
     `, [GAP_THRESHOLD_DAYS]);
 
     gapCache = result.rows
