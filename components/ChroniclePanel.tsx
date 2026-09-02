@@ -160,6 +160,25 @@ const EMPTY_ALLIANCE: AlliancePayload = {
   name: '', tag: '', color: CHRONICLE_PALETTE[5], description: '',
   memberships: [{ guild: '', joinedAt: '', leftAt: null }],
 };
+
+/** Form-only grouping: one block per guild, each holding any number of stints. */
+type MemberDraft = { guild: string; stints: { joinedAt: string; leftAt: string | null }[] };
+
+function toMemberDrafts(memberships: AlliancePayload['memberships']): MemberDraft[] {
+  const drafts: MemberDraft[] = [];
+  for (const m of memberships) {
+    const existing = m.guild.trim() !== '' ? drafts.find(d => d.guild === m.guild) : undefined;
+    if (existing) existing.stints.push({ joinedAt: m.joinedAt, leftAt: m.leftAt });
+    else drafts.push({ guild: m.guild, stints: [{ joinedAt: m.joinedAt, leftAt: m.leftAt }] });
+  }
+  return drafts.length > 0 ? drafts : [{ guild: '', stints: [{ joinedAt: '', leftAt: null }] }];
+}
+
+function fromMemberDrafts(drafts: MemberDraft[]): AlliancePayload['memberships'] {
+  return drafts
+    .filter(d => d.guild.trim() !== '')
+    .flatMap(d => d.stints.map(s => ({ guild: d.guild, joinedAt: s.joinedAt, leftAt: s.leftAt })));
+}
 const EMPTY_EVENT: EventPayload = {
   eventType: 'war', title: '', description: '', startsAt: '', endsAt: null, guilds: [], alliances: [],
 };
@@ -182,9 +201,13 @@ function SubmitForm({
   const [alliance, setAlliance] = useState<AlliancePayload>(
     isAlliance ? (form.initial as AlliancePayload) : EMPTY_ALLIANCE,
   );
+  const [members, setMembers] = useState<MemberDraft[]>(() =>
+    isAlliance ? toMemberDrafts((form.initial as AlliancePayload).memberships) : [],
+  );
   const [event, setEvent] = useState<EventPayload>(
     !isAlliance ? (form.initial as EventPayload) : EMPTY_EVENT,
   );
+  const totalStints = members.reduce((n, d) => n + d.stints.length, 0);
   const [eventGuild, setEventGuild] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -194,7 +217,7 @@ function SubmitForm({
   const submit = async () => {
     setError(null);
     const payload = isAlliance
-      ? { ...alliance, memberships: alliance.memberships.filter(m => m.guild.trim() !== '') }
+      ? { ...alliance, memberships: fromMemberDrafts(members) }
       : event;
     const validated = isAlliance ? validateAlliancePayload(payload) : validateEventPayload(payload);
     if (!validated.ok) { setError(validated.error); return; }
@@ -268,7 +291,7 @@ function SubmitForm({
             </div>
           </div>
           {label('Member guilds')}
-          {alliance.memberships.map((m, i) => (
+          {members.map((d, i) => (
             <div key={i} style={{
               marginBottom: '0.4rem',
               padding: '0.4rem',
@@ -276,45 +299,67 @@ function SubmitForm({
               borderRadius: '0.375rem',
             }}>
               <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '0.3rem' }}>
-                <GuildInput value={m.guild} guilds={guilds}
-                  onChange={(v) => setAlliance(a => {
-                    const ms = [...a.memberships]; ms[i] = { ...ms[i], guild: v }; return { ...a, memberships: ms };
+                <GuildInput value={d.guild} guilds={guilds}
+                  onChange={(v) => setMembers(ds => {
+                    const next = [...ds]; next[i] = { ...next[i], guild: v }; return next;
                   })} />
-                <button type="button" title="Add another stint for this guild (left and rejoined later)"
-                  style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
-                  onClick={() => setAlliance(a => {
-                    const ms = [...a.memberships];
-                    ms.splice(i + 1, 0, { guild: ms[i].guild, joinedAt: '', leftAt: null });
-                    return { ...a, memberships: ms };
-                  })}>
-                  <Plus size={12} />
-                </button>
-                <button type="button" title="Remove" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
-                  onClick={() => setAlliance(a => ({ ...a, memberships: a.memberships.filter((_, j) => j !== i) }))}>
+                <button type="button" title="Remove guild" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
+                  onClick={() => setMembers(ds => ds.filter((_, j) => j !== i))}>
                   <X size={12} />
                 </button>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Joined</div>
-                  <PickerField type="date" width="100%" value={toDateInput(m.joinedAt)}
-                    onChange={(v) => setAlliance(a => {
-                      const ms = [...a.memberships]; ms[i] = { ...ms[i], joinedAt: v }; return { ...a, memberships: ms };
-                    })} />
+              {d.stints.map((s, si) => (
+                <div key={si} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', marginTop: si > 0 ? '0.3rem' : 0 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Joined</div>
+                    <PickerField type="date" width="100%" value={toDateInput(s.joinedAt)}
+                      onChange={(v) => setMembers(ds => {
+                        const next = [...ds];
+                        const stints = [...next[i].stints];
+                        stints[si] = { ...stints[si], joinedAt: v };
+                        next[i] = { ...next[i], stints };
+                        return next;
+                      })} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Left (empty = current)</div>
+                    <PickerField type="date" width="100%" value={toDateInput(s.leftAt)}
+                      onChange={(v) => setMembers(ds => {
+                        const next = [...ds];
+                        const stints = [...next[i].stints];
+                        stints[si] = { ...stints[si], leftAt: v || null };
+                        next[i] = { ...next[i], stints };
+                        return next;
+                      })} />
+                  </div>
+                  {d.stints.length > 1 && (
+                    <button type="button" title="Remove stint" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
+                      onClick={() => setMembers(ds => {
+                        const next = [...ds];
+                        next[i] = { ...next[i], stints: next[i].stints.filter((_, sj) => sj !== si) };
+                        return next;
+                      })}>
+                      <X size={12} />
+                    </button>
+                  )}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Left (empty = current)</div>
-                  <PickerField type="date" width="100%" value={toDateInput(m.leftAt)}
-                    onChange={(v) => setAlliance(a => {
-                      const ms = [...a.memberships]; ms[i] = { ...ms[i], leftAt: v || null }; return { ...a, memberships: ms };
-                    })} />
-                </div>
-              </div>
+              ))}
+              {totalStints < CHRONICLE_LIMITS.membershipsMax && (
+                <button type="button" title="Add another stint (the guild left and rejoined later)"
+                  style={{ ...smallBtn, marginTop: '0.35rem', fontSize: '0.68rem' }}
+                  onClick={() => setMembers(ds => {
+                    const next = [...ds];
+                    next[i] = { ...next[i], stints: [...next[i].stints, { joinedAt: '', leftAt: null }] };
+                    return next;
+                  })}>
+                  <Plus size={12} /> Add stint
+                </button>
+              )}
             </div>
           ))}
-          {alliance.memberships.length < CHRONICLE_LIMITS.membershipsMax && (
+          {totalStints < CHRONICLE_LIMITS.membershipsMax && (
             <button type="button" style={smallBtn}
-              onClick={() => setAlliance(a => ({ ...a, memberships: [...a.memberships, { guild: '', joinedAt: '', leftAt: null }] }))}>
+              onClick={() => setMembers(ds => [...ds, { guild: '', stints: [{ joinedAt: '', leftAt: null }] }])}>
               <Plus size={12} /> Add guild
             </button>
           )}
