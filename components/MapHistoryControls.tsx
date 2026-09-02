@@ -936,6 +936,7 @@ function MapHistoryControls({
     <div
       ref={containerRef}
       data-testid="history-controls-panel"
+      data-tour="history-timeline"
       onMouseDown={handleMouseDown}
       style={{
         position: 'relative',

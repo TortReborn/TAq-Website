@@ -10,7 +10,10 @@ const GAP = 16;
 function getTooltipCoords(
   position: 'center' | 'right' | 'bottom',
   targetRect: DOMRect | null,
-): { top: number; left: number } {
+): { top: number; left: number; anchorBottom?: boolean } {
+  // SSR safety — the tooltip is only shown client-side, but this runs in a
+  // useMemo that executes during server render too
+  if (typeof window === 'undefined') return { top: 0, left: 0 };
   if (position === 'center' || !targetRect) {
     return {
       top: Math.round((window.innerHeight - TOOLTIP_HEIGHT_EST) / 2),
@@ -42,7 +45,9 @@ function getTooltipCoords(
   }
   if (left < 16) left = 16;
   if (top + TOOLTIP_HEIGHT_EST > window.innerHeight) {
-    top = targetRect.top - TOOLTIP_HEIGHT_EST - GAP;
+    // Flip above the target, anchored by the card's bottom edge so even a
+    // taller-than-estimated card never overlaps the highlighted element
+    return { top: Math.round(Math.max(16, targetRect.top - GAP)), left: Math.round(left), anchorBottom: true };
   }
 
   return { top: Math.round(top), left: Math.round(left) };
@@ -94,13 +99,16 @@ export default function OnboardingTour({
 
   if (!isActive) return null;
 
-  // Spotlight cutout values (rounded to prevent sub-pixel issues)
-  const cutout = targetRect ? {
-    x: Math.round(targetRect.left - 8),
-    y: Math.round(targetRect.top - 8),
-    w: Math.round(targetRect.width + 16),
-    h: Math.round(targetRect.height + 16),
-  } : null;
+  // Spotlight cutout values, clamped to the viewport (a target's bounding box
+  // can spill off-screen — e.g. the map timeline wrapper) and rounded to
+  // prevent sub-pixel issues
+  const cutout = targetRect ? (() => {
+    const x = Math.max(4, Math.round(targetRect.left - 8));
+    const y = Math.max(4, Math.round(targetRect.top - 8));
+    const right = Math.min(window.innerWidth - 4, Math.round(targetRect.right + 8));
+    const bottom = Math.min(window.innerHeight - 4, Math.round(targetRect.bottom + 8));
+    return { x, y, w: right - x, h: bottom - y };
+  })() : null;
 
   const overlay = (
     <div style={{ position: 'fixed', inset: 0, zIndex: 10000 }}>
@@ -153,10 +161,12 @@ export default function OnboardingTour({
 
       {/* Tooltip card */}
       <div
+        data-testid="tour-tooltip"
         style={{
           position: 'fixed',
           top: `${tooltipCoords.top}px`,
           left: `${tooltipCoords.left}px`,
+          transform: tooltipCoords.anchorBottom ? 'translateY(-100%)' : undefined,
           zIndex: 10002,
           background: 'var(--bg-card-solid)',
           border: '1px solid var(--border-card)',

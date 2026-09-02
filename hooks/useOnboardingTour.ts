@@ -20,7 +20,11 @@ export interface OnboardingTourState {
   restartTour: () => void;
 }
 
-export function useOnboardingTour(enabled: boolean): OnboardingTourState {
+export function useOnboardingTour(
+  enabled: boolean,
+  steps: TourStep[] = TOUR_STEPS,
+  storageKey: string = STORAGE_KEY,
+): OnboardingTourState {
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
@@ -29,7 +33,7 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
   // Auto-start on first visit
   useEffect(() => {
     if (!enabled) return;
-    if (localStorage.getItem(STORAGE_KEY) === 'true') return;
+    if (localStorage.getItem(storageKey) === 'true') return;
 
     const timer = setTimeout(() => {
       setIsActive(true);
@@ -37,11 +41,11 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
     }, 600);
 
     return () => clearTimeout(timer);
-  }, [enabled]);
+  }, [enabled, storageKey]);
 
   // Track target element position
   const updateTargetRect = useCallback(() => {
-    const step = TOUR_STEPS[currentStep];
+    const step = steps[currentStep];
     if (!step || !step.target) {
       setTargetRect(null);
       return;
@@ -58,7 +62,7 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
       setTargetRect(null);
       retryRef.current = 0;
     }
-  }, [currentStep]);
+  }, [currentStep, steps]);
 
   useEffect(() => {
     if (!isActive) return;
@@ -77,16 +81,16 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
 
   const completeTour = useCallback(() => {
     setIsActive(false);
-    localStorage.setItem(STORAGE_KEY, 'true');
-  }, []);
+    localStorage.setItem(storageKey, 'true');
+  }, [storageKey]);
 
   const nextStep = useCallback(() => {
-    if (currentStep >= TOUR_STEPS.length - 1) {
+    if (currentStep >= steps.length - 1) {
       completeTour();
     } else {
       setCurrentStep(prev => prev + 1);
     }
-  }, [currentStep, completeTour]);
+  }, [currentStep, steps.length, completeTour]);
 
   const prevStep = useCallback(() => {
     setCurrentStep(prev => Math.max(0, prev - 1));
@@ -104,8 +108,8 @@ export function useOnboardingTour(enabled: boolean): OnboardingTourState {
   return {
     isActive,
     currentStep,
-    totalSteps: TOUR_STEPS.length,
-    step: TOUR_STEPS[currentStep] || TOUR_STEPS[0],
+    totalSteps: steps.length,
+    step: steps[currentStep] || steps[0],
     targetRect,
     nextStep,
     prevStep,

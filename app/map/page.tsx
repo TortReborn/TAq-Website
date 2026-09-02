@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { Globe, Home, Plus, Minus, Flag, Settings, BookOpen } from "lucide-react";
+import { Globe, Home, Plus, Minus, Flag, Settings, BookOpen, HelpCircle } from "lucide-react";
 import { loadTerritories, Territory, coordToPixel } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import LandViewOverlay from "@/components/LandViewOverlay";
@@ -17,6 +17,9 @@ import ChroniclePanel from "@/components/ChroniclePanel";
 import { ChronicleData, allianceColorsAt, chronicleEventColor } from "@/lib/chronicle";
 import { TimelineEventMarker } from "@/components/HistoryTimeline";
 import ConflictFinder from "@/components/ConflictFinder";
+import OnboardingTour from "@/components/OnboardingTour";
+import { useOnboardingTour } from "@/hooks/useOnboardingTour";
+import MAP_TOUR_STEPS from "@/lib/map-tour-steps";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
 import { useTerritoryPrecomputation } from "@/hooks/useTerritoryPrecomputation";
 import { useSeasons } from "@/hooks/useSeasons";
@@ -257,6 +260,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   // out of the already-busy moment when the user switches to the history tab.
   const seasons = useSeasons(true);
   const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
+
+  // First-visit tour of the history view's controls (replayable via ? button)
+  const tour = useOnboardingTour(viewMode === 'history', MAP_TOUR_STEPS, 'map_history_tour_complete');
 
   // (Re)fetch chronicle data each time the layer is opened, so exec edits and
   // deletions show up without a page reload; existing data stays while loading
@@ -2448,9 +2454,42 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               historyAvailable={!!historyBounds}
             />
 
+            {/* Replay the history-view tour */}
+            {viewMode === 'history' && (
+              <button
+                onClick={() => tour.restartTour()}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.5rem',
+                  border: '2px solid var(--border-color)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-card)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+                title="Tour of the history view"
+              >
+                <HelpCircle size={20} strokeWidth={2} />
+              </button>
+            )}
+
             {/* Chronicle Button — community alliances & events layer */}
             <button
               data-testid="chronicle-toggle"
+              data-tour="chronicle-toggle"
               onClick={() => {
                 setShowChronicle(prev => !prev);
                 setShowFactions(false);
@@ -2488,6 +2527,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
             {/* Factions Button */}
             <button
+              data-tour="factions-toggle"
               onClick={() => {
                 setShowFactions(prev => !prev);
                 setShowChronicle(false);
@@ -2552,6 +2592,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               />
             ) : (
               <button
+                data-tour="map-settings-toggle"
                 onClick={() => setShowSettings(true)}
                 style={{
                   width: '40px',
@@ -2627,6 +2668,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             />
           </div>
         )}
+
+        {/* First-visit tour of the history view */}
+        <OnboardingTour {...tour} />
       </div>
     </main>
   );

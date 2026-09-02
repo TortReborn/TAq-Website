@@ -39,9 +39,12 @@ export async function gotoMapFresh(page: Page): Promise<void> {
   await page.goto('/map');
   // Clear map-related persistence written by any earlier navigation, then
   // reload so the page boots from defaults (live mode, fitted viewport).
+  // The history-tour flag is re-set so the first-visit tour overlay doesn't
+  // auto-start and swallow clicks in tests (it has its own dedicated test).
   await page.evaluate(() => {
     localStorage.clear();
     sessionStorage.clear();
+    localStorage.setItem('map_history_tour_complete', 'true');
     return new Promise<void>((resolve) => {
       const req = indexedDB.deleteDatabase('map-history-cache');
       req.onsuccess = req.onerror = req.onblocked = () => resolve();

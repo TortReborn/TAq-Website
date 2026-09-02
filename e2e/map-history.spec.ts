@@ -8,6 +8,26 @@ import {
 } from './helpers';
 
 test.describe('map page — history tab', () => {
+  test('first visit to history starts the intro tour; skip dismisses and persists', async ({ page }) => {
+    await gotoMapFresh(page);
+    await waitForLiveTerritories(page);
+    // Simulate a first visit: the tour-complete flag is unset
+    await page.evaluate(() => localStorage.removeItem('map_history_tour_complete'));
+
+    await page.getByTestId('map-mode-history').click();
+    const tooltip = page.getByTestId('tour-tooltip');
+    await expect(tooltip).toContainText('Welcome to History view', { timeout: 10_000 });
+
+    // Step through to the timeline highlight, then skip out
+    await tooltip.getByRole('button', { name: 'Next' }).click();
+    await expect(tooltip).toContainText('The timeline');
+    await tooltip.getByRole('button', { name: 'Skip tour' }).click();
+    await expect(tooltip).toHaveCount(0);
+
+    // Completion is persisted — switching modes doesn't restart it
+    expect(await page.evaluate(() => localStorage.getItem('map_history_tour_complete'))).toBe('true');
+  });
+
   test('switching to history shows the timeline panel and renders territories', async ({ page }) => {
     const consoleCapture = captureConsole(page);
     await gotoMapFresh(page);
