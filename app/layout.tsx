@@ -107,17 +107,32 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     
     if (shouldShowSplash) {
       setShowSplash(true);
-      
+
       // Hide splash screen after 1000ms (1 second)
+      let fadeRaf = 0;
+      let removeTimer: ReturnType<typeof setTimeout> | undefined;
       const fadeTimer = setTimeout(() => {
-        setSplashFading(true);
-        // Actually remove after fade completes
-        setTimeout(() => {
-          setShowSplash(false);
-        }, 300);
+        // Double-rAF: don't start the fade until the browser is actually
+        // painting frames. On refresh the 1s mark often lands mid-hydration
+        // of a heavy page — flipping opacity while the main thread is busy
+        // paints no transition frames, so the splash popped off instantly
+        // instead of fading.
+        fadeRaf = requestAnimationFrame(() => {
+          fadeRaf = requestAnimationFrame(() => {
+            setSplashFading(true);
+            // Remove after the 0.3s fade, with a small buffer for jank
+            removeTimer = setTimeout(() => {
+              setShowSplash(false);
+            }, 400);
+          });
+        });
       }, 1000);
-      
-      return () => clearTimeout(fadeTimer);
+
+      return () => {
+        clearTimeout(fadeTimer);
+        cancelAnimationFrame(fadeRaf);
+        if (removeTimer) clearTimeout(removeTimer);
+      };
     }
     // If it's client-side navigation within the app, showSplash stays false
   }, []);
@@ -217,7 +232,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               alignItems: 'center',
               zIndex: 9999,
               opacity: splashFading ? 0 : 1,
-              transition: 'opacity 0.3s ease-out'
+              transition: 'opacity 0.3s ease-out',
+              // Compositor-driven fade — keeps animating even if the main
+              // thread is still busy rendering the page underneath
+              willChange: 'opacity',
+              pointerEvents: splashFading ? 'none' : 'auto'
             }}
           >
             <div style={{
