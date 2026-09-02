@@ -31,7 +31,9 @@ interface ChroniclePanelProps {
   availableGuilds: { name: string; prefix: string }[];
 }
 
-const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+// UTC so that dates entered as "2019-01-01" never display as Dec 31 in
+// negative-offset timezones
+const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const fmtDate = (iso: string | null) => (iso ? DATE_FMT.format(new Date(iso)) : 'present');
 const toDateInput = (iso: string | null) => (iso ? iso.slice(0, 10) : '');
 
@@ -261,23 +263,34 @@ function SubmitForm({
           </div>
           {label('Member guilds')}
           {alliance.memberships.map((m, i) => (
-            <div key={i} style={{ display: 'flex', gap: '0.3rem', alignItems: 'center', marginBottom: '0.3rem' }}>
-              <GuildInput value={m.guild} guilds={guilds}
-                onChange={(v) => setAlliance(a => {
-                  const ms = [...a.memberships]; ms[i] = { ...ms[i], guild: v }; return { ...a, memberships: ms };
-                })} />
-              <input type="date" title="Joined" style={{ ...inputStyle, width: '8.2rem' }} value={toDateInput(m.joinedAt)}
-                onChange={(e) => setAlliance(a => {
-                  const ms = [...a.memberships]; ms[i] = { ...ms[i], joinedAt: e.target.value }; return { ...a, memberships: ms };
-                })} />
-              <input type="date" title="Left (empty = still a member)" style={{ ...inputStyle, width: '8.2rem' }} value={toDateInput(m.leftAt)}
-                onChange={(e) => setAlliance(a => {
-                  const ms = [...a.memberships]; ms[i] = { ...ms[i], leftAt: e.target.value || null }; return { ...a, memberships: ms };
-                })} />
-              <button type="button" title="Remove" style={{ ...smallBtn, padding: '0 0.3rem' }}
-                onClick={() => setAlliance(a => ({ ...a, memberships: a.memberships.filter((_, j) => j !== i) }))}>
-                <X size={12} />
-              </button>
+            <div key={i} style={{
+              marginBottom: '0.4rem',
+              padding: '0.4rem',
+              border: '1px solid var(--border-color)',
+              borderRadius: '0.375rem',
+            }}>
+              <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '0.3rem' }}>
+                <GuildInput value={m.guild} guilds={guilds}
+                  onChange={(v) => setAlliance(a => {
+                    const ms = [...a.memberships]; ms[i] = { ...ms[i], guild: v }; return { ...a, memberships: ms };
+                  })} />
+                <button type="button" title="Remove" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
+                  onClick={() => setAlliance(a => ({ ...a, memberships: a.memberships.filter((_, j) => j !== i) }))}>
+                  <X size={12} />
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+                joined
+                <input type="date" style={{ ...inputStyle, flex: 1, minWidth: 0 }} value={toDateInput(m.joinedAt)}
+                  onChange={(e) => setAlliance(a => {
+                    const ms = [...a.memberships]; ms[i] = { ...ms[i], joinedAt: e.target.value }; return { ...a, memberships: ms };
+                  })} />
+                left
+                <input type="date" title="Empty while still a member" style={{ ...inputStyle, flex: 1, minWidth: 0 }} value={toDateInput(m.leftAt)}
+                  onChange={(e) => setAlliance(a => {
+                    const ms = [...a.memberships]; ms[i] = { ...ms[i], leftAt: e.target.value || null }; return { ...a, memberships: ms };
+                  })} />
+              </div>
             </div>
           ))}
           {alliance.memberships.length < CHRONICLE_LIMITS.membershipsMax && (

@@ -8,7 +8,8 @@ import {
   chronicleEventColor,
 } from '@/lib/chronicle';
 
-const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+// UTC keeps entered dates from displaying one day earlier in negative offsets
+const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const fmtDate = (iso: string | null) => (iso ? DATE_FMT.format(new Date(iso)) : 'present');
 
 const cardStyle: React.CSSProperties = {
