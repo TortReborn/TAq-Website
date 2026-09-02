@@ -27,7 +27,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const usesFixedBg = !(pathname === '/map' || pathname.startsWith('/map/'));
   const isMembersPage = pathname === '/members';
   const [darkMode, setDarkMode] = useState(true);
-  const [showSplash, setShowSplash] = useState(false); // Start with false
+  // Starts true so the splash is in the server-rendered HTML — a document
+  // load is (almost) always a splash case, and this way it covers the
+  // pre-hydration window where the page below is still assembling itself
+  const [showSplash, setShowSplash] = useState(true);
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -105,50 +108,52 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     
     const shouldShowSplash = isPageRefresh || isFromExternalSite || isNewVisit;
     
+    // The splash is server-rendered (visible from the first paint). Hide it
+    // as soon as the page behind it is painting frames post-hydration
+    // (double-rAF), held so it's visible at least MIN_VISIBLE_MS from page
+    // start and at most MAX_MS after hydration.
+    const MIN_VISIBLE_MS = 500;
+    const MAX_MS = 1200;
+    let fadeRaf = 0;
+    let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+    let removeTimer: ReturnType<typeof setTimeout> | undefined;
+    let maxTimer: ReturnType<typeof setTimeout> | undefined;
+    let finished = false;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      // performance.now() ≈ time since navigation start, which is when the
+      // server-rendered splash first became visible
+      const wait = shouldShowSplash ? Math.max(0, MIN_VISIBLE_MS - performance.now()) : 0;
+      fadeTimer = setTimeout(() => {
+        setSplashFading(true);
+        // Remove after the 0.3s fade, with a small buffer for jank
+        removeTimer = setTimeout(() => {
+          setShowSplash(false);
+        }, 400);
+      }, wait);
+    };
+
     if (shouldShowSplash) {
-      setShowSplash(true);
-
-      // Readiness-driven: hide as soon as the page behind the splash is
-      // painting frames (double-rAF fires post-hydration, once the browser
-      // renders again), held for at least MIN_MS so it never strobes and at
-      // most MAX_MS so a slow page can't pin the splash indefinitely.
-      const MIN_MS = 400;
-      const MAX_MS = 1200;
-      const start = performance.now();
-      let fadeRaf = 0;
-      let fadeTimer: ReturnType<typeof setTimeout> | undefined;
-      let removeTimer: ReturnType<typeof setTimeout> | undefined;
-      let maxTimer: ReturnType<typeof setTimeout> | undefined;
-      let finished = false;
-
-      const finish = () => {
-        if (finished) return;
-        finished = true;
-        const wait = Math.max(0, MIN_MS - (performance.now() - start));
-        fadeTimer = setTimeout(() => {
-          setSplashFading(true);
-          // Remove after the 0.3s fade, with a small buffer for jank
-          removeTimer = setTimeout(() => {
-            setShowSplash(false);
-          }, 400);
-        }, wait);
-      };
-
       // Double-rAF: also guards against the fade firing mid-jank and popping
       // off without painting any transition frames
       fadeRaf = requestAnimationFrame(() => {
         fadeRaf = requestAnimationFrame(finish);
       });
       maxTimer = setTimeout(finish, MAX_MS);
-
-      return () => {
-        cancelAnimationFrame(fadeRaf);
-        if (fadeTimer) clearTimeout(fadeTimer);
-        if (removeTimer) clearTimeout(removeTimer);
-        if (maxTimer) clearTimeout(maxTimer);
-      };
+    } else {
+      // Same-origin navigation that still produced a document load — drop the
+      // SSR splash right away
+      finish();
     }
-    // If it's client-side navigation within the app, showSplash stays false
+
+    return () => {
+      cancelAnimationFrame(fadeRaf);
+      if (fadeTimer) clearTimeout(fadeTimer);
+      if (removeTimer) clearTimeout(removeTimer);
+      if (maxTimer) clearTimeout(maxTimer);
+    };
   }, []);
   
   return (

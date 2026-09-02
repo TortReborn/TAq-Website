@@ -2011,6 +2011,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               height: mapDimensions.height,
               transition: isAnimating ? 'transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none',
               cursor: isDragging ? 'grabbing' : 'grab',
+              // Hidden until the client restores the cached (or fitted)
+              // transform — the SSR/pre-hydration paint would otherwise show
+              // the raw untransformed map at native scale
+              visibility: isInitialized ? 'visible' : 'hidden',
             }}
           >
             {/* Low-res placeholder (~280KB) paints the map instantly; the
