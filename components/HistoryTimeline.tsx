@@ -680,6 +680,11 @@ function HistoryTimeline({
           const bandPx = ((endPct - startPct) / 100) * Math.max(trackPx - 24, 1);
           const fits = (text: string) => bandPx >= text.length * LABEL_PX_PER_CHAR + LABEL_PAD_PX;
           const label = fits(span.name) ? span.name : span.tag && fits(span.tag) ? span.tag : null;
+          // The hitbox extends half the lane gap past the visual band on every
+          // side, so adjacent bands' hit areas touch (or slightly overlap) and
+          // hover never drops out in the gap between them. The inner div draws
+          // the band at its exact geometry.
+          const HIT = BAND_GAP / 2 + 0.5;
           return (
             <div
               key={`al-${span.id}`}
@@ -687,49 +692,54 @@ function HistoryTimeline({
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); zoomToSpan(span); }}
               onMouseEnter={() => { setHoveredSpanId(span.id); setHoverPercent(null); }}
-              onMouseLeave={() => setHoveredSpanId(null)}
+              onMouseLeave={() => setHoveredSpanId(prev => (prev === span.id ? null : prev))}
               onMouseMove={(e) => e.stopPropagation()}
               style={{
                 position: 'absolute',
                 ...(isVert
                   ? {
-                      left: `${lanePos}px`,
-                      width: `${BAND_SIZE}px`,
-                      top: percentToPaddedStart(startPct),
-                      height: percentToPaddedWidth(startPct, endPct),
+                      left: `${lanePos - HIT}px`,
+                      width: `${BAND_SIZE + 2 * HIT}px`,
+                      top: `calc(${percentToPaddedStart(startPct)} - ${HIT}px)`,
+                      height: `calc(${percentToPaddedWidth(startPct, endPct)} + ${2 * HIT}px)`,
                       minHeight: '4px',
                     }
                   : {
-                      top: `${lanePos}px`,
-                      height: `${BAND_SIZE}px`,
-                      left: percentToPaddedStart(startPct),
-                      width: percentToPaddedWidth(startPct, endPct),
+                      top: `${lanePos - HIT}px`,
+                      height: `${BAND_SIZE + 2 * HIT}px`,
+                      left: `calc(${percentToPaddedStart(startPct)} - ${HIT}px)`,
+                      width: `calc(${percentToPaddedWidth(startPct, endPct)} + ${2 * HIT}px)`,
                       minWidth: '4px',
                     }),
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                inset: `${HIT}px`,
                 background: span.color,
                 borderRadius: '3px',
                 opacity: hoveredSpanId === null ? 0.95 : hovered ? 1 : 0.45,
-                cursor: 'pointer',
-                pointerEvents: 'auto',
                 overflow: 'hidden',
-              }}
-            >
-              {label && (
-                <div style={{
-                  ...(isVert
-                    ? { writingMode: 'vertical-rl' as const, padding: '4px 0', height: '100%' }
-                    : { padding: '0 5px', lineHeight: `${BAND_SIZE}px` }),
-                  fontSize: '9px',
-                  fontWeight: 700,
-                  letterSpacing: '0.02em',
-                  color: bandTextColor(span.color),
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  userSelect: 'none',
-                }}>
-                  {label}
-                </div>
-              )}
+              }}>
+                {label && (
+                  <div style={{
+                    ...(isVert
+                      ? { writingMode: 'vertical-rl' as const, padding: '4px 0', height: '100%' }
+                      : { padding: '0 5px', lineHeight: `${BAND_SIZE}px` }),
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    color: bandTextColor(span.color),
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    userSelect: 'none',
+                  }}>
+                    {label}
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
