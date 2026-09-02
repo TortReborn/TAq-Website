@@ -181,7 +181,7 @@ export type FormState =
   | { mode: 'event'; targetId: number | null; initial: EventPayload };
 
 const EMPTY_ALLIANCE: AlliancePayload = {
-  name: '', tag: '', color: CHRONICLE_PALETTE[5], description: '',
+  name: '', tag: '', color: CHRONICLE_PALETTE[5], kind: 'war', description: '',
   memberships: [{ guild: '', joinedAt: '', leftAt: null }],
 };
 
@@ -340,6 +340,24 @@ export function SubmitForm({
                   }} />
               </div>
             </div>
+          </div>
+          {label('Type')}
+          <div style={{ display: 'flex', gap: '0.35rem' }}>
+            {(['war', 'community'] as const).map(k => (
+              <button key={k} type="button" onClick={() => setAlliance(a => ({ ...a, kind: k }))}
+                style={{
+                  ...smallBtn,
+                  background: alliance.kind === k ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+                  color: alliance.kind === k ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                  border: alliance.kind === k ? 'none' : '1px solid var(--border-color)',
+                  textTransform: 'capitalize',
+                }}>
+                {k}
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+            Only war alliances color the map; community alliances show on the timeline and in this panel only.
           </div>
           {label('Member guilds')}
           {members.map((d, i) => (
@@ -677,7 +695,7 @@ export default function ChroniclePanel({
   if (!isOpen) return null;
 
   const editAlliance = (a: ChronicleAlliance) =>
-    setForm({ mode: 'alliance', targetId: a.id, initial: { name: a.name, tag: a.tag, color: a.color, description: a.description, memberships: a.memberships.map(m => ({ ...m })) } });
+    setForm({ mode: 'alliance', targetId: a.id, initial: { name: a.name, tag: a.tag, color: a.color, kind: a.kind, description: a.description, memberships: a.memberships.map(m => ({ ...m })) } });
   const editEvent = (e: ChronicleEvent) =>
     setForm({ mode: 'event', targetId: e.id, initial: { eventType: e.eventType, title: e.title, description: e.description, startsAt: e.startsAt, endsAt: e.endsAt, guilds: [...e.guilds], alliances: [...(e.alliances ?? [])] } });
 
@@ -719,6 +737,15 @@ export default function ChroniclePanel({
         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {a.name}{a.tag ? ` [${a.tag}]` : ''}
         </span>
+        {a.kind === 'community' && (
+          <span style={{
+            fontSize: '0.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em',
+            color: 'var(--text-secondary)', border: '1px solid var(--border-color)',
+            borderRadius: '0.25rem', padding: '0.05rem 0.3rem', flexShrink: 0,
+          }}>
+            community
+          </span>
+        )}
         <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
           {showSpan
             ? allianceSpan(a)

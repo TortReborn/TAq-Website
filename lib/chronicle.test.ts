@@ -131,14 +131,14 @@ describe('multi-stint memberships', () => {
 describe('allianceColorsAt', () => {
   const alliances: ChronicleAlliance[] = [
     {
-      id: 1, name: 'Pact', tag: 'P', color: '#e53935', description: '',
+      id: 1, name: 'Pact', tag: 'P', color: '#e53935', kind: 'war', description: '',
       memberships: [
         { guild: 'A', joinedAt: '2019-01-01T00:00:00.000Z', leftAt: '2020-01-01T00:00:00.000Z' },
         { guild: 'B', joinedAt: '2019-06-01T00:00:00.000Z', leftAt: null },
       ],
     },
     {
-      id: 2, name: 'Bloc', tag: 'B', color: '#1e88e5', description: '',
+      id: 2, name: 'Bloc', tag: 'B', color: '#1e88e5', kind: 'war', description: '',
       memberships: [
         { guild: 'C', joinedAt: '2021-01-01T00:00:00.000Z', leftAt: null },
       ],
@@ -166,5 +166,34 @@ describe('allianceColorsAt', () => {
   it('activeAlliancesAt returns only alliances with a current member', () => {
     expect(activeAlliancesAt(alliances, Date.parse('2019-07-01')).map(a => a.id)).toEqual([1]);
     expect(activeAlliancesAt(alliances, Date.parse('2022-01-01')).map(a => a.id)).toEqual([1, 2]);
+  });
+
+  it('community alliances never color the map', () => {
+    const mixed: ChronicleAlliance[] = [
+      {
+        id: 3, name: 'Friends', tag: 'F', color: '#00ff00', kind: 'community', description: '',
+        memberships: [{ guild: 'X', joinedAt: '2020-01-01T00:00:00.000Z', leftAt: null }],
+      },
+      {
+        id: 4, name: 'Warband', tag: 'W', color: '#ff0000', kind: 'war', description: '',
+        memberships: [{ guild: 'X', joinedAt: '2020-01-01T00:00:00.000Z', leftAt: null }],
+      },
+    ];
+    // The war alliance's color applies; the community alliance is ignored
+    expect(allianceColorsAt(mixed, Date.parse('2020-06-01')).get('X')).toBe('#ff0000');
+    // A guild only in a community alliance gets NO chronicle color at all
+    expect(allianceColorsAt([mixed[0]], Date.parse('2020-06-01')).has('X')).toBe(false);
+  });
+
+  it('validateAlliancePayload defaults kind to war and accepts community', () => {
+    const noKind = { ...validAlliance() } as Record<string, unknown>;
+    delete noKind.kind;
+    const defaulted = validateAlliancePayload(noKind);
+    expect(defaulted.ok).toBe(true);
+    if (defaulted.ok) expect(defaulted.value.kind).toBe('war');
+    const community = validateAlliancePayload({ ...validAlliance(), kind: 'community' });
+    expect(community.ok).toBe(true);
+    if (community.ok) expect(community.value.kind).toBe('community');
+    expect(validateAlliancePayload({ ...validAlliance(), kind: 'social' }).ok).toBe(false);
   });
 });

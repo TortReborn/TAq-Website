@@ -241,7 +241,7 @@ export default function ExecChroniclePage() {
                   onClick={() => setEditForm({
                     mode: 'alliance',
                     targetId: a.id,
-                    initial: { name: a.name, tag: a.tag, color: a.color, description: a.description, memberships: a.memberships.map(m => ({ ...m })) },
+                    initial: { name: a.name, tag: a.tag, color: a.color, kind: a.kind, description: a.description, memberships: a.memberships.map(m => ({ ...m })) },
                   })}>
                   <Pencil size={12} /> Edit
                 </button>

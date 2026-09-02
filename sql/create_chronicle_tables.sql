@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS chronicle_alliances (
   id          SERIAL PRIMARY KEY,
   name        VARCHAR(60)   NOT NULL,
   tag         VARCHAR(8)    NOT NULL DEFAULT '',
-  color       VARCHAR(7)    NOT NULL,          -- palette hex, validated app-side
+  color       VARCHAR(7)    NOT NULL,          -- hex color, validated app-side
+  kind        VARCHAR(12)   NOT NULL DEFAULT 'war', -- 'war' | 'community'
   description VARCHAR(1000) NOT NULL DEFAULT '',
   created_by  VARCHAR(30)   NOT NULL,          -- discord id of original submitter
   created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW(),

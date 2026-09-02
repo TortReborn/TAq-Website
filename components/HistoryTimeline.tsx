@@ -90,6 +90,7 @@ export interface TimelineAllianceSpan {
   name: string;
   tag: string;
   color: string;
+  kind: 'war' | 'community';
   startMs: number;
   endMs: number | null; // null = still active
 }
@@ -649,6 +650,9 @@ function HistoryTimeline({
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '2px', background: span.color, flexShrink: 0 }} />
             {span.name}{span.tag ? ` [${span.tag}]` : ''}
+            {span.kind === 'community' && (
+              <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '0.68rem' }}>· community</span>
+            )}
           </div>
           <div style={{ opacity: 0.7 }}>
             {DATE_FORMAT_UTC.format(new Date(span.startMs))} – {span.endMs === null ? 'active' : DATE_FORMAT_UTC.format(new Date(span.endMs))}

@@ -23,10 +23,14 @@ export interface ChronicleMembership {
   leftAt: string | null;
 }
 
+/** War alliances drive map coloring; community alliances are social/non-war. */
+export type ChronicleAllianceKind = 'war' | 'community';
+
 export interface AlliancePayload {
   name: string;
   tag: string;
   color: string;
+  kind: ChronicleAllianceKind;
   description: string;
   memberships: ChronicleMembership[];
 }
@@ -87,6 +91,8 @@ export const CHRONICLE_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
 export const CHRONICLE_EVENT_TYPES: ChronicleEventType[] = ['war', 'treaty', 'founding', 'disband', 'other'];
 
+export const CHRONICLE_ALLIANCE_KINDS: ChronicleAllianceKind[] = ['war', 'community'];
+
 export const CHRONICLE_LIMITS = {
   nameMax: 60,
   tagMax: 8,
@@ -142,6 +148,10 @@ export function validateAlliancePayload(raw: unknown): Valid<AlliancePayload> {
   const color = typeof p.color === 'string' ? p.color.trim().toLowerCase() : '';
   if (!CHRONICLE_COLOR_RE.test(color)) return { ok: false, error: 'Color must be a hex code like #1e88e5' };
 
+  // Older payloads omit kind — default to 'war' (the original implicit meaning)
+  const kind: ChronicleAllianceKind = p.kind === 'community' ? 'community' : p.kind === 'war' || p.kind === undefined ? 'war' : 'invalid' as never;
+  if (kind !== 'war' && kind !== 'community') return { ok: false, error: "Kind must be 'war' or 'community'" };
+
   const description = cleanText(p.description, CHRONICLE_LIMITS.descriptionMax) ?? '';
 
   if (!Array.isArray(p.memberships) || p.memberships.length === 0) {
@@ -167,7 +177,7 @@ export function validateAlliancePayload(raw: unknown): Valid<AlliancePayload> {
     memberships.push({ guild, joinedAt, leftAt });
   }
 
-  return { ok: true, value: { name, tag, color, description, memberships } };
+  return { ok: true, value: { name, tag, color, kind, description, memberships } };
 }
 
 export function validateEventPayload(raw: unknown): Valid<EventPayload> {
@@ -224,13 +234,16 @@ export function validateEventPayload(raw: unknown): Valid<EventPayload> {
 // ---------------------------------------------------------------------------
 
 /**
- * Guild → alliance color at a moment in time. A guild in several alliances at
- * once (data-entry overlap) gets the first match — approvers should prevent
- * real overlaps.
+ * Guild → alliance color at a moment in time. Only WAR alliances color the
+ * map — a community alliance is not a warring bloc, so painting its members
+ * would be misleading. Community alliances still appear on the timeline and
+ * in the panel; they just never claim territory colors. Within war alliances,
+ * first match wins (approvers should prevent real overlaps).
  */
 export function allianceColorsAt(alliances: ChronicleAlliance[], tMs: number): Map<string, string> {
   const colors = new Map<string, string>();
   for (const alliance of alliances) {
+    if (alliance.kind === 'community') continue;
     for (const m of alliance.memberships) {
       if (Date.parse(m.joinedAt) <= tMs && (m.leftAt === null || Date.parse(m.leftAt) > tMs)) {
         if (!colors.has(m.guild)) colors.set(m.guild, alliance.color);
@@ -253,6 +266,7 @@ export interface AllianceTimelineSpan {
   name: string;
   tag: string;
   color: string;
+  kind: ChronicleAllianceKind;
   startMs: number;
   endMs: number | null;
 }
@@ -270,7 +284,7 @@ export function allianceTimelineSpans(alliances: ChronicleAlliance[]): AllianceT
         endMs = m.leftAt === null ? null : Math.max(endMs, Date.parse(m.leftAt));
       }
     }
-    spans.push({ id: a.id, name: a.name, tag: a.tag, color: a.color, startMs, endMs });
+    spans.push({ id: a.id, name: a.name, tag: a.tag, color: a.color, kind: a.kind, startMs, endMs });
   }
   return spans.sort((x, y) => x.startMs - y.startMs);
 }

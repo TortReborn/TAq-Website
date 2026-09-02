@@ -68,6 +68,8 @@ export async function ensureChronicleTables(pool: Pool): Promise<void> {
       ON chronicle_submissions(status);
     ALTER TABLE chronicle_events
       ADD COLUMN IF NOT EXISTS alliances JSONB NOT NULL DEFAULT '[]';
+    ALTER TABLE chronicle_alliances
+      ADD COLUMN IF NOT EXISTS kind VARCHAR(12) NOT NULL DEFAULT 'war';
   `);
   tablesReady = true;
 }
@@ -79,7 +81,7 @@ export async function ensureChronicleTables(pool: Pool): Promise<void> {
 export async function loadChronicleData(pool: Pool): Promise<{ alliances: ChronicleAlliance[]; events: ChronicleEvent[] }> {
   await ensureChronicleTables(pool);
   const [alliances, memberships, events] = await Promise.all([
-    pool.query(`SELECT id, name, tag, color, description FROM chronicle_alliances ORDER BY LOWER(name)`),
+    pool.query(`SELECT id, name, tag, color, kind, description FROM chronicle_alliances ORDER BY LOWER(name)`),
     pool.query(`SELECT alliance_id, guild_name, joined_at, left_at FROM chronicle_memberships ORDER BY joined_at`),
     pool.query(`SELECT id, event_type, title, description, starts_at, ends_at, guilds, alliances FROM chronicle_events ORDER BY starts_at`),
   ]);
@@ -91,6 +93,7 @@ export async function loadChronicleData(pool: Pool): Promise<{ alliances: Chroni
       name: row.name,
       tag: row.tag,
       color: row.color,
+      kind: row.kind === 'community' ? 'community' : 'war',
       description: row.description,
       memberships: [],
     });
@@ -198,16 +201,16 @@ async function applyAlliance(client: PoolClient, targetId: number | null, p: All
   let allianceId = targetId;
   if (allianceId === null) {
     const inserted = await client.query(
-      `INSERT INTO chronicle_alliances (name, tag, color, description, created_by)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [p.name, p.tag, p.color, p.description, by],
+      `INSERT INTO chronicle_alliances (name, tag, color, kind, description, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [p.name, p.tag, p.color, p.kind, p.description, by],
     );
     allianceId = inserted.rows[0].id;
   } else {
     await client.query(
-      `UPDATE chronicle_alliances SET name = $1, tag = $2, color = $3, description = $4, updated_at = NOW()
-       WHERE id = $5`,
-      [p.name, p.tag, p.color, p.description, allianceId],
+      `UPDATE chronicle_alliances SET name = $1, tag = $2, color = $3, kind = $4, description = $5, updated_at = NOW()
+       WHERE id = $6`,
+      [p.name, p.tag, p.color, p.kind, p.description, allianceId],
     );
     // Memberships are replaced wholesale — the payload is the full new state
     await client.query(`DELETE FROM chronicle_memberships WHERE alliance_id = $1`, [allianceId]);
@@ -270,6 +273,7 @@ export async function deleteChronicleEntity(
         name: row.name,
         tag: row.tag,
         color: row.color,
+        kind: row.kind === 'community' ? 'community' : 'war',
         description: row.description,
         memberships: members.rows.map(m => ({
           guild: m.guild_name,
