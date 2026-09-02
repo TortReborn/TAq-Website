@@ -315,7 +315,8 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   }, [showChronicle, chronicleData]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  // Minutes of history per real second (see the playback effect)
+  const [playbackSpeed, setPlaybackSpeed] = useState(10);
   const [historyBounds, setHistoryBounds] = useState<HistoryBounds | null>(null);
   const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -1516,14 +1517,15 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
     return time;
   }, [historyBounds]);
 
-  // Playback logic — stable interval, steps by time (no dependency on loaded snapshot arrays)
+  // Playback logic — stable interval, steps by time (no dependency on loaded
+  // snapshot arrays). playbackSpeed is minutes of history per real second;
+  // a fixed 100ms tick advances a tenth of that, so every tier scrubs
+  // smoothly and the label ("1 hour/s", "1 day/s") is literally true.
   useEffect(() => {
     if (!isPlaying || viewMode !== 'history') return;
 
-    const FAST_SPEED = -1;
-    const isFast = playbackSpeed === FAST_SPEED;
-    const intervalMs = isFast ? 100 : 1000 / playbackSpeed;
-    const DAY_MS = 24 * 60 * 60 * 1000;
+    const TICK_MS = 100;
+    const advanceMs = playbackSpeed * 60_000 * (TICK_MS / 1000);
 
     const tick = () => {
       const currentTs = historyTimestampRef.current;
@@ -1531,32 +1533,19 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
 
       const latestMs = new Date(historyBounds.latest).getTime();
 
-      if (isFast) {
-        // Fast mode: jump forward 1 day per tick, skipping gaps
-        let nextTime = new Date(currentTs.getTime() + DAY_MS);
-        nextTime = skipGapForward(nextTime);
-        if (nextTime.getTime() > latestMs) {
-          setHistoryTimestamp(new Date(latestMs));
-          setIsPlaying(false);
-          return;
-        }
-        setHistoryTimestamp(nextTime);
-        // Ensure events are loaded around this time
-        loadEventsRef.current(nextTime);
-      } else {
-        // Normal: step forward 10 minutes, skipping gaps
-        let nextTime = new Date(currentTs.getTime() + STEP_MS);
-        nextTime = skipGapForward(nextTime);
-        if (nextTime.getTime() > latestMs) {
-          setHistoryTimestamp(new Date(latestMs));
-          setIsPlaying(false);
-          return;
-        }
-        setHistoryTimestamp(nextTime);
+      let nextTime = new Date(currentTs.getTime() + advanceMs);
+      nextTime = skipGapForward(nextTime);
+      if (nextTime.getTime() > latestMs) {
+        setHistoryTimestamp(new Date(latestMs));
+        setIsPlaying(false);
+        return;
       }
+      setHistoryTimestamp(nextTime);
+      // Ensure events are loaded around this time (cheap when covered)
+      loadEventsRef.current(nextTime);
     };
 
-    playbackIntervalRef.current = setInterval(tick, intervalMs);
+    playbackIntervalRef.current = setInterval(tick, TICK_MS);
 
     return () => {
       if (playbackIntervalRef.current) {

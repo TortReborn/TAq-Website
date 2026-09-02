@@ -27,7 +27,7 @@ const MAP_TOUR_STEPS: TourStep[] = [
     id: 'chronicle',
     target: 'chronicle-toggle',
     title: 'Chronicle',
-    description: 'Community-maintained history: alliances and events like wars. Toggle it to tint territories by the alliances that existed at the shown moment and to see event markers on the timeline. You can propose new entries or edits — an exec reviews them before they appear.',
+    description: 'Community-maintained history: alliances and events like wars. Toggle it to tint territories by the alliances that existed at the shown moment and to see event markers on the timeline. You can propose new entries or edits — an admin reviews them before they appear.',
     position: 'bottom',
   },
   {

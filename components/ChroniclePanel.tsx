@@ -276,7 +276,7 @@ export function SubmitForm({
         <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
           {direct
             ? 'The change is live on the map.'
-            : 'An exec will approve or reject it — approved entries appear on the map.'}
+            : 'An admin will approve or reject it — approved entries appear on the map.'}
         </div>
         <button type="button" style={{ ...smallBtn, marginTop: '0.75rem' }} onClick={onDone}>Done</button>
       </div>
@@ -914,7 +914,7 @@ export default function ChroniclePanel({
                     <Plus size={12} /> Event
                   </button>
                   <span style={{ fontSize: '0.66rem', color: 'var(--text-secondary)', alignSelf: 'center' }}>
-                    Reviewed by execs before appearing
+                    Reviewed by admins before appearing
                   </span>
                 </div>
               ) : (

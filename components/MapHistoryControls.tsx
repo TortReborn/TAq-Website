@@ -49,13 +49,28 @@ interface MapHistoryControlsProps {
   allianceSpans?: TimelineAllianceSpan[]; // Chronicle alliance lifetime bands
 }
 
-const SPEED_OPTIONS = [1, 2, 10, 50];
-const FAST_SPEED = -1;
-const ALL_SPEED_OPTIONS = [...SPEED_OPTIONS, FAST_SPEED];
+// Playback speeds: minutes of history per real second. Labels state the
+// literal rate so each tier is meaningful at a glance. The top tier matches
+// the old "Fast" mode (1 day per 100ms tick = 10 days/s).
+const SPEED_OPTIONS = [10, 30, 60, 360, 1440, 14400];
+const ALL_SPEED_OPTIONS = SPEED_OPTIONS;
 
 function speedLabel(s: number): string {
-  return s === FAST_SPEED ? 'Fast' : `${s}x`;
+  if (s < 60) return `${s} min/s`;
+  if (s < 1440) return `${s / 60} hr/s`;
+  const days = s / 1440;
+  return days === 1 ? '1 day/s' : `${days} days/s`;
 }
+
+// Visible grabber pill shown inside each edge-resize hitbox
+const resizePillStyle: React.CSSProperties = {
+  width: '5px',
+  height: '36px',
+  borderRadius: '999px',
+  background: 'var(--border-color)',
+  border: '1px solid var(--bg-card-solid)',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+};
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 1800;
 // Wide enough for the 10rem control rows next to the slider column — at 248
@@ -945,33 +960,44 @@ function MapHistoryControls({
     >
       {isVertical ? (
         <>
-          {/* Vertical resize handles (top/bottom) */}
+          {/* Vertical resize handles (top/bottom) — same visible-pill +
+              extended-hitbox treatment as the horizontal edges */}
           <div
             onMouseDown={handleResizeMouseDown('top')}
             style={{
               position: 'absolute',
-              top: 0,
+              top: '-10px',
               left: 0,
               right: 0,
-              height: '8px',
+              height: '20px',
               cursor: 'ns-resize',
               background: 'transparent',
               zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            <div style={{ ...resizePillStyle, width: '36px', height: '5px' }} />
+          </div>
           <div
             onMouseDown={handleResizeMouseDown('bottom')}
             style={{
               position: 'absolute',
-              bottom: 0,
+              bottom: '-10px',
               left: 0,
               right: 0,
-              height: '8px',
+              height: '20px',
               cursor: 'ns-resize',
               background: 'transparent',
               zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            <div style={{ ...resizePillStyle, width: '36px', height: '5px' }} />
+          </div>
 
           {topRightControls}
 
@@ -1232,32 +1258,47 @@ function MapHistoryControls({
       ) : (
         /* ── Horizontal: resize handles, timeline, controls ─────────── */
         <>
+          {/* Left/right resize: a visible pill straddling each edge, with a
+              hitbox that extends well outside the panel (the old invisible
+              8px inner strip was too narrow to find) */}
           <div
+            data-testid="timeline-resize-left"
             onMouseDown={handleResizeMouseDown('left')}
             style={{
               position: 'absolute',
-              left: 0,
+              left: '-14px',
               top: 0,
               bottom: 0,
-              width: '8px',
+              width: '28px',
               cursor: 'ew-resize',
               background: 'transparent',
               zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            <div style={resizePillStyle} />
+          </div>
           <div
+            data-testid="timeline-resize-right"
             onMouseDown={handleResizeMouseDown('right')}
             style={{
               position: 'absolute',
-              right: 0,
+              right: '-14px',
               top: 0,
               bottom: 0,
-              width: '8px',
+              width: '28px',
               cursor: 'ew-resize',
               background: 'transparent',
               zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            <div style={resizePillStyle} />
+          </div>
 
           {topRightControls}
 
