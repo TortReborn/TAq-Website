@@ -22,6 +22,13 @@ test.describe('map page — chronicle layer', () => {
     expect(res.status()).toBe(401);
   });
 
+  test('direct admin edits are exec-gated', async ({ page }) => {
+    const res = await page.request.post('/api/chronicle/admin', {
+      data: { kind: 'event', targetId: null, payload: {}, note: '' },
+    });
+    expect(res.status()).toBe(401);
+  });
+
   test('toggle opens the panel with the sign-in hint for anonymous visitors', async ({ page }) => {
     const consoleCapture = captureConsole(page);
     await gotoMapFresh(page);

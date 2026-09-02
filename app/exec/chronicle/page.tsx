@@ -1,13 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from 'react';
+import { Pencil } from 'lucide-react';
 import {
   AlliancePayload,
+  ChronicleAlliance,
+  ChronicleEvent,
   ChronicleSubmission,
   EventPayload,
   chronicleEventColor,
   eventTypeLabel,
 } from '@/lib/chronicle';
+import { SubmitForm, FormState } from '@/components/ChroniclePanel';
 
 // UTC keeps entered dates from displaying one day earlier in negative offsets
 const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -82,6 +86,10 @@ export default function ExecChroniclePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+  // Published entries, editable directly by execs
+  const [published, setPublished] = useState<{ alliances: ChronicleAlliance[]; events: ChronicleEvent[] }>({ alliances: [], events: [] });
+  const [guilds, setGuilds] = useState<{ name: string; prefix: string }[]>([]);
+  const [editForm, setEditForm] = useState<FormState>({ mode: 'closed' });
 
   const load = useCallback(async () => {
     try {
@@ -101,7 +109,28 @@ export default function ExecChroniclePage() {
     }
   }, []);
 
+  const loadPublished = useCallback(async () => {
+    try {
+      const res = await fetch('/api/chronicle', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setPublished({ alliances: data.alliances ?? [], events: data.events ?? [] });
+      }
+    } catch { /* section stays empty */ }
+  }, []);
+
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadPublished(); }, [loadPublished]);
+  useEffect(() => {
+    fetch('/api/guilds/list')
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data?.guilds) {
+          setGuilds(data.guilds.map((name: string, i: number) => ({ name, prefix: data.prefixes[i] || '' })));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const decide = async (id: number, approve: boolean) => {
     const note = approve ? '' : (window.prompt('Reason for rejection (optional):') ?? '');
@@ -147,6 +176,83 @@ export default function ExecChroniclePage() {
       </p>
 
       <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
+        Published entries
+      </h2>
+      <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+        Direct edits publish immediately — no review step. They still appear in the decision log.
+      </p>
+      {editForm.mode !== 'closed' ? (
+        <div style={{ ...cardStyle, maxWidth: '440px' }}>
+          <SubmitForm
+            form={editForm}
+            guilds={guilds}
+            allianceNames={published.alliances.map(a => a.name)}
+            direct
+            onDone={() => { setEditForm({ mode: 'closed' }); loadPublished(); load(); }}
+            onCancel={() => setEditForm({ mode: 'closed' })}
+          />
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ ...cardStyle, flex: '1 1 320px', marginBottom: 0 }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: '0.5rem' }}>
+              Alliances ({published.alliances.length})
+            </div>
+            {published.alliances.length === 0 && (
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>None published yet.</div>
+            )}
+            {published.alliances.map(a => (
+              <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0', fontSize: '0.82rem' }}>
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: a.color, flexShrink: 0 }} />
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{a.name}</span>
+                {a.tag && <span style={{ color: 'var(--text-secondary)' }}>[{a.tag}]</span>}
+                <span style={{ color: 'var(--text-secondary)', marginLeft: 'auto' }}>
+                  {new Set(a.memberships.map(m => m.guild)).size} guilds
+                </span>
+                <button type="button" title="Edit directly" style={{ ...btnStyle('plain'), height: '26px', padding: '0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                  onClick={() => setEditForm({
+                    mode: 'alliance',
+                    targetId: a.id,
+                    initial: { name: a.name, tag: a.tag, color: a.color, description: a.description, memberships: a.memberships.map(m => ({ ...m })) },
+                  })}>
+                  <Pencil size={12} /> Edit
+                </button>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...cardStyle, flex: '1 1 320px', marginBottom: 0 }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: '0.5rem' }}>
+              Events ({published.events.length})
+            </div>
+            {published.events.length === 0 && (
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>None published yet.</div>
+            )}
+            {published.events.map(e => (
+              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0', fontSize: '0.82rem' }}>
+                <span style={{ color: chronicleEventColor(e.eventType), fontWeight: 700, flexShrink: 0 }}>{eventTypeLabel(e.eventType)}</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{e.title}</span>
+                <span style={{ color: 'var(--text-secondary)', marginLeft: 'auto', whiteSpace: 'nowrap' }}>
+                  {fmtDate(e.startsAt)}{e.endsAt ? ` → ${fmtDate(e.endsAt)}` : ''}
+                </span>
+                <button type="button" title="Edit directly" style={{ ...btnStyle('plain'), height: '26px', padding: '0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                  onClick={() => setEditForm({
+                    mode: 'event',
+                    targetId: e.id,
+                    initial: {
+                      eventType: e.eventType, title: e.title, description: e.description,
+                      startsAt: e.startsAt, endsAt: e.endsAt,
+                      guilds: [...e.guilds], alliances: [...(e.alliances ?? [])],
+                    },
+                  })}>
+                  <Pencil size={12} /> Edit
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', margin: '2rem 0 0.75rem' }}>
         Pending ({pending.length})
       </h2>
       {pending.length === 0 && (

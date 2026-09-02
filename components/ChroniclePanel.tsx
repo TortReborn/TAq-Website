@@ -151,7 +151,7 @@ function GuildInput({
 // Submission form
 // ---------------------------------------------------------------------------
 
-type FormState =
+export type FormState =
   | { mode: 'closed' }
   | { mode: 'alliance'; targetId: number | null; initial: AlliancePayload }
   | { mode: 'event'; targetId: number | null; initial: EventPayload };
@@ -183,12 +183,13 @@ const EMPTY_EVENT: EventPayload = {
   eventType: 'war', title: '', description: '', startsAt: '', endsAt: null, guilds: [], alliances: [],
 };
 
-function SubmitForm({
+export function SubmitForm({
   form,
   guilds,
   allianceNames,
   onDone,
   onCancel,
+  direct = false,
 }: {
   form: Exclude<FormState, { mode: 'closed' }>;
   guilds: { name: string; prefix: string }[];
@@ -196,6 +197,8 @@ function SubmitForm({
   allianceNames: string[];
   onDone: () => void;
   onCancel: () => void;
+  /** Exec direct-edit mode: publishes immediately instead of queueing for review */
+  direct?: boolean;
 }) {
   const isAlliance = form.mode === 'alliance';
   const [alliance, setAlliance] = useState<AlliancePayload>(
@@ -224,7 +227,7 @@ function SubmitForm({
 
     setBusy(true);
     try {
-      const res = await fetch('/api/chronicle/submit', {
+      const res = await fetch(direct ? '/api/chronicle/admin' : '/api/chronicle/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind: form.mode, targetId: form.targetId, payload: validated.value, note }),
@@ -244,10 +247,12 @@ function SubmitForm({
       <div style={{ textAlign: 'center', padding: '1rem 0' }}>
         <Check size={22} style={{ color: 'var(--accent-primary)' }} />
         <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', marginTop: '0.4rem' }}>
-          Submitted for review
+          {direct ? 'Published' : 'Submitted for review'}
         </div>
         <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-          An exec will approve or reject it — approved entries appear on the map.
+          {direct
+            ? 'The change is live on the map.'
+            : 'An exec will approve or reject it — approved entries appear on the map.'}
         </div>
         <button type="button" style={{ ...smallBtn, marginTop: '0.75rem' }} onClick={onDone}>Done</button>
       </div>
@@ -263,7 +268,9 @@ function SubmitForm({
   return (
     <div>
       <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-        {form.targetId !== null ? 'Suggest an edit' : isAlliance ? 'Suggest an alliance' : 'Suggest an event'}
+        {direct
+          ? (form.targetId !== null ? `Edit ${form.mode}` : `New ${form.mode}`)
+          : form.targetId !== null ? 'Suggest an edit' : isAlliance ? 'Suggest an alliance' : 'Suggest an event'}
       </div>
 
       {isAlliance ? (
@@ -470,7 +477,7 @@ function SubmitForm({
         </>
       )}
 
-      {label('Note to reviewers (optional)')}
+      {label(direct ? 'Audit note (optional)' : 'Note to reviewers (optional)')}
       <input style={inputStyle} value={note} maxLength={CHRONICLE_LIMITS.noteMax}
         placeholder="sources, reasoning…" onChange={(e) => setNote(e.target.value)} />
 
@@ -481,7 +488,7 @@ function SubmitForm({
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
         <button type="button" disabled={busy} onClick={submit}
           style={{ ...smallBtn, background: 'var(--accent-primary)', color: 'var(--text-on-accent)', border: 'none', opacity: busy ? 0.6 : 1 }}>
-          {busy ? 'Submitting…' : 'Submit for review'}
+          {busy ? (direct ? 'Publishing…' : 'Submitting…') : direct ? 'Publish' : 'Submit for review'}
         </button>
         <button type="button" style={smallBtn} onClick={onCancel}>Cancel</button>
       </div>
