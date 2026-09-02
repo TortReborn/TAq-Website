@@ -8,9 +8,11 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const data = await loadChronicleData(getPool());
+    // max-age=0 so browsers always revalidate — exec edits and deletions must
+    // not linger client-side. The CDN edge may still serve up to 30s stale.
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 'public, max-age=60, s-maxage=60',
+        'Cache-Control': 'public, max-age=0, s-maxage=30',
       },
     });
   } catch (error) {

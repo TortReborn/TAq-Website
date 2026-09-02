@@ -258,9 +258,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const seasons = useSeasons(true);
   const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
 
-  // Fetch chronicle data the first time the layer is opened
+  // (Re)fetch chronicle data each time the layer is opened, so exec edits and
+  // deletions show up without a page reload; existing data stays while loading
   useEffect(() => {
-    if (!showChronicle || chronicleData) return;
+    if (!showChronicle) return;
     let cancelled = false;
     timedFetch('static', '/api/chronicle')
       .then((res) => (res.ok ? res.json() : null))
@@ -269,7 +270,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       })
       .catch((error) => mapError('static', 'Failed to load chronicle data', error));
     return () => { cancelled = true; };
-  }, [showChronicle, chronicleData]);
+  }, [showChronicle]);
 
   // The moment the chronicle should describe: the history cursor, or "now" live
   const chronicleTimeMs = useMemo(() => {

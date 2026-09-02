@@ -118,7 +118,9 @@ export default function ExecChroniclePage() {
 
   const loadPublished = useCallback(async () => {
     try {
-      const res = await fetch('/api/chronicle', { cache: 'no-store' });
+      // Timestamp param busts the CDN edge cache too, not just the browser's —
+      // this page must reflect a direct edit or delete immediately
+      const res = await fetch(`/api/chronicle?_=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setPublished({ alliances: data.alliances ?? [], events: data.events ?? [] });
