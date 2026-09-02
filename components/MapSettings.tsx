@@ -151,6 +151,7 @@ export default function MapSettings({
         pointerEvents: "auto",
         position: "relative",
       }}
+      data-map-ui=""
       onWheel={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
       onMouseMove={(e) => e.stopPropagation()}

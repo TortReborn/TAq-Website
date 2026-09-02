@@ -340,6 +340,7 @@ export default function ConflictFinder({
         flexDirection: "column",
         zIndex: 20,
       }}
+      data-map-ui=""
       onWheel={stopPropagation}
       onMouseDown={stopPropagation}
       onMouseMove={stopPropagation}

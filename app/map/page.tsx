@@ -1698,8 +1698,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     const el = containerRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
-      // Only handle wheel events if they're not from the guild territory panel
-      if (!e.target || !(e.target as Element).closest('.guild-territory-count')) {
+      // Skip wheel events from map UI panels (chronicle, factions, settings,
+      // territory leaders…): this native listener runs during the real bubble
+      // phase, before any React-level stopPropagation, and its preventDefault
+      // would kill the panel's own wheel scrolling.
+      if (!e.target || !(e.target as Element).closest('.guild-territory-count, [data-map-ui]')) {
         cancelAnimation();
         handleWheel(e);
       }

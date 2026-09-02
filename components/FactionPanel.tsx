@@ -302,6 +302,7 @@ export default function FactionPanel({
         flexDirection: "column",
         zIndex: 20,
       }}
+      data-map-ui=""
       onWheel={stopPropagation}
       onMouseDown={stopPropagation}
       onMouseMove={stopPropagation}

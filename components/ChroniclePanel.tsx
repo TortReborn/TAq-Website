@@ -615,6 +615,7 @@ export default function ChroniclePanel({
     <div
       ref={panelRef}
       data-testid="chronicle-panel"
+      data-map-ui=""
       onMouseDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
       style={{
