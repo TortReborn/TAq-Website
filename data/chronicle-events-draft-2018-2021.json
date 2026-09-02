@@ -1,0 +1,340 @@
+{
+  "$comment": "DRAFT chronicle events, 2018-2021, from the community Timeline document with dates refined by territory_exchanges analysis (see chronicle-alliances-draft-2018-2021.json for methodology). Each `payload` conforms to EventPayload (lib/chronicle.ts). Alliance names must match approved chronicle_alliances rows.",
+  "generated": "2026-09-02",
+  "events": [
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Coalition Civil War",
+        "description": "On 17 Feb 2018 HackForums, Paladins United, House of Sentinels, Emorians and Kangronomicon left The 1st Coalition, formed Alliance Alliance with Fantasy and Necronomicon, and declared war on their former alliance. The war ended on 20 Mar 2018 when The Federation took control of the map.",
+        "startsAt": "2018-02-17",
+        "endsAt": "2018-03-20",
+        "guilds": [],
+        "alliances": [
+          "Coalition",
+          "Alliance Alliance"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Fantasy turns on The Federation",
+        "description": "Fantasy left the dominant Federation in late May 2018 and fought it across the map all summer — over 220 territories were exchanged with the bloc before Fantasy rejoined on 29 Oct 2018. Departure date is map-inferred: off-FFA fighting jumps to sustained war levels in the week of 28 May.",
+        "startsAt": "2018-05-28",
+        "endsAt": "2018-10-29",
+        "guilds": [
+          "Fantasy"
+        ],
+        "alliances": [
+          "Federation"
+        ]
+      },
+      "notes": [
+        "Dates map-inferred; the document only records the 29 Oct rejoin."
+      ]
+    },
+    {
+      "payload": {
+        "eventType": "disband",
+        "title": "The Federation dies",
+        "description": "The alliance that had dominated 2018 collapsed at the start of November. The document dates it only to '?? Nov'; the map pins it — several separate wars between member guilds all ignite on 1 Nov 2018, and the fighting spreads across Corkus in the following weeks.",
+        "startsAt": "2018-11-01",
+        "endsAt": null,
+        "guilds": [],
+        "alliances": [
+          "Federation"
+        ]
+      },
+      "notes": [
+        "Date map-inferred from the simultaneous outbreak of intra-bloc wars."
+      ]
+    },
+    {
+      "payload": {
+        "eventType": "founding",
+        "title": "Luna is formed",
+        "description": "Formed on 14 Feb 2019 to counter SOL, by Imperial, Emorians, Blacklisted, BuildCraftia and others. Contrary to some retellings, exchange data shows Kingdom Foxes was not a founding member — Luna was at war with Fox from its second day.",
+        "startsAt": "2019-02-14",
+        "endsAt": null,
+        "guilds": [],
+        "alliances": [
+          "Luna"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Luna's war on Kingdom Foxes",
+        "description": "Luna fought Kingdom Foxes across 300+ territories from 15 Feb 2019 (Imperial alone attacked Fox 660 times). The war ended when Fox joined Luna on 8 Jul 2019 — the day after the Treaty of Ternaves.",
+        "startsAt": "2019-02-15",
+        "endsAt": "2019-07-08",
+        "guilds": [
+          "Kingdom Foxes"
+        ],
+        "alliances": [
+          "Luna"
+        ]
+      },
+      "notes": [
+        "War attested by exchange data; the document never names it."
+      ]
+    },
+    {
+      "payload": {
+        "eventType": "treaty",
+        "title": "Treaty of Rodoroc",
+        "description": "Peace treaty between Kingdom Foxes and DiamondDeities, signed earlier and taking effect on 2 Mar 2019.",
+        "startsAt": "2019-03-02",
+        "endsAt": null,
+        "guilds": [
+          "Kingdom Foxes",
+          "DiamondDeities"
+        ],
+        "alliances": []
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "treaty",
+        "title": "Treaty of Ternaves",
+        "description": "Signed 6 Jul 2019 by Kingdom Foxes, The Simple Ones and ThisIsMurica, splitting the territory of the dissolved Celestial Tigers.",
+        "startsAt": "2019-07-06",
+        "endsAt": null,
+        "guilds": [
+          "Kingdom Foxes",
+          "The Simple Ones",
+          "ThisIsMurica"
+        ],
+        "alliances": []
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "other",
+        "title": "Luna gains full map control",
+        "description": "After fending off an attack on Kingdom Foxes, Luna wiped every guild but Avicia; Avicia joined on 17 Jul 2019 and Luna held the entire map.",
+        "startsAt": "2019-07-17",
+        "endsAt": null,
+        "guilds": [
+          "Avicia"
+        ],
+        "alliances": [
+          "Luna"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Emorians and Avicia revolt",
+        "description": "On 29 Aug 2019, after a leadership dispute, Emorians and Avicia left Luna and declared war on Imperial — spiralling into a large war over Gavel. ThisIsMurica was kicked from Luna the next day for sending fighters, and Terra formed in the chaos.",
+        "startsAt": "2019-08-29",
+        "endsAt": "2019-09-19",
+        "guilds": [
+          "Emorians",
+          "Avicia",
+          "Imperial",
+          "ThisIsMurica"
+        ],
+        "alliances": [
+          "Luna"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Luna-Terra war",
+        "description": "The war for the map, 7-19 Sep 2019. The Simple Ones defected from Luna to Terra on 8 Sep and Terra took map control the same day; Kingdom Foxes left on the 18th and Luna collapsed. Over 2,000 exchanges across 322 territories in ten days.",
+        "startsAt": "2019-09-07",
+        "endsAt": "2019-09-19",
+        "guilds": [
+          "The Simple Ones",
+          "Kingdom Foxes"
+        ],
+        "alliances": [
+          "Luna",
+          "Terra"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "founding",
+        "title": "Council of Canyon Kingdoms formed",
+        "description": "The CCK/CoCK formed on 15 Sep 2019 out of the victorious Terra bloc: Kingdom Foxes, DiamondDeities, Titans Valor, The Simple Ones, Fantasy, Phantom Hearts and Empire of Sindria.",
+        "startsAt": "2019-09-15",
+        "endsAt": null,
+        "guilds": [],
+        "alliances": [
+          "Council of Canyon Kingdoms",
+          "Terra"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "disband",
+        "title": "CoCK collapses",
+        "description": "The Council of Canyon Kingdoms collapsed on 23 Nov 2019 after The Ascendancy bloc departed, two days after Titans Valor and DiamondDeities left.",
+        "startsAt": "2019-11-23",
+        "endsAt": null,
+        "guilds": [],
+        "alliances": [
+          "Council of Canyon Kingdoms"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "disband",
+        "title": "DiamondDeities disbanded",
+        "description": "Nitrogen2Oxygen dissolved DiamondDeities on 8 Jan 2020, taking Horologium down with it; most remaining members regrouped as Lux Nova the next day.",
+        "startsAt": "2020-01-08",
+        "endsAt": null,
+        "guilds": [
+          "DiamondDeities",
+          "Lux Nova"
+        ],
+        "alliances": [
+          "Horologium"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Goose-Artemis war",
+        "description": "The defining conflict of 2020: the Goose bloc against Artemis, fought across 370+ territories. Already running by 1 Mar 2020 (the earliest the map analysis looked) and ending only when both alliances collapsed on 11 May 2021.",
+        "startsAt": "2020-03-01",
+        "endsAt": "2021-05-11",
+        "guilds": [],
+        "alliances": [
+          "Goose",
+          "Artemis"
+        ]
+      },
+      "notes": [
+        "Start date is a map-analysis window boundary — the war may predate it."
+      ]
+    },
+    {
+      "payload": {
+        "eventType": "treaty",
+        "title": "Profession Heaven neutrality",
+        "description": "On 25 Jan 2021 Profession Heaven was granted neutral status, protected by both Goose and Artemis, and given Silent Expanse territory as a public profession-XP guild. Its first territory exchange is that same day.",
+        "startsAt": "2021-01-25",
+        "endsAt": null,
+        "guilds": [
+          "Profession Heaven"
+        ],
+        "alliances": [
+          "Goose",
+          "Artemis"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "other",
+        "title": "The Great Collapse",
+        "description": "On 11 May 2021 Goose and Artemis both collapsed on the same day. Thirteen guilds — including The Aquarium — formed Valhalla, while nine formed Khaos; Valhalla took map control from Goose's remnants within days.",
+        "startsAt": "2021-05-11",
+        "endsAt": null,
+        "guilds": [
+          "The Aquarium"
+        ],
+        "alliances": [
+          "Goose",
+          "Artemis",
+          "Valhalla",
+          "Khaos"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "Valhalla-Khaos war",
+        "description": "Begun the day both blocs formed, 11 May 2021, and still running when the historical record goes quiet — exchange data shows sustained fighting (roughly a thousand exchanges a week at its peaks) continuing into spring 2022, with Vanir inheriting Valhalla's side mid-war.",
+        "startsAt": "2021-05-11",
+        "endsAt": "2022-03-31",
+        "guilds": [],
+        "alliances": [
+          "Valhalla",
+          "Khaos",
+          "Vanir"
+        ]
+      },
+      "notes": [
+        "End date is the boundary of the map-data window examined, not a documented peace."
+      ]
+    },
+    {
+      "payload": {
+        "eventType": "treaty",
+        "title": "Treaty of Damask",
+        "description": "Signed 21 May 2021 by Nefarious Ravens and The Simple Ones; Nefarious Ravens declared independence.",
+        "startsAt": "2021-05-21",
+        "endsAt": null,
+        "guilds": [
+          "Nefarious Ravens",
+          "The Simple Ones"
+        ],
+        "alliances": []
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "founding",
+        "title": "Vanir is formed",
+        "description": "On 28 Nov 2021 ten Valhalla guilds — including The Aquarium — reorganized as Vanir. Guardian of Wynn and Nefarious Ravens were invited on 1 Dec.",
+        "startsAt": "2021-11-28",
+        "endsAt": null,
+        "guilds": [
+          "The Aquarium"
+        ],
+        "alliances": [
+          "Valhalla",
+          "Vanir"
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "eventType": "disband",
+        "title": "Vanir collapses",
+        "description": "On 18 Dec 2021 Emorians, Nefarious Ravens, IceBlue Team and Avicia left Vanir and the alliance collapsed, twenty days after forming. Niflheim officially dissolved the same day.",
+        "startsAt": "2021-12-18",
+        "endsAt": null,
+        "guilds": [
+          "Emorians",
+          "Nefarious Ravens",
+          "IceBlue Team",
+          "Avicia"
+        ],
+        "alliances": [
+          "Vanir",
+          "Niflheim"
+        ]
+      },
+      "notes": []
+    }
+  ]
+}

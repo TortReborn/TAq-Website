@@ -76,11 +76,14 @@ export interface ChronicleSubmission {
 // Constants
 // ---------------------------------------------------------------------------
 
-/** Colors are chosen from this palette — never arbitrary user CSS. */
+/** Suggested colors — any #rrggbb hex is accepted, these are just the quick picks. */
 export const CHRONICLE_PALETTE = [
   '#e53935', '#fb8c00', '#fdd835', '#43a047', '#00acc1', '#1e88e5',
   '#5e35b1', '#d81b60', '#8d6e63', '#00897b', '#7cb342', '#f4511e',
 ] as const;
+
+/** Colors are constrained to 6-digit hex — never arbitrary CSS (no names, functions, or shorthand). */
+export const CHRONICLE_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
 export const CHRONICLE_EVENT_TYPES: ChronicleEventType[] = ['war', 'treaty', 'founding', 'disband', 'other'];
 
@@ -136,8 +139,8 @@ export function validateAlliancePayload(raw: unknown): Valid<AlliancePayload> {
   const tag = cleanText(p.tag, CHRONICLE_LIMITS.tagMax) ?? '';
   if (tag && !/^[A-Za-z0-9]{2,8}$/.test(tag)) return { ok: false, error: 'Tag must be 2–8 letters/digits' };
 
-  const color = typeof p.color === 'string' ? p.color : '';
-  if (!(CHRONICLE_PALETTE as readonly string[]).includes(color)) return { ok: false, error: 'Color must come from the palette' };
+  const color = typeof p.color === 'string' ? p.color.trim().toLowerCase() : '';
+  if (!CHRONICLE_COLOR_RE.test(color)) return { ok: false, error: 'Color must be a hex code like #1e88e5' };
 
   const description = cleanText(p.description, CHRONICLE_LIMITS.descriptionMax) ?? '';
 
@@ -242,6 +245,34 @@ export function activeAlliancesAt(alliances: ChronicleAlliance[], tMs: number): 
   return alliances.filter(a =>
     a.memberships.some(m => Date.parse(m.joinedAt) <= tMs && (m.leftAt === null || Date.parse(m.leftAt) > tMs))
   );
+}
+
+/** An alliance's lifetime as one span: first join → last leave (null = still active). */
+export interface AllianceTimelineSpan {
+  id: number;
+  name: string;
+  tag: string;
+  color: string;
+  startMs: number;
+  endMs: number | null;
+}
+
+/** Collapse each alliance's memberships into a single timeline span, sorted by start. */
+export function allianceTimelineSpans(alliances: ChronicleAlliance[]): AllianceTimelineSpan[] {
+  const spans: AllianceTimelineSpan[] = [];
+  for (const a of alliances) {
+    if (a.memberships.length === 0) continue;
+    let startMs = Infinity;
+    let endMs: number | null = -Infinity;
+    for (const m of a.memberships) {
+      startMs = Math.min(startMs, Date.parse(m.joinedAt));
+      if (endMs !== null) {
+        endMs = m.leftAt === null ? null : Math.max(endMs, Date.parse(m.leftAt));
+      }
+    }
+    spans.push({ id: a.id, name: a.name, tag: a.tag, color: a.color, startMs, endMs });
+  }
+  return spans.sort((x, y) => x.startMs - y.startMs);
 }
 
 /** Display label for an event type ("war" → "War") */

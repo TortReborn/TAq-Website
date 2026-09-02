@@ -20,6 +20,15 @@ const DATE_TIME_FORMAT = new Intl.DateTimeFormat(undefined, {
   minute: '2-digit',
 });
 
+// Chronicle dates are UTC midnights — format them in UTC so they don't
+// display one day early in western timezones.
+const DATE_FORMAT_UTC = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
 // Format date for display
 const formatDate = (date: Date) => DATE_FORMAT.format(date);
 const formatDateTime = (date: Date) => DATE_TIME_FORMAT.format(date);
@@ -65,6 +74,16 @@ export interface TimelineEventMarker {
   endMs: number | null;
 }
 
+/** Chronicle alliance lifetime surfaced as a colored band over the track */
+export interface TimelineAllianceSpan {
+  id: number;
+  name: string;
+  tag: string;
+  color: string;
+  startMs: number;
+  endMs: number | null; // null = still active
+}
+
 interface HistoryTimelineProps {
   earliest: Date;
   latest: Date;
@@ -80,6 +99,8 @@ interface HistoryTimelineProps {
   onSeasonZoomChange?: (zoom: SeasonZoom | null) => void;
   /** Chronicle events — markers on the track, click jumps to the event start */
   eventMarkers?: TimelineEventMarker[];
+  /** Chronicle alliances — stacked lifetime bands beside the track, hover names them */
+  allianceSpans?: TimelineAllianceSpan[];
 }
 
 function HistoryTimeline({
@@ -94,12 +115,14 @@ function HistoryTimeline({
   seasonZoom: seasonZoomProp,
   onSeasonZoomChange,
   eventMarkers,
+  allianceSpans,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
   const [hoverPos, setHoverPos] = useState(0); // X position (horizontal) or Y position (vertical)
   const [hoveredEventId, setHoveredEventId] = useState<number | null>(null); // event marker under the cursor
+  const [hoveredSpanId, setHoveredSpanId] = useState<number | null>(null); // alliance band under the cursor
 
   // Season zoom: when set, the timeline is scoped to a single season/off-season period.
   // The effective range is the intersection of that period with the available data bounds,
@@ -168,6 +191,34 @@ function HistoryTimeline({
         markerInRange: ev.startMs >= eMs && ev.startMs <= lMs,
       }));
   }, [eventMarkers, earliest, latest, totalRange]);
+
+  // Alliance spans → Gantt lanes. Each alliance keeps ONE stable row for its
+  // whole lifetime; overlapping alliances stack into separate lanes, and
+  // non-overlapping eras reuse lanes (greedy interval packing).
+  const allianceLanes = useMemo(() => {
+    if (!allianceSpans || allianceSpans.length === 0 || totalRange === 0) {
+      return { items: [] as Array<{ span: TimelineAllianceSpan; startPct: number; endPct: number; lane: number }>, laneCount: 0 };
+    }
+    const eMs = earliest.getTime();
+    const lMs = latest.getTime();
+    const visible = allianceSpans
+      .map(span => ({ span, a: Math.max(span.startMs, eMs), b: Math.min(span.endMs ?? lMs, lMs) }))
+      .filter(v => v.a < v.b)
+      .sort((x, y) => x.a - y.a || x.span.id - y.span.id);
+    const laneEnds: number[] = []; // occupied-until timestamp per lane
+    const items = visible.map(({ span, a, b }) => {
+      let lane = laneEnds.findIndex(end => end <= a);
+      if (lane === -1) { lane = laneEnds.length; laneEnds.push(b); }
+      else laneEnds[lane] = b;
+      return {
+        span,
+        startPct: ((a - eMs) / totalRange) * 100,
+        endPct: ((b - eMs) / totalRange) * 100,
+        lane,
+      };
+    });
+    return { items, laneCount: laneEnds.length };
+  }, [allianceSpans, earliest, latest, totalRange]);
 
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
@@ -408,46 +459,32 @@ function HistoryTimeline({
   };
 
   // ── Chronicle event markers ──────────────────────────────────────────
-  // Each event is a single circle at its start; clicking zooms the timeline
-  // to the event's range (with padding), the same mechanic as season zoom.
+  // Each event is a track-height pill at its start; clicking moves the
+  // scrubber to the event's start.
 
-  const zoomToEvent = useCallback((ev: TimelineEventMarker) => {
-    const DAY = 24 * 3600 * 1000;
-    const startMs = ev.startMs;
-    const endMs = ev.endMs ?? ev.startMs;
-    const span = Math.max(endMs - startMs, DAY);
-    const pad = Math.max(span * 0.15, DAY / 2);
-    setSeasonZoom({ start: new Date(startMs - pad), end: new Date(endMs + pad), label: ev.title, kind: 'event' });
-    // Bring the scrubber into the zoomed range if it's currently outside it
-    const zs = Math.max(earliestProp.getTime(), startMs - pad);
-    const ze = Math.min(latestProp.getTime(), endMs + pad);
-    if (current.getTime() < zs || current.getTime() > ze) {
-      jumpToDate(new Date(Math.max(zs, Math.min(ze, startMs))));
-    }
-  }, [setSeasonZoom, earliestProp, latestProp, current, jumpToDate]);
-
-  const eventMarkerElements = (isVert: boolean) => visibleEventMarkers.map(({ ev, startPct, markerInRange }) => (
-    markerInRange && (
+  const eventMarkerElements = (isVert: boolean) => visibleEventMarkers.map(({ ev, startPct, markerInRange }) => {
+    if (!markerInRange) return null;
+    return (
       <div
         key={`ev-${ev.id}`}
         onMouseDown={(e) => { e.stopPropagation(); }}
-        onClick={(e) => { e.stopPropagation(); zoomToEvent(ev); }}
+        onClick={(e) => { e.stopPropagation(); jumpToDate(new Date(ev.startMs)); }}
         onMouseEnter={() => { setHoveredEventId(ev.id); setHoverPercent(null); }}
         onMouseLeave={() => setHoveredEventId(null)}
         onMouseMove={(e) => { e.stopPropagation(); }}
         style={{
+          // Pills inside the track — full bar height, slightly inset; the
+          // scrub thumb (zIndex 2) paints over them.
           position: 'absolute',
           ...(isVert
-            ? { left: '-3px', top: `calc(${percentToPaddedStart(startPct)} - 5px)` }
-            : { top: '-3px', left: `calc(${percentToPaddedStart(startPct)} - 5px)` }),
-          width: '10px',
-          height: '10px',
-          borderRadius: '50%',
+            ? { left: '2px', right: '2px', top: `calc(${percentToPaddedStart(startPct)} - 3px)`, height: '6px' }
+            : { top: '2px', bottom: '2px', left: `calc(${percentToPaddedStart(startPct)} - 3px)`, width: '6px' }),
+          borderRadius: '3px',
           background: ev.color,
-          border: '2px solid var(--bg-card-solid)',
+          border: '1px solid var(--bg-card-solid)',
           cursor: 'pointer',
           pointerEvents: 'auto',
-          zIndex: 3,
+          zIndex: 1,
         }}
       >
         {hoveredEventId === ev.id && (
@@ -468,12 +505,155 @@ function HistoryTimeline({
             zIndex: 20,
           }}>
             <div style={{ fontWeight: 600 }}>{ev.title}</div>
-            <div style={{ opacity: 0.7 }}>Click to zoom</div>
           </div>
         )}
       </div>
-    )
-  ));
+    );
+  });
+
+  // ── Chronicle alliance Gantt lanes ───────────────────────────────────
+  // Labeled Gantt rows under the track: each alliance is one solid band with
+  // its name printed inside whenever the band is wide enough. Hover names any
+  // band (single tooltip); clicking zooms the timeline to that era.
+
+  const BAND_SIZE = 12;
+  const BAND_GAP = 2;
+  /** Label shown only when the band spans enough of the visible range to fit text */
+  const LABEL_MIN_PCT = 6;
+
+  const bandTextColor = (hex: string): string => {
+    const n = parseInt(hex.slice(1), 16);
+    if (isNaN(n)) return 'rgba(255,255,255,0.92)';
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return 0.299 * r + 0.587 * g + 0.114 * b > 150 ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.92)';
+  };
+
+  const zoomToSpan = useCallback((span: TimelineAllianceSpan) => {
+    const DAY = 24 * 3600 * 1000;
+    const startMs = span.startMs;
+    const endMs = span.endMs ?? latestProp.getTime();
+    const pad = Math.max((endMs - startMs) * 0.1, DAY);
+    setSeasonZoom({ start: new Date(startMs - pad), end: new Date(endMs + pad), label: span.name, kind: 'event' });
+    const zs = Math.max(earliestProp.getTime(), startMs - pad);
+    const ze = Math.min(latestProp.getTime(), endMs + pad);
+    if (current.getTime() < zs || current.getTime() > ze) {
+      jumpToDate(new Date(Math.max(zs, Math.min(ze, startMs))));
+    }
+  }, [setSeasonZoom, earliestProp, latestProp, current, jumpToDate]);
+
+  const allianceRibbon = (isVert: boolean) => {
+    if (allianceLanes.items.length === 0) return null;
+    const stackSize = allianceLanes.laneCount * (BAND_SIZE + BAND_GAP) - BAND_GAP;
+
+    // One tooltip for the whole stack, anchored at the hovered span's midpoint
+    // (clamped inward so it can't clip at the panel edges).
+    const hoveredItem = hoveredSpanId !== null
+      ? allianceLanes.items.find(it => it.span.id === hoveredSpanId) ?? null
+      : null;
+    const tooltip = hoveredItem && (() => {
+      const { span, startPct, endPct } = hoveredItem;
+      const midPct = (startPct + endPct) / 2;
+      // Near the panel edges, pin the tooltip's near edge instead of centering
+      // it — a centered tooltip at 10% would clip outside the panel.
+      const align = midPct < 18 ? 'translateX(0)' : midPct > 82 ? 'translateX(-100%)' : 'translateX(-50%)';
+      return (
+        <div style={{
+          position: 'absolute',
+          ...(isVert
+            ? { right: '100%', top: percentToPaddedStart(Math.min(88, Math.max(12, midPct))), transform: 'translateY(-50%)', marginRight: '8px' }
+            : { bottom: '100%', left: percentToPaddedStart(midPct), transform: align, marginBottom: '6px' }),
+          padding: '0.25rem 0.5rem',
+          borderRadius: '0.375rem',
+          background: 'var(--bg-card-solid, var(--bg-card))',
+          border: '1px solid var(--border-color)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          fontSize: '0.75rem',
+          color: 'var(--text-primary)',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          zIndex: 20,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '2px', background: span.color, flexShrink: 0 }} />
+            {span.name}{span.tag ? ` [${span.tag}]` : ''}
+          </div>
+          <div style={{ opacity: 0.7 }}>
+            {DATE_FORMAT_UTC.format(new Date(span.startMs))} – {span.endMs === null ? 'active' : DATE_FORMAT_UTC.format(new Date(span.endMs))}
+            <span style={{ opacity: 0.8 }}> · click to zoom</span>
+          </div>
+        </div>
+      );
+    })();
+
+    return (
+      <div style={{
+        position: 'relative',
+        flexShrink: 0,
+        ...(isVert
+          ? { width: `${stackSize}px`, height: '100%', marginLeft: '4px' }
+          : { height: `${stackSize}px`, width: '100%', marginTop: '4px' }),
+      }}>
+        {allianceLanes.items.map(({ span, startPct, endPct, lane }) => {
+          const hovered = hoveredSpanId === span.id;
+          const lanePos = lane * (BAND_SIZE + BAND_GAP);
+          const showLabel = endPct - startPct >= LABEL_MIN_PCT;
+          return (
+            <div
+              key={`al-${span.id}`}
+              data-testid={`timeline-alliance-${span.id}`}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); zoomToSpan(span); }}
+              onMouseEnter={() => { setHoveredSpanId(span.id); setHoverPercent(null); }}
+              onMouseLeave={() => setHoveredSpanId(null)}
+              onMouseMove={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                ...(isVert
+                  ? {
+                      left: `${lanePos}px`,
+                      width: `${BAND_SIZE}px`,
+                      top: percentToPaddedStart(startPct),
+                      height: percentToPaddedWidth(startPct, endPct),
+                      minHeight: '4px',
+                    }
+                  : {
+                      top: `${lanePos}px`,
+                      height: `${BAND_SIZE}px`,
+                      left: percentToPaddedStart(startPct),
+                      width: percentToPaddedWidth(startPct, endPct),
+                      minWidth: '4px',
+                    }),
+                background: span.color,
+                borderRadius: '3px',
+                opacity: hoveredSpanId === null ? 0.95 : hovered ? 1 : 0.45,
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                overflow: 'hidden',
+              }}
+            >
+              {showLabel && (
+                <div style={{
+                  ...(isVert
+                    ? { writingMode: 'vertical-rl' as const, padding: '4px 0', height: '100%' }
+                    : { padding: '0 5px', lineHeight: `${BAND_SIZE}px` }),
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  letterSpacing: '0.02em',
+                  color: bandTextColor(span.color),
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  userSelect: 'none',
+                }}>
+                  {span.name}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {tooltip}
+      </div>
+    );
+  };
 
   // ── Season ribbon ────────────────────────────────────────────────────
   // A thin strip flush against the track showing on-season (colored) vs
@@ -749,6 +929,9 @@ function HistoryTimeline({
             {/* Thumb */}
             <div data-testid="timeline-thumb" style={thumbStyle} />
           </div>
+
+          {/* Chronicle alliance stream ribbon */}
+          {allianceRibbon(true)}
           </div>
         </div>
 
@@ -886,6 +1069,9 @@ function HistoryTimeline({
         {/* Thumb */}
         <div data-testid="timeline-thumb" style={thumbStyle} />
       </div>
+
+      {/* Chronicle alliance stream ribbon */}
+      {allianceRibbon(false)}
       </div>
 
     </div>

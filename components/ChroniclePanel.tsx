@@ -11,6 +11,7 @@ import {
   CHRONICLE_EVENT_TYPES,
   CHRONICLE_LIMITS,
   CHRONICLE_PALETTE,
+  CHRONICLE_COLOR_RE,
   EventPayload,
   activeAlliancesAt,
   chronicleEventColor,
@@ -308,7 +309,7 @@ export function SubmitForm({
             </div>
             <div style={{ flex: 1 }}>
               {label('Color')}
-              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
                 {CHRONICLE_PALETTE.map(c => (
                   <button key={c} type="button" onClick={() => setAlliance(a => ({ ...a, color: c }))}
                     style={{
@@ -316,6 +317,26 @@ export function SubmitForm({
                       border: alliance.color === c ? '2px solid var(--text-primary)' : '2px solid transparent',
                     }} />
                 ))}
+                {/* Custom color — any hex, via the native picker or typed directly */}
+                <label title="Custom color" style={{
+                  position: 'relative', width: '20px', height: '20px', borderRadius: '4px', cursor: 'pointer',
+                  background: (CHRONICLE_PALETTE as readonly string[]).includes(alliance.color)
+                    ? 'conic-gradient(#e53935, #fdd835, #43a047, #1e88e5, #d81b60, #e53935)'
+                    : alliance.color,
+                  border: !(CHRONICLE_PALETTE as readonly string[]).includes(alliance.color)
+                    ? '2px solid var(--text-primary)' : '2px solid transparent',
+                }}>
+                  <input type="color" value={CHRONICLE_COLOR_RE.test(alliance.color) ? alliance.color : '#1e88e5'}
+                    onChange={(e) => setAlliance(a => ({ ...a, color: e.target.value }))}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
+                </label>
+                <input value={alliance.color} maxLength={7} spellCheck={false}
+                  onChange={(e) => setAlliance(a => ({ ...a, color: e.target.value.trim().toLowerCase() }))}
+                  style={{
+                    ...inputStyle, width: '4.6rem', fontFamily: 'monospace', fontSize: '0.72rem',
+                    padding: '0.25rem 0.35rem', marginBottom: 0,
+                    borderColor: CHRONICLE_COLOR_RE.test(alliance.color) ? 'var(--border-color)' : '#e57373',
+                  }} />
               </div>
             </div>
           </div>
@@ -638,6 +659,18 @@ export default function ChroniclePanel({
     [data],
   );
 
+  // Compact view is scoped to the shown moment: only events running at, or
+  // within ~2 months of, the current time. The expanded view lists all.
+  const EVENT_NEAR_MS = 60 * 86400000;
+  const nearbyEvents = useMemo(
+    () => events.filter(e => {
+      const start = Date.parse(e.startsAt);
+      const end = e.endsAt ? Date.parse(e.endsAt) : start;
+      return start <= timestampMs + EVENT_NEAR_MS && end >= timestampMs - EVENT_NEAR_MS;
+    }),
+    [events, timestampMs, EVENT_NEAR_MS],
+  );
+
   if (!isOpen) return null;
 
   const editAlliance = (a: ChronicleAlliance) =>
@@ -855,13 +888,13 @@ export default function ChroniclePanel({
                 )}
                 {active.map(a => renderAlliance(a, false))}
 
-                {sectionTitle(`Events (${events.length})`)}
-                {events.length === 0 && (
+                {sectionTitle(`Events near this time (${nearbyEvents.length})`)}
+                {nearbyEvents.length === 0 && (
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                    No recorded events yet.
+                    No events near this point in time.
                   </div>
                 )}
-                {events.map(renderEvent)}
+                {nearbyEvents.map(renderEvent)}
               </>
             )}
 

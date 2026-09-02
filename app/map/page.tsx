@@ -10,7 +10,7 @@ import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
 import MapModeSelector from "@/components/MapModeSelector";
-import { ChronicleData, allianceColorsAt, chronicleEventColor } from "@/lib/chronicle";
+import { ChronicleData, allianceColorsAt, allianceTimelineSpans, chronicleEventColor } from "@/lib/chronicle";
 import type { TimelineEventMarker } from "@/components/HistoryTimeline";
 import dynamic from "next/dynamic";
 
@@ -305,6 +305,12 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       startMs: Date.parse(e.startsAt),
       endMs: e.endsAt ? Date.parse(e.endsAt) : null,
     }));
+  }, [showChronicle, chronicleData]);
+
+  // Chronicle alliances → timeline lifetime bands
+  const chronicleAllianceSpans = useMemo(() => {
+    if (!showChronicle || !chronicleData) return [];
+    return allianceTimelineSpans(chronicleData.alliances);
   }, [showChronicle, chronicleData]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -2693,6 +2699,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               seasons={seasons}
               loadProgress={historyLoadProgress}
               eventMarkers={chronicleEventMarkers}
+              allianceSpans={chronicleAllianceSpans}
             />
           </div>
         )}

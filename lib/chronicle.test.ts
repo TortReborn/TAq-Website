@@ -41,9 +41,17 @@ describe('validateAlliancePayload', () => {
     }
   });
 
-  it('rejects colors outside the palette', () => {
-    const result = validateAlliancePayload({ ...validAlliance(), color: '#123456' });
-    expect(result.ok).toBe(false);
+  it('accepts any 6-digit hex color and normalizes case', () => {
+    const result = validateAlliancePayload({ ...validAlliance(), color: '#12AB56' });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.color).toBe('#12ab56');
+  });
+
+  it('rejects non-hex colors', () => {
+    expect(validateAlliancePayload({ ...validAlliance(), color: 'red' }).ok).toBe(false);
+    expect(validateAlliancePayload({ ...validAlliance(), color: '#12345' }).ok).toBe(false);
+    expect(validateAlliancePayload({ ...validAlliance(), color: '123456' }).ok).toBe(false);
+    expect(validateAlliancePayload({ ...validAlliance(), color: '#12345g' }).ok).toBe(false);
   });
 
   it('rejects a leave date before the join date', () => {

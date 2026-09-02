@@ -1,0 +1,915 @@
+{
+  "$comment": "DRAFT chronicle alliance data, 2018-2021, reconstructed from the community Timeline document and cross-checked against territory_exchanges (guild activity windows, war detection) and guild_prefixes (exact guild-name spellings). Each entry's `payload` conforms to AlliancePayload (lib/chronicle.ts) and can be submitted via POST /api/chronicle/admin. `notes` document every inferred or approximated date and are NOT part of the payload. Dates are UTC days. METHODOLOGY: map-inferred conclusions are based on directed attack counts between guild sets, filtered for FFA noise — every 'war' claim was checked for territory spread (real wars span 100+ territories with low top-3 concentration; FFA churn concentrates on hotspots like Detlas, Hive, Lava Lake, Factory Entrance, Emerald Trail, and in 2020-21 the Silent Expanse). In the 2020-21 era allies also mass-trade territories for XP (near-symmetric exchange counts, e.g. Avicia-Emorians ~5k each way), so raw volume alone was never treated as war evidence in that period.",
+  "generated": "2026-09-02",
+  "alliances": [
+    {
+      "payload": {
+        "name": "Coalition",
+        "tag": "Coa",
+        "color": "#e53935",
+        "description": "Founded in October 2017 by Kingdom Foxes, KingdomPhoenixes, Gilded Sparrows and House of Sentinels. Took control of the Wynn Province on 23 Nov 2017 and gained full map dominance after taking Gavel on 25 Dec 2017. Fractured on 17 Feb 2018 when five member guilds left to form Alliance Alliance, starting the Coalition Civil War, and dissolved when The Federation took map control on 20 Mar 2018.",
+        "memberships": [
+          {
+            "guild": "Kingdom Foxes",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "KingdomPhoenixes",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "Gilded Sparrows",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "House of Sentinels",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-02-17"
+          },
+          {
+            "guild": "HackForums",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-02-17"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-02-17"
+          },
+          {
+            "guild": "Emorians",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-02-17"
+          },
+          {
+            "guild": "Kangronomicon",
+            "joinedAt": "2018-01-01",
+            "leftAt": "2018-02-17"
+          }
+        ]
+      },
+      "notes": [
+        "Founded ?? Oct 2017 — before the chronicle window; all joins clamped to 2018-01-01 (CHRONICLE_MIN_MS).",
+        "Hax/PUN/Snt/ERN/Fuq membership is inferred from their documented 17 Feb 2018 departure; their real join dates predate 2018.",
+        "Dissolution date 2018-03-20 is inferred: the document only says The Federation took map control that day, ending the Coalition Civil War."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Alliance Alliance",
+        "tag": "AA",
+        "color": "#fb8c00",
+        "description": "Formed on 17 Feb 2018 by the five guilds that left The 1st Coalition (HackForums, Paladins United, House of Sentinels, Emorians, Kangronomicon) together with Fantasy and Necronomicon. Declared war on The 1st Coalition, beginning the Coalition Civil War, which ended when The Federation took map control on 20 Mar 2018.",
+        "memberships": [
+          {
+            "guild": "HackForums",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "House of Sentinels",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "Emorians",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "Kangronomicon",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "Fantasy",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          },
+          {
+            "guild": "Necronomicon",
+            "joinedAt": "2018-02-17",
+            "leftAt": "2018-03-20"
+          }
+        ]
+      },
+      "notes": [
+        "End date 2018-03-20 is inferred from the end of the Coalition Civil War; the document never records a formal dissolution.",
+        "The document tags Fantasy as [Fuq] in this entry — that tag belongs to Kangronomicon; Fantasy is [Fux].",
+        "Document spells it 'Necromonicon'; the DB guild name is 'Necronomicon' [Feq] (active on the map Jan-Oct 2018)."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Federation",
+        "tag": "Fed",
+        "color": "#1e88e5",
+        "description": "Dominant alliance of 2018. First attested taking map control on 20 Mar 2018, ending the Coalition Civil War, and held map dominance through most of the year with heavy membership churn. Died in November 2018.",
+        "memberships": [
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-05-05"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2018-06-14",
+            "leftAt": "2018-07-23"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2018-09-20",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-06-25"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2018-08-23",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "KingdomPhoenixes",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-06-25"
+          },
+          {
+            "guild": "Angels Of Eternal",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-07-23"
+          },
+          {
+            "guild": "Kasai Shinrai",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-09-01"
+          },
+          {
+            "guild": "Metric",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-09-04"
+          },
+          {
+            "guild": "The Hive",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-10-27"
+          },
+          {
+            "guild": "Fantasy",
+            "joinedAt": "2018-03-20",
+            "leftAt": "2018-05-28"
+          },
+          {
+            "guild": "Fantasy",
+            "joinedAt": "2018-10-29",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "TheNoLifes",
+            "joinedAt": "2018-05-05",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "Lunatic",
+            "joinedAt": "2018-05-09",
+            "leftAt": "2018-09-01"
+          },
+          {
+            "guild": "Verinian Trials",
+            "joinedAt": "2018-06-25",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "Ex Nihilo",
+            "joinedAt": "2018-06-30",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "Renegade",
+            "joinedAt": "2018-07-08",
+            "leftAt": "2018-09-30"
+          },
+          {
+            "guild": "Aphelion",
+            "joinedAt": "2018-07-23",
+            "leftAt": "2018-10-20"
+          },
+          {
+            "guild": "Arisen",
+            "joinedAt": "2018-08-29",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "Odysseia",
+            "joinedAt": "2018-08-25",
+            "leftAt": "2018-10-29"
+          },
+          {
+            "guild": "Nethers Ascent",
+            "joinedAt": "2018-09-04",
+            "leftAt": "2018-11-01"
+          },
+          {
+            "guild": "Minerva",
+            "joinedAt": "2018-10-27",
+            "leftAt": "2018-11-01"
+          }
+        ]
+      },
+      "notes": [
+        "Founding date and roster are NOT documented — the alliance first appears taking map control on 2018-03-20. Guilds with a recorded departure but no recorded join (ANO, PUN, Phx, AoE, Two, Met, THI, Fux) are modeled as founding members from that date.",
+        "'?? Nov, Federation dies' — end set to 2018-11-01, map-inferred: several new intra-bloc wars (Arisen vs Odysseia, TheNoLifes vs Arisen, escalating TheNoLifes vs Paladins United) all ignite on exactly that day.",
+        "Fantasy's first departure is undocumented (it 'rejoins' 29 Oct 2018); map-inferred to 2018-05-28 — with FFA-cluster territories excluded, Fantasy vs Federation fighting is peace-level through April (44 exchanges total), and jumps to sustained war levels (20-90/week on quiet territories) from the week of 28 May 2018 onward.",
+        "TheNoLifes vs Paladins United exchanges during their joint Sep-Oct membership are 96% on FFA-cluster territories (mostly Factory Entrance) — FFA noise, not war — consistent with both staying members until the 1 Nov collapse, after which their fighting spreads across Corkus (49% FFA, 62 quiet territories).",
+        "Odysseia joined '?? Sep'; map-inferred to 2018-08-25 — from that day it attacks Fantasy (then a Federation enemy) alongside the bloc; its map activity starts 2018-08-24.",
+        "The document has both 'Metric is kicked' (4 Sep) and an undated '?? Sep, Metric joins' — modeled as founding member kicked 2018-09-04; the undated join line may be misplaced.",
+        "Map data corroborates several joins: Lunatic's first exchange 2018-04-28 (joined 9 May), Ex Nihilo 2018-06-24 (joined 30 Jun), Arisen 2018-08-13 (joined 29 Aug), Aphelion created 19 Mar 2018 / first exchange 2018-03-18."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Luna",
+        "tag": "Luna",
+        "color": "#fdd835",
+        "description": "Formed on 14 Feb 2019 to counter SOL. After fending off an attack on Kingdom Foxes in July 2019 it wiped every guild but Avicia and gained full map control on 17 Jul 2019. Collapsed in September 2019 after losing the map to Terra and Kingdom Foxes' departure.",
+        "memberships": [
+          {
+            "guild": "Kingdom Foxes",
+            "joinedAt": "2019-07-08",
+            "leftAt": "2019-09-18"
+          },
+          {
+            "guild": "Imperial",
+            "joinedAt": "2019-02-14",
+            "leftAt": "2019-09-19"
+          },
+          {
+            "guild": "Emorians",
+            "joinedAt": "2019-02-14",
+            "leftAt": "2019-08-29"
+          },
+          {
+            "guild": "Blacklisted",
+            "joinedAt": "2019-02-14",
+            "leftAt": "2019-09-19"
+          },
+          {
+            "guild": "BuildCraftia",
+            "joinedAt": "2019-02-14",
+            "leftAt": "2019-09-19"
+          },
+          {
+            "guild": "Illustratio Divinus",
+            "joinedAt": "2019-02-28",
+            "leftAt": "2019-09-19"
+          },
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2019-02-14",
+            "leftAt": "2019-09-08"
+          },
+          {
+            "guild": "ThisIsMurica",
+            "joinedAt": "2019-02-14",
+            "leftAt": "2019-08-30"
+          },
+          {
+            "guild": "Caeruleum Order",
+            "joinedAt": "2019-07-09",
+            "leftAt": "2019-09-19"
+          },
+          {
+            "guild": "Avicia",
+            "joinedAt": "2019-07-17",
+            "leftAt": "2019-08-29"
+          },
+          {
+            "guild": "SkyBound",
+            "joinedAt": "2019-09-01",
+            "leftAt": "2019-09-19"
+          },
+          {
+            "guild": "Raiju",
+            "joinedAt": "2019-09-01",
+            "leftAt": "2019-09-19"
+          }
+        ]
+      },
+      "notes": [
+        "Founding list in the document is marked '(placeholder)': Fox, Imp, ERN, BLA, BCr.",
+        "Kingdom Foxes REMOVED from the founding roster despite the document listing it: exchange data shows Luna at war with Fox continuously from 2019-02-15 (Imperial alone attacked Fox 660 times, Feb 16 - Jul 8) until the documented 8 Jul join. Luna was formed to counter SOL — and evidently to fight Fox — so only the 8 Jul - 18 Sep stint is real.",
+        "The Simple Ones' and ThisIsMurica's joins are undocumented (only their Sep 8 departure / Aug 30 kick are recorded); joins approximated to the founding date.",
+        "Collapse: Fox left 18 Sep and the alliance 'essentially collapses soon after'; end set to 2019-09-19 (the date SkyBound was kicked) for all remaining members.",
+        "Map data: SkyBound's first-ever exchange is 2019-07-06, matching its documented re-creation date exactly; Raiju's activity starts 2019-08-15."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Terra",
+        "tag": "Terra",
+        "color": "#8d6e63",
+        "description": "Formed on 30 Aug 2019 in opposition to Luna. Took control of the map from Luna on 8 Sep 2019 after The Simple Ones defected to it. Its bloc dispersed into the Council of Canyon Kingdoms (15 Sep) and later Artemis.",
+        "memberships": [
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2019-09-08",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "TheNoLifes",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "Lunatic",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "IceBlue Team",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "Fantasy",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "Achte Shadow",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "FinalFront",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "BlueStoneGroup",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "Phantom Hearts",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          },
+          {
+            "guild": "DiamondDeities",
+            "joinedAt": "2019-08-30",
+            "leftAt": "2019-09-15"
+          }
+        ]
+      },
+      "notes": [
+        "ROSTER LARGELY MAP-INFERRED: the document's founding roster is literally '(placeholder)' — only The Simple Ones' membership is documented (joined hours after leaving Luna on 8 Sep).",
+        "Map-inferred members are the guilds with 100+ attacks on Luna during the decisive war window (6-16 Sep 2019). The war signal is genuine: 2174 attacks across 322 territories, only 37% on FFA clusters. Weaker candidates left out: Vindicator (97), Wrath Of Poseidon, Azeron, Roses, MasterWynnLords, Mystic Woods, Nekos, Lotus.",
+        "Terra's dissolution is undocumented; all stints end 2019-09-15 when the bloc's core (DDT, ANO, Fantasy, PHA, ILQ) founded the Council of Canyon Kingdoms. PUN went on to found Artemis on 30 Oct.",
+        "Join dates use the 30 Aug 2019 formation date; several of these guilds were already fighting Luna from 25 Aug in the Emorians-Avicia revolt that preceded Terra."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Council of Canyon Kingdoms",
+        "tag": "CoCK",
+        "color": "#43a047",
+        "description": "The CCK (or CoCK) was formed on 15 Sep 2019 by Kingdom Foxes, DiamondDeities, Titans Valor, The Simple Ones, Fantasy, Phantom Hearts and Empire of Sindria. Collapsed on 23 Nov 2019 when The Ascendancy bloc departed.",
+        "memberships": [
+          {
+            "guild": "Kingdom Foxes",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-11-02"
+          },
+          {
+            "guild": "DiamondDeities",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-11-21"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-11-21"
+          },
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-11-23"
+          },
+          {
+            "guild": "Fantasy",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-11-23"
+          },
+          {
+            "guild": "Phantom Hearts",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-10-01"
+          },
+          {
+            "guild": "Empire of Sindria",
+            "joinedAt": "2019-09-15",
+            "leftAt": "2019-11-23"
+          },
+          {
+            "guild": "TheNoLifes",
+            "joinedAt": "2019-09-29",
+            "leftAt": "2019-11-23"
+          },
+          {
+            "guild": "BlueStoneGroup",
+            "joinedAt": "2019-10-11",
+            "leftAt": "2019-11-23"
+          },
+          {
+            "guild": "Vindicator",
+            "joinedAt": "2019-10-15",
+            "leftAt": "2019-11-23"
+          }
+        ]
+      },
+      "notes": [
+        "Phantom Hearts 'abandons CoCK' at an undated point in Sep-Oct 2019, approximated to 2019-10-01 (midpoint). Exchange data is INCONCLUSIVE here: PHA-vs-founder exchanges total only ~130 and are 61-77% on FFA-cluster territories, i.e. mostly FFA noise. It joined Artemis on 4 Nov.",
+        "Members without a documented individual departure are closed at the 2019-11-23 collapse.",
+        "Document name 'Diamond Deities' is spelled 'DiamondDeities' (no space) in the DB."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Artemis",
+        "tag": "ART",
+        "color": "#5e35b1",
+        "description": "Formed on 30 Oct 2019 by Imperial, Paladins United and Caeruleum Order. One of the two dominant blocs of 2020 alongside Goose, jointly protecting the neutral guild Profession Heaven from 25 Jan 2021. Collapsed on 11 May 2021, feeding into Valhalla and Khaos.",
+        "memberships": [
+          {
+            "guild": "Imperial",
+            "joinedAt": "2019-10-30",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2019-10-30",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Caeruleum Order",
+            "joinedAt": "2019-10-30",
+            "leftAt": "2021-02-08"
+          },
+          {
+            "guild": "Nightingales",
+            "joinedAt": "2019-11-01",
+            "leftAt": "2020-11-11"
+          },
+          {
+            "guild": "Phantom Hearts",
+            "joinedAt": "2019-11-04",
+            "leftAt": "2021-05-07"
+          },
+          {
+            "guild": "Yakuza",
+            "joinedAt": "2020-12-25",
+            "leftAt": "2021-02-22"
+          },
+          {
+            "guild": "Sins of Seedia",
+            "joinedAt": "2021-03-06",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Aequitas",
+            "joinedAt": "2021-05-03",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Wheres The Finish",
+            "joinedAt": "2021-05-03",
+            "leftAt": "2021-05-11"
+          }
+        ]
+      },
+      "notes": [
+        "Caeruleum Order's departure is undocumented; end map-inferred from its last territory exchange (2021-02-08, guild inactive thereafter).",
+        "Nightingales' departure is undocumented; end map-inferred from its last exchange (2020-11-11). DB name 'Nightingales' [NIG].",
+        "Yakuza's join is undocumented (only its 22 Feb 2021 kick); join map-inferred from its first exchange (2020-12-25). DB name 'Yakuza' [YAK].",
+        "Phantom Hearts closed at its official dissolution on 2021-05-07.",
+        "Aequitas and Wheres The Finish left at the collapse to co-found Khaos the same day.",
+        "The document does not record Artemis's membership between Nov 2019 and Dec 2020 — there are likely additional undocumented members (roster gap).",
+        "The Goose war is visible on the map from at least 1 Mar 2020 (window boundary) to the 11 May 2021 collapse — see the Goose entry. Likely undocumented Artemis-side members based on sustained attacks on the Goose bloc across 300+ territories: Diablo (1921 attacks), Blacklisted (967), GlowOfDust, Upsilon, Wrath Of Poseidon, JasmineDragons — not added as stints pending human confirmation, since co-belligerence does not prove membership."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Horologium",
+        "tag": "Horo",
+        "color": "#00acc1",
+        "description": "Formed on 1 Dec 2019 by DiamondDeities, Titans Valor and The Simple Ones. De-facto dissolved on 8 Jan 2020 when Nitrogen2Oxygen disbanded DiamondDeities.",
+        "memberships": [
+          {
+            "guild": "DiamondDeities",
+            "joinedAt": "2019-12-01",
+            "leftAt": "2020-01-08"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2019-12-01",
+            "leftAt": "2020-01-08"
+          },
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2019-12-01",
+            "leftAt": "2020-01-08"
+          }
+        ]
+      },
+      "notes": []
+    },
+    {
+      "payload": {
+        "name": "Empire of Nemract",
+        "tag": "EoN",
+        "color": "#7cb342",
+        "description": "A political union formed on 17 Aug 2020 by The Simple Ones and Mystic Woods.",
+        "memberships": [
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2020-08-17",
+            "leftAt": "2021-12-31"
+          },
+          {
+            "guild": "Mystic Woods",
+            "joinedAt": "2020-08-17",
+            "leftAt": "2021-12-31"
+          }
+        ]
+      },
+      "notes": [
+        "PLACEHOLDER END DATE: no dissolution is documented. 2021-12-31 marks the end of the source document's coverage, not a real event — leaving leftAt null would wrongly color today's map. Adjust before approving.",
+        "Exchange data supports the union persisting: The Simple Ones and Mystic Woods have ~30 exchanges TOTAL across six years (2020-2026) — they never fought. The end date cannot be inferred from the map; the placeholder marks the end of document coverage."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Goose",
+        "tag": "Goose",
+        "color": "#fdd835",
+        "description": "One of the two dominant blocs of 2020 alongside its rival Artemis, jointly protecting the neutral guild Profession Heaven from 25 Jan 2021. Held map control until it collapsed on 11 May 2021, when most of its members reorganized into Valhalla (which then took the map from its remnants).",
+        "memberships": [
+          {
+            "guild": "Avicia",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Emorians",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "HackForums",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Kingdom Foxes",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "ShadowFall",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "TheNoLifes",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Lux Nova",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "IceBlue Team",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Eden",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Empire of Sindria",
+            "joinedAt": "2020-03-01",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "The Aquarium",
+            "joinedAt": "2020-03-23",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "The Dark Phoenix",
+            "joinedAt": "2020-03-28",
+            "leftAt": "2021-05-11"
+          },
+          {
+            "guild": "Guardian of Wynn",
+            "joinedAt": "2020-04-05",
+            "leftAt": "2021-05-11"
+          }
+        ]
+      },
+      "notes": [
+        "ROSTER ENTIRELY MAP-INFERRED — the document names Goose repeatedly but never lists a single member. Members are the guilds that sustained the war against Artemis (5069 attacks across 373 territories Sep 2020 - May 2021, only ~52% on FFA clusters, mirrored by Artemis in return) in both the Mar-Sep 2020 and Sep 2020 - May 2021 windows, cross-checked for continuity into the documented Valhalla founding roster. Confidence: medium.",
+        "Formation date is unknown; the Goose-Artemis war was already running at the 1 Mar 2020 query boundary, so joins are clamped to 2020-03-01 ('active by at least'). The Aquarium, The Dark Phoenix and Guardian of Wynn joins use their first attacks on Artemis (TAq's is the day after its first-ever territory exchange).",
+        "Intra-bloc exchange volumes are huge (e.g. Avicia-Emorians ~5k each way) but 76% on FFA/Silent Expanse territories with near-perfect symmetry — that is XP territory-trading between allies, not war, and was NOT used as membership evidence.",
+        "Eden left at the collapse to co-found Khaos the same day. Kingdom Foxes and The Dark Phoenix did NOT join Valhalla.",
+        "ShadowFall is also documented in Niflheim from 27 Dec 2020 — Niflheim and Goose likely overlapped or were nested; the exchange data cannot separate them.",
+        "The Mage Legacy and The Simple Ones are documented Valhalla founders but show weak/no anti-Artemis signal, so they are NOT included here.",
+        "Color reuses Luna's #fdd835 — no temporal overlap (Luna ended Sep 2019)."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Niflheim",
+        "tag": "Nif",
+        "color": "#00897b",
+        "description": "Alliance active through 2020-2021. ShadowFall joined on 27 Dec 2020. Officially dissolved on 18 Dec 2021.",
+        "memberships": [
+          {
+            "guild": "ShadowFall",
+            "joinedAt": "2020-12-27",
+            "leftAt": "2021-12-18"
+          }
+        ]
+      },
+      "notes": [
+        "INCOMPLETE: formation date and wider roster are undocumented — only ShadowFall's join and the official 2021-12-18 dissolution are recorded.",
+        "Note the overlap: the document also lists ShadowFall as a Valhalla founder (11 May 2021) and Vanir founder (28 Nov 2021).",
+        "Exchange data cannot recover Niflheim's roster: by 2021 the map is saturated with near-symmetric ally territory-trading (especially in the Silent Expanse FFA region), so no distinct Niflheim war signal separable from the Goose bloc exists."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Valhalla",
+        "tag": "Val",
+        "color": "#d81b60",
+        "description": "Formed on 11 May 2021 out of the simultaneous collapse of Goose and Artemis, by thirteen guilds including The Aquarium. Took map control from Goose's remnants in mid-May 2021 and dominated until its members reorganized into Vanir on 28 Nov 2021.",
+        "memberships": [
+          {
+            "guild": "Avicia",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "Emorians",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "Empire of Sindria",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "HackForums",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "IceBlue Team",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "Lux Nova",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "The Mage Legacy",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "The Aquarium",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "TheNoLifes",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "ShadowFall",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          },
+          {
+            "guild": "Guardian of Wynn",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-11-28"
+          }
+        ]
+      },
+      "notes": [
+        "End date 2021-11-28 is inferred: Vanir formed that day with ten of the same guilds; no explicit Valhalla dissolution is documented.",
+        "Guardian of Wynn joined immediately after the founding (same document entry) — modeled as joining on the founding day.",
+        "The 2021-era guild is 'Guardian of Wynn' [GUA] in the DB — do not confuse with 'Guardians of Wynn' [GsW], a separate guild active from 2024."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Khaos",
+        "tag": "Khaos",
+        "color": "#f4511e",
+        "description": "Formed on 11 May 2021, the same day as Valhalla, by Aequitas, WheresTheFinish, Nerfuria, Tartarus Wrath, Ultra Violet, Fuzzy Spiders, ChinaNumberOne, Cyphrus Code and Eden.",
+        "memberships": [
+          {
+            "guild": "Aequitas",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          },
+          {
+            "guild": "Wheres The Finish",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          },
+          {
+            "guild": "Nerfuria",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          },
+          {
+            "guild": "Tartarus Wrath",
+            "joinedAt": "2021-05-15",
+            "leftAt": "2021-08-25"
+          },
+          {
+            "guild": "Ultra Violet",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          },
+          {
+            "guild": "Fuzzy Spiders",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          },
+          {
+            "guild": "ChinaNumberOne",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          },
+          {
+            "guild": "Cyphrus Code",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2021-05-22"
+          },
+          {
+            "guild": "Eden",
+            "joinedAt": "2021-05-11",
+            "leftAt": "2022-03-31"
+          }
+        ]
+      },
+      "notes": [
+        "PLACEHOLDER END DATES: Khaos's dissolution is undocumented. Exchange data shows the bloc still cohesive well past 2021: intra-bloc attacks stay near zero (900 total May 2021 - Mar 2022, mostly two brief flare-ups) while the war against the Valhalla/Vanir guilds continues at hundreds of exchanges per week into spring 2022. End set to 2022-03-31 (end of the data window examined) — needs post-2021 research before approving.",
+        "Tartarus Wrath was created 15 May 2021 (per the document and its first exchange 2021-05-15), days after the founding — its join uses that date; its end is map-inferred from its last exchange (2021-08-25).",
+        "Cyphrus Code's end is map-inferred from its last exchange (2021-05-22).",
+        "DB spellings: 'Wheres The Finish' (with spaces), 'Ultra Violet' [ULT], 'Fuzzy Spiders' [cxz]."
+      ]
+    },
+    {
+      "payload": {
+        "name": "Vanir",
+        "tag": "Vanir",
+        "color": "#00acc1",
+        "description": "Successor to Valhalla, formed on 28 Nov 2021 by ten of its guilds including The Aquarium. Guardian of Wynn and Nefarious Ravens were invited on 1 Dec 2021. Collapsed on 18 Dec 2021 when Emorians, Nefarious Ravens, IceBlue Team and Avicia left.",
+        "memberships": [
+          {
+            "guild": "Avicia",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Emorians",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Empire of Sindria",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "IceBlue Team",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Lux Nova",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Paladins United",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Titans Valor",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "The Aquarium",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "The Simple Ones",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "ShadowFall",
+            "joinedAt": "2021-11-28",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Guardian of Wynn",
+            "joinedAt": "2021-12-01",
+            "leftAt": "2021-12-18"
+          },
+          {
+            "guild": "Nefarious Ravens",
+            "joinedAt": "2021-12-01",
+            "leftAt": "2021-12-18"
+          }
+        ]
+      },
+      "notes": [
+        "All members are closed at the 2021-12-18 collapse; the four departing guilds triggered it that day.",
+        "Color reuses Horologium's #00acc1 — the palette has 12 entries and the two never overlap in time."
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "name": "Aesir",
+      "reason": "Created 25 Mar 2018 by two individuals (Viaire, simplyinfinity_); no guild roster documented."
+    },
+    {
+      "name": "SOL / Celestials / The Ascendancy / War Syndicate / Ordo Malleus",
+      "reason": "Referenced as opposing blocs but with no member rosters or usable dates in the window."
+    },
+    {
+      "name": "Treaties and wars (Rodoroc, Ternaves, Damask, Coalition Civil War, Luna-Terra war)",
+      "reason": "These are chronicle *events*, not alliances — can be drafted separately as EventPayload entries."
+    }
+  ]
+}
