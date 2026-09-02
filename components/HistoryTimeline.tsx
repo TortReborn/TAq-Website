@@ -518,8 +518,10 @@ function HistoryTimeline({
 
   const BAND_SIZE = 12;
   const BAND_GAP = 2;
-  /** Label shown only when the band spans enough of the visible range to fit text */
-  const LABEL_MIN_PCT = 6;
+  // Label sizing estimate at 9px font: ~5.6px per character + horizontal padding.
+  // Full name if it fits, else the tag, else no label (tooltip still names it).
+  const LABEL_PX_PER_CHAR = 5.6;
+  const LABEL_PAD_PX = 12;
 
   const bandTextColor = (hex: string): string => {
     const n = parseInt(hex.slice(1), 16);
@@ -596,7 +598,13 @@ function HistoryTimeline({
         {allianceLanes.items.map(({ span, startPct, endPct, lane }) => {
           const hovered = hoveredSpanId === span.id;
           const lanePos = lane * (BAND_SIZE + BAND_GAP);
-          const showLabel = endPct - startPct >= LABEL_MIN_PCT;
+          // Band length in px, from the real track size when available (the
+          // ref is set after first paint; 700 is a harmless first-frame guess)
+          const trackRect = trackRef.current?.getBoundingClientRect();
+          const trackPx = (isVert ? trackRect?.height : trackRect?.width) ?? 700;
+          const bandPx = ((endPct - startPct) / 100) * Math.max(trackPx - 24, 1);
+          const fits = (text: string) => bandPx >= text.length * LABEL_PX_PER_CHAR + LABEL_PAD_PX;
+          const label = fits(span.name) ? span.name : span.tag && fits(span.tag) ? span.tag : null;
           return (
             <div
               key={`al-${span.id}`}
@@ -631,7 +639,7 @@ function HistoryTimeline({
                 overflow: 'hidden',
               }}
             >
-              {showLabel && (
+              {label && (
                 <div style={{
                   ...(isVert
                     ? { writingMode: 'vertical-rl' as const, padding: '4px 0', height: '100%' }
@@ -644,7 +652,7 @@ function HistoryTimeline({
                   overflow: 'hidden',
                   userSelect: 'none',
                 }}>
-                  {span.name}
+                  {label}
                 </div>
               )}
             </div>

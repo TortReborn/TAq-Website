@@ -99,7 +99,7 @@ function mergePreservingIdentity(
   return changed ? out : prev;
 }
 
-export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'history' } = {}) {
+export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'live' | 'history'; initialLayer?: 'chronicle' | 'factions' } = {}) {
   // Store minimum scale in a ref
   const minScaleRef = useRef(0.1);
   
@@ -224,11 +224,11 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
   const [showTradeRoutes, setShowTradeRoutes] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [opaqueFill, setOpaqueFill] = useState(false);
-  const [showFactions, setShowFactions] = useState(false);
+  const [showFactions, setShowFactions] = useState(initialLayer === 'factions');
   // Chronicle layer — community-maintained alliances & events (see lib/chronicle).
   // One toggle drives everything: the panel, the alliance coloring and the
   // timeline event markers.
-  const [showChronicle, setShowChronicle] = useState(false);
+  const [showChronicle, setShowChronicle] = useState(initialLayer === 'chronicle');
   const [chronicleData, setChronicleData] = useState<ChronicleData | null>(null);
   const [showConflictFinder, setShowConflictFinder] = useState(false);
   const [conflictBounds, setConflictBounds] = useState<{ start: Date; end: Date } | null>(null);
@@ -449,8 +449,9 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     if (cachedOpaqueFill !== null) {
       setOpaqueFill(cachedOpaqueFill === 'true');
     }
+    // A layer named in the URL wins over the cached preference
     const cachedShowChronicle = localStorage.getItem('mapShowChronicle');
-    if (cachedShowChronicle !== null) {
+    if (cachedShowChronicle !== null && !initialLayer) {
       setShowChronicle(cachedShowChronicle === 'true');
     }
     setIsInitialized(true);
@@ -523,6 +524,19 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
   }, [showChronicle, isInitialized]);
 
+  // Keep the URL in sync with the view: /map (live), /map/history, and
+  // /map/history/chronicle|factions when a layer is on (chronicle wins if
+  // both are — it also wins the color override). replaceState keeps the
+  // component mounted; all three paths render this same component.
+  useEffect(() => {
+    if (!isInitialized) return;
+    const path = viewMode === 'history'
+      ? (showChronicle ? '/map/history/chronicle' : showFactions ? '/map/history/factions' : '/map/history')
+      : '/map';
+    if (window.location.pathname !== path) {
+      window.history.replaceState(null, '', path);
+    }
+  }, [viewMode, showChronicle, showFactions, isInitialized]);
 
   // Load guild colors from cached database
   const loadGuildColorsData = async () => {
