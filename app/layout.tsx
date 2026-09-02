@@ -77,11 +77,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
     
-    // Sync React state with the theme that was already applied by the script
+    // Sync React state with the theme that was already applied by the script.
+    // Dark is the site default — light only when explicitly chosen.
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    
+    const shouldBeDark = savedTheme !== 'light';
+
     setDarkMode(shouldBeDark);
     
     // Apply theme immediately to prevent flash
@@ -149,9 +149,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             __html: `
               (function() {
                 try {
+                  // Dark is the site default — light only when explicitly chosen
                   var savedTheme = localStorage.getItem('theme');
-                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                  if (savedTheme !== 'light') {
                     document.documentElement.setAttribute('data-theme', 'dark');
                   }
                 } catch (e) {}
