@@ -480,14 +480,16 @@ export default function ChroniclePanel({
     };
   }, [isDragging, clampPosition]);
 
-  // Re-clamp when the container resizes so the panel can't be stranded
+  // Re-clamp when the container resizes OR the panel itself changes size
+  // (expanded view, the submit form, expanded rows) so it can't be pushed
+  // out of bounds by growing while parked near an edge
   useEffect(() => {
     if (isDragging || !isOpen) return;
     setPosition(prev => {
       const next = clampPosition(prev.x, prev.y);
       return next.x === prev.x && next.y === prev.y ? prev : next;
     });
-  }, [containerBounds, clampPosition, isDragging, isOpen]);
+  }, [containerBounds, clampPosition, isDragging, isOpen, expandedView, form.mode, expanded]);
 
   const active = useMemo(
     () => (data ? activeAlliancesAt(data.alliances, timestampMs) : []),
