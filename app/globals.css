@@ -1368,7 +1368,10 @@ body.site-fixed-bg-active > footer {
 
 @font-face {
   font-family: 'GameFont';
-  src: url('/images/profile/game.ttf') format('truetype');
+  /* 5KB Latin+punctuation subset (preloaded in the layout head) — the full
+     14MB game.ttf stays only as a fallback for browsers without woff2 */
+  src: url('/images/profile/game.subset.woff2') format('woff2'),
+       url('/images/profile/game.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

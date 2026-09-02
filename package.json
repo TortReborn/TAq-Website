@@ -33,6 +33,7 @@
     "@types/pg": "^8.15.5",
     "@types/react": "19.1.12",
     "@types/sharp": "^0.31.1",
+    "subset-font": "^2.7.0",
     "typescript": "5.5.4",
     "vitest": "^4.0.18"
   }

@@ -191,6 +191,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             `,
           }}
         />
+        {/* The site's display font — preloaded so the server-rendered splash
+            never paints in a fallback font and swaps mid-display */}
+        <link
+          rel="preload"
+          href="/images/profile/game.subset.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <title>The Aquarium</title>
         <meta name="description" content="The Aquarium - Wynncraft guild territory map, leaderboards, and member statistics" />
 
