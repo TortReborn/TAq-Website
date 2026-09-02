@@ -1934,6 +1934,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       WebkitUserSelect: 'none',
       cursor: isDragging ? 'grabbing' : 'grab',
     }}>
+      {/* Keeps the layout splash up until the active mode has territory data,
+          so first paint under the splash is the finished map */}
+      {(viewMode === 'live'
+        ? Object.keys(territories).length === 0
+        : !historyTerritories || Object.keys(historyTerritories).length === 0) && (
+        <div data-splash-hold="" hidden />
+      )}
       <div style={{
         width: '100%',
         height: '100%',

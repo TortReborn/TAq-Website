@@ -109,15 +109,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     const shouldShowSplash = isPageRefresh || isFromExternalSite || isNewVisit;
     
     // The splash is server-rendered (visible from the first paint). Hide it
-    // as soon as the page behind it is painting frames post-hydration
-    // (double-rAF), held so it's visible at least MIN_VISIBLE_MS from page
-    // start and at most MAX_MS after hydration.
+    // once the page behind it is painting frames post-hydration (double-rAF)
+    // AND no page component is holding it open via a [data-splash-hold]
+    // marker (e.g. the map while territory data loads). Visible at least
+    // MIN_VISIBLE_MS from page start; MAX_MS is the safety valve so a stuck
+    // data load can't pin the splash forever.
     const MIN_VISIBLE_MS = 500;
-    const MAX_MS = 1200;
+    const MAX_MS = 4000;
     let fadeRaf = 0;
     let fadeTimer: ReturnType<typeof setTimeout> | undefined;
     let removeTimer: ReturnType<typeof setTimeout> | undefined;
     let maxTimer: ReturnType<typeof setTimeout> | undefined;
+    let holdTimer: ReturnType<typeof setTimeout> | undefined;
     let finished = false;
 
     const finish = () => {
@@ -135,11 +138,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       }, wait);
     };
 
+    const tryFinish = () => {
+      if (finished) return;
+      if (document.querySelector('[data-splash-hold]')) {
+        holdTimer = setTimeout(tryFinish, 100);
+        return;
+      }
+      finish();
+    };
+
     if (shouldShowSplash) {
       // Double-rAF: also guards against the fade firing mid-jank and popping
       // off without painting any transition frames
       fadeRaf = requestAnimationFrame(() => {
-        fadeRaf = requestAnimationFrame(finish);
+        fadeRaf = requestAnimationFrame(tryFinish);
       });
       maxTimer = setTimeout(finish, MAX_MS);
     } else {
@@ -153,6 +165,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       if (fadeTimer) clearTimeout(fadeTimer);
       if (removeTimer) clearTimeout(removeTimer);
       if (maxTimer) clearTimeout(maxTimer);
+      if (holdTimer) clearTimeout(holdTimer);
     };
   }, []);
   
