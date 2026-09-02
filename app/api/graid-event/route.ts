@@ -27,10 +27,12 @@ export async function GET(request: NextRequest) {
   incrementRateLimit(request, 'graid-event');
 
   try {
-    const session = await requireGuildSession(request);
+    // Session check and event fetch are independent — run them concurrently
+    const [session, { event, rows }] = await Promise.all([
+      requireGuildSession(request),
+      fetchActiveEvent(),
+    ]);
     const authorized = !!session;
-
-    const { event, rows } = await fetchActiveEvent();
     let fallback = null;
     if (!event) {
       fallback = await fetchMostRecentEvent();

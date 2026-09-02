@@ -310,7 +310,7 @@ function RankSection({ rankName, members, showOnlineOnly }: { rankName: string; 
                     textAlign: 'center',
                     marginBottom: '0.2rem'
                   }}>
-                    <img src="/images/mythics/spear.fire3.png" alt="Wars" style={{ width: '12px', height: '12px', objectFit: 'contain', verticalAlign: 'middle' }} /> {member.wars} <img src="/images/raids/aspect_warrior.png" alt="Raids" style={{ width: '12px', height: '12px', objectFit: 'contain', verticalAlign: 'middle' }} /> {member.raids} <img src="/images/profile/shells.png" alt="Shells" style={{ width: '12px', height: '12px', objectFit: 'contain', verticalAlign: 'middle' }} /> {member.shells}
+                    <img src="/images/mythics/spear.fire3.24.webp" alt="Wars" style={{ width: '12px', height: '12px', objectFit: 'contain', verticalAlign: 'middle' }} /> {member.wars} <img src="/images/raids/aspect_warrior.png" alt="Raids" style={{ width: '12px', height: '12px', objectFit: 'contain', verticalAlign: 'middle' }} /> {member.raids} <img src="/images/profile/shells.png" alt="Shells" style={{ width: '12px', height: '12px', objectFit: 'contain', verticalAlign: 'middle' }} /> {member.shells}
                   </div>
 
                   {/* Playtime */}

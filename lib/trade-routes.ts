@@ -15,6 +15,7 @@
  */
 
 import { ROL_UPDATE_CUTOFF_MS, REKINDLED_WORLD_CUTOFF_MS } from "./territory-abbreviations";
+import { VERBOSE_DATA_URL } from "./verbose-data-client";
 
 /** No trade routes existed before 1.20 Gavel Reborn went live. */
 export const TRADE_ROUTES_EPOCH_MS = ROL_UPDATE_CUTOFF_MS;
@@ -56,7 +57,7 @@ export const TRADE_ROUTE_ERAS: TradeRouteEra[] = [
   // Jul 31, 2025; boundary at first confirmed absence)
   { startMs: new Date("2025-07-31T00:00:00Z").getTime(), url: "/trade-routes/2025-07.json?v=1" },
   // 2.2 Fruma — the present-day graph (+31 territories, +48 routes)
-  { startMs: new Date("2026-04-04T00:00:00Z").getTime(), url: "/territories_verbose.json?v=4" },
+  { startMs: new Date("2026-04-04T00:00:00Z").getTime(), url: VERBOSE_DATA_URL },
 ];
 
 /**

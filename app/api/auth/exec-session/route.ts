@@ -14,17 +14,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ authenticated: false });
   }
 
-  // Verify the user is still in discord_links (any rank is OK)
-  const linkCheck = await checkDiscordLink(session.discord_id);
+  // Verify the user is still in discord_links (any rank is OK) and still in
+  // the guild — independent checks, run concurrently
+  const [linkCheck, inGuild] = await Promise.all([
+    checkDiscordLink(session.discord_id),
+    checkGuildMembership(session.uuid),
+  ]);
   if (!linkCheck.ok) {
     console.warn(`[exec-session] ${session.discord_username} (${session.discord_id}) not found in discord_links`);
     const response = NextResponse.json({ authenticated: false, reason: 'not_linked' });
     clearExecSessionCookie(response);
     return response;
   }
-
-  // Verify the user is still in the guild
-  const inGuild = await checkGuildMembership(session.uuid);
   if (!inGuild) {
     console.warn(`[exec-session] ${linkCheck.ign} (${session.discord_username}) not in guild — UUID ${session.uuid} missing from cached guild data`);
     const response = NextResponse.json({ authenticated: false, reason: 'no_longer_in_guild' });

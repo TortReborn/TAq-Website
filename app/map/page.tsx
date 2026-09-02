@@ -45,6 +45,7 @@ import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/hi
 import { shouldRenderTerritory } from "@/lib/retired-territories";
 import { ROL_UPDATE_CUTOFF_MS } from "@/lib/territory-abbreviations";
 import { mapLog, mapError, mapTime, timedFetch } from "@/lib/map-logger";
+import { fetchVerboseData } from "@/lib/verbose-data-client";
 
 // ---------------------------------------------------------------------------
 // Old Realm of Light underlay (history mode, pre-Jan-2021 only).
@@ -559,16 +560,11 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
     }
   };
 
-  // Load territories verbose data for connection calculations
+  // Load territories verbose data for connection calculations (shared
+  // memoized fetch — LandViewOverlay reuses the same promise)
   const loadVerboseData = async (): Promise<Record<string, TerritoryVerboseData>> => {
     try {
-      // ?v= busts stale browser copies when the file's contents change
-      const response = await fetch('/territories_verbose.json?v=4');
-      if (response.ok) {
-        return await response.json();
-      }
-      console.warn('Failed to load territories verbose data');
-      return {};
+      return await fetchVerboseData();
     } catch (error) {
       console.error('Error loading territories verbose data:', error);
       return {};
@@ -655,8 +651,13 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
     };
   }, [viewMode]);
 
-  // Fetch history bounds on page load
+  // Fetch history bounds when history mode is (or becomes) active. Deferred
+  // out of live-mode loads: the bounds route can take seconds on a cold cache
+  // and nothing in live mode consumes it.
+  const historyBoundsRequestedRef = useRef(false);
   useEffect(() => {
+    if (viewMode !== 'history' || historyBoundsRequestedRef.current) return;
+    historyBoundsRequestedRef.current = true;
     const fetchHistoryBounds = async () => {
       try {
         const response = await timedFetch('bounds', '/api/map-history/bounds');
@@ -682,7 +683,7 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
       }
     };
     fetchHistoryBounds();
-  }, []);
+  }, [viewMode]);
 
   // -----------------------------------------------------------------------
   // Event-based history loading with client-side reconstruction

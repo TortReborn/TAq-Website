@@ -10,7 +10,8 @@ interface Props {
 }
 
 export default function BackgroundShopModal({ isOpen, onClose, onBackgroundChange }: Props) {
-  const { data, loading, error, purchaseBackground, setActiveBackground } = useBackgroundShop();
+  // Only fetch shop data once the modal is actually opened
+  const { data, loading, error, purchaseBackground, setActiveBackground } = useBackgroundShop(isOpen);
   const [confirmingId, setConfirmingId] = useState<number | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);

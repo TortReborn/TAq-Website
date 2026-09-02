@@ -25,8 +25,63 @@ export async function GET(request: NextRequest) {
       ? [...BASE_TIME_PERIODS, customDays]
       : BASE_TIME_PERIODS;
 
-    // Get current guild data to find this member
-    const guildDataRaw = await simpleDatabaseCache.getGuildData(clientIP);
+    const pool = getPool();
+
+    // None of these depend on each other — run the guild blob read, the
+    // external Wynncraft call, the snapshot queries, settings, and the four
+    // profile queries all concurrently instead of as a serial waterfall.
+    const [
+      guildDataRaw,
+      wynnRank,
+      allSnapshots,
+      weeklyRequirement,
+      allTimeGraidRaids,
+      [graidResult, customizationResult, shellsResult, kickListResult],
+    ] = await Promise.all([
+      simpleDatabaseCache.getGuildData(clientIP),
+      // Wynncraft player data for server rank (VIP, CHAMPION, etc.) — non-fatal
+      (async (): Promise<string | null> => {
+        try {
+          const wynnRes = await fetch(`https://api.wynncraft.com/v3/player/${uuid}?fullResult`, { next: { revalidate: 300 } });
+          if (wynnRes.ok) {
+            const wynnData = await wynnRes.json();
+            if (wynnData.rank && wynnData.rank !== 'Player') {
+              return wynnData.rank;
+            } else if (wynnData.supportRank) {
+              return wynnData.supportRank;
+            }
+          }
+        } catch { /* Wynncraft API failure is non-fatal */ }
+        return null;
+      })(),
+      simpleDatabaseCache.getPlayerActivitySnapshots(timePeriods, clientIP),
+      simpleDatabaseCache.getSetting<number>('weekly_threshold', 4.0),
+      getAllTimeGraidRaidTotal(pool, uuid),
+      Promise.all([
+        pool.query(
+          `SELECT ge.id, ge.title, ge.start_ts, ge.end_ts, get2.total
+           FROM graid_event_totals get2
+           JOIN graid_events ge ON ge.id = get2.event_id
+           WHERE get2.uuid = $1
+           ORDER BY ge.start_ts DESC
+           LIMIT 10`,
+          [uuid]
+        ),
+        pool.query(
+          `SELECT gradient, background FROM profile_customization WHERE "user" = $1`,
+          [session.discord_id]
+        ).catch(() => ({ rows: [] as any[] })),
+        pool.query(
+          `SELECT balance FROM shells WHERE "user" = $1`,
+          [session.discord_id]
+        ).catch(() => ({ rows: [] as any[] })),
+        pool.query(
+          `SELECT tier FROM kick_list WHERE uuid = $1`,
+          [uuid]
+        ).catch(() => ({ rows: [] as any[] })),
+      ]),
+    ]);
+
     let memberData: any = null;
     if (guildDataRaw && (guildDataRaw as any).members) {
       const members = (guildDataRaw as any).members;
@@ -41,23 +96,6 @@ export async function GET(request: NextRequest) {
     if (!memberData) {
       return NextResponse.json({ error: 'Member data not found in guild cache' }, { status: 404 });
     }
-
-    // Fetch Wynncraft player data for server rank (VIP, CHAMPION, etc.)
-    let wynnRank: string | null = null;
-    try {
-      const wynnRes = await fetch(`https://api.wynncraft.com/v3/player/${uuid}?fullResult`, { next: { revalidate: 300 } });
-      if (wynnRes.ok) {
-        const wynnData = await wynnRes.json();
-        if (wynnData.rank && wynnData.rank !== 'Player') {
-          wynnRank = wynnData.rank;
-        } else if (wynnData.supportRank) {
-          wynnRank = wynnData.supportRank;
-        }
-      }
-    } catch { /* Wynncraft API failure is non-fatal */ }
-
-    // Get activity snapshots for time-period deltas
-    const allSnapshots = await simpleDatabaseCache.getPlayerActivitySnapshots(timePeriods, clientIP);
     const timeFrames: Record<string, { playtime: number; wars: number; raids: number; shells: number; contributed: number; hasCompleteData: boolean }> = {};
     for (const days of timePeriods) {
       const hist = (allSnapshots[days] || {})[uuid];
@@ -74,37 +112,6 @@ export async function GET(request: NextRequest) {
         };
       }
     }
-
-    const pool = getPool();
-
-    // Fetch weekly threshold setting
-    const weeklyRequirement = await simpleDatabaseCache.getSetting<number>('weekly_threshold', 4.0);
-    const allTimeGraidRaids = await getAllTimeGraidRaidTotal(pool, uuid);
-
-    // Fetch profile customization (gradient), shells balance, and kick list status in parallel
-    const [graidResult, customizationResult, shellsResult, kickListResult] = await Promise.all([
-      pool.query(
-        `SELECT ge.id, ge.title, ge.start_ts, ge.end_ts, get2.total
-         FROM graid_event_totals get2
-         JOIN graid_events ge ON ge.id = get2.event_id
-         WHERE get2.uuid = $1
-         ORDER BY ge.start_ts DESC
-         LIMIT 10`,
-        [uuid]
-      ),
-      pool.query(
-        `SELECT gradient, background FROM profile_customization WHERE "user" = $1`,
-        [session.discord_id]
-      ).catch(() => ({ rows: [] })),
-      pool.query(
-        `SELECT balance FROM shells WHERE "user" = $1`,
-        [session.discord_id]
-      ).catch(() => ({ rows: [] })),
-      pool.query(
-        `SELECT tier FROM kick_list WHERE uuid = $1`,
-        [uuid]
-      ).catch(() => ({ rows: [] })),
-    ]);
 
     const graidEvents = graidResult.rows.map((r: any) => ({
       id: r.id,

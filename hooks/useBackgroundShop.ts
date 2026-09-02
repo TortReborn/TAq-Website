@@ -15,9 +15,9 @@ interface BackgroundShopData {
   shellsBalance: number;
 }
 
-export function useBackgroundShop() {
+export function useBackgroundShop(enabled: boolean = true) {
   const { data, error, isLoading, mutate } = useSWR<BackgroundShopData>(
-    '/api/backgrounds',
+    enabled ? '/api/backgrounds' : null,
     fetcher,
     {
       revalidateOnFocus: false,

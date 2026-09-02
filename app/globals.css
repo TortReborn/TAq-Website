@@ -699,7 +699,7 @@ body.site-fixed-bg-active > footer {
   background-image:
     linear-gradient(var(--site-bg-veil), var(--site-bg-veil)),
     linear-gradient(var(--site-bg-shade), var(--site-bg-shade)),
-    url('/images/home/discord-banner.jpg');
+    url('/images/home/discord-banner.1920.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

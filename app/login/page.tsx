@@ -68,7 +68,7 @@ function LoginContent() {
       }}>
         <div style={{ marginBottom: '1.5rem' }}>
           <img
-            src="/images/guildimages/icontransparent.png"
+            src="/images/guildimages/icontransparent.128.webp"
             alt="The Aquarium"
             style={{
               width: '64px',

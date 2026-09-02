@@ -5,6 +5,7 @@ import { coordToPixel, Territory } from '@/lib/utils';
 import { RETIRED_TERRITORIES } from '@/lib/retired-territories';
 import { tradeRouteEraFor } from '@/lib/trade-routes';
 import { TerritoryVerboseData } from '@/lib/connection-calculator';
+import { VERBOSE_DATA_URL, fetchVerboseData } from '@/lib/verbose-data-client';
 
 interface TradeRoute {
   key: string;
@@ -28,6 +29,9 @@ interface TradeRoutesOverlayProps {
 const graphCache = new Map<string, Promise<Record<string, TerritoryVerboseData>>>();
 
 const fetchGraph = (url: string): Promise<Record<string, TerritoryVerboseData>> => {
+  // The present-day graph IS the verbose territory file — reuse the shared
+  // memoized fetch instead of downloading the ~270 KB file a second time.
+  if (url === VERBOSE_DATA_URL) return fetchVerboseData();
   let promise = graphCache.get(url);
   if (!promise) {
     promise = fetch(url).then((response) => {

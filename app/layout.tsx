@@ -200,6 +200,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        {/* Splash icon is the LCP element on full page loads — discover it
+            from the HTML instead of waiting for hydration */}
+        <link
+          rel="preload"
+          href="/images/guildimages/icontransparent.512.webp"
+          as="image"
+          type="image/webp"
+        />
         <title>The Aquarium</title>
         <meta name="description" content="The Aquarium - Wynncraft guild territory map, leaderboards, and member statistics" />
 
@@ -222,8 +230,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="canonical" href="https://the-aquarium.com/" />
 
         {/* Favicon */}
-        <link rel="icon" type="image/png" href="/images/guildimages/icontransparent.png" />
-        <link rel="apple-touch-icon" href="/images/guildimages/icontransparent.png" />
+        <link rel="icon" type="image/png" href="/images/guildimages/icontransparent.64.png" />
+        <link rel="apple-touch-icon" href="/images/guildimages/icontransparent.180.png" />
 
         {/* Structured Data */}
         <script
@@ -291,8 +299,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               gap: '2rem'
             }}>
               {/* Guild Icon */}
-              <img 
-                src="/images/guildimages/icontransparent.png" 
+              <img
+                src="/images/guildimages/icontransparent.512.webp"
                 alt="The Aquarium Guild Icon"
                 style={{
                   width: '450px',
@@ -362,7 +370,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               }}
             >
               <img
-                src="/images/guildimages/icontransparent.png"
+                src="/images/guildimages/icontransparent.96.webp"
                 alt="Home"
                 style={{
                   width: '42px',

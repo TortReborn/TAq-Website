@@ -80,6 +80,32 @@ async function fetchHqSnipesThisSeason(): Promise<{ season: number | null; count
   }
 }
 
+// In-process cache for the four external Wynncraft calls. `force-dynamic`
+// (needed for per-request rate limiting) disables Next's data cache defaults,
+// so without this every landing-page visit paid 4 live Wynncraft round-trips.
+const WYNN_STATS_TTL_MS = 5 * 60 * 1000;
+let wynnStatsCache: {
+  expires: number;
+  data: [GuildProfile | null, number | null, number | null, number | null];
+} | null = null;
+
+async function fetchWynnStats() {
+  if (wynnStatsCache && wynnStatsCache.expires > Date.now()) {
+    return wynnStatsCache.data;
+  }
+  const data = await Promise.all([
+    fetchGuildProfile(),
+    fetchLeaderboardPlacement('guildWars'),
+    fetchLeaderboardPlacement('guildTotalRaids'),
+    fetchLeaderboardPlacement('guildLevel'),
+  ] as const);
+  // Only cache fully-successful results so transient API failures retry
+  if (data.every(d => d !== null)) {
+    wynnStatsCache = { expires: Date.now() + WYNN_STATS_TTL_MS, data };
+  }
+  return data;
+}
+
 export async function GET(request: NextRequest) {
   const rateLimitCheck = checkRateLimit(request, 'public-stats');
   if (!rateLimitCheck.allowed) {
@@ -87,11 +113,8 @@ export async function GET(request: NextRequest) {
   }
   incrementRateLimit(request, 'public-stats');
 
-  const [profile, warsPlacement, raidsPlacement, levelPlacement, hqSnipes] = await Promise.all([
-    fetchGuildProfile(),
-    fetchLeaderboardPlacement('guildWars'),
-    fetchLeaderboardPlacement('guildTotalRaids'),
-    fetchLeaderboardPlacement('guildLevel'),
+  const [[profile, warsPlacement, raidsPlacement, levelPlacement], hqSnipes] = await Promise.all([
+    fetchWynnStats(),
     fetchHqSnipesThisSeason(),
   ]);
 

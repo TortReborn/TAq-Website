@@ -300,53 +300,83 @@ export async function requireGuildSession(request: NextRequest): Promise<ExecSes
   const session = getExecSession(request);
   if (!session) return null;
 
-  const linkCheck = await checkDiscordLink(session.discord_id);
+  const [linkCheck, inGuild] = await Promise.all([
+    checkDiscordLink(session.discord_id),
+    checkGuildMembership(session.uuid),
+  ]);
   if (!linkCheck.ok) return null;
-
-  const inGuild = await checkGuildMembership(session.uuid);
   if (!inGuild) return null;
 
   return { ...session, role: linkCheck.role, rank: linkCheck.rank, ign: linkCheck.ign };
 }
 
+// Membership answers change at most when the guild roster syncs, so a short
+// in-process cache collapses the burst of concurrent session checks a single
+// page load produces (profile fires 4-5 authenticated requests at once).
+const MEMBERSHIP_CACHE_TTL_MS = 60 * 1000;
+const membershipCache = new Map<string, { inGuild: boolean; expires: number }>();
+
 /**
  * Check if a UUID is currently a member of the guild using cached guildData from cache_entries.
+ * The membership test runs inside Postgres so only a boolean crosses the wire,
+ * instead of the full multi-hundred-KB roster blob on every authenticated request.
  */
 export async function checkGuildMembership(uuid: string): Promise<boolean> {
+  const normalizedUuid = uuid.replace(/-/g, '');
+
+  const cached = membershipCache.get(normalizedUuid);
+  if (cached && cached.expires > Date.now()) {
+    return cached.inGuild;
+  }
+
   try {
     const { getPool } = await import('@/lib/db');
     const pool = getPool();
 
     const result = await pool.query(
-      `SELECT data FROM cache_entries WHERE cache_key = 'guildData'`
+      `SELECT jsonb_typeof(data->'members') AS mtype,
+              CASE WHEN jsonb_typeof(data->'members') = 'array' THEN
+                EXISTS (
+                  SELECT 1 FROM jsonb_array_elements(data->'members') AS m
+                  WHERE replace(m->>'uuid', '-', '') = $1
+                )
+              END AS in_guild
+       FROM cache_entries WHERE cache_key = 'guildData'`,
+      [normalizedUuid]
     );
 
     if (result.rows.length === 0) {
       return false;
     }
 
-    const guildData = result.rows[0].data;
-    const members = guildData?.members;
-    if (!members) return false;
-
-    const normalizedUuid = uuid.replace(/-/g, '');
-
-    if (Array.isArray(members)) {
+    let inGuild: boolean;
+    if (result.rows[0].mtype === 'array') {
       // New format: flat array with uuid field on each member
-      return members.some((m: any) =>
-        m.uuid && m.uuid.replace(/-/g, '') === normalizedUuid
+      inGuild = result.rows[0].in_guild === true;
+    } else {
+      // Old format: members organized by rank groups { owner: { username: { uuid, ... } }, ... }
+      // Rare legacy path — only here do we pull the blob and scan in JS.
+      const blob = await pool.query(
+        `SELECT data->'members' AS members FROM cache_entries WHERE cache_key = 'guildData'`
       );
-    }
-
-    // Old format: members organized by rank groups { owner: { username: { uuid, ... } }, ... }
-    for (const [key, rankGroup] of Object.entries(members)) {
-      if (typeof rankGroup !== 'object' || rankGroup === null) continue;
-      for (const memberData of Object.values(rankGroup as Record<string, any>)) {
-        if (memberData?.uuid && memberData.uuid.replace(/-/g, '') === normalizedUuid) return true;
+      const members = blob.rows[0]?.members;
+      inGuild = false;
+      if (members && typeof members === 'object') {
+        for (const rankGroup of Object.values(members)) {
+          if (typeof rankGroup !== 'object' || rankGroup === null) continue;
+          for (const memberData of Object.values(rankGroup as Record<string, any>)) {
+            if (memberData?.uuid && memberData.uuid.replace(/-/g, '') === normalizedUuid) {
+              inGuild = true;
+              break;
+            }
+          }
+          if (inGuild) break;
+        }
       }
     }
 
-    return false;
+    membershipCache.set(normalizedUuid, { inGuild, expires: Date.now() + MEMBERSHIP_CACHE_TTL_MS });
+    return inGuild;
   } catch {
     return false;
   }

@@ -358,43 +358,28 @@ class SimpleDatabaseCache {
 
     const client = await this.pool.connect();
     try {
-      // 1. Resolve each period to the most recent snapshot date on or before
-      //    CURRENT_DATE - N days. This handles gaps (missing days) correctly.
+      // 1. Resolve every period to its target snapshot date in ONE round trip:
+      //    the most recent snapshot on or before CURRENT_DATE - N days, falling
+      //    back to the oldest available snapshot. Both subqueries are satisfied
+      //    by the snapshot_date index, so this never scans the table.
+      const dateResult = await client.query(
+        `SELECT t.period,
+                COALESCE(
+                  (SELECT MAX(snapshot_date) FROM player_activity WHERE snapshot_date <= CURRENT_DATE - t.period),
+                  (SELECT MIN(snapshot_date) FROM player_activity)
+                )::text AS target_date
+         FROM unnest($1::int[]) AS t(period)`,
+        [daysArray]
+      );
+
       const periodToDate = new Map<number, string>();
       const targetDatesSet = new Set<string>();
       const logParts: string[] = [];
-
-      for (const period of daysArray) {
-        const dateResult = await client.query(
-          `SELECT DISTINCT snapshot_date::text as snapshot_date
-           FROM player_activity
-           WHERE snapshot_date <= CURRENT_DATE - $1::integer
-           ORDER BY snapshot_date DESC
-           LIMIT 1`,
-          [period]
-        );
-
-        let targetDate: string | null = dateResult.rows[0]?.snapshot_date ?? null;
-
-        if (!targetDate) {
-          // No snapshot that far back — use the oldest available
-          const oldestResult = await client.query(
-            `SELECT DISTINCT snapshot_date::text as snapshot_date
-             FROM player_activity
-             ORDER BY snapshot_date ASC
-             LIMIT 1`
-          );
-          targetDate = oldestResult.rows[0]?.snapshot_date ?? null;
-          if (targetDate) {
-            logParts.push(`${period}d→oldest(${targetDate})`);
-          }
-        } else {
-          logParts.push(`${period}d→${targetDate}`);
-        }
-
-        if (targetDate) {
-          periodToDate.set(period, targetDate);
-          targetDatesSet.add(targetDate);
+      for (const row of dateResult.rows) {
+        if (row.target_date) {
+          periodToDate.set(Number(row.period), row.target_date);
+          targetDatesSet.add(row.target_date);
+          logParts.push(`${row.period}d→${row.target_date}`);
         }
       }
 
@@ -405,42 +390,59 @@ class SimpleDatabaseCache {
         return empty;
       }
 
-      // 2. For each target date, get the most recent snapshot per member on or
-      //    before that date. This handles members with gaps in their snapshot
-      //    history correctly (uses closest available baseline, not earliest ever).
-      //    For members who joined AFTER the target date (no snapshot on/before it),
-      //    fall back to their earliest snapshot (represents when they joined).
+      // 2. For each (target date, member) pair, find the snapshot closest to
+      //    the target date (either direction — members who joined after the
+      //    target date resolve to their earliest snapshot). The lateral picks
+      //    the nearest neighbor on each side via two LIMIT 1 probes of the
+      //    (uuid, snapshot_date) primary key, instead of the previous
+      //    full-table DISTINCT ON sort per period. All dates go in one query.
       type SnapshotRow = { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number };
-      const snapshots: Record<number, Record<string, SnapshotRow>> = {};
 
+      const result = await client.query(
+        `WITH uuids AS (SELECT DISTINCT uuid FROM player_activity)
+         SELECT t.target_date::text AS target_date, c.uuid, c.playtime, c.contributed, c.wars, c.raids, c.shells
+         FROM unnest($1::date[]) AS t(target_date)
+         CROSS JOIN uuids u
+         CROSS JOIN LATERAL (
+           SELECT * FROM (
+             (SELECT uuid, playtime, contributed, wars, raids, shells, snapshot_date
+              FROM player_activity
+              WHERE uuid = u.uuid AND snapshot_date <= t.target_date
+              ORDER BY snapshot_date DESC LIMIT 1)
+             UNION ALL
+             (SELECT uuid, playtime, contributed, wars, raids, shells, snapshot_date
+              FROM player_activity
+              WHERE uuid = u.uuid AND snapshot_date > t.target_date
+              ORDER BY snapshot_date ASC LIMIT 1)
+           ) cand
+           ORDER BY ABS(cand.snapshot_date - t.target_date) ASC, cand.snapshot_date DESC
+           LIMIT 1
+         ) c`,
+        [Array.from(targetDatesSet)]
+      );
+
+      const byDate = new Map<string, Record<string, SnapshotRow>>();
+      for (const row of result.rows) {
+        let dateData = byDate.get(row.target_date);
+        if (!dateData) {
+          dateData = {};
+          byDate.set(row.target_date, dateData);
+        }
+        dateData[row.uuid] = {
+          uuid: row.uuid,
+          playtime: row.playtime,
+          contributed: row.contributed,
+          wars: row.wars,
+          raids: row.raids,
+          shells: row.shells
+        };
+      }
+
+      const snapshots: Record<number, Record<string, SnapshotRow>> = {};
       for (const period of daysArray) {
         const dateKey = periodToDate.get(period);
-        if (!dateKey) {
-          snapshots[period] = {};
-          continue;
-        }
-
-        // Get the closest snapshot to the target date per member (either direction)
-        const result = await client.query(
-          `SELECT DISTINCT ON (uuid) uuid, playtime, contributed, wars, raids, shells
-           FROM player_activity
-           ORDER BY uuid, ABS(snapshot_date - $1::date) ASC`,
-          [dateKey]
-        );
-
-        const dateData: Record<string, SnapshotRow> = {};
-        for (const row of result.rows) {
-          dateData[row.uuid] = {
-            uuid: row.uuid,
-            playtime: row.playtime,
-            contributed: row.contributed,
-            wars: row.wars,
-            raids: row.raids,
-            shells: row.shells
-          };
-        }
-
-        snapshots[period] = dateData;
+        // Copy so periods resolving to the same date don't share one object
+        snapshots[period] = { ...((dateKey && byDate.get(dateKey)) || {}) };
       }
 
       const memberCounts = daysArray.map(p => {

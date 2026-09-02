@@ -72,6 +72,7 @@ export default function HomePage() {
                 src="/images/guildimages/icontransparent.png"
                 alt="The Aquarium"
                 fill
+                sizes="280px"
                 style={{ objectFit: 'contain' }}
                 priority
               />

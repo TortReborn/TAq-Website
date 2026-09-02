@@ -256,7 +256,8 @@ export async function GET(request: NextRequest) {
       }, {
         headers: {
           'X-Cache': 'HIT',
-          'X-Cache-Timestamp': Date.now().toString()
+          'X-Cache-Timestamp': Date.now().toString(),
+          'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=120'
         }
       });
 

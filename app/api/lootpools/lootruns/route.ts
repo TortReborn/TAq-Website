@@ -314,7 +314,9 @@ function buildLootrunPayload(pools: WynnLootPool[], shinyByRegion: Record<string
 }
 
 function createJsonResponse(data: unknown, rateLimitCheck: { remainingRequests: number; resetTime: number }) {
-  const jsonResponse = NextResponse.json(data);
+  const jsonResponse = NextResponse.json(data, {
+    headers: { 'Cache-Control': 'public, max-age=60, s-maxage=120, stale-while-revalidate=300' },
+  });
   return addRateLimitHeaders(jsonResponse, rateLimitCheck.remainingRequests, rateLimitCheck.resetTime);
 }
 
@@ -335,13 +337,21 @@ export async function GET(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
 
-    // Get nori lootpool cache for shiny data only; Wynncraft is the reward source.
-    const cachedNoriData = await simpleDatabaseCache.getLootpoolData(clientIP);
+    // Nori cache (shiny data only) and Wynncraft (reward source) are
+    // independent — fetch them concurrently.
+    const [cachedNoriData, wynncraftPoolsResult] = await Promise.all([
+      simpleDatabaseCache.getLootpoolData(clientIP),
+      fetchWynncraftLootPools().then(
+        (pools) => ({ ok: true as const, pools }),
+        (error) => ({ ok: false as const, error })
+      ),
+    ]);
     const shinyByRegion = extractShinyByRegion(cachedNoriData);
 
     try {
       // Build current lootrun rewards from Wynncraft, preserving nori's shiny item/tracker.
-      const wynncraftPools = await fetchWynncraftLootPools();
+      if (!wynncraftPoolsResult.ok) throw wynncraftPoolsResult.error;
+      const wynncraftPools = wynncraftPoolsResult.pools;
       return createJsonResponse(buildLootrunPayload(wynncraftPools, shinyByRegion), rateLimitCheck);
     } catch (wynncraftError) {
       console.warn('Failed to fetch Wynncraft loot pools, falling back to cached nori lootpool data:', wynncraftError);

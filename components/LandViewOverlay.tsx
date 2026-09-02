@@ -19,19 +19,7 @@ interface LandViewOverlayProps {
   opaqueFill?: boolean;
 }
 
-let verboseDataPromise: Promise<Record<string, TerritoryVerboseData>> | null = null;
-
-const fetchVerboseData = (): Promise<Record<string, TerritoryVerboseData>> => {
-  if (!verboseDataPromise) {
-    verboseDataPromise = fetch("/territories_verbose.json?v=4").then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    });
-    // Reset on failure so a later mount can retry instead of reusing the rejection
-    verboseDataPromise.catch(() => { verboseDataPromise = null; });
-  }
-  return verboseDataPromise;
-};
+import { fetchVerboseData } from "@/lib/verbose-data-client";
 
 const hasEntries = (obj: Record<string, unknown>): boolean => {
   for (const key in obj) {
