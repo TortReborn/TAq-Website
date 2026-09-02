@@ -2397,6 +2397,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             timestampMs={chronicleTimeMs}
             onJumpToDate={viewMode === 'history' ? handleJumpToDate : undefined}
             availableGuilds={availableGuilds}
+            containerBounds={containerSize}
           />
 
           {/* Conflict Finder Panel */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { X, Plus, Pencil, CornerDownLeft, Check } from "lucide-react";
 import {
   AlliancePayload,
@@ -29,6 +29,8 @@ interface ChroniclePanelProps {
   /** Jump the history timeline to a date (absent in live mode) */
   onJumpToDate?: (date: Date) => void;
   availableGuilds: { name: string; prefix: string }[];
+  /** Map container size — keeps the dragged panel inside the map */
+  containerBounds?: { width: number; height: number };
 }
 
 // UTC so that dates entered as "2019-01-01" never display as Dec 31 in
@@ -279,17 +281,21 @@ function SubmitForm({
                   <X size={12} />
                 </button>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
-                joined
-                <input type="date" style={{ ...inputStyle, flex: 1, minWidth: 0 }} value={toDateInput(m.joinedAt)}
-                  onChange={(e) => setAlliance(a => {
-                    const ms = [...a.memberships]; ms[i] = { ...ms[i], joinedAt: e.target.value }; return { ...a, memberships: ms };
-                  })} />
-                left
-                <input type="date" title="Empty while still a member" style={{ ...inputStyle, flex: 1, minWidth: 0 }} value={toDateInput(m.leftAt)}
-                  onChange={(e) => setAlliance(a => {
-                    const ms = [...a.memberships]; ms[i] = { ...ms[i], leftAt: e.target.value || null }; return { ...a, memberships: ms };
-                  })} />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Joined</div>
+                  <PickerField type="date" width="100%" value={toDateInput(m.joinedAt)}
+                    onChange={(v) => setAlliance(a => {
+                      const ms = [...a.memberships]; ms[i] = { ...ms[i], joinedAt: v }; return { ...a, memberships: ms };
+                    })} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Left (empty = current)</div>
+                  <PickerField type="date" width="100%" value={toDateInput(m.leftAt)}
+                    onChange={(v) => setAlliance(a => {
+                      const ms = [...a.memberships]; ms[i] = { ...ms[i], leftAt: v || null }; return { ...a, memberships: ms };
+                    })} />
+                </div>
               </div>
             </div>
           ))}
@@ -401,10 +407,77 @@ export default function ChroniclePanel({
   timestampMs,
   onJumpToDate,
   availableGuilds,
+  containerBounds,
 }: ChroniclePanelProps) {
   const { authenticated } = useExecSession();
   const [form, setForm] = useState<FormState>({ mode: 'closed' });
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Free-floating like the timeline panel: drag by the header, offset from
+  // the bottom-right anchor, clamped to the map and persisted.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+
+  useEffect(() => {
+    const cached = localStorage.getItem('chroniclePanelPosition');
+    if (cached) {
+      try { setPosition(JSON.parse(cached)); } catch { /* ignore */ }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('chroniclePanelPosition', JSON.stringify(position));
+  }, [position]);
+
+  const clampPosition = useCallback((x: number, y: number) => {
+    const panel = panelRef.current;
+    if (!panel || !containerBounds) return { x, y };
+    const { offsetWidth: w, offsetHeight: h } = panel;
+    // Anchor: right 1rem (16px), bottom 4.25rem (68px)
+    const minX = 24 + w - containerBounds.width; // left edge ≥ 8px
+    const maxX = 8;                              // right edge ≤ width - 8px
+    const minY = 76 + h - containerBounds.height; // top edge ≥ 8px
+    const maxY = 60;                              // bottom edge ≤ height - 8px
+    return {
+      x: Math.max(Math.min(minX, maxX), Math.min(maxX, x)),
+      y: Math.max(Math.min(minY, maxY), Math.min(maxY, y)),
+    };
+  }, [containerBounds]);
+
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    e.preventDefault();
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY, posX: position.x, posY: position.y };
+  }, [position]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMove = (e: MouseEvent) => {
+      setPosition(clampPosition(
+        dragStartRef.current.posX + (e.clientX - dragStartRef.current.x),
+        dragStartRef.current.posY + (e.clientY - dragStartRef.current.y),
+      ));
+    };
+    const onUp = () => setIsDragging(false);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [isDragging, clampPosition]);
+
+  // Re-clamp when the container resizes so the panel can't be stranded
+  useEffect(() => {
+    if (isDragging || !isOpen) return;
+    setPosition(prev => {
+      const next = clampPosition(prev.x, prev.y);
+      return next.x === prev.x && next.y === prev.y ? prev : next;
+    });
+  }, [containerBounds, clampPosition, isDragging, isOpen]);
 
   const active = useMemo(
     () => (data ? activeAlliancesAt(data.alliances, timestampMs) : []),
@@ -433,6 +506,7 @@ export default function ChroniclePanel({
 
   return (
     <div
+      ref={panelRef}
       data-testid="chronicle-panel"
       onMouseDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
@@ -440,6 +514,7 @@ export default function ChroniclePanel({
         position: 'absolute',
         right: '1rem',
         bottom: '4.25rem',
+        transform: `translate(${position.x}px, ${position.y}px)`,
         width: '360px',
         maxWidth: 'calc(100vw - 2rem)',
         maxHeight: 'min(560px, calc(100% - 6rem))',
@@ -453,8 +528,18 @@ export default function ChroniclePanel({
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.7rem 0.9rem 0.5rem' }}>
+      {/* Header — drag handle */}
+      <div
+        onMouseDown={handleDragStart}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.7rem 0.9rem 0.5rem',
+          cursor: isDragging ? 'grabbing' : 'grab',
+          userSelect: 'none',
+        }}
+      >
         <div>
           <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>Chronicle</div>
           <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
