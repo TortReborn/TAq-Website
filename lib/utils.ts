@@ -107,6 +107,15 @@ export interface TerritoryVerbose {
 // Function to load territories from the database cache (managed by external bot)
 export async function loadTerritories(): Promise<Record<string, Territory>> {
   try {
+    // The map page inlines a script that starts this fetch before hydration —
+    // consume that in-flight result once instead of fetching again
+    const early = (window as unknown as { __earlyTerritories?: Promise<Record<string, Territory> | null> }).__earlyTerritories;
+    if (early) {
+      (window as unknown as { __earlyTerritories?: unknown }).__earlyTerritories = undefined;
+      const result = await early;
+      if (result && !('error' in result)) return result;
+    }
+
     // Load from our API proxy - no fallbacks, cache managed by external bot
     const apiResponse = await fetch('/api/territories', {
       headers: {

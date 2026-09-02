@@ -1934,6 +1934,12 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       WebkitUserSelect: 'none',
       cursor: isDragging ? 'grabbing' : 'grab',
     }}>
+      {/* SSR-inlined: starts the territory fetch while the JS bundle is still
+          downloading/parsing, instead of waiting for hydration. Consumed once
+          by loadTerritories(). */}
+      <script dangerouslySetInnerHTML={{ __html:
+        `window.__earlyTerritories=fetch('/api/territories',{headers:{'Accept':'application/json'}}).then(function(r){return r.ok?r.json():null}).catch(function(){return null});`
+      }} />
       {/* Keeps the layout splash up until the active mode has territory data,
           so first paint under the splash is the finished map */}
       {(viewMode === 'live'
