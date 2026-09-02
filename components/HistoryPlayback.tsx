@@ -2,6 +2,7 @@
 
 import { memo, useState, useRef, useEffect } from "react";
 import { SkipBack, SkipForward, ChevronLeft, ChevronRight, ChevronDown, Play, Pause } from "lucide-react";
+import { SPEED_OPTIONS, speedLabel } from "@/lib/playback-speed";
 
 interface HistoryPlaybackProps {
   isPlaying: boolean;
@@ -17,12 +18,6 @@ interface HistoryPlaybackProps {
   hideSpeed?: boolean;
 }
 
-const SPEED_OPTIONS = [1, 2, 10, 50];
-const FAST_SPEED = -1; // sentinel: jump 1 day every 0.1s
-
-function speedLabel(s: number): string {
-  return s === FAST_SPEED ? 'Fast' : `${s}x`;
-}
 
 function HistoryPlayback({
   isPlaying,
@@ -196,7 +191,7 @@ function HistoryPlayback({
                   boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                 }}
               >
-                {[...SPEED_OPTIONS, FAST_SPEED].map((s) => (
+                {SPEED_OPTIONS.map((s) => (
                   <button
                     key={s}
                     type="button"

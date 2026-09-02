@@ -18,6 +18,7 @@ import HistoryTimeline, { SeasonZoom, TimelineEventMarker, TimelineAllianceSpan 
 import { SeasonPeriod } from "@/lib/seasons";
 import HistoryDatePicker from "./HistoryDatePicker";
 import HistoryPlayback from "./HistoryPlayback";
+import { SPEED_OPTIONS, speedLabel } from "@/lib/playback-speed";
 import PickerField from "./PickerField";
 
 interface MapHistoryControlsProps {
@@ -49,18 +50,9 @@ interface MapHistoryControlsProps {
   allianceSpans?: TimelineAllianceSpan[]; // Chronicle alliance lifetime bands
 }
 
-// Playback speeds: minutes of history per real second. Labels state the
-// literal rate so each tier is meaningful at a glance. The top tier matches
-// the old "Fast" mode (1 day per 100ms tick = 10 days/s).
-const SPEED_OPTIONS = [10, 30, 60, 360, 1440, 14400];
+// Playback speed tiers + labels live in lib/playback-speed (shared with
+// HistoryPlayback, which renders the dropdown on wide panels).
 const ALL_SPEED_OPTIONS = SPEED_OPTIONS;
-
-function speedLabel(s: number): string {
-  if (s < 60) return `${s} min/s`;
-  if (s < 1440) return `${s / 60} hr/s`;
-  const days = s / 1440;
-  return days === 1 ? '1 day/s' : `${days} days/s`;
-}
 
 // Visible grabber pill shown inside each edge-resize hitbox
 const resizePillStyle: React.CSSProperties = {
