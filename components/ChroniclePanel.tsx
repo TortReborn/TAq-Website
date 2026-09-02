@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X, Plus, Pencil, CornerDownLeft, Check } from "lucide-react";
+import { X, Plus, Pencil, CornerDownLeft, Check, Maximize2, Minimize2 } from "lucide-react";
 import {
   AlliancePayload,
   ChronicleAlliance,
@@ -412,6 +412,16 @@ export default function ChroniclePanel({
   const { authenticated } = useExecSession();
   const [form, setForm] = useState<FormState>({ mode: 'closed' });
   const [expanded, setExpanded] = useState<string | null>(null);
+  // Expanded view: a wider two-column browse of ALL alliances and events,
+  // regardless of the shown timestamp. The compact view stays the default.
+  const [expandedView, setExpandedView] = useState(false);
+
+  useEffect(() => {
+    setExpandedView(localStorage.getItem('chronicleExpandedView') === 'true');
+  }, []);
+  useEffect(() => {
+    localStorage.setItem('chronicleExpandedView', String(expandedView));
+  }, [expandedView]);
 
   // Free-floating like the timeline panel: drag by the header, offset from
   // the bottom-right anchor, clamped to the map and persisted.
@@ -504,6 +514,103 @@ export default function ChroniclePanel({
     </div>
   );
 
+  const isActiveAlliance = (a: ChronicleAlliance) =>
+    a.memberships.some(m => Date.parse(m.joinedAt) <= timestampMs && (m.leftAt === null || Date.parse(m.leftAt) > timestampMs));
+
+  /** Overall lifespan of an alliance: earliest join → latest leave (or present) */
+  const allianceSpan = (a: ChronicleAlliance) => {
+    let min = Infinity;
+    let open = false;
+    let max = -Infinity;
+    for (const m of a.memberships) {
+      min = Math.min(min, Date.parse(m.joinedAt));
+      if (m.leftAt === null) open = true;
+      else max = Math.max(max, Date.parse(m.leftAt));
+    }
+    return `${fmtDate(new Date(min).toISOString())} → ${open ? 'present' : fmtDate(new Date(max).toISOString())}`;
+  };
+
+  const renderAlliance = (a: ChronicleAlliance, showSpan: boolean) => (
+    <div key={`a${a.id}`} style={{ marginBottom: '0.35rem', opacity: showSpan && !isActiveAlliance(a) ? 0.65 : 1 }}>
+      <div
+        onClick={() => setExpanded(expanded === `a${a.id}` ? null : `a${a.id}`)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer',
+          padding: '0.35rem 0.5rem', borderRadius: '0.375rem', background: 'var(--bg-secondary)',
+        }}
+      >
+        <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: a.color, flexShrink: 0 }} />
+        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {a.name}{a.tag ? ` [${a.tag}]` : ''}
+        </span>
+        <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+          {showSpan
+            ? allianceSpan(a)
+            : `${a.memberships.filter(m => Date.parse(m.joinedAt) <= timestampMs && (m.leftAt === null || Date.parse(m.leftAt) > timestampMs)).length} guilds`}
+        </span>
+      </div>
+      {expanded === `a${a.id}` && (
+        <div style={{ padding: '0.4rem 0.5rem 0.2rem', fontSize: '0.73rem', color: 'var(--text-secondary)' }}>
+          {a.description && <div style={{ marginBottom: '0.35rem', color: 'var(--text-primary)' }}>{a.description}</div>}
+          {a.memberships.map((m, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
+              <span>{m.guild}</span>
+              <span style={{ whiteSpace: 'nowrap' }}>{fmtDate(m.joinedAt)} → {fmtDate(m.leftAt)}</span>
+            </div>
+          ))}
+          {authenticated && (
+            <button type="button" style={{ ...smallBtn, marginTop: '0.4rem' }} onClick={() => editAlliance(a)}>
+              <Pencil size={11} /> Suggest edit
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderEvent = (e: ChronicleEvent) => (
+    <div key={`e${e.id}`} style={{ marginBottom: '0.35rem' }}>
+      <div
+        onClick={() => setExpanded(expanded === `e${e.id}` ? null : `e${e.id}`)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer',
+          padding: '0.35rem 0.5rem', borderRadius: '0.375rem',
+          background: 'var(--bg-secondary)',
+          outline: isActiveEvent(e) ? `1px solid ${chronicleEventColor(e.eventType)}` : 'none',
+        }}
+      >
+        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: chronicleEventColor(e.eventType), flexShrink: 0 }} />
+        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {e.title}
+        </span>
+        <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+          {fmtDate(e.startsAt)}{e.endsAt ? ` → ${fmtDate(e.endsAt)}` : ''}
+        </span>
+      </div>
+      {expanded === `e${e.id}` && (
+        <div style={{ padding: '0.4rem 0.5rem 0.2rem', fontSize: '0.73rem', color: 'var(--text-secondary)' }}>
+          <div style={{ marginBottom: '0.25rem' }}>
+            <span style={{ color: chronicleEventColor(e.eventType), fontWeight: 700 }}>{e.eventType}</span>
+            {e.guilds.length > 0 && <> · {e.guilds.join(', ')}</>}
+          </div>
+          {e.description && <div style={{ color: 'var(--text-primary)', marginBottom: '0.35rem' }}>{e.description}</div>}
+          <div style={{ display: 'flex', gap: '0.4rem' }}>
+            {onJumpToDate && (
+              <button type="button" style={smallBtn} onClick={() => onJumpToDate(new Date(e.startsAt))}>
+                Jump to start
+              </button>
+            )}
+            {authenticated && (
+              <button type="button" style={smallBtn} onClick={() => editEvent(e)}>
+                <Pencil size={11} /> Suggest edit
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div
       ref={panelRef}
@@ -515,9 +622,9 @@ export default function ChroniclePanel({
         right: '1rem',
         bottom: '4.25rem',
         transform: `translate(${position.x}px, ${position.y}px)`,
-        width: '360px',
+        width: expandedView ? '700px' : '360px',
         maxWidth: 'calc(100vw - 2rem)',
-        maxHeight: 'min(560px, calc(100% - 6rem))',
+        maxHeight: expandedView ? 'min(640px, calc(100% - 6rem))' : 'min(560px, calc(100% - 6rem))',
         display: 'flex',
         flexDirection: 'column',
         background: 'var(--bg-card-solid)',
@@ -546,10 +653,23 @@ export default function ChroniclePanel({
             Alliances & events · {DATE_FMT.format(new Date(timestampMs))}
           </div>
         </div>
-        <button type="button" onClick={onClose} title="Close"
-          style={{ border: 'none', background: 'transparent', color: 'var(--text-primary)', opacity: 0.7, cursor: 'pointer', display: 'flex', padding: '0.25rem' }}>
-          <X size={16} />
-        </button>
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
+          <button
+            type="button"
+            data-testid="chronicle-expand"
+            onClick={() => setExpandedView(prev => !prev)}
+            onMouseDown={(e) => e.stopPropagation()}
+            title={expandedView ? 'Compact view (at shown time)' : 'Expanded view (all alliances & events)'}
+            style={{ border: 'none', background: 'transparent', color: 'var(--text-primary)', opacity: 0.7, cursor: 'pointer', display: 'flex', padding: '0.25rem' }}
+          >
+            {expandedView ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+          </button>
+          <button type="button" onClick={onClose} title="Close"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{ border: 'none', background: 'transparent', color: 'var(--text-primary)', opacity: 0.7, cursor: 'pointer', display: 'flex', padding: '0.25rem' }}>
+            <X size={16} />
+          </button>
+        </div>
       </div>
 
       {/* Body */}
@@ -563,96 +683,44 @@ export default function ChroniclePanel({
           />
         ) : (
           <>
-            {sectionTitle(`Alliances at this time (${active.length})`)}
-            {active.length === 0 && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                No known alliances at this point in time.
-              </div>
-            )}
-            {active.map(a => (
-              <div key={`a${a.id}`} style={{ marginBottom: '0.35rem' }}>
-                <div
-                  onClick={() => setExpanded(expanded === `a${a.id}` ? null : `a${a.id}`)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer',
-                    padding: '0.35rem 0.5rem', borderRadius: '0.375rem', background: 'var(--bg-secondary)',
-                  }}
-                >
-                  <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: a.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {a.name}{a.tag ? ` [${a.tag}]` : ''}
-                  </span>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                    {a.memberships.filter(m => Date.parse(m.joinedAt) <= timestampMs && (m.leftAt === null || Date.parse(m.leftAt) > timestampMs)).length} guilds
-                  </span>
+            {expandedView ? (
+              /* Expanded: everything, side by side */
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {sectionTitle(`All alliances (${data?.alliances.length ?? 0})`)}
+                  {(data?.alliances.length ?? 0) === 0 && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>No alliances recorded yet.</div>
+                  )}
+                  {(data?.alliances ?? []).map(a => renderAlliance(a, true))}
                 </div>
-                {expanded === `a${a.id}` && (
-                  <div style={{ padding: '0.4rem 0.5rem 0.2rem', fontSize: '0.73rem', color: 'var(--text-secondary)' }}>
-                    {a.description && <div style={{ marginBottom: '0.35rem', color: 'var(--text-primary)' }}>{a.description}</div>}
-                    {a.memberships.map((m, i) => (
-                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
-                        <span>{m.guild}</span>
-                        <span style={{ whiteSpace: 'nowrap' }}>{fmtDate(m.joinedAt)} → {fmtDate(m.leftAt)}</span>
-                      </div>
-                    ))}
-                    {authenticated && (
-                      <button type="button" style={{ ...smallBtn, marginTop: '0.4rem' }} onClick={() => editAlliance(a)}>
-                        <Pencil size={11} /> Suggest edit
-                      </button>
-                    )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {sectionTitle(`All events (${events.length})`)}
+                  {events.length === 0 && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>No recorded events yet.</div>
+                  )}
+                  {events.map(renderEvent)}
+                </div>
+              </div>
+            ) : (
+              /* Compact: scoped to the shown moment */
+              <>
+                {sectionTitle(`Alliances at this time (${active.length})`)}
+                {active.length === 0 && (
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    No known alliances at this point in time.
                   </div>
                 )}
-              </div>
-            ))}
+                {active.map(a => renderAlliance(a, false))}
 
-            {sectionTitle(`Events (${events.length})`)}
-            {events.length === 0 && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                No recorded events yet.
-              </div>
-            )}
-            {events.map(e => (
-              <div key={`e${e.id}`} style={{ marginBottom: '0.35rem' }}>
-                <div
-                  onClick={() => setExpanded(expanded === `e${e.id}` ? null : `e${e.id}`)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer',
-                    padding: '0.35rem 0.5rem', borderRadius: '0.375rem',
-                    background: 'var(--bg-secondary)',
-                    outline: isActiveEvent(e) ? `1px solid ${chronicleEventColor(e.eventType)}` : 'none',
-                  }}
-                >
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: chronicleEventColor(e.eventType), flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {e.title}
-                  </span>
-                  <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                    {fmtDate(e.startsAt)}{e.endsAt ? ` → ${fmtDate(e.endsAt)}` : ''}
-                  </span>
-                </div>
-                {expanded === `e${e.id}` && (
-                  <div style={{ padding: '0.4rem 0.5rem 0.2rem', fontSize: '0.73rem', color: 'var(--text-secondary)' }}>
-                    <div style={{ marginBottom: '0.25rem' }}>
-                      <span style={{ color: chronicleEventColor(e.eventType), fontWeight: 700 }}>{e.eventType}</span>
-                      {e.guilds.length > 0 && <> · {e.guilds.join(', ')}</>}
-                    </div>
-                    {e.description && <div style={{ color: 'var(--text-primary)', marginBottom: '0.35rem' }}>{e.description}</div>}
-                    <div style={{ display: 'flex', gap: '0.4rem' }}>
-                      {onJumpToDate && (
-                        <button type="button" style={smallBtn} onClick={() => onJumpToDate(new Date(e.startsAt))}>
-                          Jump to start
-                        </button>
-                      )}
-                      {authenticated && (
-                        <button type="button" style={smallBtn} onClick={() => editEvent(e)}>
-                          <Pencil size={11} /> Suggest edit
-                        </button>
-                      )}
-                    </div>
+                {sectionTitle(`Events (${events.length})`)}
+                {events.length === 0 && (
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    No recorded events yet.
                   </div>
                 )}
-              </div>
-            ))}
+                {events.map(renderEvent)}
+              </>
+            )}
 
             {/* Footer: contribute */}
             <div style={{ marginTop: '0.9rem', paddingTop: '0.6rem', borderTop: '1px solid var(--border-color)' }}>
