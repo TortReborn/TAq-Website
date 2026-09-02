@@ -21,6 +21,7 @@ const FactionPanel = dynamic(() => import("@/components/FactionPanel"), { ssr: f
 const ChroniclePanel = dynamic(() => import("@/components/ChroniclePanel"), { ssr: false });
 const ConflictFinder = dynamic(() => import("@/components/ConflictFinder"), { ssr: false });
 import OnboardingTour from "@/components/OnboardingTour";
+import WarStateBanner from "@/components/WarStateBanner";
 import { useOnboardingTour } from "@/hooks/useOnboardingTour";
 import MAP_TOUR_STEPS from "@/lib/map-tour-steps";
 import { TerritoryVerboseData, TerritoryExternalsData } from "@/lib/connection-calculator";
@@ -2202,18 +2203,31 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
             </div>
           )}
 
+          {/* Top-left overlay stack — war-state banner (persistent while the
+              scrubber is in a dead zone) with the transient hover panels
+              flowing below it, so they never overlap */}
+          <div style={{
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: '0.5rem',
+            zIndex: 1000,
+            pointerEvents: 'none',
+          }}>
+          {viewMode === 'history' && historyTimestamp && (
+            <WarStateBanner current={historyTimestamp} gaps={historyGapDates} onJump={handleJumpToDate} />
+          )}
           {/* Guild Land Tooltip - shown when hovering over land view polygons */}
           {showLandView && hoveredGuildInfo && (
             <div
               style={{
-                position: 'absolute',
-                top: '1rem',
-                left: '1rem',
                 backgroundColor: 'var(--bg-card)',
                 border: '2px solid var(--border-color)',
                 borderRadius: '0.5rem',
                 padding: '0.75rem 1rem',
-                zIndex: 20,
                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                 pointerEvents: 'none',
                 minWidth: '150px',
@@ -2239,16 +2253,12 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
           {/* Territory Hover Panel - simplified in history mode, full in live mode */}
           {viewMode === 'history' && hoveredTerritory && (
             <div style={{
-              position: 'absolute',
-              top: '1rem',
-              left: '1rem',
               minWidth: '160px',
               maxWidth: '240px',
               backgroundColor: 'var(--bg-card-solid)',
               border: '2px solid var(--border-color)',
               borderRadius: '0.5rem',
               padding: '0.75rem 1rem',
-              zIndex: 1000,
               boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
               pointerEvents: 'none',
             }}>
@@ -2269,6 +2279,7 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
               </div>
             </div>
           )}
+          </div>
           {viewMode !== 'history' && !selectedTerritory && (
             <TerritoryHoverPanel
               territory={hoveredTerritory}

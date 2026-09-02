@@ -146,7 +146,8 @@ test.describe('map page — history tab', () => {
     const box = (await track.boundingBox())!;
 
     // Pick a target ~60 days before the latest data, shifted out of any
-    // no-data gap (clicks inside gaps are deliberately ignored by the track)
+    // logging gap — not required for the click to register anymore, but
+    // landing outside gaps keeps the asserted territory state deterministic
     const bounds = await (await page.request.get('/api/map-history/bounds')).json();
     const earliest = new Date(bounds.earliest).getTime();
     const latest = new Date(bounds.latest).getTime();

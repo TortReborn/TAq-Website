@@ -21,6 +21,7 @@ import {
   OLD_ROL_TERRITORY_NAMES,
 } from "./territory-abbreviations";
 import type { HistorySnapshot, SnapshotTerritory } from "./history-data";
+import { isKnownWarOutage } from "./war-outages";
 
 // ---------------------------------------------------------------------------
 // Guild prefix cache  (small table – load once, refresh hourly)
@@ -118,10 +119,15 @@ export async function getExchangeGaps(
       WHERE next_d - d > $1
     `, [GAP_THRESHOLD_DAYS]);
 
-    gapCache = result.rows.map((row: { gap_start: Date; gap_end: Date }) => ({
-      start: new Date(row.gap_start),
-      end: new Date(row.gap_end),
-    }));
+    gapCache = result.rows
+      .map((row: { gap_start: Date; gap_end: Date }) => ({
+        start: new Date(row.gap_start),
+        end: new Date(row.gap_end),
+      }))
+      // Windows where wars were genuinely disabled server-side are not
+      // missing data — territory state did not change — so don't surface
+      // them as gaps (see lib/war-outages.ts for the evidence).
+      .filter(gap => !isKnownWarOutage(gap.start, gap.end));
     gapCacheTime = Date.now();
     return gapCache;
   } catch {

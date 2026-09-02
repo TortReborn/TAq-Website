@@ -25,7 +25,8 @@ const LS_EMPTY_RANGES = 'historyCache:emptyRanges';  // ranges that were empty (
 const LS_CACHE_VERSION = 'historyCache:version';
 // v2: old Realm of Light territories un-aliased from Light Forest — stores
 // built under v1 carry the merged (wrong) ownership and must be rebuilt
-const CACHE_VERSION = '2';
+// v3: known war-outage windows are no longer treated as data gaps
+const CACHE_VERSION = '3';
 
 // ---------------------------------------------------------------------------
 // IndexedDB helpers

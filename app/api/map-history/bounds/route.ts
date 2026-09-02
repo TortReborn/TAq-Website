@@ -13,7 +13,8 @@ export const dynamic = 'force-dynamic';
 // cache_entries table so only one request per TTL pays the computation —
 // every other request (including every cold lambda) does a single-row read.
 // earliest/latest stay fresh: MIN/MAX on an indexed column is cheap.
-const META_KEY = 'map-history-bounds-meta';
+// v2: gaps now exclude known war-outage windows (lib/war-outages.ts)
+const META_KEY = 'map-history-bounds-meta-v2';
 const META_TTL_MS = 6 * 60 * 60 * 1000;
 
 interface BoundsMeta {

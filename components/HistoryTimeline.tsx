@@ -3,6 +3,7 @@
 import { memo, useMemo, useCallback, useRef, useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { SeasonPeriod, seasonAtDate, seasonColor } from "@/lib/seasons";
+import { outageAt } from "@/lib/war-outages";
 
 // Cached formatters — creating Intl.DateTimeFormat instances is expensive,
 // and toLocale* calls construct one per invocation.
@@ -32,6 +33,11 @@ const DATE_FORMAT_UTC = new Intl.DateTimeFormat(undefined, {
 // Format date for display
 const formatDate = (date: Date) => DATE_FORMAT.format(date);
 const formatDateTime = (date: Date) => DATE_TIME_FORMAT.format(date);
+
+// Amber warning accent — used by the outage/logging-gap badge and tooltip
+// line. A literal (not a theme token) so it reads as "warning" in both themes.
+const WARNING_COLOR = '#d97706';
+
 
 // Helper to convert percentage to CSS position that keeps thumb within bounds
 // At 0%: 12px from start, at 100%: 12px from end (for 24px thumb)
@@ -89,7 +95,11 @@ interface HistoryTimelineProps {
   latest: Date;
   current: Date;
   onChange: (date: Date) => void;
-  gaps?: Array<{ start: Date; end: Date }>; // Time ranges with no data
+  // Logging gaps — periods where wars continued but no exchanges were
+  // recorded. Not rendered on the track; surfaced via the warning badge
+  // and hover tooltip instead. (Known war-outage windows, where nothing
+  // actually changed, come from lib/war-outages and are handled separately.)
+  gaps?: Array<{ start: Date; end: Date }>;
   vertical?: boolean;
   hideCurrentTime?: boolean; // Hide the current time display (shown externally)
   seasons?: SeasonPeriod[]; // On/off-season periods to overlay as context
@@ -144,16 +154,6 @@ function HistoryTimeline({
 
   // Calculate the total range in milliseconds
   const totalRange = latest.getTime() - earliest.getTime();
-
-  // Precompute gap positions as percentages of the total range
-  const gapRegions = useMemo(() => {
-    if (!gaps || gaps.length === 0 || totalRange === 0) return [];
-    return gaps.map(gap => {
-      const startPct = Math.max(0, ((gap.start.getTime() - earliest.getTime()) / totalRange) * 100);
-      const endPct = Math.min(100, ((gap.end.getTime() - earliest.getTime()) / totalRange) * 100);
-      return { startPct, endPct };
-    });
-  }, [gaps, earliest, totalRange]);
 
   // Precompute season-period positions as percentages, clipped to the visible range
   const seasonRegions = useMemo(() => {
@@ -221,6 +221,26 @@ function HistoryTimeline({
     return { items, laneCount: laneEnds.length };
   }, [allianceSpans, earliest, latest, totalRange]);
 
+  // Lane count over the FULL (unzoomed) range — the ribbon reserves this
+  // much thickness even when a zoom hides some or all alliances, so the
+  // panel's overall size never jumps while zooming.
+  const fullAllianceLaneCount = useMemo(() => {
+    if (!allianceSpans || allianceSpans.length === 0) return 0;
+    const eMs = earliestProp.getTime();
+    const lMs = latestProp.getTime();
+    const spans = allianceSpans
+      .map(span => ({ a: Math.max(span.startMs, eMs), b: Math.min(span.endMs ?? lMs, lMs) }))
+      .filter(v => v.a < v.b)
+      .sort((x, y) => x.a - y.a);
+    const laneEnds: number[] = [];
+    for (const { a, b } of spans) {
+      const lane = laneEnds.findIndex(end => end <= a);
+      if (lane === -1) laneEnds.push(b);
+      else laneEnds[lane] = b;
+    }
+    return laneEnds.length;
+  }, [allianceSpans, earliestProp, latestProp]);
+
   // Calculate the position as a percentage
   const currentPercent = useMemo(() => {
     if (totalRange === 0) return 0;
@@ -244,14 +264,6 @@ function HistoryTimeline({
   const hoverRafRef = useRef<number | null>(null);
   const hoverPointRef = useRef({ clientX: 0, clientY: 0 });
 
-  // Check if a percentage falls within a gap region
-  const isInGap = useCallback((percent: number): boolean => {
-    for (const gap of gapRegions) {
-      if (percent >= gap.startPct && percent <= gap.endPct) return true;
-    }
-    return false;
-  }, [gapRegions]);
-
   // Handle click/drag on the track — works for both horizontal and vertical
   const handleTrackInteraction = useCallback((clientX: number, clientY: number, force?: boolean) => {
     if (!force) {
@@ -272,12 +284,10 @@ function HistoryTimeline({
     const adjustedPos = Math.max(0, Math.min(usableSize, pos - padding));
     const percent = usableSize > 0 ? (adjustedPos / usableSize) * 100 : 0;
 
-    if (isInGap(percent)) return;
-
     const rawDate = percentToDate(percent);
     const newDate = snapTo10Min(rawDate);
     onChange(newDate);
-  }, [vertical, percentToDate, onChange, isInGap]);
+  }, [vertical, percentToDate, onChange]);
 
   const cancelHoverFrame = useCallback(() => {
     if (hoverRafRef.current !== null) {
@@ -320,27 +330,23 @@ function HistoryTimeline({
     }
   }, [isDragging, cancelHoverFrame]);
 
-  // Whether the hover is over a gap, and which gap
-  const hoverInGap = useMemo(() => {
-    if (hoverPercent === null) return false;
-    return isInGap(hoverPercent);
-  }, [hoverPercent, isInGap]);
-
-  const hoverGap = useMemo(() => {
-    if (hoverPercent === null || !gaps) return null;
-    for (let i = 0; i < gapRegions.length; i++) {
-      if (hoverPercent >= gapRegions[i].startPct && hoverPercent <= gapRegions[i].endPct) {
-        return gaps[i];
-      }
-    }
-    return null;
-  }, [hoverPercent, gapRegions, gaps]);
-
   // Compute hovered date from percent
   const hoverDate = useMemo(() => {
     if (hoverPercent === null) return null;
     return percentToDate(hoverPercent);
   }, [hoverPercent, percentToDate]);
+
+  // Logging gap / war-outage window under the hovered date, if any
+  // (half-open — g.end is the day data resumed, matching WarStateBanner)
+  const hoverGap = useMemo(() => {
+    if (!hoverDate || !gaps) return null;
+    return gaps.find(g => hoverDate >= g.start && hoverDate < g.end) ?? null;
+  }, [hoverDate, gaps]);
+
+  const hoverOutage = useMemo(
+    () => (hoverDate ? outageAt(hoverDate) : null),
+    [hoverDate]
+  );
 
   // Which season (or off-season) the hovered date falls in
   const hoverSeason = useMemo(() => {
@@ -395,14 +401,12 @@ function HistoryTimeline({
     return () => el.removeEventListener('wheel', onWheel);
   }, [vertical, earliest, latest, earliestProp, latestProp, setSeasonZoom, MIN_WHEEL_SPAN_MS]);
 
-  // Jump the scrubber to a season boundary (clamped to bounds + snapped), skipping no-data gaps
+  // Jump the scrubber to a season boundary (clamped to bounds + snapped)
   const jumpToDate = useCallback((date: Date) => {
     const clampedMs = Math.max(earliest.getTime(), Math.min(latest.getTime(), date.getTime()));
     const snapped = snapTo10Min(new Date(clampedMs));
-    const pct = totalRange === 0 ? 0 : ((snapped.getTime() - earliest.getTime()) / totalRange) * 100;
-    if (isInGap(pct)) return;
     onChange(snapped);
-  }, [earliest, latest, totalRange, isInGap, onChange]);
+  }, [earliest, latest, onChange]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return; // left button only — right button zooms to season
@@ -474,11 +478,23 @@ function HistoryTimeline({
     </span>
   ) : null;
 
+  const tooltipWarningLine = hoverOutage ? (
+    <span style={{ color: WARNING_COLOR }}>Wars were down — nothing changed</span>
+  ) : hoverGap ? (
+    <span style={{ color: WARNING_COLOR }}>Logging gap — data missing</span>
+  ) : null;
+
   const tooltipContent = hoverDate
-    ? (hoverInGap && hoverGap
-      ? <>{formatDate(hoverGap.start)} – {formatDate(hoverGap.end)}<br /><span style={{ opacity: 0.7 }}>No data available</span></>
-      : <>{formatDateTime(hoverDate)}{seasonTooltipLine && <><br />{seasonTooltipLine}</>}</>)
+    ? <>
+        {formatDateTime(hoverDate)}
+        {seasonTooltipLine && <><br />{seasonTooltipLine}</>}
+        {tooltipWarningLine && <><br />{tooltipWarningLine}</>}
+      </>
     : '';
+
+  // The persistent "dead zone" warning lives on the map itself
+  // (components/WarStateBanner.tsx) — the timeline only annotates its
+  // hover tooltip via tooltipWarningLine above.
 
   const thumbStyle: React.CSSProperties = {
     position: 'absolute',
@@ -592,8 +608,10 @@ function HistoryTimeline({
   }, [setSeasonZoom, earliestProp, latestProp, current, jumpToDate]);
 
   const allianceRibbon = (isVert: boolean) => {
-    if (allianceLanes.items.length === 0) return null;
-    const stackSize = allianceLanes.laneCount * (BAND_SIZE + BAND_GAP) - BAND_GAP;
+    // Size from the full-range lane count (not the zoom-scoped one) so the
+    // ribbon keeps its thickness even when zooming hides every alliance.
+    if (fullAllianceLaneCount === 0) return null;
+    const stackSize = fullAllianceLaneCount * (BAND_SIZE + BAND_GAP) - BAND_GAP;
 
     // One tooltip for the whole stack, anchored at the hovered span's midpoint
     // (clamped inward so it can't clip at the panel edges).
@@ -903,7 +921,7 @@ function HistoryTimeline({
               display: 'flex',
               alignItems: 'stretch',
               height: '100%',
-              cursor: hoverInGap ? 'not-allowed' : 'pointer',
+              cursor: 'pointer',
             }}
           >
           {seasons && seasons.length > 0 && seasonRibbon(true)}
@@ -956,30 +974,6 @@ function HistoryTimeline({
                 borderRadius: '12px 12px 0 0',
               }}
             />
-
-            {/* Gap regions — bound-touching gaps extend to the track edge (see
-                the horizontal layout note) */}
-            {gapRegions.map((gap, i) => {
-              const startCss = gap.startPct <= 0.01 ? '0px' : percentToPaddedStart(gap.startPct);
-              const endCss = gap.endPct >= 99.99 ? '100%' : percentToPaddedStart(gap.endPct);
-              return (
-                <div
-                  key={i}
-                  title="No data available"
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    top: startCss,
-                    height: `calc(${endCss} - ${startCss})`,
-                    background: 'rgba(139, 0, 0, 0.55)',
-                    borderRadius: gap.startPct <= 0.01 ? '12px 12px 0 0' : gap.endPct >= 99.99 ? '0 0 12px 12px' : '0',
-                    pointerEvents: 'none',
-                    zIndex: 1,
-                  }}
-                />
-              );
-            })}
 
             {/* Chronicle event markers */}
             {eventMarkerElements(true)}
@@ -1046,7 +1040,7 @@ function HistoryTimeline({
         onMouseLeave={handleTrackLeave}
         onContextMenu={handleContextMenu}
         onClick={(e) => e.stopPropagation()}
-        style={{ cursor: hoverInGap ? 'not-allowed' : 'pointer' }}
+        style={{ cursor: 'pointer' }}
       >
       {seasons && seasons.length > 0 && seasonRibbon(false)}
 
@@ -1096,31 +1090,6 @@ function HistoryTimeline({
             borderRadius: '12px 0 0 12px',
           }}
         />
-
-        {/* Gap regions — dark red overlay for periods with no data. Gaps that
-            touch either bound extend through the 12px thumb-padding zone to
-            the actual track edge, so they can't end in a floating blob. */}
-        {gapRegions.map((gap, i) => {
-          const startCss = gap.startPct <= 0.01 ? '0px' : percentToPaddedStart(gap.startPct);
-          const endCss = gap.endPct >= 99.99 ? '100%' : percentToPaddedStart(gap.endPct);
-          return (
-            <div
-              key={i}
-              title="No data available"
-              style={{
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: startCss,
-                width: `calc(${endCss} - ${startCss})`,
-                background: 'rgba(139, 0, 0, 0.55)',
-                borderRadius: gap.startPct <= 0.01 ? '12px 0 0 12px' : gap.endPct >= 99.99 ? '0 12px 12px 0' : '0',
-                pointerEvents: 'none',
-                zIndex: 1,
-              }}
-            />
-          );
-        })}
 
         {/* Chronicle event markers */}
         {eventMarkerElements(false)}
