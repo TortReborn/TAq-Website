@@ -467,7 +467,8 @@ function HistoryTimeline({
             pointerEvents: 'none',
             zIndex: 20,
           }}>
-            Click to zoom
+            <div style={{ fontWeight: 600 }}>{ev.title}</div>
+            <div style={{ opacity: 0.7 }}>Click to zoom</div>
           </div>
         )}
       </div>

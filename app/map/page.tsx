@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { Globe, Home, Plus, Minus, Flag, Settings, BookOpen, HelpCircle } from "lucide-react";
+import { Globe, Home, Plus, Minus, Flag, Settings, BookOpen } from "lucide-react";
 import { loadTerritories, Territory, coordToPixel } from "@/lib/utils";
 import TerritoryOverlay from "@/components/TerritoryOverlay";
 import LandViewOverlay from "@/components/LandViewOverlay";
@@ -2453,38 +2453,6 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               onModeChange={handleModeChange}
               historyAvailable={!!historyBounds}
             />
-
-            {/* Replay the history-view tour */}
-            {viewMode === 'history' && (
-              <button
-                onClick={() => tour.restartTour()}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '0.5rem',
-                  border: '2px solid var(--border-color)',
-                  background: 'var(--bg-card)',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-secondary)';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-card)';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                title="Tour of the history view"
-              >
-                <HelpCircle size={20} strokeWidth={2} />
-              </button>
-            )}
 
             {/* Chronicle Button — community alliances & events layer */}
             <button
