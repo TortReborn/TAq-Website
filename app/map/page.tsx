@@ -1434,6 +1434,23 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode, historyTimestamp, storeVersion, initialSnapshot, verboseData, historyBounds]);
 
+  // The loading overlay only appears once loading has taken a beat —
+  // cache-hit history entries resolve in tens of ms, and flashing the gray
+  // overlay for a single frame reads as a glitch rather than feedback.
+  const historyOverlayWanted =
+    viewMode === 'history' &&
+    (!historyTerritories || Object.keys(historyTerritories).length === 0) &&
+    (isLoadingHistory || !!historyTimestamp);
+  const [showHistoryLoadingOverlay, setShowHistoryLoadingOverlay] = useState(false);
+  useEffect(() => {
+    if (!historyOverlayWanted) {
+      setShowHistoryLoadingOverlay(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowHistoryLoadingOverlay(true), 300);
+    return () => clearTimeout(timer);
+  }, [historyOverlayWanted]);
+
   // Step forward/backward handlers — time-based stepping (10 minutes)
   const handleStepForward = useCallback(() => {
     if (!historyTimestamp || !historyBounds) return;
@@ -2166,8 +2183,9 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
             {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay territories={territories} verboseData={verboseData} />}
           </div>
 
-          {/* History loading overlay - shown when loading history data (initial restore or scrubbing) */}
-          {viewMode === 'history' && (!historyTerritories || Object.keys(historyTerritories).length === 0) && (isLoadingHistory || historyTimestamp) && (
+          {/* History loading overlay — shown when loading history data takes
+              more than a beat (see showHistoryLoadingOverlay's delay) */}
+          {showHistoryLoadingOverlay && (
             <div style={{
               position: 'absolute',
               inset: 0,

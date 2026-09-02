@@ -6,7 +6,11 @@ import { usePathname } from 'next/navigation';
 export default function BottomBar() {
   const pathname = usePathname();
 
-  if (pathname === '/map') {
+  // Hidden on every map view — the map viewport is position: fixed, so a
+  // footer in the page flow only adds body height that stretches the
+  // background gradient differently per route (and peeks through during
+  // layout shifts). Matches the layout's usesFixedBg map-path check.
+  if (pathname === '/map' || pathname.startsWith('/map/')) {
     return null;
   }
 
