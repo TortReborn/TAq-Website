@@ -9,14 +9,17 @@ import TerritoryInfoPanel from "@/components/TerritoryInfoPanel";
 import TerritoryHoverPanel from "@/components/TerritoryHoverPanel";
 import TradeRoutesOverlay from "@/components/TradeRoutesOverlay";
 import GuildTerritoryCount from "@/components/GuildTerritoryCount";
-import MapSettings from "@/components/MapSettings";
 import MapModeSelector from "@/components/MapModeSelector";
-import MapHistoryControls from "@/components/MapHistoryControls";
-import FactionPanel from "@/components/FactionPanel";
-import ChroniclePanel from "@/components/ChroniclePanel";
 import { ChronicleData, allianceColorsAt, chronicleEventColor } from "@/lib/chronicle";
-import { TimelineEventMarker } from "@/components/HistoryTimeline";
-import ConflictFinder from "@/components/ConflictFinder";
+import type { TimelineEventMarker } from "@/components/HistoryTimeline";
+import dynamic from "next/dynamic";
+
+// Panels not needed for first paint load as separate chunks when first shown
+const MapSettings = dynamic(() => import("@/components/MapSettings"), { ssr: false });
+const MapHistoryControls = dynamic(() => import("@/components/MapHistoryControls"), { ssr: false });
+const FactionPanel = dynamic(() => import("@/components/FactionPanel"), { ssr: false });
+const ChroniclePanel = dynamic(() => import("@/components/ChroniclePanel"), { ssr: false });
+const ConflictFinder = dynamic(() => import("@/components/ConflictFinder"), { ssr: false });
 import OnboardingTour from "@/components/OnboardingTour";
 import { useOnboardingTour } from "@/hooks/useOnboardingTour";
 import MAP_TOUR_STEPS from "@/lib/map-tour-steps";
@@ -62,6 +65,12 @@ const NEW_ROL_COVER_RECT = (() => {
   const [x2, y2] = coordToPixel([-1560, -5620]);
   return { left: Math.min(x1, x2), top: Math.min(y1, y2), width: Math.abs(x2 - x1), height: Math.abs(y2 - y1) };
 })();
+
+// Native pixel size of /images/map/fruma_map.*.webp. Known up front so the
+// low-res placeholder and the initial fit/center don't have to wait for the
+// multi-MB full-resolution image to download.
+const MAP_NATIVE_WIDTH = 4262;
+const MAP_NATIVE_HEIGHT = 6644;
 
 /**
  * Merge fresh territory data into the previous record, reusing the previous
@@ -203,7 +212,8 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     }
     setIsAnimating(false);
   }, []);
-  const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
+  const [mapDimensions, setMapDimensions] = useState({ width: MAP_NATIVE_WIDTH, height: MAP_NATIVE_HEIGHT });
+  const [fullMapLoaded, setFullMapLoaded] = useState(false);
   const [selectedTerritory, setSelectedTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [hoveredTerritory, setHoveredTerritory] = useState<{ name: string; territory: Territory } | null>(null);
   const [showTerritories, setShowTerritories] = useState(true);
@@ -832,8 +842,20 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
       const pendingData: RangedExchangeEventData[] = [];
       const pendingRanges: Array<[number, number]> = [];
       const FLUSH_AFTER = 4;
-      const flushPending = () => {
+      // Each full-store merge blocks the main thread for ~150-200ms once the
+      // store is large. Waiting for an idle slot (capped so background tabs
+      // still progress) lets input and paint flush first instead of janking
+      // the map right after switching to history.
+      const yieldToIdle = () => new Promise<void>((resolve) => {
+        if (typeof requestIdleCallback !== 'undefined') {
+          requestIdleCallback(() => resolve(), { timeout: 300 });
+        } else {
+          setTimeout(resolve, 50);
+        }
+      });
+      const flushPending = async () => {
         if (pendingData.length === 0) return;
+        await yieldToIdle();
         const doneMerge = mapTime('store', `merge ${pendingData.length} chunk(s) into store`);
         // Combine the batch first (cheap — chunks are small), then pay the
         // full-store merge cost once instead of once per chunk
@@ -918,14 +940,14 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
           pendingData.push(data);
           pendingRanges.push([chunkStart, chunkEnd]);
-          if (pendingData.length >= FLUSH_AFTER) flushPending();
+          if (pendingData.length >= FLUSH_AFTER) await flushPending();
         } catch (err: unknown) {
           if (err instanceof Error && err.name === 'AbortError') break;
           mapError('events', 'Background event fetch failed', err);
           await new Promise(r => setTimeout(r, 5000));
         }
       }
-      flushPending();
+      await flushPending();
       if (!abort.signal.aborted && findUncoveredGaps(boundsStart, boundsEnd).length === 0) {
         mapLog('events', 'background fetch complete — full timeline loaded');
       }
@@ -1538,31 +1560,30 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
   // Initialize map to fit container when image loads
   const handleImageLoad = useCallback(() => {
-    if (!mapImageRef.current || !containerRef.current) return;
-    
-    const img = mapImageRef.current;
+    if (!containerRef.current) return;
+
     const containerRect = containerRef.current.getBoundingClientRect();
-    
-    // If image hasn't loaded yet, try again in a moment
-    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+    if (containerRect.width === 0 || containerRect.height === 0) {
       setTimeout(handleImageLoad, 100);
       return;
     }
-    
-    // Calculate scale to fit entire map in view
-    const scaleX = containerRect.width / img.naturalWidth;
-    const scaleY = containerRect.height / img.naturalHeight;
+
+    // Calculate scale to fit entire map in view. The map's native size is a
+    // known constant, so this runs immediately on mount — the placeholder and
+    // territory overlays lay out before the full-res image has downloaded.
+    const scaleX = containerRect.width / MAP_NATIVE_WIDTH;
+    const scaleY = containerRect.height / MAP_NATIVE_HEIGHT;
     const fitScale = Math.min(scaleX, scaleY);
     minScaleRef.current = fitScale;
 
-    setMapDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    setMapDimensions({ width: MAP_NATIVE_WIDTH, height: MAP_NATIVE_HEIGHT });
 
     // Only set initial position and scale if not cached or if cached values are invalid
     const hasValidCache = localStorage.getItem('map-position') && localStorage.getItem('map-scale');
     if (!hasValidCache || !isInitialized) {
       // Center the map
-      const scaledWidth = img.naturalWidth * fitScale;
-      const scaledHeight = img.naturalHeight * fitScale;
+      const scaledWidth = MAP_NATIVE_WIDTH * fitScale;
+      const scaledHeight = MAP_NATIVE_HEIGHT * fitScale;
       applyTransform({
         x: (containerRect.width - scaledWidth) / 2,
         y: (containerRect.height - scaledHeight) / 2
@@ -1777,26 +1798,26 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
 
   // Handle window resize
   useEffect(() => {
-    const handleResize = () => {
-      if (mapImageRef.current?.complete) {
-        handleImageLoad();
-      }
-    };
+    const handleResize = () => handleImageLoad();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [handleImageLoad]);
 
-  // Additional effect to ensure proper initialization
+  // Lay out the map immediately on mount — dimensions are known constants,
+  // so nothing waits for the full-resolution image to download
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (mapImageRef.current?.complete && containerRef.current) {
-        handleImageLoad();
-      }
-    }, 200);
-    
-    return () => clearTimeout(timer);
+    handleImageLoad();
   }, [handleImageLoad]);
+
+  // If the full-res image finished loading before hydration, onLoad never
+  // fires — pick the completed state up here so it isn't stuck transparent
+  useEffect(() => {
+    const img = mapImageRef.current;
+    if (img && img.complete && img.naturalWidth > 0) {
+      setFullMapLoaded(true);
+    }
+  }, []);
 
 
   // Territory interaction handlers
@@ -1992,10 +2013,13 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               cursor: isDragging ? 'grabbing' : 'grab',
             }}
           >
+            {/* Low-res placeholder (~280KB) paints the map instantly; the
+                full-resolution image covers it once downloaded. Stays mounted
+                so the crossfade never shows the page background through. */}
             <img
-              ref={mapImageRef}
-              src="/images/map/fruma_map.v2.webp"
-              alt="Wynncraft Map"
+              src="/images/map/fruma_map.preview.webp"
+              alt=""
+              aria-hidden="true"
               style={{
                 position: 'absolute',
                 left: 0,
@@ -2006,7 +2030,25 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
                 width: mapDimensions.width,
                 height: mapDimensions.height,
               }}
-              onLoad={handleImageLoad}
+              draggable={false}
+            />
+            <img
+              ref={mapImageRef}
+              src="/images/map/fruma_map.v3.webp"
+              alt="Wynncraft Map"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                imageRendering: 'crisp-edges',
+                userSelect: 'none',
+                pointerEvents: 'none',
+                width: mapDimensions.width,
+                height: mapDimensions.height,
+                opacity: fullMapLoaded ? 1 : 0,
+                transition: 'opacity 0.25s ease-out',
+              }}
+              onLoad={() => setFullMapLoaded(true)}
               draggable={false}
             />
             {/* Old Realm of Light underlay — for pre-Jan-2021 history the
@@ -2390,17 +2432,18 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             
           </div>
 
-          {/* Factions Panel - positioned above bottom-right controls */}
-          <FactionPanel
+          {/* Factions Panel - positioned above bottom-right controls.
+              Mounted on first open so its chunk stays out of the initial load. */}
+          {showFactions && <FactionPanel
             isOpen={showFactions}
             onClose={() => setShowFactions(false)}
             factions={factions}
             onFactionsChange={setFactions}
             availableGuilds={availableGuilds}
-          />
+          />}
 
           {/* Chronicle Panel — alliances & events at the shown moment */}
-          <ChroniclePanel
+          {showChronicle && <ChroniclePanel
             isOpen={showChronicle}
             onClose={() => setShowChronicle(false)}
             data={chronicleData}
@@ -2408,10 +2451,10 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
             onJumpToDate={viewMode === 'history' ? handleJumpToDate : undefined}
             availableGuilds={availableGuilds}
             containerBounds={containerSize}
-          />
+          />}
 
           {/* Conflict Finder Panel */}
-          <ConflictFinder
+          {showConflictFinder && <ConflictFinder
             isOpen={showConflictFinder}
             onClose={() => setShowConflictFinder(false)}
             exchangeStore={exchangeStoreRef.current}
@@ -2432,7 +2475,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
               setFactions(newFactions);
               setShowFactions(true);
             }}
-          />
+          />}
 
           {/* Bottom Right Controls Container - Mode selector + Factions + Settings */}
           <div style={{
