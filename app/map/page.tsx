@@ -440,19 +440,22 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
       setShowTradeRoutes(cachedShowTradeRoutes === 'true');
     }
     // Only restore cached view mode if no initialMode was provided via URL
+    let effectiveMode: 'live' | 'history' = initialMode ?? 'live';
     if (!initialMode) {
       const cachedViewMode = localStorage.getItem('mapViewMode');
       if (cachedViewMode === 'live' || cachedViewMode === 'history') {
         setViewMode(cachedViewMode);
+        effectiveMode = cachedViewMode;
       }
     }
     const cachedOpaqueFill = localStorage.getItem('mapOpaqueFill');
     if (cachedOpaqueFill !== null) {
       setOpaqueFill(cachedOpaqueFill === 'true');
     }
-    // A layer named in the URL wins over the cached preference
+    // A layer named in the URL wins over the cached preference. Chronicle is
+    // a history-mode layer, so never restore it into live view.
     const cachedShowChronicle = localStorage.getItem('mapShowChronicle');
-    if (cachedShowChronicle !== null && !initialLayer) {
+    if (cachedShowChronicle !== null && !initialLayer && effectiveMode === 'history') {
       setShowChronicle(cachedShowChronicle === 'true');
     }
     setIsInitialized(true);
@@ -1175,6 +1178,12 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   // Handle mode change
   const handleModeChange = useCallback(async (mode: 'live' | 'history') => {
     setViewMode(mode);
+    if (mode === 'live') {
+      // Chronicle/factions are history-mode layers (the URL only names them
+      // under /map/history) — leaving history closes them
+      setShowChronicle(false);
+      setShowFactions(false);
+    }
     if (mode === 'history') {
       setIsPlaying(false);
       // Restore cached slider position if available, otherwise use latest
@@ -2550,8 +2559,12 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
               data-testid="chronicle-toggle"
               data-tour="chronicle-toggle"
               onClick={() => {
-                setShowChronicle(prev => !prev);
+                const opening = !showChronicle;
+                setShowChronicle(opening);
                 setShowFactions(false);
+                // Layers live in history mode — opening one from live view
+                // enters history (with its usual init) at the same time
+                if (opening && viewMode !== 'history') handleModeChange('history');
               }}
               style={{
                 width: '40px',
@@ -2588,8 +2601,10 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
             <button
               data-tour="factions-toggle"
               onClick={() => {
-                setShowFactions(prev => !prev);
+                const opening = !showFactions;
+                setShowFactions(opening);
                 setShowChronicle(false);
+                if (opening && viewMode !== 'history') handleModeChange('history');
               }}
               style={{
                 width: '40px',
