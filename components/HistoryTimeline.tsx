@@ -52,6 +52,8 @@ export interface SeasonZoom {
   start: Date;
   end: Date;
   label: string;
+  /** What the zoom window represents — an event zoom is not a season selection */
+  kind?: 'season' | 'event';
 }
 
 /** Chronicle event surfaced as a timeline marker */
@@ -97,6 +99,7 @@ function HistoryTimeline({
   const [isDragging, setIsDragging] = useState(false);
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
   const [hoverPos, setHoverPos] = useState(0); // X position (horizontal) or Y position (vertical)
+  const [hoveredEventId, setHoveredEventId] = useState<number | null>(null); // event marker under the cursor
 
   // Season zoom: when set, the timeline is scoped to a single season/off-season period.
   // The effective range is the intersection of that period with the available data bounds,
@@ -405,45 +408,70 @@ function HistoryTimeline({
   };
 
   // ── Chronicle event markers ──────────────────────────────────────────
-  // A dot at the event's start (click = jump there) plus a thin bar spanning
-  // ranged events. Rendered inside the track, above gaps, below the thumb.
+  // Each event is a single circle at its start; clicking zooms the timeline
+  // to the event's range (with padding), the same mechanic as season zoom.
 
-  const eventMarkerElements = (isVert: boolean) => visibleEventMarkers.map(({ ev, startPct, endPct, markerInRange }) => (
-    <div key={`ev-${ev.id}`} style={{ pointerEvents: 'none' }}>
-      {endPct !== null && endPct > startPct && (
-        <div style={{
+  const zoomToEvent = useCallback((ev: TimelineEventMarker) => {
+    const DAY = 24 * 3600 * 1000;
+    const startMs = ev.startMs;
+    const endMs = ev.endMs ?? ev.startMs;
+    const span = Math.max(endMs - startMs, DAY);
+    const pad = Math.max(span * 0.15, DAY / 2);
+    setSeasonZoom({ start: new Date(startMs - pad), end: new Date(endMs + pad), label: ev.title, kind: 'event' });
+    // Bring the scrubber into the zoomed range if it's currently outside it
+    const zs = Math.max(earliestProp.getTime(), startMs - pad);
+    const ze = Math.min(latestProp.getTime(), endMs + pad);
+    if (current.getTime() < zs || current.getTime() > ze) {
+      jumpToDate(new Date(Math.max(zs, Math.min(ze, startMs))));
+    }
+  }, [setSeasonZoom, earliestProp, latestProp, current, jumpToDate]);
+
+  const eventMarkerElements = (isVert: boolean) => visibleEventMarkers.map(({ ev, startPct, markerInRange }) => (
+    markerInRange && (
+      <div
+        key={`ev-${ev.id}`}
+        onMouseDown={(e) => { e.stopPropagation(); }}
+        onClick={(e) => { e.stopPropagation(); zoomToEvent(ev); }}
+        onMouseEnter={() => { setHoveredEventId(ev.id); setHoverPercent(null); }}
+        onMouseLeave={() => setHoveredEventId(null)}
+        onMouseMove={(e) => { e.stopPropagation(); }}
+        style={{
           position: 'absolute',
           ...(isVert
-            ? { left: '2px', width: '4px', top: percentToPaddedStart(startPct), height: percentToPaddedWidth(startPct, endPct) }
-            : { top: '2px', height: '4px', left: percentToPaddedStart(startPct), width: percentToPaddedWidth(startPct, endPct) }),
+            ? { left: '-3px', top: `calc(${percentToPaddedStart(startPct)} - 5px)` }
+            : { top: '-3px', left: `calc(${percentToPaddedStart(startPct)} - 5px)` }),
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
           background: ev.color,
-          opacity: 0.75,
-          borderRadius: '2px',
-          zIndex: 1,
-        }} />
-      )}
-      {markerInRange && (
-        <div
-          title={ev.title}
-          onMouseDown={(e) => { e.stopPropagation(); }}
-          onClick={(e) => { e.stopPropagation(); jumpToDate(new Date(ev.startMs)); }}
-          style={{
+          border: '2px solid var(--bg-card-solid)',
+          cursor: 'pointer',
+          pointerEvents: 'auto',
+          zIndex: 3,
+        }}
+      >
+        {hoveredEventId === ev.id && (
+          <div style={{
             position: 'absolute',
             ...(isVert
-              ? { left: '-3px', top: `calc(${percentToPaddedStart(startPct)} - 5px)` }
-              : { top: '-3px', left: `calc(${percentToPaddedStart(startPct)} - 5px)` }),
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
-            background: ev.color,
-            border: '2px solid var(--bg-card-solid)',
-            cursor: 'pointer',
-            pointerEvents: 'auto',
-            zIndex: 3,
-          }}
-        />
-      )}
-    </div>
+              ? { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: '8px' }
+              : { bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px' }),
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.375rem',
+            background: 'var(--bg-card-solid, var(--bg-card))',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            fontSize: '0.75rem',
+            color: 'var(--text-primary)',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 20,
+          }}>
+            Click to zoom
+          </div>
+        )}
+      </div>
+    )
   ));
 
   // ── Season ribbon ────────────────────────────────────────────────────
@@ -534,35 +562,50 @@ function HistoryTimeline({
     );
   };
 
-  // Reset-zoom button — shown top-left of the component when zoomed into a season.
+  // Reset-zoom button — shown top-left when zoomed into a season or event.
+  // Event zooms also show the event's title, since they aren't a season the
+  // selector could name.
   const resetZoomButton = seasonZoom ? (
-    <button
-      onClick={(e) => { e.stopPropagation(); setSeasonZoom(null); }}
-      onMouseDown={(e) => e.stopPropagation()}
-      data-testid="timeline-reset-zoom"
-      title={`Zoomed to ${seasonZoom.label === 'Off' ? 'off-season' : seasonZoom.label} — back to full range`}
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        zIndex: 25,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '3px',
-        padding: '0.1rem 0.4rem',
-        fontSize: '0.65rem',
-        fontWeight: 600,
-        color: 'var(--text-primary)',
-        background: 'var(--bg-card-solid, var(--bg-card))',
-        border: '1px solid var(--border-color)',
-        borderRadius: '0.375rem',
-        cursor: 'pointer',
-        whiteSpace: 'nowrap',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-      }}
-    >
-      <ArrowLeft size={11} strokeWidth={2.5} /> Full range
-    </button>
+    <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 25, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+      <button
+        onClick={(e) => { e.stopPropagation(); setSeasonZoom(null); }}
+        onMouseDown={(e) => e.stopPropagation()}
+        data-testid="timeline-reset-zoom"
+        title={`Zoomed to ${seasonZoom.label === 'Off' ? 'off-season' : seasonZoom.label} — back to full range`}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '3px',
+          padding: '0.1rem 0.4rem',
+          fontSize: '0.65rem',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          background: 'var(--bg-card-solid, var(--bg-card))',
+          border: '1px solid var(--border-color)',
+          borderRadius: '0.375rem',
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+        }}
+      >
+        <ArrowLeft size={11} strokeWidth={2.5} /> Full range
+      </button>
+      {seasonZoom.kind === 'event' && (
+        <span style={{
+          padding: '0.1rem 0.4rem',
+          fontSize: '0.65rem',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          background: 'var(--bg-card-solid, var(--bg-card))',
+          border: '1px solid var(--border-color)',
+          borderRadius: '0.375rem',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+        }}>
+          {seasonZoom.label}
+        </span>
+      )}
+    </div>
   ) : null;
 
   // ── Vertical layout ──────────────────────────────────────────────────

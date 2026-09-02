@@ -34,11 +34,33 @@ interface ChroniclePanelProps {
   containerBounds?: { width: number; height: number };
 }
 
-// UTC so that dates entered as "2019-01-01" never display as Dec 31 in
-// negative-offset timezones
+// Date-only entries are stored as UTC midnight and displayed as bare dates
+// (in UTC, so "2019-01-01" never shows as Dec 31). Entries with a
+// time-of-day are entered and displayed in the viewer's local timezone.
 const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-const fmtDate = (iso: string | null) => (iso ? DATE_FMT.format(new Date(iso)) : 'present');
-const toDateInput = (iso: string | null) => (iso ? iso.slice(0, 10) : '');
+const DATETIME_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+const isDateOnly = (value: string, d: Date) =>
+  value.endsWith('Z') && d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0;
+const fmtDate = (iso: string | null) => {
+  if (!iso) return 'present';
+  const d = new Date(iso);
+  return isDateOnly(iso, d) ? DATE_FMT.format(d) : DATETIME_FMT.format(d);
+};
+/** Split a stored value into date/time input strings. Time is empty for date-only entries. */
+const whenParts = (value: string | null): { date: string; time: string } => {
+  if (!value) return { date: '', time: '' };
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return { date: value, time: '' };
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return { date: value.slice(0, 10), time: '' };
+  if (isDateOnly(value, d)) return { date: value.slice(0, 10), time: '' };
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  };
+};
+/** Compose input strings back into a value: bare date = UTC midnight, date+time = local instant. */
+const composeWhen = (date: string, time: string): string => (date ? (time ? `${date}T${time}` : date) : '');
 
 const inputStyle: React.CSSProperties = {
   height: '30px',
@@ -315,42 +337,50 @@ export function SubmitForm({
                   <X size={12} />
                 </button>
               </div>
-              {d.stints.map((s, si) => (
-                <div key={si} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', marginTop: si > 0 ? '0.3rem' : 0 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Joined</div>
-                    <PickerField type="date" width="100%" value={toDateInput(s.joinedAt)}
-                      onChange={(v) => setMembers(ds => {
-                        const next = [...ds];
-                        const stints = [...next[i].stints];
-                        stints[si] = { ...stints[si], joinedAt: v };
-                        next[i] = { ...next[i], stints };
-                        return next;
-                      })} />
+              {d.stints.map((s, si) => {
+                const setStint = (patch: (cur: { joinedAt: string; leftAt: string | null }) => { joinedAt: string; leftAt: string | null }) =>
+                  setMembers(ds => {
+                    const next = [...ds];
+                    const stints = [...next[i].stints];
+                    stints[si] = patch(stints[si]);
+                    next[i] = { ...next[i], stints };
+                    return next;
+                  });
+                const joined = whenParts(s.joinedAt);
+                const left = whenParts(s.leftAt);
+                return (
+                  <div key={si} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', marginTop: si > 0 ? '0.3rem' : 0 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Joined</div>
+                      <PickerField type="date" width="100%" value={joined.date}
+                        onChange={(v) => setStint(cur => ({ ...cur, joinedAt: composeWhen(v, joined.time) }))} />
+                      <div style={{ marginTop: '2px' }}>
+                        <PickerField type="time" width="100%" value={joined.time}
+                          onChange={(v) => setStint(cur => ({ ...cur, joinedAt: composeWhen(joined.date, v) }))} />
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Left (empty = current)</div>
+                      <PickerField type="date" width="100%" value={left.date}
+                        onChange={(v) => setStint(cur => ({ ...cur, leftAt: composeWhen(v, left.time) || null }))} />
+                      <div style={{ marginTop: '2px' }}>
+                        <PickerField type="time" width="100%" value={left.time}
+                          onChange={(v) => setStint(cur => ({ ...cur, leftAt: composeWhen(left.date, v) || null }))} />
+                      </div>
+                    </div>
+                    {d.stints.length > 1 && (
+                      <button type="button" title="Remove stint" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
+                        onClick={() => setMembers(ds => {
+                          const next = [...ds];
+                          next[i] = { ...next[i], stints: next[i].stints.filter((_, sj) => sj !== si) };
+                          return next;
+                        })}>
+                        <X size={12} />
+                      </button>
+                    )}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>Left (empty = current)</div>
-                    <PickerField type="date" width="100%" value={toDateInput(s.leftAt)}
-                      onChange={(v) => setMembers(ds => {
-                        const next = [...ds];
-                        const stints = [...next[i].stints];
-                        stints[si] = { ...stints[si], leftAt: v || null };
-                        next[i] = { ...next[i], stints };
-                        return next;
-                      })} />
-                  </div>
-                  {d.stints.length > 1 && (
-                    <button type="button" title="Remove stint" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
-                      onClick={() => setMembers(ds => {
-                        const next = [...ds];
-                        next[i] = { ...next[i], stints: next[i].stints.filter((_, sj) => sj !== si) };
-                        return next;
-                      })}>
-                      <X size={12} />
-                    </button>
-                  )}
-                </div>
-              ))}
+                );
+              })}
               {totalStints < CHRONICLE_LIMITS.membershipsMax && (
                 <button type="button" title="Add another stint (the guild left and rejoined later)"
                   style={{ ...smallBtn, marginTop: '0.35rem', fontSize: '0.68rem' }}
@@ -395,13 +425,21 @@ export function SubmitForm({
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <div style={{ flex: 1 }}>
               {label('Start')}
-              <PickerField type="date" value={toDateInput(event.startsAt)} width="100%"
-                onChange={(v) => setEvent(ev => ({ ...ev, startsAt: v }))} />
+              <PickerField type="date" value={whenParts(event.startsAt).date} width="100%"
+                onChange={(v) => setEvent(ev => ({ ...ev, startsAt: composeWhen(v, whenParts(ev.startsAt).time) }))} />
+              <div style={{ marginTop: '2px' }}>
+                <PickerField type="time" value={whenParts(event.startsAt).time} width="100%"
+                  onChange={(v) => setEvent(ev => ({ ...ev, startsAt: composeWhen(whenParts(ev.startsAt).date, v) }))} />
+              </div>
             </div>
             <div style={{ flex: 1 }}>
               {label('End (optional)')}
-              <PickerField type="date" value={toDateInput(event.endsAt)} width="100%"
-                onChange={(v) => setEvent(ev => ({ ...ev, endsAt: v || null }))} />
+              <PickerField type="date" value={whenParts(event.endsAt).date} width="100%"
+                onChange={(v) => setEvent(ev => ({ ...ev, endsAt: composeWhen(v, whenParts(ev.endsAt).time) || null }))} />
+              <div style={{ marginTop: '2px' }}>
+                <PickerField type="time" value={whenParts(event.endsAt).time} width="100%"
+                  onChange={(v) => setEvent(ev => ({ ...ev, endsAt: composeWhen(whenParts(ev.endsAt).date, v) || null }))} />
+              </div>
             </div>
           </div>
           {label('Involved guilds')}

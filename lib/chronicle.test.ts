@@ -90,6 +90,12 @@ describe('validateEventPayload', () => {
     if (result.ok) expect(result.value.guilds).toEqual(['Emorians']);
   });
 
+  it('accepts local date-time values and preserves the instant', () => {
+    const result = validateEventPayload({ ...validEvent(), startsAt: '2020-03-01T14:30', endsAt: null });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.startsAt).toBe(new Date('2020-03-01T14:30').toISOString());
+  });
+
   it('accepts alliance participants and defaults to none when omitted', () => {
     const withAlliances = validateEventPayload({ ...validEvent(), alliances: ['The Pact', 'The Pact'] });
     expect(withAlliances.ok).toBe(true);

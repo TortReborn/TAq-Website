@@ -582,7 +582,7 @@ function MapHistoryControls({
             minWidth: '3.5rem',
           }}
         >
-          {seasonZoom ? seasonZoom.label : 'All'}
+          {seasonZoom && seasonZoom.kind !== 'event' ? seasonZoom.label : 'All'}
           <ChevronDown size={12} strokeWidth={2.5} />
         </button>
         {seasonOpen && (
@@ -612,8 +612,8 @@ function MapHistoryControls({
                 width: '100%',
                 padding: '0.375rem 0.625rem',
                 border: 'none',
-                background: !seasonZoom ? 'var(--accent-primary)' : 'var(--bg-card-solid)',
-                color: !seasonZoom ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                background: !seasonZoom || seasonZoom.kind === 'event' ? 'var(--accent-primary)' : 'var(--bg-card-solid)',
+                color: !seasonZoom || seasonZoom.kind === 'event' ? 'var(--text-on-accent)' : 'var(--text-primary)',
                 fontSize: '0.8rem',
                 cursor: 'pointer',
                 textAlign: 'center',

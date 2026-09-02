@@ -13,9 +13,16 @@ import {
 } from '@/lib/chronicle';
 import { SubmitForm, FormState } from '@/components/ChroniclePanel';
 
-// UTC keeps entered dates from displaying one day earlier in negative offsets
+// Date-only values (stored as UTC midnight) display as bare dates in UTC so
+// they never shift a day; values with a time-of-day display in local time.
 const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-const fmtDate = (iso: string | null) => (iso ? DATE_FMT.format(new Date(iso)) : 'present');
+const DATETIME_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+const fmtDate = (iso: string | null) => {
+  if (!iso) return 'present';
+  const d = new Date(iso);
+  const dateOnly = iso.endsWith('Z') && d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0;
+  return dateOnly ? DATE_FMT.format(d) : DATETIME_FMT.format(d);
+};
 
 const cardStyle: React.CSSProperties = {
   background: 'var(--bg-card)',

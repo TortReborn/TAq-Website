@@ -283,7 +283,7 @@ export function MapPageContent({ initialMode }: { initialMode?: 'live' | 'histor
     if (!showChronicle || !chronicleData) return [];
     return chronicleData.events.map((e) => ({
       id: e.id,
-      title: `${e.title} (${e.eventType})`,
+      title: e.title,
       color: chronicleEventColor(e.eventType),
       startMs: Date.parse(e.startsAt),
       endMs: e.endsAt ? Date.parse(e.endsAt) : null,
