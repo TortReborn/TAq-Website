@@ -6,6 +6,7 @@ import {
   ChronicleSubmission,
   EventPayload,
   chronicleEventColor,
+  eventTypeLabel,
 } from '@/lib/chronicle';
 
 // UTC keeps entered dates from displaying one day earlier in negative offsets
@@ -58,12 +59,15 @@ function EventPayloadView({ p }: { p: EventPayload }) {
   return (
     <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)' }}>
       <div style={{ marginBottom: '0.35rem' }}>
-        <span style={{ color: chronicleEventColor(p.eventType), fontWeight: 700, marginRight: '0.5rem' }}>{p.eventType}</span>
+        <span style={{ color: chronicleEventColor(p.eventType), fontWeight: 700, marginRight: '0.5rem' }}>{eventTypeLabel(p.eventType)}</span>
         <strong>{p.title}</strong>
         <span style={{ color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>
           {fmtDate(p.startsAt)}{p.endsAt ? ` → ${fmtDate(p.endsAt)}` : ''}
         </span>
       </div>
+      {(p.alliances ?? []).length > 0 && (
+        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>Alliances: {p.alliances.join(', ')}</div>
+      )}
       {p.guilds.length > 0 && (
         <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>Guilds: {p.guilds.join(', ')}</div>
       )}

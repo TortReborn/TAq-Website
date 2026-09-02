@@ -40,6 +40,8 @@ export interface EventPayload {
   startsAt: string;
   endsAt: string | null;
   guilds: string[];
+  /** Alliance names involved (validated against approved alliances) */
+  alliances: string[];
 }
 
 export interface ChronicleAlliance extends AlliancePayload {
@@ -90,6 +92,7 @@ export const CHRONICLE_LIMITS = {
   noteMax: 300,
   membershipsMax: 40,
   eventGuildsMax: 16,
+  eventAlliancesMax: 8,
   /** Pending submissions allowed per user at once */
   pendingPerUser: 5,
 } as const;
@@ -197,7 +200,20 @@ export function validateEventPayload(raw: unknown): Valid<EventPayload> {
     if (!guilds.includes(guild)) guilds.push(guild);
   }
 
-  return { ok: true, value: { eventType, title, description, startsAt, endsAt, guilds } };
+  // Alliances are optional participants (older payloads may omit the field)
+  const rawAlliances = p.alliances ?? [];
+  if (!Array.isArray(rawAlliances)) return { ok: false, error: 'Invalid alliance list' };
+  if (rawAlliances.length > CHRONICLE_LIMITS.eventAlliancesMax) {
+    return { ok: false, error: `Too many alliances (max ${CHRONICLE_LIMITS.eventAlliancesMax})` };
+  }
+  const alliances: string[] = [];
+  for (const a of rawAlliances) {
+    const alliance = cleanText(a, CHRONICLE_LIMITS.nameMax);
+    if (!alliance) return { ok: false, error: 'Invalid alliance name in list' };
+    if (!alliances.includes(alliance)) alliances.push(alliance);
+  }
+
+  return { ok: true, value: { eventType, title, description, startsAt, endsAt, guilds, alliances } };
 }
 
 // ---------------------------------------------------------------------------
@@ -226,6 +242,11 @@ export function activeAlliancesAt(alliances: ChronicleAlliance[], tMs: number): 
   return alliances.filter(a =>
     a.memberships.some(m => Date.parse(m.joinedAt) <= tMs && (m.leftAt === null || Date.parse(m.leftAt) > tMs))
   );
+}
+
+/** Display label for an event type ("war" → "War") */
+export function eventTypeLabel(type: ChronicleEventType): string {
+  return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
 export function chronicleEventColor(type: ChronicleEventType): string {

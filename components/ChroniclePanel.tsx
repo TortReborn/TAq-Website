@@ -14,6 +14,7 @@ import {
   EventPayload,
   activeAlliancesAt,
   chronicleEventColor,
+  eventTypeLabel,
   validateAlliancePayload,
   validateEventPayload,
 } from "@/lib/chronicle";
@@ -160,17 +161,20 @@ const EMPTY_ALLIANCE: AlliancePayload = {
   memberships: [{ guild: '', joinedAt: '', leftAt: null }],
 };
 const EMPTY_EVENT: EventPayload = {
-  eventType: 'war', title: '', description: '', startsAt: '', endsAt: null, guilds: [],
+  eventType: 'war', title: '', description: '', startsAt: '', endsAt: null, guilds: [], alliances: [],
 };
 
 function SubmitForm({
   form,
   guilds,
+  allianceNames,
   onDone,
   onCancel,
 }: {
   form: Exclude<FormState, { mode: 'closed' }>;
   guilds: { name: string; prefix: string }[];
+  /** Approved alliance names, offered as event participants */
+  allianceNames: string[];
   onDone: () => void;
   onCancel: () => void;
 }) {
@@ -276,6 +280,15 @@ function SubmitForm({
                   onChange={(v) => setAlliance(a => {
                     const ms = [...a.memberships]; ms[i] = { ...ms[i], guild: v }; return { ...a, memberships: ms };
                   })} />
+                <button type="button" title="Add another stint for this guild (left and rejoined later)"
+                  style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
+                  onClick={() => setAlliance(a => {
+                    const ms = [...a.memberships];
+                    ms.splice(i + 1, 0, { guild: ms[i].guild, joinedAt: '', leftAt: null });
+                    return { ...a, memberships: ms };
+                  })}>
+                  <Plus size={12} />
+                </button>
                 <button type="button" title="Remove" style={{ ...smallBtn, height: '30px', padding: '0 0.4rem' }}
                   onClick={() => setAlliance(a => ({ ...a, memberships: a.memberships.filter((_, j) => j !== i) }))}>
                   <X size={12} />
@@ -318,7 +331,7 @@ function SubmitForm({
               {label('Type')}
               <select style={{ ...inputStyle, cursor: 'pointer' }} value={event.eventType}
                 onChange={(e) => setEvent(ev => ({ ...ev, eventType: e.target.value as ChronicleEventType }))}>
-                {CHRONICLE_EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                {CHRONICLE_EVENT_TYPES.map(t => <option key={t} value={t}>{eventTypeLabel(t)}</option>)}
               </select>
             </div>
             <div style={{ flex: 1 }}>
@@ -369,6 +382,41 @@ function SubmitForm({
               <CornerDownLeft size={12} /> Add
             </button>
           </div>
+          {allianceNames.length > 0 && (
+            <>
+              {label('Involved alliances')}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                {allianceNames.map(name => {
+                  const selected = event.alliances.includes(name);
+                  return (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setEvent(ev => ({
+                        ...ev,
+                        alliances: selected
+                          ? ev.alliances.filter(a => a !== name)
+                          : ev.alliances.length < CHRONICLE_LIMITS.eventAlliancesMax
+                            ? [...ev.alliances, name]
+                            : ev.alliances,
+                      }))}
+                      style={{
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '0.75rem',
+                        border: `1px solid ${selected ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                        background: selected ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+                        color: selected ? 'var(--text-on-accent)' : 'var(--text-primary)',
+                        fontSize: '0.72rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {name}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
           {label('Description')}
           <textarea style={{ ...inputStyle, height: '56px', padding: '0.35rem 0.5rem', resize: 'vertical' }}
             value={event.description} maxLength={CHRONICLE_LIMITS.descriptionMax}
@@ -505,7 +553,7 @@ export default function ChroniclePanel({
   const editAlliance = (a: ChronicleAlliance) =>
     setForm({ mode: 'alliance', targetId: a.id, initial: { name: a.name, tag: a.tag, color: a.color, description: a.description, memberships: a.memberships.map(m => ({ ...m })) } });
   const editEvent = (e: ChronicleEvent) =>
-    setForm({ mode: 'event', targetId: e.id, initial: { eventType: e.eventType, title: e.title, description: e.description, startsAt: e.startsAt, endsAt: e.endsAt, guilds: [...e.guilds] } });
+    setForm({ mode: 'event', targetId: e.id, initial: { eventType: e.eventType, title: e.title, description: e.description, startsAt: e.startsAt, endsAt: e.endsAt, guilds: [...e.guilds], alliances: [...(e.alliances ?? [])] } });
 
   const isActiveEvent = (e: ChronicleEvent) =>
     Date.parse(e.startsAt) <= timestampMs && (e.endsAt === null ? Date.parse(e.startsAt) + 7 * 86400000 > timestampMs : Date.parse(e.endsAt) > timestampMs);
@@ -592,7 +640,8 @@ export default function ChroniclePanel({
       {expanded === `e${e.id}` && (
         <div style={{ padding: '0.4rem 0.5rem 0.2rem', fontSize: '0.73rem', color: 'var(--text-secondary)' }}>
           <div style={{ marginBottom: '0.25rem' }}>
-            <span style={{ color: chronicleEventColor(e.eventType), fontWeight: 700 }}>{e.eventType}</span>
+            <span style={{ color: chronicleEventColor(e.eventType), fontWeight: 700 }}>{eventTypeLabel(e.eventType)}</span>
+            {(e.alliances ?? []).length > 0 && <> · Alliances: {e.alliances.join(', ')}</>}
             {e.guilds.length > 0 && <> · {e.guilds.join(', ')}</>}
           </div>
           {e.description && <div style={{ color: 'var(--text-primary)', marginBottom: '0.35rem' }}>{e.description}</div>}
@@ -681,6 +730,7 @@ export default function ChroniclePanel({
           <SubmitForm
             form={form}
             guilds={availableGuilds}
+            allianceNames={(data?.alliances ?? []).map(a => a.name)}
             onDone={() => setForm({ mode: 'closed' })}
             onCancel={() => setForm({ mode: 'closed' })}
           />

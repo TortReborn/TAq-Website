@@ -66,6 +66,8 @@ export async function ensureChronicleTables(pool: Pool): Promise<void> {
     );
     CREATE INDEX IF NOT EXISTS idx_chronicle_submissions_status
       ON chronicle_submissions(status);
+    ALTER TABLE chronicle_events
+      ADD COLUMN IF NOT EXISTS alliances JSONB NOT NULL DEFAULT '[]';
   `);
   tablesReady = true;
 }
@@ -79,7 +81,7 @@ export async function loadChronicleData(pool: Pool): Promise<{ alliances: Chroni
   const [alliances, memberships, events] = await Promise.all([
     pool.query(`SELECT id, name, tag, color, description FROM chronicle_alliances ORDER BY LOWER(name)`),
     pool.query(`SELECT alliance_id, guild_name, joined_at, left_at FROM chronicle_memberships ORDER BY joined_at`),
-    pool.query(`SELECT id, event_type, title, description, starts_at, ends_at, guilds FROM chronicle_events ORDER BY starts_at`),
+    pool.query(`SELECT id, event_type, title, description, starts_at, ends_at, guilds, alliances FROM chronicle_events ORDER BY starts_at`),
   ]);
 
   const byAlliance = new Map<number, ChronicleAlliance>();
@@ -111,6 +113,7 @@ export async function loadChronicleData(pool: Pool): Promise<{ alliances: Chroni
       startsAt: row.starts_at.toISOString(),
       endsAt: row.ends_at ? row.ends_at.toISOString() : null,
       guilds: Array.isArray(row.guilds) ? row.guilds : [],
+      alliances: Array.isArray(row.alliances) ? row.alliances : [],
     })),
   };
 }
@@ -150,6 +153,13 @@ export async function countPendingBy(pool: Pool, discordId: string): Promise<num
     [discordId],
   );
   return Number(result.rows[0].n);
+}
+
+/** Names of all approved alliances (for validating event participants). */
+export async function approvedAllianceNames(pool: Pool): Promise<Set<string>> {
+  await ensureChronicleTables(pool);
+  const result = await pool.query(`SELECT name FROM chronicle_alliances`);
+  return new Set(result.rows.map(r => r.name));
 }
 
 /** Check that an edit's target entity actually exists. */
@@ -214,16 +224,16 @@ async function applyAlliance(client: PoolClient, targetId: number | null, p: All
 async function applyEvent(client: PoolClient, targetId: number | null, p: EventPayload, by: string): Promise<void> {
   if (targetId === null) {
     await client.query(
-      `INSERT INTO chronicle_events (event_type, title, description, starts_at, ends_at, guilds, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [p.eventType, p.title, p.description, p.startsAt, p.endsAt, JSON.stringify(p.guilds), by],
+      `INSERT INTO chronicle_events (event_type, title, description, starts_at, ends_at, guilds, alliances, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [p.eventType, p.title, p.description, p.startsAt, p.endsAt, JSON.stringify(p.guilds), JSON.stringify(p.alliances ?? []), by],
     );
   } else {
     await client.query(
       `UPDATE chronicle_events SET event_type = $1, title = $2, description = $3, starts_at = $4,
-              ends_at = $5, guilds = $6, updated_at = NOW()
-       WHERE id = $7`,
-      [p.eventType, p.title, p.description, p.startsAt, p.endsAt, JSON.stringify(p.guilds), targetId],
+              ends_at = $5, guilds = $6, alliances = $7, updated_at = NOW()
+       WHERE id = $8`,
+      [p.eventType, p.title, p.description, p.startsAt, p.endsAt, JSON.stringify(p.guilds), JSON.stringify(p.alliances ?? []), targetId],
     );
   }
 }

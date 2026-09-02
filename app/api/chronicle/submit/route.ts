@@ -7,7 +7,7 @@ import {
   validateAlliancePayload,
   validateEventPayload,
 } from '@/lib/chronicle';
-import { countPendingBy, createSubmission, targetExists } from '@/lib/chronicle-db';
+import { approvedAllianceNames, countPendingBy, createSubmission, targetExists } from '@/lib/chronicle-db';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,6 +58,19 @@ export async function POST(request: NextRequest) {
   for (const guild of guildNames) {
     if (!knownGuilds.has(guild)) {
       return NextResponse.json({ error: `Unknown guild: "${guild}"` }, { status: 400 });
+    }
+  }
+
+  // Alliance participants must reference approved alliances
+  if (kind === 'event') {
+    const eventAlliances = (validated.value as { alliances: string[] }).alliances;
+    if (eventAlliances.length > 0) {
+      const known = await approvedAllianceNames(pool);
+      for (const name of eventAlliances) {
+        if (!known.has(name)) {
+          return NextResponse.json({ error: `Unknown alliance: "${name}"` }, { status: 400 });
+        }
+      }
     }
   }
 

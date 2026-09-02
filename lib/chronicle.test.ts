@@ -89,6 +89,29 @@ describe('validateEventPayload', () => {
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value.guilds).toEqual(['Emorians']);
   });
+
+  it('accepts alliance participants and defaults to none when omitted', () => {
+    const withAlliances = validateEventPayload({ ...validEvent(), alliances: ['The Pact', 'The Pact'] });
+    expect(withAlliances.ok).toBe(true);
+    if (withAlliances.ok) expect(withAlliances.value.alliances).toEqual(['The Pact']);
+
+    const without = validateEventPayload(validEvent());
+    expect(without.ok).toBe(true);
+    if (without.ok) expect(without.value.alliances).toEqual([]);
+  });
+});
+
+describe('multi-stint memberships', () => {
+  it('accepts the same guild with several join/leave intervals', () => {
+    const payload = validAlliance();
+    payload.memberships = [
+      { guild: 'Emorians', joinedAt: '2019-01-01', leftAt: '2019-06-01' },
+      { guild: 'Emorians', joinedAt: '2020-01-01', leftAt: null },
+    ];
+    const result = validateAlliancePayload(payload);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.memberships).toHaveLength(2);
+  });
 });
 
 describe('allianceColorsAt', () => {

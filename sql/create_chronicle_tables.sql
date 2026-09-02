@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS chronicle_events (
   starts_at   TIMESTAMPTZ   NOT NULL,
   ends_at     TIMESTAMPTZ   NULL,
   guilds      JSONB         NOT NULL DEFAULT '[]',
+  alliances   JSONB         NOT NULL DEFAULT '[]', -- alliance names involved
   created_by  VARCHAR(30)   NOT NULL,
   created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
