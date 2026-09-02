@@ -239,6 +239,87 @@ async function applyEvent(client: PoolClient, targetId: number | null, p: EventP
 }
 
 /**
+ * Exec-only: delete a published alliance or event. The entity's final state is
+ * snapshotted into the submissions table (immediately approved, review note
+ * "direct exec delete") so the audit trail records what was removed. Deleting
+ * an alliance also cascades its memberships (FK) and strips its name from any
+ * events that listed it as a participant.
+ */
+export async function deleteChronicleEntity(
+  pool: Pool,
+  args: { kind: 'alliance' | 'event'; id: number; deletedBy: string; deletedName: string },
+): Promise<{ ok: boolean; error?: string }> {
+  await ensureChronicleTables(pool);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    let payload: AlliancePayload | EventPayload;
+    if (args.kind === 'alliance') {
+      const found = await client.query(`SELECT * FROM chronicle_alliances WHERE id = $1 FOR UPDATE`, [args.id]);
+      if (found.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return { ok: false, error: 'Alliance not found' };
+      }
+      const row = found.rows[0];
+      const members = await client.query(
+        `SELECT guild_name, joined_at, left_at FROM chronicle_memberships WHERE alliance_id = $1 ORDER BY joined_at`,
+        [args.id],
+      );
+      payload = {
+        name: row.name,
+        tag: row.tag,
+        color: row.color,
+        description: row.description,
+        memberships: members.rows.map(m => ({
+          guild: m.guild_name,
+          joinedAt: m.joined_at.toISOString(),
+          leftAt: m.left_at ? m.left_at.toISOString() : null,
+        })),
+      };
+      await client.query(`DELETE FROM chronicle_alliances WHERE id = $1`, [args.id]);
+      // Remove the alliance from events that listed it as a participant
+      await client.query(
+        `UPDATE chronicle_events SET alliances = alliances - $1, updated_at = NOW()
+         WHERE alliances ? $1`,
+        [row.name],
+      );
+    } else {
+      const found = await client.query(`SELECT * FROM chronicle_events WHERE id = $1 FOR UPDATE`, [args.id]);
+      if (found.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return { ok: false, error: 'Event not found' };
+      }
+      const row = found.rows[0];
+      payload = {
+        eventType: row.event_type,
+        title: row.title,
+        description: row.description,
+        startsAt: row.starts_at.toISOString(),
+        endsAt: row.ends_at ? row.ends_at.toISOString() : null,
+        guilds: Array.isArray(row.guilds) ? row.guilds : [],
+        alliances: Array.isArray(row.alliances) ? row.alliances : [],
+      };
+      await client.query(`DELETE FROM chronicle_events WHERE id = $1`, [args.id]);
+    }
+
+    await client.query(
+      `INSERT INTO chronicle_submissions
+         (kind, target_id, payload, note, status, submitted_by, submitted_name, reviewed_by, review_note, reviewed_at)
+       VALUES ($1, $2, $3, '', 'approved', $4, $5, $5, 'direct exec delete', NOW())`,
+      [args.kind, args.id, JSON.stringify(payload), args.deletedBy, args.deletedName],
+    );
+    await client.query('COMMIT');
+    return { ok: true };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
  * Approve or reject a pending submission. Approval applies the payload to the
  * live tables and marks the submission, atomically. Returns false if the
  * submission was not found or already reviewed.

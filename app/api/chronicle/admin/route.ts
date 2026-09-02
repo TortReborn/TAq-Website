@@ -7,7 +7,7 @@ import {
   validateAlliancePayload,
   validateEventPayload,
 } from '@/lib/chronicle';
-import { approvedAllianceNames, createSubmission, reviewSubmission, targetExists } from '@/lib/chronicle-db';
+import { approvedAllianceNames, createSubmission, deleteChronicleEntity, reviewSubmission, targetExists } from '@/lib/chronicle-db';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,5 +95,43 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[api:chronicle/admin] failed:', error);
     return NextResponse.json({ error: 'Failed to apply change' }, { status: 500 });
+  }
+}
+
+/**
+ * Exec-only: delete a published alliance or event. The removed entity's final
+ * state is snapshotted into the decision log.
+ */
+export async function DELETE(request: NextRequest) {
+  const session = await requireGuildSession(request);
+  if (!session || session.role !== 'exec') {
+    return NextResponse.json({ error: 'Exec access required' }, { status: 401 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  const b = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
+
+  const kind = b.kind === 'alliance' || b.kind === 'event' ? b.kind : null;
+  if (!kind) return NextResponse.json({ error: 'kind must be "alliance" or "event"' }, { status: 400 });
+  const id = Number.isInteger(b.targetId) && (b.targetId as number) > 0 ? (b.targetId as number) : null;
+  if (!id) return NextResponse.json({ error: 'Invalid targetId' }, { status: 400 });
+
+  try {
+    const result = await deleteChronicleEntity(getPool(), {
+      kind,
+      id,
+      deletedBy: session.discord_id,
+      deletedName: session.ign || session.discord_username,
+    });
+    if (!result.ok) return NextResponse.json({ error: result.error }, { status: 404 });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('[api:chronicle/admin] delete failed:', error);
+    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

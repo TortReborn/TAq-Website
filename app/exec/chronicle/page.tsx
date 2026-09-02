@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import {
   AlliancePayload,
   ChronicleAlliance,
@@ -139,6 +139,25 @@ export default function ExecChroniclePage() {
       .catch(() => {});
   }, []);
 
+  const deleteEntity = async (kind: 'alliance' | 'event', targetId: number, name: string) => {
+    if (!window.confirm(`Delete ${kind} "${name}"? It disappears from the map immediately. This cannot be undone.`)) return;
+    try {
+      const res = await fetch('/api/chronicle/admin', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind, targetId }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(body.error ?? `Delete failed (${res.status})`);
+        return;
+      }
+      await Promise.all([loadPublished(), load()]);
+    } catch {
+      alert('Network error — please try again');
+    }
+  };
+
   const decide = async (id: number, approve: boolean) => {
     const note = approve ? '' : (window.prompt('Reason for rejection (optional):') ?? '');
     setBusyId(id);
@@ -224,6 +243,10 @@ export default function ExecChroniclePage() {
                   })}>
                   <Pencil size={12} /> Edit
                 </button>
+                <button type="button" title="Delete" style={{ ...btnStyle('plain'), height: '26px', padding: '0 0.4rem', display: 'flex', alignItems: 'center', color: '#e57373' }}
+                  onClick={() => deleteEntity('alliance', a.id, a.name)}>
+                  <Trash2 size={12} />
+                </button>
               </div>
             ))}
           </div>
@@ -252,6 +275,10 @@ export default function ExecChroniclePage() {
                     },
                   })}>
                   <Pencil size={12} /> Edit
+                </button>
+                <button type="button" title="Delete" style={{ ...btnStyle('plain'), height: '26px', padding: '0 0.4rem', display: 'flex', alignItems: 'center', color: '#e57373' }}
+                  onClick={() => deleteEntity('event', e.id, e.title)}>
+                  <Trash2 size={12} />
                 </button>
               </div>
             ))}
@@ -307,11 +334,13 @@ export default function ExecChroniclePage() {
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
             <span style={{
               fontWeight: 700,
-              color: s.status === 'approved' ? '#66bb6a' : '#e57373',
+              color: s.reviewNote === 'direct exec delete' ? '#e57373' : s.status === 'approved' ? '#66bb6a' : '#e57373',
               textTransform: 'uppercase',
               marginRight: '0.5rem',
-            }}>{s.status}</span>
-            {s.targetId !== null ? `edit to ${s.kind}` : `new ${s.kind}`} #{s.id}
+            }}>{s.reviewNote === 'direct exec delete' ? 'DELETED' : s.status}</span>
+            {s.reviewNote === 'direct exec delete'
+              ? `deleted ${s.kind}`
+              : s.targetId !== null ? `edit to ${s.kind}` : `new ${s.kind}`} #{s.id}
             {' · '}by {s.submittedName || s.submittedBy}
             {' · '}reviewed by {s.reviewedBy} {s.reviewedAt ? `on ${fmtDate(s.reviewedAt)}` : ''}
             {s.reviewNote && <> · “{s.reviewNote}”</>}

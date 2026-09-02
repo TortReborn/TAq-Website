@@ -29,6 +29,13 @@ test.describe('map page — chronicle layer', () => {
     expect(res.status()).toBe(401);
   });
 
+  test('direct admin deletes are exec-gated', async ({ page }) => {
+    const res = await page.request.delete('/api/chronicle/admin', {
+      data: { kind: 'event', targetId: 1 },
+    });
+    expect(res.status()).toBe(401);
+  });
+
   test('toggle opens the panel with the sign-in hint for anonymous visitors', async ({ page }) => {
     const consoleCapture = captureConsole(page);
     await gotoMapFresh(page);
