@@ -1,0 +1,2110 @@
+{
+    "Air Temple Upper": [
+        "Air Temple Lower"
+    ],
+    "Air Temple Lower": [
+        "Air Temple Upper",
+        "Krolton's Cave",
+        "Cliffside Valley"
+    ],
+    "Maro Peaks": [
+        "Skiens Island",
+        "Tree Island"
+    ],
+    "Skiens Island": [
+        "Maro Peaks",
+        "Selchar",
+        "Dead Island South West",
+        "Nodguj Nation"
+    ],
+    "Tree Island": [
+        "Maro Peaks",
+        "Light Peninsula",
+        "Lost Atoll",
+        "Volcano Upper"
+    ],
+    "Plains": [
+        "Nivla Woods Entrance",
+        "South Farmers Valley",
+        "North Nivla Woods",
+        "Maltic Plains",
+        "Arachnid Route"
+    ],
+    "Nivla Woods Entrance": [
+        "Plains",
+        "Road to Time Valley",
+        "Emerald Trail",
+        "Nivla Woods"
+    ],
+    "South Farmers Valley": [
+        "Plains",
+        "Maltic Plains",
+        "Maltic Coast",
+        "Maltic",
+        "North Farmers Valley"
+    ],
+    "North Nivla Woods": [
+        "Plains",
+        "Arachnid Route",
+        "Nivla Woods Exit",
+        "Nivla Woods Edge"
+    ],
+    "Maltic Plains": [
+        "Plains",
+        "South Farmers Valley",
+        "Maltic",
+        "Emerald Trail",
+        "Ragni East Suburbs",
+        "North Farmers Valley"
+    ],
+    "Path To Thanos": [
+        "Thanos",
+        "Cinfras Thanos Transition",
+        "Cinfras County Upper",
+        "Path To Ozoth's Spire Upper"
+    ],
+    "Thanos": [
+        "Path To Thanos",
+        "Gylia Lake South East",
+        "Path To Ozoth's Spire Lower",
+        "Path To Military Base"
+    ],
+    "Cinfras Thanos Transition": [
+        "Path To Thanos",
+        "Cinfras County Mid-Upper",
+        "Path To Ozoth's Spire Upper",
+        "Burning Airship"
+    ],
+    "Savannah West Lower": [
+        "Ternaves Plains Upper",
+        "Savannah East Lower",
+        "Savannah West Upper",
+        "Detlas Savannah Transition"
+    ],
+    "Ternaves Plains Upper": [
+        "Savannah West Lower",
+        "Detlas Savannah Transition",
+        "Ternaves Plains Lower",
+        "Ternaves"
+    ],
+    "Savannah East Lower": [
+        "Savannah West Lower",
+        "Ternaves",
+        "Savannah East Upper"
+    ],
+    "Savannah West Upper": [
+        "Savannah West Lower",
+        "Bremminglar",
+        "Cathedral Harbour",
+        "Savannah East Upper"
+    ],
+    "Durum Isles Upper": [
+        "Mage Island",
+        "Nodguj Nation",
+        "Selchar",
+        "Durum Isles Center"
+    ],
+    "Mage Island": [
+        "Durum Isles Upper",
+        "Santa's Hideout",
+        "Half Moon Island",
+        "Durum Isles East",
+        "Nodguj Nation"
+    ],
+    "Nodguj Nation": [
+        "Durum Isles Upper",
+        "Skiens Island",
+        "Santa's Hideout",
+        "Mage Island",
+        "Icy Island",
+        "Dujgon Nation"
+    ],
+    "Selchar": [
+        "Durum Isles Upper",
+        "Durum Isles Center",
+        "Durum Isles Lower",
+        "Rooster Island",
+        "Skiens Island"
+    ],
+    "Durum Isles Center": [
+        "Durum Isles Upper",
+        "Selchar",
+        "Durum Isles Lower",
+        "Durum Isles East"
+    ],
+    "Durum Isles Lower": [
+        "Selchar",
+        "Durum Isles Center",
+        "Rooster Island",
+        "Cathedral Harbour"
+    ],
+    "Rooster Island": [
+        "Selchar",
+        "Nemract Town",
+        "The Bear Zoo",
+        "Durum Isles Lower"
+    ],
+    "Llevigar Plains West Lower": [
+        "Llevigar Farm Plains West",
+        "Llevigar Plains East Lower",
+        "Llevigar Plains West Upper",
+        "Llevigar Gate West"
+    ],
+    "Llevigar Farm Plains West": [
+        "Llevigar Plains West Lower",
+        "Llevigar Farm Plains East",
+        "Llevigar Gate West"
+    ],
+    "Llevigar Plains East Lower": [
+        "Llevigar Plains West Lower",
+        "Llevigar Farm Plains East",
+        "Llevigar Plains East Upper",
+        "Orc Lake"
+    ],
+    "Llevigar Plains West Upper": [
+        "Llevigar Plains West Lower",
+        "Llevigar Plains East Upper",
+        "Swamp West Lower"
+    ],
+    "Llevigar Gate West": [
+        "Llevigar Plains West Lower",
+        "Llevigar Gate East",
+        "Llevigar Farm Plains West"
+    ],
+    "Nesaak Plains South East": [
+        "Nesaak Plains South West",
+        "Nesaak Village",
+        "Bob's Tomb"
+    ],
+    "Nesaak Plains South West": [
+        "Nesaak Plains South East",
+        "Nesaak Plains Lower North West",
+        "Nesaak Bridge Transition",
+        "Nesaak Village",
+        "Twain Lake",
+        "Icy Descent"
+    ],
+    "Nesaak Village": [
+        "Nesaak Plains South East",
+        "Bob's Tomb",
+        "Nesaak Plains Lower North West",
+        "Nesaak Plains North East",
+        "Nesaak Plains South West"
+    ],
+    "Bob's Tomb": [
+        "Nesaak Plains South East",
+        "Nesaak Village",
+        "Nesaak Plains North East"
+    ],
+    "Llevigar Farm Plains East": [
+        "Llevigar Plains East Lower",
+        "Llevigar Gate East",
+        "Orc Road",
+        "Llevigar Farm Plains West"
+    ],
+    "Llevigar Plains East Upper": [
+        "Llevigar Plains East Lower",
+        "Swamp East Lower",
+        "Sunspark Camp",
+        "Orc Lake",
+        "Llevigar Plains West Upper"
+    ],
+    "Orc Lake": [
+        "Llevigar Plains East Lower",
+        "Orc Road",
+        "Sunspark Camp",
+        "Llevigar Plains East Upper",
+        "Sablestone Camp"
+    ],
+    "Kander Mines": [
+        "Mesquis Tower",
+        "Dark Forest Village",
+        "Abandoned Manor",
+        "Path to Talor"
+    ],
+    "Mesquis Tower": [
+        "Kander Mines",
+        "Cinfras Entrance",
+        "Abandoned Manor",
+        "Path to Cinfras"
+    ],
+    "Dark Forest Village": [
+        "Kander Mines",
+        "Old Crossroads South",
+        "Cinfras Outskirts",
+        "Path to Talor"
+    ],
+    "Abandoned Manor": [
+        "Kander Mines",
+        "Lone Farmstead",
+        "Mesquis Tower",
+        "Entrance to Kander"
+    ],
+    "Path to Talor": [
+        "Kander Mines",
+        "Old Crossroads North",
+        "Dark Forest Village",
+        "Viscera Pits East",
+        "Old Crossroads South",
+        "Entrance to Kander"
+    ],
+    "Swamp Dark Forest Transition Upper": [
+        "Swamp Dark Forest Transition Mid",
+        "Olux",
+        "Taproot Descent"
+    ],
+    "Swamp Dark Forest Transition Mid": [
+        "Swamp Dark Forest Transition Upper",
+        "Entrance to Olux",
+        "Taproot Descent",
+        "Swamp Dark Forest Transition Lower",
+        "Olux"
+    ],
+    "Olux": [
+        "Swamp Dark Forest Transition Upper",
+        "Entrance to Olux",
+        "Swamp Dark Forest Transition Mid",
+        "Swamp Mountain Transition Upper"
+    ],
+    "Taproot Descent": [
+        "Swamp Dark Forest Transition Upper",
+        "Gelibord Corrupted Farm",
+        "Swamp Dark Forest Transition Mid",
+        "Gelibord Castle",
+        "Fortress North"
+    ],
+    "Mine Base Plains": [
+        "Mining Base Lower",
+        "The Silent Road",
+        "Plains Lake",
+        "Mining Base Upper",
+        "Ternaves Plains Lower",
+        "Detlas Savannah Transition"
+    ],
+    "Mining Base Lower": [
+        "Mine Base Plains",
+        "Mining Base Upper"
+    ],
+    "The Silent Road": [
+        "Mine Base Plains",
+        "The Broken Road"
+    ],
+    "Plains Lake": [
+        "Mine Base Plains",
+        "Nether Plains Upper",
+        "Desolate Valley",
+        "Nether Gate"
+    ],
+    "Mining Base Upper": [
+        "Mine Base Plains",
+        "Abandoned Pass",
+        "Mining Base Lower",
+        "Ternaves Plains Lower"
+    ],
+    "Ternaves Plains Lower": [
+        "Mine Base Plains",
+        "Abandoned Pass",
+        "Ternaves Plains Upper",
+        "Ternaves",
+        "Mining Base Upper"
+    ],
+    "Detlas Savannah Transition": [
+        "Savannah West Lower",
+        "Ternaves Plains Upper",
+        "Detlas",
+        "Mine Base Plains"
+    ],
+    "Detlas": [
+        "Detlas Savannah Transition",
+        "Detlas Trail East Plains",
+        "Detlas Close Suburbs"
+    ],
+    "Fortress South": [
+        "Fortress North",
+        "Orc Battlegrounds",
+        "Swamp Dark Forest Transition Lower",
+        "Mansion of Insanity"
+    ],
+    "Fortress North": [
+        "Fortress South",
+        "Swamp Dark Forest Transition Lower",
+        "Taproot Descent",
+        "Mansion of Insanity"
+    ],
+    "Orc Battlegrounds": [
+        "Fortress South",
+        "Leadin Fortress"
+    ],
+    "Swamp Dark Forest Transition Lower": [
+        "Fortress South",
+        "Swamp Lower",
+        "Entrance to Olux",
+        "Swamp Dark Forest Transition Mid",
+        "Fortress North",
+        "Forgotten Path"
+    ],
+    "Mansion of Insanity": [
+        "Fortress South",
+        "Twisted Housing",
+        "Fortress North"
+    ],
+    "Aldorei Lowlands": [
+        "Aldorei's River",
+        "Aldorei's Waterfall",
+        "Cinfras's Small Farm"
+    ],
+    "Aldorei's River": [
+        "Aldorei Lowlands",
+        "Cinfras"
+    ],
+    "Aldorei's Waterfall": [
+        "Aldorei Lowlands",
+        "Aldorei Valley South Entrance",
+        "Aldorei Valley Upper"
+    ],
+    "Cinfras's Small Farm": [
+        "Aldorei Lowlands",
+        "Cinfras County Mid-Lower",
+        "Aldorei Valley South Entrance",
+        "Cinfras County Lower"
+    ],
+    "Llevigar Gate East": [
+        "Llevigar Gate West",
+        "Llevigar",
+        "Orc Road",
+        "Llevigar Farm Plains East"
+    ],
+    "Llevigar": [
+        "Llevigar Gate East",
+        "Llevigar Entrance",
+        "Quartz Mines South West"
+    ],
+    "Orc Road": [
+        "Llevigar Gate East",
+        "Loamsprout Camp",
+        "Llevigar Farm Plains East",
+        "Orc Lake"
+    ],
+    "Viscera Pits West": [
+        "Viscera Pits East",
+        "Twisted Ridge",
+        "Lexdales Prison",
+        "Entrance to Kander"
+    ],
+    "Viscera Pits East": [
+        "Viscera Pits West",
+        "Lexdale",
+        "Path to Talor"
+    ],
+    "Twisted Ridge": [
+        "Viscera Pits West",
+        "Lexdales Prison",
+        "Entrance to Kander"
+    ],
+    "Lexdales Prison": [
+        "Viscera Pits West",
+        "Twisted Ridge"
+    ],
+    "Entrance to Kander": [
+        "Viscera Pits West",
+        "Abandoned Manor",
+        "Twisted Ridge",
+        "Path to Talor",
+        "Gelibord"
+    ],
+    "Sanctuary Bridge": [
+        "Nesaak Plains Upper North West",
+        "Time Valley"
+    ],
+    "Nesaak Plains Upper North West": [
+        "Sanctuary Bridge",
+        "Nesaak Plains Lower North West",
+        "Elkurn",
+        "Nesaak Plains North East",
+        "Nesaak Plains Mid North West"
+    ],
+    "Time Valley": [
+        "Sanctuary Bridge",
+        "Abandoned Farm",
+        "Elkurn Fields",
+        "Little Wood"
+    ],
+    "Desert West Upper": [
+        "Almuj City",
+        "Desert Upper"
+    ],
+    "Almuj City": [
+        "Desert West Upper",
+        "Desert West Lower",
+        "Desert Mid-Upper",
+        "Savannah East Upper",
+        "Desert Mid-Lower"
+    ],
+    "Desert Upper": [
+        "Desert West Upper",
+        "Desert Mid-Upper",
+        "Mummy's Tomb"
+    ],
+    "Maltic": [
+        "Maltic Plains",
+        "South Farmers Valley",
+        "Coastal Trail",
+        "Maltic Coast",
+        "Ragni Plains"
+    ],
+    "Emerald Trail": [
+        "Maltic Plains",
+        "Ragni Main Entrance",
+        "Nivla Woods Entrance"
+    ],
+    "Ragni East Suburbs": [
+        "Maltic Plains",
+        "Ragni Main Entrance",
+        "Ragni Plains"
+    ],
+    "Bremminglar": [
+        "Savannah West Upper",
+        "Lion Lair"
+    ],
+    "Cathedral Harbour": [
+        "Savannah West Upper",
+        "Ancient Nemract",
+        "Nemract Cathedral",
+        "Durum Isles Lower",
+        "Durum Isles East",
+        "Detlas Trail East Plains"
+    ],
+    "Savannah East Upper": [
+        "Savannah West Upper",
+        "Savannah East Lower",
+        "Almuj City"
+    ],
+    "Santa's Hideout": [
+        "Mage Island",
+        "Nodguj Nation",
+        "Icy Island"
+    ],
+    "Half Moon Island": [
+        "Mage Island"
+    ],
+    "Durum Isles East": [
+        "Mage Island",
+        "Durum Isles Center",
+        "Cathedral Harbour"
+    ],
+    "Ahmsord": [
+        "Path to Ahmsord Upper",
+        "Path to Ahmsord Lower",
+        "Sky Island Ascent",
+        "Temple Island",
+        "Central Islands"
+    ],
+    "Path to Ahmsord Upper": [
+        "Ahmsord",
+        "Kandon Ridge",
+        "Path to Ahmsord Lower"
+    ],
+    "Path to Ahmsord Lower": [
+        "Ahmsord",
+        "Sky Castle",
+        "Path to Ahmsord Upper"
+    ],
+    "Sky Island Ascent": [
+        "Ahmsord",
+        "Raider's Base Upper",
+        "Jofash Tunnel",
+        "Central Islands",
+        "Sky Falls"
+    ],
+    "Temple Island": [
+        "Ahmsord",
+        "Kandon Ridge",
+        "Central Islands",
+        "Snail Island",
+        "Swamp Island"
+    ],
+    "Swamp Mountain Transition Mid": [
+        "Swamp Mountain Transition Lower",
+        "Swamp West Upper",
+        "Swamp Mountain Transition Mid-Upper"
+    ],
+    "Swamp Mountain Transition Lower": [
+        "Swamp Mountain Transition Mid"
+    ],
+    "Swamp West Upper": [
+        "Swamp Mountain Transition Mid",
+        "Swamp West Mid-Upper",
+        "Swamp East Upper",
+        "Swamp Mountain Transition Mid-Upper"
+    ],
+    "Swamp Mountain Transition Mid-Upper": [
+        "Swamp Mountain Transition Mid",
+        "Swamp West Upper",
+        "Swamp East Upper",
+        "Swamp Mountain Transition Upper"
+    ],
+    "Nesaak Plains North East": [
+        "Bob's Tomb",
+        "Nesaak Plains Upper North West",
+        "Nesaak Village",
+        "Nesaak Plains Lower North West",
+        "Nesaak Transition"
+    ],
+    "Fallen Factory": [
+        "Corkus City South",
+        "Ruined Houses",
+        "Factory Entrance",
+        "Corkus Sea Port",
+        "Corkus Sea Cove"
+    ],
+    "Corkus City South": [
+        "Fallen Factory",
+        "Corkus City",
+        "Corkus Forest South",
+        "Factory Entrance",
+        "Road To Mine",
+        "Corkus Forest North"
+    ],
+    "Ruined Houses": [
+        "Fallen Factory",
+        "Corkus Sea Port",
+        "Factory Entrance"
+    ],
+    "Factory Entrance": [
+        "Fallen Factory",
+        "Corkus City South",
+        "Corkus Forest South",
+        "Ruined Houses"
+    ],
+    "Corkus Sea Port": [
+        "Fallen Factory",
+        "Corkus Sea Cove",
+        "Lighthouse Plateau",
+        "Ruined Houses"
+    ],
+    "Canyon Valley South": [
+        "Bandit Camp Exit",
+        "Bandit Cave Lower",
+        "Canyon Mountain East"
+    ],
+    "Bandit Camp Exit": [
+        "Canyon Valley South",
+        "Canyon Path North Mid"
+    ],
+    "Bandit Cave Lower": [
+        "Canyon Valley South",
+        "Path To Ozoth's Spire Upper"
+    ],
+    "Canyon Mountain East": [
+        "Canyon Valley South",
+        "Canyon Walk Way"
+    ],
+    "Swamp East Lower": [
+        "Sunspark Camp",
+        "Llevigar Plains East Upper",
+        "Swamp East Mid",
+        "Swamp West Lower"
+    ],
+    "Sunspark Camp": [
+        "Swamp East Lower",
+        "Meteor Crater",
+        "Llevigar Plains East Upper",
+        "Swamp Mountain Base",
+        "Orc Lake"
+    ],
+    "Swamp East Mid": [
+        "Swamp East Lower",
+        "Swamp East Mid-Upper",
+        "Swamp West Mid",
+        "Swamp Mountain Base"
+    ],
+    "Swamp West Lower": [
+        "Swamp East Lower",
+        "Swamp West Mid",
+        "Llevigar Plains West Upper"
+    ],
+    "Path to Light": [
+        "Otherwordly Monolith",
+        "Azure Frontier"
+    ],
+    "Otherwordly Monolith": [
+        "Path to Light",
+        "Azure Frontier"
+    ],
+    "Azure Frontier": [
+        "Path to Light",
+        "Otherwordly Monolith",
+        "Field of Life",
+        "Nexus of Light"
+    ],
+    "Corkus City": [
+        "Corkus Forest North",
+        "Corkus Castle",
+        "Corkus Forest South",
+        "Corkus City South",
+        "Corkus Countryside"
+    ],
+    "Corkus Forest North": [
+        "Corkus City",
+        "Corkus Forest South",
+        "Corkus City South",
+        "Corkus Mountain"
+    ],
+    "Corkus Castle": [
+        "Corkus City"
+    ],
+    "Corkus Forest South": [
+        "Corkus City",
+        "Corkus City South",
+        "Corkus Forest North",
+        "Factory Entrance"
+    ],
+    "Corkus Countryside": [
+        "Corkus City",
+        "Corkus Outskirts",
+        "Corkus Mountain",
+        "Bloody Beach",
+        "Avos Temple"
+    ],
+    "Canyon Path North Mid": [
+        "Canyon Waterfall Mid North",
+        "Canyon Path South West",
+        "Bandit Camp Exit",
+        "Canyon Entrance Waterfall"
+    ],
+    "Canyon Waterfall Mid North": [
+        "Canyon Path North Mid",
+        "Canyon Fortress",
+        "Canyon Mountain South"
+    ],
+    "Canyon Path South West": [
+        "Canyon Path North Mid",
+        "Canyon Path North West",
+        "Canyon Lower South East"
+    ],
+    "Canyon Entrance Waterfall": [
+        "Canyon Path North Mid",
+        "Canyon Path North West"
+    ],
+    "The Broken Road": [
+        "The Silent Road",
+        "Worm Tunnel"
+    ],
+    "City of Troms": [
+        "Temple of Legends",
+        "Jungle Lake",
+        "South Pigmen Ravines"
+    ],
+    "Temple of Legends": [
+        "City of Troms",
+        "Jungle Lake"
+    ],
+    "Jungle Lake": [
+        "City of Troms",
+        "Jungle Mid",
+        "Temple of Legends"
+    ],
+    "South Pigmen Ravines": [
+        "City of Troms",
+        "Pigmen Ravines Entrance",
+        "Little Wood"
+    ],
+    "Gylia Lake South West": [
+        "Gylia Lake South East",
+        "Dark Forest Cinfras Transition",
+        "Gylia Lake North West"
+    ],
+    "Gylia Lake South East": [
+        "Gylia Lake South West",
+        "Cinfras County Upper",
+        "Thanos",
+        "Gylia Lake North East"
+    ],
+    "Dark Forest Cinfras Transition": [
+        "Gylia Lake South West",
+        "Fallen Village",
+        "Cinfras Outskirts"
+    ],
+    "Gylia Lake North West": [
+        "Gylia Lake South West",
+        "Jitak's Farm",
+        "Gylia Lake North East",
+        "Fallen Village"
+    ],
+    "Primal Fen": [
+        "Field of Life"
+    ],
+    "Field of Life": [
+        "Primal Fen",
+        "Luminous Plateau",
+        "Azure Frontier",
+        "Heavenly Ingress"
+    ],
+    "Canyon Walk Way": [
+        "Canyon Mountain East",
+        "Path To Ozoth's Spire Mid",
+        "Bandits Toll"
+    ],
+    "Fallen Village": [
+        "Dark Forest Cinfras Transition",
+        "Fungal Grove",
+        "Gylia Lake North West",
+        "Mushroom Hill"
+    ],
+    "Cinfras Outskirts": [
+        "Dark Forest Cinfras Transition",
+        "Fungal Grove",
+        "Cinfras",
+        "Dark Forest Village",
+        "Old Crossroads South"
+    ],
+    "Cliffside Lake": [
+        "Canyon Of The Lost",
+        "Cliffside Passage"
+    ],
+    "Canyon Of The Lost": [
+        "Cliffside Lake",
+        "Valley of the Lost",
+        "Kandon-Beda",
+        "Cliff Side of the Lost"
+    ],
+    "Cliffside Passage": [
+        "Cliffside Lake",
+        "Cliffside Passage North"
+    ],
+    "Nemract Plains West": [
+        "Nivla Woods Edge",
+        "Arachnid Route",
+        "Nemract Road",
+        "Nemract Quarry"
+    ],
+    "Nivla Woods Edge": [
+        "Nemract Plains West",
+        "Nivla Woods Exit",
+        "Detlas Far Suburbs",
+        "North Nivla Woods",
+        "Road to Elkurn"
+    ],
+    "Arachnid Route": [
+        "Nemract Plains West",
+        "North Nivla Woods",
+        "Plains"
+    ],
+    "Nemract Road": [
+        "Nemract Plains West",
+        "Ancient Nemract",
+        "Nemract Quarry",
+        "Nemract Town",
+        "Nemract Plains East",
+        "Nemract Cathedral"
+    ],
+    "Nemract Quarry": [
+        "Nemract Plains West",
+        "Plains Coast",
+        "Nemract Road"
+    ],
+    "Twain Mansion": [
+        "Twain Lake"
+    ],
+    "Twain Lake": [
+        "Twain Mansion",
+        "Nesaak Plains South West"
+    ],
+    "Ternaves": [
+        "Savannah East Lower",
+        "Ternaves Plains Upper",
+        "Ternaves Plains Lower"
+    ],
+    "Swamp Lower": [
+        "Swamp Dark Forest Transition Lower",
+        "Swamp Mountain Base",
+        "Iron Road",
+        "Entrance to Olux"
+    ],
+    "Swamp Mountain Base": [
+        "Swamp Lower",
+        "Swamp Plains Basin",
+        "Sunspark Camp",
+        "Swamp East Mid"
+    ],
+    "Iron Road": [
+        "Swamp Lower",
+        "Meteor Crater",
+        "Goblin Plains West",
+        "Forgotten Path"
+    ],
+    "Entrance to Olux": [
+        "Swamp Lower",
+        "Swamp Plains Basin",
+        "Swamp Dark Forest Transition Mid",
+        "Swamp Dark Forest Transition Lower",
+        "Olux"
+    ],
+    "Lion Lair": [
+        "Bremminglar"
+    ],
+    "Road To Light Forest": [
+        "Fleris Trail",
+        "Leadin Fortress",
+        "Light Forest Entrance"
+    ],
+    "Fleris Trail": [
+        "Road To Light Forest"
+    ],
+    "Leadin Fortress": [
+        "Road To Light Forest",
+        "Orc Battlegrounds",
+        "Pre-Light Forest Transition"
+    ],
+    "Light Forest Entrance": [
+        "Road To Light Forest",
+        "Light Forest West Mid",
+        "Light Forest South Entrance",
+        "Light Forest North Entrance"
+    ],
+    "Swamp East Mid-Upper": [
+        "Swamp East Upper",
+        "Swamp East Mid",
+        "Swamp Plains Basin",
+        "Swamp West Mid-Upper"
+    ],
+    "Swamp East Upper": [
+        "Swamp East Mid-Upper",
+        "Swamp Plains Basin",
+        "Swamp West Upper",
+        "Swamp Mountain Transition Mid-Upper",
+        "Swamp Mountain Transition Upper"
+    ],
+    "Swamp Plains Basin": [
+        "Swamp East Mid-Upper",
+        "Swamp Mountain Base",
+        "Swamp East Upper",
+        "Entrance to Olux"
+    ],
+    "Swamp West Mid-Upper": [
+        "Swamp East Mid-Upper",
+        "Swamp West Mid",
+        "Swamp West Upper"
+    ],
+    "Thanos Valley West": [
+        "Military Base Lower"
+    ],
+    "Military Base Lower": [
+        "Thanos Valley West",
+        "Path To Ozoth's Spire Lower",
+        "Military Base Upper"
+    ],
+    "Llevigar Entrance": [
+        "Llevigar",
+        "Volcano Lower"
+    ],
+    "Volcanic Slope": [
+        "Active Volcano",
+        "Lava Lake"
+    ],
+    "Active Volcano": [
+        "Volcanic Slope",
+        "Lava Lake Bridge",
+        "Lava Lake"
+    ],
+    "Lava Lake": [
+        "Volcanic Slope",
+        "Active Volcano",
+        "Molten Heights Portal"
+    ],
+    "Canyon Waterfall North": [
+        "Canyon Upper North West"
+    ],
+    "Canyon Upper North West": [
+        "Canyon Waterfall North",
+        "Aldorei's Arch",
+        "Canyon Lower South East"
+    ],
+    "Gelibord Corrupted Farm": [
+        "Twisted Housing",
+        "Gelibord",
+        "Gelibord Castle",
+        "Taproot Descent"
+    ],
+    "Twisted Housing": [
+        "Gelibord Corrupted Farm",
+        "Lone Farmstead",
+        "Gelibord",
+        "Efilim Village",
+        "Mansion of Insanity"
+    ],
+    "Gelibord": [
+        "Gelibord Corrupted Farm",
+        "Lone Farmstead",
+        "Twisted Housing",
+        "Entrance to Kander"
+    ],
+    "Gelibord Castle": [
+        "Gelibord Corrupted Farm",
+        "Taproot Descent"
+    ],
+    "Pirate Town": [
+        "Bloody Beach",
+        "Zhight Island",
+        "Lost Atoll",
+        "Volcano Upper"
+    ],
+    "Bloody Beach": [
+        "Pirate Town",
+        "Avos Temple",
+        "Volcano Lower",
+        "Corkus Outskirts",
+        "Corkus Countryside"
+    ],
+    "Zhight Island": [
+        "Pirate Town",
+        "Legendary Island",
+        "The Bear Zoo"
+    ],
+    "Lost Atoll": [
+        "Pirate Town",
+        "Tree Island",
+        "Volcano Upper"
+    ],
+    "Fungal Grove": [
+        "Old Crossroads South",
+        "Old Crossroads North",
+        "Cinfras Outskirts",
+        "Decayed Basin",
+        "Fallen Village"
+    ],
+    "Old Crossroads South": [
+        "Fungal Grove",
+        "Old Crossroads North",
+        "Dark Forest Village",
+        "Cinfras Outskirts",
+        "Path to Talor"
+    ],
+    "Old Crossroads North": [
+        "Fungal Grove",
+        "Path to Talor",
+        "Old Crossroads South",
+        "Lexdale"
+    ],
+    "Decayed Basin": [
+        "Fungal Grove",
+        "Heart of Decay",
+        "Mushroom Hill",
+        "Lexdale"
+    ],
+    "Loamsprout Camp": [
+        "Orc Road",
+        "Llevigar Farm",
+        "Sablestone Camp",
+        "Quartz Mines North West"
+    ],
+    "Lexdale": [
+        "Old Crossroads North",
+        "Decayed Basin",
+        "Heart of Decay",
+        "Viscera Pits East"
+    ],
+    "Corkus Docks": [
+        "Corkus Mountain"
+    ],
+    "Corkus Mountain": [
+        "Corkus Docks",
+        "Corkus Forest North",
+        "Corkus Countryside"
+    ],
+    "Aldorei's Arch": [
+        "Canyon Upper North West",
+        "Path To The Arch"
+    ],
+    "Ahmsord Outskirts": [
+        "Angel Refuge",
+        "Central Islands",
+        "Swamp Island",
+        "Wybel Island"
+    ],
+    "Angel Refuge": [
+        "Ahmsord Outskirts",
+        "Molten Reach"
+    ],
+    "Central Islands": [
+        "Ahmsord Outskirts",
+        "Temple Island",
+        "Wybel Island",
+        "Sky Island Ascent",
+        "Ahmsord"
+    ],
+    "Swamp Island": [
+        "Ahmsord Outskirts",
+        "Temple Island",
+        "Astraulus' Tower"
+    ],
+    "Wybel Island": [
+        "Ahmsord Outskirts",
+        "Central Islands",
+        "Sky Falls"
+    ],
+    "Desert West Lower": [
+        "Almuj City",
+        "Desert Mid-Lower",
+        "Desert Lower",
+        "Rymek West Upper"
+    ],
+    "Desert Mid-Lower": [
+        "Desert West Lower",
+        "Desert Mid-Upper",
+        "Desert East Lower",
+        "Desert Lower",
+        "Almuj City"
+    ],
+    "Desert Lower": [
+        "Desert West Lower",
+        "Rymek West Upper",
+        "Desert Mid-Lower"
+    ],
+    "Swamp West Mid": [
+        "Swamp East Mid",
+        "Swamp West Lower",
+        "Swamp West Mid-Upper"
+    ],
+    "Krolton's Cave": [
+        "Canyon Mountain South",
+        "Temple of the Lost East",
+        "Air Temple Lower",
+        "Wizard Tower North"
+    ],
+    "Canyon Mountain South": [
+        "Krolton's Cave",
+        "Canyon Waterfall Mid North"
+    ],
+    "Temple of the Lost East": [
+        "Krolton's Cave",
+        "Valley of the Lost"
+    ],
+    "Wizard Tower North": [
+        "Krolton's Cave",
+        "Bandits Toll"
+    ],
+    "Royal Gate": [
+        "Phinas Farm"
+    ],
+    "Phinas Farm": [
+        "Royal Gate",
+        "Lighthouse Plateau"
+    ],
+    "Paths of Sludge": [
+        "Toxic Drip",
+        "Lutho"
+    ],
+    "Toxic Drip": [
+        "Paths of Sludge",
+        "Toxic Caves",
+        "Gateway to Nothing"
+    ],
+    "Lutho": [
+        "Paths of Sludge",
+        "Sinister Forest"
+    ],
+    "Nesaak Plains Lower North West": [
+        "Nesaak Plains South West",
+        "Nesaak Plains Upper North West",
+        "Nesaak Village",
+        "Nesaak Plains Mid North West",
+        "Nesaak Plains North East"
+    ],
+    "Nesaak Plains Mid North West": [
+        "Nesaak Plains Lower North West",
+        "Nesaak Plains Upper North West"
+    ],
+    "Lone Farmstead": [
+        "Twisted Housing",
+        "Gelibord",
+        "Abandoned Manor"
+    ],
+    "Road to Elkurn": [
+        "Elkurn Fields",
+        "Elkurn",
+        "South Nivla Woods",
+        "Nivla Woods Edge"
+    ],
+    "Elkurn Fields": [
+        "Road to Elkurn",
+        "South Nivla Woods",
+        "Time Valley",
+        "Elkurn"
+    ],
+    "Elkurn": [
+        "Road to Elkurn",
+        "Nesaak Plains Upper North West",
+        "Nesaak Transition",
+        "Elkurn Fields",
+        "Corrupted Road",
+        "Nether Plains Lower"
+    ],
+    "South Nivla Woods": [
+        "Road to Elkurn",
+        "Road to Time Valley",
+        "Nivla Woods",
+        "Nivla Woods Exit",
+        "Elkurn Fields"
+    ],
+    "Nemract Town": [
+        "Rooster Island",
+        "Plains Coast",
+        "Nemract Road",
+        "Nemract Cathedral"
+    ],
+    "The Bear Zoo": [
+        "Rooster Island",
+        "Zhight Island"
+    ],
+    "Dernel Jungle Mid": [
+        "Dernel Jungle Upper",
+        "Dernel Jungle Lower"
+    ],
+    "Dernel Jungle Upper": [
+        "Dernel Jungle Mid"
+    ],
+    "Dernel Jungle Lower": [
+        "Dernel Jungle Mid",
+        "Jungle Lower"
+    ],
+    "Final Step": [
+        "Bizarre Passage",
+        "Gateway to Nothing"
+    ],
+    "Bizarre Passage": [
+        "Final Step",
+        "The Gate"
+    ],
+    "Gateway to Nothing": [
+        "Final Step",
+        "Toxic Drip",
+        "Void Valley"
+    ],
+    "Light Peninsula": [
+        "Tree Island",
+        "Volcano Upper",
+        "Hobbit River",
+        "Volcano Lower"
+    ],
+    "Volcano Upper": [
+        "Tree Island",
+        "Lost Atoll",
+        "Volcano Lower",
+        "Pirate Town",
+        "Light Peninsula"
+    ],
+    "Canyon Dropoff": [
+        "Cliff Side of the Lost",
+        "Mountain Path"
+    ],
+    "Cliff Side of the Lost": [
+        "Canyon Dropoff",
+        "Mountain Edge",
+        "Canyon Survivor",
+        "Valley of the Lost",
+        "Canyon Of The Lost"
+    ],
+    "Mountain Path": [
+        "Canyon Dropoff"
+    ],
+    "Ancient Nemract": [
+        "Detlas Trail East Plains",
+        "Nemract Road",
+        "Nemract Cathedral",
+        "Cathedral Harbour",
+        "Detlas Trail West Plains"
+    ],
+    "Detlas Trail East Plains": [
+        "Ancient Nemract",
+        "Detlas Suburbs",
+        "Detlas",
+        "Detlas Close Suburbs",
+        "Cathedral Harbour"
+    ],
+    "Nemract Cathedral": [
+        "Ancient Nemract",
+        "Nemract Town",
+        "Cathedral Harbour",
+        "Nemract Road"
+    ],
+    "Detlas Trail West Plains": [
+        "Ancient Nemract",
+        "Detlas Far Suburbs",
+        "Detlas Suburbs",
+        "Nemract Plains East"
+    ],
+    "Aldorei Valley Mid": [
+        "Aldorei Valley Upper",
+        "Aldorei Valley Lower"
+    ],
+    "Aldorei Valley Upper": [
+        "Aldorei Valley Mid",
+        "Aldorei's Waterfall"
+    ],
+    "Aldorei Valley Lower": [
+        "Aldorei Valley Mid",
+        "Aldorei Valley West Entrance",
+        "Mantis Nest"
+    ],
+    "Cinfras County Upper": [
+        "Cinfras County Mid-Upper",
+        "Gylia Lake South East",
+        "Path To Thanos"
+    ],
+    "Cinfras County Mid-Upper": [
+        "Cinfras County Upper",
+        "Cinfras County Mid-Lower",
+        "Cinfras Thanos Transition"
+    ],
+    "Maltic Coast": [
+        "South Farmers Valley",
+        "Maltic",
+        "Coastal Trail",
+        "North Farmers Valley"
+    ],
+    "North Farmers Valley": [
+        "South Farmers Valley",
+        "Plains Coast",
+        "Maltic Coast",
+        "Maltic Plains"
+    ],
+    "Katoa Ranch": [
+        "Ragni North Entrance",
+        "Ragni North Suburbs"
+    ],
+    "Ragni North Entrance": [
+        "Katoa Ranch",
+        "Ragni North Suburbs",
+        "Ragni"
+    ],
+    "Ragni North Suburbs": [
+        "Katoa Ranch",
+        "Ragni North Entrance",
+        "Ragni Plains"
+    ],
+    "Heart of Decay": [
+        "Decayed Basin",
+        "Lexdale",
+        "Mushroom Hill"
+    ],
+    "Mushroom Hill": [
+        "Decayed Basin",
+        "Heart of Decay",
+        "Jitak's Farm",
+        "Fallen Village"
+    ],
+    "Ragni Plains": [
+        "Ragni North Suburbs",
+        "Maltic",
+        "Ragni East Suburbs",
+        "Coastal Trail"
+    ],
+    "Path To Ozoth's Spire Lower": [
+        "Thanos",
+        "Military Base Lower"
+    ],
+    "Path To Military Base": [
+        "Thanos",
+        "Military Base"
+    ],
+    "Worm Tunnel": [
+        "The Broken Road",
+        "Grey Ruins"
+    ],
+    "Grey Ruins": [
+        "Worm Tunnel",
+        "Forgotten Town"
+    ],
+    "Cinfras County Mid-Lower": [
+        "Cinfras County Mid-Upper",
+        "Cinfras's Small Farm",
+        "Cinfras County Lower"
+    ],
+    "Cinfras County Lower": [
+        "Cinfras County Mid-Lower",
+        "Cinfras's Small Farm",
+        "Aldorei's North Exit"
+    ],
+    "Tower of Ascension": [
+        "Icy Descent"
+    ],
+    "Icy Descent": [
+        "Tower of Ascension",
+        "Lusuco",
+        "Nesaak Plains South West"
+    ],
+    "Dead Island South West": [
+        "Skiens Island",
+        "Dead Island South East",
+        "Dead Island North West",
+        "Dujgon Nation"
+    ],
+    "Lava Lake Bridge": [
+        "Active Volcano",
+        "Crater Descent",
+        "Molten Heights Portal"
+    ],
+    "Cliffside Waterfall": [
+        "Canyon High Path"
+    ],
+    "Canyon High Path": [
+        "Cliffside Waterfall",
+        "Hive South",
+        "Thanos Exit Upper"
+    ],
+    "Valley of the Lost": [
+        "Canyon Of The Lost",
+        "Temple of the Lost East",
+        "Canyon Fortress",
+        "Cliff Side of the Lost"
+    ],
+    "Canyon Fortress": [
+        "Valley of the Lost",
+        "Canyon Waterfall Mid North"
+    ],
+    "Frozen Fort": [
+        "Sky Falls"
+    ],
+    "Sky Falls": [
+        "Frozen Fort",
+        "Wybel Island",
+        "Sky Island Ascent"
+    ],
+    "Path to Cinfras": [
+        "Cinfras Entrance",
+        "Light Forest East Upper",
+        "Mesquis Tower"
+    ],
+    "Cinfras Entrance": [
+        "Path to Cinfras",
+        "Mesquis Tower",
+        "Cinfras",
+        "Light Forest North Exit"
+    ],
+    "Light Forest East Upper": [
+        "Path to Cinfras",
+        "Efilim South East Plains"
+    ],
+    "Kandon Ridge": [
+        "Temple Island",
+        "Kandon Farm",
+        "Old Coal Mine",
+        "Path to Ahmsord Upper"
+    ],
+    "Snail Island": [
+        "Temple Island",
+        "Dragonling Nests"
+    ],
+    "Icy Island": [
+        "Nodguj Nation",
+        "Regular Island",
+        "Santa's Hideout",
+        "Dujgon Nation"
+    ],
+    "Dujgon Nation": [
+        "Nodguj Nation",
+        "Regular Island",
+        "Icy Island",
+        "Dead Island South East",
+        "Dead Island South West"
+    ],
+    "Nesaak Bridge Transition": [
+        "Great Bridge Nesaak",
+        "Nesaak Plains South West"
+    ],
+    "Great Bridge Nesaak": [
+        "Nesaak Bridge Transition",
+        "Great Bridge Jungle"
+    ],
+    "Aldorei Valley South Entrance": [
+        "Cinfras's Small Farm",
+        "Aldorei's Waterfall",
+        "Aldorei's North Exit"
+    ],
+    "Road to Time Valley": [
+        "South Nivla Woods",
+        "Nivla Woods Entrance",
+        "Nivla Woods"
+    ],
+    "Nivla Woods": [
+        "South Nivla Woods",
+        "Nivla Woods Exit",
+        "Road to Time Valley",
+        "Nivla Woods Entrance"
+    ],
+    "Nivla Woods Exit": [
+        "South Nivla Woods",
+        "Nivla Woods",
+        "North Nivla Woods",
+        "Nivla Woods Edge"
+    ],
+    "Regular Island": [
+        "Jofash Docks",
+        "Dujgon Nation",
+        "Icy Island",
+        "Dead Island South East"
+    ],
+    "Jofash Docks": [
+        "Regular Island",
+        "Jofash Tunnel",
+        "Dead Island North East"
+    ],
+    "Quartz Mines South West": [
+        "Quartz Mines North West",
+        "Llevigar",
+        "Quartz Mines South East"
+    ],
+    "Quartz Mines North West": [
+        "Quartz Mines South West",
+        "Llevigar Farm",
+        "Quartz Mines North East",
+        "Loamsprout Camp"
+    ],
+    "Quartz Mines South East": [
+        "Quartz Mines South West",
+        "Quartz Mines North East"
+    ],
+    "Pigmen Ravines": [
+        "Abandoned Farm",
+        "Pigmen Ravines Entrance"
+    ],
+    "Abandoned Farm": [
+        "Pigmen Ravines",
+        "Time Valley"
+    ],
+    "Pigmen Ravines Entrance": [
+        "Pigmen Ravines",
+        "Ragni",
+        "South Pigmen Ravines"
+    ],
+    "Rymek West Mid": [
+        "Rymek East Mid",
+        "Rymek West Lower",
+        "Rymek West Upper"
+    ],
+    "Rymek East Mid": [
+        "Rymek West Mid",
+        "Rymek East Lower",
+        "Rymek East Upper"
+    ],
+    "Rymek West Lower": [
+        "Rymek West Mid",
+        "Rymek East Lower"
+    ],
+    "Rymek West Upper": [
+        "Rymek West Mid",
+        "Desert West Lower",
+        "Desert Lower",
+        "Rymek East Upper"
+    ],
+    "Avos Workshop": [
+        "Avos Temple"
+    ],
+    "Avos Temple": [
+        "Avos Workshop",
+        "Bloody Beach",
+        "Corkus Countryside"
+    ],
+    "Crater Descent": [
+        "Molten Heights Portal",
+        "Lava Lake Bridge",
+        "Rodoroc"
+    ],
+    "Molten Heights Portal": [
+        "Crater Descent",
+        "Lava Lake Bridge",
+        "Lava Lake",
+        "Molten Reach"
+    ],
+    "Rodoroc": [
+        "Crater Descent",
+        "Entrance to Rodoroc"
+    ],
+    "Jofash Tunnel": [
+        "Jofash Docks",
+        "Sky Island Ascent"
+    ],
+    "Dead Island North East": [
+        "Jofash Docks",
+        "Dead Island South East",
+        "Dead Island North West"
+    ],
+    "Ragni Main Entrance": [
+        "Ragni",
+        "Emerald Trail",
+        "Ragni East Suburbs"
+    ],
+    "Ragni": [
+        "Ragni Main Entrance",
+        "Ragni North Entrance",
+        "Pigmen Ravines Entrance"
+    ],
+    "Llevigar Farm": [
+        "Quartz Mines North West",
+        "Goblin Plains East",
+        "Loamsprout Camp",
+        "Goblin Plains West",
+        "Pre-Light Forest Transition",
+        "Quartz Mines North East"
+    ],
+    "Goblin Plains East": [
+        "Llevigar Farm",
+        "Forgotten Path",
+        "Goblin Plains West",
+        "Pre-Light Forest Transition"
+    ],
+    "Goblin Plains West": [
+        "Llevigar Farm",
+        "Iron Road",
+        "Goblin Plains East",
+        "Sablestone Camp"
+    ],
+    "Pre-Light Forest Transition": [
+        "Llevigar Farm",
+        "Quartz Mines North East",
+        "Goblin Plains East",
+        "Leadin Fortress"
+    ],
+    "Quartz Mines North East": [
+        "Llevigar Farm",
+        "Quartz Mines North West",
+        "Pre-Light Forest Transition",
+        "Quartz Mines South East"
+    ],
+    "Detlas Suburbs": [
+        "Detlas Trail East Plains",
+        "Nether Plains Upper",
+        "Detlas Close Suburbs",
+        "Detlas Far Suburbs",
+        "Detlas Trail West Plains"
+    ],
+    "Nether Plains Upper": [
+        "Detlas Suburbs",
+        "Plains Lake",
+        "Corrupted Road",
+        "Detlas Close Suburbs",
+        "Nether Gate",
+        "Detlas Far Suburbs"
+    ],
+    "Detlas Close Suburbs": [
+        "Detlas Suburbs",
+        "Nether Plains Upper",
+        "Detlas",
+        "Detlas Trail East Plains"
+    ],
+    "Detlas Far Suburbs": [
+        "Detlas Suburbs",
+        "Nether Plains Upper",
+        "Detlas Trail West Plains",
+        "Nivla Woods Edge",
+        "Corrupted Road"
+    ],
+    "Corkus Sea Cove": [
+        "Fallen Factory",
+        "Road To Mine",
+        "Corkus City Mine",
+        "Corkus Sea Port"
+    ],
+    "Road To Mine": [
+        "Corkus Sea Cove",
+        "Corkus City Mine",
+        "Corkus City South"
+    ],
+    "Corkus City Mine": [
+        "Corkus Sea Cove",
+        "Corkus Statue",
+        "Road To Mine"
+    ],
+    "Meteor Crater": [
+        "Iron Road",
+        "Sunspark Camp",
+        "Sablestone Camp"
+    ],
+    "Forgotten Path": [
+        "Iron Road",
+        "Goblin Plains East",
+        "Swamp Dark Forest Transition Lower"
+    ],
+    "Thesead Suburbs": [
+        "Ranol's Farm",
+        "Thesead",
+        "Chained House",
+        "Entrance to Rodoroc"
+    ],
+    "Ranol's Farm": [
+        "Thesead Suburbs",
+        "Eltom",
+        "Cherry Blossom Forest"
+    ],
+    "Thesead": [
+        "Thesead Suburbs",
+        "Entrance to Thesead South"
+    ],
+    "Chained House": [
+        "Thesead Suburbs",
+        "Entrance to Thesead South",
+        "Hive South",
+        "Cherry Blossom Forest"
+    ],
+    "Entrance to Rodoroc": [
+        "Thesead Suburbs",
+        "Eltom",
+        "Rodoroc"
+    ],
+    "Burning Farm": [
+        "Burning Airship",
+        "Ghostly Path"
+    ],
+    "Burning Airship": [
+        "Burning Farm",
+        "Bandit Cave Upper",
+        "Cinfras Thanos Transition"
+    ],
+    "Ghostly Path": [
+        "Burning Farm",
+        "Path To The Arch"
+    ],
+    "Desert Mid-Upper": [
+        "Desert East Mid",
+        "Desert Mid-Lower",
+        "Almuj City",
+        "Desert Upper"
+    ],
+    "Desert East Mid": [
+        "Desert Mid-Upper",
+        "Desert East Upper",
+        "Desert East Lower"
+    ],
+    "Forgotten Town": [
+        "Grey Ruins",
+        "Forest of Eyes"
+    ],
+    "Forest of Eyes": [
+        "Forgotten Town",
+        "Sinister Forest"
+    ],
+    "Plains Coast": [
+        "Nemract Quarry",
+        "Nemract Town",
+        "North Farmers Valley"
+    ],
+    "Corrupted Road": [
+        "Nether Plains Upper",
+        "Detlas Far Suburbs",
+        "Nether Gate",
+        "Elkurn"
+    ],
+    "Nether Gate": [
+        "Nether Plains Upper",
+        "Plains Lake",
+        "Corrupted Road",
+        "Nether Plains Lower"
+    ],
+    "Desert East Upper": [
+        "Desert East Mid"
+    ],
+    "Gert Camp": [
+        "Jitak's Farm",
+        "Gylia Lake North East"
+    ],
+    "Jitak's Farm": [
+        "Gert Camp",
+        "Gylia Lake North West",
+        "Mushroom Hill"
+    ],
+    "Gylia Lake North East": [
+        "Gert Camp",
+        "Gylia Lake North West",
+        "Gylia Lake South East",
+        "Military Base"
+    ],
+    "Entrance to Thesead South": [
+        "Thesead",
+        "Chained House",
+        "Entrance to Thesead North",
+        "Cliffside Valley"
+    ],
+    "Military Base Upper": [
+        "Military Base",
+        "Military Base Lower"
+    ],
+    "Military Base": [
+        "Military Base Upper",
+        "Path To Military Base",
+        "Gylia Lake North East"
+    ],
+    "Volcano Lower": [
+        "Volcano Upper",
+        "Light Peninsula",
+        "Bloody Beach",
+        "Llevigar Entrance"
+    ],
+    "Aldorei Valley West Entrance": [
+        "Hobbit River",
+        "Aldorei Valley Lower",
+        "Mantis Nest"
+    ],
+    "Hobbit River": [
+        "Aldorei Valley West Entrance",
+        "Light Forest East Lower",
+        "Light Peninsula",
+        "Light Forest West Lower"
+    ],
+    "Mantis Nest": [
+        "Aldorei Valley West Entrance",
+        "Light Forest East Lower",
+        "Light Forest Canyon",
+        "Aldorei Valley Lower",
+        "Light Forest South Exit"
+    ],
+    "Kandon-Beda": [
+        "Canyon Of The Lost"
+    ],
+    "Raider's Base Upper": [
+        "Raider's Base Lower",
+        "Sky Island Ascent"
+    ],
+    "Raider's Base Lower": [
+        "Raider's Base Upper"
+    ],
+    "Light Forest East Lower": [
+        "Mantis Nest",
+        "Hobbit River",
+        "Light Forest West Mid",
+        "Light Forest East Mid"
+    ],
+    "Light Forest West Mid": [
+        "Light Forest East Lower",
+        "Light Forest West Lower",
+        "Light Forest Entrance",
+        "Light Forest West Upper"
+    ],
+    "Light Forest East Mid": [
+        "Light Forest East Lower",
+        "Light Forest West Upper",
+        "Light Forest Canyon"
+    ],
+    "Jungle Upper": [
+        "Jungle Mid"
+    ],
+    "Jungle Mid": [
+        "Jungle Upper",
+        "Jungle Lake",
+        "Jungle Lower"
+    ],
+    "Dead Island South East": [
+        "Dead Island North East",
+        "Dead Island South West",
+        "Regular Island",
+        "Dujgon Nation"
+    ],
+    "Light Forest West Lower": [
+        "Light Forest West Mid",
+        "Hobbit River",
+        "Light Forest South Entrance"
+    ],
+    "Light Forest West Upper": [
+        "Light Forest West Mid",
+        "Efilim South East Plains",
+        "Light Forest North Entrance",
+        "Light Forest East Mid"
+    ],
+    "Efilim South East Plains": [
+        "Light Forest West Upper",
+        "Efilim South Plains",
+        "Light Forest East Upper",
+        "Efilim East Plains"
+    ],
+    "Light Forest North Entrance": [
+        "Light Forest West Upper",
+        "Efilim South Plains",
+        "Light Forest Entrance"
+    ],
+    "Mountain Edge": [
+        "Cliff Side of the Lost"
+    ],
+    "Legendary Island": [
+        "Southern Outpost",
+        "Zhight Island"
+    ],
+    "Southern Outpost": [
+        "Legendary Island",
+        "Lighthouse Plateau"
+    ],
+    "Abandoned Pass": [
+        "Mining Base Upper",
+        "Ternaves Plains Lower"
+    ],
+    "Hive South": [
+        "Chained House",
+        "Thanos Exit Upper",
+        "Cherry Blossom Forest",
+        "Canyon High Path",
+        "Hive"
+    ],
+    "Cherry Blossom Forest": [
+        "Chained House",
+        "Hive South",
+        "Ranol's Farm"
+    ],
+    "Corkus Statue": [
+        "Corkus City Mine",
+        "Corkus Outskirts"
+    ],
+    "Cinfras": [
+        "Aldorei's River",
+        "Cinfras Entrance",
+        "Cinfras Outskirts",
+        "Guild Hall"
+    ],
+    "Guild Hall": [
+        "Cinfras"
+    ],
+    "Toxic Caves": [
+        "Toxic Drip"
+    ],
+    "Nesaak Transition": [
+        "Nesaak Plains North East",
+        "Desolate Valley",
+        "Elkurn",
+        "Nether Plains Lower"
+    ],
+    "Desolate Valley": [
+        "Plains Lake",
+        "Nesaak Transition",
+        "Nether Plains Lower"
+    ],
+    "Nether Plains Lower": [
+        "Desolate Valley",
+        "Nether Gate",
+        "Nesaak Transition",
+        "Elkurn"
+    ],
+    "Luminous Plateau": [
+        "Field of Life"
+    ],
+    "Heavenly Ingress": [
+        "Field of Life",
+        "Light Forest South Entrance"
+    ],
+    "Entrance to Thesead North": [
+        "Cliffside Passage North",
+        "Entrance to Thesead South",
+        "Cliffside Valley"
+    ],
+    "Cliffside Passage North": [
+        "Entrance to Thesead North",
+        "Cliffside Passage"
+    ],
+    "Lighthouse Plateau": [
+        "Southern Outpost",
+        "Phinas Farm",
+        "Corkus Sea Port"
+    ],
+    "Cliffside Valley": [
+        "Entrance to Thesead South",
+        "Air Temple Lower",
+        "Bandits Toll",
+        "Entrance to Thesead North"
+    ],
+    "Mummy's Tomb": [
+        "Desert Upper"
+    ],
+    "Rymek East Upper": [
+        "Rymek West Upper",
+        "Rymek East Mid",
+        "Desert East Lower"
+    ],
+    "Nexus of Light": [
+        "Azure Frontier"
+    ],
+    "Coastal Trail": [
+        "Maltic",
+        "Maltic Coast",
+        "Ragni Plains"
+    ],
+    "Efilim Village": [
+        "Twisted Housing",
+        "Efilim South Plains",
+        "Efilim East Plains"
+    ],
+    "Light Forest North Exit": [
+        "Cinfras Entrance",
+        "Light Forest South Exit",
+        "Light Forest Canyon"
+    ],
+    "Bandits Toll": [
+        "Cliffside Valley",
+        "Canyon Walk Way",
+        "Wizard Tower North",
+        "Thanos Exit Upper"
+    ],
+    "Nemract Plains East": [
+        "Detlas Trail West Plains",
+        "Nemract Road"
+    ],
+    "Canyon Survivor": [
+        "Canyon Lower South East",
+        "Cliff Side of the Lost"
+    ],
+    "Canyon Lower South East": [
+        "Canyon Survivor",
+        "Canyon Path South East",
+        "Canyon Path South West",
+        "Canyon Upper North West"
+    ],
+    "Aldorei's North Exit": [
+        "Aldorei Valley South Entrance",
+        "Cinfras County Lower",
+        "Path To The Arch"
+    ],
+    "Path To Ozoth's Spire Upper": [
+        "Path To Ozoth's Spire Mid",
+        "Path To Thanos",
+        "Cinfras Thanos Transition",
+        "Bandit Cave Lower"
+    ],
+    "Path To Ozoth's Spire Mid": [
+        "Path To Ozoth's Spire Upper",
+        "Canyon Walk Way"
+    ],
+    "Light Forest South Entrance": [
+        "Light Forest West Lower",
+        "Light Forest Entrance",
+        "Heavenly Ingress"
+    ],
+    "Rymek East Lower": [
+        "Rymek East Mid",
+        "Rymek West Lower"
+    ],
+    "Lusuco": [
+        "Icy Descent"
+    ],
+    "Astraulus' Tower": [
+        "Swamp Island",
+        "Dragonling Nests"
+    ],
+    "Void Valley": [
+        "Gateway to Nothing"
+    ],
+    "Sablestone Camp": [
+        "Goblin Plains West",
+        "Orc Lake",
+        "Loamsprout Camp",
+        "Meteor Crater"
+    ],
+    "Great Bridge Jungle": [
+        "Jungle Lower",
+        "Great Bridge Nesaak",
+        "Herb Cave"
+    ],
+    "Jungle Lower": [
+        "Great Bridge Jungle",
+        "Dernel Jungle Lower",
+        "Jungle Mid"
+    ],
+    "Herb Cave": [
+        "Great Bridge Jungle"
+    ],
+    "Canyon Path North West": [
+        "Canyon Entrance Waterfall",
+        "Canyon Path South East",
+        "Canyon Path South West"
+    ],
+    "Path To The Arch": [
+        "Aldorei's Arch",
+        "Ghostly Path",
+        "Aldorei's North Exit"
+    ],
+    "Light Forest South Exit": [
+        "Light Forest North Exit",
+        "Mantis Nest"
+    ],
+    "Light Forest Canyon": [
+        "Light Forest North Exit",
+        "Light Forest East Mid",
+        "Mantis Nest"
+    ],
+    "Sinister Forest": [
+        "Forest of Eyes",
+        "Lutho"
+    ],
+    "Kandon Farm": [
+        "Kandon Ridge"
+    ],
+    "Dragonling Nests": [
+        "Astraulus' Tower",
+        "Snail Island"
+    ],
+    "Desert East Lower": [
+        "Desert East Mid",
+        "Desert Mid-Lower",
+        "Rymek East Upper"
+    ],
+    "Efilim South Plains": [
+        "Efilim South East Plains",
+        "Efilim Village",
+        "Light Forest North Entrance"
+    ],
+    "Efilim East Plains": [
+        "Efilim South East Plains",
+        "Efilim Village"
+    ],
+    "Dead Island North West": [
+        "Dead Island North East",
+        "Dead Island South West"
+    ],
+    "Little Wood": [
+        "Time Valley",
+        "South Pigmen Ravines"
+    ],
+    "Swamp Mountain Transition Upper": [
+        "Swamp Mountain Transition Mid-Upper",
+        "Swamp East Upper",
+        "Olux"
+    ],
+    "Thanos Exit Upper": [
+        "Hive South",
+        "Bandits Toll",
+        "Hive",
+        "Thanos Exit",
+        "Canyon High Path"
+    ],
+    "Hive": [
+        "Hive South",
+        "Thanos Exit Upper"
+    ],
+    "Eltom": [
+        "Entrance to Rodoroc",
+        "Ranol's Farm"
+    ],
+    "Sky Castle": [
+        "Path to Ahmsord Lower"
+    ],
+    "Canyon Path South East": [
+        "Canyon Path North West",
+        "Canyon Lower South East"
+    ],
+    "The Gate": [
+        "Bizarre Passage"
+    ],
+    "Corkus Outskirts": [
+        "Bloody Beach",
+        "Corkus Statue",
+        "Corkus Countryside"
+    ],
+    "Molten Reach": [
+        "Angel Refuge",
+        "Molten Heights Portal"
+    ],
+    "Bandit Cave Upper": [
+        "Burning Airship"
+    ],
+    "Old Coal Mine": [
+        "Kandon Ridge"
+    ],
+    "Thanos Exit": [
+        "Thanos Exit Upper"
+    ]
+}

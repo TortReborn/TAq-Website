@@ -1,0 +1,2920 @@
+{
+ "Abandoned Farm": {
+  "Trading Routes": [
+   "Pigmen Ravines",
+   "Time Valley"
+  ]
+ },
+ "Abandoned Lumberyard": {
+  "Trading Routes": [
+   "Frosty Spikes",
+   "Frozen Homestead"
+  ]
+ },
+ "Abandoned Mines": {
+  "Trading Routes": [
+   "Mine Base Plains",
+   "Mining Base Camp"
+  ]
+ },
+ "Abandoned Mines Entrance": {
+  "Trading Routes": [
+   "Abandoned Pass",
+   "Black Road",
+   "Mine Base Plains",
+   "Mining Base Camp",
+   "Ternaves"
+  ]
+ },
+ "Abandoned Pass": {
+  "Trading Routes": [
+   "Abandoned Mines Entrance",
+   "Mining Base Camp"
+  ]
+ },
+ "Accursed Dunes": {
+  "Trading Routes": [
+   "Barren Sands",
+   "Eagle Tribe",
+   "Ruined Villa"
+  ]
+ },
+ "Aerial Descent": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Kandon Ridge",
+   "Path to Ahmsord"
+  ]
+ },
+ "Ahmsord": {
+  "Trading Routes": [
+   "Aerial Descent",
+   "Central Islands",
+   "Path to Ahmsord",
+   "Sky Island Ascent",
+   "Temple Island"
+  ]
+ },
+ "Ahmsord Outskirts": {
+  "Trading Routes": [
+   "Angel Refuge",
+   "Central Islands",
+   "Swamp Island",
+   "Wybel Island"
+  ]
+ },
+ "Akias Ruins": {
+  "Trading Routes": [
+   "Corrupted Orchard",
+   "Corrupted Road",
+   "Corrupted Tower",
+   "Corrupted Warfront",
+   "Nivla Woods Exit"
+  ]
+ },
+ "Aldorei Cliffside Waterfalls": {
+  "Trading Routes": [
+   "Aldorei Valley",
+   "Big Mushroom Cave",
+   "Felroc Fields"
+  ]
+ },
+ "Aldorei River": {
+  "Trading Routes": [
+   "Cinfras",
+   "Felroc Fields"
+  ]
+ },
+ "Aldorei Springs": {
+  "Trading Routes": [
+   "Aldorei Valley Outskirts",
+   "Mantis Nest",
+   "Outer Aldorei Town"
+  ]
+ },
+ "Aldorei Valley": {
+  "Trading Routes": [
+   "Aldorei Cliffside Waterfalls",
+   "Outer Aldorei Town"
+  ]
+ },
+ "Aldorei Valley Outskirts": {
+  "Trading Routes": [
+   "Aldorei Springs",
+   "Mantis Nest",
+   "The Shiar"
+  ]
+ },
+ "Alekin": {
+  "Trading Routes": [
+   "Arachnid Woods",
+   "Blooming Boulders",
+   "Nivla Woods",
+   "Nivla Woods Exit"
+  ]
+ },
+ "Almuj": {
+  "Trading Routes": [
+   "Almuj Slums",
+   "Dusty Pit",
+   "Entrance to Almuj",
+   "Gloopy Cave",
+   "Ruined Villa"
+  ]
+ },
+ "Almuj Slums": {
+  "Trading Routes": [
+   "Almuj",
+   "Ancient Excavation",
+   "Owl Tribe",
+   "Ruined Villa"
+  ]
+ },
+ "Ancient Excavation": {
+  "Trading Routes": [
+   "Almuj Slums",
+   "Owl Tribe",
+   "Ruined Villa"
+  ]
+ },
+ "Ancient Nemract": {
+  "Trading Routes": [
+   "Cathedral Harbour",
+   "Corrupted Tower",
+   "Mount Wynn Inn",
+   "Nemract Cathedral",
+   "Scorched Trail"
+  ]
+ },
+ "Ancient Waterworks": {
+  "Trading Routes": [
+   "Farmers Settlement",
+   "Jagged Foothills",
+   "Maltic",
+   "Maltic Coast",
+   "Nomads' Refuge"
+  ]
+ },
+ "Angel Refuge": {
+  "Trading Routes": [
+   "Ahmsord Outskirts",
+   "Molten Reach"
+  ]
+ },
+ "Apprentice Huts": {
+  "Trading Routes": [
+   "Iboju Village",
+   "Monte's Village",
+   "Troms Lake"
+  ]
+ },
+ "Arachnid Woods": {
+  "Trading Routes": [
+   "Alekin",
+   "Nivla Woods Exit",
+   "Nomads' Refuge",
+   "Webbed Fracture"
+  ]
+ },
+ "Astraulus' Tower": {
+  "Trading Routes": [
+   "Dragonling Nests",
+   "Swamp Island"
+  ]
+ },
+ "Ava's Workshop": {
+  "Trading Routes": [
+   "Avos Temple"
+  ]
+ },
+ "Avos Temple": {
+  "Trading Routes": [
+   "Ava's Workshop",
+   "Bloody Beach",
+   "Retrofitted Manufactory"
+  ]
+ },
+ "Avos Territory": {
+  "Trading Routes": [
+   "Overrun Docks",
+   "Picnic Pond",
+   "Retrofitted Manufactory"
+  ]
+ },
+ "Azure Frontier": {
+  "Trading Routes": [
+   "Field of Life",
+   "Nexus of Light",
+   "Otherworldly Monolith",
+   "Path to Light"
+  ]
+ },
+ "Balloon Airbase": {
+  "Trading Routes": [
+   "Lighthouse Lookout",
+   "Relos",
+   "Southern Outpost"
+  ]
+ },
+ "Bandit Cave": {
+  "Trading Routes": [
+   "Burning Airship"
+  ]
+ },
+ "Bandit's Toll": {
+  "Trading Routes": [
+   "Canyon Walkway",
+   "Illuminant Path",
+   "Wizard Tower",
+   "Workshop Glade"
+  ]
+ },
+ "Bantisu Air Temple": {
+  "Trading Routes": [
+   "Bantisu Approach"
+  ]
+ },
+ "Bantisu Approach": {
+  "Trading Routes": [
+   "Bantisu Air Temple",
+   "Krolton's Cave",
+   "Workshop Glade"
+  ]
+ },
+ "Barren Sands": {
+  "Trading Routes": [
+   "Accursed Dunes",
+   "Gloopy Cave",
+   "Invaded Barracks"
+  ]
+ },
+ "Bear Zoo": {
+  "Trading Routes": [
+   "Rooster Island",
+   "Zhight Island"
+  ]
+ },
+ "Big Mushroom Cave": {
+  "Trading Routes": [
+   "Aldorei Cliffside Waterfalls",
+   "Cinfras's Small Farm",
+   "Waterfall Cave"
+  ]
+ },
+ "Bizarre Passage": {
+  "Trading Routes": [
+   "Final Step",
+   "The Gate"
+  ]
+ },
+ "Black Road": {
+  "Trading Routes": [
+   "Abandoned Mines Entrance",
+   "Essren's Hut",
+   "Lava Springs",
+   "Ternaves"
+  ]
+ },
+ "Blackstring Den": {
+  "Trading Routes": [
+   "Mount Wynn Inn",
+   "Nested Cliffside",
+   "Rocky Shore"
+  ]
+ },
+ "Bloody Beach": {
+  "Trading Routes": [
+   "Avos Temple",
+   "Corkus Outskirts",
+   "Pirate Town",
+   "Volcanic Excavation"
+  ]
+ },
+ "Bloody Trail": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Forgotten Path",
+   "Lizardman Camp",
+   "Lizardman Lake",
+   "Mangled Lake",
+   "Overtaken Outpost"
+  ]
+ },
+ "Blooming Boulders": {
+  "Trading Routes": [
+   "Alekin",
+   "Nivla Woods",
+   "Road to Elkurn",
+   "Road to Time Valley",
+   "Tempo Town"
+  ]
+ },
+ "Bob's Tomb": {
+  "Trading Routes": [
+   "Florist's Hut",
+   "Nesaak",
+   "Wolves' Den"
+  ]
+ },
+ "Bremminglar": {
+  "Trading Routes": [
+   "Lion Lair",
+   "Savannah Plains"
+  ]
+ },
+ "Brigand Outpost": {
+  "Trading Routes": [
+   "Collapsed Emerald Mine",
+   "Meteor Trail",
+   "Stonecave Orc Camp"
+  ]
+ },
+ "Broken Road": {
+  "Trading Routes": [
+   "Silent Road",
+   "Worm Tunnel"
+  ]
+ },
+ "Bucie Waterfall": {
+  "Trading Routes": [
+   "Entrance to Bucie",
+   "Harnort Compound",
+   "Llevigar Farm",
+   "Shineridge Orc Camp"
+  ]
+ },
+ "Burning Airship": {
+  "Trading Routes": [
+   "Bandit Cave",
+   "Burning Farm",
+   "Secluded Ponds"
+  ]
+ },
+ "Burning Farm": {
+  "Trading Routes": [
+   "Burning Airship",
+   "Evergreen Outbreak"
+  ]
+ },
+ "Canyon Dropoff": {
+  "Trading Routes": [
+   "Featherfall Cliffs",
+   "Rocky Bend"
+  ]
+ },
+ "Canyon High Path": {
+  "Trading Routes": [
+   "Illuminant Path",
+   "Path to the Dojo",
+   "Wanderer's Way"
+  ]
+ },
+ "Canyon Walkway": {
+  "Trading Routes": [
+   "Bandit's Toll",
+   "Molten Passage",
+   "Wizard's Warning"
+  ]
+ },
+ "Caritat Mansion": {
+  "Trading Routes": [
+   "Mangled Lake",
+   "Overtaken Outpost",
+   "Twisted Housing"
+  ]
+ },
+ "Cascading Basins": {
+  "Trading Routes": [
+   "Cyclospordial Hazard",
+   "Wayward Split"
+  ]
+ },
+ "Cascading Oasis": {
+  "Trading Routes": [
+   "Dusty Pit",
+   "Gloopy Cave",
+   "Mummy's Tomb"
+  ]
+ },
+ "Castle Dullahan": {
+  "Trading Routes": [
+   "Fading Forest",
+   "Gelibord Watermill"
+  ]
+ },
+ "Cathedral Harbour": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Durum Malt Islet",
+   "Durum Oat Islet",
+   "Nemract Cathedral",
+   "Savannah Plains",
+   "Scorched Trail"
+  ]
+ },
+ "Celestial Impact": {
+  "Trading Routes": [
+   "Gylia Fisherman Camp",
+   "Secluded Ponds",
+   "Silverbull Headquarters"
+  ]
+ },
+ "Centerworld Fortress": {
+  "Trading Routes": [
+   "Entrance to Bucie",
+   "Orc Battlegrounds",
+   "Road to Light Forest"
+  ]
+ },
+ "Central Islands": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Ahmsord Outskirts",
+   "Sky Island Ascent",
+   "Temple Island",
+   "Wybel Island"
+  ]
+ },
+ "Chasm Chokepoint": {
+  "Trading Routes": [
+   "Chasm Overlook",
+   "Entrance to Cinfras",
+   "Myconid Descent"
+  ]
+ },
+ "Chasm Overlook": {
+  "Trading Routes": [
+   "Chasm Chokepoint",
+   "Collapsed Bridge",
+   "Mantis Nest"
+  ]
+ },
+ "Cherry Blossom Grove": {
+  "Trading Routes": [
+   "Displaced Housing",
+   "Path to the Dojo",
+   "Ranol's Farm"
+  ]
+ },
+ "Cinfras": {
+  "Trading Routes": [
+   "Aldorei River",
+   "Cinfras Outskirts",
+   "Entrance to Cinfras",
+   "Guild Hall"
+  ]
+ },
+ "Cinfras Outskirts": {
+  "Trading Routes": [
+   "Cinfras",
+   "Dark Forest Village",
+   "Fallen Village",
+   "Fungal Grove",
+   "Talor Cemetery"
+  ]
+ },
+ "Cinfras's Small Farm": {
+  "Trading Routes": [
+   "Big Mushroom Cave",
+   "Felroc Fields",
+   "Paper Trail",
+   "Silverbull Headquarters"
+  ]
+ },
+ "Cliffhearth Orc Camp": {
+  "Trading Routes": [
+   "Llevigar Stables",
+   "Meteor Trail",
+   "Sanguine Spider Den"
+  ]
+ },
+ "Cliffside Passage North": {
+  "Trading Routes": [
+   "Cliffside Passage South",
+   "Thesead Underpass"
+  ]
+ },
+ "Cliffside Passage South": {
+  "Trading Routes": [
+   "Cliffside Passage North",
+   "Elephelk Trail"
+  ]
+ },
+ "Coastal Trail": {
+  "Trading Routes": [
+   "Maltic",
+   "Maltic Coast",
+   "Ragni Countryside North"
+  ]
+ },
+ "Collapsed Bridge": {
+  "Trading Routes": [
+   "Chasm Overlook",
+   "Mycelial Expanse",
+   "Unicorn Trail"
+  ]
+ },
+ "Collapsed Emerald Mine": {
+  "Trading Routes": [
+   "Brigand Outpost",
+   "Mudspring Orc Camp",
+   "Ogre Den"
+  ]
+ },
+ "Colourful Mountaintop": {
+  "Trading Routes": [
+   "Kitrios Barracks",
+   "Troll's Challenge"
+  ]
+ },
+ "Corkus Castle": {
+  "Trading Routes": [
+   "Corkus City"
+  ]
+ },
+ "Corkus City": {
+  "Trading Routes": [
+   "Corkus Castle",
+   "Corkus City Crossroads",
+   "Corkus Forest",
+   "Picnic Pond",
+   "Retrofitted Manufactory"
+  ]
+ },
+ "Corkus City Crossroads": {
+  "Trading Routes": [
+   "Corkus City",
+   "Corkus Forest",
+   "Fallen Factory",
+   "Industrial Clearing",
+   "Road to Mine"
+  ]
+ },
+ "Corkus City Mine": {
+  "Trading Routes": [
+   "Corkus Sea Cove",
+   "Founder's Statue",
+   "Road to Mine"
+  ]
+ },
+ "Corkus Forest": {
+  "Trading Routes": [
+   "Corkus City",
+   "Corkus City Crossroads",
+   "Industrial Clearing",
+   "Picnic Pond"
+  ]
+ },
+ "Corkus Outskirts": {
+  "Trading Routes": [
+   "Bloody Beach",
+   "Founder's Statue",
+   "Retrofitted Manufactory"
+  ]
+ },
+ "Corkus Sea Cove": {
+  "Trading Routes": [
+   "Corkus City Mine",
+   "Fallen Factory",
+   "Relos",
+   "Road to Mine"
+  ]
+ },
+ "Corrupted Orchard": {
+  "Trading Routes": [
+   "Akias Ruins",
+   "Corrupted Tower",
+   "Corrupted Warfront",
+   "Detlas Suburbs",
+   "Scorched Trail"
+  ]
+ },
+ "Corrupted River": {
+  "Trading Routes": [
+   "Desolate Valley",
+   "Elkurn",
+   "Nesaak Transition",
+   "Roots of Corruption"
+  ]
+ },
+ "Corrupted Road": {
+  "Trading Routes": [
+   "Akias Ruins",
+   "Corrupted Warfront",
+   "Elkurn",
+   "Roots of Corruption"
+  ]
+ },
+ "Corrupted Tower": {
+  "Trading Routes": [
+   "Akias Ruins",
+   "Ancient Nemract",
+   "Corrupted Orchard",
+   "Razed Inn"
+  ]
+ },
+ "Corrupted Warfront": {
+  "Trading Routes": [
+   "Akias Ruins",
+   "Corrupted Orchard",
+   "Corrupted Road",
+   "Detlas Suburbs",
+   "Plains Lake",
+   "Roots of Corruption"
+  ]
+ },
+ "Cosmic Fissures": {
+  "Trading Routes": [
+   "Gylia Fisherman Camp",
+   "Gylia Research Cabin",
+   "Gylia Watchtower",
+   "Thanos"
+  ]
+ },
+ "Crater Descent": {
+  "Trading Routes": [
+   "Dogun Ritual Site",
+   "Lava Lakes",
+   "Rodoroc"
+  ]
+ },
+ "Cyclospordial Hazard": {
+  "Trading Routes": [
+   "Cascading Basins",
+   "Turncoat Turnabout",
+   "Winding Waters"
+  ]
+ },
+ "Dark Forest Village": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Kander Mines",
+   "Path to Talor",
+   "Talor Cemetery"
+  ]
+ },
+ "Decayed Basin": {
+  "Trading Routes": [
+   "Fungal Grove",
+   "Heart of Decay",
+   "Lexdale",
+   "Mushroom Hill"
+  ]
+ },
+ "Delnar Manor": {
+  "Trading Routes": [
+   "Fountain of Youth"
+  ]
+ },
+ "Derelict Mansion": {
+  "Trading Routes": [
+   "Dreary Docks",
+   "Lifeless Forest"
+  ]
+ },
+ "Desolate Valley": {
+  "Trading Routes": [
+   "Corrupted River",
+   "Nesaak Transition",
+   "Plains Lake"
+  ]
+ },
+ "Detlas": {
+  "Trading Routes": [
+   "Detlas Suburbs",
+   "Essren's Hut",
+   "Scorched Trail"
+  ]
+ },
+ "Detlas Suburbs": {
+  "Trading Routes": [
+   "Corrupted Orchard",
+   "Corrupted Warfront",
+   "Detlas",
+   "Scorched Trail"
+  ]
+ },
+ "Displaced Housing": {
+  "Trading Routes": [
+   "Cherry Blossom Grove",
+   "Entrance to Thesead",
+   "Path to the Dojo",
+   "Thesead Suburbs"
+  ]
+ },
+ "Disturbed Crypt": {
+  "Trading Routes": [
+   "Dreary Docks",
+   "Dujgon Nation",
+   "Lifeless Forest",
+   "Regular Island"
+  ]
+ },
+ "Dodegar's Forge": {
+  "Trading Routes": [
+   "Luxuriant Pond",
+   "Mycelial Expanse",
+   "Unicorn Trail",
+   "Wood Sprite Hideaway"
+  ]
+ },
+ "Dogun Ritual Site": {
+  "Trading Routes": [
+   "Crater Descent",
+   "Freezing Heights",
+   "Lava Lakes",
+   "Molten Reach"
+  ]
+ },
+ "Dragonbone Graveyard": {
+  "Trading Routes": [
+   "Freezing Heights",
+   "Pyroclastic Flow"
+  ]
+ },
+ "Dragonling Nests": {
+  "Trading Routes": [
+   "Astraulus' Tower",
+   "Snail Island"
+  ]
+ },
+ "Dreary Docks": {
+  "Trading Routes": [
+   "Derelict Mansion",
+   "Disturbed Crypt",
+   "Dujgon Nation",
+   "Skien's Island"
+  ]
+ },
+ "Dujgon Nation": {
+  "Trading Routes": [
+   "Disturbed Crypt",
+   "Dreary Docks",
+   "Icy Island",
+   "Nodguj Nation",
+   "Regular Island"
+  ]
+ },
+ "Durum Barley Islet": {
+  "Trading Routes": [
+   "Durum Isles Barn",
+   "Mage Island",
+   "Nodguj Nation",
+   "Selchar"
+  ]
+ },
+ "Durum Isles Barn": {
+  "Trading Routes": [
+   "Durum Barley Islet",
+   "Durum Malt Islet",
+   "Durum Oat Islet",
+   "Selchar"
+  ]
+ },
+ "Durum Malt Islet": {
+  "Trading Routes": [
+   "Cathedral Harbour",
+   "Durum Isles Barn",
+   "Rooster Island",
+   "Selchar"
+  ]
+ },
+ "Durum Oat Islet": {
+  "Trading Routes": [
+   "Cathedral Harbour",
+   "Durum Isles Barn",
+   "Mage Island"
+  ]
+ },
+ "Dusty Pit": {
+  "Trading Routes": [
+   "Almuj",
+   "Cascading Oasis"
+  ]
+ },
+ "Eagle Tribe": {
+  "Trading Routes": [
+   "Accursed Dunes",
+   "Owl Tribe",
+   "Sunrise Plateau"
+  ]
+ },
+ "Efilim": {
+  "Trading Routes": [
+   "Efilim Crossroads",
+   "Minotaur Barbecue",
+   "Twisted Housing"
+  ]
+ },
+ "Efilim Crossroads": {
+  "Trading Routes": [
+   "Efilim",
+   "Guardian of the Forest",
+   "Path to the Forgery"
+  ]
+ },
+ "Elefolk Stomping Grounds": {
+  "Trading Routes": [
+   "Featherfall Cliffs",
+   "Fleris Cranny",
+   "Hobgoblin's Hoard",
+   "Protector's Pathway"
+  ]
+ },
+ "Elephelk Trail": {
+  "Trading Routes": [
+   "Cliffside Passage South",
+   "Protector's Pathway"
+  ]
+ },
+ "Elkurn": {
+  "Trading Routes": [
+   "Corrupted River",
+   "Corrupted Road",
+   "Frosty Spikes",
+   "Nesaak Transition",
+   "Road to Elkurn",
+   "Tempo Town"
+  ]
+ },
+ "Eltom": {
+  "Trading Routes": [
+   "Entrance to Molten Heights",
+   "Ranol's Farm"
+  ]
+ },
+ "Emerald Trail": {
+  "Trading Routes": [
+   "Entrance to Nivla Woods",
+   "Farmers Settlement",
+   "Ragni Main Entrance"
+  ]
+ },
+ "Enchanted River": {
+  "Trading Routes": [
+   "Faltach Manor",
+   "Gelibord",
+   "Twisted Housing"
+  ]
+ },
+ "Entamis Village": {
+  "Trading Routes": [
+   "Fountain of Youth",
+   "Monte's Village"
+  ]
+ },
+ "Entrance to Almuj": {
+  "Trading Routes": [
+   "Almuj",
+   "Savannah Plains",
+   "Ternaves Tunnel"
+  ]
+ },
+ "Entrance to Bucie": {
+  "Trading Routes": [
+   "Bucie Waterfall",
+   "Centerworld Fortress",
+   "Goblin Plains East",
+   "Llevigar Farm"
+  ]
+ },
+ "Entrance to Cinfras": {
+  "Trading Routes": [
+   "Chasm Chokepoint",
+   "Cinfras",
+   "Mesquis Tower",
+   "Path to Cinfras"
+  ]
+ },
+ "Entrance to Gavel": {
+  "Trading Routes": [
+   "Llevigar",
+   "Volcanic Excavation"
+  ]
+ },
+ "Entrance to Kander": {
+  "Trading Routes": [
+   "Faltach Manor",
+   "Gelibord",
+   "Path to Talor",
+   "Path to the Penitentiary",
+   "Twisted Ridge"
+  ]
+ },
+ "Entrance to Molten Heights": {
+  "Trading Routes": [
+   "Eltom",
+   "Rodoroc",
+   "Thesead Suburbs"
+  ]
+ },
+ "Entrance to Nivla Woods": {
+  "Trading Routes": [
+   "Emerald Trail",
+   "Nivla Woods",
+   "Nomads' Refuge",
+   "Road to Time Valley"
+  ]
+ },
+ "Entrance to Olux": {
+  "Trading Routes": [
+   "Bloody Trail",
+   "Lizardman Camp",
+   "Lizardman Lake",
+   "Olux",
+   "Shady Shack"
+  ]
+ },
+ "Entrance to Thesead": {
+  "Trading Routes": [
+   "Displaced Housing",
+   "Thesead",
+   "Thesead Underpass",
+   "Workshop Glade"
+  ]
+ },
+ "Essren's Hut": {
+  "Trading Routes": [
+   "Black Road",
+   "Detlas",
+   "Lava Springs",
+   "Mine Base Plains"
+  ]
+ },
+ "Evergreen Outbreak": {
+  "Trading Routes": [
+   "Burning Farm",
+   "Pine Pillar Forest"
+  ]
+ },
+ "Fading Forest": {
+  "Trading Routes": [
+   "Castle Dullahan",
+   "Gelibord Watermill",
+   "Lizardman Lake",
+   "Olux Lumberyard",
+   "Overtaken Outpost"
+  ]
+ },
+ "Fallen Factory": {
+  "Trading Routes": [
+   "Corkus City Crossroads",
+   "Corkus Sea Cove",
+   "Industrial Clearing",
+   "Relos",
+   "Ruined Houses"
+  ]
+ },
+ "Fallen Village": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Gylia Research Cabin",
+   "Weird Clearing"
+  ]
+ },
+ "Faltach Manor": {
+  "Trading Routes": [
+   "Enchanted River",
+   "Entrance to Kander",
+   "Kander Mines",
+   "Mesquis Tower"
+  ]
+ },
+ "Farmers Settlement": {
+  "Trading Routes": [
+   "Ancient Waterworks",
+   "Emerald Trail",
+   "Maltic",
+   "Nomads' Refuge",
+   "Ragni Countryside South"
+  ]
+ },
+ "Featherfall Cliffs": {
+  "Trading Routes": [
+   "Canyon Dropoff",
+   "Elefolk Stomping Grounds",
+   "Housing Crisis",
+   "Protector's Pathway",
+   "Troll Tower"
+  ]
+ },
+ "Felroc Fields": {
+  "Trading Routes": [
+   "Aldorei Cliffside Waterfalls",
+   "Aldorei River",
+   "Cinfras's Small Farm"
+  ]
+ },
+ "Field of Life": {
+  "Trading Routes": [
+   "Azure Frontier",
+   "Heavenly Ingress",
+   "Luminous Plateau",
+   "Primal Fen"
+  ]
+ },
+ "Final Step": {
+  "Trading Routes": [
+   "Bizarre Passage",
+   "Gateway to Nothing"
+  ]
+ },
+ "Fleris Cranny": {
+  "Trading Routes": [
+   "Elefolk Stomping Grounds",
+   "Harpy's Haunt South"
+  ]
+ },
+ "Fleris Trail": {
+  "Trading Routes": [
+   "Road to Light Forest"
+  ]
+ },
+ "Floral Peaks": {
+  "Trading Routes": [
+   "Maiden Tower",
+   "Mudspring Orc Camp",
+   "Ogre Den",
+   "Swamp Mountain Arch"
+  ]
+ },
+ "Florist's Hut": {
+  "Trading Routes": [
+   "Bob's Tomb",
+   "Frosty Spikes",
+   "Frozen Homestead",
+   "Nesaak",
+   "Nesaak Transition"
+  ]
+ },
+ "Forest of Eyes": {
+  "Trading Routes": [
+   "Forgotten Town",
+   "Sinister Forest"
+  ]
+ },
+ "Forgotten Burrows": {
+  "Trading Routes": [
+   "Infested Sinkhole",
+   "Maiden Tower",
+   "Naga Lake",
+   "Path to the Grootslangs",
+   "Shady Shack"
+  ]
+ },
+ "Forgotten Path": {
+  "Trading Routes": [
+   "Bloody Trail",
+   "Goblin Plains East",
+   "Iron Road"
+  ]
+ },
+ "Forgotten Town": {
+  "Trading Routes": [
+   "Forest of Eyes",
+   "Grey Ruins"
+  ]
+ },
+ "Founder's Statue": {
+  "Trading Routes": [
+   "Corkus City Mine",
+   "Corkus Outskirts"
+  ]
+ },
+ "Fountain of Youth": {
+  "Trading Routes": [
+   "Delnar Manor",
+   "Entamis Village",
+   "Iboju Village"
+  ]
+ },
+ "Freezing Heights": {
+  "Trading Routes": [
+   "Dogun Ritual Site",
+   "Dragonbone Graveyard",
+   "Pyroclastic Flow"
+  ]
+ },
+ "Frigid Crossroads": {
+  "Trading Routes": [
+   "Frozen Homestead",
+   "Icy Descent",
+   "Icy Vigil",
+   "Nesaak",
+   "Twain Lake",
+   "Wolves' Den"
+  ]
+ },
+ "Frosty Spikes": {
+  "Trading Routes": [
+   "Abandoned Lumberyard",
+   "Elkurn",
+   "Florist's Hut",
+   "Frozen Homestead",
+   "Sanctuary Bridge"
+  ]
+ },
+ "Frozen Fort": {
+  "Trading Routes": [
+   "Sky Falls"
+  ]
+ },
+ "Frozen Homestead": {
+  "Trading Routes": [
+   "Abandoned Lumberyard",
+   "Florist's Hut",
+   "Frigid Crossroads",
+   "Frosty Spikes",
+   "Nesaak"
+  ]
+ },
+ "Fungal Grove": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Decayed Basin",
+   "Old Crossroads",
+   "Talor Cemetery",
+   "Weird Clearing"
+  ]
+ },
+ "Gateway to Nothing": {
+  "Trading Routes": [
+   "Final Step",
+   "Toxic Drip",
+   "Void Valley"
+  ]
+ },
+ "Gelibord": {
+  "Trading Routes": [
+   "Enchanted River",
+   "Entrance to Kander",
+   "Gelibord Watermill",
+   "Twisted Housing"
+  ]
+ },
+ "Gelibord Watermill": {
+  "Trading Routes": [
+   "Castle Dullahan",
+   "Fading Forest",
+   "Gelibord",
+   "Twisted Housing"
+  ]
+ },
+ "Gert Camp": {
+  "Trading Routes": [
+   "Gylia Watchtower",
+   "Jitak's Farm"
+  ]
+ },
+ "Gloopy Cave": {
+  "Trading Routes": [
+   "Almuj",
+   "Barren Sands",
+   "Cascading Oasis",
+   "Ruined Villa"
+  ]
+ },
+ "Goblin Plains East": {
+  "Trading Routes": [
+   "Entrance to Bucie",
+   "Forgotten Path",
+   "Goblin Plains West",
+   "Llevigar Farm"
+  ]
+ },
+ "Goblin Plains West": {
+  "Trading Routes": [
+   "Goblin Plains East",
+   "Iron Road",
+   "Llevigar Farm",
+   "Sablestone Orc Camp"
+  ]
+ },
+ "Great Bridge": {
+  "Trading Routes": [
+   "Icy Vigil",
+   "Jungle Entrance"
+  ]
+ },
+ "Grey Ruins": {
+  "Trading Routes": [
+   "Forgotten Town",
+   "Worm Tunnel"
+  ]
+ },
+ "Guardian of the Forest": {
+  "Trading Routes": [
+   "Efilim Crossroads",
+   "Unicorn Trail",
+   "Wood Sprite Hideaway"
+  ]
+ },
+ "Guild Hall": {
+  "Trading Routes": [
+   "Cinfras"
+  ]
+ },
+ "Gylia Fisherman Camp": {
+  "Trading Routes": [
+   "Celestial Impact",
+   "Cosmic Fissures",
+   "Path to Thanos"
+  ]
+ },
+ "Gylia Lakehouse": {
+  "Trading Routes": [
+   "Gylia Research Cabin",
+   "Gylia Watchtower",
+   "Jitak's Farm",
+   "Weird Clearing"
+  ]
+ },
+ "Gylia Research Cabin": {
+  "Trading Routes": [
+   "Cosmic Fissures",
+   "Fallen Village",
+   "Gylia Lakehouse"
+  ]
+ },
+ "Gylia Watchtower": {
+  "Trading Routes": [
+   "Cosmic Fissures",
+   "Gert Camp",
+   "Gylia Lakehouse",
+   "Kitrios Barracks"
+  ]
+ },
+ "Half Moon Island": {
+  "Trading Routes": [
+   "Mage Island"
+  ]
+ },
+ "Harnort Compound": {
+  "Trading Routes": [
+   "Bucie Waterfall",
+   "Karoc Quarry"
+  ]
+ },
+ "Harpy's Haunt North": {
+  "Trading Routes": [
+   "Harpy's Haunt South",
+   "Krolton's Cave"
+  ]
+ },
+ "Harpy's Haunt South": {
+  "Trading Routes": [
+   "Fleris Cranny",
+   "Harpy's Haunt North",
+   "Wayward Split"
+  ]
+ },
+ "Heart of Decay": {
+  "Trading Routes": [
+   "Decayed Basin",
+   "Lexdale",
+   "Mushroom Hill"
+  ]
+ },
+ "Heavenly Ingress": {
+  "Trading Routes": [
+   "Field of Life",
+   "Path to Light's Secret"
+  ]
+ },
+ "Herb Cave": {
+  "Trading Routes": [
+   "Jungle Entrance",
+   "Troms Lake"
+  ]
+ },
+ "Hobgoblin's Hoard": {
+  "Trading Routes": [
+   "Elefolk Stomping Grounds",
+   "Krolton's Cave"
+  ]
+ },
+ "Housing Crisis": {
+  "Trading Routes": [
+   "Featherfall Cliffs"
+  ]
+ },
+ "Iboju Village": {
+  "Trading Routes": [
+   "Apprentice Huts",
+   "Fountain of Youth"
+  ]
+ },
+ "Icy Descent": {
+  "Trading Routes": [
+   "Frigid Crossroads",
+   "Lusuco",
+   "Tower of Ascension"
+  ]
+ },
+ "Icy Island": {
+  "Trading Routes": [
+   "Dujgon Nation",
+   "Nodguj Nation",
+   "Regular Island",
+   "Santa's Hideout"
+  ]
+ },
+ "Icy Vigil": {
+  "Trading Routes": [
+   "Frigid Crossroads",
+   "Great Bridge"
+  ]
+ },
+ "Illuminant Path": {
+  "Trading Routes": [
+   "Bandit's Toll",
+   "Canyon High Path",
+   "Path to the Dojo",
+   "Thanos Exit",
+   "The Hive"
+  ]
+ },
+ "Industrial Clearing": {
+  "Trading Routes": [
+   "Corkus City Crossroads",
+   "Corkus Forest",
+   "Fallen Factory",
+   "Ruined Houses"
+  ]
+ },
+ "Infested Sinkhole": {
+  "Trading Routes": [
+   "Forgotten Burrows",
+   "Naga Lake",
+   "Secluded Workshop",
+   "Witching Road"
+  ]
+ },
+ "Inhospitable Mountain": {
+  "Trading Routes": [
+   "Path to Ozoth's Spire",
+   "Perilous Grotto"
+  ]
+ },
+ "Invaded Barracks": {
+  "Trading Routes": [
+   "Barren Sands"
+  ]
+ },
+ "Iron Road": {
+  "Trading Routes": [
+   "Forgotten Path",
+   "Goblin Plains West",
+   "Lizardman Camp",
+   "Meteor Crater"
+  ]
+ },
+ "Jagged Foothills": {
+  "Trading Routes": [
+   "Ancient Waterworks",
+   "Maltic Coast",
+   "Rocky Shore"
+  ]
+ },
+ "Jitak's Farm": {
+  "Trading Routes": [
+   "Gert Camp",
+   "Gylia Lakehouse",
+   "Mushroom Hill"
+  ]
+ },
+ "Jofash Docks": {
+  "Trading Routes": [
+   "Jofash Tunnel",
+   "Lifeless Forest",
+   "Regular Island"
+  ]
+ },
+ "Jofash Tunnel": {
+  "Trading Routes": [
+   "Jofash Docks",
+   "Sky Island Ascent"
+  ]
+ },
+ "Jungle Entrance": {
+  "Trading Routes": [
+   "Great Bridge",
+   "Herb Cave",
+   "Monte's Village"
+  ]
+ },
+ "Kander Mines": {
+  "Trading Routes": [
+   "Dark Forest Village",
+   "Faltach Manor",
+   "Mesquis Tower",
+   "Path to Talor"
+  ]
+ },
+ "Kandon Farm": {
+  "Trading Routes": [
+   "Kandon Ridge"
+  ]
+ },
+ "Kandon Ridge": {
+  "Trading Routes": [
+   "Aerial Descent",
+   "Kandon Farm",
+   "Old Coal Mine",
+   "Temple Island"
+  ]
+ },
+ "Kandon-Beda": {
+  "Trading Routes": [
+   "Protector's Pathway"
+  ]
+ },
+ "Karoc Quarry": {
+  "Trading Routes": [
+   "Harnort Compound",
+   "Llevigar",
+   "Shineridge Orc Camp"
+  ]
+ },
+ "Katoa Ranch": {
+  "Trading Routes": [
+   "Ragni North Entrance",
+   "Riverbank Knoll"
+  ]
+ },
+ "Kitrios Armory": {
+  "Trading Routes": [
+   "Kitrios Barracks",
+   "Thanos"
+  ]
+ },
+ "Kitrios Barracks": {
+  "Trading Routes": [
+   "Colourful Mountaintop",
+   "Gylia Watchtower",
+   "Kitrios Armory"
+  ]
+ },
+ "Krolton's Cave": {
+  "Trading Routes": [
+   "Bantisu Approach",
+   "Harpy's Haunt North",
+   "Hobgoblin's Hoard",
+   "Wizard Tower"
+  ]
+ },
+ "Lava Lakes": {
+  "Trading Routes": [
+   "Crater Descent",
+   "Dogun Ritual Site",
+   "Pyroclastic Flow"
+  ]
+ },
+ "Lava Springs": {
+  "Trading Routes": [
+   "Black Road",
+   "Essren's Hut",
+   "Savannah Plains",
+   "Ternaves Tunnel"
+  ]
+ },
+ "Legendary Island": {
+  "Trading Routes": [
+   "Southern Outpost",
+   "Zhight Island"
+  ]
+ },
+ "Lexdale": {
+  "Trading Routes": [
+   "Decayed Basin",
+   "Heart of Decay",
+   "Old Crossroads",
+   "Viscera Pits"
+  ]
+ },
+ "Lexdale Penitentiary": {
+  "Trading Routes": [
+   "Path to the Penitentiary",
+   "Twisted Ridge"
+  ]
+ },
+ "Lifeless Forest": {
+  "Trading Routes": [
+   "Derelict Mansion",
+   "Disturbed Crypt",
+   "Jofash Docks"
+  ]
+ },
+ "Light Peninsula": {
+  "Trading Routes": [
+   "The Shiar",
+   "Tree Island",
+   "Volcanic Excavation",
+   "Volcanic Isles"
+  ]
+ },
+ "Lighthouse Lookout": {
+  "Trading Routes": [
+   "Balloon Airbase",
+   "Royal Gate"
+  ]
+ },
+ "Lion Lair": {
+  "Trading Routes": [
+   "Bremminglar"
+  ]
+ },
+ "Little Wood": {
+  "Trading Routes": [
+   "Sulphuric Hollow",
+   "Time Valley"
+  ]
+ },
+ "Lizardman Camp": {
+  "Trading Routes": [
+   "Bloody Trail",
+   "Entrance to Olux",
+   "Iron Road",
+   "Swamp Mountain Arch"
+  ]
+ },
+ "Lizardman Lake": {
+  "Trading Routes": [
+   "Bloody Trail",
+   "Entrance to Olux",
+   "Fading Forest",
+   "Olux",
+   "Olux Lumberyard"
+  ]
+ },
+ "Llevigar": {
+  "Trading Routes": [
+   "Entrance to Gavel",
+   "Karoc Quarry",
+   "Llevigar Gate"
+  ]
+ },
+ "Llevigar Farm": {
+  "Trading Routes": [
+   "Bucie Waterfall",
+   "Entrance to Bucie",
+   "Goblin Plains East",
+   "Goblin Plains West",
+   "Loamsprout Orc Camp",
+   "Shineridge Orc Camp"
+  ]
+ },
+ "Llevigar Gate": {
+  "Trading Routes": [
+   "Llevigar",
+   "Llevigar Stables",
+   "Orc Road",
+   "Sanguine Spider Den"
+  ]
+ },
+ "Llevigar Stables": {
+  "Trading Routes": [
+   "Cliffhearth Orc Camp",
+   "Llevigar Gate",
+   "Orc Road",
+   "Trunkstump Goblin Camp"
+  ]
+ },
+ "Loamsprout Orc Camp": {
+  "Trading Routes": [
+   "Llevigar Farm",
+   "Orc Road",
+   "Sablestone Orc Camp",
+   "Shineridge Orc Camp"
+  ]
+ },
+ "Lost Atoll": {
+  "Trading Routes": [
+   "Pirate Town",
+   "Tree Island",
+   "Volcanic Isles"
+  ]
+ },
+ "Luminous Plateau": {
+  "Trading Routes": [
+   "Field of Life"
+  ]
+ },
+ "Lusuco": {
+  "Trading Routes": [
+   "Icy Descent"
+  ]
+ },
+ "Lutho": {
+  "Trading Routes": [
+   "Paths of Sludge",
+   "Sinister Forest"
+  ]
+ },
+ "Luxuriant Pond": {
+  "Trading Routes": [
+   "Dodegar's Forge",
+   "Path to Light's Secret",
+   "The Shiar"
+  ]
+ },
+ "Mage Island": {
+  "Trading Routes": [
+   "Durum Barley Islet",
+   "Durum Oat Islet",
+   "Half Moon Island",
+   "Nodguj Nation",
+   "Santa's Hideout"
+  ]
+ },
+ "Maiden Tower": {
+  "Trading Routes": [
+   "Floral Peaks",
+   "Forgotten Burrows",
+   "Shady Shack",
+   "Witching Road"
+  ]
+ },
+ "Maltic": {
+  "Trading Routes": [
+   "Ancient Waterworks",
+   "Coastal Trail",
+   "Farmers Settlement",
+   "Maltic Coast",
+   "Ragni Countryside North"
+  ]
+ },
+ "Maltic Coast": {
+  "Trading Routes": [
+   "Ancient Waterworks",
+   "Coastal Trail",
+   "Jagged Foothills",
+   "Maltic"
+  ]
+ },
+ "Mangled Lake": {
+  "Trading Routes": [
+   "Bloody Trail",
+   "Caritat Mansion",
+   "Orc Battlegrounds",
+   "Overtaken Outpost"
+  ]
+ },
+ "Mantis Nest": {
+  "Trading Routes": [
+   "Aldorei Springs",
+   "Aldorei Valley Outskirts",
+   "Chasm Overlook",
+   "Mycelial Expanse",
+   "Myconid Descent"
+  ]
+ },
+ "Maro Peaks": {
+  "Trading Routes": [
+   "Skien's Island",
+   "Tree Island"
+  ]
+ },
+ "Mesquis Tower": {
+  "Trading Routes": [
+   "Entrance to Cinfras",
+   "Faltach Manor",
+   "Kander Mines",
+   "Path to Cinfras"
+  ]
+ },
+ "Meteor Crater": {
+  "Trading Routes": [
+   "Iron Road",
+   "Sablestone Orc Camp",
+   "Sunspark Orc Camp"
+  ]
+ },
+ "Meteor Trail": {
+  "Trading Routes": [
+   "Brigand Outpost",
+   "Cliffhearth Orc Camp",
+   "Sanguine Spider Den",
+   "Trunkstump Goblin Camp"
+  ]
+ },
+ "Mine Base Plains": {
+  "Trading Routes": [
+   "Abandoned Mines",
+   "Abandoned Mines Entrance",
+   "Essren's Hut",
+   "Mining Base Camp",
+   "Plains Lake",
+   "Silent Road"
+  ]
+ },
+ "Mining Base Camp": {
+  "Trading Routes": [
+   "Abandoned Mines",
+   "Abandoned Mines Entrance",
+   "Abandoned Pass",
+   "Mine Base Plains"
+  ]
+ },
+ "Minotaur Barbecue": {
+  "Trading Routes": [
+   "Efilim",
+   "Path to the Forgery"
+  ]
+ },
+ "Molten Passage": {
+  "Trading Routes": [
+   "Canyon Walkway",
+   "Path to Ozoth's Spire"
+  ]
+ },
+ "Molten Reach": {
+  "Trading Routes": [
+   "Angel Refuge",
+   "Dogun Ritual Site"
+  ]
+ },
+ "Monte's Village": {
+  "Trading Routes": [
+   "Apprentice Huts",
+   "Entamis Village",
+   "Jungle Entrance"
+  ]
+ },
+ "Mount Wynn Inn": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Blackstring Den",
+   "Nemract",
+   "Nemract Cathedral",
+   "Nested Cliffside",
+   "Razed Inn"
+  ]
+ },
+ "Mudspring Orc Camp": {
+  "Trading Routes": [
+   "Collapsed Emerald Mine",
+   "Floral Peaks",
+   "Stonecave Orc Camp",
+   "Sunspark Orc Camp"
+  ]
+ },
+ "Mummy's Tomb": {
+  "Trading Routes": [
+   "Cascading Oasis"
+  ]
+ },
+ "Mushroom Hill": {
+  "Trading Routes": [
+   "Decayed Basin",
+   "Heart of Decay",
+   "Jitak's Farm",
+   "Weird Clearing"
+  ]
+ },
+ "Mycelial Expanse": {
+  "Trading Routes": [
+   "Collapsed Bridge",
+   "Dodegar's Forge",
+   "Mantis Nest",
+   "The Shiar"
+  ]
+ },
+ "Myconid Descent": {
+  "Trading Routes": [
+   "Chasm Chokepoint",
+   "Mantis Nest"
+  ]
+ },
+ "Naga Lake": {
+  "Trading Routes": [
+   "Forgotten Burrows",
+   "Infested Sinkhole",
+   "Path to the Grootslangs",
+   "Secluded Workshop"
+  ]
+ },
+ "Nemract": {
+  "Trading Routes": [
+   "Mount Wynn Inn",
+   "Nemract Cathedral",
+   "Rocky Shore",
+   "Rooster Island"
+  ]
+ },
+ "Nemract Cathedral": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Cathedral Harbour",
+   "Mount Wynn Inn",
+   "Nemract"
+  ]
+ },
+ "Nesaak": {
+  "Trading Routes": [
+   "Bob's Tomb",
+   "Florist's Hut",
+   "Frigid Crossroads",
+   "Frozen Homestead",
+   "Wolves' Den"
+  ]
+ },
+ "Nesaak Transition": {
+  "Trading Routes": [
+   "Corrupted River",
+   "Desolate Valley",
+   "Elkurn",
+   "Florist's Hut"
+  ]
+ },
+ "Nested Cliffside": {
+  "Trading Routes": [
+   "Blackstring Den",
+   "Mount Wynn Inn",
+   "Nivla Woods Exit",
+   "Webbed Fracture"
+  ]
+ },
+ "Nexus of Light": {
+  "Trading Routes": [
+   "Azure Frontier"
+  ]
+ },
+ "Nivla Woods": {
+  "Trading Routes": [
+   "Alekin",
+   "Blooming Boulders",
+   "Entrance to Nivla Woods",
+   "Road to Time Valley"
+  ]
+ },
+ "Nivla Woods Exit": {
+  "Trading Routes": [
+   "Akias Ruins",
+   "Alekin",
+   "Arachnid Woods",
+   "Nested Cliffside",
+   "Road to Elkurn"
+  ]
+ },
+ "Nodguj Nation": {
+  "Trading Routes": [
+   "Dujgon Nation",
+   "Durum Barley Islet",
+   "Icy Island",
+   "Mage Island",
+   "Santa's Hideout",
+   "Skien's Island"
+  ]
+ },
+ "Nomads' Refuge": {
+  "Trading Routes": [
+   "Ancient Waterworks",
+   "Arachnid Woods",
+   "Entrance to Nivla Woods",
+   "Farmers Settlement",
+   "Webbed Fracture"
+  ]
+ },
+ "Ogre Den": {
+  "Trading Routes": [
+   "Collapsed Emerald Mine",
+   "Floral Peaks",
+   "Witching Road"
+  ]
+ },
+ "Old Coal Mine": {
+  "Trading Routes": [
+   "Kandon Ridge"
+  ]
+ },
+ "Old Crossroads": {
+  "Trading Routes": [
+   "Fungal Grove",
+   "Lexdale",
+   "Path to Talor",
+   "Talor Cemetery"
+  ]
+ },
+ "Olux": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Lizardman Lake",
+   "Olux Lumberyard",
+   "Path to the Grootslangs"
+  ]
+ },
+ "Olux Lumberyard": {
+  "Trading Routes": [
+   "Fading Forest",
+   "Lizardman Lake",
+   "Olux"
+  ]
+ },
+ "Orc Battlegrounds": {
+  "Trading Routes": [
+   "Centerworld Fortress",
+   "Mangled Lake"
+  ]
+ },
+ "Orc Lake": {
+  "Trading Routes": [
+   "Orc Road",
+   "Sablestone Orc Camp",
+   "Stonecave Orc Camp",
+   "Sunspark Orc Camp",
+   "Trunkstump Goblin Camp"
+  ]
+ },
+ "Orc Road": {
+  "Trading Routes": [
+   "Llevigar Gate",
+   "Llevigar Stables",
+   "Loamsprout Orc Camp",
+   "Orc Lake"
+  ]
+ },
+ "Otherworldly Monolith": {
+  "Trading Routes": [
+   "Azure Frontier",
+   "Path to Light"
+  ]
+ },
+ "Outer Aldorei Town": {
+  "Trading Routes": [
+   "Aldorei Springs",
+   "Aldorei Valley"
+  ]
+ },
+ "Overrun Docks": {
+  "Trading Routes": [
+   "Avos Territory"
+  ]
+ },
+ "Overtaken Outpost": {
+  "Trading Routes": [
+   "Bloody Trail",
+   "Caritat Mansion",
+   "Fading Forest",
+   "Mangled Lake"
+  ]
+ },
+ "Owl Tribe": {
+  "Trading Routes": [
+   "Almuj Slums",
+   "Ancient Excavation",
+   "Eagle Tribe",
+   "Sunset Plateau"
+  ]
+ },
+ "Panda Kingdom": {
+  "Trading Routes": [
+   "Panda Path",
+   "Parasitic Slime Mine"
+  ]
+ },
+ "Panda Path": {
+  "Trading Routes": [
+   "Panda Kingdom",
+   "Timeworn Arch"
+  ]
+ },
+ "Paper Trail": {
+  "Trading Routes": [
+   "Cinfras's Small Farm",
+   "Silverbull Headquarters",
+   "Waterfall Cave"
+  ]
+ },
+ "Parasitic Slime Mine": {
+  "Trading Routes": [
+   "Panda Kingdom",
+   "Troll Tower",
+   "Turncoat Turnabout",
+   "Winding Waters"
+  ]
+ },
+ "Path to Ahmsord": {
+  "Trading Routes": [
+   "Aerial Descent",
+   "Ahmsord",
+   "Sky Castle"
+  ]
+ },
+ "Path to Cinfras": {
+  "Trading Routes": [
+   "Entrance to Cinfras",
+   "Mesquis Tower",
+   "The Forgery"
+  ]
+ },
+ "Path to Light": {
+  "Trading Routes": [
+   "Azure Frontier",
+   "Otherworldly Monolith"
+  ]
+ },
+ "Path to Light's Secret": {
+  "Trading Routes": [
+   "Heavenly Ingress",
+   "Luxuriant Pond",
+   "Wood Sprite Hideaway"
+  ]
+ },
+ "Path to Ozoth's Spire": {
+  "Trading Routes": [
+   "Inhospitable Mountain",
+   "Molten Passage",
+   "Path to Thanos",
+   "Secluded Ponds"
+  ]
+ },
+ "Path to Talor": {
+  "Trading Routes": [
+   "Dark Forest Village",
+   "Entrance to Kander",
+   "Kander Mines",
+   "Old Crossroads",
+   "Talor Cemetery",
+   "Viscera Pits"
+  ]
+ },
+ "Path to Thanos": {
+  "Trading Routes": [
+   "Gylia Fisherman Camp",
+   "Path to Ozoth's Spire",
+   "Secluded Ponds",
+   "Thanos"
+  ]
+ },
+ "Path to the Dojo": {
+  "Trading Routes": [
+   "Canyon High Path",
+   "Cherry Blossom Grove",
+   "Displaced Housing",
+   "Illuminant Path",
+   "The Hive"
+  ]
+ },
+ "Path to the Forgery": {
+  "Trading Routes": [
+   "Efilim Crossroads",
+   "Minotaur Barbecue",
+   "The Forgery",
+   "Unicorn Trail"
+  ]
+ },
+ "Path to the Grootslangs": {
+  "Trading Routes": [
+   "Forgotten Burrows",
+   "Naga Lake",
+   "Olux"
+  ]
+ },
+ "Path to the Penitentiary": {
+  "Trading Routes": [
+   "Entrance to Kander",
+   "Lexdale Penitentiary",
+   "Twisted Ridge",
+   "Viscera Pits"
+  ]
+ },
+ "Paths of Sludge": {
+  "Trading Routes": [
+   "Lutho",
+   "Toxic Drip"
+  ]
+ },
+ "Perilous Grotto": {
+  "Trading Routes": [
+   "Inhospitable Mountain",
+   "Perilous Passage",
+   "Wizard's Warning"
+  ]
+ },
+ "Perilous Passage": {
+  "Trading Routes": [
+   "Perilous Grotto",
+   "Wayward Split"
+  ]
+ },
+ "Picnic Pond": {
+  "Trading Routes": [
+   "Avos Territory",
+   "Corkus City",
+   "Corkus Forest"
+  ]
+ },
+ "Pigmen Ravines": {
+  "Trading Routes": [
+   "Abandoned Farm",
+   "Ragni South Entrance"
+  ]
+ },
+ "Pine Pillar Forest": {
+  "Trading Routes": [
+   "Evergreen Outbreak",
+   "Timeworn Arch",
+   "Waterfall Cave"
+  ]
+ },
+ "Pirate Town": {
+  "Trading Routes": [
+   "Bloody Beach",
+   "Lost Atoll",
+   "Volcanic Isles",
+   "Zhight Island"
+  ]
+ },
+ "Plains Lake": {
+  "Trading Routes": [
+   "Corrupted Warfront",
+   "Desolate Valley",
+   "Mine Base Plains",
+   "Roots of Corruption"
+  ]
+ },
+ "Primal Fen": {
+  "Trading Routes": [
+   "Field of Life"
+  ]
+ },
+ "Protector's Pathway": {
+  "Trading Routes": [
+   "Elefolk Stomping Grounds",
+   "Elephelk Trail",
+   "Featherfall Cliffs",
+   "Kandon-Beda"
+  ]
+ },
+ "Pyroclastic Flow": {
+  "Trading Routes": [
+   "Dragonbone Graveyard",
+   "Freezing Heights",
+   "Lava Lakes"
+  ]
+ },
+ "Ragni": {
+  "Trading Routes": [
+   "Ragni Main Entrance",
+   "Ragni North Entrance",
+   "Ragni South Entrance"
+  ]
+ },
+ "Ragni Countryside North": {
+  "Trading Routes": [
+   "Coastal Trail",
+   "Maltic",
+   "Ragni Countryside South",
+   "Riverbank Knoll"
+  ]
+ },
+ "Ragni Countryside South": {
+  "Trading Routes": [
+   "Farmers Settlement",
+   "Ragni Countryside North",
+   "Ragni Main Entrance"
+  ]
+ },
+ "Ragni Main Entrance": {
+  "Trading Routes": [
+   "Emerald Trail",
+   "Ragni",
+   "Ragni Countryside South"
+  ]
+ },
+ "Ragni North Entrance": {
+  "Trading Routes": [
+   "Katoa Ranch",
+   "Ragni",
+   "Riverbank Knoll"
+  ]
+ },
+ "Ragni South Entrance": {
+  "Trading Routes": [
+   "Pigmen Ravines",
+   "Ragni",
+   "Sulphuric Hollow"
+  ]
+ },
+ "Raiders' Airbase": {
+  "Trading Routes": [
+   "Raiders' Stronghold"
+  ]
+ },
+ "Raiders' Stronghold": {
+  "Trading Routes": [
+   "Raiders' Airbase",
+   "Sky Island Ascent"
+  ]
+ },
+ "Ranol's Farm": {
+  "Trading Routes": [
+   "Cherry Blossom Grove",
+   "Eltom",
+   "Thesead Suburbs"
+  ]
+ },
+ "Razed Inn": {
+  "Trading Routes": [
+   "Corrupted Tower",
+   "Mount Wynn Inn"
+  ]
+ },
+ "Regular Island": {
+  "Trading Routes": [
+   "Disturbed Crypt",
+   "Dujgon Nation",
+   "Icy Island",
+   "Jofash Docks"
+  ]
+ },
+ "Relos": {
+  "Trading Routes": [
+   "Balloon Airbase",
+   "Corkus Sea Cove",
+   "Fallen Factory",
+   "Ruined Houses"
+  ]
+ },
+ "Retrofitted Manufactory": {
+  "Trading Routes": [
+   "Avos Temple",
+   "Avos Territory",
+   "Corkus City",
+   "Corkus Outskirts"
+  ]
+ },
+ "Riverbank Knoll": {
+  "Trading Routes": [
+   "Katoa Ranch",
+   "Ragni Countryside North",
+   "Ragni North Entrance"
+  ]
+ },
+ "Road to Elkurn": {
+  "Trading Routes": [
+   "Blooming Boulders",
+   "Elkurn",
+   "Nivla Woods Exit",
+   "Tempo Town"
+  ]
+ },
+ "Road to Light Forest": {
+  "Trading Routes": [
+   "Centerworld Fortress",
+   "Fleris Trail",
+   "Wood Sprite Hideaway"
+  ]
+ },
+ "Road to Mine": {
+  "Trading Routes": [
+   "Corkus City Crossroads",
+   "Corkus City Mine",
+   "Corkus Sea Cove"
+  ]
+ },
+ "Road to Time Valley": {
+  "Trading Routes": [
+   "Blooming Boulders",
+   "Entrance to Nivla Woods",
+   "Nivla Woods"
+  ]
+ },
+ "Rocky Bend": {
+  "Trading Routes": [
+   "Canyon Dropoff"
+  ]
+ },
+ "Rocky Shore": {
+  "Trading Routes": [
+   "Blackstring Den",
+   "Jagged Foothills",
+   "Nemract"
+  ]
+ },
+ "Rodoroc": {
+  "Trading Routes": [
+   "Crater Descent",
+   "Entrance to Molten Heights"
+  ]
+ },
+ "Rooster Island": {
+  "Trading Routes": [
+   "Bear Zoo",
+   "Durum Malt Islet",
+   "Nemract",
+   "Selchar"
+  ]
+ },
+ "Roots of Corruption": {
+  "Trading Routes": [
+   "Corrupted River",
+   "Corrupted Road",
+   "Corrupted Warfront",
+   "Plains Lake"
+  ]
+ },
+ "Royal Gate": {
+  "Trading Routes": [
+   "Lighthouse Lookout"
+  ]
+ },
+ "Ruined Houses": {
+  "Trading Routes": [
+   "Fallen Factory",
+   "Industrial Clearing",
+   "Relos"
+  ]
+ },
+ "Ruined Prospect": {
+  "Trading Routes": [
+   "Rymek",
+   "Sunset Plateau"
+  ]
+ },
+ "Ruined Villa": {
+  "Trading Routes": [
+   "Accursed Dunes",
+   "Almuj",
+   "Almuj Slums",
+   "Ancient Excavation",
+   "Gloopy Cave"
+  ]
+ },
+ "Rymek": {
+  "Trading Routes": [
+   "Ruined Prospect",
+   "Sunrise Plateau"
+  ]
+ },
+ "Sablestone Orc Camp": {
+  "Trading Routes": [
+   "Goblin Plains West",
+   "Loamsprout Orc Camp",
+   "Meteor Crater",
+   "Orc Lake"
+  ]
+ },
+ "Sanctuary Bridge": {
+  "Trading Routes": [
+   "Frosty Spikes",
+   "Time Valley"
+  ]
+ },
+ "Sanguine Spider Den": {
+  "Trading Routes": [
+   "Cliffhearth Orc Camp",
+   "Llevigar Gate",
+   "Meteor Trail"
+  ]
+ },
+ "Santa's Hideout": {
+  "Trading Routes": [
+   "Icy Island",
+   "Mage Island",
+   "Nodguj Nation"
+  ]
+ },
+ "Savannah Plains": {
+  "Trading Routes": [
+   "Bremminglar",
+   "Cathedral Harbour",
+   "Entrance to Almuj",
+   "Lava Springs"
+  ]
+ },
+ "Scorched Trail": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Cathedral Harbour",
+   "Corrupted Orchard",
+   "Detlas",
+   "Detlas Suburbs"
+  ]
+ },
+ "Scorpion Nest": {
+  "Trading Routes": [
+   "Secluded Workshop"
+  ]
+ },
+ "Secluded Ponds": {
+  "Trading Routes": [
+   "Burning Airship",
+   "Celestial Impact",
+   "Path to Ozoth's Spire",
+   "Path to Thanos"
+  ]
+ },
+ "Secluded Workshop": {
+  "Trading Routes": [
+   "Infested Sinkhole",
+   "Naga Lake",
+   "Scorpion Nest"
+  ]
+ },
+ "Selchar": {
+  "Trading Routes": [
+   "Durum Barley Islet",
+   "Durum Isles Barn",
+   "Durum Malt Islet",
+   "Rooster Island",
+   "Skien's Island"
+  ]
+ },
+ "Shady Shack": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Forgotten Burrows",
+   "Maiden Tower",
+   "Swamp Mountain Arch"
+  ]
+ },
+ "Shineridge Orc Camp": {
+  "Trading Routes": [
+   "Bucie Waterfall",
+   "Karoc Quarry",
+   "Llevigar Farm",
+   "Loamsprout Orc Camp"
+  ]
+ },
+ "Silent Road": {
+  "Trading Routes": [
+   "Broken Road",
+   "Mine Base Plains"
+  ]
+ },
+ "Silverbull Headquarters": {
+  "Trading Routes": [
+   "Celestial Impact",
+   "Cinfras's Small Farm",
+   "Paper Trail"
+  ]
+ },
+ "Sinister Forest": {
+  "Trading Routes": [
+   "Forest of Eyes",
+   "Lutho"
+  ]
+ },
+ "Skien's Island": {
+  "Trading Routes": [
+   "Dreary Docks",
+   "Maro Peaks",
+   "Nodguj Nation",
+   "Selchar"
+  ]
+ },
+ "Sky Castle": {
+  "Trading Routes": [
+   "Path to Ahmsord"
+  ]
+ },
+ "Sky Falls": {
+  "Trading Routes": [
+   "Frozen Fort",
+   "Sky Island Ascent",
+   "Wybel Island"
+  ]
+ },
+ "Sky Island Ascent": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Central Islands",
+   "Jofash Tunnel",
+   "Raiders' Stronghold",
+   "Sky Falls"
+  ]
+ },
+ "Snail Island": {
+  "Trading Routes": [
+   "Dragonling Nests",
+   "Temple Island"
+  ]
+ },
+ "Southern Outpost": {
+  "Trading Routes": [
+   "Balloon Airbase",
+   "Legendary Island"
+  ]
+ },
+ "Stonecave Orc Camp": {
+  "Trading Routes": [
+   "Brigand Outpost",
+   "Mudspring Orc Camp",
+   "Orc Lake",
+   "Sunspark Orc Camp",
+   "Trunkstump Goblin Camp"
+  ]
+ },
+ "Sulphuric Hollow": {
+  "Trading Routes": [
+   "Little Wood",
+   "Ragni South Entrance",
+   "Troms"
+  ]
+ },
+ "Sunrise Plateau": {
+  "Trading Routes": [
+   "Eagle Tribe",
+   "Rymek",
+   "Sunset Plateau"
+  ]
+ },
+ "Sunset Plateau": {
+  "Trading Routes": [
+   "Owl Tribe",
+   "Ruined Prospect",
+   "Sunrise Plateau"
+  ]
+ },
+ "Sunspark Orc Camp": {
+  "Trading Routes": [
+   "Meteor Crater",
+   "Mudspring Orc Camp",
+   "Orc Lake",
+   "Stonecave Orc Camp",
+   "Swamp Mountain Arch"
+  ]
+ },
+ "Swamp Island": {
+  "Trading Routes": [
+   "Ahmsord Outskirts",
+   "Astraulus' Tower",
+   "Temple Island"
+  ]
+ },
+ "Swamp Mountain Arch": {
+  "Trading Routes": [
+   "Floral Peaks",
+   "Lizardman Camp",
+   "Shady Shack",
+   "Sunspark Orc Camp"
+  ]
+ },
+ "Talor Cemetery": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Dark Forest Village",
+   "Fungal Grove",
+   "Old Crossroads",
+   "Path to Talor"
+  ]
+ },
+ "Temple Island": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Central Islands",
+   "Kandon Ridge",
+   "Snail Island",
+   "Swamp Island"
+  ]
+ },
+ "Temple of Legends": {
+  "Trading Routes": [
+   "Troms",
+   "Troms Lake"
+  ]
+ },
+ "Tempo Town": {
+  "Trading Routes": [
+   "Blooming Boulders",
+   "Elkurn",
+   "Road to Elkurn",
+   "Time Valley"
+  ]
+ },
+ "Ternaves": {
+  "Trading Routes": [
+   "Abandoned Mines Entrance",
+   "Black Road",
+   "Ternaves Tunnel"
+  ]
+ },
+ "Ternaves Tunnel": {
+  "Trading Routes": [
+   "Entrance to Almuj",
+   "Lava Springs",
+   "Ternaves"
+  ]
+ },
+ "Thanos": {
+  "Trading Routes": [
+   "Cosmic Fissures",
+   "Kitrios Armory",
+   "Path to Thanos",
+   "Upper Thanos"
+  ]
+ },
+ "Thanos Exit": {
+  "Trading Routes": [
+   "Illuminant Path"
+  ]
+ },
+ "Thanos Underpass": {
+  "Trading Routes": [
+   "Troll's Challenge"
+  ]
+ },
+ "The Forgery": {
+  "Trading Routes": [
+   "Path to Cinfras",
+   "Path to the Forgery"
+  ]
+ },
+ "The Gate": {
+  "Trading Routes": [
+   "Bizarre Passage"
+  ]
+ },
+ "The Hive": {
+  "Trading Routes": [
+   "Illuminant Path",
+   "Path to the Dojo"
+  ]
+ },
+ "The Shiar": {
+  "Trading Routes": [
+   "Aldorei Valley Outskirts",
+   "Light Peninsula",
+   "Luxuriant Pond",
+   "Mycelial Expanse"
+  ]
+ },
+ "Thesead": {
+  "Trading Routes": [
+   "Entrance to Thesead",
+   "Thesead Suburbs"
+  ]
+ },
+ "Thesead Suburbs": {
+  "Trading Routes": [
+   "Displaced Housing",
+   "Entrance to Molten Heights",
+   "Ranol's Farm",
+   "Thesead"
+  ]
+ },
+ "Thesead Underpass": {
+  "Trading Routes": [
+   "Cliffside Passage North",
+   "Entrance to Thesead",
+   "Workshop Glade"
+  ]
+ },
+ "Time Valley": {
+  "Trading Routes": [
+   "Abandoned Farm",
+   "Little Wood",
+   "Sanctuary Bridge",
+   "Tempo Town"
+  ]
+ },
+ "Timeworn Arch": {
+  "Trading Routes": [
+   "Panda Path",
+   "Pine Pillar Forest"
+  ]
+ },
+ "Tower of Ascension": {
+  "Trading Routes": [
+   "Icy Descent"
+  ]
+ },
+ "Toxic Caves": {
+  "Trading Routes": [
+   "Toxic Drip"
+  ]
+ },
+ "Toxic Drip": {
+  "Trading Routes": [
+   "Gateway to Nothing",
+   "Paths of Sludge",
+   "Toxic Caves"
+  ]
+ },
+ "Tree Island": {
+  "Trading Routes": [
+   "Light Peninsula",
+   "Lost Atoll",
+   "Maro Peaks",
+   "Volcanic Isles"
+  ]
+ },
+ "Troll Tower": {
+  "Trading Routes": [
+   "Featherfall Cliffs",
+   "Parasitic Slime Mine"
+  ]
+ },
+ "Troll's Challenge": {
+  "Trading Routes": [
+   "Colourful Mountaintop",
+   "Thanos Underpass",
+   "Upper Thanos"
+  ]
+ },
+ "Troms": {
+  "Trading Routes": [
+   "Sulphuric Hollow",
+   "Temple of Legends",
+   "Troms Lake"
+  ]
+ },
+ "Troms Lake": {
+  "Trading Routes": [
+   "Apprentice Huts",
+   "Herb Cave",
+   "Temple of Legends",
+   "Troms"
+  ]
+ },
+ "Trunkstump Goblin Camp": {
+  "Trading Routes": [
+   "Llevigar Stables",
+   "Meteor Trail",
+   "Orc Lake",
+   "Stonecave Orc Camp"
+  ]
+ },
+ "Turncoat Turnabout": {
+  "Trading Routes": [
+   "Cyclospordial Hazard",
+   "Parasitic Slime Mine",
+   "Wayward Split"
+  ]
+ },
+ "Twain Lake": {
+  "Trading Routes": [
+   "Frigid Crossroads",
+   "Twain Mansion"
+  ]
+ },
+ "Twain Mansion": {
+  "Trading Routes": [
+   "Twain Lake"
+  ]
+ },
+ "Twisted Housing": {
+  "Trading Routes": [
+   "Caritat Mansion",
+   "Efilim",
+   "Enchanted River",
+   "Gelibord",
+   "Gelibord Watermill"
+  ]
+ },
+ "Twisted Ridge": {
+  "Trading Routes": [
+   "Entrance to Kander",
+   "Lexdale Penitentiary",
+   "Path to the Penitentiary"
+  ]
+ },
+ "Unicorn Trail": {
+  "Trading Routes": [
+   "Collapsed Bridge",
+   "Dodegar's Forge",
+   "Guardian of the Forest",
+   "Path to the Forgery"
+  ]
+ },
+ "Upper Thanos": {
+  "Trading Routes": [
+   "Thanos",
+   "Troll's Challenge"
+  ]
+ },
+ "Viscera Pits": {
+  "Trading Routes": [
+   "Lexdale",
+   "Path to Talor",
+   "Path to the Penitentiary"
+  ]
+ },
+ "Void Valley": {
+  "Trading Routes": [
+   "Gateway to Nothing"
+  ]
+ },
+ "Volcanic Excavation": {
+  "Trading Routes": [
+   "Bloody Beach",
+   "Entrance to Gavel",
+   "Light Peninsula",
+   "Volcanic Isles"
+  ]
+ },
+ "Volcanic Isles": {
+  "Trading Routes": [
+   "Light Peninsula",
+   "Lost Atoll",
+   "Pirate Town",
+   "Tree Island",
+   "Volcanic Excavation"
+  ]
+ },
+ "Wanderer's Way": {
+  "Trading Routes": [
+   "Canyon High Path"
+  ]
+ },
+ "Waterfall Cave": {
+  "Trading Routes": [
+   "Big Mushroom Cave",
+   "Paper Trail",
+   "Pine Pillar Forest"
+  ]
+ },
+ "Wayward Split": {
+  "Trading Routes": [
+   "Cascading Basins",
+   "Harpy's Haunt South",
+   "Perilous Passage",
+   "Turncoat Turnabout"
+  ]
+ },
+ "Webbed Fracture": {
+  "Trading Routes": [
+   "Arachnid Woods",
+   "Nested Cliffside",
+   "Nomads' Refuge"
+  ]
+ },
+ "Weird Clearing": {
+  "Trading Routes": [
+   "Fallen Village",
+   "Fungal Grove",
+   "Gylia Lakehouse",
+   "Mushroom Hill"
+  ]
+ },
+ "Winding Waters": {
+  "Trading Routes": [
+   "Cyclospordial Hazard",
+   "Parasitic Slime Mine"
+  ]
+ },
+ "Witching Road": {
+  "Trading Routes": [
+   "Infested Sinkhole",
+   "Maiden Tower",
+   "Ogre Den"
+  ]
+ },
+ "Wizard Tower": {
+  "Trading Routes": [
+   "Bandit's Toll",
+   "Krolton's Cave"
+  ]
+ },
+ "Wizard's Warning": {
+  "Trading Routes": [
+   "Canyon Walkway",
+   "Perilous Grotto"
+  ]
+ },
+ "Wolves' Den": {
+  "Trading Routes": [
+   "Bob's Tomb",
+   "Frigid Crossroads",
+   "Nesaak"
+  ]
+ },
+ "Wood Sprite Hideaway": {
+  "Trading Routes": [
+   "Dodegar's Forge",
+   "Guardian of the Forest",
+   "Path to Light's Secret",
+   "Road to Light Forest"
+  ]
+ },
+ "Workshop Glade": {
+  "Trading Routes": [
+   "Bandit's Toll",
+   "Bantisu Approach",
+   "Entrance to Thesead",
+   "Thesead Underpass"
+  ]
+ },
+ "Worm Tunnel": {
+  "Trading Routes": [
+   "Broken Road",
+   "Grey Ruins"
+  ]
+ },
+ "Wybel Island": {
+  "Trading Routes": [
+   "Ahmsord Outskirts",
+   "Central Islands",
+   "Sky Falls"
+  ]
+ },
+ "Zhight Island": {
+  "Trading Routes": [
+   "Bear Zoo",
+   "Legendary Island",
+   "Pirate Town"
+  ]
+ }
+}

@@ -2,17 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   RETIRED_TERRITORIES,
   shouldRenderTerritory,
-  shouldRenderTradeRoute,
 } from './retired-territories';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Minimal live-territory map stub (just needs the key to be present) */
-function makeLive(...names: string[]): Record<string, unknown> {
-  return Object.fromEntries(names.map((n) => [n, {}]));
-}
 
 // ---------------------------------------------------------------------------
 // RETIRED_TERRITORIES set contents
@@ -254,55 +244,3 @@ describe('shouldRenderTerritory — unknown / future territories', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// shouldRenderTradeRoute
-// ---------------------------------------------------------------------------
-
-describe('shouldRenderTradeRoute', () => {
-  const liveMap = makeLive('Detlas', 'Ragni', 'Almuj', 'Bantisu Air Temple');
-
-  it('returns true when both source and dest exist in live territories and neither is retired', () => {
-    expect(shouldRenderTradeRoute('Detlas', 'Ragni', liveMap)).toBe(true);
-    expect(shouldRenderTradeRoute('Ragni', 'Almuj', liveMap)).toBe(true);
-  });
-
-  it('returns false when source is not in live territories (stale verbose-JSON entry)', () => {
-    // Krolton's Cave is retired and NOT in live map → route should not be drawn
-    expect(shouldRenderTradeRoute("Krolton's Cave", 'Detlas', liveMap)).toBe(false);
-  });
-
-  it('returns false when dest is not in live territories', () => {
-    expect(shouldRenderTradeRoute('Detlas', "Krolton's Cave", liveMap)).toBe(false);
-  });
-
-  it('returns false when source is in live territories but is retired', () => {
-    // Even if somehow a retired territory appears in the live map, routes should be blocked
-    const mapWithRetired = makeLive('Detlas', 'Light Forest East Lower');
-    expect(shouldRenderTradeRoute('Light Forest East Lower', 'Detlas', mapWithRetired)).toBe(false);
-  });
-
-  it('returns false when dest is in live territories but is retired', () => {
-    const mapWithRetired = makeLive('Detlas', 'Light Forest East Lower');
-    expect(shouldRenderTradeRoute('Detlas', 'Light Forest East Lower', mapWithRetired)).toBe(false);
-  });
-
-  it('returns false when both endpoints are missing from live map', () => {
-    expect(shouldRenderTradeRoute('Light Forest East Lower', 'Light Forest East Mid', liveMap)).toBe(false);
-  });
-
-  it('returns false for old farm-to-farm routes that should never render', () => {
-    const emptyMap = makeLive();
-    expect(shouldRenderTradeRoute("Ranol's Farm", "Jitak's Farm", emptyMap)).toBe(false);
-    expect(shouldRenderTradeRoute("Krolton's Cave", "Ranol's Farm", emptyMap)).toBe(false);
-  });
-
-  it('returns false for Aldorei route to Detlas when neither is live', () => {
-    expect(shouldRenderTradeRoute("Aldorei's River", 'Detlas', liveMap)).toBe(false);
-  });
-
-  it('returns false for Road to Light Forest routes', () => {
-    const mapWithRoad = makeLive('Detlas', 'Road to Light Forest');
-    expect(shouldRenderTradeRoute('Road to Light Forest', 'Detlas', mapWithRoad)).toBe(false);
-    expect(shouldRenderTradeRoute('Detlas', 'Road to Light Forest', mapWithRoad)).toBe(false);
-  });
-});

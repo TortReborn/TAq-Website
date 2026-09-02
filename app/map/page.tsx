@@ -42,7 +42,7 @@ import {
   buildInitialOwnerMap,
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
-import { shouldRenderTerritory, shouldRenderTradeRoute } from "@/lib/retired-territories";
+import { shouldRenderTerritory } from "@/lib/retired-territories";
 import { ROL_UPDATE_CUTOFF_MS } from "@/lib/territory-abbreviations";
 import { mapLog, mapError, mapTime, timedFetch } from "@/lib/map-logger";
 
@@ -2168,8 +2168,17 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
                 opaqueFill={opaqueFill}
               />
             )}
-            {/* Trade routes - only show when enabled, territories are visible, and Land View is off */}
-            {showTradeRoutes && showTerritories && !showLandView && <TradeRoutesOverlay territories={territories} verboseData={verboseData} />}
+            {/* Trade routes - only show when enabled, territories are visible, and Land View is off.
+                Anchored to the DISPLAYED territories (historical snapshot in
+                history mode) and era-selected by timestamp — no routes render
+                before 1.20 introduced them (lib/trade-routes.ts). */}
+            {showTradeRoutes && showTerritories && !showLandView && (
+              <TradeRoutesOverlay
+                territories={displayTerritories}
+                verboseData={verboseData}
+                timestampMs={viewMode === 'history' ? (historyTimestamp?.getTime() ?? null) : null}
+              />
+            )}
           </div>
 
           {/* History loading overlay — shown when loading history data takes

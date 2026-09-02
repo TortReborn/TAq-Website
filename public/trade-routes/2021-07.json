@@ -1,0 +1,2924 @@
+{
+ "Abandoned Farm": {
+  "Trading Routes": [
+   "Pigmen Ravines",
+   "Time Valley"
+  ]
+ },
+ "Abandoned Manor": {
+  "Trading Routes": [
+   "Entrance to Kander",
+   "Kander Mines",
+   "Lone Farmstead",
+   "Mesquis Tower"
+  ]
+ },
+ "Abandoned Pass": {
+  "Trading Routes": [
+   "Mining Base Upper",
+   "Ternaves Plains Lower"
+  ]
+ },
+ "Active Volcano": {
+  "Trading Routes": [
+   "Lava Lake",
+   "Lava Lake Bridge",
+   "Volcanic Slope"
+  ]
+ },
+ "Ahmsord": {
+  "Trading Routes": [
+   "Central Islands",
+   "Path to Ahmsord Lower",
+   "Path to Ahmsord Upper",
+   "Sky Island Ascent",
+   "Temple Island"
+  ]
+ },
+ "Ahmsord Outskirts": {
+  "Trading Routes": [
+   "Angel Refuge",
+   "Central Islands",
+   "Swamp Island",
+   "Wybel Island"
+  ]
+ },
+ "Air Temple Lower": {
+  "Trading Routes": [
+   "Air Temple Upper",
+   "Cliffside Valley",
+   "Krolton's Cave"
+  ]
+ },
+ "Air Temple Upper": {
+  "Trading Routes": [
+   "Air Temple Lower"
+  ]
+ },
+ "Aldorei Lowlands": {
+  "Trading Routes": [
+   "Aldorei's River",
+   "Aldorei's Waterfall",
+   "Cinfras's Small Farm"
+  ]
+ },
+ "Aldorei Valley Lower": {
+  "Trading Routes": [
+   "Aldorei Valley Mid",
+   "Aldorei Valley West Entrance",
+   "Mantis Nest"
+  ]
+ },
+ "Aldorei Valley Mid": {
+  "Trading Routes": [
+   "Aldorei Valley Lower",
+   "Aldorei Valley Upper"
+  ]
+ },
+ "Aldorei Valley South Entrance": {
+  "Trading Routes": [
+   "Aldorei's North Exit",
+   "Aldorei's Waterfall",
+   "Cinfras's Small Farm"
+  ]
+ },
+ "Aldorei Valley Upper": {
+  "Trading Routes": [
+   "Aldorei Valley Mid",
+   "Aldorei's Waterfall"
+  ]
+ },
+ "Aldorei Valley West Entrance": {
+  "Trading Routes": [
+   "Aldorei Valley Lower",
+   "Hobbit River",
+   "Mantis Nest"
+  ]
+ },
+ "Aldorei's Arch": {
+  "Trading Routes": [
+   "Canyon Waterfall North",
+   "Path To The Arch"
+  ]
+ },
+ "Aldorei's North Exit": {
+  "Trading Routes": [
+   "Aldorei Valley South Entrance",
+   "Cinfras County Lower",
+   "Path To The Arch"
+  ]
+ },
+ "Aldorei's River": {
+  "Trading Routes": [
+   "Aldorei Lowlands",
+   "Cinfras"
+  ]
+ },
+ "Aldorei's Waterfall": {
+  "Trading Routes": [
+   "Aldorei Lowlands",
+   "Aldorei Valley South Entrance",
+   "Aldorei Valley Upper"
+  ]
+ },
+ "Almuj City": {
+  "Trading Routes": [
+   "Desert Mid-Lower",
+   "Desert Mid-Upper",
+   "Desert West Lower",
+   "Desert West Upper",
+   "Savannah East Upper"
+  ]
+ },
+ "Ancient Nemract": {
+  "Trading Routes": [
+   "Cathedral Harbour",
+   "Detlas Trail East Plains",
+   "Detlas Trail West Plains",
+   "Nemract Cathedral",
+   "Nemract Road"
+  ]
+ },
+ "Angel Refuge": {
+  "Trading Routes": [
+   "Ahmsord Outskirts",
+   "Molten Reach"
+  ]
+ },
+ "Arachnid Route": {
+  "Trading Routes": [
+   "Nemract Plains West",
+   "North Nivla Woods",
+   "Plains"
+  ]
+ },
+ "Astraulus' Tower": {
+  "Trading Routes": [
+   "Dragonling Nests",
+   "Swamp Island"
+  ]
+ },
+ "Avos Temple": {
+  "Trading Routes": [
+   "Avos Workshop",
+   "Bloody Beach",
+   "Corkus Countryside"
+  ]
+ },
+ "Avos Workshop": {
+  "Trading Routes": [
+   "Avos Temple"
+  ]
+ },
+ "Azure Frontier": {
+  "Trading Routes": [
+   "Field of Life",
+   "Nexus of Light",
+   "Otherworldly Monolith",
+   "Path to Light"
+  ]
+ },
+ "Bandit Camp Exit": {
+  "Trading Routes": [
+   "Canyon Path North Mid",
+   "Canyon Valley South"
+  ]
+ },
+ "Bandit Cave Lower": {
+  "Trading Routes": [
+   "Canyon Valley South",
+   "Path To Ozoth's Spire Upper"
+  ]
+ },
+ "Bandit Cave Upper": {
+  "Trading Routes": [
+   "Burning Airship"
+  ]
+ },
+ "Bandits Toll": {
+  "Trading Routes": [
+   "Canyon Walk Way",
+   "Cliffside Valley",
+   "Thanos Exit Upper",
+   "Wizard Tower North"
+  ]
+ },
+ "Bizarre Passage": {
+  "Trading Routes": [
+   "Final Step",
+   "The Gate"
+  ]
+ },
+ "Bloody Beach": {
+  "Trading Routes": [
+   "Avos Temple",
+   "Corkus Countryside",
+   "Corkus Outskirts",
+   "Pirate Town",
+   "Volcano Lower"
+  ]
+ },
+ "Bob's Tomb": {
+  "Trading Routes": [
+   "Nesaak Plains North East",
+   "Nesaak Plains South East",
+   "Nesaak Village"
+  ]
+ },
+ "Bremminglar": {
+  "Trading Routes": [
+   "Lion Lair",
+   "Savannah West Upper"
+  ]
+ },
+ "Burning Airship": {
+  "Trading Routes": [
+   "Bandit Cave Upper",
+   "Burning Farm",
+   "Cinfras Thanos Transition"
+  ]
+ },
+ "Burning Farm": {
+  "Trading Routes": [
+   "Burning Airship",
+   "Ghostly Path"
+  ]
+ },
+ "Canyon Dropoff": {
+  "Trading Routes": [
+   "Cliff Side of the Lost",
+   "Mountain Path"
+  ]
+ },
+ "Canyon Entrance Waterfall": {
+  "Trading Routes": [
+   "Canyon Path North Mid",
+   "Canyon Path North West"
+  ]
+ },
+ "Canyon Fortress": {
+  "Trading Routes": [
+   "Canyon Waterfall Mid North",
+   "Valley of the Lost"
+  ]
+ },
+ "Canyon High Path": {
+  "Trading Routes": [
+   "Cliffside Waterfall",
+   "Hive South",
+   "Thanos Exit Upper"
+  ]
+ },
+ "Canyon Lower South East": {
+  "Trading Routes": [
+   "Canyon Path South East",
+   "Canyon Path South West",
+   "Canyon Survivor",
+   "Canyon Upper North West"
+  ]
+ },
+ "Canyon Mountain East": {
+  "Trading Routes": [
+   "Canyon Valley South",
+   "Canyon Walk Way"
+  ]
+ },
+ "Canyon Mountain South": {
+  "Trading Routes": [
+   "Canyon Waterfall Mid North",
+   "Krolton's Cave"
+  ]
+ },
+ "Canyon Of The Lost": {
+  "Trading Routes": [
+   "Cliff Side of the Lost",
+   "Cliffside Lake",
+   "Kandon-Beda",
+   "Valley of the Lost"
+  ]
+ },
+ "Canyon Path North Mid": {
+  "Trading Routes": [
+   "Bandit Camp Exit",
+   "Canyon Entrance Waterfall",
+   "Canyon Path South West",
+   "Canyon Waterfall Mid North"
+  ]
+ },
+ "Canyon Path North West": {
+  "Trading Routes": [
+   "Canyon Entrance Waterfall",
+   "Canyon Path South East",
+   "Canyon Path South West"
+  ]
+ },
+ "Canyon Path South East": {
+  "Trading Routes": [
+   "Canyon Lower South East",
+   "Canyon Path North West"
+  ]
+ },
+ "Canyon Path South West": {
+  "Trading Routes": [
+   "Canyon Lower South East",
+   "Canyon Path North Mid",
+   "Canyon Path North West"
+  ]
+ },
+ "Canyon Survivor": {
+  "Trading Routes": [
+   "Canyon Lower South East",
+   "Cliff Side of the Lost"
+  ]
+ },
+ "Canyon Upper North West": {
+  "Trading Routes": [
+   "Canyon Lower South East",
+   "Canyon Waterfall North"
+  ]
+ },
+ "Canyon Valley South": {
+  "Trading Routes": [
+   "Bandit Camp Exit",
+   "Bandit Cave Lower",
+   "Canyon Mountain East"
+  ]
+ },
+ "Canyon Walk Way": {
+  "Trading Routes": [
+   "Bandits Toll",
+   "Canyon Mountain East",
+   "Path To Ozoth's Spire Mid"
+  ]
+ },
+ "Canyon Waterfall Mid North": {
+  "Trading Routes": [
+   "Canyon Fortress",
+   "Canyon Mountain South",
+   "Canyon Path North Mid"
+  ]
+ },
+ "Canyon Waterfall North": {
+  "Trading Routes": [
+   "Aldorei's Arch",
+   "Canyon Upper North West"
+  ]
+ },
+ "Cathedral Harbour": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Detlas Trail East Plains",
+   "Durum Isles East",
+   "Durum Isles Lower",
+   "Nemract Cathedral",
+   "Savannah West Upper"
+  ]
+ },
+ "Central Islands": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Ahmsord Outskirts",
+   "Sky Island Ascent",
+   "Temple Island",
+   "Wybel Island"
+  ]
+ },
+ "Chained House": {
+  "Trading Routes": [
+   "Cherry Blossom Forest",
+   "Entrance to Thesead South",
+   "Hive South",
+   "Thesead Suburbs"
+  ]
+ },
+ "Cherry Blossom Forest": {
+  "Trading Routes": [
+   "Chained House",
+   "Hive South",
+   "Ranol's Farm"
+  ]
+ },
+ "Cinfras": {
+  "Trading Routes": [
+   "Aldorei's River",
+   "Cinfras Entrance",
+   "Cinfras Outskirts",
+   "Guild Hall"
+  ]
+ },
+ "Cinfras County Lower": {
+  "Trading Routes": [
+   "Aldorei's North Exit",
+   "Cinfras County Mid-Lower",
+   "Cinfras's Small Farm"
+  ]
+ },
+ "Cinfras County Mid-Lower": {
+  "Trading Routes": [
+   "Cinfras County Lower",
+   "Cinfras County Mid-Upper",
+   "Cinfras's Small Farm"
+  ]
+ },
+ "Cinfras County Mid-Upper": {
+  "Trading Routes": [
+   "Cinfras County Mid-Lower",
+   "Cinfras County Upper",
+   "Cinfras Thanos Transition"
+  ]
+ },
+ "Cinfras County Upper": {
+  "Trading Routes": [
+   "Cinfras County Mid-Upper",
+   "Gylia Lake South East",
+   "Path To Thanos"
+  ]
+ },
+ "Cinfras Entrance": {
+  "Trading Routes": [
+   "Cinfras",
+   "Light Forest North Exit",
+   "Mesquis Tower",
+   "Path to Cinfras"
+  ]
+ },
+ "Cinfras Outskirts": {
+  "Trading Routes": [
+   "Cinfras",
+   "Dark Forest Cinfras Transition",
+   "Dark Forest Village",
+   "Fungal Grove",
+   "Old Crossroads South"
+  ]
+ },
+ "Cinfras Thanos Transition": {
+  "Trading Routes": [
+   "Burning Airship",
+   "Cinfras County Mid-Upper",
+   "Path To Ozoth's Spire Upper",
+   "Path To Thanos"
+  ]
+ },
+ "Cinfras's Small Farm": {
+  "Trading Routes": [
+   "Aldorei Lowlands",
+   "Aldorei Valley South Entrance",
+   "Cinfras County Lower",
+   "Cinfras County Mid-Lower"
+  ]
+ },
+ "City of Troms": {
+  "Trading Routes": [
+   "Jungle Lake",
+   "South Pigmen Ravines",
+   "Temple of Legends"
+  ]
+ },
+ "Cliff Side of the Lost": {
+  "Trading Routes": [
+   "Canyon Dropoff",
+   "Canyon Of The Lost",
+   "Canyon Survivor",
+   "Mountain Edge",
+   "Valley of the Lost"
+  ]
+ },
+ "Cliffside Lake": {
+  "Trading Routes": [
+   "Canyon Of The Lost",
+   "Cliffside Passage"
+  ]
+ },
+ "Cliffside Passage": {
+  "Trading Routes": [
+   "Cliffside Lake",
+   "Cliffside Passage North"
+  ]
+ },
+ "Cliffside Passage North": {
+  "Trading Routes": [
+   "Cliffside Passage",
+   "Entrance to Thesead North"
+  ]
+ },
+ "Cliffside Valley": {
+  "Trading Routes": [
+   "Air Temple Lower",
+   "Bandits Toll",
+   "Entrance to Thesead North",
+   "Entrance to Thesead South"
+  ]
+ },
+ "Cliffside Waterfall": {
+  "Trading Routes": [
+   "Canyon High Path"
+  ]
+ },
+ "Coastal Trail": {
+  "Trading Routes": [
+   "Maltic",
+   "Maltic Coast",
+   "Ragni Plains"
+  ]
+ },
+ "Corkus Castle": {
+  "Trading Routes": [
+   "Corkus City"
+  ]
+ },
+ "Corkus City": {
+  "Trading Routes": [
+   "Corkus Castle",
+   "Corkus City South",
+   "Corkus Countryside",
+   "Corkus Forest North",
+   "Corkus Forest South"
+  ]
+ },
+ "Corkus City Mine": {
+  "Trading Routes": [
+   "Corkus Sea Cove",
+   "Corkus Statue",
+   "Road To Mine"
+  ]
+ },
+ "Corkus City South": {
+  "Trading Routes": [
+   "Corkus City",
+   "Corkus Forest North",
+   "Corkus Forest South",
+   "Factory Entrance",
+   "Fallen Factory",
+   "Road To Mine"
+  ]
+ },
+ "Corkus Countryside": {
+  "Trading Routes": [
+   "Avos Temple",
+   "Bloody Beach",
+   "Corkus City",
+   "Corkus Mountain",
+   "Corkus Outskirts"
+  ]
+ },
+ "Corkus Docks": {
+  "Trading Routes": [
+   "Corkus Mountain"
+  ]
+ },
+ "Corkus Forest North": {
+  "Trading Routes": [
+   "Corkus City",
+   "Corkus City South",
+   "Corkus Forest South",
+   "Corkus Mountain"
+  ]
+ },
+ "Corkus Forest South": {
+  "Trading Routes": [
+   "Corkus City",
+   "Corkus City South",
+   "Corkus Forest North",
+   "Factory Entrance"
+  ]
+ },
+ "Corkus Mountain": {
+  "Trading Routes": [
+   "Corkus Countryside",
+   "Corkus Docks",
+   "Corkus Forest North"
+  ]
+ },
+ "Corkus Outskirts": {
+  "Trading Routes": [
+   "Bloody Beach",
+   "Corkus Countryside",
+   "Corkus Statue"
+  ]
+ },
+ "Corkus Sea Cove": {
+  "Trading Routes": [
+   "Corkus City Mine",
+   "Corkus Sea Port",
+   "Fallen Factory",
+   "Road To Mine"
+  ]
+ },
+ "Corkus Sea Port": {
+  "Trading Routes": [
+   "Corkus Sea Cove",
+   "Fallen Factory",
+   "Lighthouse Plateau",
+   "Ruined Houses"
+  ]
+ },
+ "Corkus Statue": {
+  "Trading Routes": [
+   "Corkus City Mine",
+   "Corkus Outskirts"
+  ]
+ },
+ "Corrupted Road": {
+  "Trading Routes": [
+   "Detlas Far Suburbs",
+   "Elkurn",
+   "Nether Gate",
+   "Nether Plains Upper"
+  ]
+ },
+ "Crater Descent": {
+  "Trading Routes": [
+   "Lava Lake Bridge",
+   "Molten Heights Portal",
+   "Rodoroc"
+  ]
+ },
+ "Dark Forest Cinfras Transition": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Fallen Village",
+   "Gylia Lake South West"
+  ]
+ },
+ "Dark Forest Village": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Kander Mines",
+   "Old Crossroads South",
+   "Path to Talor"
+  ]
+ },
+ "Dead Island North East": {
+  "Trading Routes": [
+   "Dead Island North West",
+   "Dead Island South East",
+   "Jofash Docks"
+  ]
+ },
+ "Dead Island North West": {
+  "Trading Routes": [
+   "Dead Island North East",
+   "Dead Island South West"
+  ]
+ },
+ "Dead Island South East": {
+  "Trading Routes": [
+   "Dead Island North East",
+   "Dead Island South West",
+   "Dujgon Nation",
+   "Regular Island"
+  ]
+ },
+ "Dead Island South West": {
+  "Trading Routes": [
+   "Dead Island North West",
+   "Dead Island South East",
+   "Dujgon Nation",
+   "Skiens Island"
+  ]
+ },
+ "Decayed Basin": {
+  "Trading Routes": [
+   "Fungal Grove",
+   "Heart of Decay",
+   "Lexdale",
+   "Mushroom Hill"
+  ]
+ },
+ "Dernel Jungle Lower": {
+  "Trading Routes": [
+   "Dernel Jungle Mid",
+   "Jungle Lower"
+  ]
+ },
+ "Dernel Jungle Mid": {
+  "Trading Routes": [
+   "Dernel Jungle Lower",
+   "Dernel Jungle Upper",
+   "Jungle Upper"
+  ]
+ },
+ "Dernel Jungle Upper": {
+  "Trading Routes": [
+   "Dernel Jungle Mid"
+  ]
+ },
+ "Desert East Lower": {
+  "Trading Routes": [
+   "Desert East Mid",
+   "Desert Mid-Lower",
+   "Rymek East Upper"
+  ]
+ },
+ "Desert East Mid": {
+  "Trading Routes": [
+   "Desert East Lower",
+   "Desert East Upper",
+   "Desert Mid-Upper"
+  ]
+ },
+ "Desert East Upper": {
+  "Trading Routes": [
+   "Desert East Mid"
+  ]
+ },
+ "Desert Lower": {
+  "Trading Routes": [
+   "Desert Mid-Lower",
+   "Desert West Lower",
+   "Rymek West Upper"
+  ]
+ },
+ "Desert Mid-Lower": {
+  "Trading Routes": [
+   "Almuj City",
+   "Desert East Lower",
+   "Desert Lower",
+   "Desert Mid-Upper",
+   "Desert West Lower"
+  ]
+ },
+ "Desert Mid-Upper": {
+  "Trading Routes": [
+   "Almuj City",
+   "Desert East Mid",
+   "Desert Mid-Lower",
+   "Desert Upper"
+  ]
+ },
+ "Desert Upper": {
+  "Trading Routes": [
+   "Desert Mid-Upper",
+   "Desert West Upper",
+   "Mummy's Tomb"
+  ]
+ },
+ "Desert West Lower": {
+  "Trading Routes": [
+   "Almuj City",
+   "Desert Lower",
+   "Desert Mid-Lower",
+   "Rymek West Upper"
+  ]
+ },
+ "Desert West Upper": {
+  "Trading Routes": [
+   "Almuj City",
+   "Desert Upper"
+  ]
+ },
+ "Desolate Valley": {
+  "Trading Routes": [
+   "Nesaak Transition",
+   "Nether Plains Lower",
+   "Plains Lake"
+  ]
+ },
+ "Detlas": {
+  "Trading Routes": [
+   "Detlas Close Suburbs",
+   "Detlas Savannah Transition",
+   "Detlas Trail East Plains"
+  ]
+ },
+ "Detlas Close Suburbs": {
+  "Trading Routes": [
+   "Detlas",
+   "Detlas Suburbs",
+   "Detlas Trail East Plains",
+   "Nether Plains Upper"
+  ]
+ },
+ "Detlas Far Suburbs": {
+  "Trading Routes": [
+   "Corrupted Road",
+   "Detlas Suburbs",
+   "Detlas Trail West Plains",
+   "Nether Plains Upper",
+   "Nivla Woods Edge"
+  ]
+ },
+ "Detlas Savannah Transition": {
+  "Trading Routes": [
+   "Detlas",
+   "Mine Base Plains",
+   "Savannah West Lower",
+   "Ternaves Plains Upper"
+  ]
+ },
+ "Detlas Suburbs": {
+  "Trading Routes": [
+   "Detlas Close Suburbs",
+   "Detlas Far Suburbs",
+   "Detlas Trail East Plains",
+   "Detlas Trail West Plains",
+   "Nether Plains Upper"
+  ]
+ },
+ "Detlas Trail East Plains": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Cathedral Harbour",
+   "Detlas",
+   "Detlas Close Suburbs",
+   "Detlas Suburbs"
+  ]
+ },
+ "Detlas Trail West Plains": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Detlas Far Suburbs",
+   "Detlas Suburbs",
+   "Nemract Plains East"
+  ]
+ },
+ "Dragonling Nests": {
+  "Trading Routes": [
+   "Astraulus' Tower",
+   "Snail Island"
+  ]
+ },
+ "Dujgon Nation": {
+  "Trading Routes": [
+   "Dead Island South East",
+   "Dead Island South West",
+   "Icy Island",
+   "Nodguj Nation",
+   "Regular Island"
+  ]
+ },
+ "Durum Isles Center": {
+  "Trading Routes": [
+   "Durum Isles East",
+   "Durum Isles Lower",
+   "Durum Isles Upper",
+   "Selchar"
+  ]
+ },
+ "Durum Isles East": {
+  "Trading Routes": [
+   "Cathedral Harbour",
+   "Durum Isles Center",
+   "Mage Island"
+  ]
+ },
+ "Durum Isles Lower": {
+  "Trading Routes": [
+   "Cathedral Harbour",
+   "Durum Isles Center",
+   "Rooster Island",
+   "Selchar"
+  ]
+ },
+ "Durum Isles Upper": {
+  "Trading Routes": [
+   "Durum Isles Center",
+   "Mage Island",
+   "Nodguj Nation",
+   "Selchar"
+  ]
+ },
+ "Efilim East Plains": {
+  "Trading Routes": [
+   "Efilim South East Plains",
+   "Efilim Village"
+  ]
+ },
+ "Efilim South East Plains": {
+  "Trading Routes": [
+   "Efilim East Plains",
+   "Efilim South Plains",
+   "Light Forest East Upper",
+   "Light Forest West Upper"
+  ]
+ },
+ "Efilim South Plains": {
+  "Trading Routes": [
+   "Efilim South East Plains",
+   "Efilim Village",
+   "Light Forest North Entrance"
+  ]
+ },
+ "Efilim Village": {
+  "Trading Routes": [
+   "Efilim East Plains",
+   "Efilim South Plains",
+   "Twisted Housing"
+  ]
+ },
+ "Elkurn": {
+  "Trading Routes": [
+   "Corrupted Road",
+   "Elkurn Fields",
+   "Nesaak Plains Upper North West",
+   "Nesaak Transition",
+   "Nether Plains Lower",
+   "Road to Elkurn"
+  ]
+ },
+ "Elkurn Fields": {
+  "Trading Routes": [
+   "Elkurn",
+   "Road to Elkurn",
+   "South Nivla Woods",
+   "Time Valley"
+  ]
+ },
+ "Eltom": {
+  "Trading Routes": [
+   "Entrance to Rodoroc",
+   "Ranol's Farm"
+  ]
+ },
+ "Emerald Trail": {
+  "Trading Routes": [
+   "Maltic Plains",
+   "Nivla Woods Entrance",
+   "Ragni Main Entrance"
+  ]
+ },
+ "Entrance to Kander": {
+  "Trading Routes": [
+   "Abandoned Manor",
+   "Gelibord",
+   "Path to Talor",
+   "Twisted Ridge",
+   "Viscera Pits West"
+  ]
+ },
+ "Entrance to Olux": {
+  "Trading Routes": [
+   "Olux",
+   "Swamp Dark Forest Transition Lower",
+   "Swamp Dark Forest Transition Mid",
+   "Swamp Lower",
+   "Swamp Plains Basin"
+  ]
+ },
+ "Entrance to Rodoroc": {
+  "Trading Routes": [
+   "Eltom",
+   "Rodoroc",
+   "Thesead Suburbs"
+  ]
+ },
+ "Entrance to Thesead North": {
+  "Trading Routes": [
+   "Cliffside Passage North",
+   "Cliffside Valley",
+   "Entrance to Thesead South"
+  ]
+ },
+ "Entrance to Thesead South": {
+  "Trading Routes": [
+   "Chained House",
+   "Cliffside Valley",
+   "Entrance to Thesead North",
+   "Thesead"
+  ]
+ },
+ "Factory Entrance": {
+  "Trading Routes": [
+   "Corkus City South",
+   "Corkus Forest South",
+   "Fallen Factory",
+   "Ruined Houses"
+  ]
+ },
+ "Fallen Factory": {
+  "Trading Routes": [
+   "Corkus City South",
+   "Corkus Sea Cove",
+   "Corkus Sea Port",
+   "Factory Entrance",
+   "Ruined Houses"
+  ]
+ },
+ "Fallen Village": {
+  "Trading Routes": [
+   "Dark Forest Cinfras Transition",
+   "Fungal Grove",
+   "Gylia Lake North West",
+   "Mushroom Hill"
+  ]
+ },
+ "Field of Life": {
+  "Trading Routes": [
+   "Azure Frontier",
+   "Heavenly Ingress",
+   "Luminous Plateau",
+   "Primal Fen"
+  ]
+ },
+ "Final Step": {
+  "Trading Routes": [
+   "Bizarre Passage",
+   "Gateway to Nothing"
+  ]
+ },
+ "Fleris Trail": {
+  "Trading Routes": [
+   "Road To Light Forest"
+  ]
+ },
+ "Forest of Eyes": {
+  "Trading Routes": [
+   "Forgotten Town",
+   "Sinister Forest"
+  ]
+ },
+ "Forgotten Path": {
+  "Trading Routes": [
+   "Goblin Plains East",
+   "Iron Road",
+   "Swamp Dark Forest Transition Lower"
+  ]
+ },
+ "Forgotten Town": {
+  "Trading Routes": [
+   "Forest of Eyes",
+   "Grey Ruins"
+  ]
+ },
+ "Fortress North": {
+  "Trading Routes": [
+   "Fortress South",
+   "Mansion of Insanity",
+   "Swamp Dark Forest Transition Lower",
+   "Taproot Descent"
+  ]
+ },
+ "Fortress South": {
+  "Trading Routes": [
+   "Fortress North",
+   "Mansion of Insanity",
+   "Orc Battlegrounds",
+   "Swamp Dark Forest Transition Lower"
+  ]
+ },
+ "Frozen Fort": {
+  "Trading Routes": [
+   "Sky Falls"
+  ]
+ },
+ "Fungal Grove": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Decayed Basin",
+   "Fallen Village",
+   "Old Crossroads North",
+   "Old Crossroads South"
+  ]
+ },
+ "Gateway to Nothing": {
+  "Trading Routes": [
+   "Final Step",
+   "Toxic Drip",
+   "Void Valley"
+  ]
+ },
+ "Gelibord": {
+  "Trading Routes": [
+   "Entrance to Kander",
+   "Gelibord Corrupted Farm",
+   "Lone Farmstead",
+   "Twisted Housing"
+  ]
+ },
+ "Gelibord Castle": {
+  "Trading Routes": [
+   "Gelibord Corrupted Farm",
+   "Taproot Descent"
+  ]
+ },
+ "Gelibord Corrupted Farm": {
+  "Trading Routes": [
+   "Gelibord",
+   "Gelibord Castle",
+   "Taproot Descent",
+   "Twisted Housing"
+  ]
+ },
+ "Gert Camp": {
+  "Trading Routes": [
+   "Gylia Lake North East",
+   "Jitak's Farm"
+  ]
+ },
+ "Ghostly Path": {
+  "Trading Routes": [
+   "Burning Farm",
+   "Path To The Arch"
+  ]
+ },
+ "Goblin Plains East": {
+  "Trading Routes": [
+   "Forgotten Path",
+   "Goblin Plains West",
+   "Llevigar Farm",
+   "Pre-Light Forest Transition"
+  ]
+ },
+ "Goblin Plains West": {
+  "Trading Routes": [
+   "Goblin Plains East",
+   "Iron Road",
+   "Llevigar Farm",
+   "Sablestone Camp"
+  ]
+ },
+ "Great Bridge Jungle": {
+  "Trading Routes": [
+   "Great Bridge Nesaak",
+   "Herb Cave",
+   "Jungle Lower"
+  ]
+ },
+ "Great Bridge Nesaak": {
+  "Trading Routes": [
+   "Great Bridge Jungle",
+   "Nesaak Bridge Transition"
+  ]
+ },
+ "Grey Ruins": {
+  "Trading Routes": [
+   "Forgotten Town",
+   "Worm Tunnel"
+  ]
+ },
+ "Guild Hall": {
+  "Trading Routes": [
+   "Cinfras"
+  ]
+ },
+ "Gylia Lake North East": {
+  "Trading Routes": [
+   "Gert Camp",
+   "Gylia Lake North West",
+   "Gylia Lake South East",
+   "Military Base"
+  ]
+ },
+ "Gylia Lake North West": {
+  "Trading Routes": [
+   "Fallen Village",
+   "Gylia Lake North East",
+   "Gylia Lake South West",
+   "Jitak's Farm"
+  ]
+ },
+ "Gylia Lake South East": {
+  "Trading Routes": [
+   "Cinfras County Upper",
+   "Gylia Lake North East",
+   "Gylia Lake South West",
+   "Thanos"
+  ]
+ },
+ "Gylia Lake South West": {
+  "Trading Routes": [
+   "Dark Forest Cinfras Transition",
+   "Gylia Lake North West",
+   "Gylia Lake South East"
+  ]
+ },
+ "Half Moon Island": {
+  "Trading Routes": [
+   "Mage Island"
+  ]
+ },
+ "Heart of Decay": {
+  "Trading Routes": [
+   "Decayed Basin",
+   "Lexdale",
+   "Mushroom Hill"
+  ]
+ },
+ "Heavenly Ingress": {
+  "Trading Routes": [
+   "Field of Life",
+   "Light Forest South Entrance"
+  ]
+ },
+ "Herb Cave": {
+  "Trading Routes": [
+   "Great Bridge Jungle",
+   "Jungle Lake"
+  ]
+ },
+ "Hive": {
+  "Trading Routes": [
+   "Hive South",
+   "Thanos Exit Upper"
+  ]
+ },
+ "Hive South": {
+  "Trading Routes": [
+   "Canyon High Path",
+   "Chained House",
+   "Cherry Blossom Forest",
+   "Hive",
+   "Thanos Exit Upper"
+  ]
+ },
+ "Hobbit River": {
+  "Trading Routes": [
+   "Aldorei Valley West Entrance",
+   "Light Forest East Lower",
+   "Light Forest West Lower",
+   "Light Peninsula"
+  ]
+ },
+ "Icy Descent": {
+  "Trading Routes": [
+   "Lusuco",
+   "Nesaak Plains South West",
+   "Tower of Ascension"
+  ]
+ },
+ "Icy Island": {
+  "Trading Routes": [
+   "Dujgon Nation",
+   "Nodguj Nation",
+   "Regular Island",
+   "Santa's Hideout"
+  ]
+ },
+ "Iron Road": {
+  "Trading Routes": [
+   "Forgotten Path",
+   "Goblin Plains West",
+   "Meteor Crater",
+   "Swamp Lower"
+  ]
+ },
+ "Jitak's Farm": {
+  "Trading Routes": [
+   "Gert Camp",
+   "Gylia Lake North West",
+   "Mushroom Hill"
+  ]
+ },
+ "Jofash Docks": {
+  "Trading Routes": [
+   "Dead Island North East",
+   "Jofash Tunnel",
+   "Regular Island"
+  ]
+ },
+ "Jofash Tunnel": {
+  "Trading Routes": [
+   "Jofash Docks",
+   "Sky Island Ascent"
+  ]
+ },
+ "Jungle Lake": {
+  "Trading Routes": [
+   "City of Troms",
+   "Herb Cave",
+   "Jungle Mid",
+   "Temple of Legends"
+  ]
+ },
+ "Jungle Lower": {
+  "Trading Routes": [
+   "Dernel Jungle Lower",
+   "Great Bridge Jungle",
+   "Jungle Mid"
+  ]
+ },
+ "Jungle Mid": {
+  "Trading Routes": [
+   "Jungle Lake",
+   "Jungle Lower",
+   "Jungle Upper"
+  ]
+ },
+ "Jungle Upper": {
+  "Trading Routes": [
+   "Dernel Jungle Mid",
+   "Jungle Mid"
+  ]
+ },
+ "Kander Mines": {
+  "Trading Routes": [
+   "Abandoned Manor",
+   "Dark Forest Village",
+   "Mesquis Tower",
+   "Path to Talor"
+  ]
+ },
+ "Kandon Farm": {
+  "Trading Routes": [
+   "Kandon Ridge"
+  ]
+ },
+ "Kandon Ridge": {
+  "Trading Routes": [
+   "Kandon Farm",
+   "Old Coal Mine",
+   "Path to Ahmsord Upper",
+   "Temple Island"
+  ]
+ },
+ "Kandon-Beda": {
+  "Trading Routes": [
+   "Canyon Of The Lost"
+  ]
+ },
+ "Katoa Ranch": {
+  "Trading Routes": [
+   "Ragni North Entrance",
+   "Ragni North Suburbs"
+  ]
+ },
+ "Krolton's Cave": {
+  "Trading Routes": [
+   "Air Temple Lower",
+   "Canyon Mountain South",
+   "Temple of the Lost East",
+   "Wizard Tower North"
+  ]
+ },
+ "Lava Lake": {
+  "Trading Routes": [
+   "Active Volcano",
+   "Molten Heights Portal",
+   "Volcanic Slope"
+  ]
+ },
+ "Lava Lake Bridge": {
+  "Trading Routes": [
+   "Active Volcano",
+   "Crater Descent",
+   "Molten Heights Portal"
+  ]
+ },
+ "Leadin Fortress": {
+  "Trading Routes": [
+   "Orc Battlegrounds",
+   "Pre-Light Forest Transition",
+   "Road To Light Forest"
+  ]
+ },
+ "Legendary Island": {
+  "Trading Routes": [
+   "Southern Outpost",
+   "Zhight Island"
+  ]
+ },
+ "Lexdale": {
+  "Trading Routes": [
+   "Decayed Basin",
+   "Heart of Decay",
+   "Old Crossroads North",
+   "Viscera Pits East"
+  ]
+ },
+ "Lexdales Prison": {
+  "Trading Routes": [
+   "Twisted Ridge",
+   "Viscera Pits West"
+  ]
+ },
+ "Light Forest Canyon": {
+  "Trading Routes": [
+   "Light Forest East Mid",
+   "Light Forest North Exit",
+   "Mantis Nest"
+  ]
+ },
+ "Light Forest East Lower": {
+  "Trading Routes": [
+   "Hobbit River",
+   "Light Forest East Mid",
+   "Light Forest West Mid",
+   "Mantis Nest"
+  ]
+ },
+ "Light Forest East Mid": {
+  "Trading Routes": [
+   "Light Forest Canyon",
+   "Light Forest East Lower",
+   "Light Forest West Upper"
+  ]
+ },
+ "Light Forest East Upper": {
+  "Trading Routes": [
+   "Efilim South East Plains",
+   "Path to Cinfras"
+  ]
+ },
+ "Light Forest Entrance": {
+  "Trading Routes": [
+   "Light Forest North Entrance",
+   "Light Forest South Entrance",
+   "Light Forest West Mid",
+   "Road To Light Forest"
+  ]
+ },
+ "Light Forest North Entrance": {
+  "Trading Routes": [
+   "Efilim South Plains",
+   "Light Forest Entrance",
+   "Light Forest West Upper"
+  ]
+ },
+ "Light Forest North Exit": {
+  "Trading Routes": [
+   "Cinfras Entrance",
+   "Light Forest Canyon",
+   "Light Forest South Exit"
+  ]
+ },
+ "Light Forest South Entrance": {
+  "Trading Routes": [
+   "Heavenly Ingress",
+   "Light Forest Entrance",
+   "Light Forest West Lower"
+  ]
+ },
+ "Light Forest South Exit": {
+  "Trading Routes": [
+   "Light Forest North Exit",
+   "Mantis Nest"
+  ]
+ },
+ "Light Forest West Lower": {
+  "Trading Routes": [
+   "Hobbit River",
+   "Light Forest South Entrance",
+   "Light Forest West Mid"
+  ]
+ },
+ "Light Forest West Mid": {
+  "Trading Routes": [
+   "Light Forest East Lower",
+   "Light Forest Entrance",
+   "Light Forest West Lower",
+   "Light Forest West Upper"
+  ]
+ },
+ "Light Forest West Upper": {
+  "Trading Routes": [
+   "Efilim South East Plains",
+   "Light Forest East Mid",
+   "Light Forest North Entrance",
+   "Light Forest West Mid"
+  ]
+ },
+ "Light Peninsula": {
+  "Trading Routes": [
+   "Hobbit River",
+   "Tree Island",
+   "Volcano Lower",
+   "Volcano Upper"
+  ]
+ },
+ "Lighthouse Plateau": {
+  "Trading Routes": [
+   "Corkus Sea Port",
+   "Phinas Farm",
+   "Southern Outpost"
+  ]
+ },
+ "Lion Lair": {
+  "Trading Routes": [
+   "Bremminglar"
+  ]
+ },
+ "Little Wood": {
+  "Trading Routes": [
+   "South Pigmen Ravines",
+   "Time Valley"
+  ]
+ },
+ "Llevigar": {
+  "Trading Routes": [
+   "Llevigar Entrance",
+   "Llevigar Gate East",
+   "Quartz Mines South West"
+  ]
+ },
+ "Llevigar Entrance": {
+  "Trading Routes": [
+   "Llevigar",
+   "Volcano Lower"
+  ]
+ },
+ "Llevigar Farm": {
+  "Trading Routes": [
+   "Goblin Plains East",
+   "Goblin Plains West",
+   "Loamsprout Camp",
+   "Pre-Light Forest Transition",
+   "Quartz Mines North East",
+   "Quartz Mines North West"
+  ]
+ },
+ "Llevigar Farm Plains East": {
+  "Trading Routes": [
+   "Llevigar Farm Plains West",
+   "Llevigar Gate East",
+   "Llevigar Plains East Lower",
+   "Orc Road"
+  ]
+ },
+ "Llevigar Farm Plains West": {
+  "Trading Routes": [
+   "Llevigar Farm Plains East",
+   "Llevigar Gate West",
+   "Llevigar Plains West Lower"
+  ]
+ },
+ "Llevigar Gate East": {
+  "Trading Routes": [
+   "Llevigar",
+   "Llevigar Farm Plains East",
+   "Llevigar Gate West",
+   "Orc Road"
+  ]
+ },
+ "Llevigar Gate West": {
+  "Trading Routes": [
+   "Llevigar Farm Plains West",
+   "Llevigar Gate East",
+   "Llevigar Plains West Lower"
+  ]
+ },
+ "Llevigar Plains East Lower": {
+  "Trading Routes": [
+   "Llevigar Farm Plains East",
+   "Llevigar Plains East Upper",
+   "Llevigar Plains West Lower",
+   "Orc Lake"
+  ]
+ },
+ "Llevigar Plains East Upper": {
+  "Trading Routes": [
+   "Llevigar Plains East Lower",
+   "Llevigar Plains West Upper",
+   "Orc Lake",
+   "Sunspark Camp",
+   "Swamp East Lower"
+  ]
+ },
+ "Llevigar Plains West Lower": {
+  "Trading Routes": [
+   "Llevigar Farm Plains West",
+   "Llevigar Gate West",
+   "Llevigar Plains East Lower",
+   "Llevigar Plains West Upper"
+  ]
+ },
+ "Llevigar Plains West Upper": {
+  "Trading Routes": [
+   "Llevigar Plains East Upper",
+   "Llevigar Plains West Lower",
+   "Swamp West Lower"
+  ]
+ },
+ "Loamsprout Camp": {
+  "Trading Routes": [
+   "Llevigar Farm",
+   "Orc Road",
+   "Quartz Mines North West",
+   "Sablestone Camp"
+  ]
+ },
+ "Lone Farmstead": {
+  "Trading Routes": [
+   "Abandoned Manor",
+   "Gelibord",
+   "Twisted Housing"
+  ]
+ },
+ "Lost Atoll": {
+  "Trading Routes": [
+   "Pirate Town",
+   "Tree Island",
+   "Volcano Upper"
+  ]
+ },
+ "Luminous Plateau": {
+  "Trading Routes": [
+   "Field of Life"
+  ]
+ },
+ "Lusuco": {
+  "Trading Routes": [
+   "Icy Descent"
+  ]
+ },
+ "Lutho": {
+  "Trading Routes": [
+   "Paths of Sludge",
+   "Sinister Forest"
+  ]
+ },
+ "Mage Island": {
+  "Trading Routes": [
+   "Durum Isles East",
+   "Durum Isles Upper",
+   "Half Moon Island",
+   "Nodguj Nation",
+   "Santa's Hideout"
+  ]
+ },
+ "Maltic": {
+  "Trading Routes": [
+   "Coastal Trail",
+   "Maltic Coast",
+   "Maltic Plains",
+   "Ragni Plains",
+   "South Farmers Valley"
+  ]
+ },
+ "Maltic Coast": {
+  "Trading Routes": [
+   "Coastal Trail",
+   "Maltic",
+   "North Farmers Valley",
+   "South Farmers Valley"
+  ]
+ },
+ "Maltic Plains": {
+  "Trading Routes": [
+   "Emerald Trail",
+   "Maltic",
+   "Plains",
+   "Ragni East Suburbs",
+   "South Farmers Valley"
+  ]
+ },
+ "Mansion of Insanity": {
+  "Trading Routes": [
+   "Fortress North",
+   "Fortress South",
+   "Twisted Housing"
+  ]
+ },
+ "Mantis Nest": {
+  "Trading Routes": [
+   "Aldorei Valley Lower",
+   "Aldorei Valley West Entrance",
+   "Light Forest Canyon",
+   "Light Forest East Lower",
+   "Light Forest South Exit"
+  ]
+ },
+ "Maro Peaks": {
+  "Trading Routes": [
+   "Skiens Island",
+   "Tree Island"
+  ]
+ },
+ "Mesquis Tower": {
+  "Trading Routes": [
+   "Abandoned Manor",
+   "Cinfras Entrance",
+   "Kander Mines",
+   "Path to Cinfras"
+  ]
+ },
+ "Meteor Crater": {
+  "Trading Routes": [
+   "Iron Road",
+   "Sablestone Camp",
+   "Sunspark Camp"
+  ]
+ },
+ "Military Base": {
+  "Trading Routes": [
+   "Gylia Lake North East",
+   "Military Base Upper",
+   "Path To Military Base"
+  ]
+ },
+ "Military Base Lower": {
+  "Trading Routes": [
+   "Military Base Upper",
+   "Path To Ozoth's Spire Lower",
+   "Thanos Valley West"
+  ]
+ },
+ "Military Base Upper": {
+  "Trading Routes": [
+   "Military Base",
+   "Military Base Lower"
+  ]
+ },
+ "Mine Base Plains": {
+  "Trading Routes": [
+   "Detlas Savannah Transition",
+   "Mining Base Lower",
+   "Mining Base Upper",
+   "Plains Lake",
+   "Ternaves Plains Lower",
+   "The Silent Road"
+  ]
+ },
+ "Mining Base Lower": {
+  "Trading Routes": [
+   "Mine Base Plains",
+   "Mining Base Upper"
+  ]
+ },
+ "Mining Base Upper": {
+  "Trading Routes": [
+   "Abandoned Pass",
+   "Mine Base Plains",
+   "Mining Base Lower",
+   "Ternaves Plains Lower"
+  ]
+ },
+ "Molten Heights Portal": {
+  "Trading Routes": [
+   "Crater Descent",
+   "Lava Lake",
+   "Lava Lake Bridge",
+   "Molten Reach"
+  ]
+ },
+ "Molten Reach": {
+  "Trading Routes": [
+   "Angel Refuge",
+   "Molten Heights Portal"
+  ]
+ },
+ "Mountain Edge": {
+  "Trading Routes": [
+   "Cliff Side of the Lost"
+  ]
+ },
+ "Mountain Path": {
+  "Trading Routes": [
+   "Canyon Dropoff"
+  ]
+ },
+ "Mummy's Tomb": {
+  "Trading Routes": [
+   "Desert Upper"
+  ]
+ },
+ "Mushroom Hill": {
+  "Trading Routes": [
+   "Decayed Basin",
+   "Fallen Village",
+   "Heart of Decay",
+   "Jitak's Farm"
+  ]
+ },
+ "Nemract Cathedral": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Cathedral Harbour",
+   "Nemract Road",
+   "Nemract Town"
+  ]
+ },
+ "Nemract Plains East": {
+  "Trading Routes": [
+   "Detlas Trail West Plains",
+   "Nemract Road"
+  ]
+ },
+ "Nemract Plains West": {
+  "Trading Routes": [
+   "Arachnid Route",
+   "Nemract Quarry",
+   "Nemract Road",
+   "Nivla Woods Edge"
+  ]
+ },
+ "Nemract Quarry": {
+  "Trading Routes": [
+   "Nemract Plains West",
+   "Nemract Road",
+   "Plains Coast"
+  ]
+ },
+ "Nemract Road": {
+  "Trading Routes": [
+   "Ancient Nemract",
+   "Nemract Cathedral",
+   "Nemract Plains East",
+   "Nemract Plains West",
+   "Nemract Quarry",
+   "Nemract Town"
+  ]
+ },
+ "Nemract Town": {
+  "Trading Routes": [
+   "Nemract Cathedral",
+   "Nemract Road",
+   "Plains Coast",
+   "Rooster Island"
+  ]
+ },
+ "Nesaak Bridge Transition": {
+  "Trading Routes": [
+   "Great Bridge Nesaak",
+   "Nesaak Plains South West"
+  ]
+ },
+ "Nesaak Plains Lower North West": {
+  "Trading Routes": [
+   "Nesaak Plains Mid North West",
+   "Nesaak Plains North East",
+   "Nesaak Plains South West",
+   "Nesaak Plains Upper North West",
+   "Nesaak Village"
+  ]
+ },
+ "Nesaak Plains Mid North West": {
+  "Trading Routes": [
+   "Nesaak Plains Lower North West",
+   "Nesaak Plains Upper North West"
+  ]
+ },
+ "Nesaak Plains North East": {
+  "Trading Routes": [
+   "Bob's Tomb",
+   "Nesaak Plains Lower North West",
+   "Nesaak Plains Upper North West",
+   "Nesaak Transition",
+   "Nesaak Village"
+  ]
+ },
+ "Nesaak Plains South East": {
+  "Trading Routes": [
+   "Bob's Tomb",
+   "Nesaak Plains South West",
+   "Nesaak Village"
+  ]
+ },
+ "Nesaak Plains South West": {
+  "Trading Routes": [
+   "Icy Descent",
+   "Nesaak Bridge Transition",
+   "Nesaak Plains Lower North West",
+   "Nesaak Plains South East",
+   "Nesaak Village",
+   "Twain Lake"
+  ]
+ },
+ "Nesaak Plains Upper North West": {
+  "Trading Routes": [
+   "Elkurn",
+   "Nesaak Plains Lower North West",
+   "Nesaak Plains Mid North West",
+   "Nesaak Plains North East",
+   "Sanctuary Bridge"
+  ]
+ },
+ "Nesaak Transition": {
+  "Trading Routes": [
+   "Desolate Valley",
+   "Elkurn",
+   "Nesaak Plains North East",
+   "Nether Plains Lower"
+  ]
+ },
+ "Nesaak Village": {
+  "Trading Routes": [
+   "Bob's Tomb",
+   "Nesaak Plains Lower North West",
+   "Nesaak Plains North East",
+   "Nesaak Plains South East",
+   "Nesaak Plains South West"
+  ]
+ },
+ "Nether Gate": {
+  "Trading Routes": [
+   "Corrupted Road",
+   "Nether Plains Lower",
+   "Nether Plains Upper",
+   "Plains Lake"
+  ]
+ },
+ "Nether Plains Lower": {
+  "Trading Routes": [
+   "Desolate Valley",
+   "Elkurn",
+   "Nesaak Transition",
+   "Nether Gate"
+  ]
+ },
+ "Nether Plains Upper": {
+  "Trading Routes": [
+   "Corrupted Road",
+   "Detlas Close Suburbs",
+   "Detlas Far Suburbs",
+   "Detlas Suburbs",
+   "Nether Gate",
+   "Plains Lake"
+  ]
+ },
+ "Nexus of Light": {
+  "Trading Routes": [
+   "Azure Frontier"
+  ]
+ },
+ "Nivla Woods": {
+  "Trading Routes": [
+   "Nivla Woods Entrance",
+   "Nivla Woods Exit",
+   "Road to Time Valley",
+   "South Nivla Woods"
+  ]
+ },
+ "Nivla Woods Edge": {
+  "Trading Routes": [
+   "Detlas Far Suburbs",
+   "Nemract Plains West",
+   "Nivla Woods Exit",
+   "North Nivla Woods",
+   "Road to Elkurn"
+  ]
+ },
+ "Nivla Woods Entrance": {
+  "Trading Routes": [
+   "Emerald Trail",
+   "Nivla Woods",
+   "Plains",
+   "Road to Time Valley"
+  ]
+ },
+ "Nivla Woods Exit": {
+  "Trading Routes": [
+   "Nivla Woods",
+   "Nivla Woods Edge",
+   "North Nivla Woods",
+   "South Nivla Woods"
+  ]
+ },
+ "Nodguj Nation": {
+  "Trading Routes": [
+   "Dujgon Nation",
+   "Durum Isles Upper",
+   "Icy Island",
+   "Mage Island",
+   "Santa's Hideout",
+   "Skiens Island"
+  ]
+ },
+ "North Farmers Valley": {
+  "Trading Routes": [
+   "Maltic Coast",
+   "Plains Coast",
+   "South Farmers Valley"
+  ]
+ },
+ "North Nivla Woods": {
+  "Trading Routes": [
+   "Arachnid Route",
+   "Nivla Woods Edge",
+   "Nivla Woods Exit",
+   "Plains"
+  ]
+ },
+ "Old Coal Mine": {
+  "Trading Routes": [
+   "Kandon Ridge"
+  ]
+ },
+ "Old Crossroads North": {
+  "Trading Routes": [
+   "Fungal Grove",
+   "Lexdale",
+   "Old Crossroads South",
+   "Path to Talor"
+  ]
+ },
+ "Old Crossroads South": {
+  "Trading Routes": [
+   "Cinfras Outskirts",
+   "Dark Forest Village",
+   "Fungal Grove",
+   "Old Crossroads North",
+   "Path to Talor"
+  ]
+ },
+ "Olux": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Swamp Dark Forest Transition Mid",
+   "Swamp Dark Forest Transition Upper",
+   "Swamp Mountain Transition Upper"
+  ]
+ },
+ "Orc Battlegrounds": {
+  "Trading Routes": [
+   "Fortress South",
+   "Leadin Fortress"
+  ]
+ },
+ "Orc Lake": {
+  "Trading Routes": [
+   "Llevigar Plains East Lower",
+   "Llevigar Plains East Upper",
+   "Orc Road",
+   "Sablestone Camp",
+   "Sunspark Camp"
+  ]
+ },
+ "Orc Road": {
+  "Trading Routes": [
+   "Llevigar Farm Plains East",
+   "Llevigar Gate East",
+   "Loamsprout Camp",
+   "Orc Lake"
+  ]
+ },
+ "Otherworldly Monolith": {
+  "Trading Routes": [
+   "Azure Frontier",
+   "Path to Light"
+  ]
+ },
+ "Path to Ahmsord Lower": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Path to Ahmsord Upper",
+   "Sky Castle"
+  ]
+ },
+ "Path to Ahmsord Upper": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Kandon Ridge",
+   "Path to Ahmsord Lower"
+  ]
+ },
+ "Path to Cinfras": {
+  "Trading Routes": [
+   "Cinfras Entrance",
+   "Light Forest East Upper",
+   "Mesquis Tower"
+  ]
+ },
+ "Path to Light": {
+  "Trading Routes": [
+   "Azure Frontier",
+   "Otherworldly Monolith"
+  ]
+ },
+ "Path To Military Base": {
+  "Trading Routes": [
+   "Military Base",
+   "Thanos"
+  ]
+ },
+ "Path To Ozoth's Spire Lower": {
+  "Trading Routes": [
+   "Military Base Lower",
+   "Thanos"
+  ]
+ },
+ "Path To Ozoth's Spire Mid": {
+  "Trading Routes": [
+   "Canyon Walk Way",
+   "Path To Ozoth's Spire Upper"
+  ]
+ },
+ "Path To Ozoth's Spire Upper": {
+  "Trading Routes": [
+   "Bandit Cave Lower",
+   "Cinfras Thanos Transition",
+   "Path To Ozoth's Spire Mid",
+   "Path To Thanos"
+  ]
+ },
+ "Path to Talor": {
+  "Trading Routes": [
+   "Dark Forest Village",
+   "Entrance to Kander",
+   "Kander Mines",
+   "Old Crossroads North",
+   "Old Crossroads South",
+   "Viscera Pits East"
+  ]
+ },
+ "Path To Thanos": {
+  "Trading Routes": [
+   "Cinfras County Upper",
+   "Cinfras Thanos Transition",
+   "Path To Ozoth's Spire Upper",
+   "Thanos"
+  ]
+ },
+ "Path To The Arch": {
+  "Trading Routes": [
+   "Aldorei's Arch",
+   "Aldorei's North Exit",
+   "Ghostly Path"
+  ]
+ },
+ "Paths of Sludge": {
+  "Trading Routes": [
+   "Lutho",
+   "Toxic Drip"
+  ]
+ },
+ "Phinas Farm": {
+  "Trading Routes": [
+   "Lighthouse Plateau",
+   "Royal Gate"
+  ]
+ },
+ "Pigmen Ravines": {
+  "Trading Routes": [
+   "Abandoned Farm",
+   "Pigmen Ravines Entrance"
+  ]
+ },
+ "Pigmen Ravines Entrance": {
+  "Trading Routes": [
+   "Pigmen Ravines",
+   "Ragni",
+   "South Pigmen Ravines"
+  ]
+ },
+ "Pirate Town": {
+  "Trading Routes": [
+   "Bloody Beach",
+   "Lost Atoll",
+   "Volcano Upper",
+   "Zhight Island"
+  ]
+ },
+ "Plains": {
+  "Trading Routes": [
+   "Arachnid Route",
+   "Maltic Plains",
+   "Nivla Woods Entrance",
+   "North Nivla Woods",
+   "South Farmers Valley"
+  ]
+ },
+ "Plains Coast": {
+  "Trading Routes": [
+   "Nemract Quarry",
+   "Nemract Town",
+   "North Farmers Valley"
+  ]
+ },
+ "Plains Lake": {
+  "Trading Routes": [
+   "Desolate Valley",
+   "Mine Base Plains",
+   "Nether Gate",
+   "Nether Plains Upper"
+  ]
+ },
+ "Pre-Light Forest Transition": {
+  "Trading Routes": [
+   "Goblin Plains East",
+   "Leadin Fortress",
+   "Llevigar Farm",
+   "Quartz Mines North East"
+  ]
+ },
+ "Primal Fen": {
+  "Trading Routes": [
+   "Field of Life"
+  ]
+ },
+ "Quartz Mines North East": {
+  "Trading Routes": [
+   "Llevigar Farm",
+   "Pre-Light Forest Transition",
+   "Quartz Mines North West",
+   "Quartz Mines South East"
+  ]
+ },
+ "Quartz Mines North West": {
+  "Trading Routes": [
+   "Llevigar Farm",
+   "Loamsprout Camp",
+   "Quartz Mines North East",
+   "Quartz Mines South West"
+  ]
+ },
+ "Quartz Mines South East": {
+  "Trading Routes": [
+   "Quartz Mines North East",
+   "Quartz Mines South West"
+  ]
+ },
+ "Quartz Mines South West": {
+  "Trading Routes": [
+   "Llevigar",
+   "Quartz Mines North West",
+   "Quartz Mines South East"
+  ]
+ },
+ "Ragni": {
+  "Trading Routes": [
+   "Pigmen Ravines Entrance",
+   "Ragni Main Entrance",
+   "Ragni North Entrance"
+  ]
+ },
+ "Ragni East Suburbs": {
+  "Trading Routes": [
+   "Maltic Plains",
+   "Ragni Main Entrance",
+   "Ragni Plains"
+  ]
+ },
+ "Ragni Main Entrance": {
+  "Trading Routes": [
+   "Emerald Trail",
+   "Ragni",
+   "Ragni East Suburbs"
+  ]
+ },
+ "Ragni North Entrance": {
+  "Trading Routes": [
+   "Katoa Ranch",
+   "Ragni",
+   "Ragni North Suburbs"
+  ]
+ },
+ "Ragni North Suburbs": {
+  "Trading Routes": [
+   "Katoa Ranch",
+   "Ragni North Entrance",
+   "Ragni Plains"
+  ]
+ },
+ "Ragni Plains": {
+  "Trading Routes": [
+   "Coastal Trail",
+   "Maltic",
+   "Ragni East Suburbs",
+   "Ragni North Suburbs"
+  ]
+ },
+ "Raider's Base Lower": {
+  "Trading Routes": [
+   "Raider's Base Upper"
+  ]
+ },
+ "Raider's Base Upper": {
+  "Trading Routes": [
+   "Raider's Base Lower",
+   "Sky Island Ascent"
+  ]
+ },
+ "Ranol's Farm": {
+  "Trading Routes": [
+   "Cherry Blossom Forest",
+   "Eltom",
+   "Thesead Suburbs"
+  ]
+ },
+ "Regular Island": {
+  "Trading Routes": [
+   "Dead Island South East",
+   "Dujgon Nation",
+   "Icy Island",
+   "Jofash Docks"
+  ]
+ },
+ "Road to Elkurn": {
+  "Trading Routes": [
+   "Elkurn",
+   "Elkurn Fields",
+   "Nivla Woods Edge",
+   "South Nivla Woods"
+  ]
+ },
+ "Road To Light Forest": {
+  "Trading Routes": [
+   "Fleris Trail",
+   "Leadin Fortress",
+   "Light Forest Entrance"
+  ]
+ },
+ "Road To Mine": {
+  "Trading Routes": [
+   "Corkus City Mine",
+   "Corkus City South",
+   "Corkus Sea Cove"
+  ]
+ },
+ "Road to Time Valley": {
+  "Trading Routes": [
+   "Nivla Woods",
+   "Nivla Woods Entrance",
+   "South Nivla Woods"
+  ]
+ },
+ "Rodoroc": {
+  "Trading Routes": [
+   "Crater Descent",
+   "Entrance to Rodoroc"
+  ]
+ },
+ "Rooster Island": {
+  "Trading Routes": [
+   "Durum Isles Lower",
+   "Nemract Town",
+   "Selchar",
+   "The Bear Zoo"
+  ]
+ },
+ "Royal Gate": {
+  "Trading Routes": [
+   "Phinas Farm"
+  ]
+ },
+ "Ruined Houses": {
+  "Trading Routes": [
+   "Corkus Sea Port",
+   "Factory Entrance",
+   "Fallen Factory"
+  ]
+ },
+ "Rymek East Lower": {
+  "Trading Routes": [
+   "Rymek East Mid",
+   "Rymek West Lower"
+  ]
+ },
+ "Rymek East Mid": {
+  "Trading Routes": [
+   "Rymek East Lower",
+   "Rymek East Upper",
+   "Rymek West Mid"
+  ]
+ },
+ "Rymek East Upper": {
+  "Trading Routes": [
+   "Desert East Lower",
+   "Rymek East Mid",
+   "Rymek West Upper"
+  ]
+ },
+ "Rymek West Lower": {
+  "Trading Routes": [
+   "Rymek East Lower",
+   "Rymek West Mid"
+  ]
+ },
+ "Rymek West Mid": {
+  "Trading Routes": [
+   "Rymek East Mid",
+   "Rymek West Lower",
+   "Rymek West Upper"
+  ]
+ },
+ "Rymek West Upper": {
+  "Trading Routes": [
+   "Desert Lower",
+   "Desert West Lower",
+   "Rymek East Upper",
+   "Rymek West Mid"
+  ]
+ },
+ "Sablestone Camp": {
+  "Trading Routes": [
+   "Goblin Plains West",
+   "Loamsprout Camp",
+   "Meteor Crater",
+   "Orc Lake"
+  ]
+ },
+ "Sanctuary Bridge": {
+  "Trading Routes": [
+   "Nesaak Plains Upper North West",
+   "Time Valley"
+  ]
+ },
+ "Santa's Hideout": {
+  "Trading Routes": [
+   "Icy Island",
+   "Mage Island",
+   "Nodguj Nation"
+  ]
+ },
+ "Savannah East Lower": {
+  "Trading Routes": [
+   "Savannah East Upper",
+   "Savannah West Lower",
+   "Ternaves"
+  ]
+ },
+ "Savannah East Upper": {
+  "Trading Routes": [
+   "Almuj City",
+   "Savannah East Lower",
+   "Savannah West Upper"
+  ]
+ },
+ "Savannah West Lower": {
+  "Trading Routes": [
+   "Detlas Savannah Transition",
+   "Savannah East Lower",
+   "Savannah West Upper",
+   "Ternaves Plains Upper"
+  ]
+ },
+ "Savannah West Upper": {
+  "Trading Routes": [
+   "Bremminglar",
+   "Cathedral Harbour",
+   "Savannah East Upper",
+   "Savannah West Lower"
+  ]
+ },
+ "Selchar": {
+  "Trading Routes": [
+   "Durum Isles Center",
+   "Durum Isles Lower",
+   "Durum Isles Upper",
+   "Rooster Island",
+   "Skiens Island"
+  ]
+ },
+ "Sinister Forest": {
+  "Trading Routes": [
+   "Forest of Eyes",
+   "Lutho"
+  ]
+ },
+ "Skiens Island": {
+  "Trading Routes": [
+   "Dead Island South West",
+   "Maro Peaks",
+   "Nodguj Nation",
+   "Selchar"
+  ]
+ },
+ "Sky Castle": {
+  "Trading Routes": [
+   "Path to Ahmsord Lower"
+  ]
+ },
+ "Sky Falls": {
+  "Trading Routes": [
+   "Frozen Fort",
+   "Sky Island Ascent",
+   "Wybel Island"
+  ]
+ },
+ "Sky Island Ascent": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Central Islands",
+   "Jofash Tunnel",
+   "Raider's Base Upper",
+   "Sky Falls"
+  ]
+ },
+ "Snail Island": {
+  "Trading Routes": [
+   "Dragonling Nests",
+   "Temple Island"
+  ]
+ },
+ "South Farmers Valley": {
+  "Trading Routes": [
+   "Maltic",
+   "Maltic Coast",
+   "Maltic Plains",
+   "North Farmers Valley",
+   "Plains"
+  ]
+ },
+ "South Nivla Woods": {
+  "Trading Routes": [
+   "Elkurn Fields",
+   "Nivla Woods",
+   "Nivla Woods Exit",
+   "Road to Elkurn",
+   "Road to Time Valley"
+  ]
+ },
+ "South Pigmen Ravines": {
+  "Trading Routes": [
+   "City of Troms",
+   "Little Wood",
+   "Pigmen Ravines Entrance"
+  ]
+ },
+ "Southern Outpost": {
+  "Trading Routes": [
+   "Legendary Island",
+   "Lighthouse Plateau"
+  ]
+ },
+ "Sunspark Camp": {
+  "Trading Routes": [
+   "Llevigar Plains East Upper",
+   "Meteor Crater",
+   "Orc Lake",
+   "Swamp East Lower",
+   "Swamp Mountain Base"
+  ]
+ },
+ "Swamp Dark Forest Transition Lower": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Forgotten Path",
+   "Fortress North",
+   "Fortress South",
+   "Swamp Dark Forest Transition Mid",
+   "Swamp Lower"
+  ]
+ },
+ "Swamp Dark Forest Transition Mid": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Olux",
+   "Swamp Dark Forest Transition Lower",
+   "Swamp Dark Forest Transition Upper",
+   "Taproot Descent"
+  ]
+ },
+ "Swamp Dark Forest Transition Upper": {
+  "Trading Routes": [
+   "Olux",
+   "Swamp Dark Forest Transition Mid",
+   "Taproot Descent"
+  ]
+ },
+ "Swamp East Lower": {
+  "Trading Routes": [
+   "Llevigar Plains East Upper",
+   "Sunspark Camp",
+   "Swamp East Mid",
+   "Swamp West Lower"
+  ]
+ },
+ "Swamp East Mid": {
+  "Trading Routes": [
+   "Swamp East Lower",
+   "Swamp East Mid-Upper",
+   "Swamp Mountain Base",
+   "Swamp West Mid"
+  ]
+ },
+ "Swamp East Mid-Upper": {
+  "Trading Routes": [
+   "Swamp East Mid",
+   "Swamp East Upper",
+   "Swamp Plains Basin",
+   "Swamp West Mid-Upper"
+  ]
+ },
+ "Swamp East Upper": {
+  "Trading Routes": [
+   "Swamp East Mid-Upper",
+   "Swamp Mountain Transition Mid-Upper",
+   "Swamp Mountain Transition Upper",
+   "Swamp Plains Basin",
+   "Swamp West Upper"
+  ]
+ },
+ "Swamp Island": {
+  "Trading Routes": [
+   "Ahmsord Outskirts",
+   "Astraulus' Tower",
+   "Temple Island"
+  ]
+ },
+ "Swamp Lower": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Iron Road",
+   "Swamp Dark Forest Transition Lower",
+   "Swamp Mountain Base"
+  ]
+ },
+ "Swamp Mountain Base": {
+  "Trading Routes": [
+   "Sunspark Camp",
+   "Swamp East Mid",
+   "Swamp Lower",
+   "Swamp Plains Basin"
+  ]
+ },
+ "Swamp Mountain Transition Lower": {
+  "Trading Routes": [
+   "Swamp Mountain Transition Mid"
+  ]
+ },
+ "Swamp Mountain Transition Mid": {
+  "Trading Routes": [
+   "Swamp Mountain Transition Lower",
+   "Swamp Mountain Transition Mid-Upper",
+   "Swamp West Upper"
+  ]
+ },
+ "Swamp Mountain Transition Mid-Upper": {
+  "Trading Routes": [
+   "Swamp East Upper",
+   "Swamp Mountain Transition Mid",
+   "Swamp Mountain Transition Upper",
+   "Swamp West Upper"
+  ]
+ },
+ "Swamp Mountain Transition Upper": {
+  "Trading Routes": [
+   "Olux",
+   "Swamp East Upper",
+   "Swamp Mountain Transition Mid-Upper"
+  ]
+ },
+ "Swamp Plains Basin": {
+  "Trading Routes": [
+   "Entrance to Olux",
+   "Swamp East Mid-Upper",
+   "Swamp East Upper",
+   "Swamp Mountain Base"
+  ]
+ },
+ "Swamp West Lower": {
+  "Trading Routes": [
+   "Llevigar Plains West Upper",
+   "Swamp East Lower",
+   "Swamp West Mid"
+  ]
+ },
+ "Swamp West Mid": {
+  "Trading Routes": [
+   "Swamp East Mid",
+   "Swamp West Lower",
+   "Swamp West Mid-Upper"
+  ]
+ },
+ "Swamp West Mid-Upper": {
+  "Trading Routes": [
+   "Swamp East Mid-Upper",
+   "Swamp West Mid",
+   "Swamp West Upper"
+  ]
+ },
+ "Swamp West Upper": {
+  "Trading Routes": [
+   "Swamp East Upper",
+   "Swamp Mountain Transition Mid",
+   "Swamp Mountain Transition Mid-Upper",
+   "Swamp West Mid-Upper"
+  ]
+ },
+ "Taproot Descent": {
+  "Trading Routes": [
+   "Fortress North",
+   "Gelibord Castle",
+   "Gelibord Corrupted Farm",
+   "Swamp Dark Forest Transition Mid",
+   "Swamp Dark Forest Transition Upper"
+  ]
+ },
+ "Temple Island": {
+  "Trading Routes": [
+   "Ahmsord",
+   "Central Islands",
+   "Kandon Ridge",
+   "Snail Island",
+   "Swamp Island"
+  ]
+ },
+ "Temple of Legends": {
+  "Trading Routes": [
+   "City of Troms",
+   "Jungle Lake"
+  ]
+ },
+ "Temple of the Lost East": {
+  "Trading Routes": [
+   "Krolton's Cave",
+   "Valley of the Lost"
+  ]
+ },
+ "Ternaves": {
+  "Trading Routes": [
+   "Savannah East Lower",
+   "Ternaves Plains Lower",
+   "Ternaves Plains Upper"
+  ]
+ },
+ "Ternaves Plains Lower": {
+  "Trading Routes": [
+   "Abandoned Pass",
+   "Mine Base Plains",
+   "Mining Base Upper",
+   "Ternaves",
+   "Ternaves Plains Upper"
+  ]
+ },
+ "Ternaves Plains Upper": {
+  "Trading Routes": [
+   "Detlas Savannah Transition",
+   "Savannah West Lower",
+   "Ternaves",
+   "Ternaves Plains Lower"
+  ]
+ },
+ "Thanos": {
+  "Trading Routes": [
+   "Gylia Lake South East",
+   "Path To Military Base",
+   "Path To Ozoth's Spire Lower",
+   "Path To Thanos"
+  ]
+ },
+ "Thanos Exit": {
+  "Trading Routes": [
+   "Thanos Exit Upper"
+  ]
+ },
+ "Thanos Exit Upper": {
+  "Trading Routes": [
+   "Bandits Toll",
+   "Canyon High Path",
+   "Hive",
+   "Hive South",
+   "Thanos Exit"
+  ]
+ },
+ "Thanos Valley West": {
+  "Trading Routes": [
+   "Military Base Lower"
+  ]
+ },
+ "The Bear Zoo": {
+  "Trading Routes": [
+   "Rooster Island",
+   "Zhight Island"
+  ]
+ },
+ "The Broken Road": {
+  "Trading Routes": [
+   "The Silent Road",
+   "Worm Tunnel"
+  ]
+ },
+ "The Gate": {
+  "Trading Routes": [
+   "Bizarre Passage"
+  ]
+ },
+ "The Silent Road": {
+  "Trading Routes": [
+   "Mine Base Plains",
+   "The Broken Road"
+  ]
+ },
+ "Thesead": {
+  "Trading Routes": [
+   "Entrance to Thesead South",
+   "Thesead Suburbs"
+  ]
+ },
+ "Thesead Suburbs": {
+  "Trading Routes": [
+   "Chained House",
+   "Entrance to Rodoroc",
+   "Ranol's Farm",
+   "Thesead"
+  ]
+ },
+ "Time Valley": {
+  "Trading Routes": [
+   "Abandoned Farm",
+   "Elkurn Fields",
+   "Little Wood",
+   "Sanctuary Bridge"
+  ]
+ },
+ "Tower of Ascension": {
+  "Trading Routes": [
+   "Icy Descent"
+  ]
+ },
+ "Toxic Caves": {
+  "Trading Routes": [
+   "Toxic Drip"
+  ]
+ },
+ "Toxic Drip": {
+  "Trading Routes": [
+   "Gateway to Nothing",
+   "Paths of Sludge",
+   "Toxic Caves"
+  ]
+ },
+ "Tree Island": {
+  "Trading Routes": [
+   "Light Peninsula",
+   "Lost Atoll",
+   "Maro Peaks",
+   "Volcano Upper"
+  ]
+ },
+ "Twain Lake": {
+  "Trading Routes": [
+   "Nesaak Plains South West",
+   "Twain Mansion"
+  ]
+ },
+ "Twain Mansion": {
+  "Trading Routes": [
+   "Twain Lake"
+  ]
+ },
+ "Twisted Housing": {
+  "Trading Routes": [
+   "Efilim Village",
+   "Gelibord",
+   "Gelibord Corrupted Farm",
+   "Lone Farmstead",
+   "Mansion of Insanity"
+  ]
+ },
+ "Twisted Ridge": {
+  "Trading Routes": [
+   "Entrance to Kander",
+   "Lexdales Prison",
+   "Viscera Pits West"
+  ]
+ },
+ "Valley of the Lost": {
+  "Trading Routes": [
+   "Canyon Fortress",
+   "Canyon Of The Lost",
+   "Cliff Side of the Lost",
+   "Temple of the Lost East"
+  ]
+ },
+ "Viscera Pits East": {
+  "Trading Routes": [
+   "Lexdale",
+   "Path to Talor",
+   "Viscera Pits West"
+  ]
+ },
+ "Viscera Pits West": {
+  "Trading Routes": [
+   "Entrance to Kander",
+   "Lexdales Prison",
+   "Twisted Ridge",
+   "Viscera Pits East"
+  ]
+ },
+ "Void Valley": {
+  "Trading Routes": [
+   "Gateway to Nothing"
+  ]
+ },
+ "Volcanic Slope": {
+  "Trading Routes": [
+   "Active Volcano",
+   "Lava Lake"
+  ]
+ },
+ "Volcano Lower": {
+  "Trading Routes": [
+   "Bloody Beach",
+   "Light Peninsula",
+   "Llevigar Entrance",
+   "Volcano Upper"
+  ]
+ },
+ "Volcano Upper": {
+  "Trading Routes": [
+   "Light Peninsula",
+   "Lost Atoll",
+   "Pirate Town",
+   "Tree Island",
+   "Volcano Lower"
+  ]
+ },
+ "Wizard Tower North": {
+  "Trading Routes": [
+   "Bandits Toll",
+   "Krolton's Cave"
+  ]
+ },
+ "Worm Tunnel": {
+  "Trading Routes": [
+   "Grey Ruins",
+   "The Broken Road"
+  ]
+ },
+ "Wybel Island": {
+  "Trading Routes": [
+   "Ahmsord Outskirts",
+   "Central Islands",
+   "Sky Falls"
+  ]
+ },
+ "Zhight Island": {
+  "Trading Routes": [
+   "Legendary Island",
+   "Pirate Town",
+   "The Bear Zoo"
+  ]
+ }
+}

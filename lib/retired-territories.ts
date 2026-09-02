@@ -78,22 +78,5 @@ export function shouldRenderTerritory(
   return true;
 }
 
-/**
- * Returns true if a trade route between `source` and `dest` should be drawn.
- *
- * Both endpoints must:
- *  1. Exist in the current live territories (so stale verbose-JSON routes aren't drawn to empty space)
- *  2. Not be in RETIRED_TERRITORIES when in live mode
- *
- * In history mode this function is not called — trade routes are always shown for
- * territories that exist in the historical snapshot.
- */
-export function shouldRenderTradeRoute(
-  source: string,
-  dest: string,
-  liveTerritories: Record<string, unknown>,
-): boolean {
-  if (!liveTerritories[source] || !liveTerritories[dest]) return false;
-  if (RETIRED_TERRITORIES.has(source) || RETIRED_TERRITORIES.has(dest)) return false;
-  return true;
-}
+// (Trade-route endpoint filtering now lives in components/TradeRoutesOverlay.tsx,
+// anchored to the displayed territories and era-selected via lib/trade-routes.ts.)

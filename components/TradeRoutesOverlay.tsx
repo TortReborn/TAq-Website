@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { coordToPixel, Territory } from '@/lib/utils';
-import { shouldRenderTradeRoute } from '@/lib/retired-territories';
+import { RETIRED_TERRITORIES } from '@/lib/retired-territories';
+import { tradeRouteEraFor } from '@/lib/trade-routes';
 import { TerritoryVerboseData } from '@/lib/connection-calculator';
 
 interface TradeRoute {
@@ -12,22 +13,31 @@ interface TradeRoute {
 }
 
 interface TradeRoutesOverlayProps {
+  /** The territories currently displayed — live data, or the historical
+   *  snapshot in history mode. Route endpoints anchor to these, so a route
+   *  is only drawn between territories that exist on screen. */
   territories: Record<string, Territory>;
+  /** Preloaded present-day verbose data (seeds the graph cache). */
   verboseData?: Record<string, TerritoryVerboseData> | null;
+  /** History timestamp, or null/undefined for live view. Selects the route
+   *  era; before the trade-route epoch nothing renders. */
+  timestampMs?: number | null;
 }
 
-let verboseDataPromise: Promise<Record<string, TerritoryVerboseData>> | null = null;
+// One cached graph per era URL — eras never change once loaded.
+const graphCache = new Map<string, Promise<Record<string, TerritoryVerboseData>>>();
 
-const fetchVerboseData = (): Promise<Record<string, TerritoryVerboseData>> => {
-  if (!verboseDataPromise) {
-    verboseDataPromise = fetch('/territories_verbose.json?v=4').then((response) => {
+const fetchGraph = (url: string): Promise<Record<string, TerritoryVerboseData>> => {
+  let promise = graphCache.get(url);
+  if (!promise) {
+    promise = fetch(url).then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     });
-    // Reset on failure so a later mount can retry instead of reusing the rejection
-    verboseDataPromise.catch(() => { verboseDataPromise = null; });
+    promise.catch(() => { graphCache.delete(url); });
+    graphCache.set(url, promise);
   }
-  return verboseDataPromise;
+  return promise;
 };
 
 const centerPixel = (location: { start: [number, number]; end: [number, number] }): [number, number] =>
@@ -36,45 +46,51 @@ const centerPixel = (location: { start: [number, number]; end: [number, number] 
     (location.start[1] + location.end[1]) / 2,
   ]);
 
-const TradeRoutesOverlay = ({ territories, verboseData }: TradeRoutesOverlayProps) => {
-  const [fetchedData, setFetchedData] = useState<Record<string, TerritoryVerboseData> | null>(null);
+const TradeRoutesOverlay = ({ territories, verboseData, timestampMs }: TradeRoutesOverlayProps) => {
+  const isHistory = timestampMs !== null && timestampMs !== undefined;
+  const era = tradeRouteEraFor(isHistory ? timestampMs : null);
 
-  // Fallback: load verbose data directly if not provided via props
+  const [graph, setGraph] = useState<Record<string, TerritoryVerboseData> | null>(null);
+
   useEffect(() => {
-    if (verboseData) return;
+    if (!era) { setGraph(null); return; }
+    // The present-day graph may already be in memory via props
+    if (!isHistory && verboseData) { setGraph(verboseData); return; }
     let cancelled = false;
-    fetchVerboseData()
-      .then((data) => {
-        if (!cancelled) setFetchedData(data);
-      })
-      .catch((error) => console.error("Failed to fetch trade routes:", error));
-    return () => {
-      cancelled = true;
-    };
-  }, [verboseData]);
-
-  const territoriesData = verboseData ?? fetchedData;
+    fetchGraph(era.url)
+      .then((data) => { if (!cancelled) setGraph(data); })
+      .catch((error) => console.error('Failed to fetch trade routes:', error));
+    return () => { cancelled = true; };
+  }, [era, isHistory, verboseData]);
 
   const tradeRoutes = useMemo(() => {
-    if (!territoriesData) return [];
+    if (!era || !graph) return [];
 
     const routes: TradeRoute[] = [];
     // Avoid duplicate lines by only adding one for each pair, regardless of orientation
     const seenPairs = new Set<string>();
 
-    for (const territoryName in territoriesData) {
-      if (!shouldRenderTradeRoute(territoryName, territoryName, territories)) continue;
+    // A route renders only when both endpoints exist in the DISPLAYED
+    // territories — the historical snapshot in history mode, so routes
+    // appear and disappear as the map itself changes over time. Endpoint
+    // coordinates come from the displayed territory (works for retired
+    // territories, which the era graph may know but today's data doesn't).
+    const endpointRenderable = (name: string): boolean => {
+      if (!territories[name]?.location) return false;
+      if (!isHistory && RETIRED_TERRITORIES.has(name)) return false;
+      return true;
+    };
 
-      const territory = territoriesData[territoryName];
-      if (!territory["Trading Routes"]) continue;
+    for (const territoryName in graph) {
+      if (!endpointRenderable(territoryName)) continue;
 
-      const fromPixel = centerPixel(territory.Location);
+      const routePartners = graph[territoryName]['Trading Routes'];
+      if (!routePartners) continue;
 
-      territory["Trading Routes"].forEach(partnerName => {
-        if (!shouldRenderTradeRoute(territoryName, partnerName, territories)) return;
+      const fromPixel = centerPixel(territories[territoryName].location);
 
-        const partner = territoriesData[partnerName];
-        if (!partner) return;
+      routePartners.forEach(partnerName => {
+        if (!endpointRenderable(partnerName)) return;
 
         const pairKey = territoryName < partnerName
           ? `${territoryName}|${partnerName}`
@@ -82,12 +98,18 @@ const TradeRoutesOverlay = ({ territories, verboseData }: TradeRoutesOverlayProp
         if (seenPairs.has(pairKey)) return;
         seenPairs.add(pairKey);
 
-        routes.push({ key: pairKey, from: fromPixel, to: centerPixel(partner.Location) });
+        routes.push({
+          key: pairKey,
+          from: fromPixel,
+          to: centerPixel(territories[partnerName].location),
+        });
       });
     }
 
     return routes;
-  }, [territoriesData, territories]);
+  }, [era, graph, territories, isHistory]);
+
+  if (tradeRoutes.length === 0) return null;
 
   return (
     <svg
