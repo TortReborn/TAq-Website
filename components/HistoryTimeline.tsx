@@ -61,8 +61,8 @@ export interface SeasonZoom {
   start: Date;
   end: Date;
   label: string;
-  /** What the zoom window represents — an event zoom is not a season selection */
-  kind?: 'season' | 'event';
+  /** What the zoom window represents — event/wheel zooms are not season selections */
+  kind?: 'season' | 'event' | 'wheel';
 }
 
 /** Chronicle event surfaced as a timeline marker */
@@ -118,6 +118,7 @@ function HistoryTimeline({
   allianceSpans,
 }: HistoryTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const hitboxRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
   const [hoverPos, setHoverPos] = useState(0); // X position (horizontal) or Y position (vertical)
@@ -346,6 +347,53 @@ function HistoryTimeline({
     if (!hoverDate || !seasons || seasons.length === 0) return null;
     return seasonAtDate(seasons, hoverDate);
   }, [hoverDate, seasons]);
+
+  // ── Wheel zoom ───────────────────────────────────────────────────────
+  // Scrolling over the track zooms the visible range around the cursor:
+  // zoom in down to a one-month window, zoom out until the full timeline
+  // (where the zoom state clears entirely). Attached as a NATIVE non-passive
+  // listener — React registers wheel handlers as passive, so preventDefault
+  // (needed to keep the page/map from also reacting) wouldn't work via JSX.
+  const MIN_WHEEL_SPAN_MS = 30 * 24 * 3600 * 1000; // one month
+  useEffect(() => {
+    const el = hitboxRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const track = trackRef.current;
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      const padding = 12;
+      const pos = vertical ? e.clientY - rect.top : e.clientX - rect.left;
+      const trackSize = vertical ? rect.height : rect.width;
+      const usable = trackSize - padding * 2;
+      const frac = usable > 0 ? Math.max(0, Math.min(1, (pos - padding) / usable)) : 0.5;
+
+      const viewStart = earliest.getTime();
+      const span = latest.getTime() - viewStart;
+      const fullStart = earliestProp.getTime();
+      const fullEnd = latestProp.getTime();
+      const fullSpan = fullEnd - fullStart;
+      if (fullSpan <= 0) return;
+
+      // Small trackpad deltas zoom gently, a mouse tick (±100) ~16% per notch
+      const factor = Math.pow(1.0015, e.deltaY);
+      const newSpan = Math.min(fullSpan, Math.max(MIN_WHEEL_SPAN_MS, span * factor));
+      if (newSpan >= fullSpan) {
+        setSeasonZoom(null);
+        return;
+      }
+      // Keep the moment under the cursor stationary while the span changes
+      const anchor = viewStart + frac * span;
+      const newStart = Math.max(fullStart, Math.min(anchor - frac * newSpan, fullEnd - newSpan));
+      const start = new Date(newStart);
+      const end = new Date(newStart + newSpan);
+      setSeasonZoom({ start, end, label: `${formatDate(start)} – ${formatDate(end)}`, kind: 'wheel' });
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [vertical, earliest, latest, earliestProp, latestProp, setSeasonZoom, MIN_WHEEL_SPAN_MS]);
 
   // Jump the scrubber to a season boundary (clamped to bounds + snapped), skipping no-data gaps
   const jumpToDate = useCallback((date: Date) => {
@@ -671,7 +719,8 @@ function HistoryTimeline({
   // shared wrapper.
 
   const seasonRibbon = (isVert: boolean) => {
-    if (seasonRegions.length === 0) return null;
+    // Rendered even when no season period is visible (e.g. wheel-zoomed into
+    // the pre-season era) — the bare gray strip keeps the layout consistent.
     const OFF_HATCH = 'repeating-linear-gradient(45deg, rgba(140,140,140,0.30) 0 4px, rgba(140,140,140,0.08) 4px 8px)';
 
     // Segments use the same thumb-padded positioning as the loaded bar below;
@@ -843,6 +892,7 @@ function HistoryTimeline({
         }}>
           {/* Season ribbon + vertical track — one shared hitbox */}
           <div
+            ref={hitboxRef}
             data-timeline-track
             onMouseDown={handleMouseDown}
             onMouseMove={handleTrackHover}
@@ -989,6 +1039,7 @@ function HistoryTimeline({
       {/* Season ribbon + timeline track — one shared hitbox: left-click scrubs,
           right-click zooms to the season under the cursor */}
       <div
+        ref={hitboxRef}
         data-timeline-track
         onMouseDown={handleMouseDown}
         onMouseMove={handleTrackHover}
