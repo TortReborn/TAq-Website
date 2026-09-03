@@ -271,7 +271,15 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   // tiny and server-cached for 1h, and fetching it up front takes one request
   // out of the already-busy moment when the user switches to the history tab.
   const seasons = useSeasons(true);
-  const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(null);
+  // Deep-linked start time (?t=YYYY-MM-DD, used by Chronicles timeline links):
+  // seed the history scrubber at UTC noon of that day, once, on mount.
+  const [historyTimestamp, setHistoryTimestamp] = useState<Date | null>(() => {
+    if (typeof window === 'undefined' || initialMode !== 'history') return null;
+    const t = new URLSearchParams(window.location.search).get('t');
+    if (!t || !/^\d{4}-\d{2}-\d{2}$/.test(t)) return null;
+    const ms = Date.parse(`${t}T12:00:00Z`);
+    return isNaN(ms) ? null : new Date(ms);
+  });
 
   // First-visit tour of the history view's controls (replayable via ? button)
   const tour = useOnboardingTour(viewMode === 'history', MAP_TOUR_STEPS, 'map_history_tour_complete');
