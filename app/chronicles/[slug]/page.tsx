@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getPool } from '@/lib/db';
 import { getWikiPage, wikiBacklinks, resolveWikiSlugs, listWikiRevisions } from '@/lib/wiki-db';
+import { resolveWikiEmbeds } from '@/lib/wiki-embed-db';
 import { extractWikiLinks } from '@/lib/wiki';
 import WikiArticleView from '@/components/WikiArticleView';
 
@@ -28,10 +29,11 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
     ...extractWikiLinks(page.body),
     ...page.infobox.flatMap(row => extractWikiLinks(row.value)),
   ];
-  const [backlinks, existing, revisions] = await Promise.all([
+  const [backlinks, existing, revisions, embeds] = await Promise.all([
     wikiBacklinks(pool, page.slug),
     resolveWikiSlugs(pool, linkTargets),
     listWikiRevisions(pool, page.id),
+    resolveWikiEmbeds(pool, page.body),
   ]);
   const last = revisions[0] ?? null;
 
@@ -40,6 +42,7 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
       page={page}
       backlinks={backlinks}
       existingSlugs={[...existing]}
+      embeds={embeds}
       redirectedFrom={redirectedFrom}
       lastEditor={last ? { name: last.authorName, note: last.note } : null}
     />

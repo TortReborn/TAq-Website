@@ -761,11 +761,18 @@ export default function ChroniclePanel({
               <span style={{ whiteSpace: 'nowrap' }}>{fmtDate(m.joinedAt)} → {fmtDate(m.leftAt)}</span>
             </div>
           ))}
-          {authenticated && (
-            <button type="button" style={{ ...smallBtn, marginTop: '0.4rem' }} onClick={() => editAlliance(a)}>
-              <Pencil size={11} /> Suggest edit
-            </button>
-          )}
+          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', marginTop: '0.4rem' }}>
+            {authenticated && (
+              <button type="button" style={smallBtn} onClick={() => editAlliance(a)}>
+                <Pencil size={11} /> Suggest edit
+              </button>
+            )}
+            {a.wikiSlug && (
+              <a href={`/chronicles/${a.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
+                Wiki article →
+              </a>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -808,6 +815,11 @@ export default function ChroniclePanel({
               <button type="button" style={smallBtn} onClick={() => editEvent(e)}>
                 <Pencil size={11} /> Suggest edit
               </button>
+            )}
+            {e.wikiSlug && (
+              <a href={`/chronicles/${e.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none', alignSelf: 'center' }}>
+                Wiki article →
+              </a>
             )}
           </div>
         </div>

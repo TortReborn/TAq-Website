@@ -129,6 +129,14 @@ export default function WikiEditor({
     ['Quote', () => insertSnippet('\n> ', '\n')],
   ];
 
+  // Live-data embeds: block directives, resolved when the article renders.
+  // The editor preview shows a placeholder card in their place.
+  const embedSnippets: Array<[string, string]> = [
+    ['Alliance card', '\n{{alliance:Alliance Name}}\n'],
+    ['War chart', '\n{{war-chart:Guild A|Guild B|2020-01-01|2020-06-01}}\n'],
+    ['Map link', '\n{{map:2020-01-01|The map when it began}}\n'],
+  ];
+
   if (suggested) {
     return (
       <div style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
@@ -241,6 +249,18 @@ export default function WikiEditor({
               {label}
             </button>
           ))}
+          <select
+            value=""
+            onChange={(e) => {
+              const snippet = embedSnippets.find(([label]) => label === e.target.value)?.[1];
+              if (snippet) insertSnippet(snippet, '');
+            }}
+            style={{ ...inputStyle, width: 'auto', padding: '0 0.4rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, height: 'auto' }}
+            aria-label="Insert live-data embed"
+          >
+            <option value="" disabled>Embed…</option>
+            {embedSnippets.map(([label]) => <option key={label} value={label}>{label}</option>)}
+          </select>
         </div>
         <div style={{ display: 'flex', gap: '0.3rem' }}>
           <label style={{ ...inputStyle, width: 'auto', padding: '0.25rem 0.55rem', cursor: uploading ? 'wait' : 'pointer', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>

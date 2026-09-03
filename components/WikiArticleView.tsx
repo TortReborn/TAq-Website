@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Pencil, History, Link2 } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
 import { WikiPage, WikiPageSummary, WIKI_TYPE_LABELS, extractToc } from "@/lib/wiki";
+import { WikiEmbedMap } from "@/lib/wiki-embeds";
 import { useExecSession } from "@/hooks/useExecSession";
 
 /**
@@ -21,12 +22,14 @@ export default function WikiArticleView({
   page,
   backlinks,
   existingSlugs,
+  embeds,
   redirectedFrom,
   lastEditor,
 }: {
   page: WikiPage;
   backlinks: WikiPageSummary[];
   existingSlugs: string[];
+  embeds?: WikiEmbedMap;
   redirectedFrom?: string;
   lastEditor?: { name: string; note: string } | null;
 }) {
@@ -163,7 +166,7 @@ export default function WikiArticleView({
             </p>
           )}
 
-          <WikiMarkdown body={page.body} existingSlugs={existingSlugs} />
+          <WikiMarkdown body={page.body} existingSlugs={existingSlugs} embeds={embeds} />
 
           {/* Footer: what links here + page info */}
           <footer style={{ marginTop: '2rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>

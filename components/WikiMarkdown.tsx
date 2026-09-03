@@ -5,6 +5,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { headingAnchor, slugify } from "@/lib/wiki";
+import { splitWikiBody, WikiEmbedMap } from "@/lib/wiki-embeds";
+import WikiEmbed from "./WikiEmbeds";
 
 /**
  * Chronicles Wiki markdown renderer.
@@ -94,17 +96,24 @@ const sanitizeSchema = {
 function WikiMarkdown({
   body,
   existingSlugs,
+  embeds,
 }: {
   body: string;
   /** Slugs known to exist — wiki links outside this set render as red links */
   existingSlugs?: string[];
+  /**
+   * Resolved {{...}} embed data keyed by directive line (see wiki-embed-db).
+   * When absent, directives render as placeholder cards (editor preview).
+   */
+  embeds?: WikiEmbedMap;
 }) {
   const existing = useMemo(() => new Set(existingSlugs ?? []), [existingSlugs]);
   const knowsExistence = existingSlugs !== undefined;
+  const segments = useMemo(() => splitWikiBody(body), [body]);
 
-  return (
-    <div className="wiki-body">
-      <ReactMarkdown
+  const renderMd = (text: string, key: number) => (
+    <ReactMarkdown
+        key={key}
         remarkPlugins={[remarkGfm, remarkWikiLinks]}
         rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
         components={{
@@ -161,8 +170,17 @@ function WikiMarkdown({
           ),
         }}
       >
-        {body}
+        {text}
       </ReactMarkdown>
+  );
+
+  return (
+    <div className="wiki-body">
+      {segments.map((seg, i) =>
+        seg.type === 'md'
+          ? renderMd(seg.text, i)
+          : <WikiEmbed key={i} directive={seg.directive} data={embeds?.[seg.directive.raw]} />
+      )}
       <style jsx global>{`
         .wiki-body { font-size: 0.92rem; line-height: 1.65; color: var(--text-primary); }
         .wiki-body h2 { font-size: 1.35rem; font-weight: 700; margin: 1.5rem 0 0.5rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border-color); scroll-margin-top: 5rem; }
