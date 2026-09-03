@@ -99,7 +99,8 @@ export const CHRONICLE_LIMITS = {
   titleMax: 80,
   descriptionMax: 1000,
   noteMax: 300,
-  membershipsMax: 40,
+  // The Federation (2018) alone had 37-40 member guilds plus churn stints
+  membershipsMax: 60,
   eventGuildsMax: 16,
   eventAlliancesMax: 8,
   /** Pending submissions allowed per user at once */

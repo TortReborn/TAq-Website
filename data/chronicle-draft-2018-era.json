@@ -1,0 +1,258 @@
+{
+  "$comment": "2018-era chronicle change set from the Federation/Aesir/SOL research round. Primary sources: 'Federation Tribute' by founder Drew1011 (forums thread 237070, Nov 13 2018, full 37-guild roster + exact dates), 'The Aesir Pact' thread 227373, 'R.i.p Fed' thread 236962 (collapse sequence), the community guild-timeline image (imgur seklYAQ, Apr 2020, via thread 265297), Drew1011's forum title-chain, and territory_exchanges analysis. Rename chains verified in activity data: LE Flowers->DiamondDeities, DogsAmongUs->White Lotus, As Darkness Falls->Constellations. Provenance tags: [attested], [image]=community timeline image, [map].",
+  "generated": "2026-09-02",
+  "alliances": [
+    {
+      "payload": {
+        "name": "Aesir Pact",
+        "tag": "Aesir",
+        "color": "#5c6bc0",
+        "kind": "community",
+        "description": "A pact of sister guilds inside the Federation, 'especially dedicated to Gavel, and the birth place of Aesir, the canyon.' Created 25 Mar 2018 by Fantasy, Sins of Seedia and IceBlue Team (leaders Viaire, simplyinfinity_ and Vmark03 among others); DiamondDeities was accepted on 18 Jul 2018. Its guilds were the Federation's last defenders — they quit after 14 hours of constant warring as the Federation fell on 10-11 Nov 2018, and Aesir died with it.",
+        "memberships": [
+          { "guild": "Fantasy", "joinedAt": "2018-03-25", "leftAt": "2018-11-11" },
+          { "guild": "Sins of Seedia", "joinedAt": "2018-03-25", "leftAt": "2018-11-11" },
+          { "guild": "IceBlue Team", "joinedAt": "2018-03-25", "leftAt": "2018-11-11" },
+          { "guild": "DiamondDeities", "joinedAt": "2018-07-18", "leftAt": "2018-11-11" }
+        ]
+      },
+      "notes": [
+        "[attested] Roster + purpose: 'The Aesir Pact' (lotuss, thread 227373, Jun 5 2018; DDT accepted Jul 18 2018). Founding date 25 Mar 2018 from the Timeline doc ('created by Viaire and simplyinfinity_') and the community timeline image.",
+        "[attested] End: 'the Aesir guilds (SDU, DDT, IBT) quit' after 14h of war as Fed fell (R.i.p Fed thread, Nov 11 2018); [image] 'At this point Aesir died too'.",
+        "Kind=community: a sister-guild pact within the Federation, not an independent war bloc — entering it as war would wrongly override Federation map colors.",
+        "Oddity preserved: Fantasy was an Aesir founder yet waged war on the Federation May-Oct 2018 (map-attested). The pact evidently survived Fantasy's Federation exit; not resolved by any source."
+      ]
+    },
+    {
+      "payload": {
+        "name": "SOL",
+        "tag": "SOL",
+        "color": "#ff8f00",
+        "kind": "war",
+        "description": "The war alliance born from the Federation's ashes: created in the post-collapse chaos of late 2018 ('SOL was created at this time'), it became the power Luna was explicitly formed to counter on 14 Feb 2019. Still attested as a current bloc in June 2019 ('the current SOL and Luna guilds'), then vanishes from the record as Luna consolidated the map.",
+        "memberships": [
+          { "guild": "Beyond the Scene", "joinedAt": "2018-12-01", "leftAt": "2019-06-26" },
+          { "guild": "Achte Shadow", "joinedAt": "2018-12-01", "leftAt": "2019-06-26" },
+          { "guild": "DiamondDeities", "joinedAt": "2018-12-01", "leftAt": "2019-06-26" },
+          { "guild": "Wrath Of Poseidon", "joinedAt": "2018-12-01", "leftAt": "2019-06-26" },
+          { "guild": "Spectral Cabbage", "joinedAt": "2018-12-01", "leftAt": "2019-06-26" },
+          { "guild": "Ecliptic Awakening", "joinedAt": "2019-01-27", "leftAt": "2019-06-26" }
+        ]
+      },
+      "notes": [
+        "[attested] Name + era: Timeline doc ('Luna is formed as an alliance to counter SOL', Feb 14 2019); Pikacal, thread 251543, Jun 26 2019 ('the current SOL and Luna guilds'); [image] 'SOL was created at this time' (after the Nov 10 2018 Fed fall).",
+        "ROSTER IS MAP-INFERRED (no written roster exists anywhere): these six fought Luna's founders from its founding across quiet territories (Beyond the Scene 3,984 quiet exchanges) while showing near-zero fighting among themselves. Treat as medium confidence; the Goose precedent shows inferred rosters can be wrong.",
+        "Joins approximated to 2018-12-01 (creation window); Ecliptic Awakening from its first map activity (2019-01-27). End 2019-06-26 = last attestation, not a recorded dissolution.",
+        "DiamondDeities' membership is consistent with the Treaty of Rodoroc (Fox-DDT peace, effective Mar 2 2019) and its late-2018 'share Molten Heights' deal with Fox [image]."
+      ]
+    }
+  ],
+  "allianceEdits": [
+    {
+      "targetId": 5,
+      "editSummary": "Federation: founder's full 37-guild roster, Feb 16 founding, Nov 10 death",
+      "payload": {
+        "name": "Federation",
+        "tag": "Fed",
+        "color": "#1e88e5",
+        "kind": "war",
+        "description": "The dominant alliance of 2018, founded ~16 Feb 2018 when Alliance Alliance split from the Coalition and the Coalition remnant merged with War Syndicate against them. It wiped HackForums' 111 territories in under 12 hours on 19 Feb, held the entire map for 8 months and 25 days (with a ~3-day interruption in March), grew to 37-40 member guilds, and died by internal collapse: one guild left at 3 AM EST on 10 Nov 2018 and the rest cascaded out within a day. Founder and unofficial leader: Drew1011.",
+        "memberships": [
+          { "guild": "Titans Valor", "joinedAt": "2018-02-16", "leftAt": "2018-05-05" },
+          { "guild": "Titans Valor", "joinedAt": "2018-06-14", "leftAt": "2018-07-23" },
+          { "guild": "Titans Valor", "joinedAt": "2018-09-20", "leftAt": "2018-11-10" },
+          { "guild": "Paladins United", "joinedAt": "2018-03-20", "leftAt": "2018-06-25" },
+          { "guild": "Paladins United", "joinedAt": "2018-08-23", "leftAt": "2018-11-10" },
+          { "guild": "KingdomPhoenixes", "joinedAt": "2018-02-16", "leftAt": "2018-06-25" },
+          { "guild": "Angels Of Eternal", "joinedAt": "2018-02-16", "leftAt": "2018-07-23" },
+          { "guild": "Kasai Shinrai", "joinedAt": "2018-02-16", "leftAt": "2018-09-01" },
+          { "guild": "Metric", "joinedAt": "2018-02-16", "leftAt": "2018-09-04" },
+          { "guild": "The Hive", "joinedAt": "2018-02-16", "leftAt": "2018-10-27" },
+          { "guild": "Fantasy", "joinedAt": "2018-03-20", "leftAt": "2018-05-28" },
+          { "guild": "Fantasy", "joinedAt": "2018-10-29", "leftAt": "2018-11-10" },
+          { "guild": "TheNoLifes", "joinedAt": "2018-05-05", "leftAt": "2018-11-10" },
+          { "guild": "Lunatic", "joinedAt": "2018-05-09", "leftAt": "2018-09-01" },
+          { "guild": "Verinian Trials", "joinedAt": "2018-06-25", "leftAt": "2018-11-10" },
+          { "guild": "Ex Nihilo", "joinedAt": "2018-06-30", "leftAt": "2018-11-10" },
+          { "guild": "Renegade", "joinedAt": "2018-07-08", "leftAt": "2018-09-30" },
+          { "guild": "Aphelion", "joinedAt": "2018-07-23", "leftAt": "2018-10-20" },
+          { "guild": "Arisen", "joinedAt": "2018-08-29", "leftAt": "2018-11-10" },
+          { "guild": "Odysseia", "joinedAt": "2018-08-25", "leftAt": "2018-10-29" },
+          { "guild": "Nethers Ascent", "joinedAt": "2018-09-04", "leftAt": "2018-11-10" },
+          { "guild": "Minerva", "joinedAt": "2018-10-27", "leftAt": "2018-11-10" },
+          { "guild": "Kingdom Foxes", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "Imperial", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "Emorians", "joinedAt": "2018-03-20", "leftAt": "2018-11-10" },
+          { "guild": "Sins of Seedia", "joinedAt": "2018-02-16", "leftAt": "2018-11-11" },
+          { "guild": "LE Flowers", "joinedAt": "2018-02-16", "leftAt": "2018-03-15" },
+          { "guild": "DiamondDeities", "joinedAt": "2018-04-13", "leftAt": "2018-11-11" },
+          { "guild": "Holders Of LE", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "Serpentem Empire", "joinedAt": "2018-02-16", "leftAt": "2018-03-13" },
+          { "guild": "Immortalish", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "TheEnchanted", "joinedAt": "2018-02-16", "leftAt": "2018-10-24" },
+          { "guild": "BuildCraftia", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "Deimos", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "The Divine Swords", "joinedAt": "2018-02-16", "leftAt": "2018-11-10" },
+          { "guild": "DogsAmongUs", "joinedAt": "2018-02-16", "leftAt": "2018-08-06" },
+          { "guild": "White Lotus", "joinedAt": "2018-08-03", "leftAt": "2018-11-10" },
+          { "guild": "Hall of Fame", "joinedAt": "2018-02-16", "leftAt": "2018-09-30" },
+          { "guild": "IceBlue Team", "joinedAt": "2018-02-16", "leftAt": "2018-11-11" },
+          { "guild": "Illustratus", "joinedAt": "2018-02-19", "leftAt": "2018-11-10" },
+          { "guild": "As Darkness Falls", "joinedAt": "2018-02-16", "leftAt": "2018-04-23" },
+          { "guild": "Constellations", "joinedAt": "2018-04-24", "leftAt": "2018-11-10" },
+          { "guild": "Angelic", "joinedAt": "2018-03-16", "leftAt": "2018-05-07" }
+        ]
+      },
+      "notes": [
+        "[attested] Roster: the 37 guilds named in 'Federation Tribute' (Drew1011, thread 237070, Nov 13 2018). Founding ~Feb 16 2018: tribute's '8 months and 25 days' back from Nov 10, matching the community timeline image ('On Feb 16th 2018 AA left coa... which lead to the creation of Fed'). Death 10 Nov 2018 ~3 AM EST (tribute).",
+        "[attested] Collapse cascade (R.i.p Fed thread): The Hive left ~a month prior, then Odysseia, then Imperial ('for independence, which snowballed into a major attack together with the enemy alliance'), then Arisen, then the Aesir guilds (SDU, DDT, IBT) after 14 hours of constant warring.",
+        "Individual join dates for the cumulative roster are unrecorded — new members carry the 2018-02-16 founding date (or their guild's first map activity where later: Illustratus created Feb 19, Angelic Mar 16, DiamondDeities Apr 13). Ex-AA guilds (PUN, Fantasy, Emorians) join 2018-03-20, when the Coalition Civil War ended and AA was absorbed.",
+        "Rename chains entered as separate stints, verified by abutting activity windows: LE Flowers -> DiamondDeities (Mar/Apr 2018), DogsAmongUs -> White Lotus (Aug 2018), As Darkness Falls -> Constellations (Apr 2018).",
+        "'Death Reapers' from the tribute roster is NOT entered — no such guild resolves in guild_prefixes.",
+        "[map] End-date note: several new intra-bloc wars ignited Nov 1 (previous end estimate); the tribute's Nov 10 is authoritative — the Nov 1-9 fighting was the pre-collapse fraying.",
+        "Genealogy dispute preserved: Lego_DW (2020): 'Coa and WS merged... this was a creation of fed'; Slayne (2018): 'I created Fed because I (along with some others) created Double AA.'"
+      ]
+    },
+    {
+      "targetId": 3,
+      "editSummary": "Coalition: end moved to the Feb 16 split/merger into the Federation",
+      "payload": {
+        "name": "Coalition",
+        "tag": "Coa",
+        "color": "#e53935",
+        "kind": "war",
+        "description": "Founded in October 2017 by Kingdom Foxes, KingdomPhoenixes, Gilded Sparrows and House of Sentinels. Took control of the Wynn Province on 23 Nov 2017, wiped War Syndicate on Christmas Day and gained full map dominance. On 16-17 Feb 2018 five member guilds split off as Alliance Alliance over map disputes, starting the Coalition Civil War — and the Coalition remnant merged with War Syndicate's remains into the new Federation, ending the Coalition as an entity.",
+        "memberships": [
+          { "guild": "Kingdom Foxes", "joinedAt": "2018-01-01", "leftAt": "2018-02-16" },
+          { "guild": "KingdomPhoenixes", "joinedAt": "2018-01-01", "leftAt": "2018-02-16" },
+          { "guild": "Gilded Sparrows", "joinedAt": "2018-01-01", "leftAt": "2018-02-16" },
+          { "guild": "House of Sentinels", "joinedAt": "2018-01-01", "leftAt": "2018-02-17" },
+          { "guild": "HackForums", "joinedAt": "2018-01-01", "leftAt": "2018-02-17" },
+          { "guild": "Paladins United", "joinedAt": "2018-01-01", "leftAt": "2018-02-17" },
+          { "guild": "Emorians", "joinedAt": "2018-01-01", "leftAt": "2018-02-17" },
+          { "guild": "Kangronomicon", "joinedAt": "2018-01-01", "leftAt": "2018-02-17" }
+        ]
+      },
+      "notes": [
+        "Founded ?? Oct 2017 — before the chronicle window; joins clamped to 2018-01-01.",
+        "[image+attested] End corrected from 2018-03-20 to 2018-02-16: the AA split (image: Feb 16; Timeline doc: Feb 17) triggered the Coa+WS merger that created the Federation (Lego_DW, thread 265297, Apr 2020). The civil war itself ran to 20 Mar 2018.",
+        "[attested] 'They wiped ws off the map on Christmas day' (IceResistance, thread 265297) — matching the doc's Dec 25 2017 Gavel conquest.",
+        "Roster beyond the founders remains inferred from the documented Feb 17 departures."
+      ]
+    },
+    {
+      "targetId": 7,
+      "editSummary": "Terra: end extended to its attested Nov 2 2019 fall",
+      "payload": {
+        "name": "Terra",
+        "tag": "Terra",
+        "color": "#8d6e63",
+        "kind": "war",
+        "description": "Formed on 30 Aug 2019 in opposition to Luna; took the map from Luna on 8 Sep 2019 after The Simple Ones defected to it. Its core founded the Council of Canyon Kingdoms on 15 Sep, and Terra itself fell on 2 Nov 2019 — its fragments launching a final raid on the newborn Artemis on 10 Nov.",
+        "memberships": [
+          { "guild": "The Simple Ones", "joinedAt": "2019-09-08", "leftAt": "2019-09-15" },
+          { "guild": "TheNoLifes", "joinedAt": "2019-08-30", "leftAt": "2019-09-15" },
+          { "guild": "Lunatic", "joinedAt": "2019-08-30", "leftAt": "2019-11-02" },
+          { "guild": "IceBlue Team", "joinedAt": "2019-08-30", "leftAt": "2019-11-02" },
+          { "guild": "Paladins United", "joinedAt": "2019-08-30", "leftAt": "2019-10-30" },
+          { "guild": "Fantasy", "joinedAt": "2019-08-30", "leftAt": "2019-09-15" },
+          { "guild": "Achte Shadow", "joinedAt": "2019-08-30", "leftAt": "2019-11-02" },
+          { "guild": "FinalFront", "joinedAt": "2019-08-30", "leftAt": "2019-11-02" },
+          { "guild": "BlueStoneGroup", "joinedAt": "2019-08-30", "leftAt": "2019-10-11" },
+          { "guild": "Titans Valor", "joinedAt": "2019-08-30", "leftAt": "2019-09-15" },
+          { "guild": "Phantom Hearts", "joinedAt": "2019-08-30", "leftAt": "2019-09-15" },
+          { "guild": "DiamondDeities", "joinedAt": "2019-08-30", "leftAt": "2019-09-15" }
+        ]
+      },
+      "notes": [
+        "[image] 'November 2nd 2019 Terra \"falls\"' and 'November 10 2019 Terra in fragments begins a raid on artemis' (community timeline). End extended from the old 2019-09-15 approximation for members who did NOT found CoCK; CoCK founders (ILQ, TNL after Sep 29, Fantasy, ANO, PHA, DDT) keep their Sep-15-era exits, PUN leaves at Artemis's founding (Oct 30), BlueStoneGroup at its CoCK join (Oct 11).",
+        "ROSTER LARGELY MAP-INFERRED (unchanged from before): guilds with 100+ attacks on Luna during the 6-16 Sep 2019 war window; the war signal is genuine (37% FFA share)."
+      ]
+    },
+    {
+      "targetId": 23,
+      "editSummary": "Valkyrie: interregnum dominance + Drew1011 title-chain notes",
+      "payload": {
+        "name": "Valkyrie",
+        "tag": "Valk",
+        "color": "#c9a227",
+        "kind": "community",
+        "description": "The longest-lived alliance in Wynncraft history — founded 2 Jun 2015 by Kingdom of Foxes and Imperial 'not for the purpose of war', governed by an Electorate of guild masters, and still self-described as a community alliance seven years later. It persisted continuously: Drew1011's officer titles run from Oct 2016 (Leader, to Mar 2018) through Jan 2019; after the Federation's fall the community timeline records 'valk owning most of Gavel' in the winter 2018-19 interregnum; the bloc warred publicly as Luna in 2019, and lived on alongside Artemis and Hestia with Imperial, Kingdom Foxes and Paladins United until its last attestation on 19 Sep 2022. The satirical 'Greater Valkyrie Alliance' of late 2022 was unrelated guilds trading on the name.",
+        "memberships": [
+          { "guild": "Kingdom Foxes", "joinedAt": "2018-01-01", "leftAt": "2022-09-19" },
+          { "guild": "Holders Of LE", "joinedAt": "2018-01-01", "leftAt": "2018-03-10" },
+          { "guild": "HaHaUnited", "joinedAt": "2018-01-01", "leftAt": "2018-03-10" },
+          { "guild": "The Hive", "joinedAt": "2018-03-21", "leftAt": "2019-01-29" },
+          { "guild": "Emorians", "joinedAt": "2018-05-23", "leftAt": "2019-08-29" },
+          { "guild": "Imperial", "joinedAt": "2019-09-14", "leftAt": "2022-09-19" },
+          { "guild": "Paladins United", "joinedAt": "2019-09-14", "leftAt": "2022-09-19" }
+        ]
+      },
+      "notes": [
+        "All prior notes stand (see submission history). New: [attested] Drew1011's profile titles — 'Leader of Valkyrie Alliance (Oct 2016-Mar 2018)' — and [image] 'After Fed all guilds keep to themselves with valk owning most of Gavel' (Nov 2018 - Jan 2019 interregnum), which matches Fox and Imperial being the interregnum's top territory gainers in exchange data.",
+        "Kept kind=community per every self-description; its interregnum territorial phase is described in prose rather than modeled as a war alliance."
+      ]
+    }
+  ],
+  "eventEdits": [
+    {
+      "targetTitle": "The Federation dies",
+      "payload": {
+        "eventType": "disband",
+        "title": "The Federation dies",
+        "description": "At around 3 AM EST on 10 Nov 2018, one guild left the Federation — and the alliance that had held the entire map for 8 months and 25 days cascaded apart within a day. The Hive had left a month earlier, then Odysseia; Imperial's exit 'snowballed into a major attack together with the enemy alliance'; Arisen followed, and after 14 hours of constant warring the Aesir guilds quit, ending it. 'What killed Federation was... internal affairs' — founder Drew1011's tribute, posted three days later.",
+        "startsAt": "2018-11-10",
+        "endsAt": null,
+        "guilds": ["Imperial", "The Hive", "Odysseia", "Arisen"],
+        "alliances": ["Federation", "Aesir Pact"]
+      },
+      "notes": ["[attested] Date and cascade: Federation Tribute (237070) + R.i.p Fed (236962). Replaces the old map-inferred Nov 1 date."]
+    }
+  ],
+  "events": [
+    {
+      "payload": {
+        "eventType": "founding",
+        "title": "The Federation forms",
+        "description": "On ~16 Feb 2018, Alliance Alliance split from the Coalition over map disputes — and the Coalition remnant merged with War Syndicate's remains into a new alliance: the Federation, founded and led by Drew1011. It would hold the entire map for nearly nine months with a single ~3-day interruption in March.",
+        "startsAt": "2018-02-16",
+        "endsAt": null,
+        "guilds": [],
+        "alliances": ["Federation", "Coalition", "Alliance Alliance"]
+      },
+      "notes": ["[attested] Tribute duration math + [image] Feb 16 entry + Lego_DW genealogy."]
+    },
+    {
+      "payload": {
+        "eventType": "war",
+        "title": "The wipe of HackForums",
+        "description": "On 19 Feb 2018, three days after forming, the Federation attacked HackForums' 111 territories and wiped them to zero in under 12 hours — the end of Hax as a territorial power, a year after its 2017 peak of ~350 territories.",
+        "startsAt": "2018-02-19",
+        "endsAt": "2018-02-20",
+        "guilds": ["HackForums"],
+        "alliances": ["Federation"]
+      },
+      "notes": ["[image] 'Feb 19 2018 Fed attacks Hax's 111 territories and wipes them to 0 in under 12 hours'."]
+    },
+    {
+      "payload": {
+        "eventType": "disband",
+        "title": "Terra falls",
+        "description": "Terra, the alliance that broke Luna, fell on 2 Nov 2019 — seven weeks after its victory. On 10 Nov its fragments launched one last raid on the newborn Artemis.",
+        "startsAt": "2019-11-02",
+        "endsAt": null,
+        "guilds": [],
+        "alliances": ["Terra", "Artemis"]
+      },
+      "notes": ["[image] Community timeline entries for Nov 2 and Nov 10 2019."]
+    }
+  ],
+  "skipped": [
+    { "name": "The Ascendancy", "reason": "Created 27 Apr 2019 [image] and attested leaving CoCK Nov 23 2019 [doc], but no roster recorded anywhere." },
+    { "name": "War Syndicate", "reason": "Wiped Christmas Day 2017 / merged into the Federation — its independent existence predates the chronicle window; no roster." },
+    { "name": "Hax & Co", "reason": "The 2016-2017 mega-alliance around HackForums (~350 territories at peak; fall in 2017 was 'the biggest event of 2017') — predates the window; no roster beyond Hax itself." },
+    { "name": "The Emperium of Wynn", "reason": "Apr-Oct 2017 (UltimateXeons, LE Flowers, TitanZ, Kingdom Foxes) — entirely predates the window." },
+    { "name": "Death Reapers", "reason": "In the Federation tribute roster but unresolvable in guild_prefixes." },
+    { "name": "Halcyon Alliance / Legio Praetoria / Ordo Malleus / Concordia Wars / Vesta", "reason": "2015-2016 names from the timeline image and threads — predate the window." }
+  ]
+}
