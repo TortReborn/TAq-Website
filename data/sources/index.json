@@ -178,6 +178,14 @@
    "rawSha256": "862bb00b64369fc4",
    "note": "Avicia [AVO] official site — checking for history/war-log/alliance pages covering the 2023 Avicia-Sequoia and 2025 Aequitas-Avicia wars"
   },
+  "community-guild-timeline": {
+   "url": "https://docs.google.com/document/d/1Sv4TGCKng4qQvqMsjRnbRA16nccatHM1QNVy1_-gJoU/edit",
+   "kind": "community-document",
+   "title": "Wynncraft guild history timeline (community document)",
+   "fetchedAt": "2026-09-03T19:56:57.745Z",
+   "textChars": 13087,
+   "note": "The community-maintained dated timeline of Wynncraft guild history, exported from Google Docs. Cited across the research corpus as the Community Timeline document; previously free-text because no copy was held. Dates are UTC by its own convention. Community-compiled and therefore secondary — corroborate against forum posts where possible."
+  },
   "drew1011-storytime": {
    "url": "(Discord, private guild channel)",
    "kind": "testimony",
@@ -314,6 +322,14 @@
    "textChars": 4620,
    "rawSha256": "3d071d841ea60858",
    "note": "Sequoia's public war statistics page — 161,494 lifetime wars, 64 territories, per-member war leaderboard (lindafelix 21,232; SoloMap 18,616) and a season-by-season territory-completion history"
+  },
+  "the-emperial-truth": {
+   "url": "https://docs.google.com/document/d/1rOpJpRaw93ZGOKiMGpSJ1DFRMBDEqDLydO2q3zOP8O0/edit",
+   "kind": "community-document",
+   "title": "The Emperial Truth (linked from the Drew1011 storytime)",
+   "fetchedAt": "2026-09-03T19:56:57.745Z",
+   "textChars": 4931,
+   "note": "Google Doc linked inline in Drew1011s storytime account (link 35 of the storytime dump), concerning the Emperium of Wynn. Partisan in the same way the storytime is."
   },
   "thread-109319": {
    "url": "https://forums.wynncraft.com/threads/109319/",
