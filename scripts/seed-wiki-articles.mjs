@@ -59,7 +59,8 @@ const pool = dryRun ? null : new pg.Pool({
   user: env('DB_LOGIN'),
   password: env('DB_PASS'),
   database: env('DB_DATABASE'),
-  ssl: { rejectUnauthorized: false },
+  // Local dev Postgres is built without SSL; prod (Neon) requires it.
+  ssl: env('DB_SSLMODE') === 'disable' ? undefined : { rejectUnauthorized: false },
   max: 1,
 });
 
