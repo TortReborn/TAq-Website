@@ -85,16 +85,29 @@ for (const raw of articles) {
   if (existing.rows.length) { updated++; console.log(`updated ${p.slug}`); }
   else { created++; console.log(`created ${p.slug}`); }
 }
-// The chronicle alliance is named "Federation" but its article lives at
-// the-federation; the map layer's wiki cross-link resolves via this redirect.
+// Redirects: "federation" (the chronicle alliance name) to its article, and
+// founding/rename chronicle events to the alliance pages that cover them —
+// the map/timeline cross-links resolve event titles via slugify, so these
+// make every chronicle event land somewhere.
+const REDIRECTS = [
+  ['federation', 'the-federation'],
+  ['the-federation-forms', 'the-federation'],
+  ['luna-is-formed', 'luna'],
+  ['council-of-canyon-kingdoms-formed', 'council-of-canyon-kingdoms'],
+  ['vanir-is-formed', 'vanir'],
+  ['cucumber-company-forms', 'cucumber-company'],
+  // common apostrophe-less misspelling of fall-of-profession-heaven-s-neutrality
+  ['fall-of-profession-heavens-neutrality', 'fall-of-profession-heaven-s-neutrality'],
+];
 if (!dryRun) {
-  const fed = await pool.query(`SELECT id FROM wiki_pages WHERE slug = 'the-federation'`);
-  if (fed.rows.length) {
+  for (const [from, to] of REDIRECTS) {
+    const target = await pool.query(`SELECT id FROM wiki_pages WHERE slug = $1`, [to]);
+    if (!target.rows.length) { console.error(`redirect target missing: ${to}`); continue; }
     await pool.query(
-      `INSERT INTO wiki_redirects (from_slug, to_page_id) VALUES ('federation', $1) ON CONFLICT (from_slug) DO NOTHING`,
-      [fed.rows[0].id],
+      `INSERT INTO wiki_redirects (from_slug, to_page_id) VALUES ($1, $2) ON CONFLICT (from_slug) DO NOTHING`,
+      [from, target.rows[0].id],
     );
-    console.log('redirect ensured: federation -> the-federation');
+    console.log(`redirect ensured: ${from} -> ${to}`);
   }
 }
 

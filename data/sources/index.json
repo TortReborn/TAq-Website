@@ -1,0 +1,1070 @@
+{
+ "$comment": "Archived sources for the Chronicles wiki. Managed by scripts/source-archive.mjs — add entries with `add`, never by hand.",
+ "sources": {
+  "github-com-motoki317-moto-bot": {
+   "url": "https://github.com/motoki317/moto-bot",
+   "kind": "repo",
+   "title": "GitHub - motoki317/moto-bot: Discord bot for Wynncraft utility commands! (version 2, refactored) · GitHub",
+   "fetchedAt": "2026-09-03T07:05:57.413Z",
+   "textChars": 3440,
+   "rawSha256": "0ed37aa51ae3fb98",
+   "note": "motoki317/moto-bot — Wynncraft utility Discord bot, 576 commits, archived read-only 27 Jan 2024. Establishes motoki317 is NOT the titantimes/valor author (our notes conflated them)"
+  },
+  "github-com-sequoiawynncraft-sequoia-mod": {
+   "url": "https://github.com/SequoiaWynncraft/Sequoia-mod",
+   "kind": "repo",
+   "title": "GitHub - SequoiaWynncraft/Sequoia-mod: Sequoia minecraft mod · GitHub",
+   "fetchedAt": "2026-09-03T07:05:55.374Z",
+   "textChars": 12387,
+   "rawSha256": "694cefaeaaf291f4",
+   "note": "Sequoia-mod repo: source of the Jun 12 2026 commit 69fb472 parsing in-game 'formed/revoked an alliance with' chat lines, and the Jul 30 2026 Diplomacy-menu snapshotting — the in-game Diplomacy era's first attested alliance events"
+  },
+  "github-com-titantimes-valor": {
+   "url": "https://github.com/titantimes/valor",
+   "kind": "repo",
+   "title": "GitHub - titantimes/valor: Discord bot for the Titans Valor Wynncraft guild. · GitHub",
+   "fetchedAt": "2026-09-03T07:05:56.267Z",
+   "textChars": 1327,
+   "rawSha256": "f7bc34361db7361f",
+   "note": "titantimes/valor — Titans Valor's Discord bot; consumed an alliance-claims feed built on Avicia's site code, commits Apr 23 - Dec 26 2022, corroborating ANO/AVO shared alliance infrastructure in the Cucumber Company window"
+  },
+  "thread-109319": {
+   "url": "https://forums.wynncraft.com/threads/109319/",
+   "kind": "forum-thread",
+   "title": "Guild - | ♕hackforums | [☆☆ Hax] | Level 93 | Community Guild | Level 80+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:11:59.430Z",
+   "textChars": 11937,
+   "rawSha256": "8c74a48ac6070336",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-109350": {
+   "url": "https://forums.wynncraft.com/threads/109350/",
+   "kind": "forum-thread",
+   "title": "Guild - Ultimate Xeons | Lv. 53 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:00.945Z",
+   "textChars": 13271,
+   "rawSha256": "ba7fd5e6f7d637aa",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-119596": {
+   "url": "https://forums.wynncraft.com/threads/119596/",
+   "kind": "forum-thread",
+   "title": "Guild - Libertas Ranked 2 Level 62 Recruiting Level 80+ [****] Hype Revived | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:02.454Z",
+   "textChars": 9018,
+   "rawSha256": "7228f2bd71b226bf",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-130444": {
+   "url": "https://forums.wynncraft.com/threads/130444/",
+   "kind": "forum-thread",
+   "title": "Alliance - ╡ Halcyon Alliance ╞ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:03.969Z",
+   "textChars": 4466,
+   "rawSha256": "6477af6d82b529ad",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-134638": {
+   "url": "https://forums.wynncraft.com/threads/134638/",
+   "kind": "forum-thread",
+   "title": "Petition To Get Into Hax | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:04.631Z",
+   "textChars": 2602,
+   "rawSha256": "a00ac084c48bb744",
+   "note": "'Petition To Get Into Hax' (Jmberger307, Jun 30 2016): Mrussell75 Jul 1 2016 — 'there is 2 anti hax alliances' (only contemporaneous evidence of mid-2016 anti-Hax blocs)"
+  },
+  "thread-135191": {
+   "url": "https://forums.wynncraft.com/threads/135191/",
+   "kind": "forum-thread",
+   "title": "Guild - ❈ | House Of Sentinels | Aurelion Guild | Recruiting Lv. 60+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:05.500Z",
+   "textChars": 8386,
+   "rawSha256": "df84c5d772010078",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-143392": {
+   "url": "https://forums.wynncraft.com/threads/143392/",
+   "kind": "forum-thread",
+   "title": "Alliance - » Seraphim Alliance « For Those Who Give Very Few Shits | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:07.066Z",
+   "textChars": 8601,
+   "rawSha256": "2679c12d6ba9e6b7",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-147790": {
+   "url": "https://forums.wynncraft.com/threads/147790/",
+   "kind": "forum-thread",
+   "title": "Alliance - ⌠ Valkyrie Alliance ⌡ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:59.142Z",
+   "textChars": 4396,
+   "rawSha256": "8a4764f355a73b7f",
+   "note": "Valkyrie Alliance relaunch #2 (Yuno F Gasai, Aug 29 2016): members Imperial/KoF/House of Sentinels/Lightly Toasted Heroes; 'Valkyrie Parliament'; the ahri->Kv->Yuno leadership chain"
+  },
+  "thread-159734": {
+   "url": "https://forums.wynncraft.com/threads/159734/",
+   "kind": "forum-thread",
+   "title": "Alliance - ⌠ Valkyrie Alliance ⌡ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:59.639Z",
+   "textChars": 4053,
+   "rawSha256": "bc8bf288c34dd0b9",
+   "note": "Valkyrie Alliance relaunch #3 (Drew1011, Oct 15 2016): Imperial has departed; members KoF, Holders of LE, Ha Ha United; matches Drew1011's 'Leader of Valkyrie Alliance 15 Oct 2016' profile title"
+  },
+  "thread-179383": {
+   "url": "https://forums.wynncraft.com/threads/179383/",
+   "kind": "forum-thread",
+   "title": "Haxforums Should Be Limited On Territory Influence | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:05.193Z",
+   "textChars": 20672,
+   "rawSha256": "d6db9ba996fd0e07",
+   "note": "'Haxforums Should Be Limited On Territory Influence' (Tntdestroyd, Mar 1 2017): Hax controls '100+ territories'; Drew1011 defends Hax; the era's public grievance against Hax dominance"
+  },
+  "thread-187152": {
+   "url": "https://forums.wynncraft.com/threads/187152/",
+   "kind": "forum-thread",
+   "title": "Guild - ❈ | House Of Sentinels | Community & War Guild | Recruiting Lv. 80+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:08.560Z",
+   "textChars": 8741,
+   "rawSha256": "d4cf54fbc463f4b4",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-188024": {
+   "url": "https://forums.wynncraft.com/threads/188024/",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:47.023Z",
+   "textChars": 23987,
+   "rawSha256": "90446e6aaca88b24",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p02": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:48.454Z",
+   "textChars": 4639,
+   "rawSha256": "d000cab3952c16a5",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p03": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-3",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:49.907Z",
+   "textChars": 7433,
+   "rawSha256": "e94d5ba0864b0054",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p04": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-4",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:51.340Z",
+   "textChars": 9827,
+   "rawSha256": "4c346fc04c416624",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p05": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-5",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:52.787Z",
+   "textChars": 10072,
+   "rawSha256": "9345e19e92a90203",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p06": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-6",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 6 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:54.226Z",
+   "textChars": 13963,
+   "rawSha256": "857060cc647908d4",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p07": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-7",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 7 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:55.645Z",
+   "textChars": 8960,
+   "rawSha256": "3636d4466c74c3a1",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-188024-p08": {
+   "url": "https://forums.wynncraft.com/threads/188024/page-8",
+   "kind": "forum-thread",
+   "title": "Alliance - The Emperium Of Wynn | Page 8 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:57.078Z",
+   "textChars": 2994,
+   "rawSha256": "81993ae034c17325",
+   "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
+  },
+  "thread-196016": {
+   "url": "https://forums.wynncraft.com/threads/196016/",
+   "kind": "forum-thread",
+   "title": "Guild - ♔ Imperial | 10 years going strong! | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:10.031Z",
+   "textChars": 4015,
+   "rawSha256": "058c49d788985f17",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-204381": {
+   "url": "https://forums.wynncraft.com/threads/204381/",
+   "kind": "forum-thread",
+   "title": "Guild - ☼ | Kingdom Of Phoenixes | Level 52 | Recruiting 50+ | ☼ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:11.538Z",
+   "textChars": 6874,
+   "rawSha256": "2d44f6720fd9a1d6",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-206094": {
+   "url": "https://forums.wynncraft.com/threads/206094/",
+   "kind": "forum-thread",
+   "title": "Guild - Titans Valor - Community & War Guild - ♔ - (#1) | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:26.472Z",
+   "textChars": 13155,
+   "rawSha256": "245e05bb4c97e761",
+   "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately"
+  },
+  "thread-206094-p02": {
+   "url": "https://forums.wynncraft.com/threads/206094/page-2",
+   "kind": "forum-thread",
+   "title": "Guild - Titans Valor - Community & War Guild - ♔ - (#1) | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:27.921Z",
+   "textChars": 11565,
+   "rawSha256": "34dfd09fad9acb43",
+   "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately"
+  },
+  "thread-206094-p03": {
+   "url": "https://forums.wynncraft.com/threads/206094/page-3",
+   "kind": "forum-thread",
+   "title": "Guild - Titans Valor - Community & War Guild - ♔ - (#1) | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:29.374Z",
+   "textChars": 10482,
+   "rawSha256": "827dff585f2115af",
+   "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately"
+  },
+  "thread-206094-p04": {
+   "url": "https://forums.wynncraft.com/threads/206094/page-4",
+   "kind": "forum-thread",
+   "title": "Guild - Titans Valor - Community & War Guild - ♔ - (#1) | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:30.814Z",
+   "textChars": 8119,
+   "rawSha256": "edb25e85dec70f6c",
+   "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately"
+  },
+  "thread-206094-p05": {
+   "url": "https://forums.wynncraft.com/threads/206094/page-5",
+   "kind": "forum-thread",
+   "title": "Guild - Titans Valor - Community & War Guild - ♔ - (#1) | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:32.271Z",
+   "textChars": 12328,
+   "rawSha256": "0a9317f7f2268b54",
+   "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately"
+  },
+  "thread-206094-p97": {
+   "url": "https://forums.wynncraft.com/threads/206094/page-97",
+   "kind": "forum-thread",
+   "title": "Guild - Titans Valor - Community & War Guild - ♔ - (#1) | Page 97 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:32.771Z",
+   "textChars": 8716,
+   "rawSha256": "a19ee3c202a1c3fb",
+   "note": "Titans Valor thread p97: xK6TA post #1922, Apr 16 2023 — 'I was a part of Eden when it was #1 and slightly after it got couped' (sole public record of the Eden coup)"
+  },
+  "thread-208566": {
+   "url": "https://forums.wynncraft.com/threads/208566/",
+   "kind": "forum-thread",
+   "title": "Guild - ☬ Gilded Sparrows ☬ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:13.041Z",
+   "textChars": 4850,
+   "rawSha256": "13a24ef6364048aa",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-221386": {
+   "url": "https://forums.wynncraft.com/threads/221386/",
+   "kind": "forum-thread",
+   "title": "Guild - ≼ Emorians [ E R N ] ∽ Lvl 51 ∼ Recruiting ≽ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:14.558Z",
+   "textChars": 9257,
+   "rawSha256": "dd0e6ef0e1d30997",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-227373": {
+   "url": "https://forums.wynncraft.com/threads/227373/",
+   "kind": "forum-thread",
+   "title": "Alliance - The Aesir Pact | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:34.546Z",
+   "textChars": 8763,
+   "rawSha256": "a67d03ac48807c4b",
+   "note": "The Aesir Pact (lotuss/sad_nurse, Jun 5 2018, ed. Jul 21 2018): 4-guild leader table Fantasy/SDU/IBT/DDT with Viaire, SpaseCow, simplyinfinity_, Shy_Phoenix, Vmark03, Mpr100, Nitrogen2Oxygen, Icey_Diamond"
+  },
+  "thread-227373-p02": {
+   "url": "https://forums.wynncraft.com/threads/227373/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - The Aesir Pact | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:35.985Z",
+   "textChars": 1136,
+   "rawSha256": "b998f07d73239856",
+   "note": "The Aesir Pact (lotuss/sad_nurse, Jun 5 2018, ed. Jul 21 2018): 4-guild leader table Fantasy/SDU/IBT/DDT with Viaire, SpaseCow, simplyinfinity_, Shy_Phoenix, Vmark03, Mpr100, Nitrogen2Oxygen, Icey_Diamond"
+  },
+  "thread-233859": {
+   "url": "https://forums.wynncraft.com/threads/233859/",
+   "kind": "forum-thread",
+   "title": "Guild - Level 104 ✫✫✫ ↿↾ Avicia ↿↾ Recruiting All Players | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:16.072Z",
+   "textChars": 5299,
+   "rawSha256": "57187024072f7454",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-236962": {
+   "url": "https://forums.wynncraft.com/threads/236962/",
+   "kind": "forum-thread",
+   "title": "Alliance - R.i.p Fed | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:20.080Z",
+   "textChars": 8837,
+   "rawSha256": "b6a2bacf17b2e261",
+   "note": "'R.i.p Fed' (Glial, Nov 11 2018): the Federation collapse witnesses — Ascended Kitten's hour-by-hour account naming the [Ent] enemy alliance, Hive/Odysseia/Imperial/Arisen/Aesir departures"
+  },
+  "thread-236962-p02": {
+   "url": "https://forums.wynncraft.com/threads/236962/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - R.i.p Fed | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:21.545Z",
+   "textChars": 6382,
+   "rawSha256": "76ec5403099d5564",
+   "note": "'R.i.p Fed' (Glial, Nov 11 2018): the Federation collapse witnesses — Ascended Kitten's hour-by-hour account naming the [Ent] enemy alliance, Hive/Odysseia/Imperial/Arisen/Aesir departures"
+  },
+  "thread-237070": {
+   "url": "https://forums.wynncraft.com/threads/the-federation-a-tribute.237070/",
+   "kind": "forum-thread",
+   "title": "Alliance - Federation Tribute | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:48:57.925Z",
+   "textChars": 21307,
+   "rawSha256": "d1c79ee33fde216a",
+   "note": "Drew1011's Federation tribute — founding roster and Slayne's rival claim"
+  },
+  "thread-237070-p02": {
+   "url": "https://forums.wynncraft.com/threads/237070/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - Federation Tribute | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:30.879Z",
+   "textChars": 4868,
+   "rawSha256": "2a9388b294c98592",
+   "note": "Federation Tribute (Drew1011, Nov 13 2018): 40-guild Fed roster, ~25 credited leaders, Slayne's 'Double AA' claim p3 #45, Lego_DW war-leader list"
+  },
+  "thread-237070-p03": {
+   "url": "https://forums.wynncraft.com/threads/237070/page-3",
+   "kind": "forum-thread",
+   "title": "Alliance - Federation Tribute | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:32.329Z",
+   "textChars": 6179,
+   "rawSha256": "6357620a652df2eb",
+   "note": "Federation Tribute (Drew1011, Nov 13 2018): 40-guild Fed roster, ~25 credited leaders, Slayne's 'Double AA' claim p3 #45, Lego_DW war-leader list"
+  },
+  "thread-237070-p04": {
+   "url": "https://forums.wynncraft.com/threads/237070/page-4",
+   "kind": "forum-thread",
+   "title": "Alliance - Federation Tribute | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:33.789Z",
+   "textChars": 3427,
+   "rawSha256": "940e6dce9860968a",
+   "note": "Federation Tribute (Drew1011, Nov 13 2018): 40-guild Fed roster, ~25 credited leaders, Slayne's 'Double AA' claim p3 #45, Lego_DW war-leader list"
+  },
+  "thread-245468": {
+   "url": "https://forums.wynncraft.com/threads/245468/",
+   "kind": "forum-thread",
+   "title": "Imperial In A Nutshell | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:49.829Z",
+   "textChars": 10737,
+   "rawSha256": "755b1812681adba1",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-245705": {
+   "url": "https://forums.wynncraft.com/threads/245705/",
+   "kind": "forum-thread",
+   "title": "Guild - Shadowfall [★⋆shy] Recruiting Lvl 80+ Combat & Required Discord | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:51.347Z",
+   "textChars": 13686,
+   "rawSha256": "bc8fc008ba64ab1b",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-246617": {
+   "url": "https://forums.wynncraft.com/threads/246617/",
+   "fetchedFrom": "https://web.archive.org/web/20211128204357/https://forums.wynncraft.com/threads/%E2%98%86%E2%98%86%E2%98%86-paladins-united-1-level-100-guild-recruiting-level-60.246617/",
+   "waybackCapture": "20211128204357",
+   "kind": "forum-thread",
+   "title": "Guild - ☆☆☆ Paladins United #1 - Level 100 Guild - Recruiting Level 60+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:50:42.619Z",
+   "textChars": 12661,
+   "rawSha256": "5bf96f8e16aeb366",
+   "note": "PUN guild thread OP: 'PUN is in both Valkyrie, and Hestia' — control case for alliance attestation"
+  },
+  "thread-248101": {
+   "url": "https://forums.wynncraft.com/threads/248101/",
+   "kind": "forum-thread",
+   "title": "Guild - ✫✫✫ Emorians | Llevigar Warriors | Level 105 | Recruiting Lvl 70+! | #1 Guild War Count | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:03.549Z",
+   "textChars": 4435,
+   "rawSha256": "80c0dae56385689d",
+   "note": "Emorians [ERN] recruitment thread (GrandpaLee era, Apr 21 2019): ERN founded 17 Dec 2017 by AzanderK and Hazeful; The Parly/Emagistra rosters. NB thread never carries an alliance section (key negative evidence for the ERN-Valkyrie claim)"
+  },
+  "thread-251505": {
+   "url": "https://forums.wynncraft.com/threads/251505/",
+   "kind": "forum-thread",
+   "title": "Guild - Illustratus - Ius - War & Community - Closed | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:52.847Z",
+   "textChars": 2394,
+   "rawSha256": "05dfbcfc926d030a",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-251543": {
+   "url": "https://forums.wynncraft.com/threads/251543/",
+   "kind": "forum-thread",
+   "title": "The Federation (?) | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:00.140Z",
+   "textChars": 3363,
+   "rawSha256": "20063602a6f6c979",
+   "note": "'The Federation (?)' (Pikacal/Cal404, Jun 26 2019): Drew1011's reply describing his Discord 'massive ongoing written history of the guild community from May 2015 onwards'; mentions SOL and Luna"
+  },
+  "thread-252647": {
+   "url": "https://forums.wynncraft.com/threads/252647/",
+   "kind": "forum-thread",
+   "title": "An Argument Against The Current Monopoly On Territory | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:54.390Z",
+   "textChars": 30421,
+   "rawSha256": "9e9691d2596267ba",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-254001": {
+   "url": "https://forums.wynncraft.com/threads/254001/",
+   "kind": "forum-thread",
+   "title": "Guild - | ⚜️ Caeruleum Order ⚜️ | [ Cdr ] | Level 56 | Recruiting! | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:55.886Z",
+   "textChars": 7727,
+   "rawSha256": "a93e82fa9a836596",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-254541": {
+   "url": "https://forums.wynncraft.com/threads/254541/",
+   "kind": "forum-thread",
+   "title": "Guild - ☯ Raijū [rai] 雷獣 | Lvl 32 Recruiting (low Levels Accepted !) | Fr / En Guild ☯ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:57.413Z",
+   "textChars": 3162,
+   "rawSha256": "ecc94025f9df475b",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-260434": {
+   "url": "https://forums.wynncraft.com/threads/260434/",
+   "kind": "forum-thread",
+   "title": "Guild - ✾ Eden [ᴇᴅɴ] ✾ Lvl. 94 ✾ War And Community ✾ Recruiting Lvl. 80+ ✾ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:12:58.956Z",
+   "textChars": 17477,
+   "rawSha256": "1bff567146088a61",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-263975": {
+   "url": "https://forums.wynncraft.com/threads/263975/",
+   "kind": "forum-thread",
+   "title": "➤ The Artemis Alliance And Why It's Problematic To Me | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:22.275Z",
+   "textChars": 33706,
+   "rawSha256": "f767a4ab43dca00a",
+   "note": "'The Artemis Alliance And Why It's Problematic To Me' (VeeeKoooN, Mar 9 2020, locked by mod Salkasm): GoulartJJ p2 #36 'as the Shadow Fall leader and one of Artemis leaders'; Robturne, Carrie, Ascended Kitten, oinuk, Asthae"
+  },
+  "thread-263975-p02": {
+   "url": "https://forums.wynncraft.com/threads/263975/page-2",
+   "kind": "forum-thread",
+   "title": "➤ The Artemis Alliance And Why It's Problematic To Me | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:23.728Z",
+   "textChars": 23227,
+   "rawSha256": "18a673892f1e5e04",
+   "note": "'The Artemis Alliance And Why It's Problematic To Me' (VeeeKoooN, Mar 9 2020, locked by mod Salkasm): GoulartJJ p2 #36 'as the Shadow Fall leader and one of Artemis leaders'; Robturne, Carrie, Ascended Kitten, oinuk, Asthae"
+  },
+  "thread-263975-p03": {
+   "url": "https://forums.wynncraft.com/threads/263975/page-3",
+   "kind": "forum-thread",
+   "title": "➤ The Artemis Alliance And Why It's Problematic To Me | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:25.184Z",
+   "textChars": 14085,
+   "rawSha256": "fac8639867867f9b",
+   "note": "'The Artemis Alliance And Why It's Problematic To Me' (VeeeKoooN, Mar 9 2020, locked by mod Salkasm): GoulartJJ p2 #36 'as the Shadow Fall leader and one of Artemis leaders'; Robturne, Carrie, Ascended Kitten, oinuk, Asthae"
+  },
+  "thread-263975-p04": {
+   "url": "https://forums.wynncraft.com/threads/263975/page-4",
+   "kind": "forum-thread",
+   "title": "➤ The Artemis Alliance And Why It's Problematic To Me | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:26.658Z",
+   "textChars": 35662,
+   "rawSha256": "46957206f796f4f9",
+   "note": "'The Artemis Alliance And Why It's Problematic To Me' (VeeeKoooN, Mar 9 2020, locked by mod Salkasm): GoulartJJ p2 #36 'as the Shadow Fall leader and one of Artemis leaders'; Robturne, Carrie, Ascended Kitten, oinuk, Asthae"
+  },
+  "thread-265297": {
+   "url": "https://forums.wynncraft.com/threads/265297/",
+   "kind": "forum-thread",
+   "title": "A Very Never Ending Guild Timeline! | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:43.439Z",
+   "textChars": 4762,
+   "rawSha256": "dea555877d1ada60",
+   "note": "A Very Never Ending Guild Timeline! (DerpyEmerald24, Apr 3 2020): the community guild-timeline image (imgur seklYAQ) + Lego_DW/IceResistance recollections on Hax's fall, WS, Coa"
+  },
+  "thread-265297-p02": {
+   "url": "https://forums.wynncraft.com/threads/265297/page-2",
+   "kind": "forum-thread",
+   "title": "A Very Never Ending Guild Timeline! | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:44.893Z",
+   "textChars": 4769,
+   "rawSha256": "64815c3c805a31be",
+   "note": "A Very Never Ending Guild Timeline! (DerpyEmerald24, Apr 3 2020): the community guild-timeline image (imgur seklYAQ) + Lego_DW/IceResistance recollections on Hax's fall, WS, Coa"
+  },
+  "thread-265297-p03": {
+   "url": "https://forums.wynncraft.com/threads/265297/page-3",
+   "kind": "forum-thread",
+   "title": "A Very Never Ending Guild Timeline! | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:58:46.336Z",
+   "textChars": 376,
+   "rawSha256": "15722da9dd84f1e8",
+   "note": "A Very Never Ending Guild Timeline! (DerpyEmerald24, Apr 3 2020): the community guild-timeline image (imgur seklYAQ) + Lego_DW/IceResistance recollections on Hax's fall, WS, Coa"
+  },
+  "thread-266020": {
+   "url": "https://forums.wynncraft.com/threads/266020/",
+   "kind": "forum-thread",
+   "title": "Guild - Guild Alliances? | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:13:00.475Z",
+   "textChars": 1690,
+   "rawSha256": "429c435d2538dd35",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-269835": {
+   "url": "https://forums.wynncraft.com/threads/269835/",
+   "kind": "forum-thread",
+   "title": "Guild - The Aquarium [TAq] Highest Lvl Guild #1 Lvl 120. Active warring/community Guild! Recruiting lvl 80+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:13:02.027Z",
+   "textChars": 6511,
+   "rawSha256": "90690e759e78f6c1",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-278112": {
+   "url": "https://forums.wynncraft.com/threads/278112/",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:26.489Z",
+   "textChars": 14778,
+   "rawSha256": "a4a6779fc6cbd712",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p02": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-2",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:27.968Z",
+   "textChars": 10169,
+   "rawSha256": "9b3932ec9f1b5553",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p03": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-3",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:29.422Z",
+   "textChars": 8299,
+   "rawSha256": "867888085ce3045d",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p04": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-4",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:30.863Z",
+   "textChars": 3716,
+   "rawSha256": "331c69826a52d179",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p05": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-5",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:32.326Z",
+   "textChars": 15518,
+   "rawSha256": "cc957cb271518e8f",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p06": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-6",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 6 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:33.777Z",
+   "textChars": 4007,
+   "rawSha256": "5d78f63382e2b31c",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p07": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-7",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 7 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:35.237Z",
+   "textChars": 5274,
+   "rawSha256": "cb6ee3a1dc854d6e",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p07-wb20211128": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-7",
+   "fetchedFrom": "https://web.archive.org/web/20211128211949/https://forums.wynncraft.com/threads/read-before-applying-to-a-guild-all-currently-recruiting-guilds-megalist.278112/page-7",
+   "waybackCapture": "20211128211949",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 7 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:05:01.630Z",
+   "textChars": 5274,
+   "rawSha256": "b8f023bca48c2072",
+   "note": "WAYBACK 20211128211949 — megalist p7: Dream (May 25 2021) 'Valhalla and Kaos (Khaos?), Valkyrie stayed the same' (sole written Khaos attestation) + Pally (Jun 6 2021) six-guild Hestia roster incl. Emorians"
+  },
+  "thread-278112-p08": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-8",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 8 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:36.682Z",
+   "textChars": 6737,
+   "rawSha256": "53cb07aedb8f97a4",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-p08-wb20211128": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-8",
+   "fetchedFrom": "https://web.archive.org/web/20211128212718/https://forums.wynncraft.com/threads/read-before-applying-to-a-guild-all-currently-recruiting-guilds-megalist.278112/page-8",
+   "waybackCapture": "20211128212718",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 8 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:06:12.732Z",
+   "textChars": 2665,
+   "rawSha256": "0d24c3c9c6c98453",
+   "note": "WAYBACK 20211128212718 — megalist p8 in its 2021 state: HungHung's Niflheim roster (AVO/IBT/Shy/TNL), pre-dating the 2022 Cucumber Company post on the same page"
+  },
+  "thread-278112-p09": {
+   "url": "https://forums.wynncraft.com/threads/278112/page-9",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Page 9 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:57:38.135Z",
+   "textChars": 4624,
+   "rawSha256": "abbea354032dc9f1",
+   "note": "The Guild Megalist (Sg_Voltage, Nov 29 2020): era registrar thread; alliance attestations for Hestia, Goose, Niflheim, Cucumber Company, Khaos; alliance section deleted Jul 7 2022"
+  },
+  "thread-278112-wb20210704": {
+   "url": "https://forums.wynncraft.com/threads/278112/",
+   "fetchedFrom": "https://web.archive.org/web/20210704072714/https://forums.wynncraft.com/threads/read-before-applying-to-a-guild-all-currently-recruiting-guilds-megalist.278112/",
+   "waybackCapture": "20210704072714",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:05:12.929Z",
+   "textChars": 14248,
+   "rawSha256": "6adce155ddcd8320",
+   "note": "WAYBACK 20210704072714 — megalist p1 with the alliance section intact: Sg_Voltage profile (CHAMPION, no guild), crowd-edit model, Pally's Dec 2 2020 'ANO is apart of Hestia... and Artemis' note"
+  },
+  "thread-278112-wb20220517": {
+   "url": "https://forums.wynncraft.com/threads/278112/",
+   "fetchedFrom": "https://web.archive.org/web/20220517214728/https://forums.wynncraft.com/threads/read-before-applying-to-a-guild-all-currently-recruiting-guilds-megalist.278112/",
+   "waybackCapture": "20220517214728",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:05:19.422Z",
+   "textChars": 14578,
+   "rawSha256": "e24e5970fad186f4",
+   "note": "WAYBACK 20220517214728 — megalist p1, last capture BEFORE the alliance section was deleted Jul 7 2022: Hestia now ANO/ESI/LXA/PUN (Emorians dropped out)"
+  },
+  "thread-278112-wb20220915": {
+   "url": "https://forums.wynncraft.com/threads/278112/",
+   "fetchedFrom": "https://web.archive.org/web/20220915061121/https://forums.wynncraft.com/threads/read-before-applying-to-a-guild-all-currently-recruiting-guilds-megalist.278112/",
+   "waybackCapture": "20220915061121",
+   "kind": "forum-thread",
+   "title": "Info - Read Before Applying To A Guild - All Currently Recruiting Guilds Megalist | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:06:21.552Z",
+   "textChars": 14776,
+   "rawSha256": "35334ebdf8cd73c2",
+   "note": "WAYBACK 20220915061121 — megalist p1 AFTER the Jul 7 2022 alliance-section deletion; diff against 20220517214728 to see exactly what was lost"
+  },
+  "thread-279337": {
+   "url": "https://forums.wynncraft.com/threads/279337/",
+   "kind": "forum-thread",
+   "title": "Guild Moderators | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:00.684Z",
+   "textChars": 12473,
+   "rawSha256": "8d1b49f4fabff603",
+   "note": "'Guild Moderators' (Sheepn, DXI, Dec 18 2020): the Dec 2020 moderation crisis; names the then-unnamed anti-Artemis coalition (DXI/Eden/Avicia/HICH/Bovemists/Lily Pad/UVs/ERN/TNI/PUN/Imp) and places Fox+ANO in Artemis"
+  },
+  "thread-280525": {
+   "url": "https://forums.wynncraft.com/threads/280525/",
+   "kind": "forum-thread",
+   "title": "Guild - ⚖️✫✫✫ Aequitas [Aeq] | Raid, Community And War Guild | Recruiting lvl105+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:13.065Z",
+   "textChars": 8475,
+   "rawSha256": "3333748d8afd7264",
+   "note": "Aequitas [Aeq] guild thread (FrozenGalaxy, created 3 Jan 2021): founder-owner FrozenGalaxy, Chief Lalatera, recruiter peter3536. TRUNCATED to pages 1-5 of 22+ for budget; cited p22 archived separately"
+  },
+  "thread-280525-p02": {
+   "url": "https://forums.wynncraft.com/threads/280525/page-2",
+   "kind": "forum-thread",
+   "title": "Guild - ⚖️✫✫✫ Aequitas [Aeq] | Raid, Community And War Guild | Recruiting lvl105+ | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:14.524Z",
+   "textChars": 6570,
+   "rawSha256": "c68c757a567e8b70",
+   "note": "Aequitas [Aeq] guild thread (FrozenGalaxy, created 3 Jan 2021): founder-owner FrozenGalaxy, Chief Lalatera, recruiter peter3536. TRUNCATED to pages 1-5 of 22+ for budget; cited p22 archived separately"
+  },
+  "thread-280525-p03": {
+   "url": "https://forums.wynncraft.com/threads/280525/page-3",
+   "kind": "forum-thread",
+   "title": "Guild - ⚖️✫✫✫ Aequitas [Aeq] | Raid, Community And War Guild | Recruiting lvl105+ | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:15.983Z",
+   "textChars": 10306,
+   "rawSha256": "fb7ffefebd996db7",
+   "note": "Aequitas [Aeq] guild thread (FrozenGalaxy, created 3 Jan 2021): founder-owner FrozenGalaxy, Chief Lalatera, recruiter peter3536. TRUNCATED to pages 1-5 of 22+ for budget; cited p22 archived separately"
+  },
+  "thread-280525-p04": {
+   "url": "https://forums.wynncraft.com/threads/280525/page-4",
+   "kind": "forum-thread",
+   "title": "Guild - ⚖️✫✫✫ Aequitas [Aeq] | Raid, Community And War Guild | Recruiting lvl105+ | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:17.478Z",
+   "textChars": 14348,
+   "rawSha256": "479327d32a46345f",
+   "note": "Aequitas [Aeq] guild thread (FrozenGalaxy, created 3 Jan 2021): founder-owner FrozenGalaxy, Chief Lalatera, recruiter peter3536. TRUNCATED to pages 1-5 of 22+ for budget; cited p22 archived separately"
+  },
+  "thread-280525-p05": {
+   "url": "https://forums.wynncraft.com/threads/280525/page-5",
+   "kind": "forum-thread",
+   "title": "Guild - ⚖️✫✫✫ Aequitas [Aeq] | Raid, Community And War Guild | Recruiting lvl105+ | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:18.961Z",
+   "textChars": 11536,
+   "rawSha256": "5f6e093c9999ac48",
+   "note": "Aequitas [Aeq] guild thread (FrozenGalaxy, created 3 Jan 2021): founder-owner FrozenGalaxy, Chief Lalatera, recruiter peter3536. TRUNCATED to pages 1-5 of 22+ for budget; cited p22 archived separately"
+  },
+  "thread-280525-p22": {
+   "url": "https://forums.wynncraft.com/threads/280525/page-22",
+   "kind": "forum-thread",
+   "title": "Guild - ⚖️✫✫✫ Aequitas [Aeq] | Raid, Community And War Guild | Recruiting lvl105+ | Page 22 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:19.546Z",
+   "textChars": 11725,
+   "rawSha256": "67501d685431df2b",
+   "note": "Aequitas thread p22: kwiebs, Sep 1 2023 — 'TNL and AEQ were allied and warring together' (the only 2023 alliance-relationship attestation)"
+  },
+  "thread-285237": {
+   "url": "https://forums.wynncraft.com/threads/285237/",
+   "kind": "forum-thread",
+   "title": "Guild - Profession Heaven [✫✫PROF] Lv 79 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:13:03.592Z",
+   "textChars": 8466,
+   "rawSha256": "5473e143a39f209b",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-286375": {
+   "url": "https://forums.wynncraft.com/threads/286375/",
+   "kind": "forum-thread",
+   "title": "The Issue With 1.20 Guild Wars | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:01.176Z",
+   "textChars": 44929,
+   "rawSha256": "cdecf5337f6a7e0e",
+   "note": "'The Issue With 1.20 Guild Wars' (_Eragon_, Feb 20 2021): 99loulou999 on Artemis guilds warring the Rays desert; urbymine posting as 'Former Chief of Avicia'; Plymouth on EDN/ERN terrs"
+  },
+  "thread-289196": {
+   "url": "https://forums.wynncraft.com/threads/289196/",
+   "kind": "forum-thread",
+   "title": "Art - Goose Alliance - Cnm, Aeq, Wfn, Mag, Tnl, Ibt | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:02.404Z",
+   "textChars": 3810,
+   "rawSha256": "ad43efb8bb683852",
+   "note": "'Goose Alliance - Cnm, Aeq, Wfn, Mag, Tnl, Ibt' (Drasalia, CNM, Mar 30 2021): the Goose fanart roster part 1; replies by Lalatera, ZrBence, DeathLucifer, FrozenGalaxy confirm memberships"
+  },
+  "thread-289556": {
+   "url": "https://forums.wynncraft.com/threads/289556/",
+   "kind": "forum-thread",
+   "title": "Art - Goose Alliance - Edn, Gsw, Cxz, Shy, Tni, And Avo | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:02.984Z",
+   "textChars": 4055,
+   "rawSha256": "1390b41252f33de1",
+   "note": "'Goose Alliance - Edn, Gsw, Cxz, Shy, Tni, And Avo' (Drasalia, Apr 6 2021): the Goose fanart roster part 2 — the only visual artifact of an alliance roster in the era"
+  },
+  "thread-295680": {
+   "url": "https://forums.wynncraft.com/threads/295680/",
+   "kind": "forum-thread",
+   "title": "Changing how guild leaderboard and sr works(suggestion) | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:01.788Z",
+   "textChars": 2066,
+   "rawSha256": "dc433715e39169b6",
+   "note": "IamFye, Sep 25 2021: 'the meta of being top 10 on the guild sr leaderboard is to join valhalla' — best contemporary description of Valhalla-era leaderboard hegemony"
+  },
+  "thread-305152": {
+   "url": "https://forums.wynncraft.com/threads/305152/",
+   "kind": "forum-thread",
+   "title": "Alliance - Anti Alliance Alliance | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:13:05.107Z",
+   "textChars": 733,
+   "rawSha256": "c8e95070bbceb253",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-306694": {
+   "url": "https://forums.wynncraft.com/threads/306694/",
+   "kind": "forum-thread",
+   "title": "Guild - ❖ | TheNoLifes[TNL] | Lv. 94 | Community War Guild | Recruiting Level 70+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:13:06.597Z",
+   "textChars": 2506,
+   "rawSha256": "3a80622694ce2d70",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-318070": {
+   "url": "https://forums.wynncraft.com/threads/318070/",
+   "kind": "forum-thread",
+   "title": "Video - Wynncraft Warring - The Long Raid | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:13:08.088Z",
+   "textChars": 227,
+   "rawSha256": "65d35496a2fb1ca7",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-322643": {
+   "url": "https://forums.wynncraft.com/threads/322643/",
+   "kind": "forum-thread",
+   "title": "#guild-community *sigh* | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:00:04.120Z",
+   "textChars": 14026,
+   "rawSha256": "247e153cda5786f6",
+   "note": "Oct 2025 guild-politics thread: #guild-politics renamed #guild-community; IceResistance — 'real diplomacy happens in private alliance chats'"
+  },
+  "thread-89227": {
+   "url": "https://forums.wynncraft.com/threads/89227/",
+   "kind": "forum-thread",
+   "title": "Guild - |♕ Kingdom Of Foxes ♕| | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T07:11:57.885Z",
+   "textChars": 20540,
+   "rawSha256": "da477c91a0ad8d49",
+   "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-89529": {
+   "url": "https://forums.wynncraft.com/threads/89529/",
+   "kind": "forum-thread",
+   "title": "Alliance - ⌠ Valkyrie Alliance ⌡ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T06:59:58.645Z",
+   "textChars": 4413,
+   "rawSha256": "57cce5aa402502dd",
+   "note": "Valkyrie Alliance FOUNDING thread (LoveLusting 'Queen of the Foxes', Sep 10 2015): Valkyrie founded Jun 2 2015 by Kingdom of Foxes + Imperial; the 'Valkyrie Electorate' governance text"
+  },
+  "titansvalor-org-news-vol14": {
+   "url": "https://titansvalor.org/news/vol14",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:17.003Z",
+   "textChars": 21416,
+   "rawSha256": "9cd3fa7832927418",
+   "note": "Titan Times volume 14 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol15": {
+   "url": "https://titansvalor.org/news/vol15",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:17.952Z",
+   "textChars": 18563,
+   "rawSha256": "f21a917fb93bac19",
+   "note": "Titan Times volume 15 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol16": {
+   "url": "https://titansvalor.org/news/vol16",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:18.908Z",
+   "textChars": 22013,
+   "rawSha256": "3b3132b5f4c01ba7",
+   "note": "Titan Times volume 16 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol17": {
+   "url": "https://titansvalor.org/news/vol17",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:19.851Z",
+   "textChars": 18778,
+   "rawSha256": "43f63718aa2744be",
+   "note": "Titan Times volume 17 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol18": {
+   "url": "https://titansvalor.org/news/vol18",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:20.854Z",
+   "textChars": 16489,
+   "rawSha256": "4f528dbe17b49fcb",
+   "note": "Titan Times volume 18 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol19": {
+   "url": "https://titansvalor.org/news/vol19",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:21.462Z",
+   "textChars": 23125,
+   "rawSha256": "08a143b5c6f163fe",
+   "note": "Titan Times volume 19 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol20": {
+   "url": "https://titansvalor.org/news/vol20",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:22.369Z",
+   "textChars": 18130,
+   "rawSha256": "78a955e29b8ad9f0",
+   "note": "Titan Times volume 20 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titansvalor-org-news-vol21": {
+   "url": "https://titansvalor.org/news/vol21",
+   "kind": "newsletter",
+   "title": "Titan's Valor",
+   "fetchedAt": "2026-09-03T07:04:23.009Z",
+   "textChars": 16139,
+   "rawSha256": "206c54a7d696befc",
+   "note": "Titan Times volume 21 (titansvalor.org/news) — previously UNREACHABLE (host was HTTP 525, not on Wayback); covers 2023-2025 ANO/alliance record incl. the post-IceResistance ANO ownership question"
+  },
+  "titantimes-github-io-index": {
+   "url": "https://titantimes.github.io/",
+   "kind": "newsletter",
+   "title": "Home - Titan Times",
+   "fetchedAt": "2026-09-03T07:00:33.316Z",
+   "textChars": 6631,
+   "rawSha256": "cf3c86649d11ed15",
+   "note": "Titan Times index — Titans Valor's newsletter, lists vols 1-13 (May 2022 - 2024); vols 14-21 live only on titansvalor.org/news"
+  },
+  "titantimes-github-io-vol1": {
+   "url": "https://titantimes.github.io/vol1",
+   "kind": "newsletter",
+   "title": "Volume 1 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:06.483Z",
+   "textChars": 5721,
+   "rawSha256": "44f33ea228b925c5",
+   "note": "Titan Times volume 1 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol10": {
+   "url": "https://titantimes.github.io/vol10",
+   "kind": "newsletter",
+   "title": "Volume 10 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:10.920Z",
+   "textChars": 14381,
+   "rawSha256": "6e5a960b1f4ca9ef",
+   "note": "Titan Times volume 10 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol11": {
+   "url": "https://titantimes.github.io/vol11",
+   "kind": "newsletter",
+   "title": "Volume 11 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:11.368Z",
+   "textChars": 13079,
+   "rawSha256": "59c4109057106183",
+   "note": "Titan Times volume 11 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol12": {
+   "url": "https://titantimes.github.io/vol12",
+   "kind": "newsletter",
+   "title": "Volume 12 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:11.949Z",
+   "textChars": 13616,
+   "rawSha256": "20941303c6ff92cf",
+   "note": "Titan Times volume 12 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol13": {
+   "url": "https://titantimes.github.io/vol13",
+   "kind": "newsletter",
+   "title": "Volume 13 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:12.475Z",
+   "textChars": 19664,
+   "rawSha256": "d1d10a7ccc8ae577",
+   "note": "Titan Times volume 13 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol2": {
+   "url": "https://titantimes.github.io/vol2",
+   "kind": "newsletter",
+   "title": "Volume 2 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:06.955Z",
+   "textChars": 6284,
+   "rawSha256": "b1c55da43f8487aa",
+   "note": "Titan Times volume 2 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol3": {
+   "url": "https://titantimes.github.io/vol3",
+   "kind": "newsletter",
+   "title": "Volume 3 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:07.435Z",
+   "textChars": 8070,
+   "rawSha256": "1af1c7fe825b101a",
+   "note": "Titan Times volume 3 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol4": {
+   "url": "https://titantimes.github.io/vol4",
+   "kind": "newsletter",
+   "title": "Volume 4 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:07.983Z",
+   "textChars": 10387,
+   "rawSha256": "e0db73815b20b72c",
+   "note": "Titan Times volume 4 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol5": {
+   "url": "https://titantimes.github.io/vol5",
+   "kind": "newsletter",
+   "title": "Volume 5 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:08.474Z",
+   "textChars": 11580,
+   "rawSha256": "ab56d98c64ea2604",
+   "note": "Titan Times volume 5 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol6": {
+   "url": "https://titantimes.github.io/vol6",
+   "kind": "newsletter",
+   "title": "Volume 6 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:08.960Z",
+   "textChars": 12200,
+   "rawSha256": "74bd526c1762af15",
+   "note": "Titan Times volume 6 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol7": {
+   "url": "https://titantimes.github.io/vol7",
+   "kind": "newsletter",
+   "title": "Volume 7 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:09.419Z",
+   "textChars": 22184,
+   "rawSha256": "f7980e010a5d583f",
+   "note": "Titan Times volume 7 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol8": {
+   "url": "https://titantimes.github.io/vol8",
+   "kind": "newsletter",
+   "title": "Volume 8 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:09.895Z",
+   "textChars": 20673,
+   "rawSha256": "bec8b143058248fe",
+   "note": "Titan Times volume 8 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "titantimes-github-io-vol9": {
+   "url": "https://titantimes.github.io/vol9",
+   "kind": "newsletter",
+   "title": "Volume 9 - Titan Times",
+   "fetchedAt": "2026-09-03T07:03:10.453Z",
+   "textChars": 14919,
+   "rawSha256": "59e6540d66d52c03",
+   "note": "Titan Times volume 9 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)"
+  },
+  "wattpad-com-784189853-inside-myself-recent-wynncraft-guild-history": {
+   "url": "https://www.wattpad.com/784189853-inside-myself-recent-wynncraft-guild-history",
+   "kind": "memoir",
+   "title": "Inside Myself - Recent Wynncraft Guild History - Wattpad",
+   "fetchedAt": "2026-09-03T07:05:54.364Z",
+   "textChars": 7061,
+   "rawSha256": "19b3ca5e87563bc5",
+   "note": "'Inside Myself - Recent Wynncraft Guild History' (Leonhart_Arkada/A_Challenger_Arrives, ANO Aedile, ~Sep 14 2019): near-contemporaneous memoir — Valkyrie->Luna rename, Emorians revolt mechanism, Terra's ~15-guild merger, the failed Sep 14 raid"
+  },
+  "wynncraft-wiki-gg-wiki-guild-seasons": {
+   "url": "https://wynncraft.wiki.gg/wiki/Guild_Seasons",
+   "kind": "wiki",
+   "title": "Guild Seasons - Official Wynncraft Wiki",
+   "fetchedAt": "2026-09-03T07:05:53.460Z",
+   "textChars": 10382,
+   "rawSha256": "127aec5fe90e9e73",
+   "note": "Wynncraft wiki Guild Seasons table: full season 1-26 dates and winners (Shy S1, ERN S2, TAq S3/S5/S8, NFR S4, DUDE S6, AVO S7...) — the era-page backbone for 2021+ standings"
+  },
+  "youtube-com-watch-v-rlrh14ns6ok": {
+   "url": "https://www.youtube.com/watch?v=RLRh14ns6ok",
+   "kind": "video",
+   "title": "Wynncraft Warring - The Long Raid - YouTube",
+   "fetchedAt": "2026-09-03T07:05:58.436Z",
+   "textChars": 169,
+   "rawSha256": "26d2931213060b39",
+   "note": "Frank Wynncraft, 'Wynncraft Warring - The Long Raid' (premiered Aug 4 2024): the week-long siege of Aequitas's Sky-province claim; attacker never named in indexed text"
+  }
+ }
+}
