@@ -1,4 +1,4 @@
-{
+﻿{
   "$comment": "DEFINITIVE chronicle change set from the 2020-2026 research effort, revision 2 (post placeholder-hunt). Sources dossier: chronicle-research-notes-2020-2026.md. Standard: alliances require a NAME plus recorded history; map inference only refines dates or is flagged. Provenance tags: [attested]=written source, [api]=official API, [tt]=Titan Times (ANO newsletter, primary source), [testimony]=Cameron oral history, [map]=territory_exchanges. `allianceEdits` replace prod entries wholesale (targetId = chronicle_alliances.id); `eventEdits` are keyed by exact prod event title.",
   "generated": "2026-09-02",
   "alliances": [
@@ -8,7 +8,7 @@
         "tag": "Valk",
         "color": "#c9a227",
         "kind": "community",
-        "description": "The longest-lived alliance in Wynncraft history — founded 2 Jun 2015 by Kingdom of Foxes and Imperial “not for the purpose of war”, governed by an Electorate of guild masters, and still self-described as a community alliance seven years later. It persisted continuously: a rump era under Drew1011 (2016-2018), an in-place revival in March 2018 (The Hive and Emorians joining), the Luna era in which the bloc warred under another name, and the 2020-2022 era alongside Artemis and Hestia with Imperial, Kingdom Foxes and Paladins United. Last attested 19 Sep 2022; the satirical “Greater Valkyrie Alliance” of late 2022 was unrelated guilds trading on the name.",
+        "description": "The longest-lived alliance in Wynncraft history â€” founded 2 Jun 2015 by Kingdom of Foxes and Imperial â€œnot for the purpose of warâ€, governed by an Electorate of guild masters, and still self-described as a community alliance seven years later. It persisted continuously: a rump era under Drew1011 (2016-2018), an in-place revival in March 2018 (The Hive and Emorians joining), the Luna era in which the bloc warred under another name, and the 2020-2022 era alongside Artemis and Hestia with Imperial, Kingdom Foxes and Paladins United. Last attested 19 Sep 2022; the satirical â€œGreater Valkyrie Allianceâ€ of late 2022 was unrelated guilds trading on the name.",
         "memberships": [
           {
             "guild": "Kingdom Foxes",
@@ -48,7 +48,7 @@
         ]
       },
       "notes": [
-        "[attested] Community alliance in every era's self-description: 2015 founding ('not established for the purpose of war'), 2020 ('built on friendship'), 2021-22 PUN OP ('both community alliances'). Entered as kind=community, so it never overrides war-alliance map colors — resolving the earlier Fox-vs-Imperial contradiction (that war happened under Luna's banner while Valkyrie was the social layer).",
+        "[attested] Community alliance in every era's self-description: 2015 founding ('not established for the purpose of war'), 2020 ('built on friendship'), 2021-22 PUN OP ('both community alliances'). Entered as kind=community, so it never overrides war-alliance map colors â€” resolving the earlier Fox-vs-Imperial contradiction (that war happened under Luna's banner while Valkyrie was the social layer).",
         "[attested] Founded 2 Jun 2015 (pre-window; Fox join clamped to 2018-01-01). Rump era Fox/HoL/HHU attested Oct 2016 - Mar 2017 (thread 159734); HoL/HHU ends approximated to the 10 Mar 2018 leadership restructure (not re-attested after). Imperial formally left Oct 2016 (thread 147790) and is re-attested from the 14 Sep 2019 Wattpad history.",
         "[attested] The Hive joined ~Mar 2018 (welcomed 21 Apr, 'joined a month prior'); end approximated to 29 Jan 2019 (end of Drew1011's Valkyrie officer title-chain; no later attestation). Emorians joined 23 May 2018; end tied to its documented Aug 2019 Luna exit.",
         "[attested] PUN: first attested member 14 Sep 2019 (Wattpad 'Inside Myself'); self-attested 'In Valk' Mar 2020; OP listed Valkyrie through 19 Sep 2022 (last attestation of the alliance anywhere).",
@@ -106,7 +106,7 @@
         "name": "Adonis",
         "tag": "Adonis",
         "color": "#8e24aa",
-        "description": "Community alliance founded around May 2022 by the leaders of Titans Valor and Empire of Sindria as Hestia declined — 'a space for those of us who are still active to hang together.' Avicia joined within weeks. Outlived the war alliances around it: still hosting community events (and a joint server with The Farplane) in early 2024.",
+        "description": "Community alliance founded around May 2022 by the leaders of Titans Valor and Empire of Sindria as Hestia declined â€” 'a space for those of us who are still active to hang together.' Avicia joined within weeks. Outlived the war alliances around it: still hosting community events (and a joint server with The Farplane) in early 2024.",
         "memberships": [
           {
             "guild": "Titans Valor",
@@ -127,7 +127,7 @@
         "kind": "community"
       },
       "notes": [
-        "[tt] Founding: Titan Times v1 (8 May 2022). 'Avicia has joined the Adonis alliance': v3 (12 Jun 2022). Still active: v12 (20 Feb 2024, community events) and v13 (22 Mar 2024, Farplane+ANO+Avicia joint server — Farplane's membership status unclear, not entered).",
+        "[tt] Founding: Titan Times v1 (8 May 2022). 'Avicia has joined the Adonis alliance': v3 (12 Jun 2022). Still active: v12 (20 Feb 2024, community events) and v13 (22 Mar 2024, Farplane+ANO+Avicia joint server â€” Farplane's membership status unclear, not entered).",
         "PLACEHOLDER END: 2024-03-22 = last attestation (v13), not a dissolution."
       ]
     },
@@ -136,7 +136,7 @@
         "name": "Cucumber Company",
         "tag": "Cuc",
         "color": "#43a047",
-        "description": "The war alliance of the great 2022 realignment, merging the ex-Valhalla and ex-Khaos worlds. Formed for guild Season 5 (spring 2022, per Titans Valor's newsletter: 'our first season being a part of the new Cucumber Company war alliance'). Its full 14-guild roster was posted to the forum megalist on 26 Jun 2022 — the last public alliance roster ever. Archived and renamed 'Smtn else' at the start of Season 8 (autumn 2022).",
+        "description": "The war alliance of the great 2022 realignment, merging the ex-Valhalla and ex-Khaos worlds. Formed for guild Season 5 (spring 2022, per Titans Valor's newsletter: 'our first season being a part of the new Cucumber Company war alliance'). Its full 14-guild roster was posted to the forum megalist on 26 Jun 2022 â€” the last public alliance roster ever. Archived and renamed 'Smtn else' at the start of Season 8 (autumn 2022).",
         "memberships": [
           {
             "guild": "Aequitas",
@@ -229,7 +229,7 @@
         "name": "smtn elf",
         "tag": "elf",
         "color": "#e53935",
-        "description": "Cucumber Company's direct continuation: renamed 'Smtn else' at the start of Season 8 (autumn 2022) — when Gang of Fools 'left and betrayed the alliance' and Paladins United, The Simple Ones and TerraLune joined — then renamed 'smtn elf' for Christmas 2022 and never changed back. Called 'unquestionably the greatest super-alliance of 2023' that February. Died in June 2023 when The Aquarium and Avicia walked out; by the August season post it was gone from the record entirely.",
+        "description": "Cucumber Company's direct continuation: renamed 'Smtn else' at the start of Season 8 (autumn 2022) â€” when Gang of Fools 'left and betrayed the alliance' and Paladins United, The Simple Ones and TerraLune joined â€” then renamed 'smtn elf' for Christmas 2022 and never changed back. Called 'unquestionably the greatest super-alliance of 2023' that February. Died in June 2023 when The Aquarium and Avicia walked out; by the August season post it was gone from the record entirely.",
         "memberships": [
           {
             "guild": "Aequitas",
@@ -322,9 +322,9 @@
       "notes": [
         "[tt] Rename + roster changes: Titan Times v6 (12 Oct 2022). [attested] 'smtn elf' by Feb 17 2023 (thread 306790); 'SMTN ELSE SLANDER' video Oct 3 2022 (by TherapueticLiz, the megalist alliance-list author); Titan Times v8 names The Clowns an ally, v9 (25 Mar 2023) records fuy joining mid-season, NFR leaving 'on account of the guild disbanding' (its last map exchange: 2023-03-09), and ICo holding alliance territory.",
         "[testimony] Christmas-rename story and TAq/AVO departure over claim-shrinking pressure: Cameron. [map] TAq/AVO exit dated 2023-06-15 by the ignition of their war on ex-allies.",
-        "[attested] Death bracket: last live mention 10 Jun 2023 ('To our other allies in smtn elf... thank you for the hqs' — Avicia's Season 12 crown post); gone from the Season 13 post (19 Aug 2023), which instead thanks 'The Aquarium - our unwavering ally'. Alliance end approximated 2023-06-30.",
+        "[attested] Death bracket: last live mention 10 Jun 2023 ('To our other allies in smtn elf... thank you for the hqs' â€” Avicia's Season 12 crown post); gone from the Season 13 post (19 Aug 2023), which instead thanks 'The Aquarium - our unwavering ally'. Alliance end approximated 2023-06-30.",
         "Carryover of the full Cucumber roster through the rename is per Titan Times' framing of a rename, not a reformation; only ANO/AVO/TAq/MALD/NFR/fuy/ICo/PUN/ILQ/UTL are individually attested in the smtn-else era.",
-        "[map] The rump alliance shows no infighting through 2024 — a quiet fade, not a violent breakup."
+        "[map] The rump alliance shows no infighting through 2024 â€” a quiet fade, not a violent breakup."
       ]
     },
     {
@@ -332,7 +332,7 @@
         "name": "Avocado Aquarium",
         "tag": "AvoAq",
         "color": "#7cb342",
-        "description": "The two-guild pact of Avicia and The Aquarium after they quit smtn elf in June 2023, waging a sniping and claim-taking campaign against their former allies into early 2024. They ran shared infrastructure including the joint subguild Avoquarium [HQs] (created 9 Aug 2023 — 'thank you for the hqs' appears in Avicia's June 2023 season post) plus subguilds ShadowFall (TAq) and the Avos (AVO). By the August 2023 season post they were each other's 'unwavering ally'.",
+        "description": "The two-guild pact of Avicia and The Aquarium after they quit smtn elf in June 2023, waging a sniping and claim-taking campaign against their former allies into early 2024. They ran shared infrastructure including the joint subguild Avoquarium [HQs] (created 9 Aug 2023 â€” 'thank you for the hqs' appears in Avicia's June 2023 season post) plus subguilds ShadowFall (TAq) and the Avos (AVO). By the August 2023 season post they were each other's 'unwavering ally'.",
         "memberships": [
           {
             "guild": "The Aquarium",
@@ -357,12 +357,12 @@
   "allianceEdits": [
     {
       "targetId": 9,
-      "editSummary": "Artemis: 2020 transformation — Fox/Shy attested members Mar 2020, ANO by Dec 2020; founders PUN/Imp out by Dec 2020",
+      "editSummary": "Artemis: 2020 transformation â€” Fox/Shy attested members Mar 2020, ANO by Dec 2020; founders PUN/Imp out by Dec 2020",
       "payload": {
         "name": "Artemis",
         "tag": "ART",
         "color": "#5e35b1",
-        "description": "Formed on 30 Oct 2019 by Imperial, Paladins United and Caeruleum Order. Transformed across 2020: by March 2020 Kingdom Foxes was a member and ShadowFall held a leadership seat; by December 2020 Artemis was 'the war alliance made up of all the current massive land holding guilds' including Titans Valor — while founders Paladins United and Imperial had drifted out (both appear with the opposing coalition that became Goose). Jointly protected the neutral Profession Heaven from 25 Jan 2021. Collapsed on 11 May 2021, feeding into Valhalla and Khaos.",
+        "description": "Formed on 30 Oct 2019 by Imperial, Paladins United and Caeruleum Order. Transformed across 2020: by March 2020 Kingdom Foxes was a member and ShadowFall held a leadership seat; by December 2020 Artemis was 'the war alliance made up of all the current massive land holding guilds' including Titans Valor â€” while founders Paladins United and Imperial had drifted out (both appear with the opposing coalition that became Goose). Jointly protected the neutral Profession Heaven from 25 Jan 2021. Collapsed on 11 May 2021, feeding into Valhalla and Khaos.",
         "memberships": [
           {
             "guild": "Imperial",
@@ -429,8 +429,8 @@
       },
       "notes": [
         "[attested] Mar 9 2020 (thread 263975): Kingdom Foxes self-identifies as a member; ShadowFall's GoulartJJ posts as an Artemis LEADER. Dec 2 2020: ANO a member (megalist via Wayback). Dec 18 2020: conflict thread places Fox in Artemis, PUN/Imperial with the opposing coalition.",
-        "[map] PUN/Imp departures dated ~2020-12-01: their quiet-territory war with the Artemis core ignites that month (142 quiet in Dec vs <50/mo before).",
-        "ShadowFall's exit dated 2021-02-01 — 'BNU(IBT), SHY and TNL are all goose now' (megalist p4, Feb 1 2021): a genuine side-switch.",
+        "[map] PUN/Imp departures dated ~2020-12-01: their non-FFA territory war with the Artemis core ignites that month (142 quiet in Dec vs <50/mo before).",
+        "ShadowFall's exit dated 2021-02-01 â€” 'BNU(IBT), SHY and TNL are all goose now' (megalist p4, Feb 1 2021): a genuine side-switch.",
         "Joins are 'by' dates. Replaces the doc-based entry that kept PUN/Imp until the 2021 collapse."
       ]
     },
@@ -441,7 +441,7 @@
         "name": "Goose",
         "tag": "Goose",
         "color": "#fdd835",
-        "description": "The coalition that rose against Artemis's map dominance: an 'unnamed group of anti-Artemis guilds' in December 2020, carrying the name Goose by 19 Jan 2021. It grew through spring 2021 — absorbing ShadowFall, IceBlue Team and TheNoLifes from the Artemis world and the future Khaos core (Aequitas, WheresTheFinish, ChinaNumberOne, Fuzzy Spiders, Eden) — took map control, and jointly protected the neutral Profession Heaven from 25 Jan 2021. Collapsed alongside Artemis on 11 May 2021, splitting into Valhalla and Khaos.",
+        "description": "The coalition that rose against Artemis's map dominance: an 'unnamed group of anti-Artemis guilds' in December 2020, carrying the name Goose by 19 Jan 2021. It grew through spring 2021 â€” absorbing ShadowFall, IceBlue Team and TheNoLifes from the Artemis world and the future Khaos core (Aequitas, WheresTheFinish, ChinaNumberOne, Fuzzy Spiders, Eden) â€” took map control, and jointly protected the neutral Profession Heaven from 25 Jan 2021. Collapsed alongside Artemis on 11 May 2021, splitting into Valhalla and Khaos.",
         "memberships": [
           {
             "guild": "Avicia",
@@ -678,7 +678,7 @@
       },
       "notes": [
         "[attested] Formation: Timeline doc (17 Aug 2020). Branding 'ILQ + Aeu' from Nov 30 2020 (thread 278123); active through Aug 26 2021 (thread page 11).",
-        "The 'Aeu' partner guild resolves to 'Admiralia' in guild_prefixes today, but tag reuse makes the identification unsafe — not entered.",
+        "The 'Aeu' partner guild resolves to 'Admiralia' in guild_prefixes today, but tag reuse makes the identification unsafe â€” not entered.",
         "PLACEHOLDER END: 2021-08-26 = last attestation. [map] ILQ and Mystic Woods never fought (~30 exchanges over six years), so the union may have persisted quietly."
       ]
     }
@@ -689,7 +689,7 @@
       "payload": {
         "eventType": "war",
         "title": "Goose-Artemis war",
-        "description": "The war for the map that ended the Artemis era. An 'unnamed group of anti-Artemis guilds' erupted against the map-holder alliance in December 2020 (913 quiet-territory exchanges that month, after months of skirmishing); by 19 Jan 2021 the coalition carried the name Goose. The war ran until both alliances collapsed on 11 May 2021, reforming as Valhalla and Khaos.",
+        "description": "The war for the map that ended the Artemis era. An 'unnamed group of anti-Artemis guilds' erupted against the map-holder alliance in December 2020 (913 non-FFA territory exchanges that month, after months of skirmishing); by 19 Jan 2021 the coalition carried the name Goose. The war ran until both alliances collapsed on 11 May 2021, reforming as Valhalla and Khaos.",
         "startsAt": "2020-12-01",
         "endsAt": "2021-05-11",
         "guilds": [],
@@ -708,7 +708,7 @@
       "payload": {
         "eventType": "war",
         "title": "The betrayal of Valhalla",
-        "description": "The Mage Legacy and TheNoLifes turned on their Valhalla allies — friction visible from August 2021, erupting into open war in December (5,359 quiet-territory exchanges that month). Both were excluded when Vanir formed on 28 Nov 2021; per testimony, TheNoLifes went on to help lead Khaos.",
+        "description": "The Mage Legacy and TheNoLifes turned on their Valhalla allies â€” friction visible from August 2021, erupting into open war in December (5,359 non-FFA territory exchanges that month). Both were excluded when Vanir formed on 28 Nov 2021; per testimony, TheNoLifes went on to help lead Khaos.",
         "startsAt": "2021-11-28",
         "endsAt": "2022-01-31",
         "guilds": [
@@ -728,7 +728,7 @@
       "payload": {
         "eventType": "war",
         "title": "Khaos's last war",
-        "description": "Khaos's war against the ex-Valhalla/Vanir guilds — an opposing coalition remembered in testimony as 'the Pineapple Pact' (no written record of that name survives) — peaked in January 2022 at 500-800 quiet-territory exchanges per week and faded to nothing by mid-July. The realignment that followed produced Cucumber Company.",
+        "description": "Khaos's war against the ex-Valhalla/Vanir guilds â€” an opposing coalition remembered in testimony as 'the Pineapple Pact' (no written record of that name survives) â€” peaked in January 2022 at 500-800 non-FFA territory exchanges per week and faded to nothing by mid-July. The realignment that followed produced Cucumber Company.",
         "startsAt": "2022-01-01",
         "endsAt": "2022-07-18",
         "guilds": [
@@ -751,7 +751,7 @@
       "payload": {
         "eventType": "founding",
         "title": "Cucumber Company forms",
-        "description": "The war alliance of the 2022 realignment formed for guild Season 5 — Titans Valor's newsletter (8 May 2022) calls it 'our first season being a part of the new Cucumber Company war alliance'. Its 14-guild roster, posted to the forum megalist on 26 Jun 2022, was the last public alliance roster ever; the megalist's alliance section was deleted twelve days later.",
+        "description": "The war alliance of the 2022 realignment formed for guild Season 5 â€” Titans Valor's newsletter (8 May 2022) calls it 'our first season being a part of the new Cucumber Company war alliance'. Its 14-guild roster, posted to the forum megalist on 26 Jun 2022, was the last public alliance roster ever; the megalist's alliance section was deleted twelve days later.",
         "startsAt": "2022-04-01",
         "endsAt": null,
         "guilds": [],
@@ -768,7 +768,7 @@
       "payload": {
         "eventType": "other",
         "title": "Cucumber Company becomes Smtn else",
-        "description": "At the start of Season 8 (autumn 2022) 'Cucumber was archived. The new alliance name is called Smtn else' — Titans Valor's newsletter, which in the same breath records Gang of Fools having 'left and betrayed the alliance' and welcomes Paladins United, The Simple Ones and TerraLune. Renamed again to 'smtn elf' for Christmas 2022, and never renamed back.",
+        "description": "At the start of Season 8 (autumn 2022) 'Cucumber was archived. The new alliance name is called Smtn else' â€” Titans Valor's newsletter, which in the same breath records Gang of Fools having 'left and betrayed the alliance' and welcomes Paladins United, The Simple Ones and TerraLune. Renamed again to 'smtn elf' for Christmas 2022, and never renamed back.",
         "startsAt": "2022-09-25",
         "endsAt": null,
         "guilds": [
@@ -790,7 +790,7 @@
       "payload": {
         "eventType": "disband",
         "title": "smtn elf fades away",
-        "description": "The super-alliance's last recorded mention is Avicia's Season 12 post of 10 Jun 2023 ('To our other allies in smtn elf... thank you for the hqs'); days later The Aquarium and Avicia walked out, and by the Season 13 post (19 Aug 2023) smtn elf had vanished from the record — no death announcement, just silence. The remaining guilds never fought each other; it simply dissolved.",
+        "description": "The super-alliance's last recorded mention is Avicia's Season 12 post of 10 Jun 2023 ('To our other allies in smtn elf... thank you for the hqs'); days later The Aquarium and Avicia walked out, and by the Season 13 post (19 Aug 2023) smtn elf had vanished from the record â€” no death announcement, just silence. The remaining guilds never fought each other; it simply dissolved.",
         "startsAt": "2023-06-30",
         "endsAt": null,
         "guilds": [],
@@ -807,7 +807,7 @@
       "payload": {
         "eventType": "war",
         "title": "The Avocado split",
-        "description": "The Aquarium and Avicia quit smtn elf in June 2023 — rejecting pressure (led by busted moments) to shrink their claims — and as the two-guild Avocado Aquarium pact waged a sniping and claim-taking campaign against their former allies into early 2024, running mega-claims across TAq, AVO and their subguilds ShadowFall, the Avos and Avoquarium.",
+        "description": "The Aquarium and Avicia quit smtn elf in June 2023 â€” rejecting pressure (led by busted moments) to shrink their claims â€” and as the two-guild Avocado Aquarium pact waged a sniping and claim-taking campaign against their former allies into early 2024, running mega-claims across TAq, AVO and their subguilds ShadowFall, the Avos and Avoquarium.",
         "startsAt": "2023-06-15",
         "endsAt": "2024-02-28",
         "guilds": [
@@ -828,7 +828,7 @@
       "payload": {
         "eventType": "war",
         "title": "Avicia-Sequoia war",
-        "description": "Avicia's war with the young Sequoia (founded 14 Oct 2022): skirmishes through spring 2023, the main eruption 30 Oct - 20 Nov 2023 (peaking at 1,454 quiet-territory exchanges per week), and a second round in January 2024. Sequoia's rise continued regardless — it won seven consecutive guild seasons from mid-2024.",
+        "description": "Avicia's war with the young Sequoia (founded 14 Oct 2022): skirmishes through spring 2023, the main eruption 30 Oct - 20 Nov 2023 (peaking at 1,454 non-FFA territory exchanges per week), and a second round in January 2024. Sequoia's rise continued regardless â€” it won seven consecutive guild seasons from mid-2024.",
         "startsAt": "2023-10-30",
         "endsAt": "2024-01-31",
         "guilds": [
@@ -845,7 +845,7 @@
       "payload": {
         "eventType": "war",
         "title": "Idiot Co-Aquarium war",
-        "description": "The biggest war since 2021: Idiot Co against The Aquarium, igniting 29 Apr 2024 and raging through mid-July (peak 5,045 quiet-territory exchanges in a week), with a second round from November 2024 into January 2025. Spanned the Rekindled World map rework of 10 Aug 2024.",
+        "description": "The biggest war since 2021: Idiot Co against The Aquarium, igniting 29 Apr 2024 and raging through mid-July (peak 5,045 non-FFA territory exchanges in a week), with a second round from November 2024 into January 2025. Spanned the Rekindled World map rework of 10 Aug 2024.",
         "startsAt": "2024-04-29",
         "endsAt": "2025-01-31",
         "guilds": [
@@ -862,7 +862,7 @@
       "payload": {
         "eventType": "war",
         "title": "The Long Raid",
-        "description": "A roughly week-long siege of Aequitas's claim in the Sky province, late July to early August 2024 — the only battle of its era with a first-person retelling: the video 'Wynncraft Warring - The Long Raid' by Frank Wynncraft (premiered 4 Aug 2024). The attackers are never named in any surviving text.",
+        "description": "A roughly week-long siege of Aequitas's claim in the Sky province, late July to early August 2024 â€” the only battle of its era with a first-person retelling: the video 'Wynncraft Warring - The Long Raid' by Frank Wynncraft (premiered 4 Aug 2024). The attackers are never named in any surviving text.",
         "startsAt": "2024-07-28",
         "endsAt": "2024-08-04",
         "guilds": [
@@ -878,7 +878,7 @@
       "payload": {
         "eventType": "war",
         "title": "Aequitas-Avicia war",
-        "description": "The largest war in the entire territory record: Aequitas against Avicia, 3 Nov - 21 Dec 2025, with 15,710 quiet-territory exchanges (21,526 total) and a weekly peak of 4,736. Over by Christmas.",
+        "description": "The largest war in the entire territory record: Aequitas against Avicia, 3 Nov - 21 Dec 2025, with 15,710 non-FFA territory exchanges (21,526 total) and a weekly peak of 4,736. Over by Christmas.",
         "startsAt": "2025-11-03",
         "endsAt": "2025-12-21",
         "guilds": [
@@ -895,7 +895,7 @@
       "payload": {
         "eventType": "war",
         "title": "Fall of Profession Heaven's neutrality",
-        "description": "Profession Heaven had been a protected neutral profession-XP guild since 25 Jan 2021, guarded by Goose and Artemis and their successors — and a member of Cucumber Company and smtn elf. On 25 May 2026 KongoBoys began a sustained campaign against it — up to 1,700 quiet-territory exchanges a week — ending five years of neutrality. Ongoing.",
+        "description": "Profession Heaven had been a protected neutral profession-XP guild since 25 Jan 2021, guarded by Goose and Artemis and their successors â€” and a member of Cucumber Company and smtn elf. On 25 May 2026 KongoBoys began a sustained campaign against it â€” up to 1,700 non-FFA territory exchanges a week â€” ending five years of neutrality. Ongoing.",
         "startsAt": "2026-05-25",
         "endsAt": null,
         "guilds": [
@@ -912,7 +912,7 @@
       "payload": {
         "eventType": "war",
         "title": "Aequitas-Sequoia war",
-        "description": "The current war: after a one-week clash in August 2025 and spring 2026 skirmishes, full war between Aequitas and Sequoia erupted in the week of 24 Aug 2026 — 7,488 quiet-territory exchanges in its first week, with Aequitas driven to zero territories. Ongoing.",
+        "description": "The current war: after a one-week clash in August 2025 and spring 2026 skirmishes, full war between Aequitas and Sequoia erupted in the week of 24 Aug 2026 â€” 7,488 non-FFA territory exchanges in its first week, with Aequitas driven to zero territories. Ongoing.",
         "startsAt": "2026-08-24",
         "endsAt": null,
         "guilds": [
@@ -953,15 +953,15 @@
     },
     {
       "name": "Wynnic Union",
-      "reason": "Community alliance attested via ILQ's thread OP (Sep 2020) — only one member known."
+      "reason": "Community alliance attested via ILQ's thread OP (Sep 2020) â€” only one member known."
     },
     {
       "name": "New Dawn / High-Class Guilds",
-      "reason": "Named in single 2021 megalist posts (Merashold; Atlas Inc) — one member each, no further record."
+      "reason": "Named in single 2021 megalist posts (Merashold; Atlas Inc) â€” one member each, no further record."
     },
     {
       "name": "Luna as Artemis's predecessor",
-      "reason": "Mar 2020 thread recalls the Luna 'Great War' era consistently with the existing chronicle — no changes needed."
+      "reason": "Mar 2020 thread recalls the Luna 'Great War' era consistently with the existing chronicle â€” no changes needed."
     },
     {
       "name": "2024-2026 war blocs",
@@ -969,7 +969,7 @@
     },
     {
       "name": "TNL-AEQ alliance (2023)",
-      "reason": "Attested relationship (Sep 1 2023) but unnamed — both were smtn-elf members then, so likely the same alliance."
+      "reason": "Attested relationship (Sep 1 2023) but unnamed â€” both were smtn-elf members then, so likely the same alliance."
     }
   ]
 }

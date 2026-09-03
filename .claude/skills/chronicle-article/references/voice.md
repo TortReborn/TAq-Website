@@ -73,6 +73,10 @@ can act on — the footnote still says exactly where each came from.
   ("may have possibly").
 - **Specific over grand.** "held the entire map for 8 months and 25 days" beats
   "enjoyed a long period of supremacy".
+- **No research-layer jargon.** "Quiet-territory exchanges", "FFA-cluster",
+  "the chronicle", "the corpus" are internal methodology vocabulary — write
+  "territory exchanges" and let [[territory-warfare]] explain the method once.
+  Full list in `citations.md`.
 - **Dates**: `17 February 2018` in prose, `17 Feb 2018` in infoboxes. Ranges take
   an en dash: `2018–2019`.
 - **Numbers**: figures for counts and territories (`146 of roughly 332`); words

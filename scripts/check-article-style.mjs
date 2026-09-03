@@ -1,260 +1,164 @@
 #!/usr/bin/env node
-// Check chronicle articles against the house style (.claude/skills/chronicle-article).
-//
-//   node scripts/check-article-style.mjs                 # report the whole corpus
-//   node scripts/check-article-style.mjs --slug foo      # one article, with context
-//   node scripts/check-article-style.mjs --fact "15 Mar 2018"   # who repeats a fact
-//   node scripts/check-article-style.mjs --strict        # non-zero exit on errors
-//
-// The prose rules cannot be fully mechanised — whether an attribution is one of
-// the four legitimate cases is a judgement. So attribution phrases are reported
-// with their surrounding text for a human to weigh, and the gate is the corpus
-// rate, benchmarked at 0.89/1000 words across ten historical Wikipedia articles.
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+/**
+ * Style linter for the Chronicles wiki corpus (data/wiki/seed-articles.json).
+ * The rules it enforces are the chronicle-article skill's
+ * (.claude/skills/chronicle-article/): provenance lives in footnotes, not prose.
+ *
+ *   node scripts/check-article-style.mjs                  report on the corpus
+ *   node scripts/check-article-style.mjs --slug <slug>    one article
+ *   node scripts/check-article-style.mjs --strict         exit non-zero on ERRORs
+ *   node scripts/check-article-style.mjs --fact "<text>"  list articles stating a fact
+ *
+ * ERROR   mechanical violations: banned jargon, first person, manual Sources
+ *         sections, field limits. Never acceptable; --strict fails on these.
+ * WARN    phrasings that usually violate the attribution test ("according to",
+ *         "attested", "Wayback", ...). Each needs a human/agent judgment call:
+ *         the four legitimate cases (opinion, source disagreement, own conduct,
+ *         quotation) may keep their attribution. Quoted text is exempt.
+ */
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const ARTICLES = JSON.parse(readFileSync(join(ROOT, 'data/wiki/seed-articles.json'), 'utf8')).articles;
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+const strict = args.includes('--strict');
+const arg = (name) => { const i = args.indexOf(name); return i === -1 ? null : args[i + 1]; };
+const onlySlug = arg('--slug');
+const fact = arg('--fact');
 
-const argv = process.argv.slice(2);
-const flag = (n) => { const i = argv.indexOf(n); return i === -1 ? null : argv[i + 1]; };
-const STRICT = argv.includes('--strict');
-const ONLY = flag('--slug');
-const FACT = flag('--fact');
+const { articles } = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/wiki/seed-articles.json'), 'utf8'));
 
-// Wikipedia's rate over Delian League, Hanseatic League, Second Punic War,
-// Battle of Hastings, Peloponnesian War, Achaean League, Wars of the Roses,
-// Themistocles, Aetolian League, Battle of Agincourt.
-const WIKIPEDIA_ATTR_RATE = 0.89;
-const ATTR_TARGET = 1.0;
-
-const BUDGET = {
-  alliance: [300, 700], war: [250, 600], guild: [150, 400], player: [100, 300],
-  era: [400, 900], update: [150, 400], general: [150, 500],
-};
-
-// Phrases that hand provenance to the prose. Legitimate in the four cases from
-// voice.md, so these are reported rather than banned outright.
-const ATTRIBUTION = /\b(?:according to|by (?:his|her|their|its) (?:own )?account|(?:in|on) (?:his|her|their) account|(?:he|she|they|who) (?:states?|stated|writes?|wrote|claims?|claimed|recalls?|recalled|says?|said) that|(?:states?|writes?|claims?|recalls?|reports?) that|as recorded by|is (?:described|attested|recorded) (?:in detail )?(?:only )?by|supplies? (?:an?|the) (?:explanation|date|account)|on that reading)\b/gi;
-
-// Talk-page material: the article discussing our research instead of the past.
-const META = [
-  [/\ban earlier version of this article\b/gi, 'refers to an earlier revision'],
-  [/\bthis article\b/gi, 'refers to itself'],
-  [/\b(?:no|any) sources? held here\b/gi, 'refers to our archive'],
-  [/\b(?:recorded |held |found )in no source held here\b/gi, 'refers to our archive'],
-  [/\bin the corpus\b/gi, 'refers to our archive'],
-  [/\bthe chronicle's sources\b/gi, 'refers to our archive'],
-  [/\bour (?:records?|sources?|analysis|archive)\b/gi, 'first person about our research'],
-  [/\bno other .{0,40}facts? about\b/gi, 'reports the absence of research, not of history'],
-  [/\b(?:archived|retrieved) in \d{4}\b/gi, 'archive mechanics belong in the reference'],
-];
-
-// The source, rather than the event, as the subject of the sentence.
-const SOURCE_SUBJECT = [
-  [/\b(?:a|the) (?:recovered |contemporaneous )?(?:Wayback )?capture\b[^.]{0,40}\bshows?\b/gi, 'capture as subject'],
-  [/\bthe (?:forum|written|contemporaneous|surviving) record shows?\b/gi, 'record as subject'],
-  [/\b(?:a|the) first-person account\b/gi, 'account as subject'],
-  [/\b(?:the|a) (?:forum )?thread \d+ (?:shows?|records?|says?)\b/gi, 'thread as subject'],
-];
-
-const PEACOCK = /\b(?:legendary|iconic|greatest|remarkable|impressive|infamous(?:ly)?|unquestionabl[ey]|beyond question)\b/gi;
-const WEASEL = /\b(?:some say|many believe|it is widely (?:regarded|believed|held)|most agree)\b/gi;
-const HEDGE_STACK = /\b(?:may|might|could) have possibly\b|\b(?:possibly|perhaps) (?:may|might) have\b|\bappears? to possibly\b/gi;
-
-const words = (s) => s.split(/\s+/).filter(Boolean).length;
-const stripMarkup = (s) => s
-  .replace(/\{\{cite:[^}]*\}\}/g, '')
-  .replace(/\{\{(?:map|war-chart|alliance):[^}]*\}\}/g, '')
-  .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-  .replace(/\[\[([^\]|]*\|)?([^\]]*)\]\]/g, '$2');
-
-// Every way this corpus writes a date, so --fact finds all of them.
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-function dateForms(text) {
-  const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  let y, m, d;
-  if (iso) { [, y, m, d] = iso.map(Number); }
-  else {
-    const long = text.match(/^(\d{1,2})\s+([A-Za-z]+),?\s+(\d{4})$/);
-    const us = text.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
-    if (long) { d = +long[1]; m = MONTHS.findIndex(x => x.toLowerCase().startsWith(long[2].toLowerCase().slice(0, 3))) + 1; y = +long[3]; }
-    else if (us) { m = MONTHS.findIndex(x => x.toLowerCase().startsWith(us[1].toLowerCase().slice(0, 3))) + 1; d = +us[2]; y = +us[3]; }
-    else return [text];
-  }
-  if (!m || !d || !y) return [text];
-  const L = MONTHS[m - 1], S = L.slice(0, 3);
-  return [`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
-          `${d} ${L} ${y}`, `${d} ${S} ${y}`, `${L} ${d}, ${y}`, `${S} ${d}, ${y}`,
-          `${d} ${L}`, `${d} ${S}`];
-}
-
-if (FACT) {
-  const forms = dateForms(FACT.trim());
-  console.log(`Searching for: ${forms.join('  |  ')}\n`);
-  let n = 0;
-  for (const a of ARTICLES) {
-    const hay = `${a.summary}\n${JSON.stringify(a.infobox || [])}\n${a.body}`;
-    const hits = forms.filter(f => hay.includes(f));
-    if (!hits.length) continue;
-    n++;
-    const where = [];
-    if (forms.some(f => a.summary.includes(f))) where.push('LEDE');
-    if (forms.some(f => JSON.stringify(a.infobox || []).includes(f))) where.push('INFOBOX');
-    if (forms.some(f => a.body.includes(f))) where.push('body');
-    console.log(`${a.slug}  [${a.pageType}]  ${where.join(' + ')}   matched: ${hits.join(', ')}`);
-    for (const line of a.body.split('\n')) {
-      if (forms.some(f => line.includes(f))) console.log(`      ${stripMarkup(line).trim().slice(0, 150)}`);
+// --fact: where is this claim stated? (bodies, summaries, infoboxes, titles)
+if (fact) {
+  const needle = fact.toLowerCase();
+  let hits = 0;
+  for (const a of articles) {
+    const places = [];
+    if (a.title?.toLowerCase().includes(needle)) places.push('title');
+    if (a.summary?.toLowerCase().includes(needle)) places.push('summary');
+    if (a.body?.toLowerCase().includes(needle)) places.push('body');
+    for (const row of a.infobox ?? []) {
+      if (`${row.label} ${row.value}`.toLowerCase().includes(needle)) { places.push(`infobox "${row.label}"`); break; }
     }
+    if (places.length) { hits++; console.log(`${a.slug}  (${places.join(', ')})`); }
   }
-  console.log(`\n${n} article(s) repeat this fact. Update prose, infobox rows AND ledes.`);
+  console.log(`\n${hits} article(s) state ${JSON.stringify(fact)}. Update every one, or none.`);
   process.exit(0);
 }
 
-const findings = [];
-const add = (slug, sev, rule, msg, ctx) => findings.push({ slug, sev, rule, msg, ctx });
+// Remove the spans that are exempt from voice checks: quotations (a source may
+// say anything), citation markers, embeds and link targets.
+// This corpus quotes with single quotes and blockquotes as often as with double
+// quotes; missing those makes a source's own "we" look like our first person.
+const proseOf = (text) =>
+  (text ?? '')
+    .replace(/\{\{[^}]*\}\}/g, ' ')
+    .replace(/^>.*$/gm, ' <q> ')                       // blockquoted source text
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')             // image captions quote sources too
+    .replace(/"[^"\n]{2,400}"/g, ' <q> ')
+    .replace(/[“][^”\n]{2,400}[”]/g, ' <q> ')
+    // Single-quoted spans, bounded so contractions ("Fantasy's", "don't") survive.
+    .replace(/(^|[\s(—–-])'[^'\n]{2,400}'(?=$|[\s.,;:!?)\]—–-])/g, '$1 <q> ')
+    .replace(/(^|[\s(—–-])[‘][^’\n]{2,400}[’](?=$|[\s.,;:!?)\]—–-])/g, '$1 <q> ')
+    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '$2')
+    .replace(/\[\[([^\]]+)\]\]/g, '$1');
 
-let corpusWords = 0, corpusAttr = 0;
-const targets = ONLY ? ARTICLES.filter(a => a.slug === ONLY) : ARTICLES;
-if (ONLY && !targets.length) { console.error(`No article with slug "${ONLY}"`); process.exit(1); }
+const wordCount = (text) => proseOf(text).split(/\s+/).filter(Boolean).length;
 
-for (const a of targets) {
-  const body = a.body || '';
-  const prose = stripMarkup(body);
-  const w = words(prose);
-  corpusWords += w;
+// ERROR patterns — research-layer language and coinages with no place in prose.
+const BANNED = [
+  [/quiet[- ]territor/i, 'banned jargon "quiet territor…" — write "territory exchanges" ([[territory-warfare]] explains the FFA filter)'],
+  [/FFA[- ]cluster/i, 'banned jargon "FFA-cluster" — research-layer vocabulary'],
+  [/an earlier (version|revision) of this article/i, 'talks about its own revision history'],
+  [/\bthe chronicle('s)? (database|corpus|records?|sources?)\b/i, 'talks about the chronicle database — provenance belongs in the footnote'],
+  [/\b(?:our|this wiki's) (research|analysis|archive|records?|sources?)\b/i, 'first-person research talk'],
+  [/\b(recorded|held|found) in no source\b/i, 'research-process negative — write it as a fact about the past ("was never recorded")'],
+  [/^##\s+(Sources|References)\s*$/im, 'manual Sources/References section — the reference list is generated'],
+  [/\bwe\b|\bour\b/i, 'first person'],
+];
 
-  const context = (re) => {
-    const out = [];
-    for (const line of prose.split('\n')) {
-      re.lastIndex = 0;
-      if (re.test(line)) out.push(line.trim().slice(0, 160));
+// WARN patterns — each usually fails the attribution test; the four legitimate
+// cases may keep theirs.
+const SOURCE_TALK = [
+  [/\baccording to\b/i, '"according to"'],
+  [/\battest(ed|ation|s)?\b/i, '"attested"'],
+  [/\bwayback\b/i, '"Wayback"'],
+  [/\bmap[- ]data\b/i, '"map-data"'],
+  [/\b(oral )?testimon(y|ies)\b/i, '"testimony"'],
+  [/\bmemoirs?\b/i, '"memoir"'],
+  [/\brecall(s|ed)?\b|\brecollect(s|ed|ion|ions)?\b/i, '"recalled/recollection"'],
+  [/\bstorytimes?\b/i, '"storytime"'],
+  [/\barchiv(e|ed|es)\b/i, '"archive(d)" (exempt if it means an in-game guild archival)'],
+  [/\bcommunity timeline\b/i, '"community timeline"'],
+  [/\bcorroborat(e|ed|es|ion)\b/i, '"corroborated"'],
+  [/\bsurvives? (only )?(in|as|through)\b/i, '"survives in/as" (record-talk)'],
+  [/\b(a|one|a single) forum post\b/i, 'evidence-counting'],
+  [/\bthe (written )?record (goes|is|has|shows|preserves)\b/i, 'record-talk'],
+  [/\b(is|was|are|were) (not |never )?(recorded|documented|preserved)\b/i, 'passive record-talk (fine if phrased as a fact about the past: "the roster was never published")'],
+];
+
+const PEACOCK = [/\b(legendary|iconic|infamous(ly)?|remarkabl[ey]|dominant beyond|unstoppable|storied)\b/i, 'peacock word'];
+
+const BUDGETS = { alliance: 700, war: 600, guild: 400, player: 300, era: 900, update: 400, general: 500 };
+
+// In-prose attribution density (voice.md target: corpus average <= 1.0 per
+// 1,000 words). Counts the phrasings that name a source or witness in prose.
+const ATTRIB = /\baccording to\b|\battested\b|\bwayback\b|\bmap[- ]data\b|\btestimon(y|ies)\b|\bmemoirs?\b|\brecall(s|ed)?\b|\brecollection\b|\bstorytimes?\b|\bcommunity timeline\b|\bcorroborat/gi;
+
+let errors = 0, warns = 0, totalWords = 0, totalAttrib = 0;
+const scanned = onlySlug ? articles.filter((a) => a.slug === onlySlug) : articles;
+if (onlySlug && !scanned.length) { console.error(`no article with slug ${onlySlug}`); process.exit(2); }
+
+for (const a of scanned) {
+  const findings = [];
+  const fields = [['summary', a.summary ?? ''], ['body', a.body ?? '']];
+  const infoboxText = (a.infobox ?? []).map((r) => `${r.label}: ${r.value}`).join('\n');
+  if (infoboxText) fields.push(['infobox', infoboxText]);
+
+  for (const [where, raw] of fields) {
+    const prose = proseOf(raw);
+    for (const [re, msg] of BANNED) {
+      // "## Sources" must be matched against the raw body, not stripped prose
+      const target = String(re).includes('##') ? raw : prose;
+      const m = target.match(re);
+      if (m) findings.push(['ERROR', `${where}: ${msg}  [${m[0].trim().slice(0, 40)}]`]);
     }
-    return out;
-  };
-
-  // --- attribution ---------------------------------------------------------
-  const attrs = prose.match(ATTRIBUTION) || [];
-  corpusAttr += attrs.length;
-  if (attrs.length) {
-    const rate = w ? (attrs.length / w) * 1000 : 0;
-    add(a.slug, attrs.length >= 3 ? 'error' : 'warn', 'attribution',
-      `${attrs.length} in-prose attribution(s), ${rate.toFixed(1)}/1000w — keep only opinion, source disagreement, an interested party on their own conduct, or a direct quote`,
-      context(ATTRIBUTION));
-  }
-
-  // --- meta-commentary -----------------------------------------------------
-  for (const [re, why] of META) {
-    const m = prose.match(re);
-    if (m) add(a.slug, 'error', 'meta', `${why}: "${m[0]}"`, context(re));
-  }
-  for (const [re, why] of SOURCE_SUBJECT) {
-    const m = prose.match(re);
-    if (m) add(a.slug, 'warn', 'source-as-subject', `${why}: "${m[0]}"`, context(re));
-  }
-
-  // --- word choice ---------------------------------------------------------
-  // A peacock word inside a quotation is attributed, which is allowed.
-  const unquoted = prose.replace(/"[^"]*"/g, '""');
-  for (const [re, rule, sev] of [[PEACOCK, 'peacock', 'error'], [WEASEL, 'weasel', 'error'], [HEDGE_STACK, 'hedge-stack', 'warn']]) {
-    const m = unquoted.match(re);
-    if (m) add(a.slug, sev, rule, `"${[...new Set(m)].join('", "')}"`, context(re));
-  }
-
-  // --- lede ----------------------------------------------------------------
-  const sum = (a.summary || '').trim();
-  if (!sum) add(a.slug, 'error', 'lede', 'no summary');
-  else {
-    if (sum.length > 500) add(a.slug, 'error', 'lede', `${sum.length} chars (max 500)`);
-    const sentences = sum.split(/(?<=[.!?])\s+(?=[A-Z"'\[])/).length;
-    if (sentences > 3) add(a.slug, 'warn', 'lede', `${sentences} sentences (target 1–3)`);
-    if ((sum.match(/,/g) || []).length >= 6 && sentences <= 2)
-      add(a.slug, 'warn', 'lede', `comma-spliced inventory (${(sum.match(/,/g) || []).length} commas in ${sentences} sentence(s)) — define and place the subject instead`);
-  }
-
-  // --- structure -----------------------------------------------------------
-  if (/^##+\s*(Sources|References)\s*$/im.test(body))
-    add(a.slug, 'error', 'structure', 'hand-written Sources/References heading — the list is generated');
-
-  const budget = BUDGET[a.pageType];
-  if (budget && w > budget[1]) {
-    const over = w / budget[1];
-    add(a.slug, over > 1.5 ? 'error' : 'warn', 'length',
-      `${w} words, budget ${budget[0]}–${budget[1]} for ${a.pageType} (${Math.round((over - 1) * 100)}% over)`);
-  }
-
-  // Section order must follow definition -> origins -> narrative -> lists -> legacy.
-  const heads = (body.match(/^##\s+(.+)$/gm) || []).map(h => h.replace(/^##\s+/, '').trim());
-  const rank = (h) => {
-    if (/^the record$/i.test(h)) return 0;
-    if (/^(formation|foundation|background|origins?|etymology)$/i.test(h)) return 1;
-    if (/^(organization|organisation|government|governance|leadership.*)$/i.test(h)) return 2;
-    if (/^(history|course of the war)$/i.test(h)) return 3;
-    if (/^(dissolution|decline.*|collapse|aftermath)$/i.test(h)) return 4;
-    if (/^(membership|members|alliances)$/i.test(h)) return 5;
-    if (/^legacy$/i.test(h)) return 6;
-    return null;
-  };
-  const ranked = heads.map(rank).filter(r => r !== null);
-  for (let i = 1; i < ranked.length; i++) {
-    if (ranked[i] < ranked[i - 1]) {
-      add(a.slug, 'warn', 'structure', `section order: ${heads.join(' > ')}`);
-      break;
+    for (const [re, msg] of [...SOURCE_TALK, PEACOCK]) {
+      const matches = [...prose.matchAll(new RegExp(re.source, re.flags + (re.flags.includes('g') ? '' : 'g')))];
+      if (matches.length) findings.push(['WARN', `${where}: ${msg} ×${matches.length}  [${matches[0][0].trim().slice(0, 40)}]`]);
     }
   }
 
-  // --- infobox -------------------------------------------------------------
-  // A list of like items is fine; a narrative clause is not. Detect the clause
-  // by a finite verb or an over-long segment.
-  const CLAUSE = /\b(?:was|were|is|are|had|has|took|stood|left|joined|collapsed|eliminated|merged|became|remained|kept|withdrew|recorded as|per a)\b/i;
-  for (const row of a.infobox || []) {
-    const v = stripMarkup(String(row.value || ''));
-    const segments = v.split(/;/).map(s => s.trim()).filter(Boolean);
-    const narrative = segments.filter(s => CLAUSE.test(s) || words(s) > 8);
-    if (segments.length > 1 && narrative.length)
-      add(a.slug, 'error', 'infobox', `"${row.label}" carries a narrative clause — one fact per row, the rest belongs in the body: ${v.slice(0, 90)}`);
-    else if (segments.length === 1 && CLAUSE.test(v) && words(v) > 8)
-      add(a.slug, 'error', 'infobox', `"${row.label}" is a sentence, not a fact: ${v.slice(0, 90)}`);
-    else if (v.length > 60) add(a.slug, 'warn', 'infobox', `"${row.label}" is ${v.length} chars — flatten to a single fact: ${v.slice(0, 90)}`);
-    if (/^(unknown|n\/a|none|not recorded)$/i.test(v.trim()))
-      add(a.slug, 'warn', 'infobox', `"${row.label}" is "${v}" — omit the row instead`);
+  if ((a.summary ?? '').length > 500) findings.push(['ERROR', `summary is ${a.summary.length} chars (max 500)`]);
+  if ((a.title ?? '').length > 120) findings.push(['ERROR', `title is ${a.title.length} chars (max 120)`]);
+  if ((a.infobox ?? []).length > 24) findings.push(['ERROR', `infobox has ${a.infobox.length} rows (max 24)`]);
+  for (const row of a.infobox ?? []) {
+    if ((row.value ?? '').length > 300) findings.push(['ERROR', `infobox "${row.label}" value is ${row.value.length} chars (max 300)`]);
+    if ((row.value ?? '').length > 90) findings.push(['WARN', `infobox "${row.label}" is ${row.value.length} chars — a fact sheet, not prose`]);
   }
 
-  // --- images --------------------------------------------------------------
-  for (const m of body.matchAll(/!\[([^\]]*)\]\(([^)]*)\)/g)) {
-    if (!m[1].trim()) add(a.slug, 'error', 'image', `image without a caption: ${m[2].slice(0, 70)}`);
-  }
-}
+  const words = wordCount(a.body);
+  totalWords += words;
+  const budget = BUDGETS[a.pageType];
+  if (budget && words > budget * 1.25) findings.push(['WARN', `${words} words (budget for ${a.pageType}: ${budget})`]);
 
-// ---- report ---------------------------------------------------------------
-const bySlug = new Map();
-for (const f of findings) {
-  if (!bySlug.has(f.slug)) bySlug.set(f.slug, []);
-  bySlug.get(f.slug).push(f);
-}
-const errors = findings.filter(f => f.sev === 'error').length;
-const warns = findings.filter(f => f.sev === 'warn').length;
+  const attribs = [...proseOf(a.body).matchAll(ATTRIB)].length;
+  totalAttrib += attribs;
+  const density = words ? (attribs / words) * 1000 : 0;
+  if (density > 2 && attribs > 1) findings.push(['WARN', `${attribs} in-prose attributions in ${words} words (${density.toFixed(1)}/1000; target ≤ 1.0)`]);
 
-const order = [...bySlug.entries()].sort((a, b) =>
-  b[1].filter(f => f.sev === 'error').length - a[1].filter(f => f.sev === 'error').length ||
-  b[1].length - a[1].length);
-
-for (const [slug, fs] of order) {
-  console.log(`\n${slug}`);
-  for (const f of fs) {
-    console.log(`  ${f.sev === 'error' ? 'ERROR' : 'warn '} [${f.rule}] ${f.msg}`);
-    if (ONLY && f.ctx) for (const c of f.ctx.slice(0, 4)) console.log(`         · ${c}`);
+  if (findings.length) {
+    console.log(`\n${a.slug}  (${a.pageType})`);
+    for (const [level, msg] of findings) {
+      console.log(`  ${level.padEnd(5)} ${msg}`);
+      if (level === 'ERROR') errors++; else warns++;
+    }
   }
 }
 
-const rate = corpusWords ? (corpusAttr / corpusWords) * 1000 : 0;
-console.log(`\n${'='.repeat(70)}`);
-console.log(`${targets.length} article(s), ${corpusWords.toLocaleString()} words of prose`);
-console.log(`in-prose attribution: ${corpusAttr} = ${rate.toFixed(2)}/1000w  ` +
-            `(target ≤ ${ATTR_TARGET.toFixed(2)}, Wikipedia benchmark ${WIKIPEDIA_ATTR_RATE})`);
-console.log(`${errors} error(s), ${warns} warning(s) across ${bySlug.size} article(s)`);
-
-const rateFail = !ONLY && rate > ATTR_TARGET;
-if (rateFail) console.log(`\nFAIL: attribution rate ${rate.toFixed(2)} exceeds ${ATTR_TARGET.toFixed(2)}/1000 words`);
-if (STRICT && (errors || rateFail)) process.exit(1);
+const density = totalWords ? ((totalAttrib / totalWords) * 1000).toFixed(2) : '0';
+console.log(`\n${scanned.length} article(s), ${totalWords.toLocaleString()} words.`);
+console.log(`${errors} error(s), ${warns} warning(s). In-prose attribution density: ${density}/1,000 words (target ≤ 1.0).`);
+if (warns) console.log('Warnings need the attribution test: delete the attributing phrase — does the reader lose anything the footnote does not carry?');
+if (strict && errors) process.exitCode = 1;
