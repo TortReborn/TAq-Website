@@ -113,9 +113,10 @@
    "bytes": 435910,
    "contentType": "image/png",
    "sha256": "aaead3be4a05aea1",
-   "web": "/images/chronicles/storytime/11-image.webp",
    "width": 636,
-   "height": 363
+   "height": 363,
+   "sensitive": true,
+   "excluded": "Photo of a personal Windows desktop (browser tabs, taskbar), not a game screenshot. No citable value — guild labels unreadable. Web derivative deleted; do not publish."
   },
   {
    "index": 12,
@@ -592,9 +593,10 @@
    "bytes": 427164,
    "contentType": "image/png",
    "sha256": "155d07961e3cfec9",
-   "web": "/images/chronicles/storytime/55-dragoon_poster.webp",
    "width": 600,
-   "height": 920
+   "height": 920,
+   "sensitive": true,
+   "excluded": "Recruitment poster whose slogan parodies a Nazi salute. Not publishable."
   },
   {
    "index": 56,
@@ -636,9 +638,10 @@
    "bytes": 356294,
    "contentType": "image/png",
    "sha256": "e465b439930cec77",
-   "web": "/images/chronicles/storytime/59-Deus_Vult.webp",
    "width": 900,
-   "height": 900
+   "height": 900,
+   "sensitive": true,
+   "excluded": "Meme with a real-world political slogan on a cap; no historical content."
   },
   {
    "index": 60,
@@ -691,9 +694,10 @@
    "bytes": 389863,
    "contentType": "image/png",
    "sha256": "0d88f2877d5345d6",
-   "web": "/images/chronicles/storytime/64-Screenshot_20180516-104350.webp",
    "width": 1080,
-   "height": 1920
+   "height": 1920,
+   "sensitive": true,
+   "excluded": "Leaked private DMs of third parties coordinating to stalk and get a player banned; includes a real-life photograph as an avatar. Not publishable; only the status bar had evidential value."
   }
  ]
 }

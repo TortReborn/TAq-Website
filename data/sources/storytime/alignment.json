@@ -1,1240 +1,693 @@
 {
- "$comment": "PROVISIONAL mapping of storytime images to positions in Drew1011-Storytime.txt, by order of appearance. Aiden warned the alignment may not be exact, so each entry must be visually verified before use: open the image, compare it with textBefore/textAfter, then set verified=true and fill in depicts. Do NOT cite an image for a claim until it is verified.",
+ "$comment": "VERIFIED image records for the Drew1011 storytime. Each image was opened and described. IMPORTANT: the original order-based mapping was WRONG for markers 1-24 (a forum post split across two images has no Image marker in the transcript, so everything drifted); it is correct from marker 25 on. Use depicts + correctedContext to decide what an image shows and where it belongs — never the ordinal position. Entries with excluded set must not be published.",
+ "verifiedAt": "2026-09-03T19:51:46.752Z",
+ "tally": {
+  "matches": 41,
+  "mismatch": 20,
+  "unclear": 1
+ },
  "images": [
   {
-   "provisionalMarker": 1,
    "file": "01-Holders_of_LE.png",
-   "linkIndex": 1,
-   "markerLine": 2,
-   "textBefore": [],
-   "textAfter": [
-    "For the first chapter of this story, I’ll begin with where my entire guild history started. HoL.",
-    "I had been in another guild before HoL, it’s true.",
-    "That guild was called Pirates of Wynn [PoW]",
-    "I joined it in early January 2015, when it was a top 10 guild constantly fighting Kangronomicon for the #6 rank. After only a week at most of being in this guild, I went on a hiatus from Wynncraft."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/01-Holders_of_LE.webp",
+   "excluded": null,
+   "provisionalMarker": 1,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Guild emblem artwork on white. A stylised upraised hand rendered in dark teal with bright green/emerald fingertips (evoking 'Liquid Emerald'). Beneath it, in dark teal caps: 'HOLDERS OF LE' and, in smaller letterspaced caps, 'A VALKYRIE MEMBER-GUILD'. No dates, players or territory counts visible. NOTE: the 'A Valkyrie member-guild' tagline dates this artwork to HoL's Valkyrie-alliance era (2016), well after the May-September 2015 events the adjacent text describes.",
+   "usableFor": "holders-of-le - guild emblem (caption must note the artwork is the later Valkyrie-era version of the logo)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 2,
    "file": "02-a64d84b0a8360b896c510f3abac7132c.png",
-   "linkIndex": 2,
-   "markerLine": 18,
-   "textBefore": [
-    "Roughly a week in to being a member of HoL, I met with other members at the Troms throne room in what would later be named the “Secret HoL Illuminati Society” or SHIS for short.",
-    "At this meeting, myself and 3-4 other members discussed the state of the guild’s leadership and formulated possible plans to remove yosteric from the leadership position.",
-    "We ended up deciding on a simple plan: message Spham, the leader of Kangronomicon, and get her to speak to Seb about removing yosteric as the leader.",
-    "Kuroi and I were the ones who would execute the plan. We messaged Spham on the forums. Here’s a screenshot."
-   ],
-   "textAfter": [
-    "Spham agreed to speak to him, but only if he logged on to Wynn to do it. This presented a dilemma, as he never played Wynn and neither of us knew his Skype.",
-    "Kuroi and I discussed the issue for a while, and finally decided that simply speaking to yos might prove to be more beneficial than we thought.",
-    "We approached him and made him aware of our grievances with the guild, and he agreed to make us both “Head Chiefs”",
-    "This role essentially gave us the power to run the guild in his absence and do what we saw fit."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/02-a64d84b0a8360b896c510f3abac7132c.webp",
+   "excluded": null,
+   "provisionalMarker": 2,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Screenshot of a Wynncraft forums post by user 'Kuroi'. Left sidebar: avatar is a black-and-white photograph of Spock (Leonard Nimoy); username 'Kuroi'; user title 'Amateur Quantum Engineer'; stats 'Messages: 203', 'Likes Received: 1,536', 'Trophy Points: 78', 'Guild: HoL', 'Minecraft: Kur0i'. Body verbatim: \"Hi Spham, we got your msg's :P. / Alright, so we wanted to ask you something about... yosteric5. / 'We' being kategajda , @Drew1011, and a few other members, and all of us absolutely despise him. / You probably know yosteric5, he's the stand-in leader of HoL, our guild. / Basically, he's an absolutely horrible leader, and we want to change that. / We're asking you to convince our guild leader, @SSEEBBYZ , to kick him out of the guild or demote him. Being leader of Fuq, we're pretty sure you can get SSEEBBYZ to do that... / Also, I think he essentially insulted Fuq rather recently. / We would have loved to ally ourselves with Kangronomicon, but yosteric pretty much... ruined that chance? Anyway, I hope he didn't completely. We're really counting on your help here. / ~kuroiwanko617\". Names visible: Kuroi / kuroiwanko617 / Kur0i, Spham, yosteric5, kategajda, Drew1011, SSEEBBYZ. Guild tags: HoL, Fuq (Kangronomicon).",
+   "usableFor": "holders-of-le - primary evidence for the 'Secret HoL Illuminati Society' plot against yosteric5; also kuroi, spham, yosteric5, sseebbyz person pages",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 3,
    "file": "03-image.png",
-   "linkIndex": 3,
-   "markerLine": 72,
-   "textBefore": [
-    "Most of them retreated to Validus, and then later to Libertas when Yos created it.",
-    "Obviously this exodus left the guild in a poor state. It took weeks to regain our full strength and become a powerhouse. But as always, the guild prevailed through that troubled time and eventually became one of the top guilds.",
-    "That ends the story of my early guild career, along with the HoL coup.",
-    "The next part will be the beginnings of the HoL alliance with Fuq & TNA, and the early beginnings of Ordo Malleus."
-   ],
-   "textAfter": [
-    "Throughout the entire first part of this story, Validus [Val] had been a constant presence.",
-    "It all started months before, on July 5th, 2015.",
-    "After warring in the Jungle, yosteric and myself received a message from a Validus Chief named Tangler.",
-    "He was interested in the fact that we had been warring against our future ally, Kangronomicon."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/03-image.webp",
+   "excluded": null,
+   "provisionalMarker": 3,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 96 - 'The day after we became a subguild, I received a message from Tangler on the forums. He had added Spham and myself to a group chat and sent this:' (that position has NO 'Image' marker in the extracted text, which is what throws the rest of the sequence off). It is the top half of the same forum post whose bottom half is file 04-image; the next line, 'And although it was later revealed that the Ezura (Validus leader) quote was an edited quote', refers directly to the quote block shown here. It is provisionally sitting at the part break at line 80, where it makes no sense.",
+   "depicts": "Screenshot of a Wynncraft forums post header plus a quote block. Header: Minecraft-skin avatar, username 'tangler', user title 'The Mythical Rebel with Slayer V'. Quote block headed 'Ezura said:' containing verbatim: \"HoL.... / THOSE TRAITOROUS ******* SCUM! / The most loyal of my guild friends. / I CAN'T BELIEVE THOSE IDIOTS HAVE BEEN NEGOTIATING WITH LEGIO BEHIND MY BACK! / Holders. / I can't believe what they have done. / WHILE I'M PRAISING THEM FOR BEING OUR MOST LOYAL, BOOT LICKING KISS ASS MILITARY ALLIES, THEY ARE NEGOTIATING WITH OUR ******* ENEMIES! / But all those traitors will pay... THEY WILL PAY WITH THEIR OWN BLOOD!\" Profanity is asterisked in the original. Names: tangler, Ezura; guilds HoL, Legio.",
+   "usableFor": "ezura / validus - the (allegedly edited) 'traitorous scum' quote about HoL defecting to Kangronomicon; tangler - forum persona",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 4,
    "file": "04-image.png",
-   "linkIndex": 4,
-   "markerLine": 122,
-   "textBefore": [
-    "Around 3-4 guilds were attacking them, all of which were in Concordia. However, the strongest of these guilds was Validus. Validus had become armed with many new members who had left during the HoL Exodus, and among these were a few of our best warring members.",
-    "I warred with Kangronomicon for the extent of the attack, coordinating with their chiefs non-stop to ensure that our defense of Wynn was as efficient as possible.",
-    "I solod wars for longer than I ever had. When the dust finally settled and we had repelled the attack, it had been 4 hours of non stop warring.",
-    "Here is the aftermath of the attack."
-   ],
-   "textAfter": [
-    "By the time this had settled, HoL had cemented ourselves for the first time as a powerhouse guild.",
-    "After this, we thought the Concordia war was close to being over.",
-    "However, it would later be revealed that it was far from over.",
-    "The Concordia war would prove to be one of the longest and most brutal that Wynn has ever seen, and would spark the creation of the biggest Mega-alliance of its time, Ordo Malleus."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/04-image.webp",
+   "excluded": null,
+   "provisionalMarker": 4,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs with file 03-image at drew1011-storytime.md line 96 ('He had added Spham and myself to a group chat and sent this:'). This is the lower half of the SAME tangler post - it explains the asterisks in the Ezura quote shown in 03 - and carries the byline 'tangler, Aug 16, 2015', matching the narrative's dating of the HoL/Kangronomicon defection to 15 August 2015. It is provisionally sitting at line 130, 'Here is the aftermath of the attack', which is an October territory-map slot.",
+   "depicts": "Screenshot of the body of a Wynncraft forums post, verbatim: \"Ezura says no. Asterisks inserted to prevent damage to eyes, lol. BTW, he means 'Kick-ass'. / Now, I've been saying that Drew's betrayal has greatly limited our options to the current choice of joining FUQ as an ally, joining TNA's call to att FUQ in their weakness, or just dropping out of guild terrs entirely. / Perhaps I could have brought Ezura around to see the sense of the first option. He does calm down eventually. Perhaps I could have succeeded. But a Betrayer like Drew can never bring himself to trust someone he has betrayed, I should have realized. So, I'm not inclined to try to persuade Ezura to give Drew another chance, and will act on his instructions accordingly. What a waste, now we all get to fight while TNA laughs . . . / I give you an hour's notice, an hour more than Drew gave me.\" Post footer reads 'tangler, Aug 16, 2015' with 'Report' and 'Reply' links. Names: tangler, Ezura, Drew; guilds FUQ (Kangronomicon), TNA (Nether's Ascent).",
+   "usableFor": "validus / tangler - Validus's declaration of hostilities against HoL, precisely dated 16 Aug 2015; corroborates the 15 Aug 2015 Fuq subguild date",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 5,
    "file": "05-Territories.png",
-   "linkIndex": 5,
-   "markerLine": 137,
-   "textBefore": [
-    "Whether or not this ended up happening is beyond my knowledge, as I cannot remember hearing anything about it",
-    "Ezura’s antics ended up being integral to his downfall, as many leaders who so much as took a couple of his territories found themselves on the receiving end of his rudeness.",
-    "Despite this, Concordia’s growth and takedown of the remnants of Legio was completely unprecedented and unexpected.",
-    "Although they did not reach their peak until later in October, here is a screenshot of the territory map from early October/late September."
-   ],
-   "textAfter": [
-    "As you can see, Validus targeted  Kangronomicon to its knees, but left alone much of the territory Nether’s Ascent.",
-    "Myself and many others suspect this is because of the terribly kept secret that TNA would often make deals with other guilds where they managed to persuade other guilds to instead attack their Fuq, their ally.",
-    "It was around this time that Kru informed me I needed to create a council for HoL.",
-    "Drew1011 — 2/22/2018 9:18 PM"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/05-Territories.webp",
+   "excluded": null,
+   "provisionalMarker": 5,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 129/130 - 'Here is the aftermath of the attack.' It shows HoL and Kangronomicon holding nearly everything with Validus reduced to two tiles, i.e. a repelled Concordia offensive. It CANNOT illustrate its provisional slot at line 145, because the sentence immediately after that slot reads 'Validus targeted Kangronomicon to its knees' and this map shows Kangronomicon still holding roughly ten territories and Validus almost nothing.",
+   "depicts": "Wynncraft dynamic territory map (Google-Maps style, 'Wynncraft World' control top-left, coords 'X -441, Z -2065', 'View Normal Map' button top-right) centred on 'The Province of Wynn'. Holders Of LE hold a large contiguous block: Nemract Cathedral, Nemract Town, Nemract Road, Ancient Nemract, Nemract Plains East, Nemract Plains West, Plains Coast, Mt. Wynn, Detlas Trail East Plains, Detlas Trail West Plains, Detlas Close Suburbs, Detlas Suburbs, Detlas Far Suburbs, Detlas Savannah Transition, Nivla Forest, Nivla Forest Edge, Nivla Forest Exit, Nivla Forest Entrance, North Nivla Forest, Emerald Trail, Road to Time Valley, Abandoned Farm, Time Valley, Elkurn Fields (roughly 24 tiles). Kangronomicon hold Ragni Plains, Ragni East Suburbs, Ragni Main Entrance, Maltic, Maltic Coast, Maltic Plains, Farmers Valley, Plains, Road to Elkurn, Savannah West Lower and Ternaves-area tiles. Nethers Ascent hold Nether Plains Upper, Nether Gate, Corrupted Road, Elkurn, Mine Base Plains, Nesaak Transition and the Nesaak Plains cluster. Validus hold only Plains Lake and South Nivla Forest. Other tags visible: Da Classy Goats (Detlas), TheStarTeam (Nether Plains Lower), Travellers (Foster Island), Super Crafters (Pigmen Ravines), RedCra... (Ternaves).",
+   "usableFor": "holders-of-le / concordia-war - territory map of the aftermath of the four-hour October 2015 Concordia assault on Fuq and TNA",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 6,
    "file": "06-image.png",
-   "linkIndex": 6,
-   "markerLine": 200,
-   "textBefore": [
-    "When Historical left Concordia, 3 days after Ordo was created, 3z posted a thread called \"Concordia disbanded\", and revealed that Ezura had mostly quit Wynn.",
-    "And although Ezura commented on the thread and said that it had not been disbanded, that was when most people began to consider the alliance dead.",
-    "Over the next few months, many new guilds would join Ordo Malleus, and a few would also leave or be kicked. As the alliance progressed, so did the hatred towards it and the arguments between the leaders. Despite this, it would still manage to toil on for 4 months, eventually meeting its end on March 9th, 2016.",
-    "That will be the end of this part, the next part with detail the glory days of Ordo Malleus, with an added portion from @Killerfish detailing the attacks of TheAwakening [Awk]"
-   ],
-   "textAfter": [
-    "After the capitulation of Concordia, the glory days of Ordo Malleus began.",
-    "The alliance quickly established itself as the only real power on the territory map.",
-    "For a while, no other guild or alliance was able to stand a chance against the alliance.",
-    "This of course, caused lots of anger towards the alliance."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/06-image.webp",
+   "excluded": null,
+   "provisionalMarker": 6,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 145 - 'here is a screenshot of the territory map from early October/late September', immediately followed by 'As you can see, Validus targeted Kangronomicon to its knees, but left alone much of the territory Nether's Ascent.' The image matches that sentence exactly: Kangronomicon has been wiped from the map while Nether's Ascent is untouched. It is provisionally sitting at line 208, an Ordo Malleus part break.",
+   "depicts": "Wynncraft dynamic territory map ('Wynncraft World' control top-left, coords 'X -87, Z -1580') centred on 'The Province of Wynn'. Validus and Travellers hold the overwhelming majority of tiles. Validus: Cathedral Harbour, Nemract Town, Nemract Plains West, Plains Coast, Nivla Forest, Nivla Forest Exit, Road to Elkurn, Savannah East Lower, Mining Base Upper, Plains Lake area. Travellers: Almuj City, Desert Mid-Lower, Desert Lower, Desert West Lower, Rymek West Upper, Bremminglar, Savannah East Upper, Savannah West Lower, Ternaves, Ternaves Plains Upper, Ternaves Plains Lower, Detlas Savannah Transition, Nemract Cathedral, Ancient Nemract, Nemract Road, Mt. Wynn, Farmers Valley, Maltic Plains, Nivla Forest Entrance, Emerald Trail, Corrupted Road, South Nivla Forest, Elkurn, Foster Island. Holders Of LE retain only a small Detlas pocket: Detlas Trail East Plains, Detlas Trail West Plains, Detlas Close Suburbs, Detlas Suburbs, Detlas Far Suburbs. Nethers Ascent retain their whole eastern block: Nether Plains Upper, Nether Plains Lower, Nether Gate, Nesaak Transition, Nesaak Plains North East, Bob's Tomb. Also visible: HellRaisers (Savannah West Upper), Smok (Detlas), Sinners (Nivla Forest Edge). Kangronomicon appear NOWHERE on the map.",
+   "usableFor": "concordia / validus - territory map at Concordia's peak; primary evidence that Validus stripped Kangronomicon while sparing Nether's Ascent",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 7,
    "file": "07-Ordo.png",
-   "linkIndex": 7,
-   "markerLine": 213,
-   "textBefore": [
-    "It was created by Tangler, the Validus Chief.",
-    "This thread brought about some shocking revelations that angered people in both the community, and Ordo Malleus.",
-    "In this thread it was revealed that Arenos had tried to bribe guilds in to joining Ordo Malleus. I️ cannot entirely recall if this was true, but I️ believe I️ remember a discussion with Arenos where he admitted to it.",
-    "The thread quickly devolved in to a back and forth of Arenos and Ezura sharing these screenshots of each other."
-   ],
-   "textAfter": [
-    "Image",
-    "Drew1011 — 2/22/2018 9:26 PM",
-    "Image",
-    "Eventually, this was shut down by the then moderator Mekyr, who pointed out the irony of Tangler reiterating the no drama/flame wars rule on a thread which was obviously started drama and flame wars."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/07-Ordo.webp",
+   "excluded": null,
+   "provisionalMarker": 7,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "This is the Ordo Malleus alliance emblem and belongs at one of the Ordo part-break 'Image' slots - most plausibly line 208 ('After the capitulation of Concordia, the glory days of Ordo Malleus began') or line 80 (the part break announcing 'the early beginnings of Ordo Malleus'). It is provisionally sitting at line 221, which the text describes as 'Arenos and Ezura sharing these screenshots of each other'; an emblem is definitely not one of those forum screenshots.",
+   "depicts": "Hand-drawn alliance emblem on white: a heraldic shield quartered red and orange bearing a grey war-hammer whose head carries a white Celtic-knot device, crossed behind by two swords, flanked by four white feathered wings. A green banner across the shield reads 'Ordo ~ Malleus'. No dates, players or territory counts.",
+   "usableFor": "ordo-malleus - the alliance's emblem",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 8,
    "file": "09-image.png",
-   "linkIndex": 9,
-   "markerLine": 214,
-   "textBefore": [
-    "This thread brought about some shocking revelations that angered people in both the community, and Ordo Malleus.",
-    "In this thread it was revealed that Arenos had tried to bribe guilds in to joining Ordo Malleus. I️ cannot entirely recall if this was true, but I️ believe I️ remember a discussion with Arenos where he admitted to it.",
-    "The thread quickly devolved in to a back and forth of Arenos and Ezura sharing these screenshots of each other.",
-    "Image"
-   ],
-   "textAfter": [
-    "Drew1011 — 2/22/2018 9:26 PM",
-    "Image",
-    "Eventually, this was shut down by the then moderator Mekyr, who pointed out the irony of Tangler reiterating the no drama/flame wars rule on a thread which was obviously started drama and flame wars.",
-    "After that thread was locked, this thread was posted by a new account called “TheOrdoSpies”"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/09-image.webp",
+   "excluded": null,
+   "provisionalMarker": 8,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 227, directly after 'After that thread was locked, this thread was posted by a new account called \"TheOrdoSpies\"'. It is provisionally sitting at line 222, one of the Arenos/Ezura screenshot slots, two slots too early.",
+   "depicts": "Screenshot of a Wynncraft forums thread post. Header: default Steve Minecraft avatar, username 'TheOrdoSpies', user title 'Newbie Adventurer'. Centre-aligned body verbatim: \"Hello And Today i was confirmed. / If you are not an Ordo member you will not know us. / We are the Ordo Spies. / We have just changed paths to give Info about Ordo to Val. / Just to help end Ordo faster. / You will not find us, for say it might not even be 2 of us. / They might not even be in the chat but maybe one. / But we will help give an end to Ordo. / Even if it means for us getting caught and kicked. / We will help end Ordo. / For this is it. / For now. / This will be gone in 5 Days.\" Post footer date: 'Nov 28, 2015', with 'Report' and 'Like' links. References: Ordo (Ordo Malleus), Val (Validus).",
+   "usableFor": "ordo-malleus - the 'TheOrdoSpies' alt-account thread of 28 Nov 2015 that fuelled the Ordo spy paranoia",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 9,
    "file": "10-image.png",
-   "linkIndex": 10,
-   "markerLine": 216,
-   "textBefore": [
-    "The thread quickly devolved in to a back and forth of Arenos and Ezura sharing these screenshots of each other.",
-    "Image",
-    "Image",
-    "Drew1011 — 2/22/2018 9:26 PM"
-   ],
-   "textAfter": [
-    "Eventually, this was shut down by the then moderator Mekyr, who pointed out the irony of Tangler reiterating the no drama/flame wars rule on a thread which was obviously started drama and flame wars.",
-    "After that thread was locked, this thread was posted by a new account called “TheOrdoSpies”",
-    "Image",
-    "Obviously this was an alt account, so the thread was locked and the account was banned."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/10-image.webp",
+   "excluded": null,
+   "provisionalMarker": 9,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs in the three-image block at drew1011-storytime.md lines 269-271 - 'Here are some pictures from the height of Ordo Malleus. In this first screenshot: not only are TnP's territories perfect and exactly how they are supposed to be, but so are everyone else's.' The red outline drawn around ToastedPandas' block is exactly the annotation that sentence calls for. It is provisionally sitting at line 224 (an Arenos/Ezura forum screenshot slot), two slots too early.",
+   "depicts": "Cropped Wynncraft territory map with a hand-drawn red outline tracing one guild's contiguous holdings. ToastedPandas hold Detlas, Detlas Close Suburbs, Detlas Suburbs, Detlas Far Suburbs, Detlas Trail East Plains, Detlas Savannah Transition, Ternaves Plains Upper, Nether Plains Upper, Nether Plains Lower, Nether Gate, Corrupted Road, Plains Lake, Angry Village. HaHaUnited hold Ancient Nemract, Nemract Plains East and Detlas Trail West Plains. Sinners hold Nivla Forest Edge and Nivla Forest Exit. Holders Of LE hold Mine Base Plains and Nesaak Transition. 'The Province of Wynn' label centre-left.",
+   "usableFor": "ordo-malleus / toasted-pandas - annotated territory map of Ordo's designated-territory system at its height",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 10,
    "file": "11-image.png",
-   "linkIndex": 11,
-   "markerLine": 219,
-   "textBefore": [
-    "Drew1011 — 2/22/2018 9:26 PM",
-    "Image",
-    "Eventually, this was shut down by the then moderator Mekyr, who pointed out the irony of Tangler reiterating the no drama/flame wars rule on a thread which was obviously started drama and flame wars.",
-    "After that thread was locked, this thread was posted by a new account called “TheOrdoSpies”"
-   ],
-   "textAfter": [
-    "Obviously this was an alt account, so the thread was locked and the account was banned.",
-    "No mods would ever tell us whose alt account it was, but I️ suspect it was either Tangler trying to scare us, or 3zPz, Historical’s leader.",
-    "Obviously (and justifiably), all this talk of spies within Ordo made many of us paranoid.",
-    "However, with no real evidence or proof to work with, we were forced to just let it go and wait and see if any proof emerged."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "excluded": "Photo of a personal Windows desktop (browser tabs, taskbar), not a game screenshot. No citable value — guild labels unreadable. Web derivative deleted; do not publish.",
+   "provisionalMarker": 10,
+   "alignmentVerdict": "unclear",
+   "correctedContext": "Almost certainly one of the three 'height of Ordo Malleus' map screenshots at drew1011-storytime.md lines 269-271, but the guild labels are illegible so it cannot be positively tied to any sentence. It is definitely NOT its provisional slot at line 227 ('this thread was posted by a new account called TheOrdoSpies'), which requires a forum screenshot.",
+   "depicts": "Low-resolution photo/screenshot of an entire Windows browser window (title bar, roughly six open tabs, address bar showing a wynncraft.com territory-map URL, bookmarks bar, Windows taskbar and clock) displaying the Wynncraft Territory Map over the Nesaak / Great Bridge / Twain region. Tab titles partially legible: 'healthy people 2016 - Yah...', 'Killer and the body - Wi...', 'Body water - Wikipedia, f...', an alliance-related tab, 'Wynncraft Territory Map', 'HoL Captains Guide - Go...'. Territory names readable (Detlas Trail East Plains, Detlas Savannah Transition, Ternaves Plains Lower, Mining Base Upper/Lower, Mine Base Plains, Plains Lake, Nether Gate, Angry Village, Nesaak Transition, Nesaak Plains North East/South East/Upper North West/Lower North West/Mid North West/South West, Nesaak Bridge Transition, Great Bridge Nesaak, Bob's Tomb, Twain Lake, Twain Mansion, Time Valley, Elkurn Fields, Land of Legends, Animal Bridge) but the guild owner labels are too small to read reliably. No guild tag can be transcribed with confidence.",
+   "usableFor": "ordo-malleus - low-value duplicate territory map; usable only as filler illustration, nothing citable can be read from it",
+   "sensitive": true
   },
   {
-   "provisionalMarker": 11,
    "file": "12-image.png",
-   "linkIndex": 12,
-   "markerLine": 261,
-   "textBefore": [
-    "Eventually, I️ got tired of it and approached TnP about possibly donating them 6 territories.",
-    "TnP agreed to donate their three Ternaves territories if we donated our three mining base territories.",
-    "So we did.",
-    "Here are some pictures from the height of Ordo Malleus. In this first screenshot: not only are TnP’s territories perfect and exactly how they are supposed to be, but so are everyone else’s. No territory in this picture is out of place."
-   ],
-   "textAfter": [
-    "Image",
-    "Image",
-    "Ordo Malleus thrived during these glory days, and this is the Ordo that I️ choose to remember. Not the Post-Gavel Ordo that was filled with arguments, drama, and toxicity. But the camaraderie of a few leaders working together to subjugate other guilds and achieve total domination of Wynn.",
-    "Now is a story by Killerfish about the last true glory days of the alliance, mere days before Gavel was released."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/12-image.webp",
+   "excluded": null,
+   "provisionalMarker": 11,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wynncraft territory map cropped on 'The Province of Wynn'. HaHaUnited hold Cathedral Harbour, Nemract Cathedral, Nemract Plains East, Ancient Nemract, Savannah West Upper, Savannah West Lower, Savannah East Lower and Rymek West Mid. ToastedPandas hold Detlas, Detlas Close Suburbs, Detlas Suburbs, Detlas Far Suburbs, Detlas Trail East Plains, Detlas Trail West Plains, Detlas Savannah Transition, Ternaves, Ternaves Plains Upper, Ternaves Plains Lower, Mining Base Upper, Mining Base Lower, Mine Base Plains, Plains Lake, Nether Plains Upper, Nether Plains Lower, Nether Gate, Corrupted Road, Angry Village. Sinners hold Nivla Forest Edge, Nivla Forest Exit, South Nivla Forest and Road to Elkurn. HackForums hold Elkurn. Holders Of LE hold Nesaak Transition. Wynn Try Hards hold Nesaak Plains North East. Bob's Tomb visible bottom-right.",
+   "usableFor": "ordo-malleus - territory map at the alliance's height showing the designated-territory allocation across HHU, TnP, Snr, Hax and HoL",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 12,
    "file": "13-image.png",
-   "linkIndex": 13,
-   "markerLine": 262,
-   "textBefore": [
-    "TnP agreed to donate their three Ternaves territories if we donated our three mining base territories.",
-    "So we did.",
-    "Here are some pictures from the height of Ordo Malleus. In this first screenshot: not only are TnP’s territories perfect and exactly how they are supposed to be, but so are everyone else’s. No territory in this picture is out of place.",
-    "Image"
-   ],
-   "textAfter": [
-    "Image",
-    "Ordo Malleus thrived during these glory days, and this is the Ordo that I️ choose to remember. Not the Post-Gavel Ordo that was filled with arguments, drama, and toxicity. But the camaraderie of a few leaders working together to subjugate other guilds and achieve total domination of Wynn.",
-    "Now is a story by Killerfish about the last true glory days of the alliance, mere days before Gavel was released.",
-    "Killerfish [ACES],  — 2/22/2018 9:35 PM"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/13-image.webp",
+   "excluded": null,
+   "provisionalMarker": 12,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at the part-break 'Image' at drew1011-storytime.md line 287, which introduces 'On December 10th, 2016 [sic - the surrounding narrative places this in 2015], a couple weeks before where the story left off, a new alliance was created. It was created from the remnants of Concordia by the traitorous 3zPz' - the alliance the text later names as Vesta ('Aside from a few small skirmishes, Vesta barely even existed'). It is provisionally sitting at line 270, in the middle of the 'height of Ordo Malleus' map block.",
+   "depicts": "Alliance emblem artwork: a hooded, faceless figure in a blue robe against a dark starfield, arms outstretched holding two burning torches with yellow flames. Across the centre, in cracked-ice white glowing letters, the word 'VESTA'. No dates, players or territory counts.",
+   "usableFor": "vesta - the alliance's emblem",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 13,
    "file": "14-image.png",
-   "linkIndex": 14,
-   "markerLine": 263,
-   "textBefore": [
-    "So we did.",
-    "Here are some pictures from the height of Ordo Malleus. In this first screenshot: not only are TnP’s territories perfect and exactly how they are supposed to be, but so are everyone else’s. No territory in this picture is out of place.",
-    "Image",
-    "Image"
-   ],
-   "textAfter": [
-    "Ordo Malleus thrived during these glory days, and this is the Ordo that I️ choose to remember. Not the Post-Gavel Ordo that was filled with arguments, drama, and toxicity. But the camaraderie of a few leaders working together to subjugate other guilds and achieve total domination of Wynn.",
-    "Now is a story by Killerfish about the last true glory days of the alliance, mere days before Gavel was released.",
-    "Killerfish [ACES],  — 2/22/2018 9:35 PM",
-    "Hello everyone! I'll make this short, but here's a tale I remember of one of the few times Ordo's might was tested by a single guild."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/14-image.webp",
+   "excluded": null,
+   "provisionalMarker": 13,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 320 - 'Shortly before the release of Gavel, Killerfish decided to capture the entire jungle... And considering the Jungle territories were the best territories at the time, no guild benefited more from this glitch than the Toasted Pandas. Here is a screenshot of when this happened:'. The image shows exactly that: TnP holding the entire jungle block. It is provisionally sitting at line 271, in the 'height of Ordo Malleus' block.",
+   "depicts": "Cropped Wynncraft territory map of the jungle / Troms region. ToastedPandas hold Temple of Legends, City of Troms, Jungle Lake, Jungle Lower, Jungle Mid, Jungle Upper and Great Bridge Jungle. Holders Of LE hold Little Wood and Great Bridge Nes[aak]. 'Ravines' and 'Nesaa[k]' partially visible at the edges.",
+   "usableFor": "toasted-pandas - evidence for the December 2015 Gavel-release territory lock that froze TnP in control of the whole jungle",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 14,
    "file": "15-image.png",
-   "linkIndex": 15,
-   "markerLine": 279,
-   "textBefore": [
-    "Eventually within a few days, TheAwakening lost its persistence in its skirmishes upon Almuj. Thus its presence decayed out of existence and memory.",
-    "Drew1011 — 2/22/2018 9:42 PM",
-    "Thus concludes this part of the story. The next part will focus on the Ordo after Gavel, the Ordo I️ choose to forget. The many problems and ordeals leading up to the fall. Perhaps even the fall itself.",
-    "Drew1011 — 2/26/2018 7:41 PM"
-   ],
-   "textAfter": [
-    "I️ hate to backtrack on the timeline, but here it is a must.",
-    "On December 10th, 2016, a couple weeks before where the story left off, a new alliance was created.",
-    "It was created from the remnants of Concordia by the traitorous 3zPz",
-    "In the alliance contained the ex Concordia guilds as well as many new ones."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/15-image.webp",
+   "excluded": null,
+   "provisionalMarker": 14,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "This is Drew1011's message announcing HoL's departure from Ordo Malleus. It belongs at drew1011-storytime.md lines 454-455 - 'And so on March 9th, 2016, at approximately 5:27 PM EST, I took the match burning in the house and poured gasoline on it.' (that position has no 'Image' marker in the extraction; the nearest available slot is the part break at line 392). Line 500 confirms the image existed: 'This message had a much more lighthearted tone than the Ordo one'. It is provisionally sitting at line 287, the Vesta part break.",
+   "depicts": "Screenshot of a long plain-text message (black on white, no client chrome). Verbatim: \"Hello. So after HHU and TnP left, this alliance quickly became something it never should be. In my opinion, instead of this alliance being a balance between all the guilds, it become more of a dictatorship between Kru and Arenos. HHU and TnP were two of HoL's best friends. It is a known fact that the alliance was largely ran by Fuq, HHU, HoL, Tnp, and Snr. These were the original guilds, and were the most respected Ordo guilds. There was an issue that these guilds were split on. You can probably guess what it is. When HHU and TnP left, HoL was the only one left on one side of the issue. It is in my opinion that this caused the issue to grow, and I was powerless against it, with nobody on my side. I have begun to see Ordo for what it is, a group of people who judge everyone else, and look down upon every other person, and believe that this alliance is no longer beneficial to HoL. I regret to inform the leaders of Ordo Malleus that HoL will be leaving the alliance to pursue other interests. This alliance has been a great experience, and I wish some of you the best in your future endeavors. I don't want you to think I am taking this decision lightly. I have been sitting here for about 10 minutes trying to make myself hit the send button. To the people here I enjoy talking to and spending time with (you know who you are), I'm sorry.\" Guild tags: HHU, TnP, HoL, Fuq, Tnp, Snr. Names: Kru, Arenos.",
+   "usableFor": "ordo-malleus - the verbatim leaving message that triggered the alliance's collapse on 9 March 2016; also holders-of-le and drew1011",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 15,
    "file": "16-image.png",
-   "linkIndex": 16,
-   "markerLine": 312,
-   "textBefore": [
-    "All the territories were locked down and none could be attacked.",
-    "This meant that guilds lucky enough to hold territories got to keep them for the duration of the territory lock.",
-    "And considering the Jungle territories were the best territories at the time, no guild benefited more from this glitch than the Toasted Pandas.",
-    "Here is a screenshot of when this happened:"
-   ],
-   "textAfter": [
-    "The territories remained locked for two weeks after Gavel was released, and in this time TnP shot up to level 51.",
-    "This was higher than HoL and every other guild except Fuq, TNA, and HHU (who got to that level due to an unintended glitch).",
-    "This angered and saddened myself and a few other guilds, who felt that it unfair that TnP should shoot to that level because of a territory lock.",
-    "The leaders of TnP also felt that it was unfair and did not desire these seemingly undeserved levels."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/16-image.webp",
+   "excluded": null,
+   "provisionalMarker": 15,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "A Valkyrie alliance wordmark/banner - a part-header image, not a Gavel territory-lock screenshot. Its provisional slot at line 320 ('Here is a screenshot of when this happened', re: the TnP jungle lock) is wrong. It most plausibly belongs at the part break at line 392, which opens the part covering Ordo's collapse and HoL joining Valkyrie on 18 March 2016.",
+   "depicts": "Wide black banner image. Centred white line-art monogram: a large 'A'-like glyph formed of two crossing strokes with a small inverted chevron inside, over the letterspaced white caps 'V A L K Y R I E'. No dates, players or territory counts.",
+   "usableFor": "valkyrie-alliance - alliance wordmark (wide black banner variant)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 16,
    "file": "17-image.png",
-   "linkIndex": 17,
-   "markerLine": 384,
-   "textBefore": [
-    "From then on out it was nothing but a downhill fall.",
-    "Drew1011 — 2/26/2018 7:49 PM",
-    "The alliance would crumble a mere 16 days after TnP left.",
-    "That is all for this part. Next time I️ will tell the story of the collapse and what happened afterwards."
-   ],
-   "textAfter": [
-    "I️ would like to preface this part with a brief explanation of what I️ have been writing for the past two weeks.",
-    "This is not an entirely subjective story, told completely by my opinions.",
-    "Nor is this a biographical tale, devoid of any opinions of the author.",
-    "Rather, it is a mixture of both. I️ strive to tell a factually accurate story, with no lies or complete falsities. Along with this factually accurate story, I️ interweave my own perspective and opinions, with careful attention as to not make it nothing but bias."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/17-image.webp",
+   "excluded": null,
+   "provisionalMarker": 16,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 499, immediately after 'the next day I sent my leaving message to the Valkyrie Parliament. Here it is:' - the following line then reads 'This message had a much more lighthearted tone than the Ordo one'. It is provisionally sitting at line 392, one slot early.",
+   "depicts": "Screenshot of a long plain-text message (black on white, 'HoL' underlined twice by a spellchecker). Verbatim: \"I regret to inform that HoL will be leaving Valkyrie. I know y'all thought I had probable prospect of permanence, and believe me, I did. I was planning on staying forever. However, something has happened, and I am afraid HoL will be leaving VA. I don't really want to go down in history as the first (and probably only) guild to ever leave Valkyrie, but I am. Don't get me wrong, I've had a great time with y'all, and please don't hate me for this or anything, even though I know that is likely how this will end. I believe that Ari and Kv will (hopefully) be the most understanding of this, as much like Imp leaving Legio to create Valkyrie with Fox, HoL will be leaving Valkyrie to create Halcyon with TnP. Please, do not let this affect your opinion of HHU or Red's probable prospect of permanence, as he did not even know of this until about an hour ago, and has assured me that he will not leave and will stay with Valkyrie. I have already changed the HoL thread back to the original, and will remove the HoL art that Ari so graciously created for us from all the places where it is. I do not want to have any beef with anyone here, although I feel like that is inevitable, and I would completely understand if you hate me for this. You have my word that I will not share any private VA information with anyone, as I ain't no snitch. I do not know if there is any protocol for leaving this alliance, since it has never been done before, so I will just leave this chat and all y'all's chats, and if there is protocol or something I need to do, message me. Viva Valkyrie!\" Names: Ari, Kv, Red. Guilds/alliances: HoL, Valkyrie/VA, Imp, Legio, Fox, Halcyon, TnP, HHU.",
+   "usableFor": "valkyrie-alliance / halcyon-alliance - the verbatim message by which HoL became the first guild ever to leave Valkyrie, 5 June 2016; also confirms Ari drew HoL's guild art",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 17,
    "file": "18-image.png",
-   "linkIndex": 18,
-   "markerLine": 491,
-   "textBefore": [
-    "They said they would want to do that, as they currently had no true alliance and considered myself a good friend.",
-    "We decided that to create a small two-guild alliance that totally wasn’t a rip off of the original Valkyrie.",
-    "We laid out the groundwork for it, and the next day I️ sent my leaving message to the Valkyrie Parliament.",
-    "Here it is:"
-   ],
-   "textAfter": [
-    "This message had a much more lighthearted tone than the Ordo one, as I️ truly felt bad about leaving Valkyrie.",
-    "It was on this day, June 5th 2016, that HoL left Valkyrie to create the Halcyon Alliance with Toasted Pandas.",
-    "This alliance would never do much, but it would still serve as an important part of both my personal history, and the overall history of guilds. That concludes this rather short part. The next part will likely be short too.",
-    "'"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/18-image.webp",
+   "excluded": null,
+   "provisionalMarker": 17,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at the part break at drew1011-storytime.md line 504, which opens 'I will be retelling the story of how Hax came to control all of Wynn.' It is provisionally sitting at line 499 ('Here it is:' - the Valkyrie leaving message), one slot early.",
+   "depicts": "Guild wordmark on white: the word 'HACKFORUMS' in a wide, squared, bevelled purple/violet display typeface. No dates, players or territory counts.",
+   "usableFor": "hackforums-hax - guild wordmark",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 18,
    "file": "19-image.png",
-   "linkIndex": 19,
-   "markerLine": 496,
-   "textBefore": [
-    "This message had a much more lighthearted tone than the Ordo one, as I️ truly felt bad about leaving Valkyrie.",
-    "It was on this day, June 5th 2016, that HoL left Valkyrie to create the Halcyon Alliance with Toasted Pandas.",
-    "This alliance would never do much, but it would still serve as an important part of both my personal history, and the overall history of guilds. That concludes this rather short part. The next part will likely be short too.",
-    "'"
-   ],
-   "textAfter": [
-    "I️ did not intend to do this until later but by popular demand, I️ will be retelling the story of how Hax came to control all of Wynn.",
-    "This part does not fit in with the current timeline of the story, and is rather more of a standalone.",
-    "The rise of Hax was concurrent with the fall of Ordo, and the period of time HoL spent in Valkyrie.",
-    "As you know, Hax was one of the Ordo guilds that joined Astrafteri after the collapse."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/19-image.webp",
+   "excluded": null,
+   "provisionalMarker": 18,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at the part break at drew1011-storytime.md line 530, which opens 'The Halcyon alliance's intention was to strengthen the already strong relationship between HoL and TnP.' It is provisionally sitting at line 504, the Hax part break, one slot early.",
+   "depicts": "Alliance banner artwork on white: two winged angelic figures (a long-haired blonde in a cyan gown at left, a short-haired blonde in cyan at right) holding up a draped tan/grey banner reading, in ornate Gavel-style lettering, 'HALCYON ALLIANCE'. A thin teal-and-orange rule with three small circles runs beneath. No dates, players or territory counts.",
+   "usableFor": "halcyon-alliance - the alliance's banner/emblem",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 19,
    "file": "20-image.png",
-   "linkIndex": 20,
-   "markerLine": 522,
-   "textBefore": [
-    "I️ do not see it as either, but one thing I️ can respect is their honesty about what they were doing.",
-    "They didn’t try to sugarcoat it. They didn’t try to tell anyone they were trying to make the community better.",
-    "They made sure everyone knew all they wanted was to control everything, and I️ can respect that.",
-    "That is the end of this part. The next part will likely be short and will detail the rather everything from the uneventful Halcyon to the Valkyrie coup."
-   ],
-   "textAfter": [
-    "The Halcyon alliance’s intention was to strengthen the already strong relationship between HoL and TnP.",
-    "If you ask me, the truth is that it was just created by a group of friends who had nothing better to do.",
-    "We laid out the groundwork of Halcyon. It was a fairly simplistic community alliance, much akin to how Valkyrie was at the start.",
-    "The alliance had four leaders. TnP had Yami and Fishie as their two leaders, and HoL had Cora and myself as our two."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/20-image.webp",
+   "excluded": null,
+   "provisionalMarker": 19,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at the part break at drew1011-storytime.md line 560, which opens the Valkyrie coup part ('A few weeks after Ari suggested that I be made the leader of Valkyrie, the wheels were set in motion.'). It is provisionally sitting at line 530, the Halcyon part break, one slot early.",
+   "depicts": "Square royal-blue alliance logo. Centred white line-art monogram (two crossing strokes forming an 'A'-like glyph with a small inverted chevron inside), above white caps 'VALKYRIE' and, smaller and letterspaced, 'A L L I A N C E'. Same monogram as file 16-image but square, blue, and with the word 'ALLIANCE' added. No dates, players or territory counts.",
+   "usableFor": "valkyrie-alliance - alliance logo (square blue variant)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 20,
    "file": "21-image.png",
-   "linkIndex": 21,
-   "markerLine": 552,
-   "textBefore": [
-    "But as I️ would soon discover, there were problems within the alliance that had made the leaders upset at its current state.",
-    "A couple weeks after rejoining, I️ was talking to Ari about these problems when she suddenly suggested that the other leaders and me should coup Yuno and make myself the leader of Valkyrie.",
-    "The thought had barely crossed my mind until Ari suggested it, but once she did I️ knew there was no way I️ would stop until it happened.",
-    "Apologies for this rather short edition storytime. They can’t all be long tales of epic proportions. Hopefully the next part will be different, as it will detail the Valkyrie coup and the events leading up to the glorious Fox revival."
-   ],
-   "textAfter": [
-    "A few weeks after Ari suggested that I️ be made the leader of Valkyrie, the wheels were set in motion.",
-    "I️ began by messaging Misty, who had already been on board with the plan after Ari suggested it to her too.",
-    "At this point, LTH had left the alliance. Thus, Misty and I️ only had to make sure Red was on board.",
-    "Considering Red is one of my best friends, obviously he was."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/21-image.webp",
+   "excluded": null,
+   "provisionalMarker": 20,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 567, immediately after 'I wrote a message to send to him, made sure everyone agreed 100% with the message, and then had Misty send it. Here is the message that was sent:'. It is provisionally sitting at line 560, the Valkyrie coup part break, one slot early.",
+   "depicts": "Screenshot of a long plain-text message (black on white). Verbatim: \"Yuno, / I think that to say Valkyrie is thriving, or even alive for that matter, would be a complete and total lie. It is not a secret that lately the alliance has gone down the drain. We believe this to be a combination of many things. However, some of them can be fixed, and that is what we intend to do here. We know that your schedule has been highly erratic lately and that your inactivity may not be your fault. However, you have also overused your power and done things that not all of us agreed with. For example, you created the war alliance. While we were informed of it, we were not given an accurate description and agreed to it because we thought it was what everyone else wanted. Then, you added the Wybel Kingdom to it. You knew that not everyone was on good terms with the Kingdom's leaders, yet they were added anyways. I do not think anyone was consulted on this matter until after the fact. Therefore, we believe it to be in Valkyrie's best interests if you step down from your position and focus your attention on leading Imperial, not Valkyrie. We do not mean this message to be aggressive or hostile. We are asking you, as a friend, to relinquish your position as Valkyrie leader, and allow someone else to take the torch, post the thread, and take Valkyrie back in the direction of glory. / -A Unanimous Declaration from the Leaders of Valkyrie\" Names/entities: Yuno, Valkyrie, Wybel Kingdom, Imperial.",
+   "usableFor": "valkyrie-alliance - the first ultimatum of the Valkyrie coup asking Yuno to step down (verbatim); also yuno, imperial",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 21,
    "file": "22-image.png",
-   "linkIndex": 22,
-   "markerLine": 559,
-   "textBefore": [
-    "At this point, LTH had left the alliance. Thus, Misty and I️ only had to make sure Red was on board.",
-    "Considering Red is one of my best friends, obviously he was.",
-    "We convened in a group chat and discussed the best way to go about our plan. We decided to start by simply asking Yuno to step down. I️ wrote a message to send to him, made sure everyone agreed 100% with the message, and then had Misty send it.",
-    "Here is the message that was sent:"
-   ],
-   "textAfter": [
-    "After this was sent, Yuno responded by declining the offer and telling us that he did not want to. He said to give him more time and that if he did not improve, he would step down. He stated that if we did not like it, we could always leave.",
-    "I️ wrote a second message in response, made sure we all agreed, and sent it. That message was as follows:",
-    "Image",
-    "In response to this, Yuno began speaking of his experience in the Valkyrie leadership."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/22-image.webp",
+   "excluded": null,
+   "provisionalMarker": 21,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at drew1011-storytime.md line 570, immediately after 'I wrote a second message in response, made sure we all agreed, and sent it. That message was as follows:'. It is provisionally sitting at line 567 ('Here is the message that was sent:' - the FIRST message), one slot early.",
+   "depicts": "Screenshot of a plain-text message (black on white). Verbatim: \"Yuno, / I think that maybe our point did not get across to you. The 'asking you as a friend' part of the message was only a formality. That was added to stop things from escalating further. The truth is, however, that we are not really 'asking' you to step down. We are telling you to. Three out of four leaders support this cause. We also have the endorsement of Ari. Yuno, do not think that we won't take you up on the 'if you don't like it then leave' statement. If we all leave, you won't even have an alliance to lead.\" Names: Yuno, Ari.",
+   "usableFor": "valkyrie-alliance - the second, escalated coup ultimatum to Yuno (verbatim), confirming a three-of-four leader majority plus Ari's endorsement",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 22,
    "file": "23-image.png",
-   "linkIndex": 23,
-   "markerLine": 562,
-   "textBefore": [
-    "Here is the message that was sent:",
-    "Image",
-    "After this was sent, Yuno responded by declining the offer and telling us that he did not want to. He said to give him more time and that if he did not improve, he would step down. He stated that if we did not like it, we could always leave.",
-    "I️ wrote a second message in response, made sure we all agreed, and sent it. That message was as follows:"
-   ],
-   "textAfter": [
-    "In response to this, Yuno began speaking of his experience in the Valkyrie leadership.",
-    "He mentioned how this made him the best candidate for leader. He also asked who we planned to make leader of Valkyrie if he stepped down. I️ did not want to answer that question at the time, so I️ didn’t.",
-    "He said that if he would no longer be the leader, then Imperial would leave the alliance.",
-    "To be truthful, I️ thought he was bluffing. I️ think we all did. None of us fully believed that Imperial would leave."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/23-image.webp",
+   "excluded": null,
+   "provisionalMarker": 22,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at marker 23 (drew1011-storytime.md line 576), after 'Thus, I drafted a response. In said response we \"called his bluff\" and continued to push our agenda.' The image rebuts BOTH of Yuno's replies that the text places after marker 22 (his claim of a year's leadership experience, and his threat that Imperial would leave), so it cannot be the 'second message' at marker 22. The actual second message is 22-image.png, which answers Yuno's 'if you don't like it then leave' remark.",
+   "depicts": "Plain black-on-white text screenshot of a message addressed to Yuno from the Valkyrie guild leaders. Verbatim: \"Yuno, / Your experience as part of the Valkyrie government for over a year has definitely not shown in your leadership. If the cost of Valkyrie returning to its former glory is Imperial leaving it, then so be it. Not one of us have a problem with that, and we believe that the benefits far outweigh the consequences. Unlike what you have done with this alliance, every decision and every message that has  been made/sent regarding this current ordeal has been done with the unanimous consent of every other guild leader, and this message is no different. If the price of this change is the loss of Imperial, then that is a price we are all willing to take.\"",
+   "usableFor": "valkyrie-alliance -- the autumn 2016 coup against Yuno and the departure of Imperial [Imp]",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 23,
    "file": "24-image.png",
-   "linkIndex": 24,
-   "markerLine": 568,
-   "textBefore": [
-    "He mentioned how this made him the best candidate for leader. He also asked who we planned to make leader of Valkyrie if he stepped down. I️ did not want to answer that question at the time, so I️ didn’t.",
-    "He said that if he would no longer be the leader, then Imperial would leave the alliance.",
-    "To be truthful, I️ thought he was bluffing. I️ think we all did. None of us fully believed that Imperial would leave.",
-    "Thus, I️ drafted a response. In said response we “called his bluff” and continued to push our agenda."
-   ],
-   "textAfter": [
-    "Immediately after I️ sent this message, Yuno announced that Imperial would be leaving.",
-    "He left all the chats and deleted his Valkyrie thread.",
-    "Seeing as I️ was the one who would take the leadership role, it became my duty to handle the aftermath.",
-    "I️ obtained Yuno’s permission to copy and paste his Valkyrie thread, and posted it myself."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/24-image.webp",
+   "excluded": null,
+   "provisionalMarker": 23,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Belongs at marker 24 (line 592), between 'She did it in a half joking manner, but I was not going to let an opportunity like that slide by.' and 'It was those 4 messages that would spark an unprecedented guild revival.' Two independent confirmations: the image contains exactly four messages, and its date 11/21/2016 matches the text's 'On November 21st, 2016, Ari suggested to me that we should revive Fox'.",
+   "depicts": "Discord screenshot. User 'Miss Arianna' (Ari), dated 11/21/2016, four consecutive messages: 'drew' / 'marry pyrias' / 'take my crown' (italic) / 'reestablish the kingdom' (bold). Avatar is an anime-style character with brown twin-tails.",
+   "usableFor": "kingdom-of-foxes -- the 21 November 2016 revival decision and the founding of Foxton Legacy [Eon]",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 24,
    "file": "25-image.png",
-   "linkIndex": 25,
-   "markerLine": 584,
-   "textBefore": [
-    "Therefore, I️ again lost my motivation.",
-    "That would all change about a month later.",
-    "On November 21st, 2016, Ari suggested to me that we should revive Fox",
-    "She did it in a half joking manner, but I️ was not going to let an opportunity like that slide by."
-   ],
-   "textAfter": [
-    "It was those 4 messages that would spark an unprecedented guild revival.",
-    "Never before had a guild gone down in such a violent and brutal way, yet still come back.",
-    "I️ immediately messaged Misty (Pyrias) about it, who seemed open to the idea.",
-    "We decided that we needed to bring in one other person to assist us with the revival, so we turned to Fishie."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/25-image.webp",
+   "excluded": null,
+   "provisionalMarker": 24,
+   "alignmentVerdict": "mismatch",
+   "correctedContext": "Orphaned: no 'Image' marker in drew1011-storytime.md corresponds to this file. Markers 20-24 are served by files 20-image through 24-image, and markers 25 onward by files 26-image onward, leaving 25-image.png with no slot -- an image marker appears to have been lost from the transcript. Best textual fit is the Foxton Legacy [Eon] founding passage (lines ~601-606, 'So, on November 24th, we created Foxton Legacy [Eon]'), because 'Glory to the Rightful' is the motto preceding 'Forever or Nothing', which the text says was newly chosen only in February 2017 (marker 28).",
+   "depicts": "Wide guild banner graphic. Dark navy field; centred gold-outlined heraldic shield quartered with fox and wing charges, topped by a crown and ringed by a gold laurel/order collar; a furled flag on a spear behind it. Caption 'KINGDOM OF FOXES' with the motto 'GLORY TO THE RIGHTFUL' beneath; a gold bar runs along the bottom edge. No dates, players or guild tags.",
+   "usableFor": "kingdom-of-foxes -- heraldry; the pre-February-2017 'Glory to the Rightful' motto and quartered crest",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 25,
    "file": "26-image.png",
-   "linkIndex": 26,
-   "markerLine": 628,
-   "textBefore": [
-    "Soon afterwards, she told me she would likely step down as Queen. Binary and Fishie also confided in me that they wanted to leave the guild.",
-    "None of them seemed too enthralled with the vision of what the guild could become, and decided to leave rather than keep fighting to achieve that vision.",
-    "Thus, on January 28th, Misty stepped down as Queen.",
-    "She posted this announcement "
-   ],
-   "textAfter": [
-    "and left the guild.",
-    "Soon afterwards, Binary left as well. So did Fishie. So did Arsene.",
-    "Arsene was the one I intended to make Viceroy, the one I intended to rebuild the guild with.",
-    "He had promised to me that he wouldn’t leave after I informed him some others might be leaving."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/26-image.webp",
+   "excluded": null,
+   "provisionalMarker": 25,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord screenshot. User 'Lyressi' (Misty / Pyrias, Queen of the Foxes and leader of the House of Sentinels [Snt]), dated 01/28/2017, posting a highlighted @everyone announcement, verbatim: '@everyone, I'm taking my leave from Fox and solely focusing on Snt again. I apologize for any disillusions I could've possibly caused if any, but I have decided on it. Drew will be the owner of the Discord and only leader of Fox. I shall still linger here, but only as a leader of Snt.' Avatar is a pale low-poly wolf/fox head.",
+   "usableFor": "kingdom-of-foxes -- the January 2017 Council Exodus; Misty's abdication as Queen (28 Jan 2017)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 26,
    "file": "27-image.png",
-   "linkIndex": 27,
-   "markerLine": 637,
-   "textBefore": [
-    "Nonetheless, I was left alone in the council. I had to make InvertedReaper the Viceroy. A good member of the guild, but one who was not even in the council.",
-    "I slowly began to realize there was no way I could make the guild what it once was, not without the vision of someone who had been a active contributor to the original Kingdom.",
-    "Because of this, I decided the best option was to get Ari to reclaim her crown and return as Queen.",
-    "I messaged her, and asked if she would do it."
-   ],
-   "textAfter": [
-    "I may be good a leading a guild, but I am far better at it when I have someone to “make things pretty” as I like to put it.",
-    "I can make a guild successful, but I can’t make its appearance and structure professional and appealing. Because of this, I needed Ari and believed she was the best way to secure long term success.",
-    "In proper Ari style, I had to pester her about whether she’d come back for a few days, and then finally this happened.",
-    "Image"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/27-image.webp",
+   "excluded": null,
+   "provisionalMarker": 26,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord DM screenshot dated 01/29/2017 between Drew1011 and Miss Arianna. Verbatim: Drew1011: 'Remember how a while back' / 'You suggested that we give the guild to you'. Miss Arianna: 'Sure'. Drew1011: 'Would you still be interested in that' / 'because if you are i'm heavily considering it' / 'i don't see how I can fix this'. Miss Arianna: 'Idk ill think bout it' followed by a grinning-face emoji.",
+   "usableFor": "kingdom-of-foxes -- Ari's return to the throne; the approach made one day after Misty left (29 Jan 2017)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 27,
    "file": "28-image.png",
-   "linkIndex": 28,
-   "markerLine": 641,
-   "textBefore": [
-    "Image",
-    "I may be good a leading a guild, but I am far better at it when I have someone to “make things pretty” as I like to put it.",
-    "I can make a guild successful, but I can’t make its appearance and structure professional and appealing. Because of this, I needed Ari and believed she was the best way to secure long term success.",
-    "In proper Ari style, I had to pester her about whether she’d come back for a few days, and then finally this happened."
-   ],
-   "textAfter": [
-    "Never before had a guild related message made me as happy as that one. I was overjoyed at the idea of Ari returning to her throne and leading the guild again.",
-    "However again, in proper Ari style, I had to pester her about it for a couple days before the power transfer occurred.",
-    "It was on February 7th, 2017, that I stepped down from my position as King and restored the Foxton bloodline to the throne.",
-    "I became the Viceroy of the Foxes, the second male one in the history of Her "
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/28-image.webp",
+   "excluded": null,
+   "provisionalMarker": 27,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord DM screenshot dated 02/02/2017 between Drew1011 and Miss Arianna. Verbatim: Drew1011: 'You said you're really considering joining back' / 'And I'm just wondering where you are' / 'on that'. Miss Arianna: 'Uh' / 'Whats a good time for you'. Drew1011: 'What do you mean?'. Miss Arianna: 'Transfer of power 8)'. Drew1011: 'LONG LIVE THE QUEEN o/'.",
+   "usableFor": "kingdom-of-foxes -- Ari's restoration as Queen (agreed 2 Feb 2017, executed 7 Feb 2017)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 28,
    "file": "29-proxy.png",
-   "linkIndex": 29,
-   "markerLine": 659,
-   "textBefore": [
-    "We chose a new motto, one fitting of the Queen’s return, and of Fox’s unwillingness to die",
-    "“Forever or Nothing.”",
-    "It was the idea of the guild lasting forever that gave us the motivation to continue, to create a legacy that would last longer than us.",
-    "That idea followed the guild throughout all the trials and tribulations that would follow in the coming year, and eventually elevate the guild to a position it had never achieved before."
-   ],
-   "textAfter": [
-    "In the days after Ari retook the throne, we began a rework of the guild.",
-    "Everything from the guild ranks to the discord itself received a major overhaul in order to streamline the guild and make things run more smoothly.",
-    "Along with these changes, Ari and I️ had massive changes planned for Valkyrie. We had hoped to revive the alliance and restore it to former glory. However, a mere five days after the leadership change, the House of Sentinels left the alliance.",
-    "Considering HoL and HHU, the only other guilds left in Valkyrie, were already dead, there seemed to be no point in trying to revive Valkyrie at that time."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/29-proxy.webp",
+   "excluded": null,
+   "provisionalMarker": 28,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wide guild banner graphic. Dark navy field; crowned gold laurel-ringed shield bearing a white howling fox on an orange ground; furled flag on a spear behind. Caption 'KINGDOM OF FOXES' with the motto 'FOREVER OR NOTHING'; gold bar along the bottom edge.",
+   "usableFor": "kingdom-of-foxes -- heraldry; the 'Forever or Nothing' motto adopted on Ari's return (Feb 2017)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 29,
    "file": "30-image.jpg",
-   "linkIndex": 30,
-   "markerLine": 707,
-   "textBefore": [
-    "It was around this time that Fox had truly become one of the most active guilds in the game.",
-    "On average there were usually around 8-9 members online during the daytime. It was not uncommon to log on and see upwards of 14 members online during the weekend.",
-    "Although I️ have no way of confirming this, I️ truly believe that other than Hax, Fox was the most active guild in Wynn at the time.",
-    "Here is a screenshot from a month prior to our peak of activity, during the March 2017 Award Ceremony."
-   ],
-   "textAfter": [
-    "All but two or three people present in this image were members of the guild at the time.",
-    "I️ believe this screenshot truly highlights how successful the guild became in the short couple months after the Council Exodus.",
-    "The Kingdom of Foxes quickly went from a cause many believed to be hopeless, to surpassing many other guilds in terms of activity and becoming a respected guild once more.",
-    "However, this could not last forever. The guild would have its ups and downs over the coming months, but would eventually settle down at a much lower position than it had seen in a while."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/30-image.webp",
+   "excluded": null,
+   "provisionalMarker": 29,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wynncraft in-game screenshot of a large crowd in a flower garden with stone paths. Visible nameplates: orange0401, Sitrio, Schattentoeter7, VovaTheEpic, 4Bengals, Luko0, Kiric, Antra, shiznetx3, cowmoonist, AurumKitsune, LoveLusting, Drew1011; two horses labelled '[orange0401]' and 'Heavy Flow [LoveLusting]'. Boss bar at top reads 'Cinfras Guard'. Chat log verbatim: '[88/Wa/**Imp] [VIP] Snaky0mnivore: lag server' / '[98/Wa/Wyb] [VIP] Striaton: wheres salted' / '[100/Ma/-Fox] [Vet] Antra: holy [redacted] guys [redacted] stop' (two words covered by red redaction bars applied in the source image) / '[94/Ma/**Imp] [VIP+] Gryphene: orange0401 stop using spells'. HUD shows 2399/2586 and coordinates -403 SE -4965, 20/20.",
+   "usableFor": "kingdom-of-foxes -- activity peak in early 2017; member roster. CAVEAT: no date is visible in the image, so the 'March 2017 Award Ceremony' attribution rests solely on Drew's narration; the guild tags in chat (-Fox, **Imp, Wyb) are server-wide chat, not proof of who is standing in frame.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 30,
    "file": "31-proxy.png",
-   "linkIndex": 31,
-   "markerLine": 713,
-   "textBefore": [
-    "I️ believe this screenshot truly highlights how successful the guild became in the short couple months after the Council Exodus.",
-    "The Kingdom of Foxes quickly went from a cause many believed to be hopeless, to surpassing many other guilds in terms of activity and becoming a respected guild once more.",
-    "However, this could not last forever. The guild would have its ups and downs over the coming months, but would eventually settle down at a much lower position than it had seen in a while.",
-    "End of part 12."
-   ],
-   "textAfter": [
-    "Shorty after the Prime Minister election, I messaged Arenos and inquired as to what ever came of the alliance he was creating and of the short summary we were supposed to receive.",
-    "He told me that he thought we had said we weren’t interested. I’m not sure why he figured that was the case, since I had made it clear we’d consider it if we just had the alliance summarized for us.",
-    "I shrugged it off and he sent me a behemoth of a document that was meant to be an explanation of the alliance.",
-    "The document called “The Emperial Truth”, and it was one of the most needlessly complex and confusing documents I’ve ever read."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/31-proxy.webp",
+   "excluded": null,
+   "provisionalMarker": 30,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "The Emperium alliance emblem on a white/transparent ground: a brown shield edged with white pearls, bearing a cluster of green emerald crystals; a silver-headed sword and a fletched arrow crossed behind it; a cream scroll banner across the lower shield reads 'The Emperium' in blackletter. Artist signature 'RANI' at bottom right.",
+   "usableFor": "the-emperium -- alliance emblem/heraldry (art signed by Rani)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 31,
    "file": "32-eJwVzMENwyAMAMBdGAAbTBKabRBBhCrUCLuvqru3.png",
-   "linkIndex": 32,
-   "markerLine": 744,
-   "textBefore": [
-    "On June 2nd, 2017, the KoF celebrated its third birthday. This was celebrated with the second award ceremony since the revival.",
-    "We met at the Llevigar beaches and distributed awards to deserving members.",
-    "It was here that I achieved one of the four goals I set for myself upon Ari’s return: Obtain the Queen’s Cross. It is the highest award that can be obtained in Fox, and including myself the only other people who have obtained it are Princess Kurumi and Misty, both of which received it before the guild was disbanded.",
-    "Here are two screenshots from the event:"
-   ],
-   "textAfter": [
-    "Image",
-    "Unfortunately I had to leave before the second screenshot was taken, so only four members in it were dressed in uniform.",
-    "It was around this time that the guild began seeing a massive drop in activity.",
-    "You can only keep guild members active with nothing but grinding events and award ceremonies for so long, especially when incoming applications drop to almost zero."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/32-eJwVzMENwyAMAMBdGAAbTBKabRBBhCrUCLuvqru3.webp",
+   "excluded": null,
+   "provisionalMarker": 31,
+   "alignmentVerdict": "matches",
+   "correctedContext": "Correctly placed at the 'Here are two screenshots from the event' pair (markers 31 and 32 are adjacent lines 752/753 of the .md), but the order within the pair is uncertain: the text's 'I had to leave before the second screenshot was taken, so only four members in it were dressed in uniform' fits THIS image better than 33-image, and the scene is a grassy hilltop rather than the 'Llevigar beaches' the text names. The pair may be reversed.",
+   "depicts": "Wynncraft night-time screenshot with a hand-lettered white overlay reading 'forever or nothing' above the line 'JUNE AWARDS CEREMONY'. A group of players stands on a grassy rise beside a torch, with a stepped hillside and red-brick chimneys behind. Roughly four figures on the left wear matching navy-and-gold dress uniform; several non-uniformed players stand at right, one nameplate legible as 'InvertedReap[er]'.",
+   "usableFor": "kingdom-of-foxes -- the June 2017 awards ceremony / third guild birthday",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 32,
    "file": "33-Screen_Shot_2017-06-02_at_6.png",
-   "linkIndex": 33,
-   "markerLine": 745,
-   "textBefore": [
-    "We met at the Llevigar beaches and distributed awards to deserving members.",
-    "It was here that I achieved one of the four goals I set for myself upon Ari’s return: Obtain the Queen’s Cross. It is the highest award that can be obtained in Fox, and including myself the only other people who have obtained it are Princess Kurumi and Misty, both of which received it before the guild was disbanded.",
-    "Here are two screenshots from the event:",
-    "Image"
-   ],
-   "textAfter": [
-    "Unfortunately I had to leave before the second screenshot was taken, so only four members in it were dressed in uniform.",
-    "It was around this time that the guild began seeing a massive drop in activity.",
-    "You can only keep guild members active with nothing but grinding events and award ceremonies for so long, especially when incoming applications drop to almost zero.",
-    "The next few months were nothing but inactiveness."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/33-Screen_Shot_2017-06-02_at_6.webp",
+   "excluded": null,
+   "provisionalMarker": 32,
+   "alignmentVerdict": "matches",
+   "correctedContext": "Filename date 2017-06-02 independently confirms the KoF third-birthday ceremony of 2 June 2017, and the beach with a wrecked ship matches 'We met at the Llevigar beaches'. Order within the two-screenshot pair is uncertain -- see marker 31.",
+   "depicts": "Wynncraft daytime screenshot on a sandy beach with a wrecked sailing ship offshore (Llevigar coast). About twelve characters posed in two rows: a back row of five seated on brown chairs (red-shirted, black cat-mask, ice-blue, white/black formal, goggled brown), and a front row of seven standing, most in matching navy-black-and-gold dress uniform, including one wearing an orange fox mask with a crown and one in purple. Filename carries the date 2017-06-02. No chat or HUD visible.",
+   "usableFor": "kingdom-of-foxes -- 2 June 2017 third-birthday awards ceremony at Llevigar; dress-uniform and roster evidence",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 33,
    "file": "34-image.png",
-   "linkIndex": 34,
-   "markerLine": 755,
-   "textBefore": [
-    "Activity levels had dropped to zero, nobody truly cared about wanting to make the guild active again, etc.",
-    "I became incredibly bored to the point where I would later find entertainment in messing around and running for leader of the Emperium, which for some reason even non-alliance members could run for.",
-    "Yet there is no time for that now, and the Emperator election will be detailed in the next part.",
-    "Drew1011 — 2/26/2018 9:20 PM"
-   ],
-   "textAfter": [
-    "The Emperium discord had become one of my favorite places to hang out.",
-    "You see, when somebody dislikes me I purposefully speak more in their presence just because it aggravates them.",
-    "And nobody disliked me more than Rani and Arenos.",
-    "Thus, it was enjoyable to converse in their alliance discord."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/34-image.webp",
+   "excluded": null,
+   "provisionalMarker": 33,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wide guild banner graphic. Dark navy field; crowned gold laurel-ringed shield bearing a white fox head in profile on an orange ground; furled flag on a spear behind. Caption 'KINGDOM OF FOXES' with the motto 'FOREVER OR NOTHING'. A later crest revision than 29-proxy.png, which uses a full howling fox.",
+   "usableFor": "kingdom-of-foxes -- heraldry (later fox-head crest variant). Decorative part-break art only: the slot has no descriptive lead-in, so it is not evidence for the Emperator-election narrative that follows it.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 34,
    "file": "36-image.jpg",
-   "linkIndex": 36,
-   "markerLine": 770,
-   "textBefore": [
-    "These were Nitro, Josh (now known as ElegantDeath), and me.",
-    "Nitro is a younger member of the Wynn community, and many viewed him as immature.",
-    "One of the events that had given him this image was the time he spammed the Emperium discord with his alt account as a “test” to see how people would react.",
-    "This led to the now infamous spam meme, drawn by oniyan:"
-   ],
-   "textAfter": [
-    "Josh was a well respected member of the Emperium, and to me he was the obvious winner.",
-    "Therefore, I had to get sneaky in order to have a chance at winning.",
-    "I managed to convince Josh to drop out of the race and support my candidacy.",
-    "In exchange for this, if I won I would ensure he won the position of Community Leader."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/36-image.webp",
+   "excluded": null,
+   "provisionalMarker": 34,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Crude digital drawing of a blue-and-yellow tin of SPAM on a white ground. Hand-lettered text on the tin: 'SPAM!' on the right face; '(it was just a test)' on the left face; '(but not really)' beneath 'SPAM!'.",
+   "usableFor": "the-emperium -- the Nitrogen2Oxygen alt-account spam incident in the Emperium discord; meme credited in the text to oniyan",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 35,
    "file": "37-image.png",
-   "linkIndex": 37,
-   "markerLine": 787,
-   "textBefore": [
-    "Unbeknownst to me, someone I thought I had convinced to vote for me, Angry_will, was secretly working as Nitro’s campaign manager.",
-    "He had garnered most of the votes Nitro received, and kept the race as close as it was.",
-    "The biggest lead one of us ever obtained was only a 5 vote lead.",
-    "At the end of the week, the vote was an astoundingly close 30-31, with Nitro as the winner."
-   ],
-   "textAfter": [
-    "And although it would later be revealed that the vote had been rigged in Nitro’s favor, I was still disappointed at the fact that I lost to him.",
-    "Shortly thereafter, Arenos quit the alliance and abandoned his position as “Shadow Advisor”.",
-    "Nitro started an election for SA, and obviously I ran. I won in a landslide.",
-    "Image"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/37-image.webp",
+   "excluded": null,
+   "provisionalMarker": 35,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord announcement screenshot. Author 'A'renos' (purple name, armoured-paladin avatar), timestamped 'Last Wednesday at 11:11 AM', marked '(edited)'. Verbatim: '@Emperium Member and @Honorary Members  Greetings all, the time has come for the alliance to elect the @Emperator. Today and for 3 days, the vote will be held in here. If you would like to vote for @Nitrogen2Oxygen Please vote [N]. If you would rather vote for @Drew1011 Please vote [D]'. Reaction tallies underneath: regional-indicator D = 30, regional-indicator N = 31, plus two further reactions each at 11.",
+   "usableFor": "the-emperium -- the Emperator election, Drew1011 vs Nitrogen2Oxygen, final tally 30-31; Arenos as the officiating alliance leader",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 36,
    "file": "38-image.png",
-   "linkIndex": 38,
-   "markerLine": 791,
-   "textBefore": [
-    "Image",
-    "And although it would later be revealed that the vote had been rigged in Nitro’s favor, I was still disappointed at the fact that I lost to him.",
-    "Shortly thereafter, Arenos quit the alliance and abandoned his position as “Shadow Advisor”.",
-    "Nitro started an election for SA, and obviously I ran. I won in a landslide."
-   ],
-   "textAfter": [
-    "Around this time, at home in the Kingdom of Foxes, issues were beginning to develop.",
-    "There had been increasing tension between a few members of Parliament and me.",
-    "I felt as if they were being disrespectful, and as if they did not respect the higher authority within the guild.",
-    "One incident in question was when I was randomly and for no reason falsely accused of wanting to rig an election to ensure Whimsy would not be re elected for Prime Minister."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/38-image.webp",
+   "excluded": null,
+   "provisionalMarker": 36,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord poll screenshot. Author 'Nitrogen2Oxygen' (blue-smiley avatar), dated 08/31/2017. Verbatim: 'Who do you want as your shadow advisor? [S]hy_Phoenix, [A]ngry_will, [D]rew1011 or [W]himsicality? React with the letter to vote.' Reaction tallies: S = 4, A = 5, D = 19, W = 4.",
+   "usableFor": "the-emperium -- Shadow Advisor election of 31 August 2017; Drew1011 elected 19 votes to 5/4/4 over Angry_will, Shy_Phoenix and Whimsicality",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 37,
    "file": "39-image.png",
-   "linkIndex": 39,
-   "markerLine": 813,
-   "textBefore": [
-    "However along with this splinter, tensions and hostility quickly grew between Fox and Phx, causing much drama in the coming months.",
-    "The hostility between Fox and Phx would also prove to be the single most important cause of Fox’s transformation from a purely community guild to one of the top War guilds in the community.",
-    "Drew1011 — 2/26/2018 9:34 PM",
-    "However, that’s for next time. The transformation and shift within Fox will be detailed in the next part."
-   ],
-   "textAfter": [
-    "The friction between Fox and Phx began as nothing more than a mutual dislike that many members of each guild had for members of the opposite guild.",
-    "However, as the time progressed it quickly grew in to more.",
-    "One of the most severe issues that Fox members had with Phx was that they had completely copied the structure of Fox, without so much as asking a respectful “is this alright?”",
-    "Although for me, the biggest problem I had at the start were eight simple words on the Phx thread. "
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/39-image.webp",
+   "excluded": null,
+   "provisionalMarker": 37,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Kingdom of Phoenixes [Phx] guild banner: a black pennant with a chevron-notched lower edge, bearing a white stylised phoenix curled inside a circle, above the stacked text 'KINGDOM OF PHOENIXES'.",
+   "usableFor": "kingdom-of-phoenixes -- guild emblem/heraldry",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 38,
    "file": "40-image.jpg",
-   "linkIndex": 40,
-   "markerLine": 838,
-   "textBefore": [
-    "When Fishie concluded his rant, he decided that the best way to vent his anger was to attack Phx.",
-    "He yelled at me to war too, although I did not wish to attack Phx so as not to cause further drama between our guilds.",
-    "So he attacked the Phx territories near Detlas and Nemract, while I tried to attack a territory belonging to a guild I had never heard of before named DogsAmongUs [DAU]",
-    "Immediately after taking Ternaves from DAU, I received a message from someone I only faintly recognized."
-   ],
-   "textAfter": [
-    "I was not entirely sure who he was or what he meant, but I would later come to find it was him who had organized the alliance that brought down Hax.",
-    "Wars were still incredibly broken at the time, but Fishie seemed to have better luck than me.",
-    "In the time it took me to capture Ternaves, he had taken roughly eight Phx territories.",
-    "It was roughly 3 AM at this point, so I decided to go on to sleep and war more tomorrow."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/40-image.webp",
+   "excluded": null,
+   "provisionalMarker": 38,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wynncraft in-game chat screenshot of a private-message exchange. Verbatim: '[Tntdestroyd (WC1) -> Drew1011] ill be a monkeys uncle' / '[Tntdestroyd (WC1) -> Drew1011] did i just see a msg saying a community guild just kicked ass .... :0' / '[Tntdestroyd (WC1) -> Drew1011] gg' / (magenta system line) 'As the sun rises, you feel a little bit safer...' / '[+1 Soul Point]' / '[Drew1011 -> Tntdestroyd (WC1)] wat' / '[Drew1011 -> Tntdestroyd (WC1)] a message?'",
+   "usableFor": "war-syndicate -- Tntdestroyd's first contact with Drew1011, immediately after Fox took Ternaves from DogsAmongUs [DAU]; the start of Fox's turn toward warring",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 39,
    "file": "41-image.png",
-   "linkIndex": 41,
-   "markerLine": 858,
-   "textBefore": [
-    "Tnt had been telling Phx that Aurum betrayed them, and wouldn’t give Aurum her roles back in their discord even after she took Phx back.",
-    "Because of this and a few other things, Phx left War Syndicate.",
-    "It was after this incident that Aurum and I both realized we didn’t particularly like their alliance.",
-    "So in mid October, a proposal was put forth."
-   ],
-   "textAfter": [
-    "Drew1011 — 3/4/2018 2:06 AM",
-    "Aurum sent me this screenshot from the Phx Parliament, and from there we began a discussion about creating our own alliance, since the Emperium was completely dead at that point.",
-    "It was Fox and Phx that cofounded it, with Spr (the guild Fishie had made) being the third guild to join, and Snt being the fourth.",
-    "From there we would grow our alliance with the sole purpose of bringing down War Syndicate."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/41-image.webp",
+   "excluded": null,
+   "provisionalMarker": 39,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord screenshot from the Kingdom of Phoenixes parliament channel, forwarded to Drew by Aurum. Author 'King ElegantDeath' (yellow name, Pikachu-style avatar), 'Today at 4:07 PM'. Verbatim: 'Now I know you all hate Fox, but they are the enemy of our somewhat enemy, Tnt' / 'I'm somewhat thinking about a temporary alliance with them purely for the sake of elimination of BCr' / 'I'm wanting to hear your opinions bc I know some of you have bad experiences with them'.",
+   "usableFor": "the-coalition -- the mid-October 2017 Phx-side proposal that produced the Fox+Phx alliance against War Syndicate; ElegantDeath as Phx leader",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 40,
    "file": "42-image.png",
-   "linkIndex": 42,
-   "markerLine": 865,
-   "textBefore": [
-    "Aurum sent me this screenshot from the Phx Parliament, and from there we began a discussion about creating our own alliance, since the Emperium was completely dead at that point.",
-    "It was Fox and Phx that cofounded it, with Spr (the guild Fishie had made) being the third guild to join, and Snt being the fourth.",
-    "From there we would grow our alliance with the sole purpose of bringing down War Syndicate.",
-    "But that shall be detailed in the next part."
-   ],
-   "textAfter": [
-    "We immediately got to work at recruiting new guilds for the Coalition.",
-    "At first, we simply contacted friends who owned guilds and asked if they’d be willing to join.",
-    "One of these friends was DarkSoul, the leader of Hax. He was one of my oldest allies, as we had been in Ordo together.",
-    "I knew that Hax still had the potential to be one of the best warring guilds, and I also knew that War Syndicate was terrified of them."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/42-image.webp",
+   "excluded": null,
+   "provisionalMarker": 40,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Heraldic emblem on a dark navy ground: a grey steel shield with a studded gold rim bearing an ornate blackletter gold letter 'C' with a small cross finial; two gold-hilted swords with blue-jewelled pommels crossed behind the shield; a lion-headed stone warhammer standing upright behind the whole device. No text.",
+   "usableFor": "the-coalition -- alliance emblem/heraldry",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 41,
    "file": "43-image.jpg",
-   "linkIndex": 43,
-   "markerLine": 893,
-   "textBefore": [
-    "For a brief moment, we even considered kicking out most of the guilds and keeping all of Wynn to ourselves.",
-    "If this had been done, Wynn would have been divided between Fox, Phx, Snt, HoF, and Feq (if they chose to come with us). ",
-    "The first four would have had an even 24 territories, and Feq would have had roughly half that, since although they did a better job of claiming their territories than most guilds, they were still practically dead and took forever to do it.",
-    "Here is a map of what it would have looked like, with blue being Fox, Red being Snt, gold being HoF, orange being Phx, and pink being Feq"
-   ],
-   "textAfter": [
-    "However, this idea never made it farther than a single night where we quickly dismissed the idea, as we knew we would be unable to accomplish our final goal and also did not want to abandon and betray the smaller guilds in the alliance. ",
-    "It was on November 23rd, 2017 that the Coalition first took control of every territory on the Wynn mainland. This is what the map looked like at that time.",
-    "Image",
-    "For comparison, this is what the map looked like shortly before the Coalition was founded."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/43-image.webp",
+   "excluded": null,
+   "provisionalMarker": 41,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Isometric render of the Wynncraft territory map, unlabelled. Territories are shaded by their then-current holder in many colours (teal, orange, dark red, violet, magenta, gold, green, blue, grey, pale pink), and each is additionally overlaid with a hand-drawn coloured blob in one of six colours: blue, red, gold, orange, magenta/pink, and a few grey/white. The blob layer partitions the mainland into large contiguous blocks that do not follow the underlying fills. Mainland plus the north-west island cluster are shown.",
+   "usableFor": "the-coalition -- the abandoned November 2017 plan to partition Wynn between Fox (blue), Snt (red), HoF (gold), Phx (orange) and Feq (pink). The text's colour key applies to the hand-drawn blob overlay, not to the underlying territory fills.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 42,
    "file": "44-image.jpg",
-   "linkIndex": 44,
-   "markerLine": 896,
-   "textBefore": [
-    "Here is a map of what it would have looked like, with blue being Fox, Red being Snt, gold being HoF, orange being Phx, and pink being Feq",
-    "Image",
-    "However, this idea never made it farther than a single night where we quickly dismissed the idea, as we knew we would be unable to accomplish our final goal and also did not want to abandon and betray the smaller guilds in the alliance. ",
-    "It was on November 23rd, 2017 that the Coalition first took control of every territory on the Wynn mainland. This is what the map looked like at that time."
-   ],
-   "textAfter": [
-    "For comparison, this is what the map looked like shortly before the Coalition was founded.",
-    "Image",
-    "Everything the Coalition did before the Wynnter War was all in preparation for it.",
-    "One of our greatest weapons was information, and the one who supplied this information."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/44-image.webp",
+   "excluded": null,
+   "provisionalMarker": 42,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Isometric render of the Wynncraft territory map with every territory labelled by holding guild and territory name. Mainland holders are exclusively Coalition guilds: Kingdom Foxes, Kingdom Phoenixes, Gilded Sparrows, Necronomicon, Hall of Fame, House of Sentinels, LE Flowers, Dishonored and Immortalish. The only non-Coalition holdings are off the mainland: Titans Valor on Durum Isles (Upper, Lower, West Upper, East) plus Roasted Island and Pirate Boar Zoo, and The Mage Legacy on Mage Island. Legible territory names include Desert Upper/Mid/Lower/East, Mummy's Tomb, Almuj City, Savannah East/West, Detlas Suburbs, Plains, Nivla Forest, Nesaak, Elkurn, Emerald Fields, Cinfras, Bandit Cave, Pigmen Ravines, Jungle Lower/Upper, Dernel Jungle, Cornal Jungle, City of Troms, Temple of Legends, Abandoned Farm and Roots of Corruption.",
+   "usableFor": "the-coalition -- 23 November 2017, the Coalition's first total control of the Wynn mainland; primary territory-holder evidence and a full guild-by-territory snapshot",
+   "sensitive": false
   },
   {
+   "file": "45-image.png",
+   "web": null,
+   "excluded": null,
    "provisionalMarker": 43,
-   "file": "45-image.jpg",
-   "linkIndex": 45,
-   "markerLine": 898,
-   "textBefore": [
-    "However, this idea never made it farther than a single night where we quickly dismissed the idea, as we knew we would be unable to accomplish our final goal and also did not want to abandon and betray the smaller guilds in the alliance. ",
-    "It was on November 23rd, 2017 that the Coalition first took control of every territory on the Wynn mainland. This is what the map looked like at that time.",
-    "Image",
-    "For comparison, this is what the map looked like shortly before the Coalition was founded."
-   ],
-   "textAfter": [
-    "Everything the Coalition did before the Wynnter War was all in preparation for it.",
-    "One of our greatest weapons was information, and the one who supplied this information.",
-    "A mysterious person within War Syndicate, known only to the rest of the Coalition as “Mr. White” was secretly supplying us with information for months.",
-    "This supplier was none other than the leader of the War Syndicate guild known as DsO. He was unhappy with the alliance, and therefore aided its opponents every step of the way."
-   ],
-   "verified": false,
-   "depicts": null
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wynncraft territory map of the Wynn province (isometric web map), every territory tinted by owner and labelled with owner guild name + territory name in brackets. Legible owners: Kingdom Foxes (very widespread - Nemract Town, Nemract Road, Nemract Plains West, Mt. Wynn, E Flowers, Detlas Far Suburbs, Nesaak Plains North / Mid North West / Lower North West, Bob's Tomb, Nesaak Village, Battle Tower, Farmers Valley, Maltic Plains, Nivla Forest Entrance), New York Nibbas (Nether Plains Upper, Nether Gate, Corrupted Road, Road to Elkurn, South Nivla Forest, Elkurn Fields, Abandoned Farm, Pigmen Ravines, Temple of Legends, Great Bridge Nesaak), Tranquility (Plains, North Nivla Forest, Nivla Forest Exit, Nivla Forest, Nesaak Transition, Mining Base Plains, Plains Lake, Angry Village, City of Troms, Jungle Lower), Titans Valor (Almuj City, Savannah East/West Upper, Ternaves, Jungle Upper), TheOldKeepers (Elkurn, Nesaak Plains Upper North), DogsAmongUs, Shadow Kittens (Nemract Cathedral), KingdomPhoenixes (Detlas Suburbs), The Divine Swords (Animal Bridge), UltimateXeons (Time Valley), BuildCraftia (Savannah East Upper, Nesaak Bridge, Twain Lake, Rymek), Dragons Arise, Toasted Paladins, a House of / Ice Sentinels label, Lion Lair, plus Desert Mid-Lower and Desert West Lower. Ownership is fragmented across roughly a dozen guilds, several of them later War Syndicate members (Tranquility, Titans Valor, BuildCraftia, TheOldKeepers, DogsAmongUs, The Divine Swords). No date or legend box on the image.",
+   "usableFor": "the-coalition — Wynn territory control shortly before the Coalition was founded (autumn 2017); a good contrast piece against the 23 Nov 2017 all-Coalition map that precedes it in the text",
+   "sensitive": false
   },
   {
+   "file": "46-image.png",
+   "web": null,
+   "excluded": null,
    "provisionalMarker": 44,
-   "file": "46-image.jpg",
-   "linkIndex": 46,
-   "markerLine": 916,
-   "textBefore": [
-    "This was the first true test of our strength, as before then we had only fought tiny and unorganized guilds with no reputation.",
-    "The third and final event was the joining of Hax. It was winter now, and Dark finally had the free time to revive his guild.",
-    "Once Hax joined, we knew it was time to strike. Our guilds outnumbered theirs, and we finally had the strength to take down War Syndicate.",
-    "In the days leading up to the war, this is what the Wynn map looked like, with Blue being Fox, Red being Snt, Pink being HOS, Hot pink being Feq, Purple as HoF, Orange as Phx, green as Smd, dark red as TOH, dark green as Two, Cyan as LEF, and gray as ffa territories. "
-   ],
-   "textAfter": [
-    "It was on December 21st, 2017 that we would finally launch our invasion. Somewhat ironically, this was HoL’s third birthday, and the third anniversary of the release of guilds.",
-    "At the time of the declaration of war, these were the guilds on each side.",
-    "Coalition: ",
-    "DeathReapers [DxR]"
-   ],
-   "verified": false,
-   "depicts": null
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Unlabelled Wynncraft territory map of the Wynn province, same viewpoint as marker 43. Two visual layers: a translucent colour tint per territory plus a coloured blob marker inside each territory. Visible colours include cyan/turquoise with orange blobs across the northern desert/Almuj band, dark red with red blobs in the north-east, hot pink and pale pink in the west (Nemract/plains), purple and light purple in the south-west, orange with blue blobs through the centre-east (canyon/Nesaak), green and dark green in the far south, and a few grey blobs. No legend is drawn on the image itself; the key comes only from Drew's caption: Blue = Fox, Red = Snt, Pink = HOS, Hot pink = Feq, Purple = HoF, Orange = Phx, green = Smd, dark red = TOH, dark green = Two, Cyan = LEF, grey = FFA. No date visible.",
+   "usableFor": "gavel-invasion — the Wynn map in the days before 21 Dec 2017, with Coalition guilds holding the whole province. The colour key must be quoted from Drew's caption because the image carries no legend, and the image has two colour layers, so any caption should say which layer is being read.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 45,
    "file": "47-dragoons_emblem.png",
-   "linkIndex": 47,
-   "markerLine": 947,
-   "textBefore": [
-    "TheOldKeepers [Tok] ",
-    "As you can tell, this war would be massive, and until recently, a larger war than any that had ever occurred.",
-    "Despite its scale, the winner would be fairly obvious after a mere day, and the final blow would be dealt a short 4 days after its start.",
-    "However, the event causing the war and the war itself will both be detailed in the next part."
-   ],
-   "textAfter": [
-    "The Gavel Invasion was one of the most consequential events that I have participated in on this server.",
-    "Although it was a complete and total landslide victory, it ushered in a new era in the community. One of fast paced wars, rapid territorial changes, and extreme rivalries.",
-    "However before we can get in to all that, we must examine why the war began.",
-    "The war was inevitable. Once Hax joined, Coalition was planning a strike, although there was no definitive date yet."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/47-dragoons_emblem.webp",
+   "excluded": null,
+   "provisionalMarker": 45,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Vector emblem/roundel on a transparent background: navy disc inside a gold ring, a gold-and-red St Edward's crown at the top, an orange-and-white fox head in profile pierced by a yellow lightning bolt at the centre. Ring text reads 'HER MAJESTY'S ROYAL DRAGOONS' across the top and 'SI VIS PACEM PARA BELLUM' across the bottom. No other text, dates or player names.",
+   "usableFor": "kingdom-of-foxes — insignia of Her Majesty's Royal Dragoons, the Fox warring order. Note it is used here purely as a decorative chapter header for the Gavel Invasion chapter, so its position carries no evidential weight; it should not be read as evidence about December 2017 (the Dragoons only appear in the narrative from May 2018 onward).",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 46,
    "file": "48-unknown.png",
-   "linkIndex": 48,
-   "markerLine": 953,
-   "textBefore": [
-    "Although it was a complete and total landslide victory, it ushered in a new era in the community. One of fast paced wars, rapid territorial changes, and extreme rivalries.",
-    "However before we can get in to all that, we must examine why the war began.",
-    "The war was inevitable. Once Hax joined, Coalition was planning a strike, although there was no definitive date yet.",
-    "Then, an opportunity arose. Tnt tagged me in the War Syndicate discord, and this exchange of words happened."
-   ],
-   "textAfter": [
-    "Image",
-    "We took this as a declaration of war, and we knew had to make the first strike.",
-    "We immediately tagged everyone in the alliance and told them to invade Gavel.",
-    "The original announcement does not exist any longer, yet I still have the one from the Fox discord here:"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/48-unknown.webp",
+   "excluded": null,
+   "provisionalMarker": 46,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord screenshot, dark theme, four messages all dated 12/21/2017. Verbatim: [Whats Coalition?] 'If hax is in coalition' / '@Drew1011' / 'This isnt gonna be pretty'. [Drew1011] 'and whys that'. [Whats Coalition?] 'cuz im going to attack everything'. [Drew1011] 'are you even still confident that you would win'. The name 'Whats Coalition?' renders in red and is Tnt/Tntdestroyd under a joke nickname. Avatars are small and not identifiable.",
+   "usableFor": "gavel-invasion — the exchange in the War Syndicate discord that the Coalition treated as a declaration of war (part 1 of 2; continues in 49-unknown.png)",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 47,
    "file": "49-unknown.png",
-   "linkIndex": 49,
-   "markerLine": 954,
-   "textBefore": [
-    "However before we can get in to all that, we must examine why the war began.",
-    "The war was inevitable. Once Hax joined, Coalition was planning a strike, although there was no definitive date yet.",
-    "Then, an opportunity arose. Tnt tagged me in the War Syndicate discord, and this exchange of words happened.",
-    "Image"
-   ],
-   "textAfter": [
-    "We took this as a declaration of war, and we knew had to make the first strike.",
-    "We immediately tagged everyone in the alliance and told them to invade Gavel.",
-    "The original announcement does not exist any longer, yet I still have the one from the Fox discord here:",
-    "Image"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/49-unknown.webp",
+   "excluded": null,
+   "provisionalMarker": 47,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Direct continuation of the same Discord exchange, all messages dated 12/21/2017. Verbatim: [Drew1011] 'are you even still confident that you would win'. [Whats Coalition?] 'fuck yes'. [Drew1011] 'alright then'. [Whats Coalition?] 'lol' / 'k'. [LordSuper] 'The grinch that stole wynn'. [Drew1011] 'the man so terrified of Hax that hed wage war with another alliance just because they joined'. [Whats Coalition?] 'you think im terrified of hax' / 'i think that you lettin them join you doomed your alliance' / 'here we come'. Contains one profanity.",
+   "usableFor": "gavel-invasion — the casus belli; the 'here we come' line the Coalition read as a declaration of war (part 2 of 2). Also places LordSuper (BCr co-leader) in the channel.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 48,
    "file": "50-image.png",
-   "linkIndex": 50,
-   "markerLine": 958,
-   "textBefore": [
-    "Image",
-    "We took this as a declaration of war, and we knew had to make the first strike.",
-    "We immediately tagged everyone in the alliance and told them to invade Gavel.",
-    "The original announcement does not exist any longer, yet I still have the one from the Fox discord here:"
-   ],
-   "textAfter": [
-    "After this announcement, we all crowded in to the voice channel of the Coalition discord, creating this massive call:",
-    "Image",
-    "Here is a picture of the territory map shortly after the announcement was made:",
-    "Image"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/50-image.webp",
+   "excluded": null,
+   "provisionalMarker": 48,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord screenshot of a single highlighted (@-mention) message. Header: 'Viceroy Drew1011  12/21/2017'. Body verbatim: '@Kingdom of Foxes Member  Our hands have been forced and we are initiating a pre-emptive strike on Gavel. Have all able players log on and attack Gavel. Check the Coalition info channel to make sure you know your allies, as you should not attack them. Deus Vult!'",
+   "usableFor": "gavel-invasion — the Kingdom of Foxes mobilisation order of 21 Dec 2017; also evidences Drew's in-guild title 'Viceroy' and the Fox war cry 'Deus Vult'",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 49,
    "file": "51-d5fa4a2f822f1bea744320067a6c1a73-png.png",
-   "linkIndex": 51,
-   "markerLine": 960,
-   "textBefore": [
-    "We immediately tagged everyone in the alliance and told them to invade Gavel.",
-    "The original announcement does not exist any longer, yet I still have the one from the Fox discord here:",
-    "Image",
-    "After this announcement, we all crowded in to the voice channel of the Coalition discord, creating this massive call:"
-   ],
-   "textAfter": [
-    "Here is a picture of the territory map shortly after the announcement was made:",
-    "Image",
-    "The war began. It was frustrating. Wars were still fairly broken at the time, and there was maybe only a 33% chance at most that they would work.",
-    "Somehow, Coalition was luckier than War Syndicate in this respect, leading many to falsely accuse jp of rigging wars in our favor."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/51-d5fa4a2f822f1bea744320067a6c1a73-png.webp",
+   "excluded": null,
+   "provisionalMarker": 49,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord voice-channel member list, channel titled 'Alliance Members' (locked voice-channel icon), 21 participants with mute icons beside many of them: 'Angry, King of the An...', 'Berrii, Prime Minister of F...', 'Dadda, the non-gay tr...', 'DEUS VULT', 'FlirtyReece', 'Fraad', 'Goden, Establisher of ...', 'Join Snt', 'juiceboxing', 'Knock', 'LogicalTitan', 'Lue the Yandere', 'Pizza', 'PopularSnek', 'slasher', 'Thilyzh', 'Thundderr, King of Troms', 'Time, The Crusher of King...', 'Tonkotsu Ramen', 'VIAIAE (stylised Greek-letter name)', 'VovaTheEpic'. Avatars are Minecraft skins and cartoon art; no real faces. One nickname is truncated as 'Dadda, the non-gay tr...' — the cut-off word is not legible but may be crude, so caption or crop around it if published.",
+   "usableFor": "the-coalition — roster of the Coalition voice call on the night the Gavel Invasion was launched (21 Dec 2017); a rare named list of who in the alliance leadership was present",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 50,
    "file": "52-Gavel1.jpg",
-   "linkIndex": 52,
-   "markerLine": 963,
-   "textBefore": [
-    "Image",
-    "After this announcement, we all crowded in to the voice channel of the Coalition discord, creating this massive call:",
-    "Image",
-    "Here is a picture of the territory map shortly after the announcement was made:"
-   ],
-   "textAfter": [
-    "The war began. It was frustrating. Wars were still fairly broken at the time, and there was maybe only a 33% chance at most that they would work.",
-    "Somehow, Coalition was luckier than War Syndicate in this respect, leading many to falsely accuse jp of rigging wars in our favor.",
-    "However, persistence was the true determinate of the war.",
-    "One of the earliest events of the war was when Paladins United [PUN] joined the Coalition. We had been attempting to invite them for a while now but never saw their owner, Olinite, online."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/52-Gavel1.webp",
+   "excluded": null,
+   "provisionalMarker": 50,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wynncraft territory map of the Gavel province, labelled per territory with the owning guild. Owners visible: BuildCraftia (Light Realm sky islands plus many central territories), The Divine Swords (a large southern/western block and sky-island territories), TheOldKeepers (Light Realm, Corrupted, and a dense cluster in the centre-north), Tranquility (centre-west band), Beasts (large yellow band across the south-west including swamp/transition territories), DogsAmongUs (central band), Sins of Seedia (large pale-green block in the north-east), HackForums (purple territories in the far north-east near Hall of Fame / Molten Heights), Titans Valor (eastern coast and the ocean island territories), Fantasy (one north-east territory), plus a small red 'Kingdom...' label. Filename 'Gavel1' marks it as the first of Drew's numbered war-progress screenshots.",
+   "usableFor": "gavel-invasion — Gavel ownership at the start of the invasion, i.e. War Syndicate's holdings on 21 Dec 2017 with only a Hax foothold in the north-east; pairs directly with 54-Gavel27.jpg as a before/after",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 51,
    "file": "53-image.png",
-   "linkIndex": 53,
-   "markerLine": 973,
-   "textBefore": [
-    "Although they were (understandably) hesitant to join considering we had taken Corkus away from them a mere days prior, their history with Hax and their disdain for War Syndicate led to them joining.",
-    "This was the only addition to our roster during the war.",
-    "Halfway through the first day of warring, we became concerned with how slow the fighting was happening. It had been somewhere around 3 hours, and we had only taken around 10 territories due to the many glitches.",
-    "This frightened a few of us, and we passed a vote to offer WS a ceasefire until wars became less glitched."
-   ],
-   "textAfter": [
-    "However tnt never responded, so the warring continued.",
-    "By the end of the day, we had realized that a ceasefire was unnecessary. A leader counted the total amount of territories, and 44 Gavel territories had been captured by Coalition.",
-    "This war was extremely lopsided. We had anticipated ferocious fighting considering how cocky many within War Syndicate had been, yet in the end only two of their guilds consistently fought back.",
-    "BCr and SDU were the main two guilds fighting back throughout the war, with roughly half their guilds barely even attacking back."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/53-image.webp",
+   "excluded": null,
+   "provisionalMarker": 51,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord DM screenshot framed by two date dividers, 'December 21, 2017' at the top and 'December 28, 2017' at the bottom, with nothing between them. Single message block: 'Drew1011  12/21/2017 — How would you feel about a ceasefire until guild wars actually work and don't take 20 tries' / 'A full on war is annoying and pointless under the current conditions' / 'Pretty much all the active warrers in our alliance agreed that a ceasefire until they're fixed would be a good decision'. The empty gap before the next date divider visually demonstrates that no reply came for a week.",
+   "usableFor": "gavel-invasion — Drew's ceasefire offer to Tnt on day one of the war and the documented absence of any reply; also primary evidence for how broken guild wars were in Dec 2017",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 52,
    "file": "54-Gavel27.jpg",
-   "linkIndex": 54,
-   "markerLine": 989,
-   "textBefore": [
-    "Two days in to the war on December 23rd, three guilds became annoyed enough with War Syndicate to leave the alliance entirely. I saw this as the final blow to the alliance, and knew that it would never exist again in the same way that it had.",
-    "On the 24th, the remaining members of War Syndicate abandoned Gavel entirely and moved their focus towards Wynn, taking up the territories that we had left behind.",
-    "This is what the map looked like after Gavel had been completely taken:",
-    "Drew1011 — 5/20/2018 11:49 PM"
-   ],
-   "textAfter": [
-    "Here is a video that shows the progress of the war. However, it has not been fully updated with every screenshot I have from the war.",
-    "https://www.youtube.com/watch?v=fcpv3Luzlbg",
-    "YouTube",
-    "Ari F"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/54-Gavel27.webp",
+   "excluded": null,
+   "provisionalMarker": 52,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Wynncraft territory map of the Gavel province, labelled per territory, after the Coalition conquest. Owners visible: Paladins United (the entire Light Realm sky-island cluster — Light Realm East/Mid/Lower, Orphion's Seal, Light Realm Mushrooms, Light Realm Corruption, Road to Corruption, Spiralling Trees — plus Olux and Aldorei's Ward), Kingdom Foxes (very widespread across the centre and west: Gylia Lake, Corrupted Village, Dark Forest, Cinfras Entrance, Guild Hall, Path to Faroth, Swamp West/East, Volcano Mines, Fungal Grotto, Entrance to Fedoras, Lava Lake), KingdomPhoenixes (Gelibord Coastal, Fortress North/South, Elysium Plains, Mansion of Insanity, Maquis Lower, Aldorei Valley Upper/Mid, Light Forest East Lower, Molten Mine, Volcano Upper/Lower, Pirate Town), HackForums (dense block in the north-east, Cinfras County, Temple Lower/Upper, Adonai Field), Hall of Fame (large eastern block: Cinfras County Mid/Upper/Lower, Path to Farrall, Canyon Waterfall, Aldorei's Bond), Kasai Shinrai (northern strip: Entrance to Thesead South, Thesead Suburbs, Canyon Mid), Imperial (Cinfras-side territories), DeathReapers (one northern territory), Dishonored (Llevigar Plains, south-west), a Sentinels label near Olux, LE Flowers (LEF Town), and residual single territories still labelled BuildCraftia and Titans Valor. Filename 'Gavel27' = the 27th screenshot in Drew's war series.",
+   "usableFor": "gavel-invasion — Gavel after the province was taken (24-25 Dec 2017), showing the Coalition guild-by-guild carve-up and Paladins United already holding Corkus/Light Realm after joining mid-war. Caveat: two non-Coalition labels (BuildCraftia, Titans Valor) remain, so the map shows Gavel essentially, not literally 100%, taken.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 53,
    "file": "55-dragoon_poster.png",
-   "linkIndex": 55,
-   "markerLine": 999,
-   "textBefore": [
-    "drew wants to call it the great war",
-    "We had initially planned on doing what they had done and letting them hold these territories, but we had all just seen how terribly that had gone for them in the end, and none of us had any desire left to allow them a slice of the map.",
-    "On Christmas Day, with Gavel fully subjugated, our banners turned towards the province of Wynn, and we fully completed what Coalition had set out to accomplish: the complete destruction of War Syndicate. By the end of the day, all 349 territories on the map were owned by Coalition guilds or those we had truced with.",
-    "And so it came to pass that 67 days after the planning had begun, victory had been achieved."
-   ],
-   "textAfter": [
-    "In the days after our historic victory, we had much to resolve. Going from owning half the map to owning the entire map is no small transition.",
-    "During the process of dividing up the map, two guilds left. Necronomicon left because they felt that they were getting the short end up the stick. However, I believe this is far from the truth",
-    "Necronomicon had only taken a single territory in the entire invasion, yet we were giving them all of Llevigar. This was 20+ territories, which I think is more than fair.",
-    "It is in my belief that they did not read the updates on the map and thought they would be stuck with just their 9 Nemract territories."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "excluded": "Recruitment poster whose slogan parodies a Nazi salute. Not publishable.",
+   "provisionalMarker": 53,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Fan-made recruitment poster styled as a wartime propaganda print: navy background with a taped-photo border, a screenshot of three Minecraft characters in navy-and-orange Fox uniform skins standing behind a stone wall beneath a white crown icon. Large hand-lettered slogan 'HEIL FOXTON!' with, beneath it, 'DEFEND THE KINGDOM OF FOXES / JOIN THE ROYAL DRAGOONS' and the Royal Dragoons roundel at the foot. Used as a decorative chapter break.",
+   "usableFor": "kingdom-of-foxes — Royal Dragoons recruitment propaganda; decorative chapter break, so its position carries no evidential weight",
+   "sensitive": true
   },
   {
-   "provisionalMarker": 54,
    "file": "56-Map9_-_Copy.png",
-   "linkIndex": 56,
-   "markerLine": 1033,
-   "textBefore": [
-    "I had been growing increasingly irritated with Hax over the last few weeks, as they would often act like they were objectively the strongest guild and far stronger than Fox, despite the fact that even then the war log showed that Fox did more wars with them.",
-    "Them opposing the idea just added to that.",
-    "But nevertheless, I dropped the idea and didn’t mention it again. The next day, Catherine messaged me and mentioned how much she wanted to divide up Wynn. I told her to start a vote if she felt that way, and she did. The end result of the vote was a clear yes in favor of dividing Wynn.",
-    "So, I redrew the map MULTIPLE times in order to please everyone. Here are the final maps, the territory totals, and the list:"
-   ],
-   "textAfter": [
-    "Image",
-    "Image",
-    "Hax: ~64",
-    "PUN ~50"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/56-Map9_-_Copy.webp",
+   "excluded": null,
+   "provisionalMarker": 54,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Screenshot of the Wynncraft territory map site (Wynncraft Tools logo top-left, Google Maps attribution and an 'X 2197 Z -4971 (r.4.-10.mca)' coordinate bar at the bottom) showing the Gavel province. Two layers: the territory tint is the current owner and hand-drawn coloured blobs mark the proposed new owner (e.g. the Sky Islands are tinted HackForums purple and blobbed pink, pink being Hax's colour in the assignment announcement). An overlaid legend box reads 'Territory Counts (377/377)' with HackForums: 101, Paladins United: 65, Kingdom Foxes: 49, House of Sentinels: 45, Hall of Fame: 26, Kangronomicon: 26, Holders of LE: 19, Imperial: 19, LE Flowers: 19, Emorians: 4, Heavy Metal Viking: 1, Germany Elite: 1, VictrixMortalis: 1, DiePimmler: 1 (sums to 377). Filename 'Map9' indicates the ninth redraw. The 101/65/49/45 figures corroborate Drew's text that Hax would lose roughly 35 territories, PUN about 20, Fox about 17 and Snt about 5.",
+   "usableFor": "the-coalition / coalition-collapse — the only hard quantitative snapshot of Coalition holdings before the February 2018 Wynn division (377 territories in total, Hax alone on 101), with the proposed Gavel redivision drawn over it",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 55,
    "file": "57-Map9Wynn2_-_Copy.png",
-   "linkIndex": 57,
-   "markerLine": 1034,
-   "textBefore": [
-    "Them opposing the idea just added to that.",
-    "But nevertheless, I dropped the idea and didn’t mention it again. The next day, Catherine messaged me and mentioned how much she wanted to divide up Wynn. I told her to start a vote if she felt that way, and she did. The end result of the vote was a clear yes in favor of dividing Wynn.",
-    "So, I redrew the map MULTIPLE times in order to please everyone. Here are the final maps, the territory totals, and the list:",
-    "Image"
-   ],
-   "textAfter": [
-    "Image",
-    "Hax: ~64",
-    "PUN ~50",
-    "HoF: 38"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/57-Map9Wynn2_-_Copy.webp",
+   "excluded": null,
+   "provisionalMarker": 55,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Companion map to 56-Map9: the same territory-map site, Wynn province, without the legend box. Current-ownership tint is overwhelmingly purple (HackForums, per the counts legend on the Gavel sheet), with orange (Kingdom Foxes), grey/white (Paladins United), dark red (House of Sentinels) and green patches. Drawn over it, the proposed reassignment appears as coloured blobs in geographically coherent clumps: lime on the north-west coast (Nemract), teal/aqua through the centre (Detlas / Nivla / Time Valley), blue on the east (Nesaak / North Canyon), pink in the south and north-centre (Savannah / Jungle), grey in the north-east (Desert), dark purple in the south-west (Ragni / South Canyon) and red in the east-centre (Swamp / Dark Forest / Rymek). Filename 'Map9Wynn2' = ninth redraw, Wynn sheet.",
+   "usableFor": "coalition-collapse — the proposed division of Wynn that triggered the 16 Feb 2018 split; reads together with the assignment list in 58-*.png, whose regions and colours it matches",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 56,
    "file": "58-52bb6b02a8a9f0906e04907a12ab07bd.png",
-   "linkIndex": 58,
-   "markerLine": 1035,
-   "textBefore": [
-    "But nevertheless, I dropped the idea and didn’t mention it again. The next day, Catherine messaged me and mentioned how much she wanted to divide up Wynn. I told her to start a vote if she felt that way, and she did. The end result of the vote was a clear yes in favor of dividing Wynn.",
-    "So, I redrew the map MULTIPLE times in order to please everyone. Here are the final maps, the territory totals, and the list:",
-    "Image",
-    "Image"
-   ],
-   "textAfter": [
-    "Hax: ~64",
-    "PUN ~50",
-    "HoF: 38",
-    "Fox: 36 "
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/58-52bb6b02a8a9f0906e04907a12ab07bd.webp",
+   "excluded": null,
+   "provisionalMarker": 56,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord screenshot of an @everyone announcement. Header: 'Drew1011  02/16/2018'. Verbatim body: '@everyone / Territory change, we decided to assign Wynn / HackForums [Hax]: Molten Heights, Sky Islands, Light Realm, Savannah, Jungle, and Little Wood (Pink) / Kingdom Foxes [Fox]: North Canyon and Nesaak (Blue) / Hall of Fame [HoF]: South Canyon, Ragni (Purple) / Imperial [Imp]: Cinfras surroundings, Kander (Dark Red) / Serpentem Empire [SNK] Nemract (Lime) / House of Sentinels [Snt]: Swamp, Dark Forest, and Rymek (Light Red) / Kangronomicon [Fuq]: Light Forest (Light Blue) / KingdomPhoenixes [Phx]: Mid canyon (Gold) / Holders of LE [HoL]: Detlas, Nether Portal, Nivla, and Time Valley (Orange) / LE Flowers [LEF]: Llevigar surroundings (Cyan) / Emorians [ERN]: Llevigar, Quartz Mines, Leadin Fortress, Llevigar Entrance, Road to Light Forest, and Desert (Gray) / Immortalish [Smd]: Pigman Ravines (Green) / Paladins United [PUN]: Corkus and Ocean', followed by an '(edited)' tag.",
+   "usableFor": "coalition-collapse / the-federation — the 16 Feb 2018 announcement that split the Coalition within the hour (Hax, PUN, Snt, Fuq and ERN left). A complete, dated, guild-by-guild territory allocation and the colour key for the two Map9 sheets. It also fixes that the tag [Fuq] belongs to Kangronomicon, not to Fantasy [Fux].",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 57,
    "file": "59-Deus_Vult.png",
-   "linkIndex": 59,
-   "markerLine": 1067,
-   "textBefore": [
-    "I immediately came up with an unorthodox solution and proposed it to the remaining leaders: that we merge with the remnants of War Syndicate. There were no other viable allies, and it was the most logical option. I messaged Super, the BCr Co-Leader, but he seemed relatively unresponsive.",
-    "A short while after that conversation, Simplyinfinity, the SDU Leader, messaged me and said they would agree to a merger. ",
-    "We began discussing how it would work, and laid the foundation for the war that was to come, and the alliance that was to come.",
-    "Drew1011 — 8/30/2018 5:10 PM"
-   ],
-   "textAfter": [
-    "At first, our makeshift alliance had no name. We were simply a few leaders sitting and talking. The name “Federation” began as a joke, considering Coalition had also been named just by being a synonym for alliance, I joked we should do it again with the name Federation, but people liked it and it became our name.",
-    "We began to organize and copied the exact same structure that Coalition had, and then set our sights on the map. There were small skirmishes, but at the beginning nobody had the morale to attack, and nothing truly organized happened.",
-    "The fighting began with a lone chief from HoF. Her name was Snowythewolf. She had remembered the leaders of ERN speaking about their low bank in Coalition, and made the decision to begin attacking their Llevigar territories. She fought for countless hours, and was able to hold her own for quite some time, warring so much that the leaders of THI had to join HoF to war for the night so that she could sleep. ",
-    "I began warring for Llevigar as well on the night of February 17th, and continued until about 3 AM the 18th. When I went to sleep, Llevigar was firmly under the control of Emorians. Curiously however, I noted that despite going bankrupt, they were still defended with the full 1000 mobs, and seeing as this was before the mob update, this cost roughly 2.5k emeralds per defense. "
-   ],
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "excluded": "Meme with a real-world political slogan on a cap; no historical content.",
+   "provisionalMarker": 57,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Cartoon/anime chibi drawing on a white background: a white-haired fox-eared character wearing a grey knight's great helm with a red baseball cap reading 'MAGA' on top, grinning, in a red scarf and holding an upright sword. This is the circulating 'Deus Vult' crusader meme image. Used as a decorative chapter header for the founding-of-the-Federation chapter; it carries no in-game or narrative content.",
+   "usableFor": "the-federation — chapter header only. Recommend not republishing: it carries a real-world political slogan and the narrative loses nothing without it.",
+   "sensitive": true
   },
   {
-   "provisionalMarker": 58,
    "file": "60-image0.jpg",
-   "linkIndex": 60,
-   "markerLine": 1099,
-   "textBefore": [
-    "Fuq also slowed down their war efforts, and they mostly stopped warring.",
-    "At this point, AA was no longer a real threat to the Federation and I would say it was around this time that the war officially ended, with a decisive Federation victory.",
-    "The map was secure, the alliance was stronger than ever, and we had no true organized enemies left. However, this peace and quiet was the perfect breeding ground for old rivalries and resentments to remerge, and the alliance would soon go through it’s most unstable and volatile period in history.",
-    "Drew1011 — 6/20/2019 1:02 AM"
-   ],
-   "textAfter": [
-    "(Help I’ve run out of images someone please give me ideas I’ll accept practically anything over this egotistical excuse for a chapter header)",
-    "Aside from its final days, early Federation was the most unstable point in the alliance’s existence.",
-    "The first 2 months of an alliance’s lifespan are always the most crucial, it is in that time that empires are either forged or smothered. And Federation was no different.",
-    "The first indication of trouble came before AA retook the map. BCr, who did not participate in the first battle whatsoever, decided that they were unhappy with the territories they were designated."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/60-image0.webp",
+   "excluded": null,
+   "provisionalMarker": 58,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Anime-style digital portrait on a peach background: a young man with brown hair in a navy-blue military dress coat with a gold collar, a gold bullion epaulette, a white sash, a silver cross badge and a red/white/blue medal ribbon with two medals. It matches the Drew1011 Discord avatar seen in the other screenshots in this set, i.e. a drawn portrait of the author's persona, not a photograph. No text.",
+   "usableFor": "drew1011 — persona portrait. Alignment is positively confirmed rather than merely order-matched: the text immediately after this marker apologises for 'this egotistical excuse for a chapter header'.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 59,
    "file": "61-OFFICIAL_FOX_FLAG.png",
-   "linkIndex": 61,
-   "markerLine": 1143,
-   "textBefore": [
-    "The vote was standard except for an addendum that nobody would be forced to war against BCr since many guilds in Federation were still friends with Tnt and didn’t want to kick him if it meant they’d have to fight.",
-    "Drew1011 — 6/20/2019 1:17 AM",
-    "Another unnecessary fact I feel needs clarifying due to the sheer amount of historical revisionism it’s gone through: Tnt will claim that he left Federation, and while this is technically true, he simply pulled a Nixon. The vote was 100% going to end with him kicked, he simply left everything before the vote finished so that he could tell everyone he wasn’t kicked.",
-    "With Tnt finally gone, Federation entered one of its most prosperous periods. The next few months were fairly stable and easily some of the least drama filled in the alliance’s history, despite growing opposition from Tnt’s new alliance and its countless splinters. However, in my opinion the sheer havoc he was able to wreak from the inside was far more of a threat than anything he was ever able to do from the outside. It is a minor miracle that the alliance survived its first few months, and many more such miracles would have to occur before the alliance would finally succumb."
-   ],
-   "textAfter": [
-    "The next few months ran smoothly. For the most part, the alliance had no major issues. There were arguments, of course. Guilds left. Guilds were kicked. But for the most part, it was peaceful. Federation had established itself as the dominant force, and the enemy alliances Tnt kept forming were too weak and splintered apart at every chance.",
-    "I could make some attempt to drone on and on about this time period, but it has been almost 3 years at this point, and my memory of everything other than significant events has almost entirely vanished. Instead, I will cover the highlights. The most interesting and memorable events. ",
-    "Early in April, Thunder had become far too addicted to watching anime to effectively continue his ownership of HoL, and he informed me that he would like to leave Federation and go inactive. He first informed me of this on April 1st, and since I trust no man on April Fool’s Day, I told him I would ignore him until he told me the same tomorrow.",
-    "Truth be told, I knew he was serious. I just loved having him as a close ally, and he was the only person I have ever trusted with ownership of HoL. I was hoping he might sleep on it and reconsider, but he didn’t. Once again HoL was returned to the dirt, cold and dead."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/61-OFFICIAL_FOX_FLAG.webp",
+   "excluded": null,
+   "provisionalMarker": 59,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Vector flag graphic with five horizontal bands (navy, orange, white, orange, navy). Centred on the white band is a heraldic achievement: an orange shield bearing a white howling fox head, encircled by a gold-and-navy collar of chain with an order badge pendant, ensigned with a red-and-gold St Edward's crown. No text.",
+   "usableFor": "kingdom-of-foxes — the official Fox flag and national colours; a decorative chapter header in this document, so its position carries no evidential weight",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 60,
    "file": "62-image.png",
-   "linkIndex": 62,
-   "markerLine": 1153,
-   "textBefore": [
-    "-The dragoons",
-    "-Parliament",
-    "-the Valkyrie command channel",
-    "Shortly after, I received another screenshot from Viaire shown here:"
-   ],
-   "textAfter": [
-    "wherein Tnt was angry Viaire was a “snake.” He had received word from a spy in one of those channels that I had warned them about an impending attack, but we were not yet sure which channel it was.",
-    "I brainstormed with Ari for a moment about where the traitor was before I came to a realization. Tnt specified the phrase “Be on the lookout.” I looked back at my warnings to each channel, and I immediately noticed that the only channel which I used that wording was the Dragoons channel. Bingo. The spy is one of our very own.",
-    "ApolloNox became our first suspect, as he was one of the newest members of the Dragoons and most of the others had months or even years of built-up trust and loyalty behind them. That led to this now legendary screenshot:",
-    "Image"
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/62-image.webp",
+   "excluded": null,
+   "provisionalMarker": 60,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord screenshot, three messages, relative timestamps only ('Today at 5:22 / 5:23 / 5:24 AM'). Verbatim: [Tntdestroyd] 'no' / 'there not' / 'they plan to attempt to get me banned' / 'anyway they can as a fucking tactic?' / 'fuck u on about saying there fucking nice' / '\"This just in, Drew gets the news we could be attacking them next, be on the lookout, blah blah...\" you rly r a snake'. [Viaire] 'lmao'. [Tntdestroyd] ':\\'. Contains profanity.",
+   "usableFor": "fox-spy-hunt / the-federation — the screenshot Viaire passed to Drew in mid-May 2018. The quoted phrase 'be on the lookout' is the exact clue that narrowed the leak to the Dragoons channel, making this the pivot of the whole spy-hunt episode.",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 61,
    "file": "63-image0.png",
-   "linkIndex": 63,
-   "markerLine": 1157,
-   "textBefore": [
-    "Image",
-    "wherein Tnt was angry Viaire was a “snake.” He had received word from a spy in one of those channels that I had warned them about an impending attack, but we were not yet sure which channel it was.",
-    "I brainstormed with Ari for a moment about where the traitor was before I came to a realization. Tnt specified the phrase “Be on the lookout.” I looked back at my warnings to each channel, and I immediately noticed that the only channel which I used that wording was the Dragoons channel. Bingo. The spy is one of our very own.",
-    "ApolloNox became our first suspect, as he was one of the newest members of the Dragoons and most of the others had months or even years of built-up trust and loyalty behind them. That led to this now legendary screenshot:"
-   ],
-   "textAfter": [
-    "However, with no hard evidence, there was nothing we could do to accuse anyone. Until Tnt slipped up. He sent this screenshot, a screenshot clearly from the spy:",
-    "Image",
-    "I then went and using discord search, found screenshots that every member of the dragoons had sent. Ruling out the people with an iPhone made it clear that a member named Vised was our primary suspect. I discovered a screenshot he had sent which had a practically identical toolbar at the top. Not knowing much about Androids, I asked a friend who had an android what the likelihood of these screenshots being from the same person was, and she said almost 100%. Bingo again.",
-    "We confronted him. He claimed it wasn’t him. We said we would continue going after other dragoons then. He broke and admitted it was him. He said he had only done it because being so dominant was boring and he wanted to have more fun by supporting Tnt and shaking up the war scene. He was removed from the guild. That was the end of the great spy hunt. "
-   ],
-   "verified": false,
-   "depicts": null
+   "web": "/images/chronicles/storytime/63-image0.webp",
+   "excluded": null,
+   "provisionalMarker": 61,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Discord group-DM screenshot. System line: 'Drew1011 added robodog4 to the group.  05/17/2018'. Then [Drew1011  05/17/2018] 'Robo' / 'I've got some good news and bad news' / 'Just kidding, it's all bad news. There's a spy in the dragoons and the prime suspect is your region's first and only dragoon.' Then [robodog4  05/17/2018] 'god damnit'. Avatars are cartoon/game art.",
+   "usableFor": "fox-spy-hunt — the 'now legendary screenshot' the text refers to; dates the spy hunt precisely to 17 May 2018 and corroborates that the first suspect was robodog4's region's only Dragoon, though the image itself never names ApolloNox",
+   "sensitive": false
   },
   {
-   "provisionalMarker": 62,
    "file": "64-Screenshot_20180516-104350.png",
-   "linkIndex": 64,
-   "markerLine": 1159,
-   "textBefore": [
-    "I brainstormed with Ari for a moment about where the traitor was before I came to a realization. Tnt specified the phrase “Be on the lookout.” I looked back at my warnings to each channel, and I immediately noticed that the only channel which I used that wording was the Dragoons channel. Bingo. The spy is one of our very own.",
-    "ApolloNox became our first suspect, as he was one of the newest members of the Dragoons and most of the others had months or even years of built-up trust and loyalty behind them. That led to this now legendary screenshot:",
-    "Image",
-    "However, with no hard evidence, there was nothing we could do to accuse anyone. Until Tnt slipped up. He sent this screenshot, a screenshot clearly from the spy:"
-   ],
-   "textAfter": [
-    "I then went and using discord search, found screenshots that every member of the dragoons had sent. Ruling out the people with an iPhone made it clear that a member named Vised was our primary suspect. I discovered a screenshot he had sent which had a practically identical toolbar at the top. Not knowing much about Androids, I asked a friend who had an android what the likelihood of these screenshots being from the same person was, and she said almost 100%. Bingo again.",
-    "We confronted him. He claimed it wasn’t him. We said we would continue going after other dragoons then. He broke and admitted it was him. He said he had only done it because being so dominant was boring and he wanted to have more fun by supporting Tnt and shaking up the war scene. He was removed from the guild. That was the end of the great spy hunt. ",
-    "A month later, I was awarded my second Queens Cross. I am still to this day the only Fox member that has achieved this great honor twice. It is one of my proudest accomplishments on Wynn, and it always will be.",
-    "At the end of July 2018, I awoke to some drama. My girlfriend had been involved on some kind of argument in the Federation discord, and although I am still fuzzy on the details, it became clear that everyone blamed her for the fallout afterward. A vote was started to kick her guild. She left the alliance before it could complete. I broke up with her immediately after this. There were issues in the relationship, just as any, you can imagine. But for the most part looking back, I believe I made this decision primarily because I saw my own girlfriend as an inconvenience to my plans for Wynncraft."
-   ],
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "excluded": "Leaked private DMs of third parties coordinating to stalk and get a player banned; includes a real-life photograph as an avatar. Not publishable; only the status bar had evidential value.",
+   "provisionalMarker": 62,
+   "alignmentVerdict": "matches",
+   "correctedContext": null,
+   "depicts": "Android phone screenshot of the Discord mobile app: status bar with photo and voicemail icons, mute, alarm, wifi and signal indicators and '86%' battery; the composer reads 'Message #security'; a grey bar reads \"You're viewing older messages\". The server name in the header and every message timestamp have been scribbled out in white. Conversation between 'Executor Triverr of The...' and 'Nepeta Leijon [Leo emoji] Rogue...', verbatim: [Triverr] 'Yes' / 'But' / 'Intentionally provoking him to do this would only prove him right on the bs reason for the unban'. [Nepeta Leijon] \"I'm not saying we provoke him\" / 'We just stalk him'. [Triverr] \"That's the only option to get him banned if he behaves\". [Nepeta Leijon] 'If he behaves, then good for us'. [Triverr] \"If he behaves then there's not really a problem\". [Nepeta Leijon] \"He's no longer an asshole\". [Triverr] \"If he doesn't we can report again\". One avatar is a real-life photograph of a cat on a piece of furniture. The filename timestamp 20180516-104350 is consistent with the mid-May 2018 spy hunt.",
+   "usableFor": "fox-spy-hunt — the leaked screenshot Tnt re-sent, whose distinctive Android status bar is what let Drew rule out the iPhone-using Dragoons and identify Vised. The toolbar at the top is the load-bearing detail, not the conversation; consider publishing only a crop of the status bar.",
+   "sensitive": true
   }
  ]
 }
