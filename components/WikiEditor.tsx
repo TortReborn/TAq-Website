@@ -292,9 +292,7 @@ export default function WikiEditor({
           style={{ ...inputStyle, minHeight: '28rem', resize: 'vertical', fontFamily: 'monospace', fontSize: '0.8rem', lineHeight: 1.5 }}
           value={form.body}
           onChange={(e) => set('body', e.target.value)}
-          placeholder={'Markdown body. Wiki links: [[Page Title]] or [[page-slug|label]].\n\nCitations: {{cite:thread-237070|p3 #45}} -> numbered superscript + reference entry.
-
-## Section headings build the table of contents'}
+          placeholder={'Markdown body. Wiki links: [[Page Title]] or [[page-slug|label]].\nCitations: {{cite:thread-237070|p3 #45}} renders a numbered superscript.\n\n## Section headings build the table of contents'}
         />
         {showPreview && (
           <div style={{

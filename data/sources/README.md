@@ -51,6 +51,19 @@ Forum-thread extraction preserves per-post attribution:
 which is the unit our articles cite ("thread 237070 p3 #45"). Extraction is
 best-effort; when a page looks mangled, the gzipped original is right there.
 
+### Caveats when citing
+
+- **Post dates on edited posts are the LAST-EDIT date, not the original.** XenForo
+  shows one timestamp, and for a post edited in place (guild recruitment OPs are
+  edited for years) that is the edit date. Verified on several threads: an OP
+  opened in April 2019 can carry a December 2021 stamp. So date a claim by the
+  thread's own context or by the Wayback capture, and when an OP's state matters,
+  cite a dated capture (`--wayback`) rather than the live page.
+- **Some evidence lives in the HTML, not the text.** Forum guild badges and user
+  titles under an author's name are markup, so they do not appear in the extracted
+  text. The gzipped original in `raw/` still has them.
+- A capture and the live page are separate entries; cite the one you actually read.
+
 ## Scope
 
 Public pages only, stored for citation and preservation of a game community's

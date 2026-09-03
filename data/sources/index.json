@@ -136,6 +136,15 @@
    "rawSha256": "694cefaeaaf291f4",
    "note": "Sequoia-mod repo: source of the Jun 12 2026 commit 69fb472 parsing in-game 'formed/revoked an alliance with' chat lines, and the Jul 30 2026 Diplomacy-menu snapshotting — the in-game Diplomacy era's first attested alliance events"
   },
+  "github-com-sequoiawynncraft-sequoia-mod-blob-main-src-test-java-com-seq": {
+   "url": "https://github.com/SequoiaWynncraft/Sequoia-mod/blob/main/src/test/java/com/seqwawa/seq/managers/GuildAllianceSnapshotManagerTest.java",
+   "kind": "repo",
+   "title": "Sequoia-mod/src/test/java/com/seqwawa/seq/managers/GuildAllianceSnapshotManagerTest.java at main · SequoiaWynncraft/Sequoia-mod · GitHub",
+   "fetchedAt": "2026-09-03T17:12:08.546Z",
+   "textChars": 8334,
+   "rawSha256": "884676a0aad99a2b",
+   "note": "Sequoia-mod GuildAllianceSnapshotManagerTest — parses the in-game 'Sequoia: Diplomacy' menu into an authoritative ally list; fixture allies are Avicia [AVO] and Nefarious Ravens; 'Nefarious Ravens: Diplomacy' also appears as a menu title"
+  },
   "github-com-titantimes-valor": {
    "url": "https://github.com/titantimes/valor",
    "kind": "repo",
@@ -153,6 +162,14 @@
    "textChars": 285,
    "rawSha256": "dd4cabc2c3903b9b",
    "note": "Sequoia's public territory map (seqwawa) — live + /history mode; the era's main territory-tracking tool, built by Sequoia"
+  },
+  "raw-githubusercontent-com-sequoiawynncraft-sequoia-mod-main-src-test-java-com-seqwawa-": {
+   "url": "https://raw.githubusercontent.com/SequoiaWynncraft/Sequoia-mod/main/src/test/java/com/seqwawa/seq/managers/ChatManagerTest.java",
+   "kind": "repo",
+   "fetchedAt": "2026-09-03T17:07:04.780Z",
+   "textChars": 19137,
+   "rawSha256": "a1806425a2018690",
+   "note": "Sequoia-mod ChatManagerTest — captured in-game alliance system messages naming real guilds: 'Sequoia formed an alliance with Silk Road', 'Anime Lovers revoked the alliance with Sequoia', 'GaztheCat revoked the alliance with Chiefs Of Corkus', 'Tannslee formed an alliance with Radiant Roses'; also '[NewM] captured the territory Detlas Suburbs'"
   },
   "sequoia-ooo-index-wb20240322": {
    "url": "https://sequoia.ooo/",
@@ -365,6 +382,15 @@
    "textChars": 13017,
    "rawSha256": "32914f69f13fdf97"
   },
+  "thread-119596-p20": {
+   "url": "https://forums.wynncraft.com/threads/119596/page-20",
+   "kind": "forum-thread",
+   "title": "Guild - Libertas Ranked 2 Level 62 Recruiting Level 80+ [****] Hype Revived | Page 20 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:06:37.946Z",
+   "textChars": 15010,
+   "rawSha256": "c21bc088cd396244",
+   "note": "Libertas [Lir] recruitment thread page 20 — applications only; no war record (confirms round-1 dead end)"
+  },
   "thread-119596-p21": {
    "url": "https://forums.wynncraft.com/threads/119596/page-21",
    "kind": "forum-thread",
@@ -397,6 +423,24 @@
    "textChars": 10006,
    "rawSha256": "c0c7511472c121a1"
   },
+  "thread-119596-p25": {
+   "url": "https://forums.wynncraft.com/threads/119596/page-25",
+   "kind": "forum-thread",
+   "title": "Guild - Libertas Ranked 2 Level 62 Recruiting Level 80+ [****] Hype Revived | Page 25 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:06:39.511Z",
+   "textChars": 12220,
+   "rawSha256": "d4c02c06920b9c31",
+   "note": "Libertas [Lir] recruitment thread page 25 — applications only; no war record (confirms round-1 dead end)"
+  },
+  "thread-119596-p26": {
+   "url": "https://forums.wynncraft.com/threads/119596/page-26",
+   "kind": "forum-thread",
+   "title": "Guild - Libertas Ranked 2 Level 62 Recruiting Level 80+ [****] Hype Revived | Page 26 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:06:40.977Z",
+   "textChars": 8248,
+   "rawSha256": "6e4142f217828416",
+   "note": "Libertas [Lir] recruitment thread page 26 — applications only; no war record (confirms round-1 dead end)"
+  },
   "thread-130386": {
    "url": "https://forums.wynncraft.com/threads/130386/",
    "kind": "forum-thread",
@@ -423,6 +467,15 @@
    "textChars": 8183,
    "rawSha256": "2f7ebd41ec732171",
    "note": "Blacklisted [BLA] 2016 recruitment thread — BLA is the third guild of the Hax bloc (with Lir), per thread 143392 Aug 2016"
+  },
+  "thread-133666": {
+   "url": "https://forums.wynncraft.com/threads/133666/",
+   "kind": "forum-thread",
+   "title": "Alliance - The Separatists | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:06:36.446Z",
+   "textChars": 7641,
+   "rawSha256": "f4f1b3c14e294d7e",
+   "note": "'The Separatists' (Tapu_Fini, Jun 26 2016) — the 2nd of the two mid-2016 anti-Hax alliances; OP narrates the Hax+Libertas duumvirate; post #13 valvoid confirms the Hax/Lir/UXs mutual land agreement"
   },
   "thread-134638": {
    "url": "https://forums.wynncraft.com/threads/134638/",
@@ -1029,6 +1082,15 @@
    "rawSha256": "90690e759e78f6c1",
    "note": "cited in research dossiers (backfill sweep)"
   },
+  "thread-269835-p15": {
+   "url": "https://forums.wynncraft.com/threads/the-aquarium-taq-highest-lvl-guild-1-lvl-120-active-warring-community-guild-recruiting-lvl-80.269835/page-15",
+   "kind": "forum-thread",
+   "title": "Guild - The Aquarium [TAq] Highest Lvl Guild #1 Lvl 120. Active warring/community Guild! Recruiting lvl 80+ | Page 15 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:07:31.469Z",
+   "textChars": 2153,
+   "rawSha256": "97d92d29f01d8bb9",
+   "note": "The Aquarium [TAq] recruitment thread final page — most recent TAq activity; TAq won Season 14 (2023) and fought Idiot Co in 2024"
+  },
   "thread-277744": {
    "url": "https://forums.wynncraft.com/threads/277744/",
    "kind": "forum-thread",
@@ -1380,6 +1442,24 @@
    "rawSha256": "dc433715e39169b6",
    "note": "IamFye, Sep 25 2021: 'the meta of being top 10 on the guild sr leaderboard is to join valhalla' — best contemporary description of Valhalla-era leaderboard hegemony"
   },
+  "thread-301804": {
+   "url": "https://forums.wynncraft.com/threads/idiot-co-lvl-108-recruiting-lvl-120-est-2017.301804/",
+   "kind": "forum-thread",
+   "title": "Guild - Idiot Co | Lvl 108 | Recruiting lvl 120+ | Est. 2017 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:07:20.723Z",
+   "textChars": 6699,
+   "rawSha256": "07645d29b96032bb",
+   "note": "Idiot Co [ICo] recruitment thread OP — guild founded 26 Nov 2017 by DoomDeath1313; ICo won guild Seasons 15 and 17 and fought The Aquarium in 2024"
+  },
+  "thread-301804-p26": {
+   "url": "https://forums.wynncraft.com/threads/idiot-co-lvl-108-recruiting-lvl-120-est-2017.301804/page-26",
+   "kind": "forum-thread",
+   "title": "Guild - Idiot Co | Lvl 108 | Recruiting lvl 120+ | Est. 2017 | Page 26 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:07:31.158Z",
+   "textChars": 622,
+   "rawSha256": "8e53dc44f944a80a",
+   "note": "Idiot Co [ICo] recruitment thread final page — most recent ICo activity; checking for 2024-2026 war/alliance mentions"
+  },
   "thread-305152": {
    "url": "https://forums.wynncraft.com/threads/305152/",
    "kind": "forum-thread",
@@ -1398,6 +1478,24 @@
    "rawSha256": "3a80622694ce2d70",
    "note": "cited in research dossiers (backfill sweep)"
   },
+  "thread-309201": {
+   "url": "https://forums.wynncraft.com/threads/alliance-cross-guild-chat.309201/",
+   "kind": "forum-thread",
+   "title": "Guilds - Alliance/Cross Guild Chat | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:10:41.337Z",
+   "textChars": 1595,
+   "rawSha256": "669181733340be96",
+   "note": "TheNelston, 6 Jul 2023 — 'Alliance/Cross Guild Chat' suggestion thread; contemporary evidence that alliance coordination had moved entirely off-platform into private Discords"
+  },
+  "thread-313565": {
+   "url": "https://forums.wynncraft.com/threads/guilds-are-not-in-a-great-spot-right-now.313565/",
+   "kind": "forum-thread",
+   "title": "Media - guilds are not in a great spot right now | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:10:41.032Z",
+   "textChars": 5389,
+   "rawSha256": "7e79c00a3467c2a4",
+   "note": "TheNelston (Idiot Co, former ICo owner), 9 Dec 2023 — state-of-the-guild-community essay at the start of the private-diplomacy era; the best contemporary written diagnosis of why guild politics went silent"
+  },
   "thread-318070": {
    "url": "https://forums.wynncraft.com/threads/318070/",
    "kind": "forum-thread",
@@ -1406,6 +1504,24 @@
    "textChars": 227,
    "rawSha256": "65d35496a2fb1ca7",
    "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-320194": {
+   "url": "https://forums.wynncraft.com/threads/a-comprehensive-guide-to-guilds.320194/",
+   "kind": "forum-thread",
+   "title": "A comprehensive guide to guilds | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:11:49.281Z",
+   "textChars": 4961,
+   "rawSha256": "c6cc40226c8d3e93",
+   "note": "Mocomochi, 23 Dec 2024 — 'A comprehensive guide to guilds'; the only substantial 2024 forum document explaining how guilds/wars/alliances actually worked mid-era"
+  },
+  "thread-321698": {
+   "url": "https://forums.wynncraft.com/threads/dead-guilds.321698/",
+   "kind": "forum-thread",
+   "title": "Guild - Dead Guilds | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T17:10:41.643Z",
+   "textChars": 3226,
+   "rawSha256": "12e823be26a785db",
+   "note": "JenericPerson, 28 May 2025 — 'Dead Guilds' thread; late-era commentary on guild attrition"
   },
   "thread-322643": {
    "url": "https://forums.wynncraft.com/threads/322643/",
@@ -1650,6 +1766,15 @@
    "rawSha256": "127aec5fe90e9e73",
    "note": "Wynncraft wiki Guild Seasons table: full season 1-26 dates and winners (Shy S1, ERN S2, TAq S3/S5/S8, NFR S4, DUDE S6, AVO S7...) — the era-page backbone for 2021+ standings"
   },
+  "wynncraft-wiki-gg-wiki-guild-war": {
+   "url": "https://wynncraft.wiki.gg/wiki/Guild_War",
+   "kind": "wiki",
+   "title": "Guild War - Official Wynncraft Wiki",
+   "fetchedAt": "2026-09-03T17:11:48.939Z",
+   "textChars": 19789,
+   "rawSha256": "7801f778fb75ce22",
+   "note": "Wynncraft wiki Guild War page — documents the in-game Diplomacy system (ally tax rates, alliance/enemy status) that replaced private-Discord diplomacy; the mechanical backbone of the 2023-2026 era"
+  },
   "wynncraft-wiki-gg-wiki-version-1-20": {
    "url": "https://wynncraft.wiki.gg/wiki/Version_1.20",
    "kind": "wiki",
@@ -1659,6 +1784,15 @@
    "rawSha256": "baa1daceb634bea1",
    "note": "Official wiki page for Version 1.20 Gavel Reborn (20 Jan 2021) — canonical feature list for the guild/territory rework (guild bank, 4-letter tags, tower upgrades, territory bonuses)"
   },
+  "youtube-com-feeds-videos-xml-channel-id-ucjooggtimerj6rxphwebgxg": {
+   "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCjoOgGtimerj6RXphwebgxg",
+   "kind": "video",
+   "title": "TheNelston",
+   "fetchedAt": "2026-09-03T17:11:23.860Z",
+   "textChars": 19755,
+   "rawSha256": "7e437cd48e05070a",
+   "note": "TheNelston channel RSS — the era's main guild-war content creator (Idiot Co); latest 15 uploads with titles and dates"
+  },
   "youtube-com-feeds-videos-xml-channel-id-uctvz1ej1xkenlaitgsiol3g": {
    "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCTVz1eJ1xKEnlAITgsioL3g",
    "kind": "video",
@@ -1667,6 +1801,15 @@
    "textChars": 9917,
    "rawSha256": "84474ab051ba64bc",
    "note": "Frank Wynncraft channel RSS (last 15 uploads, Feb-May 2026) — DEAD END for guild politics: content is Fruma questing, raids and streams, zero war/alliance/guild-diplomacy videos"
+  },
+  "youtube-com-watch-v-m2g6zqx2dko": {
+   "url": "https://www.youtube.com/watch?v=M2g6zqx2Dko",
+   "kind": "video",
+   "title": "Wynncraft's Guilds are Bad... Here's Why. - YouTube",
+   "fetchedAt": "2026-09-03T17:11:09.166Z",
+   "textChars": 169,
+   "rawSha256": "1e974dfb235b4979",
+   "note": "TheNelston (Idiot Co, former ICo owner), 'Wynncraft's Guilds are Bad... Here's Why', 9 Dec 2023 — the era's flagship guild-community critique video; companion to forum thread 313565"
   },
   "youtube-com-watch-v-rlrh14ns6ok": {
    "url": "https://www.youtube.com/watch?v=RLRh14ns6ok",

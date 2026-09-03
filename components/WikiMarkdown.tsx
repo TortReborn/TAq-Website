@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useMemo } from "react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
@@ -208,8 +209,8 @@ function WikiMarkdown({
             if (wikiSlug) {
               const missing = knowsExistence && !existing.has(wikiSlug);
               return (
-                <a
-                  href={href}
+                <Link
+                  href={href ?? "#"}
                   {...props}
                   style={{
                     color: missing ? "#e57373" : "var(--accent-primary)",
@@ -219,10 +220,17 @@ function WikiMarkdown({
                   title={missing ? "This page doesn't exist yet" : undefined}
                 >
                   {children}
-                </a>
+                </Link>
               );
             }
             const external = typeof href === "string" && /^https?:\/\//.test(href);
+            if (typeof href === "string" && href.startsWith("/")) {
+              return (
+                <Link href={href} {...props} style={{ color: "var(--accent-primary)" }}>
+                  {children}
+                </Link>
+              );
+            }
             return (
               <a
                 href={href}
