@@ -1,0 +1,734 @@
+{
+ "$comment": "Images from the Federation's Discord announcement channels (2018), downloaded before the Discord CDN links expired. index = position in the corresponding '... Announcement Images.txt' link file, which corresponds in order to the 'Image' markers in the matching announcements export.",
+ "images": [
+  {
+   "set": "alliance",
+   "index": 1,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/416232105815834624/image.jpg?ex=6a9ace5b&is=6a997cdb&hm=16857d6db73248945419efa10d80af5d30dc674997f8ee98196596b2ad592150&",
+   "file": "fed-alliance-01-image.jpg",
+   "bytes": 525042,
+   "contentType": "image/jpeg",
+   "sha256": "00b1be7886173b59"
+  },
+  {
+   "set": "alliance",
+   "index": 2,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/416232126627971074/image.jpg?ex=6a9ace60&is=6a997ce0&hm=9bc7635fd1a94bd5b0f5801912263d9b3bd36f58c7eae9d9b44aa90f48242b87&",
+   "file": "fed-alliance-02-image.jpg",
+   "bytes": 419938,
+   "contentType": "image/jpeg",
+   "sha256": "08708bd24dabe482"
+  },
+  {
+   "set": "alliance",
+   "index": 3,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/416232134492160001/image.jpg?ex=6a9ace62&is=6a997ce2&hm=98d1e3b8e01cc834496f77b85a54134b172a53ee99a31577b43aa85b7a9f07a1&",
+   "file": "fed-alliance-03-image.jpg",
+   "bytes": 334191,
+   "contentType": "image/jpeg",
+   "sha256": "72b04c848aa11ad9"
+  },
+  {
+   "set": "alliance",
+   "index": 4,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/422154594383298580/Gavel.png?ex=6a9a995a&is=6a9947da&hm=9119132e3f5328ad25ba7f8a854c02ee0729e82b961ff41ac0760e8e007ce6a7&",
+   "file": "fed-alliance-04-Gavel.png",
+   "bytes": 3092008,
+   "contentType": "image/png",
+   "sha256": "0bed9241604e828e"
+  },
+  {
+   "set": "alliance",
+   "index": 5,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/422154722582200331/Ocean.png?ex=6a9a9979&is=6a9947f9&hm=4a365ea0d33cff12bedcf83cabf07d8531e48f78a56e1138cabe195614327d6b&",
+   "file": "fed-alliance-05-Ocean.png",
+   "bytes": 661064,
+   "contentType": "image/png",
+   "sha256": "7642da40ada25338"
+  },
+  {
+   "set": "alliance",
+   "index": 6,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/422154754924216320/Wynn.png?ex=6a9a9980&is=6a994800&hm=4f621f3de04d052a4d5e4da9fe3a8d96ea6c596baadbbad50a08b5536fd85bed&",
+   "file": "fed-alliance-06-Wynn.png",
+   "bytes": 595689,
+   "contentType": "image/png",
+   "sha256": "a0465240b061f2a1"
+  },
+  {
+   "set": "alliance",
+   "index": 7,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/427198625471528985/WynnMap.png?ex=6a9b26b9&is=6a99d539&hm=b0888bd9cb5cbe62a3f3cfd8cad36659c847e2622f7bc47552f62fed519f48c1&",
+   "file": "fed-alliance-07-WynnMap.png",
+   "bytes": 466170,
+   "contentType": "image/png",
+   "sha256": "2def2623ecee584e"
+  },
+  {
+   "set": "alliance",
+   "index": 8,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/427198626700460034/GavelMap.png?ex=6a9b26b9&is=6a99d539&hm=46a179b7f7b4a293a6aced31d8725f5bf7d1139944bf636a974faaa0edc048b1&",
+   "file": "fed-alliance-08-GavelMap.png",
+   "bytes": 370655,
+   "contentType": "image/png",
+   "sha256": "979437014e90473f"
+  },
+  {
+   "set": "alliance",
+   "index": 9,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/437727826020532224/wynn.png?ex=6a9b394e&is=6a99e7ce&hm=dcc7fc724ef464a700fa660d51bae6fdff9230932727bdaa7e02c1fba8721ae8&",
+   "file": "fed-alliance-09-wynn.png",
+   "bytes": 543922,
+   "contentType": "image/png",
+   "sha256": "f6664fe08817ac51"
+  },
+  {
+   "set": "alliance",
+   "index": 10,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/437727826788220928/gavel.png?ex=6a9b394e&is=6a99e7ce&hm=992d282fe1f475519c2978f8bda9299348d92daa71b581ec4dfac20790fb09f7&",
+   "file": "fed-alliance-10-gavel.png",
+   "bytes": 386450,
+   "contentType": "image/png",
+   "sha256": "c8537a8ace3994da"
+  },
+  {
+   "set": "alliance",
+   "index": 11,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/441962343799324673/image.jpg?ex=6a9acf02&is=6a997d82&hm=9df4d06f7f3acf1a4e11ecaf77d9cb3126afb316afa04e69219c9ba498ae38f6&",
+   "file": "fed-alliance-11-image.jpg",
+   "bytes": 105047,
+   "contentType": "image/jpeg",
+   "sha256": "d3ea760c758ea56e"
+  },
+  {
+   "set": "alliance",
+   "index": 12,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/444371159341989898/image.png?ex=6a9b00a4&is=6a99af24&hm=e708a3db5b217358062e9fcc99cd1a7d5d611aad519d10099884aa3ae0d1f43e&",
+   "file": "fed-alliance-12-image.png",
+   "bytes": 311513,
+   "contentType": "image/png",
+   "sha256": "c9386f7989c8e81a"
+  },
+  {
+   "set": "alliance",
+   "index": 13,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/444371170494513152/image.png?ex=6a9b00a7&is=6a99af27&hm=e3c1f28c5e0557743391c8df4125ef3cf4a0a80c2346a93fa7d14f6b27001155&",
+   "file": "fed-alliance-13-image.png",
+   "bytes": 419304,
+   "contentType": "image/png",
+   "sha256": "f9320c82c0f1133d"
+  },
+  {
+   "set": "alliance",
+   "index": 14,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/453311314123685889/WynnMap.png?ex=6a9b3a0f&is=6a99e88f&hm=d0a1fe297da9a63270238c0c0da12e0ee3887161cdcd39ae337761d1c2f22a39&",
+   "file": "fed-alliance-14-WynnMap.png",
+   "bytes": 1180261,
+   "contentType": "image/png",
+   "sha256": "04f158f5d22355a6"
+  },
+  {
+   "set": "alliance",
+   "index": 15,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/453311323485241354/Ocean_Map.png?ex=6a9b3a11&is=6a99e891&hm=33545cae3089c14a56817264d9ab5891151ba29e7c0158077019ab7400ef4f72&",
+   "file": "fed-alliance-15-Ocean_Map.png",
+   "bytes": 877520,
+   "contentType": "image/png",
+   "sha256": "b665d54e75335f22"
+  },
+  {
+   "set": "alliance",
+   "index": 16,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/453311341114163211/GavelMap.png?ex=6a9b3a15&is=6a99e895&hm=595fd8a9ae71c2b77a4f8985d298b3b5d754e682156c56ae63416addff02ee3f&",
+   "file": "fed-alliance-16-GavelMap.png",
+   "bytes": 1904588,
+   "contentType": "image/png",
+   "sha256": "427a6c2831e04841"
+  },
+  {
+   "set": "alliance",
+   "index": 17,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/453311354787463168/LightRealmMap.png?ex=6a9b3a19&is=6a99e899&hm=612adb34aab1888a1f4838e7f7dbeed3cd879d0e42ddaa34708e122eb62f2be8&",
+   "file": "fed-alliance-17-LightRealmMap.png",
+   "bytes": 301341,
+   "contentType": "image/png",
+   "sha256": "8766a8f8d747061e"
+  },
+  {
+   "set": "alliance",
+   "index": 18,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/454882460212396032/image.png?ex=6a9b028d&is=6a99b10d&hm=5977923114d7c1a1efc0c5900b40c8fe0ffe302d3425ba5257317e7dd9ea607d&",
+   "file": "fed-alliance-18-image.png",
+   "bytes": 2678815,
+   "contentType": "image/png",
+   "sha256": "2b169c98a263bac5"
+  },
+  {
+   "set": "alliance",
+   "index": 19,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/457558246274629663/LightRealmMap.png?ex=6a9adb52&is=6a9989d2&hm=8cbb9a5d76eac55e1df20eba701b011119cb832f614b9d574bad0dd7ecdad6d8&",
+   "file": "fed-alliance-19-LightRealmMap.png",
+   "bytes": 301341,
+   "contentType": "image/png",
+   "sha256": "8766a8f8d747061e"
+  },
+  {
+   "set": "alliance",
+   "index": 20,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/457558264096489473/GavelMap.png?ex=6a9adb57&is=6a9989d7&hm=9ec065dc9ad4ba7e09e4577c1bade63dd57842295773a1b210495c9c9b868f76&",
+   "file": "fed-alliance-20-GavelMap.png",
+   "bytes": 1878039,
+   "contentType": "image/png",
+   "sha256": "1d0a81921acb35cc"
+  },
+  {
+   "set": "alliance",
+   "index": 21,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/457558273978007552/Ocean_Map.png?ex=6a9adb59&is=6a9989d9&hm=e5c176f85a7fcde959780585cef8a27a0a734ff2d6ed34bbc25eae08113d8d12&",
+   "file": "fed-alliance-21-Ocean_Map.png",
+   "bytes": 927079,
+   "contentType": "image/png",
+   "sha256": "63c9843de9df6ad9"
+  },
+  {
+   "set": "alliance",
+   "index": 22,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/457558282769530931/WynnMap.png?ex=6a9adb5b&is=6a9989db&hm=b5ab2348da081f76a10b26fe57102eb947ff9a857c342661eddad4937c4763b4&",
+   "file": "fed-alliance-22-WynnMap.png",
+   "bytes": 1230884,
+   "contentType": "image/png",
+   "sha256": "019fc93bae6a8750"
+  },
+  {
+   "set": "alliance",
+   "index": 23,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/457558327946248202/unknown.png?ex=6a9adb66&is=6a9989e6&hm=5e2671b072c044b6392eaeb82bb1ac387c05a73e7cbc7037f52430f320a8721d&",
+   "file": "fed-alliance-23-unknown.png",
+   "bytes": 43844,
+   "contentType": "image/png",
+   "sha256": "f14d8676451b7493"
+  },
+  {
+   "set": "alliance",
+   "index": 24,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/459503755424169995/LightRealm_Map.png?ex=6a9aaef8&is=6a995d78&hm=9df7cdc3e3cc14d73170a7524f0a22073bb842779688d5aba80ec7696589e2dc&",
+   "file": "fed-alliance-24-LightRealm_Map.png",
+   "bytes": 287452,
+   "contentType": "image/png",
+   "sha256": "227240a7e56fa9d0"
+  },
+  {
+   "set": "alliance",
+   "index": 25,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/459503776051757066/Gavel_Map.png?ex=6a9aaefd&is=6a995d7d&hm=5f5d3ce6a192b6ef74c164e8a0dff2d600261344428932cece40952c3d5f24fa&",
+   "file": "fed-alliance-25-Gavel_Map.png",
+   "bytes": 1866322,
+   "contentType": "image/png",
+   "sha256": "89c5e34f7483b706"
+  },
+  {
+   "set": "alliance",
+   "index": 26,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/459503790098350122/Ocean_Map.png?ex=6a9aaf00&is=6a995d80&hm=cedac8cf911bd287f7299b0f888f8e8705fa054cbd5de3dd84b58bf25d9016f2&",
+   "file": "fed-alliance-26-Ocean_Map.png",
+   "bytes": 914606,
+   "contentType": "image/png",
+   "sha256": "5c99a04943e8d4e8"
+  },
+  {
+   "set": "alliance",
+   "index": 27,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/459503809207468032/Wynn_Map.png?ex=6a9aaf05&is=6a995d85&hm=9ea9b72aa2a2813498895f52339d1226aeffb3aa9d73d7043b49f175e1eaaa27&",
+   "file": "fed-alliance-27-Wynn_Map.png",
+   "bytes": 1208209,
+   "contentType": "image/png",
+   "sha256": "bc65d3716f5d676b"
+  },
+  {
+   "set": "alliance",
+   "index": 28,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/459503822306279444/unknown.png?ex=6a9aaf08&is=6a995d88&hm=150814656e2a8ef6fa4699c3735e7302eba8b1a545cc33d5bf2911c44cfb9ddb&",
+   "file": "fed-alliance-28-unknown.png",
+   "bytes": 64276,
+   "contentType": "image/png",
+   "sha256": "54e3c149ae30f0fa"
+  },
+  {
+   "set": "alliance",
+   "index": 29,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/460930046568431627/LightRealm_Map.png?ex=6a9a994e&is=6a9947ce&hm=c72e0c074f66636197b32d9ab1a49307ca5ac20f2f07ce4f1dad6d709e28efb9&",
+   "file": "fed-alliance-29-LightRealm_Map.png",
+   "bytes": 287452,
+   "contentType": "image/png",
+   "sha256": "227240a7e56fa9d0"
+  },
+  {
+   "set": "alliance",
+   "index": 30,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/460930065459576832/Gavel_Map.png?ex=6a9a9953&is=6a9947d3&hm=c6df83ed5b9fcf45f03ea55a934d8c3367c9deeee13c1f68ba559de29c539028&",
+   "file": "fed-alliance-30-Gavel_Map.png",
+   "bytes": 1866322,
+   "contentType": "image/png",
+   "sha256": "89c5e34f7483b706"
+  },
+  {
+   "set": "alliance",
+   "index": 31,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/460930073306857483/Ocean_Map.png?ex=6a9a9955&is=6a9947d5&hm=e68b0369bf8fd57c28fb5e64b170b784288e21cb9d6e985f877c79178ed43192&",
+   "file": "fed-alliance-31-Ocean_Map.png",
+   "bytes": 910840,
+   "contentType": "image/png",
+   "sha256": "6f335d67d4d554b8"
+  },
+  {
+   "set": "alliance",
+   "index": 32,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/460930086993133573/Wynn_Map.png?ex=6a9a9958&is=6a9947d8&hm=d3c5b5ace855db7f6d67fe7fad255d2bd414830f205d2390a92cedf71b5bb13b&",
+   "file": "fed-alliance-32-Wynn_Map.png",
+   "bytes": 1200208,
+   "contentType": "image/png",
+   "sha256": "f63b659625c5546a"
+  },
+  {
+   "set": "alliance",
+   "index": 33,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/460930100041351179/unknown.png?ex=6a9a995b&is=6a9947db&hm=a58e6c9e550ecf8da56770140c998979d0a3eebdfd05ff16d14419dd78e20fe2&",
+   "file": "fed-alliance-33-unknown.png",
+   "bytes": 61693,
+   "contentType": "image/png",
+   "sha256": "54bf18871d9cc99d"
+  },
+  {
+   "set": "alliance",
+   "index": 34,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/462709271235395594/LightRealm_Map.png?ex=6a9b2396&is=6a99d216&hm=a4b14dbf94fe77f12298576f0b22a59dc788c6d3817bee02b9247ad2c59bb642&",
+   "file": "fed-alliance-34-LightRealm_Map.png",
+   "bytes": 276247,
+   "contentType": "image/png",
+   "sha256": "f45e337a1c06620e"
+  },
+  {
+   "set": "alliance",
+   "index": 35,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/462709359730753536/Gavel_Map.png?ex=6a9b23ac&is=6a99d22c&hm=6d8a0373009466c41c594edb05abaa739b12c8580fa102b254f90c05af6f96a0&",
+   "file": "fed-alliance-35-Gavel_Map.png",
+   "bytes": 1857675,
+   "contentType": "image/png",
+   "sha256": "52babe16be1ef8e8"
+  },
+  {
+   "set": "alliance",
+   "index": 36,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/462709382703218688/Ocean_Map.png?ex=6a9b23b1&is=6a99d231&hm=91b087b048e5cb8fb42c5c7c48f685c499af92158352e3ee1a0af56b3b1fe01b&",
+   "file": "fed-alliance-36-Ocean_Map.png",
+   "bytes": 904363,
+   "contentType": "image/png",
+   "sha256": "dcc6fadf52b7740d"
+  },
+  {
+   "set": "alliance",
+   "index": 37,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/462709408477085696/Wynn_Map.png?ex=6a9b23b7&is=6a99d237&hm=2f1b28c98a330bf6a04b6c738bd7e0547c675d49dadaeea71ab4c65b2a07ae97&",
+   "file": "fed-alliance-37-Wynn_Map.png",
+   "bytes": 1201118,
+   "contentType": "image/png",
+   "sha256": "bb8add2f00e3e092"
+  },
+  {
+   "set": "alliance",
+   "index": 38,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/462709574219202572/unknown.png?ex=6a9b23df&is=6a99d25f&hm=98a8e71e77e3833ab6241a7518cd54845b6c01ee4b7444d34cb7bc1f8a5c3ce8&",
+   "file": "fed-alliance-38-unknown.png",
+   "bytes": 63513,
+   "contentType": "image/png",
+   "sha256": "6f404ae823291e8d"
+  },
+  {
+   "set": "alliance",
+   "index": 39,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/464507393363935234/image.jpg?ex=6a9b16b8&is=6a99c538&hm=6ed405564a44df8e2ab4d6b081682436d2448af5dcc6986781d0bf772f1cd217&",
+   "file": "fed-alliance-39-image.jpg",
+   "bytes": 231236,
+   "contentType": "image/jpeg",
+   "sha256": "5890c7f66938d563"
+  },
+  {
+   "set": "alliance",
+   "index": 40,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/467495530231103518/LightRealm_Map.png?ex=6a9ac0e4&is=6a996f64&hm=801b9af86455fceb8f29a421df4d097845266e2ffa1c8e23ec9731d8ec0b7ec0&",
+   "file": "fed-alliance-40-LightRealm_Map.png",
+   "bytes": 262795,
+   "contentType": "image/png",
+   "sha256": "1e5f4f267f1f59a1"
+  },
+  {
+   "set": "alliance",
+   "index": 41,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/467495548186918912/Gavel_Map.png?ex=6a9ac0e8&is=6a996f68&hm=faacc4ea85cb4f313f6e1acf3e2fa0b7ceb3afcadb0492d86712dc54859738dc&",
+   "file": "fed-alliance-41-Gavel_Map.png",
+   "bytes": 1829444,
+   "contentType": "image/png",
+   "sha256": "534016f4787bb2cc"
+  },
+  {
+   "set": "alliance",
+   "index": 42,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/467495557363924992/Ocean_Map.png?ex=6a9ac0ea&is=6a996f6a&hm=ecd199a9df01d513812231f98671d8080440b9e41f80d25cbe6ef825d311f813&",
+   "file": "fed-alliance-42-Ocean_Map.png",
+   "bytes": 903442,
+   "contentType": "image/png",
+   "sha256": "9792e5074f1c888f"
+  },
+  {
+   "set": "alliance",
+   "index": 43,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/467495572526596096/Wynn_Map.png?ex=6a9ac0ee&is=6a996f6e&hm=529ec948857c7ab1ffaf4247b058f800068f71d47bd47f8dec990c3f421a390b&",
+   "file": "fed-alliance-43-Wynn_Map.png",
+   "bytes": 1142134,
+   "contentType": "image/png",
+   "sha256": "a42dde67113e08c4"
+  },
+  {
+   "set": "alliance",
+   "index": 44,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/467495660191612948/unknown.png?ex=6a9ac103&is=6a996f83&hm=1f8ca8fb2ff2628a503cf4f2c9a129905324c6a5e79a147005163bdcda2f803b&",
+   "file": "fed-alliance-44-unknown.png",
+   "bytes": 65456,
+   "contentType": "image/png",
+   "sha256": "dade236de67e1257"
+  },
+  {
+   "set": "alliance",
+   "index": 45,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/469261372547661854/LightRealm_Map.png?ex=6a9a95f5&is=6a994475&hm=9c192257a8f6cbf57df1cf34db924e945abb74e8f8e37a594438fed3b9d89f18&",
+   "file": "fed-alliance-45-LightRealm_Map.png",
+   "bytes": 262795,
+   "contentType": "image/png",
+   "sha256": "1e5f4f267f1f59a1"
+  },
+  {
+   "set": "alliance",
+   "index": 46,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/469261391212183552/Gavel_Map.png?ex=6a9a95fa&is=6a99447a&hm=dc1370b87c2d75fa9aa7d93ce35f886255640f6871e599763916cde72b2ac46d&",
+   "file": "fed-alliance-46-Gavel_Map.png",
+   "bytes": 1792448,
+   "contentType": "image/png",
+   "sha256": "18663ab10890d848"
+  },
+  {
+   "set": "alliance",
+   "index": 47,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/469261399500259328/Ocean_Map.png?ex=6a9a95fc&is=6a99447c&hm=758de2e69cccd7428a72626e22bc7f57982a90fe8d860a5fe02d8ac4314a3f3a&",
+   "file": "fed-alliance-47-Ocean_Map.png",
+   "bytes": 888535,
+   "contentType": "image/png",
+   "sha256": "d133ecea0bb3a6ee"
+  },
+  {
+   "set": "alliance",
+   "index": 48,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/469261409293828098/Wynn_Map.png?ex=6a9a95fe&is=6a99447e&hm=a0e738bd74d65c3f6da46eceba677371484a3e21e029c402f1ece0841d9423d3&",
+   "file": "fed-alliance-48-Wynn_Map.png",
+   "bytes": 1124972,
+   "contentType": "image/png",
+   "sha256": "ab38067c6f6df90d"
+  },
+  {
+   "set": "alliance",
+   "index": 49,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/469261418131357716/unknown.png?ex=6a9a9600&is=6a994480&hm=600f524aaa0894a62b6ebfebe8bb0193b50235f5fe5b989c65b33dc4b7b160c5&",
+   "file": "fed-alliance-49-unknown.png",
+   "bytes": 64089,
+   "contentType": "image/png",
+   "sha256": "42e20d18455e5453"
+  },
+  {
+   "set": "alliance",
+   "index": 50,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/469480647841284097/DiamondDeities_Award_Ceremony.png?ex=6a9ab96c&is=6a9967ec&hm=0f24f968e58c6997243ea19ad20ad56d22241d75cd7a87709ecfe8a932b8adb2&",
+   "file": "fed-alliance-50-DiamondDeities_Award_Ceremony.png",
+   "bytes": 84455,
+   "contentType": "image/png",
+   "sha256": "ca20e0933808f775"
+  },
+  {
+   "set": "alliance",
+   "index": 51,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/470781288052162560/image.png?ex=6a9ad77d&is=6a9985fd&hm=1a731f41a072123146236cf5720e961e8452c78e46bc9c99aae09783009c757c&",
+   "file": "fed-alliance-51-image.png",
+   "bytes": 119125,
+   "contentType": "image/png",
+   "sha256": "cf9c070ae343f142"
+  },
+  {
+   "set": "alliance",
+   "index": 52,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472148979682115626/LightRealm_Map.png?ex=6a9b3400&is=6a99e280&hm=7d9336bff340568e6e8050bb6239bd1fdccc762ac2ac74a843103b8758eb4d75&",
+   "file": "fed-alliance-52-LightRealm_Map.png",
+   "bytes": 255073,
+   "contentType": "image/png",
+   "sha256": "c3840507f7fc6785"
+  },
+  {
+   "set": "alliance",
+   "index": 53,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472148999999324162/Gavel_Map.png?ex=6a9b3405&is=6a99e285&hm=ec11c023c6eeec48b0b66a132515e340e5e72ef8045c7fe4720fac8ec0ee6bab&",
+   "file": "fed-alliance-53-Gavel_Map.png",
+   "bytes": 1785250,
+   "contentType": "image/png",
+   "sha256": "bf1eaa433da49af7"
+  },
+  {
+   "set": "alliance",
+   "index": 54,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472149008161177622/Ocean_Map.png?ex=6a9b3407&is=6a99e287&hm=1f543b02fbe3690e2aa4e0946d136df21de86fd73889cd978ef2edf2dd284c1e&",
+   "file": "fed-alliance-54-Ocean_Map.png",
+   "bytes": 885670,
+   "contentType": "image/png",
+   "sha256": "8b541a717806127a"
+  },
+  {
+   "set": "alliance",
+   "index": 55,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472149018579959812/Wynn_Map.png?ex=6a9b340a&is=6a99e28a&hm=2175e36bdadf8825849544c01e981b6f39c4fa6347c070a5f576dfcbfdb065ea&",
+   "file": "fed-alliance-55-Wynn_Map.png",
+   "bytes": 1083970,
+   "contentType": "image/png",
+   "sha256": "f09e0ece98d377dd"
+  },
+  {
+   "set": "alliance",
+   "index": 56,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472149079204429825/unknown.png?ex=6a9b3418&is=6a99e298&hm=d728d27fb1fb67aa4f30719922bd3881025c74c4f4bd51218d24c367f01595e8&",
+   "file": "fed-alliance-56-unknown.png",
+   "bytes": 63584,
+   "contentType": "image/png",
+   "sha256": "4dbfdecb85b711ac"
+  },
+  {
+   "set": "alliance",
+   "index": 57,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472892524290244628/image.jpg?ex=6a9a9cbb&is=6a994b3b&hm=a67ef15116edee0548b87d82b6b6f758c3db7a69e50c2c5f1dcdfb850b916757&",
+   "file": "fed-alliance-57-image.jpg",
+   "bytes": 24659,
+   "contentType": "image/jpeg",
+   "sha256": "aaad8e55c1b17d99"
+  },
+  {
+   "set": "alliance",
+   "index": 58,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/472892531051331586/image.png?ex=6a9a9cbd&is=6a994b3d&hm=4893a8fe98bbb0797b6730d0a6aadb5f6d3ad77a104887c5916d9025f10ae015&",
+   "file": "fed-alliance-58-image.png",
+   "bytes": 42698,
+   "contentType": "image/png",
+   "sha256": "0208df6690d7fec6"
+  },
+  {
+   "set": "alliance",
+   "index": 59,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/474372023087398928/LightRealm_Map.png?ex=6a9ab89f&is=6a99671f&hm=1fda4934e79a806ba617eedde37dccfabb1d2cfa5663a118097aaa3436ce2d9c&",
+   "file": "fed-alliance-59-LightRealm_Map.png",
+   "bytes": 251097,
+   "contentType": "image/png",
+   "sha256": "b6d17b86ba723cce"
+  },
+  {
+   "set": "alliance",
+   "index": 60,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/474372043291492362/Gavel_Map.png?ex=6a9ab8a4&is=6a996724&hm=2e3f8a8c24558587156afbcc549332fb116f258162366ffecb0eefaf968f2489&",
+   "file": "fed-alliance-60-Gavel_Map.png",
+   "bytes": 1768213,
+   "contentType": "image/png",
+   "sha256": "1ff40664f9d40cbf"
+  },
+  {
+   "set": "alliance",
+   "index": 61,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/474372056188846090/Ocean_Map.png?ex=6a9ab8a7&is=6a996727&hm=20c73f9d559260fb01a0ecbb71d66046fd4a604e10bb4c2d52e5ab8b9c52467e&",
+   "file": "fed-alliance-61-Ocean_Map.png",
+   "bytes": 878898,
+   "contentType": "image/png",
+   "sha256": "e3aaa1876fe7f744"
+  },
+  {
+   "set": "alliance",
+   "index": 62,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/474372069203902469/Wynn_Map.png?ex=6a9ab8aa&is=6a99672a&hm=2289bad6cae990a4cb3969b2f55ddaee15b3b065ff1d05d325e744ad470e51c2&",
+   "file": "fed-alliance-62-Wynn_Map.png",
+   "bytes": 1071435,
+   "contentType": "image/png",
+   "sha256": "b837bc17d8b28b49"
+  },
+  {
+   "set": "alliance",
+   "index": 63,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/474372079735537674/unknown.png?ex=6a9ab8ad&is=6a99672d&hm=75de6e868b1cc9fcab8b215e77e73402aca62cc3810bceffee4d214ba3f07e3a&",
+   "file": "fed-alliance-63-unknown.png",
+   "bytes": 61283,
+   "contentType": "image/png",
+   "sha256": "9242c49026f90b96"
+  },
+  {
+   "set": "alliance",
+   "index": 64,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/479787105514422274/image.jpg?ex=6a9aa54f&is=6a9953cf&hm=d019d3815d0c26405890b53a538face1a67fff1c70ec5b8ffccffd223edcaa81&",
+   "file": "fed-alliance-64-image.jpg",
+   "bytes": 77400,
+   "contentType": "image/jpeg",
+   "sha256": "8715c91792bde075"
+  },
+  {
+   "set": "alliance",
+   "index": 65,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/479787133955997706/image.jpg?ex=6a9aa556&is=6a9953d6&hm=385bbf8562d8c51f98ea0ca4b42291c438dff77cdd993ff50f34225a179f7375&",
+   "file": "fed-alliance-65-image.jpg",
+   "bytes": 566543,
+   "contentType": "image/jpeg",
+   "sha256": "8a63a83a78895b2a"
+  },
+  {
+   "set": "alliance",
+   "index": 66,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/479787171172319242/image.jpg?ex=6a9aa55f&is=6a9953df&hm=96a7ebdf79a5f2f1248454a2bd6e686023e30fedcd58e331c907857d815da32f&",
+   "file": "fed-alliance-66-image.jpg",
+   "bytes": 336650,
+   "contentType": "image/jpeg",
+   "sha256": "4184350f91d209e2"
+  },
+  {
+   "set": "alliance",
+   "index": 67,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/479787211970052097/image.jpg?ex=6a9aa569&is=6a9953e9&hm=275337d256a4cb8095052adf96fcf7e70f14b447b1e6b4acd937b586f66fcc98&",
+   "file": "fed-alliance-67-image.jpg",
+   "bytes": 424980,
+   "contentType": "image/jpeg",
+   "sha256": "494c64177b6c8ba4"
+  },
+  {
+   "set": "alliance",
+   "index": 68,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/479787231205130256/image.jpg?ex=6a9aa56d&is=6a9953ed&hm=f03d8c81a8924f17f0a2010845863ada5c1380604d5fea14d9ecb9c986e8e524&",
+   "file": "fed-alliance-68-image.jpg",
+   "bytes": 109857,
+   "contentType": "image/jpeg",
+   "sha256": "6de55d4408daefeb"
+  },
+  {
+   "set": "alliance",
+   "index": 69,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/484776522209558539/LightRealm_Map.png?ex=6a9affd1&is=6a99ae51&hm=d0f0b7246071f6f10609442391e71efd70e5ce7a46359f9a0ff950b4d7ccc21c&",
+   "file": "fed-alliance-69-LightRealm_Map.png",
+   "bytes": 241142,
+   "contentType": "image/png",
+   "sha256": "5fcf87f0684cf308"
+  },
+  {
+   "set": "alliance",
+   "index": 70,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/484776554199646237/Gavel_Map.png?ex=6a9affd9&is=6a99ae59&hm=4db830dff7b008b3a04250970743d4d31db983d6e76145727ceb45824932c590&",
+   "file": "fed-alliance-70-Gavel_Map.png",
+   "bytes": 1742809,
+   "contentType": "image/png",
+   "sha256": "18e1300f5ee2af58"
+  },
+  {
+   "set": "alliance",
+   "index": 71,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/484776620343820288/Ocean.png?ex=6a9affe9&is=6a99ae69&hm=d15626ce77b0f2b3767cdee01db47d8b6f5dc565caa02c637bf6e524fc39d5f3&",
+   "file": "fed-alliance-71-Ocean.png",
+   "bytes": 861341,
+   "contentType": "image/png",
+   "sha256": "9c2bde288a211fc7"
+  },
+  {
+   "set": "alliance",
+   "index": 72,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/484776645266243586/Wynn.png?ex=6a9affee&is=6a99ae6e&hm=268e6e8cf9f459df7ea9f2b92f74066a0bd21b80790837a67c25f536c101f445&",
+   "file": "fed-alliance-72-Wynn.png",
+   "bytes": 1069754,
+   "contentType": "image/png",
+   "sha256": "130e2be986bf360f"
+  },
+  {
+   "set": "alliance",
+   "index": 73,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/484776664551784449/post.png?ex=6a9afff3&is=6a99ae73&hm=e032b50b0e231f59ad86e61028d587d6fe43e6547221aa8cadbe6861b3e39888&",
+   "file": "fed-alliance-73-post.png",
+   "bytes": 210382,
+   "contentType": "image/png",
+   "sha256": "165ada3f7025e840"
+  },
+  {
+   "set": "alliance",
+   "index": 74,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/488829667529195520/Gavel_and_LR_Final_9.png?ex=6a9a955a&is=6a9943da&hm=c9738bb9e235b9cd32983e965aa3d64374e7253bf057a727d2fb62946d71d094&",
+   "file": "fed-alliance-74-Gavel_and_LR_Final_9.png",
+   "bytes": 1990339,
+   "contentType": "image/png",
+   "sha256": "e1b6f0a4e58285c7"
+  },
+  {
+   "set": "alliance",
+   "index": 75,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/488829680909287424/Ocean_Final_9.png?ex=6a9a955d&is=6a9943dd&hm=462364900ba903be4f89d5335c29a5bc18b88ea6515e15dcf07d21bbea04daa8&",
+   "file": "fed-alliance-75-Ocean_Final_9.png",
+   "bytes": 1570253,
+   "contentType": "image/png",
+   "sha256": "d5d9bb1c0421b814"
+  },
+  {
+   "set": "alliance",
+   "index": 76,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/488829696549847040/Wynn_Final_9.png?ex=6a9a9561&is=6a9943e1&hm=df1aa3c221c67c163fbf9020f4aa284b10f103bed0a8fab273f29555e55e02b2&",
+   "file": "fed-alliance-76-Wynn_Final_9.png",
+   "bytes": 1978143,
+   "contentType": "image/png",
+   "sha256": "7c779c291e2ce587"
+  },
+  {
+   "set": "alliance",
+   "index": 77,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/488829706808983553/Territory_Graph_Final_9.png?ex=6a9a9564&is=6a9943e4&hm=d0fe3c074fd37072203e49eb38fd41ba218427fe22ed76feed829f4f0440aacc&",
+   "file": "fed-alliance-77-Territory_Graph_Final_9.png",
+   "bytes": 55518,
+   "contentType": "image/png",
+   "sha256": "d4c8bd9159ade694"
+  },
+  {
+   "set": "alliance",
+   "index": 78,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/502249595968159782/image.png?ex=6a9aa023&is=6a994ea3&hm=2baf0451f0fe2e4e166396d17a3070c5fa1151fe4ade87d71ee5cbd4d654b982&",
+   "file": "fed-alliance-78-image.png",
+   "bytes": 152177,
+   "contentType": "image/png",
+   "sha256": "5c5e1c9cab0b12b0"
+  },
+  {
+   "set": "alliance",
+   "index": 79,
+   "url": "https://cdn.discordapp.com/attachments/414516254544494592/505379482408845323/image0.jpg?ex=6a9ace52&is=6a997cd2&hm=52e01df791fb17a8bbbb126b6bb66a10dde14ab818122724b15685600e558efb&",
+   "file": "fed-alliance-79-image0.jpg",
+   "bytes": 333942,
+   "contentType": "image/jpeg",
+   "sha256": "06c711adbb743869"
+  },
+  {
+   "set": "public",
+   "index": 1,
+   "url": "https://cdn.discordapp.com/attachments/414516173837828096/474345579686789151/summer_festival.png?ex=6a9a9fff&is=6a994e7f&hm=e389fa451cf7de556feb4950ec4e22f4503f0648a5baf180514c7ba6a9c512c6&",
+   "file": "fed-public-01-summer_festival.png",
+   "bytes": 196322,
+   "contentType": "image/png",
+   "sha256": "bfd48f91f55dff05"
+  },
+  {
+   "set": "public",
+   "index": 2,
+   "url": "https://cdn.discordapp.com/attachments/414516173837828096/474345609604759553/event_location.png?ex=6a9aa006&is=6a994e86&hm=13602f5b53f40bf51c76122d8d3482cd1b77c6ea9651d9110dcdf63ecea1a509&",
+   "file": "fed-public-02-event_location.png",
+   "bytes": 1968007,
+   "contentType": "image/png",
+   "sha256": "5227bdc7ec0f5b69"
+  }
+ ]
+}
