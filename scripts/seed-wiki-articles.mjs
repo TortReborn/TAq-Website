@@ -1,4 +1,4 @@
-// Seed Chronicles wiki articles from data/wiki-seed-articles.json.
+// Seed Chronicles wiki articles from data/wiki/seed-articles.json.
 //
 //   node scripts/seed-wiki-articles.mjs --dry-run     validate only
 //   node scripts/seed-wiki-articles.mjs --dev         seed the TEST_DB_* database
@@ -66,7 +66,7 @@ const pool = dryRun ? null : new pg.Pool({
 const AUTHOR = { id: '170719819715313665', name: 'Thundderr' };
 const NOTE = 'Seeded from the chronicle research corpus';
 
-const { articles } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'wiki-seed-articles.json'), 'utf8'));
+const { articles } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'wiki', 'seed-articles.json'), 'utf8'));
 
 let created = 0, updated = 0, failed = 0;
 const seen = new Set();

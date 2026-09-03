@@ -10,7 +10,7 @@ import {
 
 /**
  * Server-side resolution of wiki citations against the local source archive
- * (data/sources/index.json — see data/sources/README.md).
+ * (data/wiki/sources/index.json — see data/wiki/sources/README.md).
  *
  * The manifest is a build-time artifact, so it is read once and cached for the
  * life of the process. A citation whose ref isn't an archived id still renders;
@@ -30,7 +30,7 @@ let manifest: Record<string, ArchivedSource> | null = null;
 function loadManifest(): Record<string, ArchivedSource> {
   if (manifest) return manifest;
   try {
-    const file = path.join(process.cwd(), 'data', 'sources', 'index.json');
+    const file = path.join(process.cwd(), 'data', 'wiki', 'sources', 'index.json');
     manifest = JSON.parse(fs.readFileSync(file, 'utf8')).sources ?? {};
   } catch (error) {
     console.error('[wiki-sources] source manifest unavailable:', error);

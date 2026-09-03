@@ -231,7 +231,7 @@ DogsAmongUs->White Lotus, As Darkness Falls->Constellations.
 
 Pre-2018 territory data verdict: exchange-level data DOES NOT EXIST anywhere public
 (only archived territoryList capture: 2018-06-16). But Wayback holds guild-leaderboard
-API captures WITH per-guild territory counts — see data/pre2018-territory-snapshots.json:
+API captures WITH per-guild territory counts — see data/chronicle/pre2018-territory-snapshots.json:
 Sep 23 2016 (Hax 146 of ~332; Libertas [Lir] 60 — a major 2016 power unknown to any
 written source; UltimateXeons 53), Apr 16 2018 (all 15 holders = Federation guilds,
 384 territories — independent confirmation of the tribute roster and rename dates),

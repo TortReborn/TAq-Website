@@ -3,7 +3,7 @@
  * Source archive — a local, citable corpus for the Chronicles wiki.
  *
  * Every page we consult for guild history gets fetched ONCE and stored in
- * data/sources/, so drafting and fact-checking read from disk instead of the
+ * data/wiki/sources/, so drafting and fact-checking read from disk instead of the
  * network. Forum threads rot, Wayback is slow and sometimes blocked, and
  * research agents shouldn't re-fetch what we already have.
  *
@@ -15,9 +15,9 @@
  *   node scripts/source-archive.mjs verify
  *
  * Layout:
- *   data/sources/index.json   manifest: id -> {url, kind, title, fetchedAt, ...}
- *   data/sources/docs/<id>.md extracted text with YAML-ish frontmatter
- *   data/sources/raw/<id>.html.gz  original HTML (re-extract without re-fetching)
+ *   data/wiki/sources/index.json   manifest: id -> {url, kind, title, fetchedAt, ...}
+ *   data/wiki/sources/docs/<id>.md extracted text with YAML-ish frontmatter
+ *   data/wiki/sources/raw/<id>.html.gz  original HTML (re-extract without re-fetching)
  *
  * Extraction is best-effort: XenForo forum threads become per-post sections
  * (author, date, post number, body); everything else falls back to a generic
@@ -30,7 +30,7 @@ import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, '..', 'data', 'sources');
+const ROOT = path.join(__dirname, '..', 'data', 'wiki', 'sources');
 const DOCS = path.join(ROOT, 'docs');
 const RAW = path.join(ROOT, 'raw');
 const INDEX = path.join(ROOT, 'index.json');

@@ -1,6 +1,6 @@
 # Dossier — Drew1011 "storytime", a recovered first-person account of 2015–2018
 
-Research pass **2026-09-03**. Subject document: `data/sources/docs/drew1011-storytime.md`
+Research pass **2026-09-03**. Subject document: `data/wiki/sources/docs/drew1011-storytime.md`
 (archive id **`drew1011-storytime`**, kind `testimony`, 1180 lines). Cross-checked against the
 229-source archive this pass; new archive material found and cited below.
 
@@ -46,12 +46,12 @@ years at this point, and my memory of everything other than significant events h
 entirely vanished" (L1153).**
 
 **Line numbers.** All `L…` references are `cat -n` line numbers in
-`data/sources/docs/drew1011-storytime.md`. NOTE: the sibling image index
-`data/sources/storytime/alignment.json` numbers lines against a *different* file
+`data/wiki/sources/docs/drew1011-storytime.md`. NOTE: the sibling image index
+`data/wiki/sources/storytime/alignment.json` numbers lines against a *different* file
 (`Drew1011-Storytime.txt`) with an **offset of −8** (alignment `markerLine 2` = this file's
 `L10`). Do not mix the two schemes.
 
-**Images.** 62 screenshots sit in `data/sources/storytime/`. The alignment file's own `$comment`
+**Images.** 62 screenshots sit in `data/wiki/sources/storytime/`. The alignment file's own `$comment`
 says the mapping is PROVISIONAL and every entry is `verified: false`. **Do not cite any storytime
 image for any claim until it has been opened and verified.** What they purport to show is a
 research lead in itself (§9).
