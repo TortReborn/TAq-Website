@@ -1,0 +1,1298 @@
+{
+ "$comment": "PROVISIONAL mapping of Federation announcement images to the Image markers in the channel exports, by order of appearance. Each entry carries the message author and timestamp the marker sits under, which makes verification straightforward. Alignment must be checked visually before an image is used — an earlier corpus was mis-mapped this way.",
+ "images": [
+  {
+   "channel": "alliance",
+   "marker": 1,
+   "line": 30,
+   "author": "Drew1011",
+   "postedAt": "2/22/2018 5:57 AM",
+   "textBefore": [
+    "The Hive [THI]: Nether Gate and surroundings (Lime)",
+    "FFA TERRITORIES ARE IN BLACK",
+    "Drew1011 — 2/22/2018 5:57 AM"
+   ],
+   "file": "fed-alliance-01-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-01-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 2,
+   "line": 31,
+   "author": "Drew1011",
+   "postedAt": "2/22/2018 5:57 AM",
+   "textBefore": [
+    "The Hive [THI]: Nether Gate and surroundings (Lime)",
+    "FFA TERRITORIES ARE IN BLACK",
+    "Drew1011 — 2/22/2018 5:57 AM"
+   ],
+   "file": "fed-alliance-02-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-02-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 3,
+   "line": 32,
+   "author": "Drew1011",
+   "postedAt": "2/22/2018 5:57 AM",
+   "textBefore": [
+    "The Hive [THI]: Nether Gate and surroundings (Lime)",
+    "FFA TERRITORIES ARE IN BLACK",
+    "Drew1011 — 2/22/2018 5:57 AM"
+   ],
+   "file": "fed-alliance-03-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-03-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 4,
+   "line": 66,
+   "author": "Deleted User",
+   "postedAt": "3/10/2018 2:11 PM",
+   "textBefore": [
+    "Titans Valor [ANO], 20 terrs, Light Realm + North Ocean (Tan) ",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail (12)",
+    "Available Territories for the Future (FFA for now): Abandoned Church, Corrupted Impact, Mesquis Tower, Path to Cinfras, Light Forest Canyon, Light Forest East Mid, Light Forest East Upper (7)"
+   ],
+   "file": "fed-alliance-04-Gavel.png",
+   "web": "/images/chronicles/federation/fed-alliance-04-Gavel.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 5,
+   "line": 67,
+   "author": "Deleted User",
+   "postedAt": "3/10/2018 2:11 PM",
+   "textBefore": [
+    "Titans Valor [ANO], 20 terrs, Light Realm + North Ocean (Tan) ",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail (12)",
+    "Available Territories for the Future (FFA for now): Abandoned Church, Corrupted Impact, Mesquis Tower, Path to Cinfras, Light Forest Canyon, Light Forest East Mid, Light Forest East Upper (7)"
+   ],
+   "file": "fed-alliance-05-Ocean.png",
+   "web": "/images/chronicles/federation/fed-alliance-05-Ocean.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 6,
+   "line": 68,
+   "author": "Deleted User",
+   "postedAt": "3/10/2018 2:11 PM",
+   "textBefore": [
+    "Titans Valor [ANO], 20 terrs, Light Realm + North Ocean (Tan) ",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail (12)",
+    "Available Territories for the Future (FFA for now): Abandoned Church, Corrupted Impact, Mesquis Tower, Path to Cinfras, Light Forest Canyon, Light Forest East Mid, Light Forest East Upper (7)"
+   ],
+   "file": "fed-alliance-06-Wynn.png",
+   "web": "/images/chronicles/federation/fed-alliance-06-Wynn.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 7,
+   "line": 110,
+   "author": null,
+   "postedAt": null,
+   "textBefore": [
+    "The Hive [THI], 20 terrs, Savannah + Nether + Angry Village (Dark Yellow)",
+    "Titans Valor [ANO], 13 terrs, Light Realm (Tan)",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Wybel Island, Herb Cave (21) "
+   ],
+   "file": "fed-alliance-07-WynnMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-07-WynnMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 8,
+   "line": 111,
+   "author": null,
+   "postedAt": null,
+   "textBefore": [
+    "The Hive [THI], 20 terrs, Savannah + Nether + Angry Village (Dark Yellow)",
+    "Titans Valor [ANO], 13 terrs, Light Realm (Tan)",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Wybel Island, Herb Cave (21) "
+   ],
+   "file": "fed-alliance-08-GavelMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-08-GavelMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 9,
+   "line": 149,
+   "author": "Deleted User",
+   "postedAt": "4/22/2018 2:34 PM",
+   "textBefore": [
+    "The Divine Swords [DsQ]: wynn desert -> 17 territories (Hot Pink)",
+    "The Hive [THI]: south sky islands, south corkus, nether area -> 28 territories (Purple)",
+    "Titans Valor [ANO]: light realm -> 13 territories (light orange) "
+   ],
+   "file": "fed-alliance-09-wynn.png",
+   "web": "/images/chronicles/federation/fed-alliance-09-wynn.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 10,
+   "line": 150,
+   "author": "Deleted User",
+   "postedAt": "4/22/2018 2:34 PM",
+   "textBefore": [
+    "The Divine Swords [DsQ]: wynn desert -> 17 territories (Hot Pink)",
+    "The Hive [THI]: south sky islands, south corkus, nether area -> 28 territories (Purple)",
+    "Titans Valor [ANO]: light realm -> 13 territories (light orange) "
+   ],
+   "file": "fed-alliance-10-gavel.png",
+   "web": "/images/chronicles/federation/fed-alliance-10-gavel.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 11,
+   "line": 173,
+   "author": "Deleted User",
+   "postedAt": "5/4/2018 7:00 AM",
+   "textBefore": [
+    "Deleted User — 5/4/2018 7:00 AM",
+    "Hey guys, this is simply the Sins of Seedia leader! As you may know or may not know, my SDU’s one year event will be happening this weekend, and we would love to invite anyone in the federation to it. The event is Sunday, May 6th, 11:00am CST/16:00 UTC, Troms, WC will be announced the day of the event, the theme color is red so if you want to wear a red mc skin that’d be cool too. Please feel free to join us for item bombs, a mythic giveaway and multiple legendary giveaways, a following CSST, speeches, and to celebrate a year of my guild’s success (it wasn’t possible without the support of federation ;D).",
+    "Thanks you guys, can’t wait to see you all there!! "
+   ],
+   "file": "fed-alliance-11-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-11-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 12,
+   "line": 189,
+   "author": "Deleted User",
+   "postedAt": "5/10/2018 10:32 PM",
+   "textBefore": [
+    "Drew1011 — 5/8/2018 6:31 PM",
+    "Lunatic [Mox] has joined the alliance.",
+    "Deleted User — 5/10/2018 10:32 PM"
+   ],
+   "file": "fed-alliance-12-image.png",
+   "web": "/images/chronicles/federation/fed-alliance-12-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 13,
+   "line": 190,
+   "author": "Deleted User",
+   "postedAt": "5/10/2018 10:32 PM",
+   "textBefore": [
+    "Drew1011 — 5/8/2018 6:31 PM",
+    "Lunatic [Mox] has joined the alliance.",
+    "Deleted User — 5/10/2018 10:32 PM"
+   ],
+   "file": "fed-alliance-13-image.png",
+   "web": "/images/chronicles/federation/fed-alliance-13-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 14,
+   "line": 234,
+   "author": "Viaire",
+   "postedAt": "6/4/2018 2:37 PM",
+   "textBefore": [
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Wybel Island, Herb Cave, Jungle Lake, Twisted Ridge (23) ",
+    "Go fetch now",
+    "Viaire — 6/4/2018 2:37 PM"
+   ],
+   "file": "fed-alliance-14-WynnMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-14-WynnMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 15,
+   "line": 235,
+   "author": "Viaire",
+   "postedAt": "6/4/2018 2:37 PM",
+   "textBefore": [
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Wybel Island, Herb Cave, Jungle Lake, Twisted Ridge (23) ",
+    "Go fetch now",
+    "Viaire — 6/4/2018 2:37 PM"
+   ],
+   "file": "fed-alliance-15-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-15-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 16,
+   "line": 236,
+   "author": "Viaire",
+   "postedAt": "6/4/2018 2:37 PM",
+   "textBefore": [
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Wybel Island, Herb Cave, Jungle Lake, Twisted Ridge (23) ",
+    "Go fetch now",
+    "Viaire — 6/4/2018 2:37 PM"
+   ],
+   "file": "fed-alliance-16-GavelMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-16-GavelMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 17,
+   "line": 237,
+   "author": "Viaire",
+   "postedAt": "6/4/2018 2:37 PM",
+   "textBefore": [
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Wybel Island, Herb Cave, Jungle Lake, Twisted Ridge (23) ",
+    "Go fetch now",
+    "Viaire — 6/4/2018 2:37 PM"
+   ],
+   "file": "fed-alliance-17-LightRealmMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-17-LightRealmMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 18,
+   "line": 263,
+   "author": "Drew1011",
+   "postedAt": "6/8/2018 10:40 PM",
+   "textBefore": [
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Raider’s Base Upper, Herb Cave, Jungle Lake, (21) ",
+    "Drew1011 — 6/8/2018 10:40 PM",
+    "HoF is having an award ceremony tomorrow and extends the invite to the alliance!"
+   ],
+   "file": "fed-alliance-18-image.png",
+   "web": "/images/chronicles/federation/fed-alliance-18-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 19,
+   "line": 267,
+   "author": "Viaire",
+   "postedAt": "6/16/2018 7:53 AM",
+   "textBefore": [
+    "Drew1011 — 6/13/2018 9:59 PM",
+    "Titans Valor [ANO] has rejoined the Federation.",
+    "Viaire — 6/16/2018 7:53 AM"
+   ],
+   "file": "fed-alliance-19-LightRealmMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-19-LightRealmMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 20,
+   "line": 268,
+   "author": "Viaire",
+   "postedAt": "6/16/2018 7:53 AM",
+   "textBefore": [
+    "Drew1011 — 6/13/2018 9:59 PM",
+    "Titans Valor [ANO] has rejoined the Federation.",
+    "Viaire — 6/16/2018 7:53 AM"
+   ],
+   "file": "fed-alliance-20-GavelMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-20-GavelMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 21,
+   "line": 269,
+   "author": "Viaire",
+   "postedAt": "6/16/2018 7:53 AM",
+   "textBefore": [
+    "Drew1011 — 6/13/2018 9:59 PM",
+    "Titans Valor [ANO] has rejoined the Federation.",
+    "Viaire — 6/16/2018 7:53 AM"
+   ],
+   "file": "fed-alliance-21-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-21-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 22,
+   "line": 270,
+   "author": "Viaire",
+   "postedAt": "6/16/2018 7:53 AM",
+   "textBefore": [
+    "Drew1011 — 6/13/2018 9:59 PM",
+    "Titans Valor [ANO] has rejoined the Federation.",
+    "Viaire — 6/16/2018 7:53 AM"
+   ],
+   "file": "fed-alliance-22-WynnMap.png",
+   "web": "/images/chronicles/federation/fed-alliance-22-WynnMap.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 23,
+   "line": 271,
+   "author": "Viaire",
+   "postedAt": "6/16/2018 7:53 AM",
+   "textBefore": [
+    "Titans Valor [ANO] has rejoined the Federation.",
+    "Viaire — 6/16/2018 7:53 AM"
+   ],
+   "file": "fed-alliance-23-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-23-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 24,
+   "line": 274,
+   "author": "Viaire",
+   "postedAt": "6/21/2018 4:43 PM",
+   "textBefore": [
+    "@unknown-role @unknown-role",
+    "Viaire — 6/21/2018 4:43 PM"
+   ],
+   "file": "fed-alliance-24-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-24-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 25,
+   "line": 275,
+   "author": "Viaire",
+   "postedAt": "6/21/2018 4:43 PM",
+   "textBefore": [
+    "@unknown-role @unknown-role",
+    "Viaire — 6/21/2018 4:43 PM"
+   ],
+   "file": "fed-alliance-25-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-25-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 26,
+   "line": 276,
+   "author": "Viaire",
+   "postedAt": "6/21/2018 4:43 PM",
+   "textBefore": [
+    "@unknown-role @unknown-role",
+    "Viaire — 6/21/2018 4:43 PM"
+   ],
+   "file": "fed-alliance-26-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-26-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 27,
+   "line": 277,
+   "author": "Viaire",
+   "postedAt": "6/21/2018 4:43 PM",
+   "textBefore": [
+    "@unknown-role @unknown-role",
+    "Viaire — 6/21/2018 4:43 PM"
+   ],
+   "file": "fed-alliance-27-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-27-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 28,
+   "line": 278,
+   "author": "Viaire",
+   "postedAt": "6/21/2018 4:43 PM",
+   "textBefore": [
+    "@unknown-role @unknown-role",
+    "Viaire — 6/21/2018 4:43 PM"
+   ],
+   "file": "fed-alliance-28-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-28-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 29,
+   "line": 283,
+   "author": "Viaire",
+   "postedAt": "6/25/2018 3:11 PM",
+   "textBefore": [
+    "Drew1011 — 6/25/2018 2:17 PM",
+    "PUN and Phx have left the alliance. Verinian Trials [ViT] has joined the alliance.",
+    "Viaire — 6/25/2018 3:11 PM"
+   ],
+   "file": "fed-alliance-29-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-29-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 30,
+   "line": 284,
+   "author": "Viaire",
+   "postedAt": "6/25/2018 3:11 PM",
+   "textBefore": [
+    "Drew1011 — 6/25/2018 2:17 PM",
+    "PUN and Phx have left the alliance. Verinian Trials [ViT] has joined the alliance.",
+    "Viaire — 6/25/2018 3:11 PM"
+   ],
+   "file": "fed-alliance-30-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-30-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 31,
+   "line": 285,
+   "author": "Viaire",
+   "postedAt": "6/25/2018 3:11 PM",
+   "textBefore": [
+    "Drew1011 — 6/25/2018 2:17 PM",
+    "PUN and Phx have left the alliance. Verinian Trials [ViT] has joined the alliance.",
+    "Viaire — 6/25/2018 3:11 PM"
+   ],
+   "file": "fed-alliance-31-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-31-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 32,
+   "line": 286,
+   "author": "Viaire",
+   "postedAt": "6/25/2018 3:11 PM",
+   "textBefore": [
+    "Drew1011 — 6/25/2018 2:17 PM",
+    "PUN and Phx have left the alliance. Verinian Trials [ViT] has joined the alliance.",
+    "Viaire — 6/25/2018 3:11 PM"
+   ],
+   "file": "fed-alliance-32-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-32-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 33,
+   "line": 287,
+   "author": "Viaire",
+   "postedAt": "6/25/2018 3:11 PM",
+   "textBefore": [
+    "PUN and Phx have left the alliance. Verinian Trials [ViT] has joined the alliance.",
+    "Viaire — 6/25/2018 3:11 PM"
+   ],
+   "file": "fed-alliance-33-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-33-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 34,
+   "line": 298,
+   "author": "Viaire",
+   "postedAt": "6/30/2018 1:01 PM",
+   "textBefore": [
+    "Viaire — 6/30/2018 7:19 AM",
+    "Ex Nihilo [Nih] has joined the alliance.",
+    "Viaire — 6/30/2018 1:01 PM"
+   ],
+   "file": "fed-alliance-34-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-34-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 35,
+   "line": 299,
+   "author": "Viaire",
+   "postedAt": "6/30/2018 1:01 PM",
+   "textBefore": [
+    "Viaire — 6/30/2018 7:19 AM",
+    "Ex Nihilo [Nih] has joined the alliance.",
+    "Viaire — 6/30/2018 1:01 PM"
+   ],
+   "file": "fed-alliance-35-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-35-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 36,
+   "line": 300,
+   "author": "Viaire",
+   "postedAt": "6/30/2018 1:01 PM",
+   "textBefore": [
+    "Viaire — 6/30/2018 7:19 AM",
+    "Ex Nihilo [Nih] has joined the alliance.",
+    "Viaire — 6/30/2018 1:01 PM"
+   ],
+   "file": "fed-alliance-36-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-36-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 37,
+   "line": 301,
+   "author": "Viaire",
+   "postedAt": "6/30/2018 1:01 PM",
+   "textBefore": [
+    "Viaire — 6/30/2018 7:19 AM",
+    "Ex Nihilo [Nih] has joined the alliance.",
+    "Viaire — 6/30/2018 1:01 PM"
+   ],
+   "file": "fed-alliance-37-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-37-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 38,
+   "line": 302,
+   "author": "Viaire",
+   "postedAt": "6/30/2018 1:01 PM",
+   "textBefore": [
+    "Ex Nihilo [Nih] has joined the alliance.",
+    "Viaire — 6/30/2018 1:01 PM"
+   ],
+   "file": "fed-alliance-38-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-38-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 39,
+   "line": 306,
+   "author": "Deleted User",
+   "postedAt": "7/5/2018 12:06 PM",
+   "textBefore": [
+    "@Guild Leader @Captain",
+    "Deleted User — 7/5/2018 12:06 PM",
+    "@here hello!! SDU will be having an award ceremony tomorrow! It’s quick and easy as I am doing most of the speaking, also with a fun seavale after party, but I would love for you guys to join us in celebrating the accomplishments within SDU! Long live the Sins!"
+   ],
+   "file": "fed-alliance-39-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-39-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 40,
+   "line": 316,
+   "author": "Viaire",
+   "postedAt": "7/13/2018 6:00 PM",
+   "textBefore": [
+    "Wynn — 7/10/2018 11:05 AM",
+    "Hey yall warrers when defending DAU territories can you please use 1000 mobs? Levels are up to you but just so we don't burn as much money defending kthxbai",
+    "Viaire — 7/13/2018 6:00 PM"
+   ],
+   "file": "fed-alliance-40-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-40-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 41,
+   "line": 317,
+   "author": "Viaire",
+   "postedAt": "7/13/2018 6:00 PM",
+   "textBefore": [
+    "Wynn — 7/10/2018 11:05 AM",
+    "Hey yall warrers when defending DAU territories can you please use 1000 mobs? Levels are up to you but just so we don't burn as much money defending kthxbai",
+    "Viaire — 7/13/2018 6:00 PM"
+   ],
+   "file": "fed-alliance-41-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-41-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 42,
+   "line": 318,
+   "author": "Viaire",
+   "postedAt": "7/13/2018 6:00 PM",
+   "textBefore": [
+    "Wynn — 7/10/2018 11:05 AM",
+    "Hey yall warrers when defending DAU territories can you please use 1000 mobs? Levels are up to you but just so we don't burn as much money defending kthxbai",
+    "Viaire — 7/13/2018 6:00 PM"
+   ],
+   "file": "fed-alliance-42-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-42-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 43,
+   "line": 319,
+   "author": "Viaire",
+   "postedAt": "7/13/2018 6:00 PM",
+   "textBefore": [
+    "Wynn — 7/10/2018 11:05 AM",
+    "Hey yall warrers when defending DAU territories can you please use 1000 mobs? Levels are up to you but just so we don't burn as much money defending kthxbai",
+    "Viaire — 7/13/2018 6:00 PM"
+   ],
+   "file": "fed-alliance-43-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-43-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 44,
+   "line": 320,
+   "author": "Viaire",
+   "postedAt": "7/13/2018 6:00 PM",
+   "textBefore": [
+    "Hey yall warrers when defending DAU territories can you please use 1000 mobs? Levels are up to you but just so we don't burn as much money defending kthxbai",
+    "Viaire — 7/13/2018 6:00 PM"
+   ],
+   "file": "fed-alliance-44-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-44-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 45,
+   "line": 323,
+   "author": "Viaire",
+   "postedAt": "7/18/2018 2:57 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Viaire — 7/18/2018 2:57 PM"
+   ],
+   "file": "fed-alliance-45-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-45-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 46,
+   "line": 324,
+   "author": "Viaire",
+   "postedAt": "7/18/2018 2:57 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Viaire — 7/18/2018 2:57 PM"
+   ],
+   "file": "fed-alliance-46-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-46-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 47,
+   "line": 325,
+   "author": "Viaire",
+   "postedAt": "7/18/2018 2:57 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Viaire — 7/18/2018 2:57 PM"
+   ],
+   "file": "fed-alliance-47-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-47-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 48,
+   "line": 326,
+   "author": "Viaire",
+   "postedAt": "7/18/2018 2:57 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Viaire — 7/18/2018 2:57 PM"
+   ],
+   "file": "fed-alliance-48-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-48-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 49,
+   "line": 327,
+   "author": "Viaire",
+   "postedAt": "7/18/2018 2:57 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Viaire — 7/18/2018 2:57 PM"
+   ],
+   "file": "fed-alliance-49-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-49-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 50,
+   "line": 331,
+   "author": "Gas",
+   "postedAt": "7/19/2018 5:28 AM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Gas — 7/19/2018 5:28 AM",
+    "@everyone DDT invites you to our award ceremony. Sorry for the late time EU members but our guild voted on it. YES! Icey will be there and thanks to her for doing the art. Please join our discord for more info"
+   ],
+   "file": "fed-alliance-50-DiamondDeities_Award_Ceremony.png",
+   "web": "/images/chronicles/federation/fed-alliance-50-DiamondDeities_Award_Ceremony.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 51,
+   "line": 356,
+   "author": "Deleted User",
+   "postedAt": "7/22/2018 7:36 PM",
+   "textBefore": [
+    "Drew1011 — 7/22/2018 6:14 PM",
+    "Titans Valor [ANO] and Angels of Eternal [AoE] have left the Federation. Aphelion [Aph] has joined.",
+    "Deleted User — 7/22/2018 7:36 PM"
+   ],
+   "file": "fed-alliance-51-image.png",
+   "web": "/images/chronicles/federation/fed-alliance-51-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 52,
+   "line": 393,
+   "author": "Viaire",
+   "postedAt": "7/26/2018 2:11 PM",
+   "textBefore": [
+    "Drew1011 — 7/25/2018 5:23 PM",
+    "I’d just like to give a personal thank you to everyone who warred today. Y’all did good. Thanks for being there whenever the alliance needs it.",
+    "Viaire — 7/26/2018 2:11 PM"
+   ],
+   "file": "fed-alliance-52-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-52-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 53,
+   "line": 394,
+   "author": "Viaire",
+   "postedAt": "7/26/2018 2:11 PM",
+   "textBefore": [
+    "Drew1011 — 7/25/2018 5:23 PM",
+    "I’d just like to give a personal thank you to everyone who warred today. Y’all did good. Thanks for being there whenever the alliance needs it.",
+    "Viaire — 7/26/2018 2:11 PM"
+   ],
+   "file": "fed-alliance-53-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-53-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 54,
+   "line": 395,
+   "author": "Viaire",
+   "postedAt": "7/26/2018 2:11 PM",
+   "textBefore": [
+    "Drew1011 — 7/25/2018 5:23 PM",
+    "I’d just like to give a personal thank you to everyone who warred today. Y’all did good. Thanks for being there whenever the alliance needs it.",
+    "Viaire — 7/26/2018 2:11 PM"
+   ],
+   "file": "fed-alliance-54-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-54-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 55,
+   "line": 396,
+   "author": "Viaire",
+   "postedAt": "7/26/2018 2:11 PM",
+   "textBefore": [
+    "Drew1011 — 7/25/2018 5:23 PM",
+    "I’d just like to give a personal thank you to everyone who warred today. Y’all did good. Thanks for being there whenever the alliance needs it.",
+    "Viaire — 7/26/2018 2:11 PM"
+   ],
+   "file": "fed-alliance-55-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-55-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 56,
+   "line": 397,
+   "author": "Viaire",
+   "postedAt": "7/26/2018 2:11 PM",
+   "textBefore": [
+    "I’d just like to give a personal thank you to everyone who warred today. Y’all did good. Thanks for being there whenever the alliance needs it.",
+    "Viaire — 7/26/2018 2:11 PM"
+   ],
+   "file": "fed-alliance-56-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-56-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 57,
+   "line": 401,
+   "author": "Drew1011",
+   "postedAt": "7/28/2018 3:25 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Drew1011 — 7/28/2018 3:25 PM",
+    "HAVE YOU EVER BEEN TAGGED BUT DONT KNOW WHERE OR WHY? DO YOU ALWAYS ASK WHY YOU WERE TAGGED? WELL HAVE I GOT NEWS FOR YOU! There’s this great little @ button at the top right of your screen that SHOWS YOU where you were tagged! On mobile it’s at the bottom of your screen when you go to the channel view! Wow! Isn’t that crazy???"
+   ],
+   "file": "fed-alliance-57-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-57-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 58,
+   "line": 402,
+   "author": "Drew1011",
+   "postedAt": "7/28/2018 3:25 PM",
+   "textBefore": [
+    "@Guild Leader @War",
+    "Drew1011 — 7/28/2018 3:25 PM",
+    "HAVE YOU EVER BEEN TAGGED BUT DONT KNOW WHERE OR WHY? DO YOU ALWAYS ASK WHY YOU WERE TAGGED? WELL HAVE I GOT NEWS FOR YOU! There’s this great little @ button at the top right of your screen that SHOWS YOU where you were tagged! On mobile it’s at the bottom of your screen when you go to the channel view! Wow! Isn’t that crazy???"
+   ],
+   "file": "fed-alliance-58-image.png",
+   "web": "/images/chronicles/federation/fed-alliance-58-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 59,
+   "line": 412,
+   "author": "Viaire",
+   "postedAt": "8/1/2018 5:25 PM",
+   "textBefore": [
+    "Drew1011 — 8/1/2018 12:01 PM",
+    "DAU is pulling a LEF/ASF and are transferring over to a new guild, White Lotus [LTS]. They are in Fed.",
+    "Viaire — 8/1/2018 5:25 PM"
+   ],
+   "file": "fed-alliance-59-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-59-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 60,
+   "line": 413,
+   "author": "Viaire",
+   "postedAt": "8/1/2018 5:25 PM",
+   "textBefore": [
+    "Drew1011 — 8/1/2018 12:01 PM",
+    "DAU is pulling a LEF/ASF and are transferring over to a new guild, White Lotus [LTS]. They are in Fed.",
+    "Viaire — 8/1/2018 5:25 PM"
+   ],
+   "file": "fed-alliance-60-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-60-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 61,
+   "line": 414,
+   "author": "Viaire",
+   "postedAt": "8/1/2018 5:25 PM",
+   "textBefore": [
+    "Drew1011 — 8/1/2018 12:01 PM",
+    "DAU is pulling a LEF/ASF and are transferring over to a new guild, White Lotus [LTS]. They are in Fed.",
+    "Viaire — 8/1/2018 5:25 PM"
+   ],
+   "file": "fed-alliance-61-Ocean_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-61-Ocean_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 62,
+   "line": 415,
+   "author": "Viaire",
+   "postedAt": "8/1/2018 5:25 PM",
+   "textBefore": [
+    "Drew1011 — 8/1/2018 12:01 PM",
+    "DAU is pulling a LEF/ASF and are transferring over to a new guild, White Lotus [LTS]. They are in Fed.",
+    "Viaire — 8/1/2018 5:25 PM"
+   ],
+   "file": "fed-alliance-62-Wynn_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-62-Wynn_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 63,
+   "line": 416,
+   "author": "Viaire",
+   "postedAt": "8/1/2018 5:25 PM",
+   "textBefore": [
+    "DAU is pulling a LEF/ASF and are transferring over to a new guild, White Lotus [LTS]. They are in Fed.",
+    "Viaire — 8/1/2018 5:25 PM"
+   ],
+   "file": "fed-alliance-63-unknown.png",
+   "web": "/images/chronicles/federation/fed-alliance-63-unknown.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 64,
+   "line": 424,
+   "author": "Deleted User",
+   "postedAt": "8/16/2018 4:02 PM",
+   "textBefore": [
+    "Viaire — 8/6/2018 3:51 PM",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Herb Cave, Jungle Lake, Raider's Base Upper, Swamp Dark Forest Transition Mid, Factory Entrance, Mine Base Plains (22)",
+    "Deleted User — 8/16/2018 4:02 PM"
+   ],
+   "file": "fed-alliance-64-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-64-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 65,
+   "line": 425,
+   "author": "Deleted User",
+   "postedAt": "8/16/2018 4:02 PM",
+   "textBefore": [
+    "Viaire — 8/6/2018 3:51 PM",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Herb Cave, Jungle Lake, Raider's Base Upper, Swamp Dark Forest Transition Mid, Factory Entrance, Mine Base Plains (22)",
+    "Deleted User — 8/16/2018 4:02 PM"
+   ],
+   "file": "fed-alliance-65-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-65-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 66,
+   "line": 426,
+   "author": "Deleted User",
+   "postedAt": "8/16/2018 4:02 PM",
+   "textBefore": [
+    "Viaire — 8/6/2018 3:51 PM",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Herb Cave, Jungle Lake, Raider's Base Upper, Swamp Dark Forest Transition Mid, Factory Entrance, Mine Base Plains (22)",
+    "Deleted User — 8/16/2018 4:02 PM"
+   ],
+   "file": "fed-alliance-66-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-66-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 67,
+   "line": 427,
+   "author": "Deleted User",
+   "postedAt": "8/16/2018 4:02 PM",
+   "textBefore": [
+    "Viaire — 8/6/2018 3:51 PM",
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Herb Cave, Jungle Lake, Raider's Base Upper, Swamp Dark Forest Transition Mid, Factory Entrance, Mine Base Plains (22)",
+    "Deleted User — 8/16/2018 4:02 PM"
+   ],
+   "file": "fed-alliance-67-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-67-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 68,
+   "line": 428,
+   "author": "Deleted User",
+   "postedAt": "8/16/2018 4:02 PM",
+   "textBefore": [
+    "Free For All [FFA]: Qira’s Battle Room, Hive, Lava Lake, Temple of Legends, Bob’s Tomb, Battle Tower (ToA), Detlas, Cinfras, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Herb Cave, Jungle Lake, Raider's Base Upper, Swamp Dark Forest Transition Mid, Factory Entrance, Mine Base Plains (22)",
+    "Deleted User — 8/16/2018 4:02 PM"
+   ],
+   "file": "fed-alliance-68-image.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-68-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 69,
+   "line": 439,
+   "author": "Viaire",
+   "postedAt": "8/30/2018 10:28 AM",
+   "textBefore": [
+    "Deleted User — 8/30/2018 6:32 AM",
+    "If you saw the map, disregard it for later",
+    "Viaire — 8/30/2018 10:28 AM"
+   ],
+   "file": "fed-alliance-69-LightRealm_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-69-LightRealm_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 70,
+   "line": 440,
+   "author": "Viaire",
+   "postedAt": "8/30/2018 10:28 AM",
+   "textBefore": [
+    "Deleted User — 8/30/2018 6:32 AM",
+    "If you saw the map, disregard it for later",
+    "Viaire — 8/30/2018 10:28 AM"
+   ],
+   "file": "fed-alliance-70-Gavel_Map.png",
+   "web": "/images/chronicles/federation/fed-alliance-70-Gavel_Map.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 71,
+   "line": 441,
+   "author": "Viaire",
+   "postedAt": "8/30/2018 10:28 AM",
+   "textBefore": [
+    "Deleted User — 8/30/2018 6:32 AM",
+    "If you saw the map, disregard it for later",
+    "Viaire — 8/30/2018 10:28 AM"
+   ],
+   "file": "fed-alliance-71-Ocean.png",
+   "web": "/images/chronicles/federation/fed-alliance-71-Ocean.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 72,
+   "line": 442,
+   "author": "Viaire",
+   "postedAt": "8/30/2018 10:28 AM",
+   "textBefore": [
+    "Deleted User — 8/30/2018 6:32 AM",
+    "If you saw the map, disregard it for later",
+    "Viaire — 8/30/2018 10:28 AM"
+   ],
+   "file": "fed-alliance-72-Wynn.png",
+   "web": "/images/chronicles/federation/fed-alliance-72-Wynn.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 73,
+   "line": 443,
+   "author": "Viaire",
+   "postedAt": "8/30/2018 10:28 AM",
+   "textBefore": [
+    "If you saw the map, disregard it for later",
+    "Viaire — 8/30/2018 10:28 AM"
+   ],
+   "file": "fed-alliance-73-post.png",
+   "web": "/images/chronicles/federation/fed-alliance-73-post.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 74,
+   "line": 530,
+   "author": "Drew1011",
+   "postedAt": "9/10/2018 2:54 PM",
+   "textBefore": [
+    "-In the ~8 days this update covers, there have been 8,741 unique wars. That far less than last week's update, so hopefully Confed is slowing down.",
+    "ok not much happened this week so thats all i love you bye ",
+    "Drew1011 — 9/10/2018 2:54 PM"
+   ],
+   "file": "fed-alliance-74-Gavel_and_LR_Final_9.png",
+   "web": "/images/chronicles/federation/fed-alliance-74-Gavel_and_LR_Final_9.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 75,
+   "line": 531,
+   "author": "Drew1011",
+   "postedAt": "9/10/2018 2:54 PM",
+   "textBefore": [
+    "-In the ~8 days this update covers, there have been 8,741 unique wars. That far less than last week's update, so hopefully Confed is slowing down.",
+    "ok not much happened this week so thats all i love you bye ",
+    "Drew1011 — 9/10/2018 2:54 PM"
+   ],
+   "file": "fed-alliance-75-Ocean_Final_9.png",
+   "web": "/images/chronicles/federation/fed-alliance-75-Ocean_Final_9.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 76,
+   "line": 532,
+   "author": "Drew1011",
+   "postedAt": "9/10/2018 2:54 PM",
+   "textBefore": [
+    "-In the ~8 days this update covers, there have been 8,741 unique wars. That far less than last week's update, so hopefully Confed is slowing down.",
+    "ok not much happened this week so thats all i love you bye ",
+    "Drew1011 — 9/10/2018 2:54 PM"
+   ],
+   "file": "fed-alliance-76-Wynn_Final_9.png",
+   "web": "/images/chronicles/federation/fed-alliance-76-Wynn_Final_9.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 77,
+   "line": 533,
+   "author": "Drew1011",
+   "postedAt": "9/10/2018 2:54 PM",
+   "textBefore": [
+    "ok not much happened this week so thats all i love you bye ",
+    "Drew1011 — 9/10/2018 2:54 PM"
+   ],
+   "file": "fed-alliance-77-Territory_Graph_Final_9.png",
+   "web": "/images/chronicles/federation/fed-alliance-77-Territory_Graph_Final_9.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 78,
+   "line": 563,
+   "author": "hot pink emperor",
+   "postedAt": "10/17/2018 3:40 PM",
+   "textBefore": [
+    "lego — 10/10/2018 3:41 PM",
+    "If you're wondering about pings in ⁠general, its because someone @ spammed several guilds and War",
+    "hot pink emperor — 10/17/2018 3:40 PM"
+   ],
+   "file": "fed-alliance-78-image.png",
+   "web": "/images/chronicles/federation/fed-alliance-78-image.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "alliance",
+   "marker": 79,
+   "line": 580,
+   "author": "Deleted User",
+   "postedAt": "10/26/2018 6:57 AM",
+   "textBefore": [
+    "The ceremony will now begin at 3:50 PM EST, and the recession will begin after the ceremony concudes. The location shall remain the same, at Selchar Town Square. Titans Valor Citizens, please make your way towards Selchar thirty minutes prior to the beginning of the ceremony.",
+    "Deleted User — 10/26/2018 6:57 AM",
+    "@here Hey guys! SDU will be having an event tomorrow at 3-5 UTC! Everyone is welcome to show up! We will be having a costume contest so be sure to wear a costume skin for a prize! WC will be announced tomorrow! Hope to see you at our spookiest event (:"
+   ],
+   "file": "fed-alliance-79-image0.jpg",
+   "web": "/images/chronicles/federation/fed-alliance-79-image0.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "public",
+   "marker": 1,
+   "line": 39,
+   "author": "Arianna",
+   "postedAt": "8/1/2018 3:39 PM",
+   "textBefore": [
+    "Thank you :)",
+    "~jp ",
+    "Arianna — 8/1/2018 3:39 PM"
+   ],
+   "file": "fed-public-01-summer_festival.png",
+   "web": "/images/chronicles/federation/fed-public-01-summer_festival.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "public",
+   "marker": 2,
+   "line": 48,
+   "author": "Arianna",
+   "postedAt": "8/1/2018 3:39 PM",
+   "textBefore": [
+    "Where:       A beach on the peninsula north of Katoa Ranch",
+    "Date:           Friday, August 10",
+    "Time:           3:00 PM EST "
+   ],
+   "file": "fed-public-02-event_location.png",
+   "web": "/images/chronicles/federation/fed-public-02-event_location.webp",
+   "verified": false,
+   "depicts": null
+  },
+  {
+   "channel": "public",
+   "marker": 3,
+   "line": 150,
+   "author": "Drew1011",
+   "postedAt": "11/13/2018 12:56 AM",
+   "textBefore": [
+    "Wynncraft Forums",
+    "Alliance - Federation Tribute",
+    "If you clicked this thread, odds are you know what Federation was. However, after seeing two threads made about its collapse, I felt obligated to make..."
+   ],
+   "file": null,
+   "web": null,
+   "verified": false,
+   "depicts": null
+  }
+ ]
+}

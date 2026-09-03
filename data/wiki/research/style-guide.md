@@ -80,6 +80,29 @@ Write as if for Wikipedia. Concretely:
 - **Plain, specific language.** Prefer "held the entire map for 8 months and 25
   days" to "enjoyed a long period of supremacy."
 
+## Source tiers — weigh evidence, do not just cite it
+
+Every archived source carries a tier, shown on its reference page and beside the
+citation in the article:
+
+- **primary** — a record made at the time by the people involved: forum posts
+  from the era, Discord exports, API captures, the territory log, contemporaneous
+  images. The strongest evidence available.
+- **retrospective** — first-person but recalled later: memoirs, oral testimony,
+  an account written years after the events. Valuable, and often the only source
+  for a period, but memory reorders and rationalises. Attribute it in prose.
+- **secondary** — compiled or curated by others afterwards: the community
+  timeline, the game wiki, fan wikis. Useful for orientation; check its own
+  sources where a claim matters.
+- **derived** — our own records, datasets and analysis: the chronicle, map-data
+  method, the search methods behind our negatives. Transparent, but ours.
+
+**Prefer a primary source where one exists.** Where a retrospective account and a
+contemporaneous record disagree, say so and give the contemporaneous one more
+weight — but check it, because a dated record can be attached to the wrong event
+(see the Federation map-control analysis). Where a claim rests on a
+retrospective or derived source alone, the prose must say so.
+
 ## Rigor — every claim is sourced, nothing is invented
 
 This is the hard rule of the project: **do not make anything up.** No plausible

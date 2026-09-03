@@ -220,6 +220,9 @@ export default function WikiArticleView({
                       <span>{c.title}</span>
                     )}
                     {c.locator && <span className="wiki-ref-meta">, {c.locator}</span>}
+                    {c.tier && c.tier !== 'primary' && (
+                      <span className={`wiki-ref-tier wiki-tier-${c.tier}`}>{c.tier}</span>
+                    )}
                     {/* The archived copy is the primary target — it is what the
                         claim was checked against — with the live page and any
                         capture offered alongside. */}
@@ -283,6 +286,13 @@ export default function WikiArticleView({
         :global(.wiki-ref-link) { color: var(--accent-primary); text-decoration: none; }
         :global(.wiki-ref-link:hover) { text-decoration: underline; }
         :global(.wiki-ref-meta) { color: var(--text-secondary); }
+        :global(.wiki-ref-tier) {
+          margin-left: 0.4rem; padding: 0.02rem 0.35rem; border-radius: 0.65rem;
+          font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em;
+          border: 1px solid var(--border-color); color: var(--text-secondary);
+        }
+        :global(.wiki-tier-retrospective) { border-color: #d97706; color: #d97706; }
+        :global(.wiki-tier-derived) { border-color: var(--accent-primary); color: var(--accent-primary); }
         :global(.wiki-ref-alt) { color: var(--text-secondary); text-decoration: none; font-size: 0.95em; }
         :global(.wiki-ref-alt:hover) { color: var(--accent-primary); text-decoration: underline; }
         :global(.wiki-references-manual) { list-style: disc; }
