@@ -178,6 +178,14 @@
    "rawSha256": "862bb00b64369fc4",
    "note": "Avicia [AVO] official site — checking for history/war-log/alliance pages covering the 2023 Avicia-Sequoia and 2025 Aequitas-Avicia wars"
   },
+  "drew1011-storytime": {
+   "url": "(Discord, private guild channel)",
+   "kind": "testimony",
+   "title": "Drew1011 storytime — first-person account of early Wynncraft guild history",
+   "fetchedAt": "2026-09-03T19:36:43.560Z",
+   "textChars": 135283,
+   "note": "Partisan first-person account by the Federation founder; 62 images in data/sources/storytime/"
+  },
   "forums-wynncraft-com-forums-guilds-72-page-2-prefix-id-82-order-post-date-directi": {
    "url": "https://forums.wynncraft.com/forums/guilds.72/page-2?prefix_id=82&order=post_date&direction=asc",
    "kind": "forum-index",
