@@ -132,6 +132,9 @@ function MapHistoryControls({
   // Season zoom shared between the track (right-click) and the selector below
   const [seasonZoom, setSeasonZoom] = useState<SeasonZoom | null>(null);
   const [seasonOpen, setSeasonOpen] = useState(false);
+  // Community (non-war) alliances are hidden from the timeline by default —
+  // they're social groupings, so their bands mostly add noise when scrubbing wars
+  const [showCommunityAlliances, setShowCommunityAlliances] = useState(false);
   const seasonSelRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const resizeStartRef = useRef({ x: 0, y: 0, width: 1200, height: DEFAULT_VERTICAL_HEIGHT, posX: 0, posY: 0 });
@@ -269,6 +272,15 @@ function MapHistoryControls({
   const seasonOptions = useMemo(
     () => (seasons ?? []).filter((p) => p.type === 'season').slice().reverse(),
     [seasons]
+  );
+
+  const hasCommunitySpans = useMemo(
+    () => (allianceSpans ?? []).some((s) => s.kind === 'community'),
+    [allianceSpans]
+  );
+  const visibleAllianceSpans = useMemo(
+    () => showCommunityAlliances ? allianceSpans : allianceSpans?.filter((s) => s.kind !== 'community'),
+    [allianceSpans, showCommunityAlliances]
   );
 
   // Leave season view automatically when the current time moves outside the
@@ -649,6 +661,40 @@ function MapHistoryControls({
     </div>
   ) : null;
 
+  // ── Community-alliance toggle (shared, sits next to the season selector) ──
+
+  const communityToggle = hasCommunitySpans ? (
+    <button
+      type="button"
+      data-testid="community-alliance-toggle"
+      aria-pressed={showCommunityAlliances}
+      onClick={(e) => { e.stopPropagation(); setShowCommunityAlliances(prev => !prev); }}
+      onMouseDown={(e) => e.stopPropagation()}
+      title={showCommunityAlliances
+        ? 'Hide community (non-war) alliances on the timeline'
+        : 'Show community (non-war) alliances on the timeline'}
+      style={{
+        height: '32px',
+        boxSizing: 'border-box',
+        padding: '0 0.5rem',
+        borderRadius: '0.375rem',
+        border: `1px solid ${showCommunityAlliances ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+        background: showCommunityAlliances ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+        color: showCommunityAlliances ? 'var(--text-on-accent)' : 'var(--text-primary)',
+        fontSize: '0.8rem',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        transition: 'all 0.15s ease',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      Community
+    </button>
+  ) : null;
+
   // ── Top-right controls (shared) ───────────────────────────────────────
 
   const topRightControls = (
@@ -812,6 +858,7 @@ function MapHistoryControls({
           hideSpeed={!showSpeedInPlayback}
         />
         {showSpeedInPlayback && seasonSelector}
+        {showSpeedInPlayback && communityToggle}
         {showSpeedInPlayback && (
           <HistoryDatePicker
             current={current}
@@ -919,6 +966,7 @@ function MapHistoryControls({
             </div>
           </div>
           {seasonSelector}
+          {communityToggle}
           <HistoryDatePicker
             current={current}
             earliest={earliest}
@@ -1015,7 +1063,7 @@ function MapHistoryControls({
                 seasonZoom={seasonZoom}
                 onSeasonZoomChange={setSeasonZoom}
                 eventMarkers={eventMarkers}
-                allianceSpans={allianceSpans}
+                allianceSpans={visibleAllianceSpans}
               />
             </div>
 
@@ -1171,8 +1219,9 @@ function MapHistoryControls({
                 </div>
               </div>
 
-              {/* Row 4b: Season selector */}
+              {/* Row 4b: Season selector + community-alliance toggle */}
               {seasonSelector}
+              {communityToggle}
 
               {/* Row 5: Date picker */}
               <PickerField
@@ -1304,7 +1353,7 @@ function MapHistoryControls({
             seasonZoom={seasonZoom}
             onSeasonZoomChange={setSeasonZoom}
             eventMarkers={eventMarkers}
-            allianceSpans={allianceSpans}
+            allianceSpans={visibleAllianceSpans}
           />
           {controlsSection}
         </>
