@@ -898,6 +898,15 @@
    "rawSha256": "81993ae034c17325",
    "note": "The Emperium Of Wynn (Paladin A'renos, May 7 2017): full 12-guild roster with leaders, Emperator Nitrogen2Oxygen, Oath of the Shadow Advisor governance"
   },
+  "thread-189768": {
+   "url": "https://forums.wynncraft.com/threads/no-guild-war-no-life.189768/",
+   "kind": "forum-thread",
+   "title": "No Guild War No Life | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:36:17.000Z",
+   "textChars": 4050,
+   "rawSha256": "65b93a96029d07e0",
+   "note": "Hide007, 22 May 2017 — the May 2017 Hax complaint thread cited for HackForums' peak territory count; checking whether it attests 'more than 300 territories'"
+  },
   "thread-196016": {
    "url": "https://forums.wynncraft.com/threads/196016/",
    "kind": "forum-thread",
@@ -1147,6 +1156,15 @@
    "rawSha256": "940e6dce9860968a",
    "note": "Federation Tribute (Drew1011, Nov 13 2018): 40-guild Fed roster, ~25 credited leaders, Slayne's 'Double AA' claim p3 #45, Lego_DW war-leader list"
   },
+  "thread-238340": {
+   "url": "https://forums.wynncraft.com/threads/238340/",
+   "kind": "forum-thread",
+   "title": "1.18 The Economy Update - Changelog | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:18.356Z",
+   "textChars": 72166,
+   "rawSha256": "8bcd8271a1990e4d",
+   "note": "Official 1.18 'The Economy Update' changelog thread — archived as the recoverable primary announcement for 1.18, standing in for the January 2019 Wynncraft tweet that could not be recovered; checked for the in-game Trade Market promise"
+  },
   "thread-245207": {
    "url": "https://forums.wynncraft.com/threads/245207/",
    "kind": "forum-thread",
@@ -1267,6 +1285,94 @@
    "textChars": 3162,
    "rawSha256": "ecc94025f9df475b",
    "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-255067": {
+   "url": "https://forums.wynncraft.com/threads/255067/",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:32.370Z",
+   "textChars": 5911,
+   "rawSha256": "de0676247fd207d6"
+  },
+  "thread-255067-p02": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-2",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:33.823Z",
+   "textChars": 5863,
+   "rawSha256": "64bac95a129c071f"
+  },
+  "thread-255067-p03": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-3",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:35.270Z",
+   "textChars": 5043,
+   "rawSha256": "3b5a8968751f3149"
+  },
+  "thread-255067-p04": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-4",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:36.729Z",
+   "textChars": 4524,
+   "rawSha256": "8770d72a7835ae6d"
+  },
+  "thread-255067-p05": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-5",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:38.171Z",
+   "textChars": 6526,
+   "rawSha256": "19c8e16e12bb6824"
+  },
+  "thread-255067-p06": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-6",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 6 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:39.626Z",
+   "textChars": 3214,
+   "rawSha256": "5c7cdc86fb22399a"
+  },
+  "thread-255067-p07": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-7",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 7 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:41.073Z",
+   "textChars": 4601,
+   "rawSha256": "c5af16147ae66422"
+  },
+  "thread-255067-p08": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-8",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 8 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:42.525Z",
+   "textChars": 4813,
+   "rawSha256": "d39d4515a1c5d5be"
+  },
+  "thread-255067-p09": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-9",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 9 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:43.959Z",
+   "textChars": 3058,
+   "rawSha256": "6e8b2bfb21d1e24b"
+  },
+  "thread-255067-p10": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-10",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 10 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:45.399Z",
+   "textChars": 3792,
+   "rawSha256": "1f3921ad206e17f0"
+  },
+  "thread-255067-p11": {
+   "url": "https://forums.wynncraft.com/threads/255067/page-11",
+   "kind": "forum-thread",
+   "title": "Guild - [☆ Ilq] | The Simple Ones Lvl:59 | Community And War | Page 11 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:39:46.831Z",
+   "textChars": 982,
+   "rawSha256": "33c6cd8b2ccc80a1"
   },
   "thread-256130": {
    "url": "https://forums.wynncraft.com/threads/256130/",
@@ -1538,6 +1644,159 @@
    "textChars": 14776,
    "rawSha256": "35334ebdf8cd73c2",
    "note": "WAYBACK 20220915061121 — megalist p1 AFTER the Jul 7 2022 alliance-section deletion; diff against 20220517214728 to see exactly what was lost"
+  },
+  "thread-278123": {
+   "url": "https://forums.wynncraft.com/threads/278123/",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:40:43.378Z",
+   "textChars": 8823,
+   "rawSha256": "a6c82990a5028574",
+   "note": "Thread cited for the 'Empire of Nemract | ILQ + Aeu' branding; checking page count and whether it carries a 26 Aug 2021 attestation"
+  },
+  "thread-278123-p02": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-2",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:40:59.007Z",
+   "textChars": 5184,
+   "rawSha256": "e82d16895a52d2c1"
+  },
+  "thread-278123-p03": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-3",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:00.475Z",
+   "textChars": 7821,
+   "rawSha256": "269886fb5a3a8f38"
+  },
+  "thread-278123-p04": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-4",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:01.939Z",
+   "textChars": 4409,
+   "rawSha256": "d1105e2d9f7384db"
+  },
+  "thread-278123-p05": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-5",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:03.418Z",
+   "textChars": 6480,
+   "rawSha256": "0c5711691100c9ea"
+  },
+  "thread-278123-p06": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-6",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 6 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:04.902Z",
+   "textChars": 7459,
+   "rawSha256": "dd821ab7c2e1f435"
+  },
+  "thread-278123-p07": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-7",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 7 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:06.367Z",
+   "textChars": 7748,
+   "rawSha256": "e0cfa6c25a17045c"
+  },
+  "thread-278123-p08": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-8",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 8 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:07.830Z",
+   "textChars": 5471,
+   "rawSha256": "6a5a144193dd4996"
+  },
+  "thread-278123-p09": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-9",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 9 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:09.303Z",
+   "textChars": 5617,
+   "rawSha256": "87115fa64eeeb0a3"
+  },
+  "thread-278123-p10": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-10",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 10 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:10.763Z",
+   "textChars": 8272,
+   "rawSha256": "ed9374e7ffe0743c"
+  },
+  "thread-278123-p11": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-11",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 11 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:12.258Z",
+   "textChars": 5901,
+   "rawSha256": "4852685da8606edf"
+  },
+  "thread-278123-p12": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-12",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 12 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:13.735Z",
+   "textChars": 5163,
+   "rawSha256": "5bd114a8612338f6"
+  },
+  "thread-278123-p13": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-13",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 13 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:15.196Z",
+   "textChars": 4544,
+   "rawSha256": "88d35ee86103bcb5"
+  },
+  "thread-278123-p14": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-14",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 14 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:16.671Z",
+   "textChars": 7658,
+   "rawSha256": "5836a271c80ac9c5"
+  },
+  "thread-278123-p15": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-15",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 15 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:18.163Z",
+   "textChars": 8778,
+   "rawSha256": "c82208a22d4276b9"
+  },
+  "thread-278123-p16": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-16",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 16 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:19.652Z",
+   "textChars": 7591,
+   "rawSha256": "80e1c63fcada6612"
+  },
+  "thread-278123-p17": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-17",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 17 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:21.118Z",
+   "textChars": 3857,
+   "rawSha256": "6d5f97e7ccb2b42b"
+  },
+  "thread-278123-p18": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-18",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 18 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:22.585Z",
+   "textChars": 4749,
+   "rawSha256": "d8c87e36aa7a38b0"
+  },
+  "thread-278123-p19": {
+   "url": "https://forums.wynncraft.com/threads/278123/page-19",
+   "kind": "forum-thread",
+   "title": "Guild - ♕ The Empire of Nemract Lvl:93 | ILQ + Aeu | LGBTQ+ Friendly | Now Recruiting! | Page 19 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:41:24.045Z",
+   "textChars": 1919,
+   "rawSha256": "15c9af4ad13828ff"
   },
   "thread-279337": {
    "url": "https://forums.wynncraft.com/threads/279337/",
@@ -2104,6 +2363,15 @@
    "rawSha256": "7801f778fb75ce22",
    "note": "Wynncraft wiki Guild War page — documents the in-game Diplomacy system (ally tax rates, alliance/enemy status) that replaced private-Discord diplomacy; the mechanical backbone of the 2023-2026 era"
   },
+  "wynncraft-wiki-gg-wiki-version-1-18": {
+   "url": "https://wynncraft.wiki.gg/wiki/Version_1.18",
+   "kind": "wiki",
+   "title": "Version 1.18 - Official Wynncraft Wiki",
+   "fetchedAt": "2026-09-03T21:43:00.844Z",
+   "textChars": 3362,
+   "rawSha256": "455e69f5cff831eb",
+   "note": "Official Wynncraft Wiki 'Version 1.18' — archived as the recoverable primary-adjacent attestation for 1.18 'The Economy Update' (18 Jan 2019) and the Trade Market, standing in for the January 2019 announcement tweet that Wayback did not preserve"
+  },
   "wynncraft-wiki-gg-wiki-version-1-20": {
    "url": "https://wynncraft.wiki.gg/wiki/Version_1.20",
    "kind": "wiki",
@@ -2112,6 +2380,16 @@
    "textChars": 17068,
    "rawSha256": "baa1daceb634bea1",
    "note": "Official wiki page for Version 1.20 Gavel Reborn (20 Jan 2021) — canonical feature list for the guild/territory rework (guild bank, 4-letter tags, tower upgrades, territory bonuses)"
+  },
+  "x-com-wynncraft-status-1084983171920351232-wb20251203": {
+   "url": "https://x.com/wynncraft/status/1084983171920351232",
+   "fetchedFrom": "https://web.archive.org/web/20251203152011/https://x.com/wynncraft/status/1084983171920351232",
+   "waybackCapture": "20251203152011",
+   "kind": "social",
+   "fetchedAt": "2026-09-03T21:42:47.030Z",
+   "textChars": 176,
+   "rawSha256": "b7e5feabfa0c3d8f",
+   "note": "The January 2019 Wynncraft 1.18 announcement tweet (posted 15 Jan 2019, snowflake-decoded from the status id). Wayback's ONLY capture is this 3 Dec 2025 one and it preserves NOTHING: an empty x.com JS shell reading 'JavaScript is not available'. The tweet text is not recoverable from Wayback or the live site — do not re-try this."
   },
   "youtube-com-feeds-videos-xml-channel-id-ucjooggtimerj6rxphwebgxg": {
    "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCjoOgGtimerj6RXphwebgxg",
@@ -2148,6 +2426,15 @@
    "textChars": 169,
    "rawSha256": "26d2931213060b39",
    "note": "Frank Wynncraft, 'Wynncraft Warring - The Long Raid' (premiered Aug 4 2024): the week-long siege of Aequitas's Sky-province claim; attacker never named in indexed text"
+  },
+  "youtube-com-watch-v-tfcs3b6emlq": {
+   "url": "https://www.youtube.com/watch?v=TFCs3b6EmlQ",
+   "kind": "video",
+   "title": "SMTN ELSE SLANDER - YouTube",
+   "fetchedAt": "2026-09-03T21:36:32.125Z",
+   "textChars": 169,
+   "rawSha256": "6f2544b34ace5584",
+   "note": "YouTube watch page for 'SMTN ELSE SLANDER', cited on therapeuticliz and smtn-elf; archived to establish title, channel and upload date"
   }
  }
 }
