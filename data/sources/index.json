@@ -17,6 +17,30 @@
    "rawSha256": "80ef8609e660fac5",
    "note": "Wynncraft official API v3 guild record for Avicia, captured Sep 2026 — authoritative live roster: owner, chiefs, creation date, level, total wars, territory count"
   },
+  "api-wynncraft-com-v3-guild-blacklisted": {
+   "url": "https://api.wynncraft.com/v3/guild/Blacklisted",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T19:13:02.394Z",
+   "textChars": 38779,
+   "rawSha256": "8508f2e0b53d0ff5",
+   "note": "Blacklisted [BLA] current API record — creation date, level, member count; for the Blacklisted guild article"
+  },
+  "api-wynncraft-com-v3-guild-empire-20of-20sindria": {
+   "url": "https://api.wynncraft.com/v3/guild/Empire%20of%20Sindria",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:48:32.095Z",
+   "textChars": 191034,
+   "rawSha256": "c3a30c5f4c126cf7",
+   "note": "Wynncraft API guild record: founding date, level, current owner and territory count for a guild article"
+  },
+  "api-wynncraft-com-v3-guild-iceblue-20team": {
+   "url": "https://api.wynncraft.com/v3/guild/IceBlue%20Team",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:51:17.264Z",
+   "textChars": 109689,
+   "rawSha256": "34db8e6242f31c71",
+   "note": "Wynncraft API guild record for IceBlue Team [IBT] (later Blue Nations United): founding date, level, owner"
+  },
   "api-wynncraft-com-v3-guild-idiot-20co": {
    "url": "https://api.wynncraft.com/v3/guild/Idiot%20Co",
    "kind": "api",
@@ -24,6 +48,14 @@
    "textChars": 168594,
    "rawSha256": "f2d0c93eb07002a7",
    "note": "Wynncraft official API v3 guild record for Idiot%20Co, captured Sep 2026 — authoritative live roster: owner, chiefs, creation date, level, total wars, territory count"
+  },
+  "api-wynncraft-com-v3-guild-kingdom-20foxes": {
+   "url": "https://api.wynncraft.com/v3/guild/Kingdom%20Foxes",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:50:32.719Z",
+   "textChars": 158905,
+   "rawSha256": "c16a8210ec61f722",
+   "note": "Wynncraft API v3 guild record captured Sep 2026 — owner, chiefs, creation date, level, lifetime wars, territory count; principal holder in the Sep 2026 territory census"
   },
   "api-wynncraft-com-v3-guild-kongoboys": {
    "url": "https://api.wynncraft.com/v3/guild/KongoBoys",
@@ -40,6 +72,38 @@
    "textChars": 328898,
    "rawSha256": "599dca4206e00b3b",
    "note": "Wynncraft API v3 full territory ownership snapshot, 3 Sep 2026 — 437 territories: SEQ 62, TNSR 59, AVO 59, Fox 55, DUDE 32, ANO 31, ESI 25, Aeq 22, NewM 21, PUN 21; the 2026 map in one capture"
+  },
+  "api-wynncraft-com-v3-guild-lux-20nova": {
+   "url": "https://api.wynncraft.com/v3/guild/Lux%20Nova",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:48:32.591Z",
+   "textChars": 105981,
+   "rawSha256": "8d52f352ffee9fe1",
+   "note": "Wynncraft API guild record: founding date, level, current owner and territory count for a guild article"
+  },
+  "api-wynncraft-com-v3-guild-nefarious-20ravens": {
+   "url": "https://api.wynncraft.com/v3/guild/Nefarious%20Ravens",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:48:31.546Z",
+   "textChars": 24778,
+   "rawSha256": "623f1b22f09c4c99",
+   "note": "Wynncraft API guild record: founding date, level, current owner and territory count for a guild article"
+  },
+  "api-wynncraft-com-v3-guild-new-20moon": {
+   "url": "https://api.wynncraft.com/v3/guild/New%20Moon",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:50:33.352Z",
+   "textChars": 132364,
+   "rawSha256": "7543b5c586f0e0cc",
+   "note": "Wynncraft API v3 guild record captured Sep 2026 — owner, chiefs, creation date, level, lifetime wars, territory count; principal holder in the Sep 2026 territory census"
+  },
+  "api-wynncraft-com-v3-guild-paladins-20united": {
+   "url": "https://api.wynncraft.com/v3/guild/Paladins%20United",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:50:33.707Z",
+   "textChars": 230631,
+   "rawSha256": "c412a7cd710a47f1",
+   "note": "Wynncraft API v3 guild record captured Sep 2026 — owner, chiefs, creation date, level, lifetime wars, territory count; principal holder in the Sep 2026 territory census"
   },
   "api-wynncraft-com-v3-guild-profession-20heaven": {
    "url": "https://api.wynncraft.com/v3/guild/Profession%20Heaven",
@@ -65,6 +129,30 @@
    "rawSha256": "492788879741864e",
    "note": "Wynncraft official API v3 guild record for The%20Aquarium, captured Sep 2026 — authoritative live roster: owner, chiefs, creation date, level, total wars, territory count"
   },
+  "api-wynncraft-com-v3-guild-the-20mage-20legacy": {
+   "url": "https://api.wynncraft.com/v3/guild/The%20Mage%20Legacy",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:48:31.061Z",
+   "textChars": 130026,
+   "rawSha256": "4c9cff90a3ce2526",
+   "note": "Wynncraft API guild record: founding date, level, current owner and territory count for a guild article"
+  },
+  "api-wynncraft-com-v3-guild-the-20nameless-20samurai": {
+   "url": "https://api.wynncraft.com/v3/guild/The%20Nameless%20Samurai",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:50:07.124Z",
+   "textChars": 119024,
+   "rawSha256": "e02837f47595601d",
+   "note": "Wynncraft API v3 guild record for The Nameless Samurai [TNSR], captured Sep 2026 — owner, chiefs, creation date, level, lifetime wars, season ratings; the only record of the era's undocumented 59-territory power"
+  },
+  "api-wynncraft-com-v3-guild-thenolifes": {
+   "url": "https://api.wynncraft.com/v3/guild/TheNoLifes",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T18:48:30.677Z",
+   "textChars": 10959,
+   "rawSha256": "a8e5dd739dff0623",
+   "note": "Wynncraft API guild record: founding date, level, current owner and territory count for a guild article"
+  },
   "api-wynncraft-com-v3-guild-titans-20valor": {
    "url": "https://api.wynncraft.com/v3/guild/Titans%20Valor",
    "kind": "api",
@@ -72,6 +160,14 @@
    "textChars": 237165,
    "rawSha256": "e86e9b88119527a9",
    "note": "Wynncraft official API v3 guild record for Titans%20Valor, captured Sep 2026 — authoritative live roster: owner, chiefs, creation date, level, total wars, territory count"
+  },
+  "api-wynncraft-com-v3-guild-ultimatexeons": {
+   "url": "https://api.wynncraft.com/v3/guild/UltimateXeons",
+   "kind": "api",
+   "fetchedAt": "2026-09-03T19:13:02.904Z",
+   "textChars": 34938,
+   "rawSha256": "14a91339fc153c3d",
+   "note": "UltimateXeons [UXs] current API record — creation date, level, member count; for the UltimateXeons guild article"
   },
   "avicia-info-index": {
    "url": "https://www.avicia.info/",
@@ -450,6 +546,46 @@
    "rawSha256": "9c7c1c9eee46f08d",
    "note": "Alliance-prefixed thread from complete guilds.72 prefix_id=82 census (round-2 sweep)"
   },
+  "thread-130386-p02": {
+   "url": "https://forums.wynncraft.com/threads/130386/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - The Banhammer (anti-hax) Added A Poll | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T19:13:36.771Z",
+   "textChars": 10330,
+   "rawSha256": "2ad28a512f1cf5db"
+  },
+  "thread-130386-p03": {
+   "url": "https://forums.wynncraft.com/threads/130386/page-3",
+   "kind": "forum-thread",
+   "title": "Alliance - The Banhammer (anti-hax) Added A Poll | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T19:13:38.211Z",
+   "textChars": 10434,
+   "rawSha256": "a3522c19e5bf9bc6"
+  },
+  "thread-130386-p04": {
+   "url": "https://forums.wynncraft.com/threads/130386/page-4",
+   "kind": "forum-thread",
+   "title": "Alliance - The Banhammer (anti-hax) Added A Poll | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T19:13:39.648Z",
+   "textChars": 6852,
+   "rawSha256": "b6d3d630c5d595bf"
+  },
+  "thread-130386-p05": {
+   "url": "https://forums.wynncraft.com/threads/130386/page-5",
+   "kind": "forum-thread",
+   "title": "Alliance - The Banhammer (anti-hax) Added A Poll | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T19:13:41.091Z",
+   "textChars": 8404,
+   "rawSha256": "4f5addcc46795c7b"
+  },
+  "thread-130386-p06": {
+   "url": "https://forums.wynncraft.com/threads/130386/page-6",
+   "kind": "forum-thread",
+   "title": "Alliance - The Banhammer (anti-hax) Added A Poll | Page 6 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T19:13:42.517Z",
+   "textChars": 890,
+   "rawSha256": "bfe5b5d257b044b4"
+  },
   "thread-130444": {
    "url": "https://forums.wynncraft.com/threads/130444/",
    "kind": "forum-thread",
@@ -476,6 +612,14 @@
    "textChars": 7641,
    "rawSha256": "f4f1b3c14e294d7e",
    "note": "'The Separatists' (Tapu_Fini, Jun 26 2016) — the 2nd of the two mid-2016 anti-Hax alliances; OP narrates the Hax+Libertas duumvirate; post #13 valvoid confirms the Hax/Lir/UXs mutual land agreement"
+  },
+  "thread-133666-p02": {
+   "url": "https://forums.wynncraft.com/threads/133666/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - The Separatists | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T19:13:53.379Z",
+   "textChars": 5124,
+   "rawSha256": "f2eb9be2d552b0e9"
   },
   "thread-134638": {
    "url": "https://forums.wynncraft.com/threads/134638/",
@@ -521,6 +665,158 @@
    "textChars": 4396,
    "rawSha256": "8a4764f355a73b7f",
    "note": "Valkyrie Alliance relaunch #2 (Yuno F Gasai, Aug 29 2016): members Imperial/KoF/House of Sentinels/Lightly Toasted Heroes; 'Valkyrie Parliament'; the ahri->Kv->Yuno leadership chain"
+  },
+  "thread-153722": {
+   "url": "https://forums.wynncraft.com/threads/153722/",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:04.554Z",
+   "textChars": 6150,
+   "rawSha256": "e108a0e07cc337f0"
+  },
+  "thread-153722-p02": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-2",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:06.010Z",
+   "textChars": 8704,
+   "rawSha256": "4f2e783ffc156549"
+  },
+  "thread-153722-p03": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-3",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:07.487Z",
+   "textChars": 7073,
+   "rawSha256": "872bceab8722e012"
+  },
+  "thread-153722-p04": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-4",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:08.933Z",
+   "textChars": 1840,
+   "rawSha256": "e19f816e24c0031d"
+  },
+  "thread-153722-p05": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-5",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:10.376Z",
+   "textChars": 1840,
+   "rawSha256": "49bb79bcfb9ab9a7"
+  },
+  "thread-153722-p06": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-6",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:11.824Z",
+   "textChars": 1840,
+   "rawSha256": "4eb081c1e5f05778"
+  },
+  "thread-153722-p07": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-7",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:13.266Z",
+   "textChars": 1840,
+   "rawSha256": "716d9f2c37934a39"
+  },
+  "thread-153722-p08": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-8",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:14.851Z",
+   "textChars": 1840,
+   "rawSha256": "05ab3cef3a65de20"
+  },
+  "thread-153722-p09": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-9",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:16.285Z",
+   "textChars": 1840,
+   "rawSha256": "e940fbb0abad4cf3"
+  },
+  "thread-153722-p10": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-10",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:17.737Z",
+   "textChars": 1840,
+   "rawSha256": "6b545d02c7a05218"
+  },
+  "thread-153722-p11": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-11",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:19.180Z",
+   "textChars": 1840,
+   "rawSha256": "a87240e920e43b1a"
+  },
+  "thread-153722-p12": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-12",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:20.625Z",
+   "textChars": 1840,
+   "rawSha256": "f74a6ca5eda2adce"
+  },
+  "thread-153722-p13": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-13",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:22.062Z",
+   "textChars": 1840,
+   "rawSha256": "54d6481c5648863e"
+  },
+  "thread-153722-p14": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-14",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:23.515Z",
+   "textChars": 1840,
+   "rawSha256": "009aad4d1a7c3944"
+  },
+  "thread-153722-p15": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-15",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:24.985Z",
+   "textChars": 1840,
+   "rawSha256": "c823ee5eda16a80f"
+  },
+  "thread-153722-p16": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-16",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:26.431Z",
+   "textChars": 1840,
+   "rawSha256": "e92b839a36c79723"
+  },
+  "thread-153722-p17": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-17",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:27.872Z",
+   "textChars": 1840,
+   "rawSha256": "311a369c818a99c1"
+  },
+  "thread-153722-p18": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-18",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:29.307Z",
+   "textChars": 1840,
+   "rawSha256": "a93172a3174c6b95"
+  },
+  "thread-153722-p19": {
+   "url": "https://forums.wynncraft.com/threads/153722/page-19",
+   "kind": "forum-thread",
+   "title": "Alliance - Lux Imperius! Community Alliance! | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:47:30.756Z",
+   "textChars": 1840,
+   "rawSha256": "e4aff3970b677720"
   },
   "thread-159734": {
    "url": "https://forums.wynncraft.com/threads/159734/",
