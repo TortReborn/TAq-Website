@@ -681,9 +681,10 @@
    "bytes": 24659,
    "contentType": "image/jpeg",
    "sha256": "aaad8e55c1b17d99",
-   "web": "/images/chronicles/federation/fed-alliance-57-image.webp",
    "width": 813,
-   "height": 170
+   "height": 170,
+   "sensitive": true,
+   "excluded": "Screenshot of a private #guild-leaders channel showing member handles and a personal status line. Pseudonymous, but private-channel content about named people."
   },
   {
    "set": "alliance",
@@ -693,9 +694,10 @@
    "bytes": 42698,
    "contentType": "image/png",
    "sha256": "0208df6690d7fec6",
-   "web": "/images/chronicles/federation/fed-alliance-58-image.webp",
    "width": 750,
-   "height": 139
+   "height": 139,
+   "sensitive": true,
+   "excluded": "Discord screenshot exposing a full user tag (discriminator). Could be published if that line were cropped."
   },
   {
    "set": "alliance",
@@ -945,9 +947,10 @@
    "bytes": 333942,
    "contentType": "image/jpeg",
    "sha256": "06c711adbb743869",
-   "web": "/images/chronicles/federation/fed-alliance-79-image0.webp",
    "width": 1245,
-   "height": 1273
+   "height": 1273,
+   "sensitive": true,
+   "excluded": "Event poster carrying a named individual's contact details (Discord tag and IGN). Publishable only if that line is redacted."
   },
   {
    "set": "public",
