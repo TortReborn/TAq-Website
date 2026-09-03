@@ -24,7 +24,16 @@ interface SourceMeta {
   fetchedAt?: string;
   note?: string;
   textChars?: number;
+  tier?: string;
 }
+
+/** What each evidentiary tier means, stated on the page rather than assumed. */
+const TIER_NOTE: Record<string, string> = {
+  primary: 'Primary source — a record made at the time by the people involved.',
+  retrospective: 'Retrospective account — first-person, but recalled after the events. Treat dates and motives with care, and prefer a contemporaneous record where one exists.',
+  secondary: 'Secondary source — compiled or curated by others after the events, from sources of its own.',
+  derived: 'Derived from our own records and analysis rather than an outside document; the method is described below.',
+};
 
 function loadSource(id: string): { meta: SourceMeta; body: string } | null {
   if (!/^[A-Za-z0-9._-]+$/.test(id)) return null;
@@ -82,6 +91,16 @@ export default async function ReferencePage({ params }: { params: Promise<{ id: 
         margin: '0.9rem 0', padding: '0.75rem 0.9rem', borderRadius: '0.5rem',
         border: '1px solid var(--border-color)', background: 'var(--bg-card)', fontSize: '0.8rem',
       }}>
+        {meta.tier && (
+          <div style={{
+            marginBottom: '0.6rem', paddingBottom: '0.5rem',
+            borderBottom: '1px solid var(--border-color)',
+            color: 'var(--text-secondary)', lineHeight: 1.5,
+          }}>
+            <strong style={{ color: 'var(--text-primary)', textTransform: 'capitalize' }}>{meta.tier}</strong>
+            {' — '}{TIER_NOTE[meta.tier] ?? ''}
+          </div>
+        )}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem 1.25rem', marginBottom: meta.note ? '0.5rem' : 0 }}>
           {meta.kind && (
             <span style={{ color: 'var(--text-secondary)' }}>

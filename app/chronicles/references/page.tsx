@@ -22,7 +22,16 @@ interface SourceMeta {
   waybackCapture?: string;
   textChars?: number;
   note?: string;
+  tier?: string;
 }
+
+/** Evidentiary tiers, strongest first. */
+const TIERS: [string, string][] = [
+  ['primary', 'Records made at the time by the people involved.'],
+  ['retrospective', 'First-person, but recalled after the events.'],
+  ['secondary', 'Compiled or curated by others afterwards.'],
+  ['derived', 'Our own records, datasets and analysis.'],
+];
 
 const KIND_ORDER = ['forum-thread', 'community-document', 'testimony', 'dataset', 'internal-record', 'titan-times', 'wiki', 'api', 'repository', 'guild-site', 'video', 'memoir', 'web'];
 
@@ -60,6 +69,25 @@ export default async function ReferencesIndex() {
         citation points at a copy that will still be here. {Object.keys(sources).length} sources.
       </p>
 
+      <div style={{
+        margin: '0 0 1.5rem', padding: '0.75rem 0.9rem', borderRadius: '0.5rem',
+        border: '1px solid var(--border-color)', background: 'var(--bg-card)', fontSize: '0.8rem',
+      }}>
+        <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+          How sources are weighed
+        </div>
+        {TIERS.map(([tier, blurb]) => {
+          const n = Object.values(sources).filter(s => (s.tier ?? 'secondary') === tier).length;
+          if (!n) return null;
+          return (
+            <div key={tier} style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize', fontWeight: 600 }}>{tier}</span>
+              {' ('}{n}{') — '}{blurb}
+            </div>
+          );
+        })}
+      </div>
+
       {kinds.map(kind => (
         <section key={kind} style={{ marginBottom: '1.5rem' }}>
           <h2 style={{
@@ -77,6 +105,7 @@ export default async function ReferencesIndex() {
                 </Link>
                 <span style={{ color: 'var(--text-secondary)' }}>
                   {' · '}<code style={{ fontSize: '0.72rem' }}>{id}</code>
+                  {s.tier && s.tier !== 'primary' ? ` · ${s.tier}` : ''}
                   {s.waybackCapture ? ` · capture ${s.waybackCapture.slice(0, 8)}` : ''}
                 </span>
               </li>

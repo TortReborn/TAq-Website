@@ -64,6 +64,23 @@ best-effort; when a page looks mangled, the gzipped original is right there.
   text. The gzipped original in `raw/` still has them.
 - A capture and the live page are separate entries; cite the one you actually read.
 
+## Source tiers
+
+Each entry carries a `tier`, shown on its reference page and beside citations so
+a reader can weigh a claim without opening the source:
+
+| tier | meaning |
+|---|---|
+| `primary` | Made at the time by the people involved — era forum posts, Discord exports, API captures, the territory log. |
+| `retrospective` | First-person but recalled later — memoirs, oral testimony. |
+| `secondary` | Compiled or curated by others afterwards — community timelines, the game wiki. |
+| `derived` | Our own records, datasets and analysis. |
+
+The tier follows from the source's kind, with a short list of deliberate
+exceptions — a first-person account written years after the events is
+retrospective even though its author was present. Prefer primary evidence; where
+a retrospective or derived source is the only one, the article must say so.
+
 ## Scope
 
 Public pages only, stored for citation and preservation of a game community's

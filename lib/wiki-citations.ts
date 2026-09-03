@@ -43,6 +43,12 @@ export interface WikiCitation extends WikiCitationRef {
   referencePath?: string;
   /** Direct link to the Wayback capture, when the citation is to one */
   waybackUrl?: string;
+  /**
+   * Evidentiary tier: 'primary' (contemporaneous), 'retrospective' (first-person
+   * but recalled later), 'secondary' (compiled by others afterwards) or
+   * 'derived' (our own records and analysis).
+   */
+  tier?: string;
 }
 
 export type WikiCitationMap = Record<string, WikiCitation>;

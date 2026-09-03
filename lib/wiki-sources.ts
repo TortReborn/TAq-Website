@@ -23,6 +23,7 @@ interface ArchivedSource {
   title?: string;
   waybackCapture?: string;
   note?: string;
+  tier?: string;
 }
 
 let manifest: Record<string, ArchivedSource> | null = null;
@@ -63,6 +64,7 @@ export function resolveWikiCitations(body: string): WikiCitationMap {
         kind: archived.kind,
         waybackCapture: archived.waybackCapture,
         archived: true,
+        tier: archived.tier,
         referencePath: `/chronicles/references/${ref.ref}`,
         waybackUrl: archived.waybackCapture && /^https?:///.test(archived.url)
           ? `https://web.archive.org/web/${archived.waybackCapture}/${archived.url}`
