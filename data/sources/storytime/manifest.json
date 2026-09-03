@@ -7,7 +7,10 @@
    "file": "01-Holders_of_LE.png",
    "bytes": 36590,
    "contentType": "image/png",
-   "sha256": "d60186ddfee5d304"
+   "sha256": "d60186ddfee5d304",
+   "web": "/images/chronicles/storytime/01-Holders_of_LE.webp",
+   "width": 392,
+   "height": 388
   },
   {
    "index": 2,
@@ -15,7 +18,10 @@
    "file": "02-a64d84b0a8360b896c510f3abac7132c.png",
    "bytes": 70766,
    "contentType": "image/png",
-   "sha256": "366a91c6a6bdb171"
+   "sha256": "366a91c6a6bdb171",
+   "web": "/images/chronicles/storytime/02-a64d84b0a8360b896c510f3abac7132c.webp",
+   "width": 868,
+   "height": 343
   },
   {
    "index": 3,
@@ -23,7 +29,10 @@
    "file": "03-image.png",
    "bytes": 266880,
    "contentType": "image/png",
-   "sha256": "34a2b7a47de31d34"
+   "sha256": "34a2b7a47de31d34",
+   "web": "/images/chronicles/storytime/03-image.webp",
+   "width": 750,
+   "height": 650
   },
   {
    "index": 4,
@@ -31,7 +40,10 @@
    "file": "04-image.png",
    "bytes": 263315,
    "contentType": "image/png",
-   "sha256": "07412226a75b6a88"
+   "sha256": "07412226a75b6a88",
+   "web": "/images/chronicles/storytime/04-image.webp",
+   "width": 750,
+   "height": 947
   },
   {
    "index": 5,
@@ -39,7 +51,10 @@
    "file": "05-Territories.png",
    "bytes": 3064577,
    "contentType": "image/png",
-   "sha256": "9c0798eb1c4e7e20"
+   "sha256": "9c0798eb1c4e7e20",
+   "web": "/images/chronicles/storytime/05-Territories.webp",
+   "width": 1600,
+   "height": 783
   },
   {
    "index": 6,
@@ -47,7 +62,10 @@
    "file": "06-image.png",
    "bytes": 1526210,
    "contentType": "image/png",
-   "sha256": "44abef6569d3a6b0"
+   "sha256": "44abef6569d3a6b0",
+   "web": "/images/chronicles/storytime/06-image.webp",
+   "width": 1198,
+   "height": 593
   },
   {
    "index": 7,
@@ -55,7 +73,10 @@
    "file": "07-Ordo.png",
    "bytes": 543027,
    "contentType": "image/png",
-   "sha256": "1a211579d721ae63"
+   "sha256": "1a211579d721ae63",
+   "web": "/images/chronicles/storytime/07-Ordo.webp",
+   "width": 1024,
+   "height": 768
   },
   {
    "index": 8,
@@ -69,7 +90,10 @@
    "file": "09-image.png",
    "bytes": 251570,
    "contentType": "image/png",
-   "sha256": "139e93e6e30c4cf8"
+   "sha256": "139e93e6e30c4cf8",
+   "web": "/images/chronicles/storytime/09-image.webp",
+   "width": 750,
+   "height": 940
   },
   {
    "index": 10,
@@ -77,7 +101,10 @@
    "file": "10-image.png",
    "bytes": 457025,
    "contentType": "image/png",
-   "sha256": "aeca4ce522f8ce22"
+   "sha256": "aeca4ce522f8ce22",
+   "web": "/images/chronicles/storytime/10-image.webp",
+   "width": 635,
+   "height": 315
   },
   {
    "index": 11,
@@ -85,7 +112,10 @@
    "file": "11-image.png",
    "bytes": 435910,
    "contentType": "image/png",
-   "sha256": "aaead3be4a05aea1"
+   "sha256": "aaead3be4a05aea1",
+   "web": "/images/chronicles/storytime/11-image.webp",
+   "width": 636,
+   "height": 363
   },
   {
    "index": 12,
@@ -93,7 +123,10 @@
    "file": "12-image.png",
    "bytes": 1578454,
    "contentType": "image/png",
-   "sha256": "4372db5534d9cccf"
+   "sha256": "4372db5534d9cccf",
+   "web": "/images/chronicles/storytime/12-image.webp",
+   "width": 1210,
+   "height": 586
   },
   {
    "index": 13,
@@ -101,7 +134,10 @@
    "file": "13-image.png",
    "bytes": 1241388,
    "contentType": "image/png",
-   "sha256": "2b37ef5295568a7e"
+   "sha256": "2b37ef5295568a7e",
+   "web": "/images/chronicles/storytime/13-image.webp",
+   "width": 1200,
+   "height": 1200
   },
   {
    "index": 14,
@@ -109,7 +145,10 @@
    "file": "14-image.png",
    "bytes": 516708,
    "contentType": "image/png",
-   "sha256": "f6a1d17f29db60ba"
+   "sha256": "f6a1d17f29db60ba",
+   "web": "/images/chronicles/storytime/14-image.webp",
+   "width": 762,
+   "height": 288
   },
   {
    "index": 15,
@@ -117,7 +156,10 @@
    "file": "15-image.png",
    "bytes": 324393,
    "contentType": "image/png",
-   "sha256": "fc66f1a9f4eeb9b7"
+   "sha256": "fc66f1a9f4eeb9b7",
+   "web": "/images/chronicles/storytime/15-image.webp",
+   "width": 750,
+   "height": 1150
   },
   {
    "index": 16,
@@ -125,7 +167,10 @@
    "file": "16-image.png",
    "bytes": 17227,
    "contentType": "image/png",
-   "sha256": "6db81e11d9fa7c21"
+   "sha256": "6db81e11d9fa7c21",
+   "web": "/images/chronicles/storytime/16-image.webp",
+   "width": 980,
+   "height": 325
   },
   {
    "index": 17,
@@ -133,7 +178,10 @@
    "file": "17-image.png",
    "bytes": 409281,
    "contentType": "image/png",
-   "sha256": "1b5298688c521d3c"
+   "sha256": "1b5298688c521d3c",
+   "web": "/images/chronicles/storytime/17-image.webp",
+   "width": 750,
+   "height": 1290
   },
   {
    "index": 18,
@@ -141,7 +189,10 @@
    "file": "18-image.png",
    "bytes": 34601,
    "contentType": "image/png",
-   "sha256": "5d31fce77ad231b2"
+   "sha256": "5d31fce77ad231b2",
+   "web": "/images/chronicles/storytime/18-image.webp",
+   "width": 800,
+   "height": 300
   },
   {
    "index": 19,
@@ -149,7 +200,10 @@
    "file": "19-image.png",
    "bytes": 156900,
    "contentType": "image/png",
-   "sha256": "30a505e08e65ab0a"
+   "sha256": "30a505e08e65ab0a",
+   "web": "/images/chronicles/storytime/19-image.webp",
+   "width": 696,
+   "height": 295
   },
   {
    "index": 20,
@@ -157,7 +211,10 @@
    "file": "20-image.png",
    "bytes": 101621,
    "contentType": "image/png",
-   "sha256": "52d7edaf7e3100d1"
+   "sha256": "52d7edaf7e3100d1",
+   "web": "/images/chronicles/storytime/20-image.webp",
+   "width": 500,
+   "height": 500
   },
   {
    "index": 21,
@@ -165,7 +222,10 @@
    "file": "21-image.png",
    "bytes": 355055,
    "contentType": "image/png",
-   "sha256": "ca03e975a967da68"
+   "sha256": "ca03e975a967da68",
+   "web": "/images/chronicles/storytime/21-image.webp",
+   "width": 750,
+   "height": 1258
   },
   {
    "index": 22,
@@ -173,7 +233,10 @@
    "file": "22-image.png",
    "bytes": 137039,
    "contentType": "image/png",
-   "sha256": "0e979f48d9c6bfa4"
+   "sha256": "0e979f48d9c6bfa4",
+   "web": "/images/chronicles/storytime/22-image.webp",
+   "width": 750,
+   "height": 503
   },
   {
    "index": 23,
@@ -181,7 +244,10 @@
    "file": "23-image.png",
    "bytes": 171488,
    "contentType": "image/png",
-   "sha256": "05b58a4e3919f111"
+   "sha256": "05b58a4e3919f111",
+   "web": "/images/chronicles/storytime/23-image.webp",
+   "width": 750,
+   "height": 604
   },
   {
    "index": 24,
@@ -189,7 +255,10 @@
    "file": "24-image.png",
    "bytes": 61349,
    "contentType": "image/png",
-   "sha256": "213a0c376ef39b3b"
+   "sha256": "213a0c376ef39b3b",
+   "web": "/images/chronicles/storytime/24-image.webp",
+   "width": 750,
+   "height": 250
   },
   {
    "index": 25,
@@ -197,7 +266,10 @@
    "file": "25-image.png",
    "bytes": 84826,
    "contentType": "image/png",
-   "sha256": "7c4527bcc623b170"
+   "sha256": "7c4527bcc623b170",
+   "web": "/images/chronicles/storytime/25-image.webp",
+   "width": 980,
+   "height": 325
   },
   {
    "index": 26,
@@ -205,7 +277,10 @@
    "file": "26-image.png",
    "bytes": 152589,
    "contentType": "image/png",
-   "sha256": "f6d2b803618996a7"
+   "sha256": "f6d2b803618996a7",
+   "web": "/images/chronicles/storytime/26-image.webp",
+   "width": 750,
+   "height": 311
   },
   {
    "index": 27,
@@ -213,7 +288,10 @@
    "file": "27-image.png",
    "bytes": 216805,
    "contentType": "image/png",
-   "sha256": "33aa7df49d6da85d"
+   "sha256": "33aa7df49d6da85d",
+   "web": "/images/chronicles/storytime/27-image.webp",
+   "width": 750,
+   "height": 714
   },
   {
    "index": 28,
@@ -221,7 +299,10 @@
    "file": "28-image.png",
    "bytes": 235202,
    "contentType": "image/png",
-   "sha256": "eadf08a4e8c8e377"
+   "sha256": "eadf08a4e8c8e377",
+   "web": "/images/chronicles/storytime/28-image.webp",
+   "width": 750,
+   "height": 758
   },
   {
    "index": 29,
@@ -229,7 +310,10 @@
    "file": "29-proxy.png",
    "bytes": 83776,
    "contentType": "image/png",
-   "sha256": "213534d0b7bbae4b"
+   "sha256": "213534d0b7bbae4b",
+   "web": "/images/chronicles/storytime/29-proxy.webp",
+   "width": 980,
+   "height": 325
   },
   {
    "index": 30,
@@ -237,7 +321,10 @@
    "file": "30-image.jpg",
    "bytes": 383594,
    "contentType": "image/jpeg",
-   "sha256": "7e48409ff9c0bfbd"
+   "sha256": "7e48409ff9c0bfbd",
+   "web": "/images/chronicles/storytime/30-image.webp",
+   "width": 1334,
+   "height": 750
   },
   {
    "index": 31,
@@ -245,7 +332,10 @@
    "file": "31-proxy.png",
    "bytes": 252296,
    "contentType": "image/png",
-   "sha256": "76c010eb142ffcdd"
+   "sha256": "76c010eb142ffcdd",
+   "web": "/images/chronicles/storytime/31-proxy.webp",
+   "width": 750,
+   "height": 750
   },
   {
    "index": 32,
@@ -253,7 +343,10 @@
    "file": "32-eJwVzMENwyAMAMBdGAAbTBKabRBBhCrUCLuvqru3.png",
    "bytes": 1114475,
    "contentType": "image/png",
-   "sha256": "ba22d2b1a551dbb6"
+   "sha256": "ba22d2b1a551dbb6",
+   "web": "/images/chronicles/storytime/32-eJwVzMENwyAMAMBdGAAbTBKabRBBhCrUCLuvqru3.webp",
+   "width": 1600,
+   "height": 848
   },
   {
    "index": 33,
@@ -261,7 +354,10 @@
    "file": "33-Screen_Shot_2017-06-02_at_6.png",
    "bytes": 261341,
    "contentType": "image/png",
-   "sha256": "e96edab7f63d10b5"
+   "sha256": "e96edab7f63d10b5",
+   "web": "/images/chronicles/storytime/33-Screen_Shot_2017-06-02_at_6.webp",
+   "width": 1496,
+   "height": 942
   },
   {
    "index": 34,
@@ -269,7 +365,10 @@
    "file": "34-image.png",
    "bytes": 72753,
    "contentType": "image/png",
-   "sha256": "1c28dcd1e14ea925"
+   "sha256": "1c28dcd1e14ea925",
+   "web": "/images/chronicles/storytime/34-image.webp",
+   "width": 980,
+   "height": 325
   },
   {
    "index": 35,
@@ -283,7 +382,10 @@
    "file": "36-image.jpg",
    "bytes": 22808,
    "contentType": "image/jpeg",
-   "sha256": "cd6cb2985de585e8"
+   "sha256": "cd6cb2985de585e8",
+   "web": "/images/chronicles/storytime/36-image.webp",
+   "width": 283,
+   "height": 301
   },
   {
    "index": 37,
@@ -291,7 +393,10 @@
    "file": "37-image.png",
    "bytes": 225846,
    "contentType": "image/png",
-   "sha256": "3bb8313b4f5de461"
+   "sha256": "3bb8313b4f5de461",
+   "web": "/images/chronicles/storytime/37-image.webp",
+   "width": 750,
+   "height": 667
   },
   {
    "index": 38,
@@ -299,7 +404,10 @@
    "file": "38-image.png",
    "bytes": 84689,
    "contentType": "image/png",
-   "sha256": "2495e0be4d886286"
+   "sha256": "2495e0be4d886286",
+   "web": "/images/chronicles/storytime/38-image.webp",
+   "width": 750,
+   "height": 271
   },
   {
    "index": 39,
@@ -307,7 +415,10 @@
    "file": "39-image.png",
    "bytes": 69860,
    "contentType": "image/png",
-   "sha256": "afee44c9c5aa92b0"
+   "sha256": "afee44c9c5aa92b0",
+   "web": "/images/chronicles/storytime/39-image.webp",
+   "width": 600,
+   "height": 785
   },
   {
    "index": 40,
@@ -315,7 +426,10 @@
    "file": "40-image.jpg",
    "bytes": 56481,
    "contentType": "image/jpeg",
-   "sha256": "3d0f0730906bdec5"
+   "sha256": "3d0f0730906bdec5",
+   "web": "/images/chronicles/storytime/40-image.webp",
+   "width": 626,
+   "height": 148
   },
   {
    "index": 41,
@@ -323,7 +437,10 @@
    "file": "41-image.png",
    "bytes": 27199,
    "contentType": "image/png",
-   "sha256": "92c9786f006565ba"
+   "sha256": "92c9786f006565ba",
+   "web": "/images/chronicles/storytime/41-image.webp",
+   "width": 743,
+   "height": 123
   },
   {
    "index": 42,
@@ -331,7 +448,10 @@
    "file": "42-image.png",
    "bytes": 655743,
    "contentType": "image/png",
-   "sha256": "f4613f26057d9aa0"
+   "sha256": "f4613f26057d9aa0",
+   "web": "/images/chronicles/storytime/42-image.webp",
+   "width": 750,
+   "height": 764
   },
   {
    "index": 43,
@@ -339,7 +459,10 @@
    "file": "43-image.jpg",
    "bytes": 382545,
    "contentType": "image/jpeg",
-   "sha256": "305c9bee566ca29b"
+   "sha256": "305c9bee566ca29b",
+   "web": "/images/chronicles/storytime/43-image.webp",
+   "width": 1095,
+   "height": 887
   },
   {
    "index": 44,
@@ -347,7 +470,10 @@
    "file": "44-image.jpg",
    "bytes": 293427,
    "contentType": "image/jpeg",
-   "sha256": "d46e3d1e9baef694"
+   "sha256": "d46e3d1e9baef694",
+   "web": "/images/chronicles/storytime/44-image.webp",
+   "width": 1200,
+   "height": 772
   },
   {
    "index": 45,
@@ -355,7 +481,10 @@
    "file": "45-image.jpg",
    "bytes": 303131,
    "contentType": "image/jpeg",
-   "sha256": "8f88aed1fe55fe09"
+   "sha256": "8f88aed1fe55fe09",
+   "web": "/images/chronicles/storytime/45-image.webp",
+   "width": 848,
+   "height": 702
   },
   {
    "index": 46,
@@ -363,7 +492,10 @@
    "file": "46-image.jpg",
    "bytes": 307542,
    "contentType": "image/jpeg",
-   "sha256": "94fbc4f8917e15c0"
+   "sha256": "94fbc4f8917e15c0",
+   "web": "/images/chronicles/storytime/46-image.webp",
+   "width": 1152,
+   "height": 864
   },
   {
    "index": 47,
@@ -371,7 +503,10 @@
    "file": "47-dragoons_emblem.png",
    "bytes": 217027,
    "contentType": "image/png",
-   "sha256": "049de46be3d65fa8"
+   "sha256": "049de46be3d65fa8",
+   "web": "/images/chronicles/storytime/47-dragoons_emblem.webp",
+   "width": 670,
+   "height": 670
   },
   {
    "index": 48,
@@ -379,7 +514,10 @@
    "file": "48-unknown.png",
    "bytes": 81558,
    "contentType": "image/png",
-   "sha256": "265cdc42aa5efbf4"
+   "sha256": "265cdc42aa5efbf4",
+   "web": "/images/chronicles/storytime/48-unknown.webp",
+   "width": 622,
+   "height": 524
   },
   {
    "index": 49,
@@ -387,7 +525,10 @@
    "file": "49-unknown.png",
    "bytes": 150042,
    "contentType": "image/png",
-   "sha256": "bb6675588bb87124"
+   "sha256": "bb6675588bb87124",
+   "web": "/images/chronicles/storytime/49-unknown.webp",
+   "width": 1043,
+   "height": 923
   },
   {
    "index": 50,
@@ -395,7 +536,10 @@
    "file": "50-image.png",
    "bytes": 167189,
    "contentType": "image/png",
-   "sha256": "8d07f8fe681e8011"
+   "sha256": "8d07f8fe681e8011",
+   "web": "/images/chronicles/storytime/50-image.webp",
+   "width": 750,
+   "height": 340
   },
   {
    "index": 51,
@@ -403,7 +547,10 @@
    "file": "51-d5fa4a2f822f1bea744320067a6c1a73-png.png",
    "bytes": 138136,
    "contentType": "image/png",
-   "sha256": "bf4daf2f1eaa352d"
+   "sha256": "bf4daf2f1eaa352d",
+   "web": "/images/chronicles/storytime/51-d5fa4a2f822f1bea744320067a6c1a73-png.webp",
+   "width": 229,
+   "height": 627
   },
   {
    "index": 52,
@@ -411,7 +558,10 @@
    "file": "52-Gavel1.jpg",
    "bytes": 353329,
    "contentType": "image/jpeg",
-   "sha256": "7d937621741943e6"
+   "sha256": "7d937621741943e6",
+   "web": "/images/chronicles/storytime/52-Gavel1.webp",
+   "width": 1200,
+   "height": 635
   },
   {
    "index": 53,
@@ -419,7 +569,10 @@
    "file": "53-image.png",
    "bytes": 135392,
    "contentType": "image/png",
-   "sha256": "b745fc65f4b07004"
+   "sha256": "b745fc65f4b07004",
+   "web": "/images/chronicles/storytime/53-image.webp",
+   "width": 750,
+   "height": 456
   },
   {
    "index": 54,
@@ -427,7 +580,10 @@
    "file": "54-Gavel27.jpg",
    "bytes": 1217530,
    "contentType": "image/jpeg",
-   "sha256": "e90e4fafc4ca1499"
+   "sha256": "e90e4fafc4ca1499",
+   "web": "/images/chronicles/storytime/54-Gavel27.webp",
+   "width": 1600,
+   "height": 836
   },
   {
    "index": 55,
@@ -435,7 +591,10 @@
    "file": "55-dragoon_poster.png",
    "bytes": 427164,
    "contentType": "image/png",
-   "sha256": "155d07961e3cfec9"
+   "sha256": "155d07961e3cfec9",
+   "web": "/images/chronicles/storytime/55-dragoon_poster.webp",
+   "width": 600,
+   "height": 920
   },
   {
    "index": 56,
@@ -443,7 +602,10 @@
    "file": "56-Map9_-_Copy.png",
    "bytes": 2628792,
    "contentType": "image/png",
-   "sha256": "ce9360492509d99a"
+   "sha256": "ce9360492509d99a",
+   "web": "/images/chronicles/storytime/56-Map9_-_Copy.webp",
+   "width": 1600,
+   "height": 786
   },
   {
    "index": 57,
@@ -451,7 +613,10 @@
    "file": "57-Map9Wynn2_-_Copy.png",
    "bytes": 1601536,
    "contentType": "image/png",
-   "sha256": "e1f27ebbf0a7f8b2"
+   "sha256": "e1f27ebbf0a7f8b2",
+   "web": "/images/chronicles/storytime/57-Map9Wynn2_-_Copy.webp",
+   "width": 1140,
+   "height": 888
   },
   {
    "index": 58,
@@ -459,7 +624,10 @@
    "file": "58-52bb6b02a8a9f0906e04907a12ab07bd.png",
    "bytes": 79786,
    "contentType": "image/png",
-   "sha256": "f2cc935bbc72bb58"
+   "sha256": "f2cc935bbc72bb58",
+   "web": "/images/chronicles/storytime/58-52bb6b02a8a9f0906e04907a12ab07bd.webp",
+   "width": 608,
+   "height": 213
   },
   {
    "index": 59,
@@ -467,7 +635,10 @@
    "file": "59-Deus_Vult.png",
    "bytes": 356294,
    "contentType": "image/png",
-   "sha256": "e465b439930cec77"
+   "sha256": "e465b439930cec77",
+   "web": "/images/chronicles/storytime/59-Deus_Vult.webp",
+   "width": 900,
+   "height": 900
   },
   {
    "index": 60,
@@ -475,7 +646,10 @@
    "file": "60-image0.jpg",
    "bytes": 119380,
    "contentType": "image/jpeg",
-   "sha256": "2ad277342f691371"
+   "sha256": "2ad277342f691371",
+   "web": "/images/chronicles/storytime/60-image0.webp",
+   "width": 996,
+   "height": 996
   },
   {
    "index": 61,
@@ -483,7 +657,10 @@
    "file": "61-OFFICIAL_FOX_FLAG.png",
    "bytes": 357897,
    "contentType": "image/png",
-   "sha256": "3e91ccb7b6c91fde"
+   "sha256": "3e91ccb7b6c91fde",
+   "web": "/images/chronicles/storytime/61-OFFICIAL_FOX_FLAG.webp",
+   "width": 1600,
+   "height": 960
   },
   {
    "index": 62,
@@ -491,7 +668,10 @@
    "file": "62-image.png",
    "bytes": 139329,
    "contentType": "image/png",
-   "sha256": "0436f7b0f2dcb0b6"
+   "sha256": "0436f7b0f2dcb0b6",
+   "web": "/images/chronicles/storytime/62-image.webp",
+   "width": 805,
+   "height": 375
   },
   {
    "index": 63,
@@ -499,7 +679,10 @@
    "file": "63-image0.png",
    "bytes": 153723,
    "contentType": "image/png",
-   "sha256": "abaf1369b1b533f7"
+   "sha256": "abaf1369b1b533f7",
+   "web": "/images/chronicles/storytime/63-image0.webp",
+   "width": 828,
+   "height": 542
   },
   {
    "index": 64,
@@ -507,7 +690,10 @@
    "file": "64-Screenshot_20180516-104350.png",
    "bytes": 389863,
    "contentType": "image/png",
-   "sha256": "0d88f2877d5345d6"
+   "sha256": "0d88f2877d5345d6",
+   "web": "/images/chronicles/storytime/64-Screenshot_20180516-104350.webp",
+   "width": 1080,
+   "height": 1920
   }
  ]
 }
