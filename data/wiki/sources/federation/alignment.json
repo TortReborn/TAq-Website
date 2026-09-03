@@ -1,5 +1,5 @@
 {
- "$comment": "PROVISIONAL mapping of Federation announcement images to the Image markers in the channel exports, by order of appearance. Each entry carries the message author and timestamp the marker sits under, which makes verification straightforward. Alignment must be checked visually before an image is used — an earlier corpus was mis-mapped this way.",
+ "$comment": "VERIFIED image records for the Federation announcement channels. Every image was opened and described; ordinal alignment held throughout (0 mismatches), unlike the storytime corpus. CAVEATS: marker 4 shows the LIVE map at posting, not the 20-guild March division described in that message; and textBefore is misleading for markers 14-17 and later Viaire posts, where the territory list follows the images rather than preceding them. Entries with excluded set must not be published.",
  "images": [
   {
    "channel": "alliance",
@@ -14,8 +14,13 @@
    ],
    "file": "fed-alliance-01-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-01-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft website territory map, isometric 3-D render, Gavel-province viewport (mainland running SW-to-NE with the Realm of Light shown as a detached ~12-tile parallelogram at upper left, volcanic/Molten terrain at the far NE corner, open ocean lower right). Every territory is tinted in its owning guild's colour with a coloured blob marker. A 'Guild Counts (.../382)' panel is docked at the left edge but is cropped so only the right-hand part of each guild name survives; readable as: '...me: 54', '...of LE: 45', '...: 41', '...Swords: 37', '...: 33', '...gUs: 24', '...: 20', '...: 19', '...Foxes: 18', '...: 17', '...ight: 16', '...: 14', '...Eternal: 7', '...od: 5', '...: 5', '...: 3', '...s: 3', '...Phoenixes: 3', '...Eris: 3', '...Sentinels: 2', '...berOne: 1', '...United: 1', '...esGalo: 1', '...ire: 1', '...ypse: 1', '...: 1' - about 26 guilds sharing 382 territories, i.e. the broad spread the 21 Feb division describes. Bottom-right tooltip reads 'Territory: Zhight Island Owned by Illustratus / Clicked Location: -511, 64, -2810'; bottom-left coordinate readout 'X 2028 Z -5044 (3, -10)'; footer 'Image may be subject to copyright  Terms of Use'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the three maps Drew1011 posted 2/22/2018 5:57 AM under the 2/21 territory-division list. The 'Illustratus' tooltip corroborates the 2/21 line 'Illustratus [lus]: Nemract (Gray)'. Guild set (Divine Swords, DogsAmongUs, Kingdom Foxes, Angels of Eternal, KingdomPhoenixes, Holders of LE) is the February roster, not the later ones.",
+   "usableFor": "the-federation - the February 1018 territory division (Gavel province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -30,8 +35,13 @@
    ],
    "file": "fed-alliance-02-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-02-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Same Wynncraft isometric territory map, ocean viewport: the Great Sea between Gavel (upper left) and Wynn (right/lower right), with Corkus and the island chains claimed. Territory tints visible: a large purple/maroon-tinted rocky island block upper-left-of-centre; teal/cyan island squares in the north; orange and gold-blobbed islands scattered mid-ocean and in the south-west; a gold/yellow-blobbed cluster over the green south-western landmass; a crimson/red island south of centre; violet and purple islands along the eastern (Wynn) coastline. Top-right tab label 'Wynncraft - Territor[ies]'. No legend panel visible.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the three maps posted 2/22/2018; the ocean sheet of the same three-part set (Gavel / Ocean / Wynn) that later posts repeat with explicit filenames.",
+   "usableFor": "the-federation - the February 1018 territory division (ocean and islands)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -46,8 +56,13 @@
    ],
    "file": "fed-alliance-03-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-03-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Same Wynncraft isometric territory map, Wynn-province viewport: ocean at upper left, the Wynn landmass filling the frame, the snow-capped mountain spine and the crimson canyon terrain at the bottom, and the giant white block-built runic (Wynnic) glyphs on the right-hand black margin that identify this framing in every later 'Wynn' screenshot. Densely claimed - roughly a hundred tinted squares in purple, violet, teal, lime, spring green, olive, orange, pale grey/white, crimson, pink, cream and sky blue, with several black (FFA) tiles. No legend panel visible.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the three maps posted 2/22/2018 - the Wynn sheet of the Gavel/Ocean/Wynn set.",
+   "usableFor": "the-federation - the February 1018 territory division (Wynn province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -62,8 +77,13 @@
    ],
    "file": "fed-alliance-04-Gavel.png",
    "web": "/images/chronicles/federation/fed-alliance-04-Gavel.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft website territory map (full-resolution browser screenshot, 1916x952), Gavel-province viewport: mainland SW-to-NE, Realm of Light as a detached tan block of ~13 tiles at upper left tinted gold with orange markers, volcanic terrain at the NE corner, ocean lower right. Header 'WC6 - You'll see your party, friends, and guild that are online WC6'; top-right controls 'Wynncraft - Territories' and 'Overlays'. The left panel reads in full: 'Territory Counts (382/382) - Kingdom Foxes: 88 (orange); BuildCraftia: 63 (green); Imperial: 60 (dark red); Fantasy: 52 (light blue); Sins of Seedia: 47 (lime); The Hive: 22 (yellow-green); Titans Valor: 20 (gold); Paladins United: 16 (pale pink); IceBlue Team: 6 (pale blue); Holders Of LE: 4 (spring green); Angels Of Eternal: 1 (aquamarine); Kangronomicon: 1 (light blue); New York Nibbas: 1 (violet); LE Flowers: 1 (cyan)'. The counts total exactly 382 across only 14 guilds.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the three maps posted with the 3/10/2018 2:11 PM territory assignment. IMPORTANT for citation: the legend shows the LIVE map at the moment of posting, not the 20-guild division written in the message - a heavily concentrated post-war state (Foxes 88, BuildCraftia 63, Imperial 60) that the 3/10 announcement was redistributing. The roster dates it to 8 Mar-22 Apr 1018: Paladins United (joined 3/8) is present and BuildCraftia and Titans Valor (both gone by the 4/22 list) still hold land.",
+   "usableFor": "the-federation - the March 1018 redistribution; evidence of the concentration of territory in a few guilds after the early-March war",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -78,8 +98,13 @@
    ],
    "file": "fed-alliance-05-Ocean.png",
    "web": "/images/chronicles/federation/fed-alliance-05-Ocean.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, ocean viewport (800x441 crop), header 'WC6'. Tan/orange-tinted islands with cream markers across the northern and central ocean; a cluster of white-marked tiles and a crimson/red-marked group on the green-and-dark-red landmass in the south-west (Corkus); pale-grey/white tiles on the southern islands; grey-blue tinted island squares at upper left. Ocean otherwise unclaimed.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the three maps posted 3/10/2018 2:11 PM. Consistent with the accompanying text lines 'Paladins United [PUN], 22 terrs, South Ocean + Part of Corkus (White)' and 'Titans Valor [ANO], 20 terrs, Light Realm + North Ocean (Tan)'.",
+   "usableFor": "the-federation - the March 1018 territory division (ocean and Corkus)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -94,8 +119,13 @@
    ],
    "file": "fed-alliance-06-Wynn.png",
    "web": "/images/chronicles/federation/fed-alliance-06-Wynn.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Wynn-province viewport (800x483 crop), header 'WC6'; the giant white runic glyphs sit on the black margin at right. Claimed blocks visible: a large sky-blue/cyan band across the north-east; gold/amber tiles through the centre-north; bright green through the west and centre; magenta/pink tiles in the west-centre; dark red and crimson along the south and south-west; yellow tiles at the south-east edge; several black FFA tiles. Ocean and islands at upper left.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the three maps posted 3/10/2018 2:11 PM - the Wynn sheet.",
+   "usableFor": "the-federation - the March 1018 territory division (Wynn province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -110,8 +140,13 @@
    ],
    "file": "fed-alliance-07-WynnMap.png",
    "web": "/images/chronicles/federation/fed-alliance-07-WynnMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Wynn/ocean viewport (800x414), header 'WC7 - You'll see your party, friends, and guild that are online WC7'; runic glyphs on the right margin. White-marked tiles blanket the dark-red rocky landmass at bottom-left (Corkus); pink/hot-pink marked islands are scattered through the northern and central ocean; lime-green, blue and pale-pink island squares dot mid-ocean; the Wynn landmass on the right carries lime, purple, violet, teal, orange and green claims. A partial guild-count panel is cut off at the very top-left edge and is unreadable.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the two maps posted under the 3/24/2018 1:14 PM list ('New map out! Bon appetit'). Matches its text: 'Paladins United [PUN], 19 terrs, Corkus (White)' and 'Angels of Eternal [AoE], 22 terrs, Main Kander + Parts of Ocean (Hot Pink)'.",
+   "usableFor": "the-federation - the 24 March 1018 territory division (Wynn and ocean)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -126,8 +161,13 @@
    ],
    "file": "fed-alliance-08-GavelMap.png",
    "web": "/images/chronicles/federation/fed-alliance-08-GavelMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Gavel viewport (800x402), header 'WC7'. The Realm of Light floats detached at upper left as a tan/gold block of about thirteen tiles with cream markers. On the mainland, from SW to NE: a dense bright-yellow cluster at the south-west tip, magenta/pink beside it, red and crimson through the centre-west, pale pink/white, bright green and cyan through the middle, a dark-blue cluster north of centre, then green-with-orange and orange claims at the north-east, with dark volcanic terrain at the top edge. Ocean and further claimed islands at the lower right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the two maps posted 3/24/2018. Strong corroboration of the text: 'Titans Valor [ANO], 13 terrs, Light Realm (Tan)' - the detached block holds roughly thirteen tan tiles - plus 'KingdomPhoenixes [Phx] ... Llevigar (Yellow)' at the south-west tip and 'Imperial [Imp], 33 terrs, Light Forest + Aldorei (Bright Red)' in the centre.",
+   "usableFor": "the-federation - the 24 March 1018 territory division (Gavel and the Realm of Light)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -142,8 +182,13 @@
    ],
    "file": "fed-alliance-09-wynn.png",
    "web": "/images/chronicles/federation/fed-alliance-09-wynn.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Wynn/ocean viewport (800x482), no header bar; runic glyphs on the right margin. Three small gold/yellow-marked island tiles sit alone in the centre-south ocean; pale-blue and cyan island squares occupy the north and west ocean; the dark-red Corkus landmass at lower left carries crimson and pink markers; the Wynn landmass at right is covered in hot-pink/magenta markers along its eastern (desert) side with cyan, lime, orange and violet claims towards the middle; teal and crimson tiles at the bottom edge.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the two maps posted under the 4/22/2018 2:34 PM assignment. Matches its text: 'Hall of Fame [HoF]: south ocean -> 3 territories (Yellow)' (exactly three isolated yellow islands), 'The Divine Swords [DsQ]: wynn desert -> 17 territories (Hot Pink)' and 'Imperial [Imp]: light forest, aldorei, north corkus -> 39 territories (Dark Red)'.",
+   "usableFor": "the-federation - the 22 April 1018 territory division (Wynn and ocean)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -158,8 +203,13 @@
    ],
    "file": "fed-alliance-10-gavel.png",
    "web": "/images/chronicles/federation/fed-alliance-10-gavel.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Gavel viewport (801x415), no header bar. The Realm of Light floats detached at upper left as a tan block of roughly a dozen tiles marked in gold/amber. The mainland shows, west to east: violet and blue claims at the SW (Llevigar), orange and pale-blue through the west, a crimson/dark-red band through the centre, a large cyan/turquoise block east of centre, red markers beside it, then blue, purple and magenta claims to the NE, with orange-brown volcanic terrain at the top-right corner. Claimed islands in the ocean at lower right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the two maps posted 4/22/2018. The gold-marked Realm of Light matches 'Titans Valor [ANO]: light realm -> 13 territories (light orange)'.",
+   "usableFor": "the-federation - the 22 April 1018 territory division (Gavel and the Realm of Light)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -174,8 +224,13 @@
    ],
    "file": "fed-alliance-11-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-11-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Event poster on a white background. Verbatim text: 'DANCE OF THE DAMNED' (dark red display type) above the Sins of Seedia guild emblem - a flame-and-crossed-swords crest reading 'SINS OF SEEDIA'; then 'SINS OF SEEDIA ONE YEAR EVENT'; 'JOIN US FOR' with the bullets 'Item bombs', 'Legendary Give aways', 'Following Csst', 'Speeches and words regarding the sins'; and at the foot 'May 6, 11AM CST / 16:00 UTC, Troms'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Posted 5/4/2018 7:00 AM directly under the SDU leader's invitation, whose text gives the identical time and place ('Sunday, May 6th, 11:00am CST/16:00 UTC, Troms').",
+   "usableFor": "sins-of-seedia - the guild's one-year anniversary event, 6 May 1018; the-federation - alliance social life",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -190,8 +245,13 @@
    ],
    "file": "fed-alliance-12-image.png",
    "web": "/images/chronicles/federation/fed-alliance-12-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Gavel viewport (750x394). The Realm of Light floats detached at upper left as a tan block of about twelve tiles, now marked in dark purple. Mainland claims from SW to NE: violet, blue and orange at the south-west; light blue and cyan through the west; a large crimson/dark-red block in the centre; a big cyan/turquoise block east of centre; red markers to its east; blue and purple at the north-east; magenta and violet along the eastern edge; orange-brown volcanic terrain at the top-right corner. Ocean with claimed islands at lower right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the two maps posted 5/10/2018 10:32 PM, immediately above the 'Territory Assignment' list. The dark-purple Realm of Light confirms the new line '(13) Constellations [Ari] - light realm (dark purple)', replacing Titans Valor who had been kicked on 5/4.",
+   "usableFor": "the-federation - the 10 May 1018 territory assignment; evidence of Constellations taking the Realm of Light after Titans Valor's expulsion",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -206,8 +266,13 @@
    ],
    "file": "fed-alliance-13-image.png",
    "web": "/images/chronicles/federation/fed-alliance-13-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynncraft isometric territory map, Wynn/ocean viewport (750x450); runic glyphs on the right margin. Three isolated gold/yellow island tiles in the centre ocean; teal, cyan and pale-blue island squares north and west; white-marked tiles at the top of the ocean; the Corkus landmass at lower left in crimson and pink; the Wynn landmass at right carrying a dense band of gold, lime, cyan and orange markers through the middle and magenta/pink along the far eastern edge, with teal and crimson at the bottom.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the two maps posted 5/10/2018 10:32 PM with the Territory Assignment list.",
+   "usableFor": "the-federation - the 10 May 1018 territory assignment (Wynn and ocean)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -222,8 +287,13 @@
    ],
    "file": "fed-alliance-14-WynnMap.png",
    "web": "/images/chronicles/federation/fed-alliance-14-WynnMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "A different and far more legible map style: a flat top-down Wynn-province map (1066x870) with every territory outlined and stamped with its owner's guild tag on a coloured disc. Readable claims - TNL (green) across the Ragni region in the west; HoF (yellow) over Detlas, Nemract and the northern coast; TWO (light green, Kasai Shinrai) through Nivla Forest; THI (purple/magenta) across the centre and south; Fux (pale blue) east of centre; SDU (red) in the north-east savannah and again over the dark-red jungle in the south-west; DsQ (magenta) blanketing the eastern desert; Mox (orange) over the snowy Nesaak belt in the south-centre; DDT (pale blue) on exactly three tiles at the west-centre; several black FFA tiles.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the four maps Viaire posted 6/4/2018 2:37 PM; note the Territory Assignment list follows the images in the export rather than preceding them, so alignment.json's textBefore for this marker is the previous (5/10) message. Content matches the 6/4 list specifically - '(3) DiamondDeities [DDT] - Pigmen ravine' (exactly three DDT tiles), '(15) TheNoLifes [TNL] - ragni', '(13) Lunatic [Mox] - nesaak (orange)' and '(18) TheDivineSwords [DsQ] - desert (hot pink)' - and not the 5/10 list, where DDT had 4 tiles at Detlas and TNL held the north sky islands.",
+   "usableFor": "the-federation - the 4 June 1018 territory assignment (Wynn province); best single illustration of Federation territory control because every tile is labelled with its guild tag",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -238,8 +308,13 @@
    ],
    "file": "fed-alliance-15-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-15-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down ocean map (1378x839) with tagged territories. AoE (pink) holds the large brown island in the north plus many islands along the eastern chain; Fox (cyan on orange) holds two islands in the north-west and one mid-ocean; Imp (red) holds the northern half of the Corkus landmass at the far west; THI (purple) holds the southern half of Corkus and one eastern island; TNL (green) holds a single large island in the south-west (Legendary Island); ERN, HoF (yellow) and one further Imp and Fox tile appear in the south-east; black FFA tiles at two points. Most open water is unclaimed.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the four maps posted 6/4/2018 2:37 PM. Matches the 6/4 list: AoE 'dark forest, west ocean', Imperial 'north corkus', The Hive 'south corkus', TheNoLifes 'ragni, legendary island'.",
+   "usableFor": "the-federation - the 4 June 1018 territory assignment (ocean and Corkus)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -254,8 +329,13 @@
    ],
    "file": "fed-alliance-16-GavelMap.png",
    "web": "/images/chronicles/federation/fed-alliance-16-GavelMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Gavel-province map (1512x680) with tagged territories, running from Llevigar in the south-west to the Canyon of the Lost and the volcanic north-east. ERN (blue) holds Llevigar and its plains in the south-west; a large pale grey-blue IBT block holds the north-west (swamp and dark forest); AoE (pink) holds a cluster north of centre; Imp (dark red) holds a very large block through the centre (Light Forest / Aldorei); Fux (cyan) holds the big mid-canyon grid east of centre; SDU (dark red) holds the south canyon below it; Fox (orange) holds the north canyon and a wide band along the north-east; THI (purple) holds the south-east and sky-island tiles; numerous black FFA tiles along the eastern edge.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the four maps posted 6/4/2018 2:37 PM. Matches the 6/4 list line for line: ERN llevigar, IBT swamp+dark forest, Imp light forest+aldorei, Fux mid canyon, SDU south canyon, Fox north canyon, THI south sky islands+nether.",
+   "usableFor": "the-federation - the 4 June 1018 territory assignment (Gavel province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -270,8 +350,13 @@
    ],
    "file": "fed-alliance-17-LightRealmMap.png",
    "web": "/images/chronicles/federation/fed-alliance-17-LightRealmMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down map of the Realm of Light alone (1053x325), a single mossy island of thirteen territories, every one of them tagged 'Imp' (Imperial) on a red disc; the tile outlines alternate cyan, dark red and orange. One isolated purple 'FFA' tile sits to the right of the island.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fourth of the four maps posted 6/4/2018 2:37 PM, and the first time the Realm of Light gets its own sheet. Matches '(50) Imperial [Imp] - light forest, aldorei, north corkus, light realm (dark red)'.",
+   "usableFor": "the-federation - Imperial's control of the Realm of Light, June 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -286,8 +371,13 @@
    ],
    "file": "fed-alliance-18-image.png",
    "web": "/images/chronicles/federation/fed-alliance-18-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Event poster, 1200x1800, over a blurred Minecraft screenshot background. Verbatim text: 'Hall of Fame' in yellow brush script, 'AWARDS CEREMONY' beneath it; then 'RAGNI CASTLE / SATURDAY 6/9 / 3PM PST'; 'SPEECHES, GIVEAWAYS, CSST!'; and at the foot 'SERVER 4 (UNTIL FURTHER NOTICE)'. The right two-thirds is an anime-style drawing of a dark-blue-haired female character in a black crop-top uniform with an orange collar, raising a white cap. The art is mildly fanservice-styled (bare midriff) but not explicit, and depicts a fictional character, not a real person.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Posted 6/8/2018 10:40 PM under Drew1011's line 'HoF is having an award ceremony tomorrow and extends the invite to the alliance!' - the poster's date, Saturday 6/9, is exactly 'tomorrow'.",
+   "usableFor": "hall-of-fame - the guild's 9 June 1018 awards ceremony; the-federation - alliance social life",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -302,8 +392,13 @@
    ],
    "file": "fed-alliance-19-LightRealmMap.png",
    "web": "/images/chronicles/federation/fed-alliance-19-LightRealmMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Byte-for-byte identical to marker 17: flat top-down map of the Realm of Light, thirteen territories all tagged 'Imp' (Imperial), plus one isolated purple FFA tile to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the five maps Viaire posted 6/16/2018 7:53 AM. It is the same file as the 6/4 sheet (identical MD5), reposted unchanged because Imperial still held the whole Realm of Light - the 6/16 table at marker 23 lists Imperial's location as 'North Corkus, Light Forest, Light Realm'.",
+   "usableFor": "the-federation - Imperial's control of the Realm of Light, June 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -318,8 +413,13 @@
    ],
    "file": "fed-alliance-20-GavelMap.png",
    "web": "/images/chronicles/federation/fed-alliance-20-GavelMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Gavel-province map (1512x680) with tagged territories, updated from marker 16. ERN (blue) in Llevigar; IBT (pale grey-blue) across the north-west; Mox (orange) has replaced AoE across the Kander Forest cluster north of centre, with a few IBT tiles mixed in; Imp (dark red) in the Light Forest centre; Fux (cyan) on the mid-canyon grid; SDU (dark red) on the south canyon; Fox (orange) across the north canyon and, newly, over the purple sky-island tiles in the south-east that THI held on 6/4; many black FFA tiles along the eastern and north-eastern edge.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the five maps posted 6/16/2018 7:53 AM, three days after Titans Valor rejoined. Consistent with the 6/16 table at marker 23: 'Lunatic [Mox] 18 - Kander Forest' and 'Kingdom Foxes [Fox] 48 - North Canyon, Sky Islands'; Angels of Eternal no longer appear at all.",
+   "usableFor": "the-federation - the 16 June 1018 territory table (Gavel province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -334,8 +434,13 @@
    ],
    "file": "fed-alliance-21-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-21-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down ocean map (1378x839) with tagged territories. IBT (pale cyan) now holds most of the ocean, including the large northern island, the eastern chain and several mid-ocean tiles; ANO (pale lavender) holds three or four tiles on the north-eastern ice islands; SDU (red) holds two north-western islands and one mid-ocean island; Imp (dark red) holds northern Corkus at the far west and Fux (cyan) its southern half; TNL (green) holds Legendary Island in the south-west; HoF (yellow), ERN, Fox and THI hold single tiles.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the five maps posted 6/16/2018 7:53 AM. The lavender ANO tiles corroborate both Drew1011's 6/13 line 'Titans Valor [ANO] has rejoined the Federation' and the table at marker 23: 'Titans Valor [ANO] 4 - Ice Islands'.",
+   "usableFor": "the-federation - Titans Valor's readmission in June 1018 and the four ice islands it was given",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -350,8 +455,13 @@
    ],
    "file": "fed-alliance-22-WynnMap.png",
    "web": "/images/chronicles/federation/fed-alliance-22-WynnMap.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Wynn-province map (1066x870) with tagged territories, updated from marker 14. TNL (green) at Ragni in the west; HoF (yellow) over Detlas and Nemract; DDT (bright green) on six tiles at the west-centre; THI (purple/magenta) now spread very widely across the centre, the Nesaak snowfields and the south; ERN (cyan) newly holding a block in the north-east; DsQ (magenta) reduced to nine tiles in the eastern desert; FUX (cyan) on a handful of tiles east of centre; SDU (red) over the south-western jungle; black FFA tiles scattered. Mox has vanished from Wynn.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fourth of the five maps posted 6/16/2018 7:53 AM. Every count checks against the table at marker 23: DDT 6 Pigmen Ravine, DsQ 9 Desert, THI 35 'Nesaak, Nether, Time Valley, North Savannah', ERN 'Llevigar, Desert', Mox moved out to Kander Forest.",
+   "usableFor": "the-federation - the 16 June 1018 territory table (Wynn province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -365,8 +475,13 @@
    ],
    "file": "fed-alliance-23-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-23-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "A spreadsheet screenshot (665x396) - the Federation's territory table, columns 'Guild | Territory Count | Colour | Location', each row carrying a colour swatch. Rows verbatim: DiamondDeities [DDT] 6, Pigmen Ravine; Emorians [ERN] 40, Llevigar, Desert; Fantasy [Fux] 39, Mid Canyon, South Corkus, South Savannah; Hall of Fame [HoF] 20, South Ocean, Nemract, Nivla, Detlas; Ice Blue Team [IBT] 39, Swamp, Dark Forest, Ocean; Imperial [Imp] 51, North Corkus, Light Forest, Light Realm; Kingdom Foxes [Fox] 48, North Canyon, Sky Islands; Lunatic [Mox] 18, Kander Forest; Sins of Seedia [SDU] 39, South Canyon, Wynn Jungle, West Ocean; The Hive [THI] 35, Nesaak, Nether, Time Valley, North Savannah; The Divine Swords [DsQ] 9, Desert; TheNoLifes [TNL] 15, Ragni; Titans Valor [ANO] 4, Ice Islands. A yellow footnote box lists the FFA territories: 'Free For All [FFA]: Qira's Battle Room, Hive, Lava Lake, Temple of Legends, Bob's Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Raider's Base Upper, Herb Cave, Jungle Lake, (21)'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fifth and last image of the 6/16/2018 7:53 AM post. Titans Valor's four Ice Islands date it after their 6/13 return; the counts reconcile with markers 19-22.",
+   "usableFor": "the-federation - the 16 June 1018 territory table; a directly citable, machine-checkable record of 13 guilds' holdings and the 21 FFA territories",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -380,8 +495,13 @@
    ],
    "file": "fed-alliance-24-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-24-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down map of the Realm of Light (1053x325), thirteen territories, every one now tagged 'DsQ' (The Divine Swords) on a magenta disc; one isolated purple FFA tile to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the five maps Viaire posted 6/21/2018 4:43 PM. Matches the same post's table (marker 28), 'TheDivineSwords [DsQ] 13 - Light Realm' - the Divine Swords have been moved off the Wynn desert and given the Realm of Light in Imperial's place.",
+   "usableFor": "the-federation - the handover of the Realm of Light from Imperial to The Divine Swords, 21 June 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -395,8 +515,13 @@
    ],
    "file": "fed-alliance-25-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-25-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Gavel-province map (1512x680) with tagged territories. ERN (blue) has expanded north-west out of Llevigar into the swamp; IBT (pale grey-blue) holds the dark forest and part of Kander; Mox (orange) holds the Kander Forest / Gylia cluster with a few IBT tiles interleaved; Imp (dark red) holds the Light Forest centre; Fux (cyan) holds the mid-canyon grid; SDU (dark red) the south canyon; Fox (orange, and purple in the south-east) the north canyon and the sky islands; black FFA tiles along the eastern edge.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the five maps posted 6/21/2018 4:43 PM. Matches its table (marker 28): ERN 41 'Llevigar, Swamp', IBT 36 'Swamp, Dark Forest, Kander Forest, Ocean', Mox 17 'Kander Forest, Gylia Lake', Imp 41 'North Corkus, Light Forest'.",
+   "usableFor": "the-federation - the 21 June 1018 territory table (Gavel province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -410,8 +535,13 @@
    ],
    "file": "fed-alliance-26-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-26-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down ocean map (1378x839) with tagged territories, essentially unchanged from marker 21: IBT (pale cyan) over most of the ocean and the large northern island; ANO (pale lavender) on the north-eastern ice islands; SDU (red) on two north-western islands and one mid-ocean island; Imp (dark red) on north Corkus, Fux (cyan) on south Corkus; TNL (green) on Legendary Island; HoF, ERN, Fox and THI on single tiles; two black FFA tiles.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the five maps posted 6/21/2018 4:43 PM.",
+   "usableFor": "the-federation - the 21 June 1018 territory table (ocean and Corkus)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -425,8 +555,13 @@
    ],
    "file": "fed-alliance-27-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-27-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Wynn-province map (1066x870) with tagged territories. AoE (pink) has returned with five tiles around Detlas; DDT (bright green) holds nine tiles in Rymek; Phx (orange) holds nine tiles in the northern desert; HoF (yellow) holds Nemract and the north savannah; TNL (green) Ragni; THI (purple) a very large spread through the centre, Nesaak and the south; SDU (red) the south-western jungle; Fux (cyan) a few tiles east of centre; black FFA tiles scattered. The Divine Swords have disappeared from the desert entirely.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fourth of the five maps posted 6/21/2018 4:43 PM. Every visible count matches its table (marker 28): AoE 5 Detlas, DDT 9 Rymek, Phx 9 North Desert, DsQ gone to the Light Realm.",
+   "usableFor": "the-federation - the 21 June 1018 territory table (Wynn province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -440,8 +575,13 @@
    ],
    "file": "fed-alliance-28-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-28-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet screenshot (858x572) of the Federation territory table, columns 'Guild | Territory Count | Colour | Location' with colour swatches. Rows verbatim: Angels Of Eternal [AoE] 5, Detlas; DiamondDeities [DDT] 9, Rymek; Emorians [ERN] 41, Llevigar, Swamp; Fantasy [Fux] 39, Mid Canyon, South Corkus, South Savannah; Hall of Fame [HoF] 21, Nemract, North Savannah; Ice Blue Team [IBT] 36, Swamp, Dark Forest, Kander Forest, Ocean; Imperial [Imp] 41, North Corkus, Light Forest; Kingdom Foxes [Fox] 39, North Canyon, Sky Islands; KingdomPhoenixes [Phx] 9, North Desert; Lunatic [Mox] 17, Kander Forest, Gylia Lake; Sins of Seedia [SDU] 39, South Canyon, Wynn Jungle, West Ocean; The Hive [THI] 35, Nesaak, Nether, Time Valley; TheDivineSwords [DsQ] 13, Light Realm; TheNoLifes [TNL] 16, Ragni; Titans Valor [ANO] 4, Ice Islands. Yellow footnote box with the same 21 FFA territories as marker 23.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fifth and last image of the 6/21/2018 4:43 PM post. KingdomPhoenixes are still listed, which places it before Drew1011's 6/25 announcement that 'PUN and Phx have left the alliance'.",
+   "usableFor": "the-federation - the 21 June 1018 territory table; citable record of 15 guilds' holdings",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -456,8 +596,13 @@
    ],
    "file": "fed-alliance-29-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-29-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Byte-for-byte identical to marker 24: the Realm of Light, thirteen territories all tagged 'DsQ' (The Divine Swords) in magenta, plus one isolated purple FFA tile.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the five maps Viaire posted 6/25/2018 3:11 PM. Reposted unchanged from 6/21 (identical MD5) because The Divine Swords still held the whole Realm of Light - confirmed by the 6/25 table at marker 33.",
+   "usableFor": "the-federation - The Divine Swords' control of the Realm of Light, June 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -472,8 +617,13 @@
    ],
    "file": "fed-alliance-30-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-30-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Byte-for-byte identical to marker 25: the flat top-down Gavel map with ERN in Llevigar and the swamp, IBT in the dark forest, Mox in Kander, Imperial in the Light Forest, Fux on the mid canyon, SDU on the south canyon and Fox across the north canyon and sky islands.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the five maps posted 6/25/2018 3:11 PM, reposted unchanged from 6/21 (identical MD5) - the 6/25 shake-up (Phx and PUN leaving, Verinian Trials joining) affected Wynn and the ocean, not Gavel.",
+   "usableFor": "the-federation - the 25 June 1018 territory table (Gavel province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -488,8 +638,13 @@
    ],
    "file": "fed-alliance-31-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-31-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down ocean map (1378x839). IBT (pale cyan) holds most of the ocean including the large northern island and the north-eastern ice islands - the lavender ANO tiles present on 6/21 are gone, replaced by IBT; HoF (yellow) has taken the large central-east island; SDU (red) holds two north-western islands and one mid-ocean island; Imp (dark red) north Corkus and Fux (cyan) south Corkus; TNL (green) Legendary Island; ERN, Fox and THI single tiles; two black FFA tiles.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the five maps posted 6/25/2018 3:11 PM. The disappearance of the ANO ice-island tiles matches the 6/25 table (marker 33), which no longer lists Titans Valor at all - a second Titans Valor departure only twelve days after they rejoined, which the channel text does not otherwise record.",
+   "usableFor": "the-federation - the 25 June 1018 territory table; evidence that Titans Valor lost or gave up its territories again in late June 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -504,8 +659,13 @@
    ],
    "file": "fed-alliance-32-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-32-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Wynn-province map (1066x870). AoE (pink) has moved from Detlas out to the northern desert with nine tiles; DDT (bright green) holds nine tiles in Rymek; ViT (Verinian Trials, blue) appears for the first time with five tiles at the Pigmen Ravine in the west; HoF (yellow) Nemract and the north savannah; TNL (green) Ragni; THI (purple) the centre, Nesaak and the south; SDU (red) the south-western jungle; Fux (cyan) a few tiles; black FFA tiles scattered. KingdomPhoenixes are gone from the desert.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fourth of the five maps posted 6/25/2018 3:11 PM, under Drew1011's line 'PUN and Phx have left the alliance. Verinian Trials [ViT] has joined the alliance.' The five ViT tiles at Pigmen Ravine and the removal of Phx are both visible.",
+   "usableFor": "the-federation - Verinian Trials' admission and KingdomPhoenixes' departure, 25 June 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -519,8 +679,13 @@
    ],
    "file": "fed-alliance-33-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-33-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet screenshot (861x547) of the Federation territory table. Rows verbatim: Angels Of Eternal [AoE] 9, North Desert; DiamondDeities [DDT] 9, Rymek; Emorians [ERN] 41, Llevigar, Swamp; Fantasy [Fux] 39, Mid Canyon, South Corkus, South Savannah; Hall of Fame [HoF] 22, Nemract, North Savannah; Ice Blue Team [IBT] 39, Swamp, Dark Forest, Kander Forest, Ocean; Imperial [Imp] 41, North Corkus, Light Forest; Kingdom Foxes [Fox] 39, North Canyon, Sky Islands; Lunatic [Mox] 17, Kander Forest, Gylia Lake; Sins of Seedia [SDU] 39, South Canyon, Wynn Jungle, West Ocean; The Hive [THI] 35, Nesaak, Nether, Time Valley; TheDivineSwords [DsQ] 13, Light Realm; TheNoLifes [TNL] 16, Ragni; Verinian Trials [ViT] 5, Pigmen Ravine. Yellow footnote box with the same 21 FFA territories.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fifth and last image of the 6/25/2018 3:11 PM post. KingdomPhoenixes, Paladins United and Titans Valor have all been dropped from the table and Verinian Trials added, exactly as Drew1011 announced 54 minutes earlier.",
+   "usableFor": "the-federation - the 25 June 1018 territory table; citable record of the alliance immediately after Phx/PUN left and ViT joined",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -535,8 +700,13 @@
    ],
    "file": "fed-alliance-34-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-34-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down map of the Realm of Light (1053x325), thirteen territories now split between two guilds: six tiles on the left tagged 'Mox' (Lunatic) on orange discs and seven tiles on the right tagged 'Nih' (Ex Nihilo) on pink discs; one isolated purple FFA tile to the right of the island.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the five maps Viaire posted 6/30/2018 1:01 PM, hours after 'Ex Nihilo [Nih] has joined the alliance.' The split matches the same post's table (marker 38) precisely: 'Ex Nihilo [Nih] 7 - Light Realm' and 'Lunatic [Mox] 23 - Kander Forest, Gylia Lake, Light Realm'.",
+   "usableFor": "the-federation - Ex Nihilo's admission on 30 June 1018 and the splitting of the Realm of Light",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -551,8 +721,13 @@
    ],
    "file": "fed-alliance-35-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-35-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Gavel-province map (1512x680). ERN (blue) Llevigar and the swamp; IBT (pale grey-blue) the north-west, plus a block of IBT tiles now embedded inside the mid-canyon grid; Mox (orange) the Kander Forest cluster; Imp (dark red) the Light Forest centre; Fux (teal) the mid canyon, visibly reduced by the IBT incursion; SDU (dark red) the south canyon; Fox (orange, purple in the south-east) the north canyon and sky islands; black FFA tiles along the eastern edge.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Second of the five maps posted 6/30/2018 1:01 PM. The Fantasy/IceBlue change matches the table at marker 38, where Fantasy drops from 39 to 27 and Ice Blue Team rises to 37.",
+   "usableFor": "the-federation - the 30 June 1018 territory table (Gavel province)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -567,8 +742,13 @@
    ],
    "file": "fed-alliance-36-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-36-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down ocean map (1378x839). HoF (yellow) now holds the large northern island and most of the central and eastern ocean tiles; TNL (green) has taken the north-eastern ice islands; SDU (red) two north-western islands and one mid-ocean island; Imp (dark red) north Corkus and Fux (cyan) south Corkus; TNL also holds Legendary Island in the south-west; ERN, Fox and THI single tiles; two black FFA tiles.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Third of the five maps posted 6/30/2018 1:01 PM. Matches the table at marker 38: 'Hall of Fame [HoF] 23 - Nemract, Ocean' and 'TheNoLifes [TNL] 24 - Ragni, Ocean'.",
+   "usableFor": "the-federation - the 30 June 1018 territory table (ocean and Corkus)",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -583,8 +763,13 @@
    ],
    "file": "fed-alliance-37-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-37-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down Wynn-province map (1066x870). AoE (pink) holds nine tiles in the eastern desert; DDT (bright green) nine tiles in Rymek; DAU (DogsAmongUs, cream/tan) appears with five tiles at the Pigmen Ravine, replacing Verinian Trials there; ViT (dark green) has moved to seven tiles in the savannah north of centre; HoF (yellow) Nemract and the north; TNL (green) Ragni; THI (purple) the centre, Nesaak and the south; SDU (red) the south-western jungle; Fux (cyan) a few tiles; black FFA tiles scattered.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fourth of the five maps posted 6/30/2018 1:01 PM. Matches the table at marker 38: 'DogsAmongUs [DAU] 5 - Pigmen Ravine' and 'Verinian Trials [ViT] 7 - Savannah'. DogsAmongUs's return to territory-holding here also explains Wynn's 7/10 request that warrers 'use 1000 mobs' when defending DAU territories.",
+   "usableFor": "the-federation - the 30 June 1018 territory table (Wynn province); DogsAmongUs's return to territory-holding",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -598,8 +783,13 @@
    ],
    "file": "fed-alliance-38-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-38-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet screenshot (856x563) of the Federation territory table. Rows verbatim: Angels Of Eternal [AoE] 9, Desert; DiamondDeities [DDT] 9, Rymek; DogsAmongUs [DAU] 5, Pigmen Ravine; Emorians [ERN] 41, Llevigar, Swamp; Ex Nihilo [Nih] 7, Light Realm; Fantasy [Fux] 27, Mid Canyon, South Corkus, South Savannah; Hall of Fame [HoF] 23, Nemract, Ocean; Ice Blue Team [IBT] 37, Swamp, Dark Forest, Kander Forest, Ocean; Imperial [Imp] 41, North Corkus, Light Forest; Kingdom Foxes [Fox] 39, North Canyon, Sky Islands; Lunatic [Mox] 23, Kander Forest, Gylia Lake, Light Realm; Sins of Seedia [SDU] 39, South Canyon, Wynn Jungle, West Ocean; The Hive [THI] 33, Nesaak, Nether, Time Valley; TheNoLifes [TNL] 24, Ragni, Ocean; Verinian Trials [ViT] 7, Savannah. Yellow footnote box with the same 21 FFA territories. Note that The Divine Swords are absent from this table even though they held the whole Realm of Light five days earlier.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Fifth and last image of the 6/30/2018 1:01 PM post, following 'Ex Nihilo [Nih] has joined the alliance.'",
+   "usableFor": "the-federation - the 30 June 1018 territory table; citable record of 15 guilds' holdings, the arrival of Ex Nihilo and the return of DogsAmongUs",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -614,8 +804,13 @@
    ],
    "file": "fed-alliance-39-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-39-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Event poster, 1280x1280, on an off-white background. Verbatim text: 'SINS OF SEEDIA AWARD CEREMONY'; 'Celebrate the amazing successes and members of of SDU with us'; 'With a seavale reef search party after'; 'Join us, July 6th, Ragni Throne Room, 12pm CST, 17 UTC, WC will be announced the day of.' At the foot, the Sins of Seedia flame-and-swords emblem beside an anime-style drawing of a long brown-haired female character in a white and dark-red off-shoulder top. Fictional character art, not a photograph.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Posted 7/5/2018 12:06 PM under the SDU announcement of an award ceremony 'tomorrow ... with a fun seavale after party'; the 7/6 follow-up confirms 'WC10, ragni throne room'.",
+   "usableFor": "sins-of-seedia - the guild's July 1018 award ceremony; the-federation - alliance social life",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -630,8 +825,13 @@
    ],
    "file": "fed-alliance-40-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-40-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Flat top-down map of the Realm of Light (1053x325), all thirteen territories now tagged 'Nih' (Ex Nihilo) on pink discs - Lunatic's six tiles from 6/30 have been handed over; one isolated purple FFA tile to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "First of the five maps Viaire posted 7/13/2018 6:00 PM. Shows the completion of the handover begun on 6/30, when the realm was split six Mox / seven Nih; the accompanying 7/13 table is at marker 44, outside this batch.",
+   "usableFor": "the-federation - Ex Nihilo's control of the whole Realm of Light by mid-July 1018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -646,8 +846,13 @@
    ],
    "file": "fed-alliance-41-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-41-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation territory-assignment map of the Gavel province (Llevigar / Gelibord / Cinfras / Molten Heights strip), rendered over the Wynncraft world map. Territories are drawn as coloured rectangles with a circular guild tag on each. Tags visible: THI (magenta, Swamp/Dark Forest block top-left), ERN (blue, Llevigar and Llevigar Plains), Imp (dark red/maroon, large Light Forest block centre-left), IBT (pale cyan, Kander Forest cluster and a second cluster mid-map), Fox (light blue, Canyon of the Lost), Fux (teal, Mid Canyon), SDU (red on maroon, South Canyon), TNL (green, Sky Islands and eastern Molten Heights), plus black FFA discs at Hive, Qira's Battle Room, Lava Lake, Cinfras and several Molten Heights territories. No ANO, AoE or HoF tags appear on this sheet.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd of the five attachments Viaire posted at 7/13/2018 6:00 PM (message tagged @Guild Leader @War). Confirmed in-window: the accompanying legend (marker 44) still lists Angels of Eternal [AoE], Hall of Fame [HoF] and DogsAmongUs [DAU], all of which are gone by the following set — so this block cannot be shifted forward; it also lists Renegade [ReA], who only joined 7/7/2018, so it cannot be shifted back to the 6/30 set.",
+   "usableFor": "Federation territory control, mid-2018; Gavel province assignments under the alliance; the Federation map-team's weekly map series",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -662,8 +867,13 @@
    ],
    "file": "fed-alliance-42-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-42-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation territory-assignment map of the Ocean region (open sea between Wynn/Gavel and Corkus, including the Sky/Ocean islands). Tags visible: HoF (yellow) on the large Corkus-north island block, on Wybel Island and on several eastern islands; AoE (pink) on a cluster of five eastern island territories; SDU (red) on the Selchar/Nemract sea group and two north-west islands; Imp (dark red) covering the western Corkus landmass; Fux (teal) on southern Corkus; TNL (green) on Wybel/Sky Island territories; single tags for THI (purple), ERN, Fox, DDT and a dark-red SNT disc on Tree Island; one black FFA disc on Corkus. Yellow-outlined unlabelled boxes mark unheld ocean territories.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of Viaire's 7/13/2018 6:00 PM map post. The presence of both AoE and HoF places it before 7/22 and 7/25 respectively; the SNT/Tree Island disc matches Drew1011's 7/7/2018 treaty announcement with Snt.",
+   "usableFor": "Federation territory control mid-2018; the Snt (House of Sentinels) Tree Island treaty; AoE and HoF holdings before they left the alliance",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -678,8 +888,13 @@
    ],
    "file": "fed-alliance-43-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-43-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation territory-assignment map of the Wynn province (Ragni through Nemract, Nesaak, the Desert and Time Valley). Tags visible: DDT (bright green, Ragni and surrounds), ReA (slate blue, Pigmen Ravine), Fox (light blue, Canyon and Dernal Jungle south-west block), HoF (yellow, Nemract and Savannah), Mox (orange, Nesaak / Time Valley / Nether block, a very large holding), DAU (cream, Savannah), ViT (dark green, Rymek and the Desert), Fux (teal, a few Savannah squares), plus black FFA discs at Detlas, Emerald Trail, Bob's Tomb and a green-outlined FFA at Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th attachment of Viaire's 7/13/2018 6:00 PM map post. Consistent with the accompanying legend (marker 44): DAU 7 in Savannah, ViT 9 in Rymek, Mox 29 in Nesaak/Nether, ReA 6 in Pigmen Ravine.",
+   "usableFor": "Federation territory control mid-2018; Wynn province assignments; the short-lived Verinian Trials [ViT] and DogsAmongUs [DAU] holdings",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -693,8 +908,13 @@
    ],
    "file": "fed-alliance-44-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-44-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend keying the map set: columns 'Guild | Territory Count | Colour | Location'. Rows verbatim — Angels Of Eternal [AoE] 8, pink, Ocean; DiamondDeities [DDT] 16, green, Ragni; DogsAmongUs [DAU] 7, tan, Savannah; Emorians [ERN] 31, blue, Llevigar; Ex Nihilo [Nih] 13, light pink, Light Realm; Fantasy [Fux] 27, teal, 'Mid Canyon, South Corkus, South Savannah'; Hall of Fame [HoF] 22, yellow, 'Nemract, Ocean'; Ice Blue Team [IBT] 39, pale cyan, 'Dark Forest, Kander Forest, Mid Canyon'; Imperial [Imp] 41, dark red, 'North Corkus, Light Forest'; Kingdom Foxes [Fox] 36, blue, 'North Canyon, Desert, Dernal Jungle'; Lunatic [Mox] 29, orange, 'Nesaak, Nether'; Renegade [ReA] 6, slate blue, Pigmen Ravine; Sins of Seedia [SDU] 31, red, 'South Canyon, West Ocean'; The Hive [THI] 26, purple, Swamp; TheNoLifes [TNL] 22, green, Sky Islands; Verinian Trials [ViT] 9, dark green, Rymek; House of Sentinels [Snt] 1, dark maroon, Tree Island. Footer box: 'Free For All (Black) : Qira's Battle Room, Hive, Lava Lake, Temple of Legends, Bob's Tomb, Battle Tower (ToA), Detlas, Cinfras, Avos Temple, Factory Entrance, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Raider's Base Upper, Herb Cave, Jungle Lake, (21)'. Guild totals sum to 364 territories across 17 guilds, plus 21 FFA.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "5th and final attachment of Viaire's 7/13/2018 6:00 PM map post. Note Titans Valor [ANO] is absent even though ANO had rejoined on 6/13 and did not formally leave until 7/22 — their Light Realm holding had already been reassigned to Ex Nihilo [Nih].",
+   "usableFor": "Federation membership roster and territory counts, 13 July 2018 — the single best citable snapshot of alliance composition at its mid-summer height",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -708,8 +928,13 @@
    ],
    "file": "fed-alliance-45-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-45-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation territory-assignment map of the Light Realm island (the small floating landmass rendered against a black background). All thirteen territories carry pale-pink 'Nih' tags (Ex Nihilo), sitting inside boxes outlined in maroon, cyan and orange. A single purple-outlined black 'FFA' box sits off to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st attachment of Viaire's 7/18/2018 2:57 PM map post. Agrees with the paired legend (marker 49): 'Ex Nihilo [Nih] 17, Light Realm, Nesaak'. Ex Nihilo had joined on 6/30 and took over the Light Realm formerly assigned to Titans Valor [ANO].",
+   "usableFor": "Ex Nihilo [Nih] in the Federation; Light Realm territory assignment history",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -723,8 +948,13 @@
    ],
    "file": "fed-alliance-46-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-46-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Gavel-province assignment map. Same base as marker 41 but updated: the Nesaak/Gylia orange block now carries orange 'Mox' tags instead of IBT; the South Canyon block shows large bright-red 'SDU' discs; IBT (pale cyan) holds a dense Kander Forest cluster; Fux (teal) Mid Canyon; ERN (blue) Llevigar; THI (magenta) Swamp/Dark Forest; Imp (dark red) Light Forest; TNL (green) Sky Islands and eastern Molten Heights; black FFA discs at Hive, Qira's Battle Room, Lava Lake, Cinfras and across Molten Heights.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment of Viaire's 7/18/2018 2:57 PM map post.",
+   "usableFor": "Federation territory control, July 2018; Gavel province assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -738,8 +968,13 @@
    ],
    "file": "fed-alliance-47-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-47-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Ocean-region assignment map. HoF (yellow) still holds the large Corkus-north island block, Wybel Island and several eastern islands. The five pink AoE island territories of the previous set are gone, replaced by IBT (pale cyan), SDU (red), DDT (green) and Fux (teal). Imp (dark red) holds western Corkus, Fux southern Corkus, TNL a Sky Island, SNT (dark red disc) Tree Island; single THI, ERN, Fox and Imp tags near Selchar; one black FFA disc on Corkus.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of Viaire's 7/18/2018 2:57 PM map post. Worth noting for the wiki: Angels of Eternal [AoE] have already been stripped from the map on 18 July, four days before Drew1011's 7/22 announcement that ANO and AoE had left the Federation.",
+   "usableFor": "Angels of Eternal's exit from the Federation; Ocean-region territory control July 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -753,8 +988,13 @@
    ],
    "file": "fed-alliance-48-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-48-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Wynn-province assignment map. HoF (yellow) has expanded sharply across Nemract and the Savannah; ViT (dark green) holds Rymek and a Nesaak block; THI (purple) Nesaak; Nih (pale pink) a few Time Valley squares; DDT (green) Ragni; ReA (slate blue) Pigmen Ravine; DAU (cream) Savannah; Mox (orange) Gylia/Time Valley; Fox (light blue) the south-western Canyon/Dernal Jungle block; Imp (red) and ERN (blue) squares in the far south around Detlas Suburbs and Nivla; black FFA discs at Detlas, Emerald Trail, Bob's Tomb and Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th attachment of Viaire's 7/18/2018 2:57 PM map post. This is the last Federation map on which Hall of Fame [HoF] and Verinian Trials [ViT] appear — both left on 7/25/2018 and partnered with CGoW.",
+   "usableFor": "Hall of Fame and Verinian Trials' final Federation holdings; Wynn province territory control July 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -768,8 +1008,13 @@
    ],
    "file": "fed-alliance-49-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-49-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend, columns 'Guild | Territory Count | Colour | Location'. Rows verbatim — DiamondDeities [DDT] 17, Ragni; DogsAmongUs [DAU] 7, Savannah; Emorians [ERN] 36, 'Llevigar, Nesaak'; Ex Nihilo [Nih] 17, 'Light Realm, Nesaak'; Fantasy [Fux] 25, 'Mid Canyon, South Corkus, South Savannah'; Hall of Fame [HoF] 26, 'Nemract, Ocean'; Ice Blue Team [IBT] 37, 'Kander Forest, Mid Canyon, Ocean'; Imperial [Imp] 41, 'North Corkus, Light Forest'; Kingdom Foxes [Fox] 36, 'North Canyon, Desert, Dernal Jungle'; Lunatic [Mox] 19, 'Gylia, Time Valley'; Renegade [ReA] 6, Pigmen Ravine; Sins of Seedia [SDU] 32, 'South Caynon, Ocean' [sic]; The Hive [THI] 29, 'Swamp, Nether'; TheNoLifes [TNL] 22, Sky Islands; Verinian Trials [ViT] 12, 'Rymek, Nesaak'; House of Sentinels [Snt] 1, Tree Island. Footer: identical 21-territory FFA list to marker 44. Guild totals sum to 363 across 16 guilds, plus 21 FFA.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "5th attachment of Viaire's 7/18/2018 2:57 PM map post. Angels of Eternal [AoE] have been dropped from the roster relative to the 7/13 legend, ahead of the formal 7/22 departure announcement.",
+   "usableFor": "Federation membership roster and territory counts, 18 July 2018; documenting AoE's departure",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -784,8 +1029,13 @@
    ],
    "file": "fed-alliance-50-DiamondDeities_Award_Ceremony.png",
    "web": "/images/chronicles/federation/fed-alliance-50-DiamondDeities_Award_Ceremony.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Guild event poster, blue/white, with the Diamond Deities diamond-and-wings logo at top. Text verbatim: 'DiamondDeities / Season 1 / Award Ceremony'; 'Join the members of the guild as they receive various awards.'; 'Includes: Organized Legendary Island Party afterwards'; 'Join the DDT discord server for further info/live updates and a voice chat during the event'; 'Date & Time — July 21st, 11pm UTC (7pm EST, 4pm PST, 9am AEST)'; 'Where — Detlas Ballroom (South-west corner of Detlas)'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Attached to Gas's 7/19/2018 5:28 AM @everyone post inviting the alliance to the Diamond Deities award ceremony (the post credits 'Icey' for the art and links discord.gg/Ec4JMbX). Gas amended the time two hours earlier at 5:46 AM the same morning, so the 11pm UTC on the poster is the original schedule; IceyDiamond's 7/21 follow-up says the event was disrupted by the Wynncraft player limit and server lag.",
+   "usableFor": "Diamond Deities [DDT] guild culture; Federation social/ceremonial events 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -800,8 +1050,13 @@
    ],
    "file": "fed-alliance-51-image.png",
    "web": "/images/chronicles/federation/fed-alliance-51-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Black poster on a white background, styled as a taped-up flyer, with a dark laurel-wreath motif. Text verbatim: 'DANCING WITH THE GUILDS / AUGUST 4TH / 5PM PST | 8PM EST'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Attached to the 'Deleted User' post of 7/22/2018 7:36 PM announcing Hall of Fame's 'Dancing With the Guilds' event, a Dancing With the Stars-style guild competition on a private server, with a Google Forms registration link. Posted the same evening as Drew1011's announcement that ANO and AoE had left and Aphelion [Aph] had joined.",
+   "usableFor": "Federation-era inter-guild social events; Hall of Fame [HoF] guild culture",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -816,8 +1071,13 @@
    ],
    "file": "fed-alliance-52-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-52-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Light Realm assignment map, thirteen territories. The western half carries slate-blue 'ReA' tags (Renegade, 6 territories); the eastern half carries orange 'Mox' tags (Lunatic, 7 territories). A purple-outlined black 'FFA' box sits off to the right. Ex Nihilo, who held the whole island a week earlier, is gone from it.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st attachment of Viaire's 7/26/2018 2:11 PM map post, the set following the HoF/ViT departure and the wars Drew1011 thanked the alliance for on 7/25.",
+   "usableFor": "Light Realm reassignment after the July 2018 defections; Renegade [ReA] and Lunatic [Mox] holdings",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -832,8 +1092,13 @@
    ],
    "file": "fed-alliance-53-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-53-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Gavel-province assignment map. THI (magenta) Swamp/Dark Forest; ERN (blue) Llevigar; Imp (dark red) Light Forest; Mox (orange) the Nesaak/Gylia column; IBT (pale cyan) and newly DDT (bright green) sharing the Mid Canyon cluster; Fux (teal) Mid Canyon; SDU (bright red and maroon) South Canyon; Fox (light blue) Canyon of the Lost; TNL (green) Sky Islands and eastern Molten Heights; black FFA discs at Hive, Qira's Battle Room, Lava Lake, Cinfras and across Molten Heights.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment of Viaire's 7/26/2018 2:11 PM map post.",
+   "usableFor": "Federation territory control late July 2018; Gavel province assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -848,8 +1113,13 @@
    ],
    "file": "fed-alliance-54-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-54-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Ocean-region assignment map. Every territory previously tagged HoF is now pale-pink 'Nih' (Ex Nihilo) — the Corkus-north island block, Wybel Island, the mid-ocean island and several small islands. IBT (pale cyan) holds a large eastern island group; SDU (red), DDT (green) and Fux (teal) share the Selchar-area cluster; Imp (dark red) western Corkus; Fux southern Corkus; Mox (orange) an eastern island; TNL a Sky Island; SNT (dark red) Tree Island.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of Viaire's 7/26/2018 2:11 PM map post. The wholesale HoF-to-Nih relabelling documents the redistribution of Hall of Fame's ocean holdings the day after HoF left on 7/25.",
+   "usableFor": "Redistribution of Hall of Fame's territories after its July 2018 departure; Ocean-region control",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -864,8 +1134,13 @@
    ],
    "file": "fed-alliance-55-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-55-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Wynn-province assignment map. Nih (pale pink) has taken over the whole Nemract/Savannah belt formerly held by HoF; ERN (blue) now holds Rymek and the eastern Desert formerly held by ViT; Aph (brown) appears for the first time on three ToA/Time Valley squares in the far south; DAU (cream) Pigmen Ravine; DDT (green) Ragni; Fox (light blue) the south-western Canyon/Dernal Jungle block; THI (purple) Nesaak; IBT (pale cyan) a large southern Detlas-area block; Imp (red) three Time Valley squares; black FFA discs at Detlas, Emerald Trail, Bob's Tomb and Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th attachment of Viaire's 7/26/2018 2:11 PM map post. Aphelion's first appearance on a Federation map, four days after Drew1011 announced they had joined (7/22).",
+   "usableFor": "Aphelion [Aph] joining the Federation; redistribution of HoF and ViT territory; Wynn province control late July 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -879,8 +1154,13 @@
    ],
    "file": "fed-alliance-56-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-56-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend. Rows verbatim — Aphelion [Aph] 3, brown, ToA; DiamondDeities [DDT] 19, 'Ragni, Mid Canyon'; DogsAmongUs [DAU] 7, 'Pigmen Ravine'; Emorians [ERN] 40, 'Llevigar, Rymek'; Ex Nihilo [Nih] 37, 'Ocean, Nemract, Savannah'; Fantasy [Fux] 30, 'Mid Canyon, South Corkus'; Ice Blue Team [IBT] 35, 'Kander Forest, Mid Canyon, Ocean, Nesaak'; Imperial [Imp] 42, 'North Corkus, Light Forest'; Kingdom Foxes [Fox] 36, 'North Canyon, Desert, Dernal Jungle'; Lunatic [Mox] 21, 'Gylia, Light Realm, Ocean'; Renegade [ReA] 6, 'Light Realm'; Sins of Seedia [SDU] 32, 'South Caynon, Ocean' [sic]; The Hive [THI] 30, 'Swamp, Nether'; TheNoLifes [TNL] 22, 'Sky Islands'; House of Sentinels [Snt] 1, 'Tree Island'. Footer FFA list of 21 territories. Guild totals sum to 361 across 15 guilds, plus 21 FFA. Hall of Fame, Verinian Trials, Angels of Eternal and Titans Valor are all absent.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "5th attachment of Viaire's 7/26/2018 2:11 PM map post — the first roster sheet after the HoF/ViT/CGoW split announced on 7/25.",
+   "usableFor": "Federation membership roster and territory counts, 26 July 2018; the immediate aftermath of the HoF/ViT defection to CGoW",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -894,9 +1174,14 @@
     "HAVE YOU EVER BEEN TAGGED BUT DONT KNOW WHERE OR WHY? DO YOU ALWAYS ASK WHY YOU WERE TAGGED? WELL HAVE I GOT NEWS FOR YOU! There’s this great little @ button at the top right of your screen that SHOWS YOU where you were tagged! On mobile it’s at the bottom of your screen when you go to the channel view! Wow! Isn’t that crazy???"
    ],
    "file": "fed-alliance-57-image.jpg",
-   "web": "/images/chronicles/federation/fed-alliance-57-image.webp",
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "verified": true,
+   "depicts": "Cropped Discord desktop screenshot of the top bar of a channel named 'guild-leaders', with the search box, the @ (mentions) button and the ? button circled in thick red marker. A blue banner reads 'new messages since 23:00 / MARK AS READ'; the member list at right is headed 'GUILD LEADER—14' with the first entry '! Liz' whose status reads 'Playing I kept going, im at 44days'; a red username 'WineShaman' with 'Today at 23:00' appears at lower left.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st of two attachments to Drew1011's 7/28/2018 3:25 PM post telling members to use the @ mentions button ('this great little @ button at the top right of your screen'). This screenshot illustrates the desktop position; marker 58 illustrates the other placement.",
+   "usableFor": "Federation Discord administration and the recurring problem of role-ping abuse; illustrating the alliance's leadership channel structure ('GUILD LEADER — 14' members)",
+   "sensitive": false,
+   "excluded": "Screenshot of a private #guild-leaders channel showing member handles and a personal status line. Pseudonymous, but private-channel content about named people."
   },
   {
    "channel": "alliance",
@@ -910,9 +1195,14 @@
     "HAVE YOU EVER BEEN TAGGED BUT DONT KNOW WHERE OR WHY? DO YOU ALWAYS ASK WHY YOU WERE TAGGED? WELL HAVE I GOT NEWS FOR YOU! There’s this great little @ button at the top right of your screen that SHOWS YOU where you were tagged! On mobile it’s at the bottom of your screen when you go to the channel view! Wow! Isn’t that crazy???"
    ],
    "file": "fed-alliance-58-image.png",
-   "web": "/images/chronicles/federation/fed-alliance-58-image.webp",
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "verified": true,
+   "depicts": "Cropped Discord screenshot of the user/channel header area showing the avatar and name 'Drew1011' with the discriminator '#9146' beneath it, alongside the search, @ (mentions) and settings gear icons; a partially visible channel name 'storytime-discussion' at top and a voice-channel entry 'Kingdo…' at right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment to Drew1011's 7/28/2018 3:25 PM post about the @ mentions button ('On mobile it's at the bottom of your screen when you go to the channel view').",
+   "usableFor": "Federation Discord administration; identifying Drew1011 as the alliance's Discord manager — usable if the '#9146' discriminator is cropped or blurred",
+   "sensitive": true,
+   "excluded": "Discord screenshot exposing a full user tag (discriminator). Could be published if that line were cropped."
   },
   {
    "channel": "alliance",
@@ -927,8 +1217,13 @@
    ],
    "file": "fed-alliance-59-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-59-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Light Realm assignment map, thirteen territories. Western half slate-blue 'ReA' (Renegade, 6); eastern half cream 'DAU' (DogsAmongUs, 7). Purple-outlined black 'FFA' box off to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st attachment of Viaire's 8/1/2018 5:25 PM map post. Note the map still labels the eastern half DAU while the paired legend (marker 63) has already renamed them White Lotus [LTS] — Drew1011 announced the DAU-to-LTS guild transfer at 12:01 PM the same day, five hours before the maps went up.",
+   "usableFor": "The DogsAmongUs to White Lotus [LTS] guild transfer of 1 August 2018; Light Realm assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -943,8 +1238,13 @@
    ],
    "file": "fed-alliance-60-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-60-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Gavel-province assignment map. IBT (pale cyan) now occupies the north-west Dark Forest block previously tagged THI; THI (magenta) has shifted to the Kander Forest and Nesaak-approach squares; Mox (orange) the Gylia/Nesaak column; Fux (teal) a much enlarged Mid Canyon block; ERN (blue) Llevigar; Imp (dark red) Light Forest; SDU (red/maroon) South Canyon; Fox (light blue) Canyon of the Lost; TNL (green) Sky Islands and eastern Molten Heights; black FFA discs at Hive, Qira's Battle Room, Lava Lake, Cinfras and Molten Heights.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment of Viaire's 8/1/2018 5:25 PM map post (Drew1011 tagged @Guild Leader @War one minute later).",
+   "usableFor": "Federation territory control, 1 August 2018; Gavel province assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -959,8 +1259,13 @@
    ],
    "file": "fed-alliance-61-Ocean_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-61-Ocean_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Ocean-region assignment map. Nih (pale pink) holds the Corkus-north island block, Wybel Island and the mid-ocean island; IBT (pale cyan) a large eastern island group; SDU (red) and DDT (green) the Selchar-area cluster; Imp (dark red) has expanded to cover almost all of Corkus, pushing Fux back to a single teal square; Mox (orange) two eastern islands; ERN, THI, Fox and Imp single tags near Selchar; TNL a Sky Island; one black FFA disc on Corkus.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of Viaire's 8/1/2018 5:25 PM map post.",
+   "usableFor": "Federation territory control, 1 August 2018; Ocean-region and Corkus assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -975,8 +1280,13 @@
    ],
    "file": "fed-alliance-62-Wynn_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-62-Wynn_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Wynn-province assignment map. Nih (pale pink) holds the Nemract/Savannah belt; ERN (blue) Rymek and the eastern Desert; DDT (bright green) a much enlarged Ragni/Time Valley block; DsQ (hot pink) appears on a Gylia/Nether cluster; Aph (brown) Pigmen Ravine; Fox (light blue) the south-western Canyon/Dernal Jungle block and northern Canyon; IBT (pale cyan) the southern Detlas block; Fux (teal) one square; black FFA discs at Detlas, Emerald Trail, Bob's Tomb and Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th attachment of Viaire's 8/1/2018 5:25 PM map post. First appearance of The Divine Swords [DsQ] in this map series since the 7/13 set omitted them; Aphelion has moved from ToA to Pigmen Ravine.",
+   "usableFor": "Federation territory control, 1 August 2018; Wynn province assignments; The Divine Swords [DsQ] holdings",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -990,8 +1300,13 @@
    ],
    "file": "fed-alliance-63-unknown.png",
    "web": "/images/chronicles/federation/fed-alliance-63-unknown.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend. Rows verbatim — Aphelion [Aph] 5, brown, 'Pigmen Ravine'; DiamondDeities [DDT] 23, 'Ragni, Time Valley'; Emorians [ERN] 40, 'Lleviagr, Rymek' [sic]; Ex Nihilo [Nih] 35, 'Ocean, Nemract, Savannah'; Fantasy [Fux] 29, 'Mid Canyon'; Ice Blue Team [IBT] 37, 'Swamp, Nesaak, Ocean'; Imperial [Imp] 46, 'Corkus, Light Forest'; Kingdom Foxes [Fox] 36, 'North Canyon, Desert, Dernal Jungle'; Lunatic [Mox] 16, 'Gylia, Ocean'; Renegade [ReA] 6, 'Light Realm'; Sins of Seedia [SDU] 33, 'South Caynon, Ocean' [sic]; The Hive [THI] 23, 'Kander Forest'; TheDivineSwords [DsQ] 5, hot pink, 'Nether'; TheNoLifes [TNL] 22, 'Sky Islands'; White Lotus [LTS] 7, cream, 'Light Realm'. Footer FFA list of 20 territories. Guild totals sum to 363 across 15 guilds, plus 20 FFA. DogsAmongUs and House of Sentinels no longer appear.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "5th attachment of Viaire's 8/1/2018 5:25 PM map post. This is the sheet on which DogsAmongUs [DAU] is replaced by White Lotus [LTS], confirming Drew1011's 8/1 12:01 PM announcement. Snt has also dropped off, consistent with Drew1011's 7/30 note that 'Snt has broken the treety'.",
+   "usableFor": "Federation membership roster and territory counts, 1 August 2018; the DAU-to-White Lotus transfer; the collapse of the Snt treaty",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1006,8 +1321,13 @@
    ],
    "file": "fed-alliance-64-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-64-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Light Realm assignment map, thirteen territories, every one tagged cream 'LTS' (White Lotus). Purple-outlined black 'FFA' box off to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st of five attachments to the 'Deleted User' post of 8/16/2018 4:02 PM (tagged @Guild Leader @War). Agrees with the paired legend (marker 68): 'White Lotus [LTS] 13, Light Realm'. Renegade has vacated the western half, which White Lotus absorbed.",
+   "usableFor": "White Lotus [LTS] holdings; Light Realm assignment history",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1022,8 +1342,13 @@
    ],
    "file": "fed-alliance-65-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-65-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Gavel-province assignment map. DDT (bright green) has taken the whole Nesaak/Gylia column formerly held by Mox; THI (magenta) a broad Dark Forest/Kander band; IBT (pale cyan) the north-west corner; ERN (blue) Llevigar; Imp (dark red) Light Forest; Fux (teal) an enlarged Mid Canyon block; SDU (red/maroon) South Canyon; Fox (light blue) Canyon of the Lost; TNL (green) Sky Islands and eastern Molten Heights; black FFA discs at Hive, Qira's Battle Room, Lava Lake, Cinfras and Molten Heights.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment of the 8/16/2018 4:02 PM map post.",
+   "usableFor": "Federation territory control, mid-August 2018; Gavel province assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1038,8 +1363,13 @@
    ],
    "file": "fed-alliance-66-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-66-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Ocean-region assignment map. DDT (bright green) now holds the Corkus-north island block, the mid-ocean island and an eastern island; SDU (red) a cluster of six island territories near Selchar and Nemract plus its north-western holdings; Fox (light blue) has taken the mid-ocean and southern ocean territories previously Nih's; Nih (pale pink) is reduced to southern Corkus; Imp (dark red) holds the rest of Corkus; IBT (pale cyan) and Fux (teal) single eastern islands; TNL a Sky Island; one black FFA disc on Corkus.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of the 8/16/2018 4:02 PM map post. Documents Ex Nihilo's contraction ahead of their departure, reported in Drew1011's 9/1 weekly update as 'Ex Nihilo [Nih] left Federation (dont ask, none of us leaders really understand what went down with that whole incident either)'.",
+   "usableFor": "Ex Nihilo's decline and exit from the Federation; Ocean-region control mid-August 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1054,8 +1384,13 @@
    ],
    "file": "fed-alliance-67-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-67-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Wynn-province assignment map. Mox (orange) holds a very large Ragni/Pigmen Ravine block in the west; DsQ (hot pink) the entire Desert in the north-east; ReA (slate blue) a Nemract/Nesaak block; Nih (pale pink) the Savannah; Aph (brown) three Time Valley squares; Fox (light blue) the northern Canyon, the south-western Canyon/Dernal Jungle block and several Nemract squares; ERN (blue) Rymek; IBT (pale cyan) the southern Detlas block and Ranch area; black FFA discs at Detlas, Emerald Trail, Bob's Tomb and Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th attachment of the 8/16/2018 4:02 PM map post. Matches the paired legend (marker 68) row for row: Mox 25 'Ragni, Pigmen Ravine', DsQ 13 'Desert', ReA 7 'Nether', Nih 22 'South Corkus, Nemract', Aph 5 'Time Valley'.",
+   "usableFor": "Federation territory control, mid-August 2018; Wynn province assignments; Lunatic [Mox] at its largest before leaving on 8/31",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1069,8 +1404,13 @@
    ],
    "file": "fed-alliance-68-image.jpg",
    "web": "/images/chronicles/federation/fed-alliance-68-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend. Rows verbatim — Aphelion [Aph] 5, 'Time Valley'; DiamondDeities [DDT] 17, 'Gylia, Ocean'; Emorians [ERN] 40, 'Llevigar, Rymek'; Ex Nihilo [Nih] 22, 'South Corkus, Nemract'; Fantasy [Fux] 28, 'Mid Canyon'; Ice Blue Team [IBT] 29, 'Swamp, Nesaak, Ocean'; Imperial [Imp] 38, 'North Corkus, Light Forest'; Kingdom Foxes [Fox] 40, 'North Canyon, Savannah, Ocean, Dernal Jungle'; Lunatic [Mox] 25, 'Ragni, Pigmen Ravine'; Renegade [ReA] 7, 'Nether'; Sins of Seedia [SDU] 36, 'South Canyon, Ocean'; The Hive [THI] 26, 'Kander Forest'; TheDivineSwords [DsQ] 13, 'Desert'; TheNoLifes [TNL] 22, 'Sky Islands'; White Lotus [LTS] 13, 'Light Realm'. Footer: 'Free For All (Black): Qira's Battle Room, Hive, Lava Lake, Temple of Legends, Bob's Tomb, Battle Tower (ToA), Detlas, Cinfras, Swamp Dark Forest Transition Mid, Emerald Trail, Rodoroc, Molten Reach, Molten Heights Portal, Lava Lake Bridge, Active Volcano, Volcanic Slope, Crater Descent, Herb Cave, Jungle Lake, Factory Entrance, Mine Base Plains, Jofash Tunnel (22)'. Guild totals sum to 361 across 15 guilds, plus 22 FFA.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "5th attachment of the 8/16/2018 4:02 PM map post. Factory Entrance and Mine Base Plains appear in the FFA list, matching Viaire's 8/5/2018 note that both had been returned to FFA.",
+   "usableFor": "Federation membership roster and territory counts, 16 August 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1085,8 +1425,13 @@
    ],
    "file": "fed-alliance-69-LightRealm_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-69-LightRealm_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Light Realm assignment map, thirteen territories, every one tagged bright green 'DDT' (Diamond Deities). Purple-outlined black 'FFA' box off to the right.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st of five attachments to Viaire's 8/30/2018 10:28 AM map post (tagged @Guild Leader @War; preceded by 'If you saw the map, disregard it for later'). Agrees with the paired legend (marker 73): 'DiamondDeities [DDT] 27, Gylia, Light Realm'. White Lotus [LTS] has vanished from the roster entirely between 8/16 and 8/30, without any departure announcement in the channel.",
+   "usableFor": "Diamond Deities [DDT] holdings; the undocumented disappearance of White Lotus from the Federation; Light Realm assignment history",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1101,8 +1446,13 @@
    ],
    "file": "fed-alliance-70-Gavel_Map.png",
    "web": "/images/chronicles/federation/fed-alliance-70-Gavel_Map.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Gavel-province assignment map. THI (magenta) holds a wide Dark Forest/Kander Forest band including the north-west corner; IBT (pale cyan) a Nesaak-approach cluster; DDT (bright green) the Gylia column; ERN (blue) Llevigar; Imp (dark red) Light Forest; Fux (teal) a large Mid Canyon block; SDU (red/maroon) South Canyon; Fox (light blue) Canyon of the Lost; TNL (green) Sky Islands and eastern Molten Heights; black FFA discs at Hive, Qira's Battle Room, Lava Lake, Cinfras and Molten Heights.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment of Viaire's 8/30/2018 10:28 AM map post.",
+   "usableFor": "Federation territory control, end of August 2018; Gavel province assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1117,8 +1467,13 @@
    ],
    "file": "fed-alliance-71-Ocean.png",
    "web": "/images/chronicles/federation/fed-alliance-71-Ocean.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Ocean-region assignment map. PUN (pale lilac) — Paladins United, freshly rejoined — holds the Corkus-north island block, the mid-ocean island, Wybel Island and roughly ten scattered ocean territories; SDU (red) a Selchar/Nemract cluster and north-western islands; ERN (blue) has replaced Nih across southern Corkus; Imp (dark red) northern Corkus; DDT (green), IBT (pale cyan) and Fux (teal) single eastern islands; TNL a Sky Island; one black FFA disc on Corkus. Ex Nihilo no longer appears anywhere.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of Viaire's 8/30/2018 10:28 AM map post. Paladins United had rejoined on 8/23/2018 ('PUN has joined the Federation' / 'Rejoined*'), and this is their first appearance on a map.",
+   "usableFor": "Paladins United [PUN] rejoining the Federation; Ex Nihilo's exit; Ocean-region control end of August 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1133,8 +1488,13 @@
    ],
    "file": "fed-alliance-72-Wynn.png",
    "web": "/images/chronicles/federation/fed-alliance-72-Wynn.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Federation Wynn-province assignment map. IBT (pale cyan) holds the western Ragni block; Fox (light blue) a large central Ragni/Nivla band plus the south-western Canyon/Dernal Jungle block; ReA (slate blue) the Nemract belt; Ris (dark teal) — Arisen — a row of Detlas-area territories; Aph (brown) a Detlas Suburbs cluster; Mox (orange) a reduced Savannah group; DsQ (hot pink) the Desert; Met (brown) — Metric — six Rymek territories in the north-east; black FFA discs at Detlas, Emerald Trail, Bob's Tomb and Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th attachment of Viaire's 8/30/2018 10:28 AM map post. Contains the only Federation map appearance of Metric [Met], who joined in the week of 8/26 and was expelled on 9/2/2018 after 'Evidence arose that Metric [Met] only joined the alliance to spy and cause internal chaos'; Arisen [Ris], Goden's new guild, had joined on 8/28. Lunatic [Mox] is reduced to 8 territories the day before leaving.",
+   "usableFor": "The Metric [Met] spy incident of September 2018; Arisen [Ris] joining; Lunatic's decline before leaving on 8/31; Wynn province control",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1148,8 +1508,13 @@
    ],
    "file": "fed-alliance-73-post.png",
    "web": "/images/chronicles/federation/fed-alliance-73-post.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend (despite the 'post' filename, the content is the territory-assignment key). Rows verbatim — Aphelion [Aph] 6, 'Nether'; Arisen [Ris] 6, 'Detlas'; DiamondDeities [DDT] 27, 'Gylia, Light Realm'; Emorians [ERN] 37, 'Llevigar, South Corkus'; Fantasy [Fux] 28, 'Air Temple, Mid Canyon'; Ice Blue Team [IBT] 34, 'Swamp, Nesaak, Ocean, Ragni'; Imperial [Imp] 41, 'North Corkus, Light Forest'; Kingdom Foxes [Fox] 41, 'North Canyon, Dernal Jungle, Time Valley'; Lunatic [Mox] 8, 'Savannah'; Metric [Met] 6, brown, 'Rymek'; Paladins United [PUN] 10, pale lilac, 'Islands'; Renegade [ReA] 11, 'Nemract'; Sins of Seedia [SDU] 36, 'South Canyon, Ocean'; The Hive [THI] 35, 'Kander Forest, Swamp'; TheDivineSwords [DsQ] 13, 'Desert'; TheNoLifes [TNL] 22, 'Sky Islands'. Footer FFA list of 22 territories. Guild totals sum to 361 across 16 guilds, plus 22 FFA.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "5th attachment of Viaire's 8/30/2018 10:28 AM map post. The only roster sheet listing Metric [Met], expelled three days later as a spy.",
+   "usableFor": "Federation membership roster and territory counts, 30 August 2018; the Metric spy incident",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1164,8 +1529,13 @@
    ],
    "file": "fed-alliance-74-Gavel_and_LR_Final_9.png",
    "web": "/images/chronicles/federation/fed-alliance-74-Gavel_and_LR_Final_9.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Combined Gavel-and-Light-Realm territory map in a new, flatter cartographic style (translucent colour washes with small white labels rather than coloured discs). Top inset: the Light Realm island, all thirteen territories tagged DDT. Main panel: the Gavel province — ERN (blue) across Llevigar and Llevigar Plains; THI (purple) the Dark Forest and Swamp; DsQ (magenta) a long Gylia/Cinfras County column; Imp (dark red) Light Forest; DDT (blue-teal) and Fux (cyan) sharing Mid Canyon and the Thesead surroundings; SDU (dark red) South Canyon; Fox (orange) a Molten Heights/North Desert band; TNL (pale green) the Sky Islands, Molten Heights and eastern edge; grey FFA boxes at Hive, Qira's Battle Room, Lava Lake, Molten Reach, Jofash Tunnel, Thesead and Cinfras.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "1st of four attachments to Drew1011's 9/10/2018 2:54 PM post, appended to his weekly alliance update (week of 9/2/18). Drew credits the artwork in the same message: '(catherine made the original and then goden made adjustments, they wanted the credit)'. This is a redesigned map series replacing Viaire's earlier style.",
+   "usableFor": "Federation territory control at its September 2018 peak; the redesigned Federation map series by Catherine and Goden; Gavel and Light Realm assignments",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1180,8 +1550,13 @@
    ],
    "file": "fed-alliance-75-Ocean_Final_9.png",
    "web": "/images/chronicles/federation/fed-alliance-75-Ocean_Final_9.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Ocean-region territory map in the new flat style. SDU (dark red) holds a very large share of the open ocean including the Corkus-north island block, Wybel Island, the mid-ocean island and roughly ten scattered islands; PUN (pale grey-lilac) holds southern Corkus and several ocean territories; Imp (red) northern Corkus; ReA (pale blue) a Nemract-coast group; Fox (orange) and TNL (pale green) territories along the eastern coast, with TNA (Nethers Ascent) labels at the bottom right; DDT (light blue) and Fux (cyan) single eastern islands, alongside one further pale island tag that is too small to read reliably; grey FFA box on Corkus.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "2nd attachment of Drew1011's 9/10/2018 2:54 PM weekly-update map post. Nethers Ascent [TNA] appear, having joined on 9/3/2018.",
+   "usableFor": "Federation territory control September 2018; Sins of Seedia's ocean dominance; Nethers Ascent [TNA] joining",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1196,8 +1571,13 @@
    ],
    "file": "fed-alliance-76-Wynn_Final_9.png",
    "web": "/images/chronicles/federation/fed-alliance-76-Wynn_Final_9.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wynn-province territory map in the new flat style. Oys (red) — Odysseia — holds the Ragni and Nivla Forest block in the north-west; Fox (orange) a wide central band and the south-western Canyon/Dernal Jungle block; ReA (pale blue) the Nemract belt; Aph (brown-red) a Detlas Suburbs cluster; TNA (olive) the Savannah and Mining Base; Ris (pale green) Rymek and the Mid Desert in the north-east; TNL (pale green) a northern Desert group; IBT (pale blue-white) the snowy Nesaak region; grey FFA boxes at Detlas, Emerald Trail, Katoa Ranch, Bob's Tomb and Temple of Legends.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "3rd attachment of Drew1011's 9/10/2018 2:54 PM weekly-update map post. Odysseia [Oys] and Nethers Ascent [TNA] both appear; TNA holds the six Rymek-area territories Drew1011 reassigned from the expelled Metric on 9/3.",
+   "usableFor": "Federation territory control September 2018; Odysseia and Nethers Ascent joining; reassignment of Metric's territories",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1211,8 +1591,13 @@
    ],
    "file": "fed-alliance-77-Territory_Graph_Final_9.png",
    "web": "/images/chronicles/federation/fed-alliance-77-Territory_Graph_Final_9.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Spreadsheet legend for the redesigned map series, columns 'Guild | Territory Count | Color | Location'. Rows verbatim — Aphelion [Aph] 10, 'Detlas Suburbs, Nether'; Arisen [Ris] 10, 'Rymek, Mid Desert'; DiamondDeities [DDT} 30, 'Mid Canyon, Light Realm'; Emorians [ERN] 41, 'Llevigar'; Fantasy [Fux] 11, 'Air Temple, Thesead Surroundings'; IceBlue Team [IBT] 16, 'Nesaak'; Imperial [Imp] 39, 'North Corkus, Light Forest'; Kingdom Foxes [Fox] 40, 'North Canyon, North Desert, Time Valley'; Nethers Ascent [TNA] 11, 'Savannah, Mining Base'; Odysseia [Oys] 18, 'Ragni, Nivla Forest'; Paladins United [PUN] 12, 'South Corkus, Islands'; Renegade [ReA] 11, 'Nemract'; Sins of Seedia [SDU} 36, 'Aldorei Valley, South Canyon, Islands'; The Hive [THI] 34, 'Swamp, Dark Forest'; The Divine Swords [DsQ] 18, 'Lake Gylia, Cinfras County, Aldorei Entrance'; TheNoLifes [TNL] 32, 'Sky Islands, Molten Heights, North Desert'. Footer: 'Free For All (Gray): Hive, Qira's Battle Room, Lava Lake, Molten Reach, Jofash Tunnel, Thanos, Thesead, Cinfras, Detlas, Mine Base Plains, Emerald Trail, Katoa Ranch, Bob's Tomb, Herb Cave, Jungle Lake, Temple of Legends (17)'. Guild totals sum to 369 territories across 16 guilds, plus 17 FFA — 386 in all.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "4th and final attachment of Drew1011's 9/10/2018 2:54 PM weekly-update post. Metric and Lunatic are gone; Odysseia, Arisen and Nethers Ascent are in. The same message reports 8,741 unique wars over the preceding ~8 days and hopes 'Confed is slowing down'. This is the last full roster-and-territory sheet in the channel — no further map sets were posted before the 10 November collapse.",
+   "usableFor": "The Federation at its documented maximum extent (369 assigned territories, 16 guilds, 10 September 2018); alliance membership roster; the war-volume statistics of the Confederation conflict",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1227,8 +1612,13 @@
    ],
    "file": "fed-alliance-78-image.png",
    "web": "/images/chronicles/federation/fed-alliance-78-image.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Guild event poster over an in-game screenshot of a large Wynncraft island build (a spired citadel on a floating/coastal island under a blue sky). The Titans Valor emblem and wordmark 'TITANS VALOR [ANO]' appear top-left. Text verbatim: 'JOIN US FOR OUR / ONE YEAR ANNIVERSARY'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Attached to 'hot pink emperor's 10/17/2018 3:40 PM post: 'We wish to extend an invite to all our Federation allies... Ceremony / Saturday, October 20th / Time: 2:00 PM EST / Location: Selchar Town Square / Recession / Saturday, October 19th / Time: shortly after ceremony concludes'. Rescheduled to 3:50 PM EST in the follow-up of 10/20.",
+   "usableFor": "Titans Valor [ANO] one-year anniversary, October 2018; Federation-era inter-guild ceremonies in the alliance's final weeks",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "alliance",
@@ -1242,9 +1632,14 @@
     "@here Hey guys! SDU will be having an event tomorrow at 3-5 UTC! Everyone is welcome to show up! We will be having a costume contest so be sure to wear a costume skin for a prize! WC will be announced tomorrow! Hope to see you at our spookiest event (:"
    ],
    "file": "fed-alliance-79-image0.jpg",
-   "web": "/images/chronicles/federation/fed-alliance-79-image0.webp",
-   "verified": false,
-   "depicts": null
+   "web": null,
+   "verified": true,
+   "depicts": "Event poster, cream background with red serif lettering, a full moon with bats, and the Sins of Seedia flame-and-swords logo. Text verbatim: '[SDU] SINS OF SEEDIA / HALLOWEEN GALA'; 'JOIN US, GUYS AND GHOULS, FOR THE SINS' SPOOKY HALLOWEEN PARTY!'; bullets 'WEAR A COSTUME SKIN FOR OUR SKIN COSTUME CONTEST (FOR LE AND LEGENDARIES).', 'TRICK OR TREATING WITH ITEMS AND POWDERS!', 'SATURDAY OCTOBER 27TH 3-5 UTC (10am-12pm CST), WC WILL BE ANNOUNCED THE DAY OF AT GELIBORD.'; then 'QUESTIONS? ASK Princess Simply#5429 THROUGH DISCORD OR IN GAME simplyinfinity_'; footer 'SEE YOU THERE'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Attached to the 'Deleted User' post of 10/26/2018 6:57 AM announcing the SDU Halloween event; corrected to '3pm-5pm UTC' at 7:05 AM and confirmed on the day ('WC8 Gelibord for the party!'). The poster carries a named individual's Discord tag and in-game name as a contact address — usable on the wiki only with 'Princess Simply#5429' and 'simplyinfinity_' cropped or redacted.",
+   "usableFor": "Sins of Seedia [SDU] guild culture; Federation social life two weeks before the collapse — usable if the contact line is redacted",
+   "sensitive": true,
+   "excluded": "Event poster carrying a named individual's contact details (Discord tag and IGN). Publishable only if that line is redacted."
   },
   {
    "channel": "public",
@@ -1259,8 +1654,13 @@
    ],
    "file": "fed-public-01-summer_festival.png",
    "web": "/images/chronicles/federation/fed-public-01-summer_festival.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Wide event banner: a pale-yellow duotone in-game screenshot of a Wynncraft street overlaid with navy text — 'KINGDOM OF FOXES' above a large brush-script 'SUMMER FESTIVAL', and beneath it 'AUGUST 10 @ 3 PM EST'.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "Attached to Arianna's 8/1/2018 3:39 PM post in #public-announcements, immediately above the body text 'It's the last month of Summer, and we're hosting a beach party!' The banner's date and time match the announced 'August 10th, from 3:00 PM EST'. Arianna confirmed the venue on 8/10 ('WC42 beach party') and jpresent pinged @everyone the same day.",
+   "usableFor": "Kingdom of Foxes [Fox] guild culture; Federation-era public community events, August 2018",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "public",
@@ -1275,8 +1675,13 @@
    ],
    "file": "fed-public-02-event_location.png",
    "web": "/images/chronicles/federation/fed-public-02-event_location.webp",
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": "Annotated Wynncraft world-map screenshot of the north-east coast. A thick yellow circle with a black outline marks a beach on the peninsula north of Katoa Ranch, captioned in yellow capitals 'EVENT HAPPENS HERE'. Labelled map features: 'The Bear Zoo' island (top right), 'Coastal Trail', 'Maltic', 'Katoa Ranch'; an inset of a small island town sits top-left.",
+   "alignmentVerdict": "matches",
+   "correctedContext": "The second attachment of Arianna's 8/1/2018 3:39 PM post, placed after the event details block ('Where: A beach on the peninsula north of Katoa Ranch / Date: Friday, August 10 / Time: 3:00 PM EST'). The circled location is precisely the peninsula north of Katoa Ranch named in that text.",
+   "usableFor": "Kingdom of Foxes summer festival, August 2018; illustrating Wynncraft event venues of the period",
+   "sensitive": false,
+   "excluded": null
   },
   {
    "channel": "public",
@@ -1290,9 +1695,17 @@
     "If you clicked this thread, odds are you know what Federation was. However, after seeing two threads made about its collapse, I felt obligated to make..."
    ],
    "file": null,
-   "web": null,
-   "verified": false,
-   "depicts": null
+   "verified": true,
+   "depicts": null,
+   "alignmentVerdict": "unclear",
+   "correctedContext": "No surviving image. This marker sits under Drew1011's 11/13/2018 12:56 AM @everyone post linking https://forums.wynncraft.com/threads/federation-tribute.237070/ — the 'Image' line is the thumbnail of the auto-generated Wynncraft Forums link embed ('Alliance - Federation Tribute / If you clicked this thread, odds are you know what Federation was...'), not a user-uploaded attachment, which is why it was not archived. The two surviving public-channel images both belong to Arianna's 8/1/2018 post (markers 1 and 2), so the provisional ordinal mapping is correct as it stands.",
+   "usableFor": null,
+   "sensitive": false
   }
- ]
+ ],
+ "verifiedAt": "2026-09-03T22:28:56.216Z",
+ "tally": {
+  "matches": 81,
+  "unclear": 1
+ }
 }
