@@ -1478,6 +1478,15 @@
    "rawSha256": "3a80622694ce2d70",
    "note": "cited in research dossiers (backfill sweep)"
   },
+  "thread-308780": {
+   "url": "https://forums.wynncraft.com/threads/308780/",
+   "kind": "forum-thread",
+   "title": "Selling Guild Crown Season 12 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:31:44.709Z",
+   "textChars": 3142,
+   "rawSha256": "3ab1cdd7fabe69e2",
+   "note": "Avicia Season 12 post (10 Jun 2023): 'thank you for the hqs' — smtn elf's last recorded mention"
+  },
   "thread-309201": {
    "url": "https://forums.wynncraft.com/threads/alliance-cross-guild-chat.309201/",
    "kind": "forum-thread",
@@ -1486,6 +1495,15 @@
    "textChars": 1595,
    "rawSha256": "669181733340be96",
    "note": "TheNelston, 6 Jul 2023 — 'Alliance/Cross Guild Chat' suggestion thread; contemporary evidence that alliance coordination had moved entirely off-platform into private Discords"
+  },
+  "thread-310286": {
+   "url": "https://forums.wynncraft.com/threads/310286/",
+   "kind": "forum-thread",
+   "title": "Selling Guild Crown - Season 13 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T18:31:45.136Z",
+   "textChars": 2546,
+   "rawSha256": "85c3c62336ce3081",
+   "note": "Avicia Season 13 post (19 Aug 2023): 'The Aquarium - our unwavering ally'; smtn elf gone from the record"
   },
   "thread-313565": {
    "url": "https://forums.wynncraft.com/threads/guilds-are-not-in-a-great-spot-right-now.313565/",
