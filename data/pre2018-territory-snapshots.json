@@ -1,0 +1,450 @@
+{
+  "$comment": "Point-in-time per-guild territory counts recovered from Wayback Machine captures of the v1 Wynncraft API guild leaderboard (public_api.php?action=statsLeaderboard&type=guild&timeframe=alltime). These are the ONLY structured territory data that exist before our territory_exchanges log begins (2018-01-03): exchange-level pre-2018 war data was never archived anywhere (the only archived territoryList capture is 2018-06-16). Sep 2016 snapshot documents the Hax-dominance era, including Libertas [Lir] at 60 territories — a major 2016 power absent from every written source. Apr 2018 independently confirms total Federation map control (all 15 holders are tribute-roster guilds, 384 territories). Later captures (2019+) overlap the exchange log and serve as validation. Additional captures exist at: 2019-04-04, 2019-05-08, 2019-06-25, 2019-07-19, 2019-12-09, 2020-01-06, 2020-03-05, 2020-03-07 (same URL pattern via web.archive.org).",
+  "snapshots": [
+    {
+      "capturedAt": "2016-09-23T22:10:32Z",
+      "source": "web.archive.org/web/20160923221032/https://api.wynncraft.com/public_api.php?action=statsLeaderboard&type=guild&timeframe=alltime",
+      "territoryHolders": [
+        {
+          "name": "HackForums",
+          "prefix": "Hax",
+          "territories": 146,
+          "level": 65,
+          "members": 72
+        },
+        {
+          "name": "Libertas",
+          "prefix": "Lir",
+          "territories": 60,
+          "level": 59,
+          "members": 57
+        },
+        {
+          "name": "UltimateXeons",
+          "prefix": "UXs",
+          "territories": 53,
+          "level": 52,
+          "members": 58
+        },
+        {
+          "name": "Blacklisted",
+          "prefix": "BLA",
+          "territories": 22,
+          "level": 51,
+          "members": 56
+        },
+        {
+          "name": "Kangronomicon",
+          "prefix": "Fuq",
+          "territories": 13,
+          "level": 52,
+          "members": 54
+        },
+        {
+          "name": "Wynn Theory",
+          "prefix": "WTh",
+          "territories": 7,
+          "level": 50,
+          "members": 53
+        },
+        {
+          "name": "We Lag Alot",
+          "prefix": "WLA",
+          "territories": 7,
+          "level": 23,
+          "members": 6
+        },
+        {
+          "name": "WarLords",
+          "prefix": "War",
+          "territories": 3,
+          "level": 42,
+          "members": 43
+        },
+        {
+          "name": "Everest",
+          "prefix": "EVR",
+          "territories": 3,
+          "level": 20,
+          "members": 13
+        },
+        {
+          "name": "TheNoLifes",
+          "prefix": "TNL",
+          "territories": 2,
+          "level": 52,
+          "members": 52
+        },
+        {
+          "name": "The Dark Phoenix",
+          "prefix": "TNI",
+          "territories": 1,
+          "level": 52,
+          "members": 18
+        },
+        {
+          "name": "HaHaUnited",
+          "prefix": "HHU",
+          "territories": 1,
+          "level": 51,
+          "members": 58
+        },
+        {
+          "name": "Boom",
+          "prefix": "Yaa",
+          "territories": 1,
+          "level": 42,
+          "members": 32
+        },
+        {
+          "name": "Dragons Arise",
+          "prefix": "DsA",
+          "territories": 1,
+          "level": 34,
+          "members": 34
+        },
+        {
+          "name": "Beasts",
+          "prefix": "BST",
+          "territories": 1,
+          "level": 32,
+          "members": 30
+        },
+        {
+          "name": "MasterWarriors",
+          "prefix": "MTW",
+          "territories": 1,
+          "level": 27,
+          "members": 16
+        },
+        {
+          "name": "Dissonance",
+          "prefix": "Dne",
+          "territories": 1,
+          "level": 27,
+          "members": 2
+        },
+        {
+          "name": "Spectral Cabbage",
+          "prefix": "SPC",
+          "territories": 1,
+          "level": 24,
+          "members": 8
+        },
+        {
+          "name": "SecretGroup",
+          "prefix": "SGX",
+          "territories": 1,
+          "level": 24,
+          "members": 1
+        },
+        {
+          "name": "Knix Clan",
+          "prefix": "Knx",
+          "territories": 1,
+          "level": 21,
+          "members": 24
+        },
+        {
+          "name": "Mage Faction",
+          "prefix": "fOm",
+          "territories": 1,
+          "level": 16,
+          "members": 11
+        },
+        {
+          "name": "The EarthQuakes",
+          "prefix": "TEQ",
+          "territories": 1,
+          "level": 10,
+          "members": 9
+        },
+        {
+          "name": "AnarKia",
+          "prefix": "ank",
+          "territories": 1,
+          "level": 7,
+          "members": 3
+        },
+        {
+          "name": "FlufferMuffin",
+          "prefix": "FuM",
+          "territories": 1,
+          "level": 7,
+          "members": 4
+        },
+        {
+          "name": "CHAOSTHEORY",
+          "prefix": "CTY",
+          "territories": 1,
+          "level": 7,
+          "members": 11
+        },
+        {
+          "name": "PolishTeam",
+          "prefix": "POL",
+          "territories": 1,
+          "level": 7,
+          "members": 4
+        }
+      ]
+    },
+    {
+      "capturedAt": "2018-04-16T14:03:44Z",
+      "source": "web.archive.org/web/20180416140344/https://api.wynncraft.com/public_api.php?action=statsLeaderboard&type=guild&timeframe=alltime",
+      "territoryHolders": [
+        {
+          "name": "Kingdom Foxes",
+          "prefix": "Fox",
+          "territories": 82,
+          "level": 62,
+          "members": 63
+        },
+        {
+          "name": "Imperial",
+          "prefix": "Imp",
+          "territories": 52,
+          "level": 58,
+          "members": 56
+        },
+        {
+          "name": "The Hive",
+          "prefix": "THI",
+          "territories": 44,
+          "level": 54,
+          "members": 49
+        },
+        {
+          "name": "IceBlue Team",
+          "prefix": "IBT",
+          "territories": 36,
+          "level": 55,
+          "members": 59
+        },
+        {
+          "name": "Sins of Seedia",
+          "prefix": "SDU",
+          "territories": 34,
+          "level": 59,
+          "members": 63
+        },
+        {
+          "name": "Angels Of Eternal",
+          "prefix": "AoE",
+          "territories": 31,
+          "level": 50,
+          "members": 53
+        },
+        {
+          "name": "Fantasy",
+          "prefix": "Fux",
+          "territories": 27,
+          "level": 60,
+          "members": 34
+        },
+        {
+          "name": "Holders Of LE",
+          "prefix": "HoL",
+          "territories": 24,
+          "level": 51,
+          "members": 54
+        },
+        {
+          "name": "Angelic",
+          "prefix": "SKY",
+          "territories": 14,
+          "level": 43,
+          "members": 40
+        },
+        {
+          "name": "Titans Valor",
+          "prefix": "ANO",
+          "territories": 13,
+          "level": 53,
+          "members": 41
+        },
+        {
+          "name": "The Divine Swords",
+          "prefix": "DsQ",
+          "territories": 9,
+          "level": 52,
+          "members": 41
+        },
+        {
+          "name": "Emorians",
+          "prefix": "ERN",
+          "territories": 7,
+          "level": 46,
+          "members": 41
+        },
+        {
+          "name": "As Darkness Falls",
+          "prefix": "ASF",
+          "territories": 5,
+          "level": 43,
+          "members": 35
+        },
+        {
+          "name": "Kasai Shinrai",
+          "prefix": "Two",
+          "territories": 5,
+          "level": 43,
+          "members": 39
+        },
+        {
+          "name": "BuildCraftia",
+          "prefix": "BCr",
+          "territories": 1,
+          "level": 61,
+          "members": 64
+        }
+      ]
+    },
+    {
+      "capturedAt": "2019-03-03T19:33:38Z",
+      "source": "web.archive.org/web/20190303193338/https://api.wynncraft.com/public_api.php?action=statsLeaderboard&type=guild&timeframe=alltime",
+      "territoryHolders": [
+        {
+          "name": "Imperial",
+          "prefix": "Imp",
+          "territories": 85,
+          "level": 69,
+          "members": 67
+        },
+        {
+          "name": "Emorians",
+          "prefix": "ERN",
+          "territories": 61,
+          "level": 63,
+          "members": 59
+        },
+        {
+          "name": "BuildCraftia",
+          "prefix": "BCr",
+          "territories": 34,
+          "level": 62,
+          "members": 65
+        },
+        {
+          "name": "HackForums",
+          "prefix": "Hax",
+          "territories": 33,
+          "level": 82,
+          "members": 84
+        },
+        {
+          "name": "Kingdom Foxes",
+          "prefix": "Fox",
+          "territories": 33,
+          "level": 73,
+          "members": 74
+        },
+        {
+          "name": "Paladins United",
+          "prefix": "PUN",
+          "territories": 24,
+          "level": 70,
+          "members": 65
+        },
+        {
+          "name": "Titans Valor",
+          "prefix": "ANO",
+          "territories": 24,
+          "level": 57,
+          "members": 61
+        },
+        {
+          "name": "Blacklisted",
+          "prefix": "BLA",
+          "territories": 23,
+          "level": 56,
+          "members": 45
+        },
+        {
+          "name": "DiamondDeities",
+          "prefix": "DDT",
+          "territories": 15,
+          "level": 66,
+          "members": 61
+        },
+        {
+          "name": "The Divine Swords",
+          "prefix": "DsQ",
+          "territories": 15,
+          "level": 56,
+          "members": 34
+        },
+        {
+          "name": "Wrath Of Poseidon",
+          "prefix": "Oce",
+          "territories": 11,
+          "level": 50,
+          "members": 46
+        },
+        {
+          "name": "Fantasy",
+          "prefix": "Fux",
+          "territories": 10,
+          "level": 69,
+          "members": 72
+        },
+        {
+          "name": "Beyond the Scene",
+          "prefix": "BYS",
+          "territories": 7,
+          "level": 47,
+          "members": 49
+        },
+        {
+          "name": "Ecliptic Awakening",
+          "prefix": "ECP",
+          "territories": 7,
+          "level": 35,
+          "members": 2
+        },
+        {
+          "name": "Awakened Inferno",
+          "prefix": "Xav",
+          "territories": 3,
+          "level": 43,
+          "members": 3
+        },
+        {
+          "name": "Bluebewwy",
+          "prefix": "BEW",
+          "territories": 3,
+          "level": 18,
+          "members": 8
+        },
+        {
+          "name": "reaper Monarchy",
+          "prefix": "rMy",
+          "territories": 2,
+          "level": 29,
+          "members": 25
+        },
+        {
+          "name": "Exorcism",
+          "prefix": "xsm",
+          "territories": 1,
+          "level": 47,
+          "members": 38
+        },
+        {
+          "name": "ThisIsMurica",
+          "prefix": "TDM",
+          "territories": 1,
+          "level": 41,
+          "members": 25
+        },
+        {
+          "name": "ShadowRiders",
+          "prefix": "jvm",
+          "territories": 1,
+          "level": 15,
+          "members": 3
+        }
+      ]
+    }
+  ]
+}

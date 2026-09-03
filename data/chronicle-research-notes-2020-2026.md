@@ -214,3 +214,27 @@ CONFIRMED with corrected dates, Khaos-during-Vanir-only REFUTED.
 
 The definitive change set (rev 2) lives in chronicle-draft-2020-2026-additions.json:
 5 alliance edits, 6 new alliances, 1 event edit, 13 new events — dry-run clean.
+
+---
+
+## Addendum 3 — 2018-era round + pre-2018 territory data (2026-09-02)
+
+2018 research applied to prod: Federation rebuilt from founder Drew1011's tribute
+(thread 237070: 40 guilds, founded ~Feb 16 2018, died Nov 10 2018 3AM cascade);
+Coalition end corrected to the Feb 16 Coa+WS merger; Aesir Pact added (thread 227373);
+SOL added (name attested 3x; roster map-inferred: BYS/ASh/DDT/Oce/SPC/ECL); Terra's
+Nov 2 2019 fall; events for the Federation's founding, the Feb 19 2018 Hax wipe
+(111 territories to zero in <12h), and Terra's fall. Community guild-timeline image
+(imgur seklYAQ, via thread 265297) recovered and read — key dates cross-checked.
+Rename chains verified by abutting activity windows: LE Flowers->DiamondDeities,
+DogsAmongUs->White Lotus, As Darkness Falls->Constellations.
+
+Pre-2018 territory data verdict: exchange-level data DOES NOT EXIST anywhere public
+(only archived territoryList capture: 2018-06-16). But Wayback holds guild-leaderboard
+API captures WITH per-guild territory counts — see data/pre2018-territory-snapshots.json:
+Sep 23 2016 (Hax 146 of ~332; Libertas [Lir] 60 — a major 2016 power unknown to any
+written source; UltimateXeons 53), Apr 16 2018 (all 15 holders = Federation guilds,
+384 territories — independent confirmation of the tribute roster and rename dates),
+plus 2019-2020 captures usable as validation against territory_exchanges. 2015-era
+wynncraft.com/guild/ pages carry no territory counts. 2016-2017 war-event data
+survives only as forum-thread imagery and written accounts.
