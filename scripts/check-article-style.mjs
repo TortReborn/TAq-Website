@@ -56,11 +56,11 @@ const proseOf = (text) =>
     .replace(/\{\{[^}]*\}\}/g, ' ')
     .replace(/^>.*$/gm, ' <q> ')                       // blockquoted source text
     .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')             // image captions quote sources too
-    .replace(/"[^"\n]{2,400}"/g, ' <q> ')
-    .replace(/[“][^”\n]{2,400}[”]/g, ' <q> ')
+    .replace(/"[^"\n]{2,1500}"/g, ' <q> ')
+    .replace(/[“][^”\n]{2,1500}[”]/g, ' <q> ')
     // Single-quoted spans, bounded so contractions ("Fantasy's", "don't") survive.
-    .replace(/(^|[\s(—–-])'[^'\n]{2,400}'(?=$|[\s.,;:!?)\]—–-])/g, '$1 <q> ')
-    .replace(/(^|[\s(—–-])[‘][^’\n]{2,400}[’](?=$|[\s.,;:!?)\]—–-])/g, '$1 <q> ')
+    .replace(/(^|[\s(—–-])'[^'\n]{2,1500}'(?=$|[\s.,;:!?)\]—–-])/g, '$1 <q> ')
+    .replace(/(^|[\s(—–-])[‘][^’\n]{2,1500}[’](?=$|[\s.,;:!?)\]—–-])/g, '$1 <q> ')
     .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '$2')
     .replace(/\[\[([^\]]+)\]\]/g, '$1');
 
