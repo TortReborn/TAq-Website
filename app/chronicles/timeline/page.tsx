@@ -101,7 +101,7 @@ export default async function ChroniclesTimeline() {
       </h1>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0.6rem 0 1.5rem' }}>
         Every recorded alliance and event, 2018 to today. Dates link to the{' '}
-        <Link href="/map/history/chronicle" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>history map</Link>{' '}
+        <Link href="/map/history/chronicle" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>history map</Link>{' '}
         at that moment; titles link to their Chronicles article where one exists.
       </p>
 
@@ -125,8 +125,10 @@ export default async function ChroniclesTimeline() {
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <Link
                     href={`/map/history/chronicle?t=${e.mapDate}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', textDecoration: 'none', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}
-                    title="Open the history map at this date"
+                    title="Open the history map at this date in a new tab"
                   >
                     {e.dateLabel}
                   </Link>

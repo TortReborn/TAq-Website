@@ -38,7 +38,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
           <Link href="/chronicles/timeline" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
             Master timeline →
           </Link>
-          <Link href="/map/history/chronicle" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
+          <Link href="/map/history/chronicle" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
             History map →
           </Link>
           <WikiLandingActions />

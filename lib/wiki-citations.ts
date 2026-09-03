@@ -92,3 +92,28 @@ export function fallbackCitationTitle(ref: string): string {
     return ref;
   }
 }
+
+/**
+ * Older articles carry a hand-written "## Sources" list from before inline
+ * citations existed. Split it off so the article renders ONE reference section:
+ * numbered inline citations first, then any leftover manual entries.
+ *
+ * Migrating an article means turning these bullets into {{cite:}} markers at the
+ * claims they support and deleting the section — after which this returns none.
+ */
+export function splitManualSources(body: string): { body: string; entries: string[] } {
+  const match = /\n##\s+(?:Sources|References)\s*\n([\s\S]*)$/i.exec(body);
+  if (!match) return { body, entries: [] };
+
+  const tail = match[1];
+  // Only absorb a trailing list — if another section follows, leave it alone.
+  if (/\n##\s+/.test(tail)) return { body, entries: [] };
+
+  const entries = tail
+    .split('\n')
+    .map(line => line.replace(/^\s*[-*]\s+/, '').trim())
+    .filter(Boolean);
+  if (!entries.length) return { body, entries: [] };
+
+  return { body: body.slice(0, match.index), entries };
+}

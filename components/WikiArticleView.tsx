@@ -6,7 +6,7 @@ import { Pencil, History, Link2 } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
 import { WikiPage, WikiPageSummary, WIKI_TYPE_LABELS, extractToc } from "@/lib/wiki";
 import { WikiEmbedMap } from "@/lib/wiki-embeds";
-import { WikiCitationMap, citationAnchor, citationList } from "@/lib/wiki-citations";
+import { WikiCitationMap, citationAnchor, citationList, splitManualSources } from "@/lib/wiki-citations";
 import { useExecSession } from "@/hooks/useExecSession";
 
 /**
@@ -38,6 +38,12 @@ export default function WikiArticleView({
 }) {
   const { isExec, authenticated } = useExecSession();
   const references = useMemo(() => (citations ? citationList(citations) : []), [citations]);
+  // Pre-citation articles end in a hand-written "## Sources" list. Split it out
+  // so the page shows a single reference section rather than two.
+  const { body: articleBody, entries: manualSources } = useMemo(
+    () => splitManualSources(page.body),
+    [page.body],
+  );
   const toc = useMemo(() => extractToc(page.body), [page.body]);
   const showToc = toc.length >= 3;
 
@@ -170,11 +176,11 @@ export default function WikiArticleView({
             </p>
           )}
 
-          <WikiMarkdown body={page.body} existingSlugs={existingSlugs} embeds={embeds} citations={citations} />
+          <WikiMarkdown body={articleBody} existingSlugs={existingSlugs} embeds={embeds} citations={citations} />
 
           {/* References — numbered, in order of first appearance, each linking
               out to the cited source (and back to where it was cited). */}
-          {references.length > 0 && (
+          {(references.length > 0 || manualSources.length > 0) && (
             <section style={{ marginTop: '1.75rem' }}>
               <h2 id="references" style={{
                 fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)',
@@ -183,6 +189,7 @@ export default function WikiArticleView({
               }}>
                 References
               </h2>
+              {references.length > 0 && (
               <ol className="wiki-references">
                 {references.map(c => (
                   <li key={c.number} id={citationAnchor(c.number)}>
@@ -201,6 +208,14 @@ export default function WikiArticleView({
                   </li>
                 ))}
               </ol>
+              )}
+              {manualSources.length > 0 && (
+                <ul className="wiki-references wiki-references-manual">
+                  {manualSources.map((entry, i) => (
+                    <li key={i}><WikiMarkdown body={entry} existingSlugs={existingSlugs} /></li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
 
@@ -236,6 +251,9 @@ export default function WikiArticleView({
         :global(.wiki-ref-link) { color: var(--accent-primary); text-decoration: none; }
         :global(.wiki-ref-link:hover) { text-decoration: underline; }
         :global(.wiki-ref-meta) { color: var(--text-secondary); }
+        :global(.wiki-references-manual) { list-style: disc; }
+        :global(.wiki-references-manual .wiki-body) { font-size: 0.82rem; display: inline; }
+        :global(.wiki-references-manual .wiki-body p) { margin: 0; display: inline; }
         .wiki-toc { display: none; }
         :global(.wiki-infobox) {
           border: 1px solid var(--border-color);

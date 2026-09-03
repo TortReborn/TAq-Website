@@ -125,7 +125,9 @@ function AllianceCard({ data }: { data: AllianceEmbedData }) {
       )}
 
       <div style={{ padding: '0.45rem 0.9rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '1rem' }}>
-        <Link href={mapHref} style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
+        <Link href={mapHref} target="_blank" rel="noopener noreferrer"
+          title="Opens the history map in a new tab"
+          style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
           <MapIcon size={11} style={{ verticalAlign: '-1px', marginRight: '0.25rem' }} />
           View on the map
         </Link>
@@ -357,6 +359,9 @@ function MapCard({ data }: { data: MapEmbedData }) {
   return (
     <Link
       href={`/map/history/chronicle?t=${data.date}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Opens the history map in a new tab"
       style={{
         ...cardStyle,
         display: 'flex', alignItems: 'center', gap: '0.6rem',
