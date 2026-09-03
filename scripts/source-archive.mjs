@@ -316,6 +316,17 @@ async function cmdAdd(args) {
   };
   saveIndex(idx);
   console.log(`archived ${id}: ${text.length} chars of text${keepRaw ? ' (+ raw html)' : ''}`);
+  return { id, textSha: crypto.createHash('sha256').update(text).digest('hex') };
+}
+
+/** Remove a source completely — doc, raw copy and manifest entry. */
+function removeSource(id) {
+  for (const f of [path.join(DOCS, `${id}.md`), path.join(RAW, `${id}.html.gz`)]) {
+    if (fs.existsSync(f)) fs.unlinkSync(f);
+  }
+  const idx = loadIndex();
+  delete idx.sources[id];
+  saveIndex(idx);
 }
 
 /**
@@ -338,10 +349,22 @@ async function cmdThread(args) {
   const pages = Math.min(max, Math.max(nav ? Number(nav) : 1, counts.length ? Math.max(...counts) : 1));
   console.log(`${base} — ${pages} page(s)`);
 
+  // XenForo serves the LAST page for any out-of-range page number, so a
+  // too-high page count would otherwise store N copies of the final page.
+  // Stop as soon as a page's text repeats the one before it.
+  let lastSha = null;
   for (let p = 1; p <= pages; p++) {
     const url = p === 1 ? base : `${base}page-${p}`;
     try {
-      await cmdAdd([url, ...args.slice(1)]);
+      const result = await cmdAdd([url, ...args.slice(1)]);
+      if (result) {
+        if (lastSha && result.textSha === lastSha) {
+          removeSource(result.id);
+          console.log(`  page ${p} repeats page ${p - 1} — stopping (thread has ${p - 1} pages)`);
+          break;
+        }
+        lastSha = result.textSha;
+      }
     } catch (e) {
       console.error(`  page ${p} failed: ${e.message}`);
     }
