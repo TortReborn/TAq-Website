@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { Children, isValidElement, memo, useMemo } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -245,12 +245,33 @@ function WikiMarkdown({
           },
           img: ({ src, alt }) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={typeof src === "string" ? src : undefined}
-              alt={alt ?? ""}
-              style={{ maxWidth: "100%", borderRadius: "0.375rem", margin: "0.5rem 0" }}
-            />
+            <img data-wiki-img="" src={typeof src === "string" ? src : undefined} alt={alt ?? ""} />
           ),
+          p: ({ children, node: _pNode, ...props }) => {
+            const kids = Children.toArray(children);
+            const isImage = (c: unknown) =>
+              isValidElement(c) &&
+              (c.type === "img" ||
+                (c.props as { node?: { tagName?: string } })?.node?.tagName === "img");
+            const imgAt = kids.findIndex(isImage);
+            if (imgAt === -1) return <p {...props}>{children}</p>;
+
+            const img = kids[imgAt] as React.ReactElement<{ alt?: string }>;
+            // Anything else in the paragraph — typically the citation markers
+            // written straight after the image — belongs in the caption.
+            const trailing = kids
+              .filter((_, i) => i !== imgAt)
+              .filter((c) => !(typeof c === "string" && !c.trim()));
+            const caption = img.props.alt;
+            return (
+              <span className="wiki-figure">
+                {img}
+                {(caption || trailing.length > 0) && (
+                  <span className="wiki-figcaption">{caption}{trailing}</span>
+                )}
+              </span>
+            );
+          },
           table: ({ children }) => (
             <div style={{ overflowX: "auto", margin: "0.75rem 0" }}>
               <table className="wiki-table">{children}</table>
@@ -284,6 +305,9 @@ function WikiMarkdown({
         .wiki-table { border-collapse: collapse; font-size: 0.85rem; min-width: 50%; }
         .wiki-table th, .wiki-table td { border: 1px solid var(--border-color); padding: 0.35rem 0.6rem; text-align: left; }
         .wiki-table th { background: var(--bg-secondary); font-weight: 700; }
+        .wiki-body .wiki-figure { display: block; margin: 0.9rem auto; text-align: center; max-width: 100%; }
+        .wiki-body .wiki-figure img { max-width: 100%; height: auto; border-radius: 0.375rem; display: block; margin: 0 auto; border: 1px solid var(--border-color); }
+        .wiki-body .wiki-figcaption { display: block; font-size: 0.75rem; line-height: 1.45; color: var(--text-secondary); margin-top: 0.35rem; text-align: center; }
         .wiki-body .wiki-cite { font-size: 0.72em; line-height: 0; vertical-align: super; white-space: nowrap; }
         .wiki-body .wiki-cite a { color: var(--accent-primary); text-decoration: none; padding: 0 0.05em; }
         .wiki-body .wiki-cite a:hover { text-decoration: underline; }

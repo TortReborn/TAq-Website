@@ -37,6 +37,14 @@ export interface WikiPagePayload {
   summary: string;
   /** Ordered infobox rows; empty array = no infobox */
   infobox: WikiInfoboxRow[];
+  /**
+   * The article's lead image, shown at the top of the infobox with its caption
+   * beneath — the Wikipedia arrangement. A site-relative path (/images/...) or
+   * an absolute http(s) URL. Body images are separate and stay in the prose.
+   */
+  leadImage?: string;
+  /** Short caption under the lead image; say what is shown, not what it means */
+  leadImageCaption?: string;
   body: string; // markdown
 }
 
@@ -83,7 +91,15 @@ export const WIKI_LIMITS = {
   infoboxRowsMax: 24,
   infoboxLabelMax: 40,
   infoboxValueMax: 300,
+  leadImageMax: 400,
+  leadImageCaptionMax: 200,
 } as const;
+
+/**
+ * Lead images must be our own assets or an absolute http(s) URL — no
+ * javascript:, data: or protocol-relative targets reaching an <img src>.
+ */
+export const WIKI_IMAGE_SRC_RE = /^(?:\/images\/[A-Za-z0-9._\-/]+|https?:\/\/[^\s"'<>]+)$/;
 
 export const WIKI_SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -201,7 +217,23 @@ export function validateWikiPagePayload(raw: unknown): Valid<WikiPagePayload> {
     infobox.push({ label, value });
   }
 
-  return { ok: true, value: { slug: rawSlug, title, pageType, summary, infobox, body } };
+  const leadImage = cleanText(p.leadImage, WIKI_LIMITS.leadImageMax);
+  if (leadImage && !WIKI_IMAGE_SRC_RE.test(leadImage)) {
+    return { ok: false, error: 'Lead image must be a /images/... path or an http(s) URL' };
+  }
+  const leadImageCaption = cleanText(p.leadImageCaption, WIKI_LIMITS.leadImageCaptionMax);
+  if (leadImageCaption && !leadImage) {
+    return { ok: false, error: 'Lead image caption needs a lead image' };
+  }
+
+  return {
+    ok: true,
+    value: {
+      slug: rawSlug, title, pageType, summary, infobox, body,
+      ...(leadImage ? { leadImage } : {}),
+      ...(leadImageCaption ? { leadImageCaption } : {}),
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------

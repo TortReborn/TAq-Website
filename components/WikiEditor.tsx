@@ -197,6 +197,29 @@ export default function WikiEditor({
         </div>
       </div>
 
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 2fr) minmax(200px, 3fr)', gap: '0.75rem' }}>
+        <div>
+          <div style={labelStyle}>Lead image (shown at the top of the infobox)</div>
+          <input
+            style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '0.75rem' }}
+            placeholder="/images/chronicles/media/example.webp"
+            value={form.leadImage ?? ''}
+            maxLength={WIKI_LIMITS.leadImageMax}
+            onChange={(e) => set('leadImage', e.target.value)}
+          />
+        </div>
+        <div>
+          <div style={labelStyle}>Lead image caption</div>
+          <input
+            style={inputStyle}
+            placeholder="What the image shows, dated where known"
+            value={form.leadImageCaption ?? ''}
+            maxLength={WIKI_LIMITS.leadImageCaptionMax}
+            onChange={(e) => set('leadImageCaption', e.target.value)}
+          />
+        </div>
+      </div>
+
       <div style={labelStyle}>Summary (the lede — one or two sentences shown above the article and in search)</div>
       <textarea
         style={{ ...inputStyle, minHeight: '3.2rem', resize: 'vertical' }}
