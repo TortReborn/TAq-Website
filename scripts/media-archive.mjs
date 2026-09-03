@@ -15,8 +15,8 @@
  *   node scripts/media-archive.mjs verify
  *
  * Layout:
- *   data/sources/media/<id>.<ext>              original (evidence)
- *   data/sources/media/manifest.json           provenance records
+ *   data/wiki/sources/media/<id>.<ext>              original (evidence)
+ *   data/wiki/sources/media/manifest.json           provenance records
  *   public/images/chronicles/media/<id>.webp   what articles reference
  *
  * RULES: game and forum content only. No real-life photographs, no personal
@@ -32,8 +32,8 @@ import sharp from 'sharp';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
-const SRC_RAW = path.join(ROOT, 'data', 'sources', 'raw');
-const MEDIA = path.join(ROOT, 'data', 'sources', 'media');
+const SRC_RAW = path.join(ROOT, 'data', 'wiki', 'sources', 'raw');
+const MEDIA = path.join(ROOT, 'data', 'wiki', 'sources', 'media');
 const WEB_OUT = path.join(ROOT, 'public', 'images', 'chronicles', 'media');
 const MANIFEST = path.join(MEDIA, 'manifest.json');
 const UA = 'Mozilla/5.0 (compatible; TAqChronicles/1.0)';

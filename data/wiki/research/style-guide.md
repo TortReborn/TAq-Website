@@ -5,7 +5,7 @@ You are drafting articles for the "Chronicles" wiki of a Wynncraft guild website
 
 ## The source archive — check it BEFORE any web call
 
-`TAq-Website/data/sources/` holds primary sources already fetched (forum
+`TAq-Website/data/wiki/sources/` holds primary sources already fetched (forum
 threads with per-post attribution, Wayback captures, newsletters). Search it
 first; only hit the network for something genuinely missing, and archive
 whatever you fetch so it is there next time:
@@ -27,14 +27,14 @@ verbatim and the post number, author and date are right there in the heading.
   tag, war/community kind, description, full membership stints with dates) and 36
   events (type, title, description, dates, guilds, alliances). **This is the
   ground truth.** Article claims must not contradict it.
-- `TAq-Website/data/chronicle-research-notes-2020-2026.md` — sourced research
+- `TAq-Website/data/chronicle/research-notes-2020-2026.md` — sourced research
   dossier with forum-thread numbers, Titan Times volumes, provenance standards.
-- `TAq-Website/data/chronicle-events-draft-2018-2021.json` and
+- `TAq-Website/data/chronicle/drafts/events-2018-2021.json` and
   `chronicle-alliances-draft-2018-2021.json` and
   `chronicle-draft-2020-2026-additions.json` and `chronicle-draft-2018-era.json`
   — earlier drafts with extra narrative detail and provenance tags
   ([attested]/[api]/[tt]=Titan Times/[testimony]/[map]/[image]).
-- `TAq-Website/data/pre2018-territory-snapshots.json` — recovered 2016/2018
+- `TAq-Website/data/chronicle/pre2018-territory-snapshots.json` — recovered 2016/2018
   leaderboard captures with per-guild territory counts.
 
 ## Output format
@@ -130,7 +130,7 @@ Forms, in order of preference:
 
 1. **An archived source id** — `{{cite:thread-237070|post #1, 13 Nov 2018}}`.
    Resolves automatically to the real title, URL and capture date from
-   `data/sources/index.json`, and the quoted text is on disk. **Always prefer this.**
+   `data/wiki/sources/index.json`, and the quoted text is on disk. **Always prefer this.**
    Find ids with `node scripts/source-archive.mjs list` or `search`.
 2. **A URL** we have not archived — `{{cite:https://example.com/x|Page title}}`.
    Better: archive it first with `source-archive.mjs add`, then cite the id.

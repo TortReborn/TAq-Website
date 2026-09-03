@@ -12,8 +12,8 @@
  * a numbered reference list at the foot of the article.
  *
  * Citing by archived id is strongly preferred: the reference list then resolves
- * to the real title, URL and capture date from data/sources/index.json, and the
- * text we quoted is on disk (see data/sources/README.md).
+ * to the real title, URL and capture date from data/wiki/sources/index.json, and the
+ * text we quoted is on disk (see data/wiki/sources/README.md).
  */
 
 export interface WikiCitationRef {
