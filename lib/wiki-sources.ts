@@ -63,6 +63,10 @@ export function resolveWikiCitations(body: string): WikiCitationMap {
         kind: archived.kind,
         waybackCapture: archived.waybackCapture,
         archived: true,
+        referencePath: `/chronicles/references/${ref.ref}`,
+        waybackUrl: archived.waybackCapture && /^https?:///.test(archived.url)
+          ? `https://web.archive.org/web/${archived.waybackCapture}/${archived.url}`
+          : undefined,
       };
     } else {
       citation = {

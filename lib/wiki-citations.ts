@@ -39,6 +39,10 @@ export interface WikiCitation extends WikiCitationRef {
   waybackCapture?: string;
   /** True when the ref matched an entry in the local source archive */
   archived: boolean;
+  /** Our own copy, always readable: /chronicles/references/<id> */
+  referencePath?: string;
+  /** Direct link to the Wayback capture, when the citation is to one */
+  waybackUrl?: string;
 }
 
 export type WikiCitationMap = Record<string, WikiCitation>;

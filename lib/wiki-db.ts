@@ -114,6 +114,15 @@ export async function ensureWikiTables(pool: Pool): Promise<void> {
       END IF;
     END $$;
   `);
+  // Lead image (Wikipedia-style: shown at the top of the infobox with a caption).
+  // Added after the tables shipped, so applied as idempotent ALTERs.
+  await pool.query(`
+    ALTER TABLE wiki_pages ADD COLUMN IF NOT EXISTS lead_image VARCHAR(400) NOT NULL DEFAULT '';
+    ALTER TABLE wiki_pages ADD COLUMN IF NOT EXISTS lead_image_caption VARCHAR(200) NOT NULL DEFAULT '';
+    ALTER TABLE wiki_page_revisions ADD COLUMN IF NOT EXISTS lead_image VARCHAR(400) NOT NULL DEFAULT '';
+    ALTER TABLE wiki_page_revisions ADD COLUMN IF NOT EXISTS lead_image_caption VARCHAR(200) NOT NULL DEFAULT '';
+  `);
+
   tablesReady = true;
 }
 
@@ -129,6 +138,8 @@ function rowToPage(row: Record<string, any>): WikiPage {
     pageType: row.page_type,
     summary: row.summary,
     infobox: Array.isArray(row.infobox) ? row.infobox : [],
+    ...(row.lead_image ? { leadImage: row.lead_image } : {}),
+    ...(row.lead_image_caption ? { leadImageCaption: row.lead_image_caption } : {}),
     body: row.body,
     status: row.status,
     createdAt: row.created_at.toISOString(),
@@ -154,6 +165,8 @@ function rowToRevision(row: Record<string, any>): WikiRevision {
     title: row.title,
     summary: row.summary,
     infobox: Array.isArray(row.infobox) ? row.infobox : [],
+    ...(row.lead_image ? { leadImage: row.lead_image } : {}),
+    ...(row.lead_image_caption ? { leadImageCaption: row.lead_image_caption } : {}),
     body: row.body,
     authorId: row.author_id,
     authorName: row.author_name,
@@ -315,15 +328,15 @@ export async function createWikiPage(
       return { ok: false, error: `Slug "${payload.slug}" is already in use` };
     }
     const inserted = await client.query(
-      `INSERT INTO wiki_pages (slug, title, page_type, summary, infobox, body, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [payload.slug, payload.title, payload.pageType, payload.summary, JSON.stringify(payload.infobox), payload.body, author.id],
+      `INSERT INTO wiki_pages (slug, title, page_type, summary, infobox, body, created_by, lead_image, lead_image_caption)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+      [payload.slug, payload.title, payload.pageType, payload.summary, JSON.stringify(payload.infobox), payload.body, author.id, payload.leadImage ?? '', payload.leadImageCaption ?? ''],
     );
     const pageId = inserted.rows[0].id;
     await client.query(
-      `INSERT INTO wiki_page_revisions (page_id, rev_number, title, summary, infobox, body, author_id, author_name, note)
-       VALUES ($1, 1, $2, $3, $4, $5, $6, $7, $8)`,
-      [pageId, payload.title, payload.summary, JSON.stringify(payload.infobox), payload.body, author.id, author.name, note || 'Page created'],
+      `INSERT INTO wiki_page_revisions (page_id, rev_number, title, summary, infobox, body, author_id, author_name, note, lead_image, lead_image_caption)
+       VALUES ($1, 1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [pageId, payload.title, payload.summary, JSON.stringify(payload.infobox), payload.body, author.id, author.name, note || 'Page created', payload.leadImage ?? '', payload.leadImageCaption ?? ''],
     );
     await recomputeLinks(client, pageId, payload.body);
     await client.query('COMMIT');
@@ -375,18 +388,18 @@ export async function editWikiPage(
 
     await client.query(
       `UPDATE wiki_pages SET slug = $1, title = $2, page_type = $3, summary = $4,
-              infobox = $5, body = $6, updated_at = NOW()
+              infobox = $5, body = $6, lead_image = $8, lead_image_caption = $9, updated_at = NOW()
        WHERE id = $7`,
-      [payload.slug, payload.title, payload.pageType, payload.summary, JSON.stringify(payload.infobox), payload.body, pageId],
+      [payload.slug, payload.title, payload.pageType, payload.summary, JSON.stringify(payload.infobox), payload.body, pageId, payload.leadImage ?? '', payload.leadImageCaption ?? ''],
     );
     const rev = await client.query(
       `SELECT COALESCE(MAX(rev_number), 0) + 1 AS next FROM wiki_page_revisions WHERE page_id = $1`,
       [pageId],
     );
     await client.query(
-      `INSERT INTO wiki_page_revisions (page_id, rev_number, title, summary, infobox, body, author_id, author_name, note)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [pageId, rev.rows[0].next, payload.title, payload.summary, JSON.stringify(payload.infobox), payload.body, author.id, author.name, note],
+      `INSERT INTO wiki_page_revisions (page_id, rev_number, title, summary, infobox, body, author_id, author_name, note, lead_image, lead_image_caption)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [pageId, rev.rows[0].next, payload.title, payload.summary, JSON.stringify(payload.infobox), payload.body, author.id, author.name, note, payload.leadImage ?? '', payload.leadImageCaption ?? ''],
     );
     await recomputeLinks(client, pageId, payload.body);
     await client.query('COMMIT');

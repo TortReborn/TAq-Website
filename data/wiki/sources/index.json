@@ -169,6 +169,14 @@
    "rawSha256": "14a91339fc153c3d",
    "note": "UltimateXeons [UXs] current API record — creation date, level, member count; for the UltimateXeons guild article"
   },
+  "archive-search-method": {
+   "url": "https://forums.wynncraft.com/forums/guilds.72/",
+   "kind": "internal-record",
+   "title": "Forum and archive search methods (how negatives were established)",
+   "fetchedAt": "2026-09-03T21:27:54.807Z",
+   "textChars": 1667,
+   "note": "The census and sweep techniques used to prove that a thread or roster never existed, rather than merely failing to find it. Cited where an article states that something is unrecorded."
+  },
   "avicia-info-index": {
    "url": "https://www.avicia.info/",
    "kind": "guild-site",
@@ -177,6 +185,30 @@
    "textChars": 374,
    "rawSha256": "862bb00b64369fc4",
    "note": "Avicia [AVO] official site — checking for history/war-log/alliance pages covering the 2023 Avicia-Sequoia and 2025 Aequitas-Avicia wars"
+  },
+  "cameron-oral-history": {
+   "url": "",
+   "kind": "testimony",
+   "title": "Cameron (The Aquarium veteran) — oral testimony",
+   "fetchedAt": "2026-09-03T21:26:30.521Z",
+   "textChars": 1435,
+   "note": "Recollections from a long-serving TAq member covering the smtn elf and Avocado Aquarium period, relayed in 2026. Uncorroborated testimony unless a written source or map data confirms it."
+  },
+  "chronicle-map-methodology": {
+   "url": "",
+   "kind": "internal-record",
+   "title": "Chronicle map-data methodology notes",
+   "fetchedAt": "2026-09-03T21:26:30.521Z",
+   "textChars": 1505,
+   "note": "The method used to distinguish real wars from free-for-all trading in the exchange log, and to infer alliance activity windows. Recorded with the draft change sets in data/chronicle/drafts/."
+  },
+  "chronicle-records": {
+   "url": "https://theaquarium.wynn/map/history/chronicle",
+   "kind": "internal-record",
+   "title": "Chronicle alliance and event records (TAq database)",
+   "fetchedAt": "2026-09-03T21:26:30.521Z",
+   "textChars": 1499,
+   "note": "The reviewed alliance and event records behind the map's Chronicle layer. Each entry was submitted, sourced and approved before entry; membership stints carry join and leave dates."
   },
   "community-guild-timeline": {
    "url": "https://docs.google.com/document/d/1Sv4TGCKng4qQvqMsjRnbRA16nccatHM1QNVy1_-gJoU/edit",
@@ -230,6 +262,15 @@
    "rawSha256": "f76ed39e635de3df",
    "note": "Guild subforum (Planning Parlour) sorted by post date, Wayback 2017-07-21 — thread titles/creation dates in the War Syndicate founding window"
   },
+  "forums-wynncraft-com-members-drew1011-2157": {
+   "url": "https://forums.wynncraft.com/members/drew1011.2157/",
+   "kind": "forum-profile",
+   "title": "Drew1011 | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:27:25.534Z",
+   "textChars": 14,
+   "rawSha256": "e384351d5e94ec10",
+   "note": "Drew1011's Wynncraft forum profile (member 2157). The dated custom-title chain recording his guild and alliance offices is rendered for logged-in viewers, so the archived copy holds little text; the original is linked and the titles were read from it directly."
+  },
   "github-com-motoki317-moto-bot": {
    "url": "https://github.com/motoki317/moto-bot",
    "kind": "repo",
@@ -274,6 +315,14 @@
    "textChars": 285,
    "rawSha256": "dd4cabc2c3903b9b",
    "note": "Sequoia's public territory map (seqwawa) — live + /history mode; the era's main territory-tracking tool, built by Sequoia"
+  },
+  "pre2018-territory-snapshots": {
+   "url": "https://web.archive.org/web/*/wynncraft.com/api*",
+   "kind": "dataset",
+   "title": "Pre-2018 territory snapshots (recovered leaderboard captures)",
+   "fetchedAt": "2026-09-03T21:26:30.521Z",
+   "textChars": 1335,
+   "note": "Guild-leaderboard API captures recovered from the Wayback Machine, carrying per-guild territory counts for dates before the exchange log begins. The only quantitative view of the 2016-2017 map."
   },
   "raw-githubusercontent-com-sequoiawynncraft-sequoia-mod-main-src-test-java-com-seqwawa-": {
    "url": "https://raw.githubusercontent.com/SequoiaWynncraft/Sequoia-mod/main/src/test/java/com/seqwawa/seq/managers/ChatManagerTest.java",
@@ -323,6 +372,14 @@
    "rawSha256": "3d071d841ea60858",
    "note": "Sequoia's public war statistics page — 161,494 lifetime wars, 64 territories, per-member war leaderboard (lindafelix 21,232; SoloMap 18,616) and a season-by-season territory-completion history"
   },
+  "territory-exchanges": {
+   "url": "https://theaquarium.wynn/map/history",
+   "kind": "dataset",
+   "title": "territory_exchanges — the territory capture log",
+   "fetchedAt": "2026-09-03T21:26:30.521Z",
+   "textChars": 2078,
+   "note": "Every recorded territory capture from 3 Jan 2018 onward: timestamp, territory, attacker and defender. The backbone of the wiki's map-data analysis, and the only continuous record of Wynncraft warring."
+  },
   "the-emperial-truth": {
    "url": "https://docs.google.com/document/d/1rOpJpRaw93ZGOKiMGpSJ1DFRMBDEqDLydO2q3zOP8O0/edit",
    "kind": "community-document",
@@ -339,6 +396,17 @@
    "textChars": 11937,
    "rawSha256": "8c74a48ac6070336",
    "note": "cited in research dossiers (backfill sweep)"
+  },
+  "thread-109319-wb20190723": {
+   "url": "https://forums.wynncraft.com/threads/109319/",
+   "fetchedFrom": "https://web.archive.org/web/20241007232354/https://forums.wynncraft.com/threads/%E2%99%95hackforums-%E2%98%86%E2%98%86-hax-level-93-community-guild-level-80.109319/",
+   "waybackCapture": "20241007232354",
+   "kind": "forum-thread",
+   "title": "Guild - | ♕hackforums | [☆☆ Hax] | Level 93 | Community Guild | Level 80+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:28:45.997Z",
+   "textChars": 11937,
+   "rawSha256": "d114f674908c1f78",
+   "note": "HackForums recruitment thread, Wayback capture 23 Jul 2019 — carries the 'This is a war guild' line absent from later revisions"
   },
   "thread-109350": {
    "url": "https://forums.wynncraft.com/threads/109350/",
@@ -1116,6 +1184,17 @@
    "textChars": 12661,
    "rawSha256": "5bf96f8e16aeb366",
    "note": "PUN guild thread OP: 'PUN is in both Valkyrie, and Hestia' — control case for alliance attestation"
+  },
+  "thread-246617-wb20220919": {
+   "url": "https://forums.wynncraft.com/threads/246617/",
+   "fetchedFrom": "https://web.archive.org/web/20211128204357/https://forums.wynncraft.com/threads/%E2%98%86%E2%98%86%E2%98%86-paladins-united-1-level-100-guild-recruiting-level-60.246617/",
+   "waybackCapture": "20211128204357",
+   "kind": "forum-thread",
+   "title": "Guild - ☆☆☆ Paladins United #1 - Level 100 Guild - Recruiting Level 60+ | Wynncraft Forums",
+   "fetchedAt": "2026-09-03T21:28:41.914Z",
+   "textChars": 12661,
+   "rawSha256": "429281ab6bc499f9",
+   "note": "Paladins United guild thread OP, Wayback capture 19 Sep 2022 — the last attestation of Valkyrie and Hestia as community alliances"
   },
   "thread-248101": {
    "url": "https://forums.wynncraft.com/threads/248101/",
@@ -1998,6 +2077,14 @@
    "textChars": 7061,
    "rawSha256": "19b3ca5e87563bc5",
    "note": "'Inside Myself - Recent Wynncraft Guild History' (Leonhart_Arkada/A_Challenger_Arrives, ANO Aedile, ~Sep 14 2019): near-contemporaneous memoir — Valkyrie->Luna rename, Emorians revolt mechanism, Terra's ~15-guild merger, the failed Sep 14 raid"
+  },
+  "wynncraft-api": {
+   "url": "https://api.wynncraft.com/v3/",
+   "kind": "api",
+   "title": "Wynncraft official API (v3)",
+   "fetchedAt": "2026-09-03T21:26:30.521Z",
+   "textChars": 1259,
+   "note": "The game's own API: guild creation dates, current rosters, owners and chiefs, territory holdings, season ratings and player records. Authoritative for the present, silent about the past."
   },
   "wynncraft-wiki-gg-wiki-guild-seasons": {
    "url": "https://wynncraft.wiki.gg/wiki/Guild_Seasons",

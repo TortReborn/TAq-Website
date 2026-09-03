@@ -141,7 +141,7 @@ export default function WikiArticleView({
 
         <article style={{ minWidth: 0 }}>
           {/* Infobox — right-floated on wide screens, stacked on mobile */}
-          {page.infobox.length > 0 && (
+          {(page.infobox.length > 0 || page.leadImage) && (
             <aside className="wiki-infobox">
               <div style={{
                 background: 'var(--bg-secondary)', fontWeight: 700, fontSize: '0.85rem',
@@ -150,6 +150,24 @@ export default function WikiArticleView({
               }}>
                 {page.title}
               </div>
+              {page.leadImage && (
+                <figure style={{ margin: 0, padding: '0.6rem 0.6rem 0.5rem', textAlign: 'center' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={page.leadImage}
+                    alt={page.leadImageCaption || page.title}
+                    style={{ maxWidth: '100%', height: 'auto', borderRadius: '0.25rem' }}
+                  />
+                  {page.leadImageCaption && (
+                    <figcaption style={{
+                      fontSize: '0.72rem', color: 'var(--text-secondary)',
+                      lineHeight: 1.4, marginTop: '0.35rem', textAlign: 'center',
+                    }}>
+                      {page.leadImageCaption}
+                    </figcaption>
+                  )}
+                </figure>
+              )}
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
                 <tbody>
                   <tr>
@@ -194,16 +212,30 @@ export default function WikiArticleView({
                 {references.map(c => (
                   <li key={c.number} id={citationAnchor(c.number)}>
                     <a href={`#${citationAnchor(c.number)}`} className="wiki-ref-back" aria-label={`Reference ${c.number}`}>^</a>{' '}
-                    {c.url ? (
+                    {c.referencePath ? (
+                      <Link href={c.referencePath} target="_blank" className="wiki-ref-link">{c.title}</Link>
+                    ) : c.url ? (
                       <a href={c.url} target="_blank" rel="noopener noreferrer" className="wiki-ref-link">{c.title}</a>
                     ) : (
                       <span>{c.title}</span>
                     )}
                     {c.locator && <span className="wiki-ref-meta">, {c.locator}</span>}
-                    {c.waybackCapture && (
-                      <span className="wiki-ref-meta">
-                        {' '}(archived {c.waybackCapture.slice(0, 4)}-{c.waybackCapture.slice(4, 6)}-{c.waybackCapture.slice(6, 8)})
-                      </span>
+                    {/* The archived copy is the primary target — it is what the
+                        claim was checked against — with the live page and any
+                        capture offered alongside. */}
+                    {c.referencePath && c.url && (
+                      <>
+                        {' '}<span className="wiki-ref-meta">·</span>{' '}
+                        <a href={c.url} target="_blank" rel="noopener noreferrer" className="wiki-ref-alt">original</a>
+                      </>
+                    )}
+                    {c.waybackUrl && c.waybackCapture && (
+                      <>
+                        {' '}<span className="wiki-ref-meta">·</span>{' '}
+                        <a href={c.waybackUrl} target="_blank" rel="noopener noreferrer" className="wiki-ref-alt">
+                          capture {c.waybackCapture.slice(0, 4)}-{c.waybackCapture.slice(4, 6)}-{c.waybackCapture.slice(6, 8)}
+                        </a>
+                      </>
                     )}
                   </li>
                 ))}
@@ -251,6 +283,8 @@ export default function WikiArticleView({
         :global(.wiki-ref-link) { color: var(--accent-primary); text-decoration: none; }
         :global(.wiki-ref-link:hover) { text-decoration: underline; }
         :global(.wiki-ref-meta) { color: var(--text-secondary); }
+        :global(.wiki-ref-alt) { color: var(--text-secondary); text-decoration: none; font-size: 0.95em; }
+        :global(.wiki-ref-alt:hover) { color: var(--accent-primary); text-decoration: underline; }
         :global(.wiki-references-manual) { list-style: disc; }
         :global(.wiki-references-manual .wiki-body) { font-size: 0.82rem; display: inline; }
         :global(.wiki-references-manual .wiki-body p) { margin: 0; display: inline; }
