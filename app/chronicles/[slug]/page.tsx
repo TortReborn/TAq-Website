@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getPool } from '@/lib/db';
 import { getWikiPage, wikiBacklinks, resolveWikiSlugs, listWikiRevisions } from '@/lib/wiki-db';
 import { resolveWikiEmbeds } from '@/lib/wiki-embed-db';
+import { resolveWikiCitations } from '@/lib/wiki-sources';
 import { extractWikiLinks } from '@/lib/wiki';
 import WikiArticleView from '@/components/WikiArticleView';
 
@@ -36,6 +37,8 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
     resolveWikiEmbeds(pool, page.body),
   ]);
   const last = revisions[0] ?? null;
+  // Citations resolve against the local source archive (no DB, no network)
+  const citations = resolveWikiCitations(page.body);
 
   return (
     <WikiArticleView
@@ -43,6 +46,7 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
       backlinks={backlinks}
       existingSlugs={[...existing]}
       embeds={embeds}
+      citations={citations}
       redirectedFrom={redirectedFrom}
       lastEditor={last ? { name: last.authorName, note: last.note } : null}
     />

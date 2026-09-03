@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { headingAnchor, slugify } from "@/lib/wiki";
 import { splitWikiBody, WikiEmbedMap } from "@/lib/wiki-embeds";
+import { CITATION_RE, WikiCitationMap, citationAnchor, citationBackAnchor, extractCitations } from "@/lib/wiki-citations";
 import WikiEmbed from "./WikiEmbeds";
 
 /**
@@ -80,12 +81,70 @@ function remarkWikiLinks() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// remark plugin: {{cite:...}} -> superscript reference marker.
+// Runs on text nodes like the wiki-link plugin, so code blocks stay untouched.
+// ---------------------------------------------------------------------------
+
+function splitCitations(node: MdNode, numbers: Map<string, number>): MdNode[] | null {
+  const text = node.value ?? "";
+  CITATION_RE.lastIndex = 0;
+  if (!CITATION_RE.test(text)) return null;
+  CITATION_RE.lastIndex = 0;
+
+  const out: MdNode[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = CITATION_RE.exec(text)) !== null) {
+    if (m.index > last) out.push({ type: "text", value: text.slice(last, m.index) });
+    const n = numbers.get(m[0]);
+    if (n) {
+      out.push({
+        type: "link",
+        url: `#${citationAnchor(n)}`,
+        data: { hProperties: { "data-cite": String(n), id: `${citationBackAnchor(n)}-${m.index}` } },
+        children: [{ type: "text", value: String(n) }],
+      });
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push({ type: "text", value: text.slice(last) });
+  return out;
+}
+
+function remarkCitations(numbers: Map<string, number>) {
+  return () => (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (!node.children) return;
+      const next: MdNode[] = [];
+      for (const child of node.children) {
+        if (child.type === "text") {
+          const replaced = splitCitations(child, numbers);
+          if (replaced) { next.push(...replaced); continue; }
+        }
+        walk(child);
+        next.push(child);
+      }
+      node.children = next;
+    };
+    walk(tree);
+  };
+}
+
 // Sanitize schema: default + heading ids + our wiki-link data attribute
 const sanitizeSchema = {
   ...defaultSchema,
   attributes: {
     ...defaultSchema.attributes,
-    a: [...(defaultSchema.attributes?.a ?? []), ["dataWikiSlug"], ["className"]],
+    // hProperties land in the tree verbatim, so these must be the literal
+    // attribute names — the camelCase hast forms are silently stripped, which
+    // takes the red-link and citation styling with them.
+    a: [
+      ...(defaultSchema.attributes?.a ?? []),
+      ["data-wiki-slug"], ["dataWikiSlug"],
+      ["data-cite"], ["dataCite"],
+      ["id"], ["className"],
+    ],
     h2: [...(defaultSchema.attributes?.h2 ?? []), ["id"]],
     h3: [...(defaultSchema.attributes?.h3 ?? []), ["id"]],
   },
@@ -97,6 +156,7 @@ function WikiMarkdown({
   body,
   existingSlugs,
   embeds,
+  citations,
 }: {
   body: string;
   /** Slugs known to exist — wiki links outside this set render as red links */
@@ -106,15 +166,23 @@ function WikiMarkdown({
    * When absent, directives render as placeholder cards (editor preview).
    */
   embeds?: WikiEmbedMap;
+  /** Resolved citations keyed by raw token; numbering is derived from the body */
+  citations?: WikiCitationMap;
 }) {
   const existing = useMemo(() => new Set(existingSlugs ?? []), [existingSlugs]);
   const knowsExistence = existingSlugs !== undefined;
   const segments = useMemo(() => splitWikiBody(body), [body]);
+  // Numbering comes from the body itself, so the editor preview matches the
+  // published article even before citations are resolved server-side.
+  const citationNumbers = useMemo(
+    () => new Map(extractCitations(body).map(c => [c.raw, c.number])),
+    [body],
+  );
 
   const renderMd = (text: string, key: number) => (
     <ReactMarkdown
         key={key}
-        remarkPlugins={[remarkGfm, remarkWikiLinks]}
+        remarkPlugins={[remarkGfm, remarkWikiLinks, remarkCitations(citationNumbers)]}
         rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
         components={{
           h2: ({ children, ...props }) => (
@@ -124,6 +192,18 @@ function WikiMarkdown({
             <h3 id={headingAnchor(textOf(children))} {...props}>{children}</h3>
           ),
           a: ({ href, children, node: _node, ...props }) => {
+            const citeNumber = (props as Record<string, unknown>)["data-cite"] as string | undefined;
+            if (citeNumber) {
+              const cite = citations
+                ? Object.values(citations).find(c => String(c.number) === citeNumber)
+                : undefined;
+              const tip = cite ? `${cite.title}${cite.locator ? ` — ${cite.locator}` : ""}` : undefined;
+              return (
+                <sup className="wiki-cite">
+                  <a href={href} {...props} title={tip}>[{children}]</a>
+                </sup>
+              );
+            }
             const wikiSlug = (props as Record<string, unknown>)["data-wiki-slug"] as string | undefined;
             if (wikiSlug) {
               const missing = knowsExistence && !existing.has(wikiSlug);
@@ -196,6 +276,10 @@ function WikiMarkdown({
         .wiki-table { border-collapse: collapse; font-size: 0.85rem; min-width: 50%; }
         .wiki-table th, .wiki-table td { border: 1px solid var(--border-color); padding: 0.35rem 0.6rem; text-align: left; }
         .wiki-table th { background: var(--bg-secondary); font-weight: 700; }
+        .wiki-body .wiki-cite { font-size: 0.72em; line-height: 0; vertical-align: super; white-space: nowrap; }
+        .wiki-body .wiki-cite a { color: var(--accent-primary); text-decoration: none; padding: 0 0.05em; }
+        .wiki-body .wiki-cite a:hover { text-decoration: underline; }
+        .wiki-body .wiki-cite a:target { background: color-mix(in srgb, var(--accent-primary) 18%, transparent); }
       `}</style>
     </div>
   );

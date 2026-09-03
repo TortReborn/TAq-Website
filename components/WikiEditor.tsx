@@ -127,6 +127,9 @@ export default function WikiEditor({
     ['[[link]]', () => insertSnippet('[[', ']]')],
     ['Table', () => insertSnippet('\n| Column | Column |\n| --- | --- |\n| ', ' | |\n')],
     ['Quote', () => insertSnippet('\n> ', '\n')],
+    // Inline reference: cite an archived source id (see data/sources/) so the
+    // footnote resolves to a real title and link.
+    ['Cite', () => insertSnippet('{{cite:', '}}')],
   ];
 
   // Live-data embeds: block directives, resolved when the article renders.
@@ -289,7 +292,9 @@ export default function WikiEditor({
           style={{ ...inputStyle, minHeight: '28rem', resize: 'vertical', fontFamily: 'monospace', fontSize: '0.8rem', lineHeight: 1.5 }}
           value={form.body}
           onChange={(e) => set('body', e.target.value)}
-          placeholder={'Markdown body. Wiki links: [[Page Title]] or [[page-slug|label]].\n\n## Section headings build the table of contents'}
+          placeholder={'Markdown body. Wiki links: [[Page Title]] or [[page-slug|label]].\n\nCitations: {{cite:thread-237070|p3 #45}} -> numbered superscript + reference entry.
+
+## Section headings build the table of contents'}
         />
         {showPreview && (
           <div style={{

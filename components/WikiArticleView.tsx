@@ -6,6 +6,7 @@ import { Pencil, History, Link2 } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
 import { WikiPage, WikiPageSummary, WIKI_TYPE_LABELS, extractToc } from "@/lib/wiki";
 import { WikiEmbedMap } from "@/lib/wiki-embeds";
+import { WikiCitationMap, citationAnchor, citationList } from "@/lib/wiki-citations";
 import { useExecSession } from "@/hooks/useExecSession";
 
 /**
@@ -23,6 +24,7 @@ export default function WikiArticleView({
   backlinks,
   existingSlugs,
   embeds,
+  citations,
   redirectedFrom,
   lastEditor,
 }: {
@@ -30,10 +32,12 @@ export default function WikiArticleView({
   backlinks: WikiPageSummary[];
   existingSlugs: string[];
   embeds?: WikiEmbedMap;
+  citations?: WikiCitationMap;
   redirectedFrom?: string;
   lastEditor?: { name: string; note: string } | null;
 }) {
   const { isExec, authenticated } = useExecSession();
+  const references = useMemo(() => (citations ? citationList(citations) : []), [citations]);
   const toc = useMemo(() => extractToc(page.body), [page.body]);
   const showToc = toc.length >= 3;
 
@@ -166,7 +170,39 @@ export default function WikiArticleView({
             </p>
           )}
 
-          <WikiMarkdown body={page.body} existingSlugs={existingSlugs} embeds={embeds} />
+          <WikiMarkdown body={page.body} existingSlugs={existingSlugs} embeds={embeds} citations={citations} />
+
+          {/* References — numbered, in order of first appearance, each linking
+              out to the cited source (and back to where it was cited). */}
+          {references.length > 0 && (
+            <section style={{ marginTop: '1.75rem' }}>
+              <h2 id="references" style={{
+                fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)',
+                margin: '1.5rem 0 0.5rem', paddingBottom: '0.25rem',
+                borderBottom: '1px solid var(--border-color)', scrollMarginTop: '5rem',
+              }}>
+                References
+              </h2>
+              <ol className="wiki-references">
+                {references.map(c => (
+                  <li key={c.number} id={citationAnchor(c.number)}>
+                    <a href={`#${citationAnchor(c.number)}`} className="wiki-ref-back" aria-label={`Reference ${c.number}`}>^</a>{' '}
+                    {c.url ? (
+                      <a href={c.url} target="_blank" rel="noopener noreferrer" className="wiki-ref-link">{c.title}</a>
+                    ) : (
+                      <span>{c.title}</span>
+                    )}
+                    {c.locator && <span className="wiki-ref-meta">, {c.locator}</span>}
+                    {c.waybackCapture && (
+                      <span className="wiki-ref-meta">
+                        {' '}(archived {c.waybackCapture.slice(0, 4)}-{c.waybackCapture.slice(4, 6)}-{c.waybackCapture.slice(6, 8)})
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
           {/* Footer: what links here + page info */}
           <footer style={{ marginTop: '2rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
@@ -193,6 +229,13 @@ export default function WikiArticleView({
 
       <style jsx>{`
         .wiki-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 0.5rem; }
+        :global(.wiki-references) { margin: 0.5rem 0 0 1.5rem; padding: 0; font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary); }
+        :global(.wiki-references li) { margin: 0.2rem 0; scroll-margin-top: 5rem; }
+        :global(.wiki-references li:target) { background: color-mix(in srgb, var(--accent-primary) 18%, transparent); border-radius: 0.25rem; }
+        :global(.wiki-ref-back) { color: var(--text-secondary); text-decoration: none; font-weight: 700; }
+        :global(.wiki-ref-link) { color: var(--accent-primary); text-decoration: none; }
+        :global(.wiki-ref-link:hover) { text-decoration: underline; }
+        :global(.wiki-ref-meta) { color: var(--text-secondary); }
         .wiki-toc { display: none; }
         :global(.wiki-infobox) {
           border: 1px solid var(--border-color);

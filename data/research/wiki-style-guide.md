@@ -57,22 +57,79 @@ Write ONE JSON file at the path given in your task: an array of page objects:
 Limits: title ≤ 120 chars, summary ≤ 500, body ≤ 100 000, infobox ≤ 24 rows,
 infobox label ≤ 40 chars / value ≤ 300 (values may contain [[wiki links]]).
 
-## Voice and rigor
+## Voice — emulate Wikipedia
 
-- Wikipedia register: neutral, third person, past tense for past events. No
-  first person, no editorializing, no hype.
-- **Every dated claim must trace to the corpus.** Where the record is inference
-  rather than attestation, say so in prose ("map-data analysis places the war's
-  start near..."; "the roster was never published"). Do not invent names, dates,
-  rosters, or causes. Uncertainty is content: state what is unknown.
-- End every article with a `## Sources` section: bulleted list, e.g.
-  `- Wynncraft forums thread 278112 ("the megalist"), posts of 2 Dec 2020 and 26 Jun 2022`
-  `- Titan Times vol. 6 (12 Oct 2022)`
-  `- territory_exchanges map-data analysis (weekly capture volumes)`
-  Cite what the corpus cites; do not fabricate citations.
-- If you use WebSearch/WebFetch to fill a gap, only add claims you actually
-  verified, and cite the URL/thread. Prefer the corpus when they conflict —
-  or note the conflict.
+Write as if for Wikipedia. Concretely:
+
+- **Neutral point of view.** Describe what happened and who said what; never take a
+  side, never praise or condemn. "Gang of Fools left the alliance mid-season" —
+  not "Gang of Fools infamously betrayed the alliance."
+- **Third person, past tense**, for past events. No "we", "our guild", "you".
+  The Aquarium is described exactly like every other guild.
+- **No peacock words** (legendary, iconic, dominant-beyond-question, greatest)
+  and **no weasel words** (some say, many believe, it is widely regarded).
+  If a superlative is in a source, attribute it: `Titan Times called it
+  "unquestionably the greatest super-alliance of 2023"`.
+- **Attribute contested claims** rather than asserting them. "Slayne later
+  claimed the alliance was founded as a rival project" beats "the alliance was
+  founded as a rival project."
+- **Lede first.** Open with a sentence that defines the subject and places it in
+  time: "The Federation was the dominant Wynncraft war alliance of 2018."
+- **No narrative flourish**: no rhetorical questions, no scene-setting, no
+  "little did they know". Dates and facts carry the drama on their own.
+- **Plain, specific language.** Prefer "held the entire map for 8 months and 25
+  days" to "enjoyed a long period of supremacy."
+
+## Rigor — every claim is sourced, nothing is invented
+
+This is the hard rule of the project: **do not make anything up.** No plausible
+dates, rosters, causes, outcomes or motivations. Readers cannot tell an invented
+detail from a real one, which is what makes it damaging.
+
+- Every factual claim traces to a source, and carries an inline citation.
+- **Uncertainty is content.** Write "the roster was never published", "which side
+  prevailed is not recorded", "the cause is undocumented" — these sentences are
+  valuable, not filler.
+- **Label non-attested material in the prose itself**, every time:
+  - map inference → "map-data analysis places the war's start near…"
+  - recollection → "in a 2019 memoir, Arkada recalled…"
+  - testimony → "according to a veteran's recollection, not corroborated in writing…"
+  - single-source → "attested only by a single forum post"
+- **State contradictions** instead of silently picking a side: "the community
+  timeline places the merger on 24 December; participants recall a Christmas Day
+  wipe followed by a February merger."
+- If you cannot source it, leave it out and say the record is silent.
+
+## Citations — inline superscripts, Wikipedia style
+
+Cite inline with `{{cite:...}}`, which renders a numbered superscript linking to
+a numbered reference list at the foot of the article:
+
+    Federation wiped HackForums' 111 territories in under 12 hours{{cite:thread-237070|post #1, 13 Nov 2018}}.
+
+Forms, in order of preference:
+
+1. **An archived source id** — `{{cite:thread-237070|post #1, 13 Nov 2018}}`.
+   Resolves automatically to the real title, URL and capture date from
+   `data/sources/index.json`, and the quoted text is on disk. **Always prefer this.**
+   Find ids with `node scripts/source-archive.mjs list` or `search`.
+2. **A URL** we have not archived — `{{cite:https://example.com/x|Page title}}`.
+   Better: archive it first with `source-archive.mjs add`, then cite the id.
+3. **Free text** for unlinkable evidence — `{{cite:territory_exchanges map-data analysis}}`.
+
+Rules:
+- The **locator** (after `|`) points at the exact place: `p3 #45`, `post #12`,
+  `vol. 6, 12 Oct 2022`. Include it whenever the source is longer than a page.
+- Identical citations share a number automatically, as on Wikipedia. A different
+  locator counts as a different reference.
+- **Cite at the claim**, not in a lump at the end of a paragraph — put the marker
+  immediately after the sentence or clause it supports.
+- Every paragraph making factual claims should carry at least one citation.
+- Do **not** hand-write a `## Sources` or `## References` section: the reference
+  list is generated. (Older articles still carry a manual `## Sources` list —
+  when you revise one, convert those entries into inline citations and delete
+  the section.)
+
 
 ## Wiki dialect
 
