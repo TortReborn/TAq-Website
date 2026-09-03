@@ -66,6 +66,35 @@ export async function ensureWikiTables(pool: Pool): Promise<void> {
       to_page_id INTEGER     NOT NULL REFERENCES wiki_pages(id) ON DELETE CASCADE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS wiki_page_submissions (
+      id             SERIAL PRIMARY KEY,
+      target_page_id INTEGER      NULL REFERENCES wiki_pages(id) ON DELETE SET NULL,
+      payload        JSONB        NOT NULL,
+      note           VARCHAR(300) NOT NULL DEFAULT '',
+      status         VARCHAR(10)  NOT NULL DEFAULT 'pending',
+      submitted_by   VARCHAR(30)  NOT NULL,
+      submitted_name VARCHAR(60)  NOT NULL DEFAULT '',
+      submitted_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+      reviewed_by    VARCHAR(60)  NULL,
+      review_note    VARCHAR(300) NULL,
+      reviewed_at    TIMESTAMPTZ  NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_wiki_submissions_status ON wiki_page_submissions(status);
+
+    CREATE TABLE IF NOT EXISTS wiki_images (
+      id          SERIAL PRIMARY KEY,
+      url         TEXT         NOT NULL,
+      filename    VARCHAR(200) NOT NULL,
+      mime        VARCHAR(60)  NOT NULL,
+      bytes       INTEGER      NOT NULL,
+      width       INTEGER      NULL,
+      height      INTEGER      NULL,
+      caption     VARCHAR(300) NOT NULL DEFAULT '',
+      status      VARCHAR(12)  NOT NULL DEFAULT 'active',
+      uploaded_by VARCHAR(30)  NOT NULL,
+      created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    );
   `);
   // Full-text search vector (separate statement: generated columns can't be
   // added twice, and IF NOT EXISTS isn't supported for them on older PG)
@@ -382,4 +411,108 @@ export async function setWikiPageStatus(
     [status, pageId],
   );
   return (result.rowCount ?? 0) > 0;
+}
+
+// ---------------------------------------------------------------------------
+// Suggestions (community proposals → exec review)
+// ---------------------------------------------------------------------------
+
+import { WikiSubmission } from './wiki';
+
+function rowToSubmission(row: Record<string, any>): WikiSubmission {
+  return {
+    id: row.id,
+    targetPageId: row.target_page_id ?? null,
+    payload: row.payload,
+    note: row.note,
+    status: row.status,
+    submittedBy: row.submitted_by,
+    submittedName: row.submitted_name,
+    submittedAt: row.submitted_at.toISOString(),
+    reviewedBy: row.reviewed_by ?? null,
+    reviewNote: row.review_note ?? null,
+    reviewedAt: row.reviewed_at ? row.reviewed_at.toISOString() : null,
+  };
+}
+
+export async function countPendingWikiBy(pool: Pool, discordId: string): Promise<number> {
+  await ensureWikiTables(pool);
+  const r = await pool.query(
+    `SELECT COUNT(*) AS n FROM wiki_page_submissions WHERE submitted_by = $1 AND status = 'pending'`,
+    [discordId],
+  );
+  return Number(r.rows[0].n);
+}
+
+export async function createWikiSubmission(
+  pool: Pool,
+  args: { targetPageId: number | null; payload: WikiPagePayload; note: string; submittedBy: string; submittedName: string },
+): Promise<number> {
+  await ensureWikiTables(pool);
+  const r = await pool.query(
+    `INSERT INTO wiki_page_submissions (target_page_id, payload, note, submitted_by, submitted_name)
+     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+    [args.targetPageId, JSON.stringify(args.payload), args.note, args.submittedBy, args.submittedName],
+  );
+  return r.rows[0].id;
+}
+
+export async function listWikiSubmissions(pool: Pool, status?: string, limit = 50): Promise<WikiSubmission[]> {
+  await ensureWikiTables(pool);
+  const r = status
+    ? await pool.query(`SELECT * FROM wiki_page_submissions WHERE status = $1 ORDER BY submitted_at DESC LIMIT $2`, [status, limit])
+    : await pool.query(`SELECT * FROM wiki_page_submissions ORDER BY submitted_at DESC LIMIT $1`, [limit]);
+  return r.rows.map(rowToSubmission);
+}
+
+/**
+ * Approve or reject a pending suggestion. Approval materializes the payload
+ * through the normal create/edit path, so the change lands as a revision
+ * authored by the SUGGESTER, with the reviewer recorded in the edit note.
+ */
+export async function reviewWikiSubmission(
+  pool: Pool,
+  args: { id: number; approve: boolean; reviewedBy: string; reviewNote: string },
+): Promise<{ ok: boolean; error?: string; slug?: string }> {
+  await ensureWikiTables(pool);
+  const found = await pool.query(`SELECT * FROM wiki_page_submissions WHERE id = $1 AND status = 'pending'`, [args.id]);
+  if (found.rows.length === 0) return { ok: false, error: 'Submission not found or already reviewed' };
+  const sub = rowToSubmission(found.rows[0]);
+
+  if (args.approve) {
+    const author = { id: sub.submittedBy, name: sub.submittedName };
+    const note = `${sub.note || 'Suggested edit'} (approved by ${args.reviewedBy})`.slice(0, 300);
+    let result: { ok: boolean; error?: string; slug?: string };
+    if (sub.targetPageId === null) {
+      const created = await createWikiPage(pool, sub.payload, author, note);
+      result = created.ok ? { ok: true, slug: sub.payload.slug } : created;
+    } else {
+      const edited = await editWikiPage(pool, sub.targetPageId, sub.payload, author, note);
+      result = edited.ok ? { ok: true, slug: edited.slug } : edited;
+    }
+    if (!result.ok) return result;
+  }
+
+  await pool.query(
+    `UPDATE wiki_page_submissions SET status = $1, reviewed_by = $2, review_note = $3, reviewed_at = NOW() WHERE id = $4`,
+    [args.approve ? 'approved' : 'rejected', args.reviewedBy, args.reviewNote, args.id],
+  );
+  return { ok: true, slug: sub.payload.slug };
+}
+
+// ---------------------------------------------------------------------------
+// Images
+// ---------------------------------------------------------------------------
+
+export async function recordWikiImage(
+  pool: Pool,
+  args: { url: string; filename: string; mime: string; bytes: number; width: number | null; height: number | null; caption: string; status: 'active' | 'pending'; uploadedBy: string },
+): Promise<number> {
+  await ensureWikiTables(pool);
+  const r = await pool.query(
+    `INSERT INTO wiki_images (url, filename, mime, bytes, width, height, caption, status, uploaded_by)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [args.url, args.filename, args.mime, args.bytes, args.width, args.height, args.caption, args.status, args.uploadedBy],
+  );
+  return r.rows[0].id;
 }

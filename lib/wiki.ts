@@ -203,3 +203,25 @@ export function validateWikiPagePayload(raw: unknown): Valid<WikiPagePayload> {
 
   return { ok: true, value: { slug: rawSlug, title, pageType, summary, infobox, body } };
 }
+
+// ---------------------------------------------------------------------------
+// Suggestions (community edit proposals — reviewed by execs)
+// ---------------------------------------------------------------------------
+
+export interface WikiSubmission {
+  id: number;
+  /** null = proposal for a new page */
+  targetPageId: number | null;
+  payload: WikiPagePayload;
+  note: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedBy: string;
+  submittedName: string;
+  submittedAt: string;
+  reviewedBy: string | null;
+  reviewNote: string | null;
+  reviewedAt: string | null;
+}
+
+/** Pending suggestions allowed per user at once (matches the map chronicle). */
+export const WIKI_PENDING_PER_USER = 5;

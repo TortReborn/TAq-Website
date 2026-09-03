@@ -30,7 +30,7 @@ export default function WikiArticleView({
   redirectedFrom?: string;
   lastEditor?: { name: string; note: string } | null;
 }) {
-  const { isExec } = useExecSession();
+  const { isExec, authenticated } = useExecSession();
   const toc = useMemo(() => extractToc(page.body), [page.body]);
   const showToc = toc.length >= 3;
 
@@ -67,11 +67,15 @@ export default function WikiArticleView({
           <Link href={`/chronicles/${page.slug}/history`} style={tabStyle(false)}>
             <History size={12} /> History
           </Link>
-          {isExec && (
+          {isExec ? (
             <Link href={`/chronicles/${page.slug}/edit`} style={tabStyle(false)}>
               <Pencil size={12} /> Edit
             </Link>
-          )}
+          ) : authenticated ? (
+            <Link href={`/chronicles/${page.slug}/edit`} style={tabStyle(false)}>
+              <Pencil size={12} /> Suggest edit
+            </Link>
+          ) : null}
         </div>
       </div>
 

@@ -5,7 +5,11 @@ import WikiEditor from "./WikiEditor";
 import { WikiPagePayload } from "@/lib/wiki";
 import { useExecSession } from "@/hooks/useExecSession";
 
-/** Exec gate for the wiki editor (Phase 2 opens a suggestion path for members). */
+/**
+ * Editor gate: execs edit directly; any other linked guild account gets the
+ * same editor in suggestion mode (queued for exec review); anonymous visitors
+ * are asked to sign in.
+ */
 export default function WikiEditorGate({
   targetId,
   initial,
@@ -13,18 +17,17 @@ export default function WikiEditorGate({
   targetId: number | null;
   initial: WikiPagePayload;
 }) {
-  const { isExec, loading } = useExecSession();
+  const { isExec, authenticated, loading } = useExecSession();
   if (loading) {
     return <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading…</div>;
   }
-  if (!isExec) {
+  if (!authenticated) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-        Editing the Chronicles wiki requires exec access.{' '}
         <Link href="/exec/login" style={{ color: 'var(--accent-primary)' }}>Sign in</Link>
-        {' '}— community edit suggestions are coming soon.
+        {' '}with a linked guild account to suggest edits to the Chronicles.
       </div>
     );
   }
-  return <WikiEditor targetId={targetId} initial={initial} />;
+  return <WikiEditor targetId={targetId} initial={initial} mode={isExec ? 'direct' : 'suggest'} />;
 }

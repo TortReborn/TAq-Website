@@ -9,28 +9,9 @@ import { WikiPage, WikiRevision } from "@/lib/wiki";
  * two revisions and compare them as a line-level diff.
  */
 
-const DT_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+import { diffCollapsed } from "@/lib/wiki-diff";
 
-// Simple LCS-based line diff — plenty for wiki bodies at this scale.
-function diffLines(a: string[], b: string[]): Array<{ kind: 'same' | 'del' | 'add'; text: string }> {
-  const n = a.length, m = b.length;
-  const lcs: number[][] = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-  for (let i = n - 1; i >= 0; i--) {
-    for (let j = m - 1; j >= 0; j--) {
-      lcs[i][j] = a[i] === b[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
-    }
-  }
-  const out: Array<{ kind: 'same' | 'del' | 'add'; text: string }> = [];
-  let i = 0, j = 0;
-  while (i < n && j < m) {
-    if (a[i] === b[j]) { out.push({ kind: 'same', text: a[i] }); i++; j++; }
-    else if (lcs[i + 1][j] >= lcs[i][j + 1]) { out.push({ kind: 'del', text: a[i] }); i++; }
-    else { out.push({ kind: 'add', text: b[j] }); j++; }
-  }
-  while (i < n) { out.push({ kind: 'del', text: a[i++] }); }
-  while (j < m) { out.push({ kind: 'add', text: b[j++] }); }
-  return out;
-}
+const DT_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
 export default function WikiHistoryView({ page, revisions }: { page: WikiPage; revisions: WikiRevision[] }) {
   const [oldRev, setOldRev] = useState<number | null>(revisions.length > 1 ? revisions[1].revNumber : null);
@@ -41,22 +22,7 @@ export default function WikiHistoryView({ page, revisions }: { page: WikiPage; r
     const b = revisions.find(r => r.revNumber === newRev);
     if (!a || !b || a.revNumber === b.revNumber) return null;
     const [older, newer] = a.revNumber < b.revNumber ? [a, b] : [b, a];
-    const rows = diffLines(older.body.split('\n'), newer.body.split('\n')).filter(r => r.kind !== 'same' ||
-      // keep 1-line context around changes by marking; simple approach: drop long same runs
-      false);
-    const full = diffLines(older.body.split('\n'), newer.body.split('\n'));
-    // Collapse same-runs to context of 2 lines around changes
-    const keep = new Set<number>();
-    full.forEach((r, idx) => {
-      if (r.kind !== 'same') for (let k = idx - 2; k <= idx + 2; k++) keep.add(k);
-    });
-    const collapsed: Array<{ kind: 'same' | 'del' | 'add' | 'skip'; text: string }> = [];
-    let skipping = false;
-    full.forEach((r, idx) => {
-      if (keep.has(idx)) { collapsed.push(r); skipping = false; }
-      else if (!skipping) { collapsed.push({ kind: 'skip', text: '⋯' }); skipping = true; }
-    });
-    return { older, newer, rows: collapsed, changed: rows.length > 0 || older.body !== newer.body };
+    return { older, newer, rows: diffCollapsed(older.body, newer.body) };
   }, [revisions, oldRev, newRev]);
 
   return (

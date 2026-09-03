@@ -12,6 +12,7 @@ import {
   eventTypeLabel,
 } from '@/lib/chronicle';
 import { SubmitForm, FormState } from '@/components/ChroniclePanel';
+import WikiReviewQueue from '@/components/WikiReviewQueue';
 
 // Date-only values (stored as UTC midnight) display as bare dates in UTC so
 // they never shift a day; values with a time-of-day display in local time.
@@ -202,6 +203,18 @@ export default function ExecChroniclePage() {
         publishes it immediately; edits replace the current entry. The full decision log below is
         the audit trail.
       </p>
+
+      <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+        Chronicles Wiki — suggestion queue
+      </h2>
+      <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+        Community-suggested wiki pages and edits. Approving publishes immediately, credited to the
+        suggester with you recorded as reviewer. Exec edits are made directly on the{' '}
+        <a href="/chronicles" style={{ color: 'var(--accent-primary)' }}>Chronicles pages</a> themselves.
+      </p>
+      <div style={{ marginBottom: '2rem' }}>
+        <WikiReviewQueue />
+      </div>
 
       <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
         Published entries

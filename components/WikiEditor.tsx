@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, X, Eye, EyeOff } from "lucide-react";
+import { Plus, X, Eye, EyeOff, ImagePlus } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
 import {
   WIKI_LIMITS,
@@ -44,9 +44,12 @@ const labelStyle: React.CSSProperties = {
 export default function WikiEditor({
   targetId,
   initial,
+  mode = 'direct',
 }: {
   targetId: number | null;
   initial: WikiPagePayload;
+  /** 'direct' publishes immediately (exec); 'suggest' queues for review */
+  mode?: 'direct' | 'suggest';
 }) {
   const router = useRouter();
   const [form, setForm] = useState<WikiPagePayload>(initial);
@@ -55,6 +58,8 @@ export default function WikiEditor({
   const [showPreview, setShowPreview] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggested, setSuggested] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const set = <K extends keyof WikiPagePayload>(key: K, value: WikiPagePayload[K]) =>
     setForm(f => ({ ...f, [key]: value }));
@@ -79,19 +84,38 @@ export default function WikiEditor({
     if (!validation.ok) { setError(validation.error); return; }
     setBusy(true);
     try {
-      const res = await fetch('/api/wiki/admin', {
+      const endpoint = mode === 'direct' ? '/api/wiki/admin' : '/api/wiki/suggest';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetId, payload: validation.value, note }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? 'Save failed'); return; }
+      if (mode === 'suggest') { setSuggested(true); return; }
       router.push(`/chronicles/${data.slug}`);
       router.refresh();
     } catch {
       setError('Network error');
     } finally {
       setBusy(false);
+    }
+  };
+
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/wiki/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? 'Upload failed'); return; }
+      insertSnippet(`\n![${file.name.replace(/\.[a-z]+$/i, '')}](${data.url})\n`, '');
+    } catch {
+      setError('Upload failed — network error');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -105,11 +129,31 @@ export default function WikiEditor({
     ['Quote', () => insertSnippet('\n> ', '\n')],
   ];
 
+  if (suggested) {
+    return (
+      <div style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
+        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>
+          Suggestion submitted
+        </div>
+        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+          An exec will review it — approved changes appear with you credited as the author.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
-      <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-        {targetId === null ? 'New Chronicles page' : `Editing: ${initial.title}`}
+      <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+        {targetId === null
+          ? (mode === 'direct' ? 'New Chronicles page' : 'Suggest a new Chronicles page')
+          : (mode === 'direct' ? `Editing: ${initial.title}` : `Suggest an edit: ${initial.title}`)}
       </h1>
+      {mode === 'suggest' && (
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0 0 0.75rem' }}>
+          Your changes go to the exec review queue; nothing publishes until approved.
+        </p>
+      )}
 
       {/* Metadata row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 2fr) minmax(160px, 1.5fr) minmax(120px, 1fr)', gap: '0.75rem' }}>
@@ -198,10 +242,26 @@ export default function WikiEditor({
             </button>
           ))}
         </div>
-        <button type="button" onClick={() => setShowPreview(p => !p)}
-          style={{ ...inputStyle, width: 'auto', padding: '0.25rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-          {showPreview ? <EyeOff size={13} /> : <Eye size={13} />} {showPreview ? 'Hide preview' : 'Show preview'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.3rem' }}>
+          <label style={{ ...inputStyle, width: 'auto', padding: '0.25rem 0.55rem', cursor: uploading ? 'wait' : 'pointer', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            <ImagePlus size={13} /> {uploading ? 'Uploading…' : 'Image'}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              style={{ display: 'none' }}
+              disabled={uploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) uploadImage(f);
+                e.target.value = '';
+              }}
+            />
+          </label>
+          <button type="button" onClick={() => setShowPreview(p => !p)}
+            style={{ ...inputStyle, width: 'auto', padding: '0.25rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            {showPreview ? <EyeOff size={13} /> : <Eye size={13} />} {showPreview ? 'Hide preview' : 'Show preview'}
+          </button>
+        </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr', gap: '0.75rem', alignItems: 'stretch' }}>
         <textarea
@@ -240,7 +300,11 @@ export default function WikiEditor({
             opacity: busy ? 0.6 : 1, padding: '0.45rem 1.2rem',
           }}
         >
-          {busy ? 'Saving…' : targetId === null ? 'Create page' : 'Save changes'}
+          {busy
+            ? 'Saving…'
+            : mode === 'suggest'
+              ? 'Submit suggestion'
+              : targetId === null ? 'Create page' : 'Save changes'}
         </button>
       </div>
       {error && <div style={{ color: '#e57373', fontSize: '0.8rem', marginTop: '0.5rem' }}>{error}</div>}
