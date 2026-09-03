@@ -100,6 +100,25 @@ detail from a real one, which is what makes it damaging.
   wipe followed by a February merger."
 - If you cannot source it, leave it out and say the record is silent.
 
+## Domain caveat — the in-game "ally" feature is not a political alliance
+
+Wynncraft's in-game guild ally system (the Diplomacy menu, and the "X formed an
+alliance with Y" chat broadcasts that Sequoia's mod began capturing in June 2026)
+is **mainly a game-mechanical convenience: it lets guilds run guild raids
+together.** It is *not* evidence of a political alliance. Guilds that are
+in-game allies may be rivals, and may have recently fought each other.
+
+These records are seductive because they are dated, verbatim and machine-made,
+arriving exactly when the written record goes quiet — which makes them easy to
+over-read. So:
+
+- Never present an in-game ally record as a bloc, a pact, a reconciliation, or a
+  side in a war.
+- Whenever such a record is cited, say what it is in the same breath: "an in-game
+  ally registration, a relationship used chiefly to permit joint guild raids".
+- Keep them clearly separate from the chronicle's war and community alliances,
+  which are a far stronger class of evidence.
+
 ## Citations — inline superscripts, Wikipedia style
 
 Cite inline with `{{cite:...}}`, which renders a numbered superscript linking to
