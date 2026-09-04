@@ -135,7 +135,8 @@ export async function ensureWikiTables(pool: Pool): Promise<void> {
   // key alongside the url (the url is a route on this site that streams it).
   await pool.query(`
     ALTER TABLE wiki_page_revisions ADD COLUMN IF NOT EXISTS author_kind VARCHAR(8) NOT NULL DEFAULT 'human';
-    ALTER TABLE wiki_images ADD COLUMN IF NOT EXISTS s3_key VARCHAR(300) NOT NULL DEFAULT '';
+    ALTER TABLE wiki_images ADD COLUMN IF NOT EXISTS s3_key VARCHAR(600) NOT NULL DEFAULT '';
+    ALTER TABLE wiki_images ADD COLUMN IF NOT EXISTS backend VARCHAR(8) NOT NULL DEFAULT 's3';
 
     CREATE TABLE IF NOT EXISTS wiki_chroniclers (
       discord_id   VARCHAR(30)  PRIMARY KEY,
@@ -554,13 +555,13 @@ export async function reviewWikiSubmission(
 
 export async function recordWikiImage(
   pool: Pool,
-  args: { url: string; s3Key?: string; filename: string; mime: string; bytes: number; width: number | null; height: number | null; caption: string; status: 'active' | 'pending'; uploadedBy: string },
+  args: { url: string; s3Key?: string; backend?: 'blob' | 's3'; filename: string; mime: string; bytes: number; width: number | null; height: number | null; caption: string; status: 'active' | 'pending'; uploadedBy: string },
 ): Promise<number> {
   await ensureWikiTables(pool);
   const r = await pool.query(
-    `INSERT INTO wiki_images (url, s3_key, filename, mime, bytes, width, height, caption, status, uploaded_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
-    [args.url, args.s3Key ?? '', args.filename, args.mime, args.bytes, args.width, args.height, args.caption, args.status, args.uploadedBy],
+    `INSERT INTO wiki_images (url, s3_key, backend, filename, mime, bytes, width, height, caption, status, uploaded_by)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+    [args.url, args.s3Key ?? '', args.backend ?? 's3', args.filename, args.mime, args.bytes, args.width, args.height, args.caption, args.status, args.uploadedBy],
   );
   return r.rows[0].id;
 }

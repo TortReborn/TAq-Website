@@ -1,17 +1,19 @@
 import { NextResponse } from 'next/server';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getPool } from '@/lib/db';
-import { getS3 } from '@/lib/s3';
+import { getWikiImage, type WikiImageBackend } from '@/lib/wiki-image-storage';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Serve a wiki image out of S3. The bucket is not public, so uploads are
- * referenced as /api/wiki/image/<id> and streamed through here.
+ * Serve a wiki image.
+ *
+ * Images are addressed by row id rather than by their storage URL so the
+ * backend can move between S3 and Vercel Blob without rewriting URLs already
+ * embedded in article bodies, and so quarantined uploads stay unreachable.
  *
  * Only 'active' images are served. An image uploaded by someone without publish
- * rights stays 'pending' until the suggestion using it is approved, so a
- * quarantined image cannot be surfaced simply by linking straight to its id.
+ * rights stays 'pending' until the suggestion using it is approved, so it
+ * cannot be surfaced by linking straight to its id.
  */
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const { id: rawId } = await context.params;
@@ -22,7 +24,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 
   try {
     const result = await getPool().query(
-      `SELECT s3_key, mime, status FROM wiki_images WHERE id = $1`,
+      `SELECT s3_key, backend, mime, status FROM wiki_images WHERE id = $1`,
       [id],
     );
     if (result.rows.length === 0) {
@@ -33,12 +35,13 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       return NextResponse.json({ error: 'Image not available' }, { status: 404 });
     }
 
-    const { client, bucket } = getS3();
-    const object = await client.send(new GetObjectCommand({ Bucket: bucket, Key: row.s3_key }));
-    const bytes = await object.Body?.transformToByteArray();
+    const bytes = await getWikiImage({
+      backend: (row.backend as WikiImageBackend) ?? 's3',
+      location: row.s3_key,
+    });
     if (!bytes) return NextResponse.json({ error: 'Image data is unavailable' }, { status: 404 });
 
-    return new NextResponse(Buffer.from(bytes), {
+    return new NextResponse(new Uint8Array(bytes), {
       headers: {
         'Content-Type': row.mime || 'image/webp',
         // Content at a given id never changes — a new upload gets a new id.
