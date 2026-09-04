@@ -74,7 +74,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(240px, 1fr)', gap: '1.5rem', alignItems: 'start' }}>
+      <div className="chronicles-hub-grid">
         {/* Page index */}
         <section>
           {pages.length === 0 ? (

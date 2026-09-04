@@ -706,6 +706,43 @@ body.site-fixed-bg-active > footer {
   pointer-events: none;
 }
 
+/* Wiki editor: three fixed grids whose column minimums summed to 480px and
+   420px, so on a phone they overflowed the screen. Single column by default,
+   multi-column only where there is room. */
+.wiki-editor-meta,
+.wiki-editor-meta2,
+.wiki-editor-panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+.wiki-editor-panes { align-items: stretch; }
+
+@media (min-width: 760px) {
+  .wiki-editor-meta { grid-template-columns: minmax(200px, 2fr) minmax(160px, 1.5fr) minmax(120px, 1fr); }
+  .wiki-editor-meta2 { grid-template-columns: minmax(220px, 2fr) minmax(200px, 3fr); }
+}
+
+@media (min-width: 900px) {
+  .wiki-editor-panes--split { grid-template-columns: 1fr 1fr; }
+}
+
+/* Chronicles hub: page index beside recent changes on wide screens, stacked on
+   narrow ones. It was a fixed two-column grid whose right column had a 240px
+   minimum, so on a phone the two columns overlapped and both were unreadable. */
+.chronicles-hub-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .chronicles-hub-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  }
+}
+
 /* Near-opaque reading surface for long-form pages (the Chronicles). Rendered
    in the root layout as a sibling of PageTransition, deliberately: when this
    darkening lived inside the route layout it was a child of the transition
