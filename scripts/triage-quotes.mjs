@@ -40,6 +40,11 @@ const norm = (s) =>
     // ("control it.And the thing"). Applied to article and source alike, so a
     // faithful quotation stops reading as an altered one.
     .replace(/([.,;:!?])(?=[A-Za-z])/g, '$1 ')
+    // A forum listing wraps a hyphenated title across two lines, so the thread
+    // "Come Join! The Odeus Anti-Validus Pact" is archived as "Anti- Validus".
+    .replace(/([A-Za-z])-\s+([A-Za-z])/g, '$1-$2')
+    // Quote-style list markers are the post's formatting, not its words.
+    .replace(/(^|\s)>\s*/g, '$1')
     .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
