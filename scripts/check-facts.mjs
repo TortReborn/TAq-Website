@@ -124,7 +124,8 @@ function sourceText(id) {
     // claim be "verified" against our own summary of the source rather than the
     // source. The line endings here are CRLF, and an LF-only pattern silently
     // matched nothing at all — leaving every frontmatter block in place.
-    text = norm(raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ''));
+    const title = (raw.match(/^title:\s*"?(.+?)"?\s*$/m) ?? [])[1] ?? '';
+    text = norm(`${title}\n` + raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ''));
   }
   docCache.set(id, text);
   return text;
@@ -207,6 +208,9 @@ for (const a of articles) {
 
     const prose = seg
       .replace(/!\[[\s\S]*?\]\([^)]*\)/g, ' ')
+      .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g, '$1')
+      .replace(/\[\[([^\]]*)\]\]/g, '$1')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(CITE_G, ' ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -224,13 +228,23 @@ for (const a of articles) {
         const parts = norm(quote).split(/\s*\.\.\.\s*|\s*\[…\]\s*/).filter((p) => p.length >= 12);
         const missing = parts.filter((p) => !pool.includes(p));
         if (missing.length) {
+          // Much of this corpus is Discord screenshots, and a quotation read off
+          // one will never appear in the extracted text however faithful it is.
+          // Three findings I called fabrications turned out to be verbatim in
+          // the image the citation named. When the locator says "screenshot",
+          // the text search cannot settle the question and must not pretend to.
+          const fromImage = cites.some((c) => /screenshot|image|img/i.test(c.locator));
           add({
-            kind: 'quote-not-in-source',
-            severity: 'high',
+            kind: fromImage ? 'quote-only-verifiable-in-image' : 'quote-not-in-source',
+            severity: fromImage ? 'low' : 'high',
             slug: a.slug,
             detail: quote.slice(0, 160),
             cited: [...new Set(cites.map((c) => c.id))].join(', '),
-            note: missing.length === parts.length ? 'no part of this quotation found' : 'part of this quotation not found',
+            note: fromImage
+              ? 'citation names a screenshot; open the image to settle it'
+              : missing.length === parts.length
+                ? 'no part of this quotation found'
+                : 'part of this quotation not found',
           });
         }
       }
