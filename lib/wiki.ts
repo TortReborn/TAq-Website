@@ -55,6 +55,21 @@ export interface WikiPage extends WikiPagePayload {
   createdAt: string;
 }
 
+/**
+ * What produced a piece of text. 'ai' is the drafting pipeline (the seeder and
+ * anything else generating prose); 'human' is a person in the editor. This is
+ * load-bearing rather than decorative: a page is unverified exactly while it
+ * has no human revision.
+ */
+export type WikiAuthorKind = 'ai' | 'human';
+
+export interface WikiAuthor {
+  id: string;
+  name: string;
+  /** Defaults to 'human' — only the generation pipeline passes 'ai'. */
+  kind?: WikiAuthorKind;
+}
+
 export interface WikiRevision {
   id: number;
   pageId: number;
@@ -65,9 +80,30 @@ export interface WikiRevision {
   body: string;
   authorId: string;
   authorName: string;
+  authorKind: WikiAuthorKind;
   note: string;
   createdAt: string;
 }
+
+/** A page's standing with the people who check it. */
+export interface WikiVerification {
+  /** True once a human has revised the page, or enough chroniclers vouch for it. */
+  verified: boolean;
+  /** A human has edited it — the strongest signal, and it never lapses. */
+  hasHumanRevision: boolean;
+  /** Chroniclers who vouched for the *current* revision. */
+  validations: number;
+  /** Names of those chroniclers, for the banner's tooltip. */
+  validatedBy: string[];
+  /** Has the viewer already vouched for this revision? */
+  viewerValidated: boolean;
+}
+
+/**
+ * Vouches needed to clear the banner on a page no human has edited. Two, so no
+ * single person can wave through a page — including one they wrote.
+ */
+export const WIKI_VALIDATIONS_REQUIRED = 2;
 
 /** Lightweight listing row (search results, category pages, recent changes) */
 export interface WikiPageSummary {
@@ -99,7 +135,9 @@ export const WIKI_LIMITS = {
  * Lead images must be our own assets or an absolute http(s) URL — no
  * javascript:, data: or protocol-relative targets reaching an <img src>.
  */
-export const WIKI_IMAGE_SRC_RE = /^(?:\/images\/[A-Za-z0-9._\-/]+|https?:\/\/[^\s"'<>]+)$/;
+// Uploaded images live in S3 and are served through /api/wiki/image/<id>, so
+// that path is a valid source alongside the committed /images tree.
+export const WIKI_IMAGE_SRC_RE = /^(?:\/images\/[A-Za-z0-9._\-/]+|\/api\/wiki\/image\/\d+|https?:\/\/[^\s"'<>]+)$/;
 
 export const WIKI_SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -219,7 +257,7 @@ export function validateWikiPagePayload(raw: unknown): Valid<WikiPagePayload> {
 
   const leadImage = cleanText(p.leadImage, WIKI_LIMITS.leadImageMax);
   if (leadImage && !WIKI_IMAGE_SRC_RE.test(leadImage)) {
-    return { ok: false, error: 'Lead image must be a /images/... path or an http(s) URL' };
+    return { ok: false, error: 'Lead image must be an uploaded image, a /images/... path, or an http(s) URL' };
   }
   const leadImageCaption = cleanText(p.leadImageCaption, WIKI_LIMITS.leadImageCaptionMax);
   if (leadImageCaption && !leadImage) {

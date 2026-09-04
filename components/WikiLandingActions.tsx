@@ -1,15 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useExecSession } from "@/hooks/useExecSession";
+import { useWikiSession } from "@/hooks/useWikiSession";
 
-/** Exec-only "New page" action on the Chronicles landing header. */
+/**
+ * Actions on the Chronicles landing header.
+ *
+ * The editorial desk is offered to anyone — a reader who wants to know what is
+ * still unchecked should be able to find it — while creating a page needs
+ * publish rights. Driven by the wiki session, not the exec session, so a
+ * chronicler outside the guild sees their tools.
+ */
 export default function WikiLandingActions() {
-  const { isExec } = useExecSession();
-  if (!isExec) return null;
+  const { canPublish, canReview } = useWikiSession();
+  const linkStyle = {
+    fontSize: '0.82rem',
+    color: 'var(--accent-primary)',
+    textDecoration: 'none',
+    fontWeight: 600,
+  } as const;
+
   return (
-    <Link href="/chronicles/new" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
-      + New page
-    </Link>
+    <span style={{ display: 'inline-flex', gap: '0.9rem', alignItems: 'center' }}>
+      <Link href="/chronicles/admin" style={linkStyle}>
+        {canReview ? 'Editorial' : 'What needs checking'}
+      </Link>
+      {canPublish && (
+        <Link href="/chronicles/new" style={linkStyle}>
+          + New page
+        </Link>
+      )}
+    </span>
   );
 }

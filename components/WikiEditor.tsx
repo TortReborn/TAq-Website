@@ -135,6 +135,24 @@ export default function WikiEditor({
     }
   };
 
+  /** Upload and set the lead image, rather than inserting into the body. */
+  const uploadLeadImage = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/wiki/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? 'Upload failed'); return; }
+      set('leadImage', data.url);
+    } catch {
+      setError('Upload failed — network error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const uploadImage = async (file: File) => {
     setUploading(true);
     setError(null);
@@ -233,13 +251,44 @@ export default function WikiEditor({
       <div className="wiki-editor-meta2">
         <div>
           <div style={labelStyle}>Lead image (shown at the top of the infobox)</div>
-          <input
-            style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '0.75rem' }}
-            placeholder="/images/chronicles/media/example.webp"
-            value={form.leadImage ?? ''}
-            maxLength={WIKI_LIMITS.leadImageMax}
-            onChange={(e) => set('leadImage', e.target.value)}
-          />
+          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'stretch' }}>
+            <input
+              style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '0.75rem', flex: 1, minWidth: 0 }}
+              placeholder="Upload one, or paste a path or URL"
+              value={form.leadImage ?? ''}
+              maxLength={WIKI_LIMITS.leadImageMax}
+              onChange={(e) => set('leadImage', e.target.value)}
+            />
+            <label
+              title="Upload an image for the top of this article"
+              style={{
+                ...inputStyle, width: 'auto', padding: '0 0.6rem', cursor: uploading ? 'wait' : 'pointer',
+                fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <ImagePlus size={13} /> {uploading ? 'Uploading…' : 'Upload'}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                style={{ display: 'none' }}
+                disabled={uploading}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = '';
+                  if (f) uploadLeadImage(f);
+                }}
+              />
+            </label>
+          </div>
+          {form.leadImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={form.leadImage}
+              alt=""
+              style={{ marginTop: '0.4rem', maxHeight: '110px', maxWidth: '100%', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}
+            />
+          ) : null}
         </div>
         <div>
           <div style={labelStyle}>Lead image caption</div>
