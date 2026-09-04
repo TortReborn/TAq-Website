@@ -200,7 +200,7 @@ export default function WikiEditor({
       )}
 
       {/* Metadata row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 2fr) minmax(160px, 1.5fr) minmax(120px, 1fr)', gap: '0.75rem' }}>
+      <div className="wiki-editor-meta">
         <div>
           <div style={labelStyle}>Title</div>
           <input
@@ -230,7 +230,7 @@ export default function WikiEditor({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 2fr) minmax(200px, 3fr)', gap: '0.75rem' }}>
+      <div className="wiki-editor-meta2">
         <div>
           <div style={labelStyle}>Lead image (shown at the top of the infobox)</div>
           <input
@@ -264,7 +264,7 @@ export default function WikiEditor({
       {/* Infobox rows */}
       <div style={labelStyle}>Infobox</div>
       {form.infobox.map((row, i) => (
-        <div key={i} style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.35rem' }}>
+        <div key={i} style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
           <input
             style={{ ...inputStyle, width: '11rem' }}
             placeholder="Label"
@@ -300,8 +300,8 @@ export default function WikiEditor({
       )}
 
       {/* Body: toolbar + split pane */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0.9rem 0 0.25rem' }}>
-        <div style={{ display: 'flex', gap: '0.3rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', flexWrap: 'wrap', margin: '0.9rem 0 0.25rem' }}>
+        <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
           {toolbar.map(([label, fn]) => (
             <button key={label} type="button" onClick={fn}
               style={{ ...inputStyle, width: 'auto', padding: '0.25rem 0.55rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700 }}>
@@ -321,7 +321,7 @@ export default function WikiEditor({
             {embedSnippets.map(([label]) => <option key={label} value={label}>{label}</option>)}
           </select>
         </div>
-        <div style={{ display: 'flex', gap: '0.3rem' }}>
+        <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
           <label style={{ ...inputStyle, width: 'auto', padding: '0.25rem 0.55rem', cursor: uploading ? 'wait' : 'pointer', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
             <ImagePlus size={13} /> {uploading ? 'Uploading…' : 'Image'}
             <input
@@ -342,7 +342,7 @@ export default function WikiEditor({
           </button>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr', gap: '0.75rem', alignItems: 'stretch' }}>
+      <div className={showPreview ? 'wiki-editor-panes wiki-editor-panes--split' : 'wiki-editor-panes'}>
         <textarea
           id="wiki-body-input"
           style={{ ...inputStyle, minHeight: '28rem', resize: 'vertical', fontFamily: 'monospace', fontSize: '0.8rem', lineHeight: 1.5 }}
@@ -361,7 +361,7 @@ export default function WikiEditor({
       </div>
 
       {/* Save row */}
-      <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', marginTop: '0.9rem' }}>
+      <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap', marginTop: '0.9rem' }}>
         <input
           style={{ ...inputStyle, flex: 1 }}
           placeholder="Edit summary (what changed and why — shown in page history)"

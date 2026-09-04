@@ -63,19 +63,23 @@ function AllianceCard({ data }: { data: AllianceEmbedData }) {
   const former = data.members.filter(m => m.leftAt !== null);
   const mapHref = data.startsAt ? `/map/history/chronicle?t=${data.startsAt.slice(0, 10)}` : '/map/history/chronicle';
 
+  // The date column is nowrap, so on a phone the table is wider than the card.
+  // Let it scroll inside its own box rather than run off the screen edge.
   const memberRows = (rows: typeof data.members) => (
-    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-      <tbody>
-        {rows.map((m, i) => (
-          <tr key={`${m.guild}-${i}`} style={{ borderTop: '1px solid var(--border-color)' }}>
-            <td style={{ padding: '0.25rem 0.9rem', color: 'var(--text-primary)' }}>{m.guild}</td>
-            <td style={{ padding: '0.25rem 0.9rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', textAlign: 'right' }}>
-              {fmtDate(m.joinedAt)} – {fmtDate(m.leftAt)}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+        <tbody>
+          {rows.map((m, i) => (
+            <tr key={`${m.guild}-${i}`} style={{ borderTop: '1px solid var(--border-color)' }}>
+              <td style={{ padding: '0.25rem 0.6rem', color: 'var(--text-primary)' }}>{m.guild}</td>
+              <td style={{ padding: '0.25rem 0.6rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', textAlign: 'right' }}>
+                {fmtDate(m.joinedAt)} – {fmtDate(m.leftAt)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   return (

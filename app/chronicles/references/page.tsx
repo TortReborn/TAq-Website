@@ -98,7 +98,9 @@ export default async function ReferencesIndex() {
           </h2>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {byKind.get(kind)!.sort((a, b) => a[0].localeCompare(b[0])).map(([id, s]) => (
-              <li key={id} style={{ padding: '0.3rem 0', borderBottom: '1px solid var(--border-color)', fontSize: '0.82rem' }}>
+              // Source titles are sometimes a raw repository path with no spaces
+              // in it, which runs off a phone screen unless it may break anywhere.
+              <li key={id} style={{ padding: '0.3rem 0', borderBottom: '1px solid var(--border-color)', fontSize: '0.82rem', overflowWrap: 'anywhere' }}>
                 <Link href={`/chronicles/references/${id}`} target="_blank"
                   style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
                   {s.title ?? id}
