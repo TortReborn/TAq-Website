@@ -34,7 +34,19 @@ interface MdNode {
   data?: { hProperties?: Record<string, unknown> };
 }
 
-const WIKI_LINK_RE = /\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g;
+const WIKI_LINK_RE = /\[\[([^\]|]+)(?:\\?\|([^\]]*))?\]\]/g;
+
+/**
+ * Escape the pipe inside a wiki link so the table parser cannot split a row
+ * there. Markdown already defines "\|" as a literal pipe in a cell, so this is
+ * the mechanism tables expect rather than a trick — and it is harmless outside
+ * a table, where the escape simply never matters.
+ */
+export function protectWikiLinkPipes(md: string): string {
+  return md.replace(/\[\[([^\]]*)\]\]/g, (whole, inner) =>
+    inner.includes('|') ? `[[${inner.split('|').join('\\|')}]]` : whole,
+  );
+}
 
 function splitWikiLinks(node: MdNode): MdNode[] | null {
   const text = node.value ?? "";
@@ -48,7 +60,7 @@ function splitWikiLinks(node: MdNode): MdNode[] | null {
   while ((m = WIKI_LINK_RE.exec(text)) !== null) {
     if (m.index > last) out.push({ type: "text", value: text.slice(last, m.index) });
     const target = m[1].trim();
-    const label = (m[2] ?? "").trim() || target;
+    const label = (m[2] ?? "").replace(/\\\|/g, '|').trim() || target;
     const slug = slugify(target);
     out.push({
       type: "link",
@@ -180,7 +192,7 @@ function WikiMarkdown({
     [body],
   );
 
-  const renderMd = (text: string, key: number) => (
+  const renderMd = (rawText: string, key: number) => (
     <ReactMarkdown
         key={key}
         remarkPlugins={[remarkGfm, remarkWikiLinks, remarkCitations(citationNumbers)]}
@@ -279,7 +291,7 @@ function WikiMarkdown({
           ),
         }}
       >
-        {text}
+        {protectWikiLinkPipes(rawText)}
       </ReactMarkdown>
   );
 
