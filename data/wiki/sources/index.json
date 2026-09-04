@@ -615,6 +615,24 @@
    "note": "titantimes/valor — Titans Valor's Discord bot; consumed an alliance-claims feed built on Avicia's site code, commits Apr 23 - Dec 26 2022, corroborating ANO/AVO shared alliance infrastructure in the Cucumber Company window",
    "tier": "secondary"
   },
+  "holders-of-le-announcements": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "Holders of LE guild announcements (Discord export, Feb-Jul 2018)",
+   "fetchedAt": "2026-09-04T21:22:51.559Z",
+   "textChars": 12500,
+   "note": "The guild's internal announcement channel during its Federation year: territory assignments and defence orders, promotions, alliance joins, and the events it entered. Two real first names and the live invite, attachment and form links were removed before archiving.",
+   "tier": "primary"
+  },
+  "holders-of-le-public-announcements": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "Holders of LE public announcements (Discord export, 2018-2019)",
+   "fetchedAt": "2026-09-04T21:24:55.068Z",
+   "textChars": 845,
+   "note": "The guild's public announcement channel. Four notices: the red-panda banner of April 2018, Drew1011 reviving HoL as an open community in June 2018, an inactivity purge three days later, and a new icon in March 2019.",
+   "tier": "primary"
+  },
   "kingdomfoxes-com-members": {
    "url": "https://kingdomfoxes.com/members",
    "kind": "capture",
