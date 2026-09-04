@@ -29,6 +29,8 @@ if (!dryRun && !useProd && !args.includes('--dev')) {
   process.exit(2);
 }
 
+const unquote = (v) => v.replace(/^(['"])(.*)\1$/s, '$2');
+
 for (const name of ['.env', '.env.local']) {
   const envPath = path.join(__dirname, '..', name);
   if (!fs.existsSync(envPath)) continue;
@@ -38,7 +40,8 @@ for (const name of ['.env', '.env.local']) {
     const idx = trimmed.indexOf('=');
     if (idx === -1) continue;
     const key = trimmed.slice(0, idx).trim();
-    if (!process.env[key]) process.env[key] = trimmed.slice(idx + 1).trim();
+    // vercel env pull quotes its values; those quotes are not part of the value.
+    if (!process.env[key]) process.env[key] = unquote(trimmed.slice(idx + 1).trim());
   }
 }
 
