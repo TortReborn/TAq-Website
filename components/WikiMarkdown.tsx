@@ -11,7 +11,7 @@ import { CITATION_RE, WikiCitationMap, citationAnchor, citationBackAnchor, extra
 import WikiEmbed from "./WikiEmbeds";
 
 /**
- * Chronicles Wiki markdown renderer.
+ * Chronicle Wiki markdown renderer.
  *
  * GitHub-flavored markdown, sanitized (no raw HTML — bodies are ultimately
  * community input), plus the wiki dialect:

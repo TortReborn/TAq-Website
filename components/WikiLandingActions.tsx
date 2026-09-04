@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useWikiSession } from "@/hooks/useWikiSession";
 
 /**
- * Actions on the Chronicles landing header.
+ * Actions on the Chronicle landing header.
  *
  * The editorial desk is offered to anyone — a reader who wants to know what is
  * still unchecked should be able to find it — while creating a page needs

@@ -11,8 +11,8 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'References — Chronicles',
-  description: 'Every primary source the Chronicles wiki cites, archived and readable.',
+  title: 'References — Chronicle',
+  description: 'Every primary source the Chronicle wiki cites, archived and readable.',
 };
 
 interface SourceMeta {
@@ -55,7 +55,7 @@ export default async function ReferencesIndex() {
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicles</Link>
+        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
       </div>
       <h1 style={{
         fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)',
@@ -64,7 +64,7 @@ export default async function ReferencesIndex() {
         References
       </h1>
       <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0.9rem 0 1.25rem' }}>
-        Every source the Chronicles articles cite, archived here as it read when it was checked.
+        Every source the Chronicle articles cite, archived here as it read when it was checked.
         Forum threads get edited and deleted, image hosts expire and guild sites go down, so each
         citation points at a copy that will still be here. {Object.keys(sources).length} sources.
       </p>

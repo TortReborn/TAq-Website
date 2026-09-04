@@ -1,6 +1,6 @@
 # Source archive
 
-Primary sources for the Chronicles wiki, fetched once and kept here so that
+Primary sources for the Chronicle wiki, fetched once and kept here so that
 writing and fact-checking read from disk instead of the network.
 
 Wynncraft's guild history lives on pages that keep disappearing: forum threads

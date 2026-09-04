@@ -209,7 +209,7 @@ export default function WikiEditor({
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
         {targetId === null
-          ? (mode === 'direct' ? 'New Chronicles page' : 'Suggest a new Chronicles page')
+          ? (mode === 'direct' ? 'New Chronicle page' : 'Suggest a new Chronicle page')
           : (mode === 'direct' ? `Editing: ${initial.title}` : `Suggest an edit: ${initial.title}`)}
       </h1>
       {mode === 'suggest' && (

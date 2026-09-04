@@ -9,7 +9,7 @@ import { useWikiSession } from "@/hooks/useWikiSession";
 /**
  * The unverified notice.
  *
- * Every article in the Chronicles was drafted from archived sources by an AI
+ * Every article in the Chronicle was drafted from archived sources by an AI
  * pass. That is a reasonable way to get 180 pages written and a poor reason for
  * a reader to trust any one of them, so a page says so plainly until a person
  * has either edited it or vouched for it.

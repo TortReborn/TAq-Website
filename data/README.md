@@ -21,7 +21,7 @@ data/
     research-notes-2020-2026.md  the sourced dossier behind the 2020-2026
                                 chronicle entries
 
-  wiki/                         everything behind the Chronicles wiki
+  wiki/                         everything behind the Chronicle wiki
     seed-articles.json          every published article, exported from the
                                 database. Re-seed or reproduce the whole wiki
                                 with scripts/seed-wiki-articles.mjs

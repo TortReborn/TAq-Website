@@ -5,7 +5,7 @@ import { activeImageBackend } from '@/lib/wiki-image-storage';
 export const dynamic = 'force-dynamic';
 
 /**
- * Who the viewer is, as far as the Chronicles are concerned.
+ * Who the viewer is, as far as the Chronicle are concerned.
  *
  * Distinct from /api/auth/exec-session because that answers a guild question
  * (rank, in-guild, uuid) and returns unauthenticated for a chronicler who was

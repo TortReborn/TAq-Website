@@ -1,4 +1,4 @@
-// Seed Chronicles wiki articles from data/wiki/seed-articles.json.
+// Seed Chronicle wiki articles from data/wiki/seed-articles.json.
 //
 //   node scripts/seed-wiki-articles.mjs --dry-run     validate only
 //   node scripts/seed-wiki-articles.mjs --dev         seed the TEST_DB_* database

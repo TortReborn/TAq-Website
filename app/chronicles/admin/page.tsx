@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import ChroniclesAdmin from '@/components/ChroniclesAdmin';
 
 export const metadata: Metadata = {
-  title: 'Chronicles — editorial',
-  description: 'Review queue, unverified pages and chronicler management for the Chronicles.',
+  title: 'Chronicle — editorial',
+  description: 'Review queue, unverified pages and chronicler management for the Chronicle.',
 };
 
 /**
- * Editorial desk for the Chronicles, deliberately here rather than under /exec.
+ * Editorial desk for the Chronicle, deliberately here rather than under /exec.
  *
  * Chroniclers are often not in the guild, so they cannot be given exec access
  * just to approve a suggestion — /exec is the guild's own administration and

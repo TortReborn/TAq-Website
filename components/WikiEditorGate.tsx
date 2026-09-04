@@ -33,7 +33,7 @@ export default function WikiEditorGate({
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
         <Link href="/exec/login" style={{ color: 'var(--accent-primary)' }}>Sign in with Discord</Link>
-        {' '}to edit the Chronicles.
+        {' '}to edit the Chronicle.
         <div style={{ marginTop: '0.6rem', fontSize: '0.8rem' }}>
           You do not need to be in the guild — ask an exec to add you as a chronicler and
           sign in with the same Discord account.

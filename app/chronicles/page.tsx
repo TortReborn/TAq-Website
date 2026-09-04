@@ -9,7 +9,7 @@ import WikiLandingActions from '@/components/WikiLandingActions';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Chronicles — The Aquarium',
+  title: 'Chronicle — The Aquarium',
   description: 'The history of Wynncraft’s guild scene: guilds, alliances, wars and eras.',
 };
 
@@ -27,7 +27,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem 3rem' }}>
       <header style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.3rem' }}>Chronicles</h1>
+        <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.3rem' }}>Chronicle</h1>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
           The history of Wynncraft’s guild scene — its guilds, alliances, wars and eras.
         </p>

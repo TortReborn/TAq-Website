@@ -71,7 +71,7 @@ export default function WikiArticleView({
       {/* Kicker row: breadcrumb + type badge */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-          <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicles</Link>
+          <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
           {' › '}
           <Link href={`/chronicles?type=${page.pageType}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
             {WIKI_TYPE_LABELS[page.pageType]}s
