@@ -6,6 +6,8 @@ import {
   setExecSessionCookie,
   getBaseUrl,
 } from '@/lib/exec-auth';
+import { setChroniclerSessionCookie } from '@/lib/wiki-auth';
+import { isChronicler } from '@/lib/wiki-db';
 import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -42,18 +44,36 @@ export async function GET(request: NextRequest) {
     // Check if user exists in discord_links (any guild member can log in)
     const linkCheck = await checkDiscordLink(discordUser.id);
 
+    // Build avatar URL
+    const avatarUrl = discordUser.avatar
+      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+      : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(discordUser.id) >> 22n) % 6}.png`;
+
     if (!linkCheck.ok) {
+      // Not a guild member — but the Chronicles wiki is deliberately open to
+      // people outside the guild, so check for a chronicler role before
+      // turning them away. They get a wiki-only session with no rank attached.
+      if (await isChronicler(getPool(), discordUser.id)) {
+        const storedRedirect = request.cookies.get('oauth_redirect')?.value;
+        const response = NextResponse.redirect(
+          new URL(storedRedirect?.startsWith('/chronicles') ? storedRedirect : '/chronicles', baseUrl),
+        );
+        setChroniclerSessionCookie(response, {
+          discord_id: discordUser.id,
+          discord_username: discordUser.username,
+          discord_avatar: avatarUrl,
+        });
+        response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
+        response.cookies.set('oauth_redirect', '', { maxAge: 0, path: '/' });
+        return response;
+      }
+
       console.warn(`[auth] Login denied: Discord user ${discordUser.username} (${linkCheck.discord_id}) not found in discord_links`);
       const params = new URLSearchParams({ reason: 'not_linked', discord_id: linkCheck.discord_id, discord_name: discordUser.username });
       const response = NextResponse.redirect(new URL(`/unauthorized?${params.toString()}`, baseUrl));
       response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
       return response;
     }
-
-    // Build avatar URL
-    const avatarUrl = discordUser.avatar
-      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-      : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(discordUser.id) >> 22n) % 6}.png`;
 
     // Redirect: use stored redirect path if present, otherwise role-based default
     const storedRedirect = request.cookies.get('oauth_redirect')?.value;

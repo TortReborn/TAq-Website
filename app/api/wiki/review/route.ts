@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
-import { requireGuildSession } from '@/lib/exec-auth';
+import { requireWikiEditor } from '@/lib/wiki-auth';
 import { WIKI_LIMITS } from '@/lib/wiki';
 import { getWikiPage, listWikiSubmissions, reviewWikiSubmission } from '@/lib/wiki-db';
 
 export const dynamic = 'force-dynamic';
 
-/** Exec-only: the pending suggestion queue (with current page bodies for diffing). */
+/** Chronicler or exec: the pending suggestion queue (with current page bodies for diffing). */
 export async function GET(request: NextRequest) {
-  const session = await requireGuildSession(request);
-  if (!session || session.role !== 'exec') {
-    return NextResponse.json({ error: 'Exec access required' }, { status: 401 });
+  const principal = await requireWikiEditor(request);
+  if (!principal) {
+    return NextResponse.json({ error: 'Chronicler or exec access required' }, { status: 401 });
   }
   try {
     const pool = getPool();
@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/** Exec-only: approve or reject a suggestion. */
+/** Chronicler or exec: approve or reject a suggestion. */
 export async function POST(request: NextRequest) {
-  const session = await requireGuildSession(request);
-  if (!session || session.role !== 'exec') {
-    return NextResponse.json({ error: 'Exec access required' }, { status: 401 });
+  const principal = await requireWikiEditor(request);
+  if (!principal) {
+    return NextResponse.json({ error: 'Chronicler or exec access required' }, { status: 401 });
   }
   let body: unknown;
   try {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const result = await reviewWikiSubmission(getPool(), {
       id,
       approve: b.approve,
-      reviewedBy: session.ign || session.discord_username,
+      reviewedBy: principal.name,
       reviewNote,
     });
     if (!result.ok) return NextResponse.json({ error: result.error }, { status: 409 });
