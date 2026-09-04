@@ -95,7 +95,10 @@ const SOURCE_TALK = [
   [/\bsurvives? (only )?(in|as|through)\b/i, '"survives in/as" (record-talk)'],
   [/\b(a|one|a single) forum post\b/i, 'evidence-counting'],
   [/\bthe (written )?record (goes|is|has|shows|preserves)\b/i, 'record-talk'],
-  [/\b(is|was|are|were) (not |never )?(recorded|documented|preserved)\b/i, 'passive record-talk (fine if phrased as a fact about the past: "the roster was never published")'],
+  // Past-tense "was never recorded" is the sanctioned phrasing and is NOT
+  // flagged; present-tense forms talk about the archive's current state.
+  [/\b(is|are) (not |never )?(recorded|documented|preserved)\b/i, 'present-tense record-talk — prefer the past-fact form ("was never recorded")'],
+  [/\b(recorded|documented|attested|named|mentioned) (in no|nowhere|by no)\b/i, 'record-inventory phrasing'],
 ];
 
 const PEACOCK = [/\b(legendary|iconic|infamous(ly)?|remarkabl[ey]|dominant beyond|unstoppable|storied)\b/i, 'peacock word'];
