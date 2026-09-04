@@ -1,0 +1,16 @@
+{
+ "$comment": "VERIFIED image record for the KingdomPhoenixes announcements channel. ORDINAL ALIGNMENT FAILED HERE TOO: the export holds four \"Image\" markers and one attachment, the other three being link previews (a Google Forms embed, a Strawpoll embed, a forum shop thread). The scaffold placed this image at line 37, under the Prime Minister election form. It belongs to Drew1011's message of 22 November 2017, which posted the map as a Gyazo link.",
+ "images": [
+  {
+   "marker": 1,
+   "line": 5,
+   "author": "Drew1011",
+   "postedAt": "11/22/2017 6:03 PM",
+   "file": "kingdomphoenixes-announcements-01.jpg",
+   "web": "/images/chronicles/kingdomphoenixes-announcements/kingdomphoenixes-announcements-01.webp",
+   "verified": true,
+   "depicts": "Wynncraft website territory map, isometric render of the province of Wynn, every territory tinted and carrying a coloured blob marker. No labels or count panel. Ten colours are in play, matching the allocation listed in the message that carries it: orange across the desert and savannah in the north (Kingdom Phoenixes), yellow at Detlas and the Nether gate (Gilded Sparrows), purple and dark red at Ragni (Hall of Fame; Dishonored on the main entrance and Emerald Trail), red in the canyon and at Ternaves (House of Sentinels), light and dark greens through the jungle and Nivla (Immortalish; Kasai Shinrai), dark blue at Nesaak and the mining base (Kingdom Foxes), light blue at Time Valley (LE Flowers), and pink at Nemract (Necronomicon).",
+   "alignmentVerdict": "matches — Drew1011's 22 Nov 2017 message posts the map as a Gyazo link and then lists the ten guilds and their regions. NOT the marker the scaffold picked, which is a Google Forms preview under the Prime Minister election post."
+  }
+ ]
+}

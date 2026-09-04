@@ -98,6 +98,13 @@ const CHECKS = [
   ['timezone', /\b(?:GMT|UTC)\s*[+-]\s*\d{1,2}\b/g],
   ['discord-tag', /\b[\w.]+#\d{4}\b/g],
   ['email', /\b[\w.+-]+@[\w-]+\.[a-z]{2,}\b/gi],
+  // A message need not state a birthday to expose one. The Kingdom of Phoenixes
+  // export set a treasure hunt whose "hint relies on knowing when my birthday is
+  // and how old I am" — no data in the text, and a pointer straight at it.
+  ['birthday-or-age-reference', /\b(?:my|their|his|her)\s+(?:birthday|birth date|age)\b|\bhow old (?:i|he|she|they) (?:am|is|are)\b/gi],
+  // A private Minecraft server address is live infrastructure, not a fact about
+  // guild history.
+  ['server-address', /\b(?!forums\.|docs\.|www\.|discord)[a-z0-9][a-z0-9-]*\.(?:[a-z0-9-]+\.)*[a-z]{2,}(?::\d{2,5})\b|\b[a-z0-9][a-z0-9-]*\.(?:mcworlds|fluctis|aternos|minehut|serv|apexmc)\.[a-z]{2,}\b/gi],
   ['invite-left', /discord\.gg|discordapp\.com\/invite/gi],
   // Bare capitalised given names are the hard case: the Federation export was
   // clean, the Holders of LE export was not ("bounty on Joshua", "confirm with
