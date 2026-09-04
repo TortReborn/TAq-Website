@@ -38,6 +38,7 @@ const norm = (s) =>
     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
     // Nested quotation marks switch kind when quoted, so treat both as one.
     .replace(/['"]/g, '')
+    .split(' / ').join(' ')
     .replace(/[︀-️​-‍﻿]/g, '')
     .replace(/\s+/g, ' ').toLowerCase().trim();
 
@@ -91,13 +92,21 @@ for (const f of quotes) {
   }
 
   let compressed = 0;
+  let trivial = false;
   for (const id of cited) {
     const text = corpus.get(id);
-    if (text) compressed = Math.max(compressed, longestRun(words, text));
+    if (!text) continue;
+    compressed = Math.max(compressed, longestRun(words, text));
+    // Embedding a quotation in prose legitimately changes its first letter and
+    // its final punctuation. Comparing with all punctuation and case removed
+    // separates "the article reworded the source" from "the article dropped a
+    // comma", and only the first is a defect worth an edit.
+    const loose = (x) => x.replace(/[^a-z0-9 ]+/gi, ' ').replace(/s+/g, ' ').trim();
+    if (loose(text).includes(loose(q))) trivial = true;
   }
 
   out.push({
-    verdict: elsewhere ? 'MISCITED' : compressed >= 4 ? 'COMPRESSED' : 'ABSENT',
+    verdict: trivial ? 'PUNCTUATION' : elsewhere ? 'MISCITED' : compressed >= 4 ? 'COMPRESSED' : 'ABSENT',
     slug: f.slug,
     quote: f.detail.slice(0, 100),
     cited: f.cited,
@@ -106,11 +115,11 @@ for (const f of quotes) {
   });
 }
 
-const by = { MISCITED: [], COMPRESSED: [], ABSENT: [] };
+const by = { MISCITED: [], COMPRESSED: [], ABSENT: [], PUNCTUATION: [] };
 for (const o of out) by[o.verdict].push(o);
 
 console.log(`${quotes.length} quote findings triaged\n`);
-for (const k of ['MISCITED', 'COMPRESSED', 'ABSENT']) console.log(`  ${k.padEnd(11)} ${by[k].length}`);
+for (const k of ['MISCITED', 'COMPRESSED', 'ABSENT', 'PUNCTUATION']) console.log(`  ${k.padEnd(11)} ${by[k].length}`);
 console.log();
 
 for (const o of by.MISCITED) {
