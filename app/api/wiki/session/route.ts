@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
+import { activeImageBackend } from '@/lib/wiki-image-storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,5 +27,9 @@ export async function GET(request: NextRequest) {
       canReview: principal.canReview,
       canManageChroniclers: principal.canManageChroniclers,
     },
+    // Which image store this deployment is actually wired to. Shown on the
+    // editorial page because a mismatched WIKI_BLOB_ACCESS is otherwise
+    // invisible until someone tries to upload and gets "access denied".
+    ...(principal.canReview ? { imageBackend: activeImageBackend() } : {}),
   });
 }
