@@ -7,6 +7,7 @@ import { WIKI_TYPE_LABELS, WIKI_VALIDATIONS_REQUIRED, WikiPageSummary } from "@/
 import { useWikiSession } from "@/hooks/useWikiSession";
 import WikiReviewQueue from "./WikiReviewQueue";
 import ChroniclerManager from "./ChroniclerManager";
+import SourceArchivePanel from "./SourceArchivePanel";
 
 type UnverifiedPageRow = WikiPageSummary & { validations: number; revisions: number };
 
@@ -32,6 +33,9 @@ export default function ChroniclesAdmin() {
   const [unverified, setUnverified] = useState<UnverifiedPageRow[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [error] = useState<string | null>(null);
+  // Every page is unchecked at present, so this list is the whole corpus and
+  // rendering it in full buries everything below it under 181 links.
+  const [showAllUnverified, setShowAllUnverified] = useState(false);
 
   const loadUnverified = useCallback(async () => {
     const res = await fetch('/api/wiki/unverified');
@@ -103,20 +107,38 @@ export default function ChroniclesAdmin() {
             Nothing outstanding — every published page has been read by a person.
           </p>
         ) : (
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.3rem' }}>
-            {unverified.map((p) => (
-              <li key={p.slug} style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', fontSize: '0.85rem' }}>
-                <Link href={`/chronicle/${p.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
-                  {p.title}
-                </Link>
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>
-                  {WIKI_TYPE_LABELS[p.pageType] ?? p.pageType}
-                  {p.validations > 0 && ` · ${p.validations}/${WIKI_VALIDATIONS_REQUIRED} vouched`}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.3rem' }}>
+              {(showAllUnverified ? unverified : unverified.slice(0, 25)).map((p) => (
+                <li key={p.slug} style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', fontSize: '0.85rem' }}>
+                  <Link href={`/chronicle/${p.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
+                    {p.title}
+                  </Link>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>
+                    {WIKI_TYPE_LABELS[p.pageType] ?? p.pageType}
+                    {p.validations > 0 && ` · ${p.validations}/${WIKI_VALIDATIONS_REQUIRED} vouched`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {!showAllUnverified && unverified.length > 25 && (
+              <button
+                onClick={() => setShowAllUnverified(true)}
+                style={{
+                  marginTop: '0.7rem', fontSize: '0.78rem', background: 'none', border: 'none',
+                  color: 'var(--accent-primary)', cursor: 'pointer', padding: 0,
+                }}
+              >
+                Show the remaining {unverified.length - 25}
+              </button>
+            )}
+          </>
         )}
+      </section>
+
+      {/* --- what we hold, and what nobody has used yet -------------------- */}
+      <section style={card}>
+        <SourceArchivePanel />
       </section>
 
       {/* --- suggestions awaiting a decision ------------------------------ */}
