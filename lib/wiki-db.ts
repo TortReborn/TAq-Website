@@ -136,7 +136,7 @@ export async function ensureWikiTables(pool: Pool): Promise<void> {
   await pool.query(`
     ALTER TABLE wiki_page_revisions ADD COLUMN IF NOT EXISTS author_kind VARCHAR(8) NOT NULL DEFAULT 'human';
     ALTER TABLE wiki_images ADD COLUMN IF NOT EXISTS s3_key VARCHAR(600) NOT NULL DEFAULT '';
-    ALTER TABLE wiki_images ADD COLUMN IF NOT EXISTS backend VARCHAR(8) NOT NULL DEFAULT 's3';
+    ALTER TABLE wiki_images ADD COLUMN IF NOT EXISTS backend VARCHAR(16) NOT NULL DEFAULT 's3';
 
     CREATE TABLE IF NOT EXISTS wiki_chroniclers (
       discord_id   VARCHAR(30)  PRIMARY KEY,
@@ -555,7 +555,7 @@ export async function reviewWikiSubmission(
 
 export async function recordWikiImage(
   pool: Pool,
-  args: { url: string; s3Key?: string; backend?: 'blob' | 's3'; filename: string; mime: string; bytes: number; width: number | null; height: number | null; caption: string; status: 'active' | 'pending'; uploadedBy: string },
+  args: { url: string; s3Key?: string; backend?: 'blob' | 'blob-private' | 's3'; filename: string; mime: string; bytes: number; width: number | null; height: number | null; caption: string; status: 'active' | 'pending'; uploadedBy: string },
 ): Promise<number> {
   await ensureWikiTables(pool);
   const r = await pool.query(

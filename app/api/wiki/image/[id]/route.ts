@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
-import { getWikiImage, type WikiImageBackend } from '@/lib/wiki-image-storage';
+import { getWikiImage, isPubliclyAddressable, type WikiImageBackend } from '@/lib/wiki-image-storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +42,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     }
 
     const backend = (row.backend as WikiImageBackend) ?? 's3';
-    if (backend === 'blob') {
+    if (isPubliclyAddressable(backend)) {
       // 308 rather than 302: the mapping from id to blob URL never changes, so
       // browsers and intermediaries may cache the redirect permanently.
       return NextResponse.redirect(row.s3_key, {

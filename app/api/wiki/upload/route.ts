@@ -99,6 +99,20 @@ export async function POST(request: NextRequest) {
       backend: activeImageBackend(),
     });
   } catch (error) {
+    // Writing with the wrong access mode is the one setup mistake that is
+    // otherwise baffling: the token is valid, so it reads as a generic
+    // failure. Say what to change instead.
+    if (error instanceof Error && /access denied|forbidden/i.test(error.message)) {
+      console.error('[api:wiki/upload] blob access mode rejected:', error.message);
+      return NextResponse.json(
+        {
+          error:
+            'Image storage rejected the upload. The Blob store’s access mode does not match ' +
+            'WIKI_BLOB_ACCESS — set it to "private" for a private store, or "public" for a public one.',
+        },
+        { status: 500 },
+      );
+    }
     console.error('[api:wiki/upload] failed:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
