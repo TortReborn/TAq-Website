@@ -77,6 +77,13 @@ function norm(s) {
     // correctly, so leaving the debris in makes a faithful quotation look
     // invented. Strip the tags and the stray spacing they leave behind.
     .replace(/\[\/?[A-Za-z][^\]]{0,40}\]/g, '')
+    // The same markup also survives unclosed — "@NeonRider[/USER," — and the
+    // bracketed form above needs a closing bracket it never gets.
+    .replace(/\[\/?[A-Za-z]{2,12}(?![^\]\n]*\])/g, '')
+    // Some posts lose the space after sentence punctuation in extraction
+    // ("control it.And the thing"). Applied to article and source alike, so a
+    // faithful quotation stops reading as an altered one.
+    .replace(/([.,;:!?])(?=[A-Za-z])/g, '$1 ')
     .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
