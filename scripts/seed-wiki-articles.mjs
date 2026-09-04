@@ -64,7 +64,12 @@ const pool = dryRun ? null : new pg.Pool({
   max: 1,
 });
 
-const AUTHOR = { id: '170719819715313665', name: 'Thundderr' };
+// Seeded prose is written by the drafting pipeline, not by a person. It used to
+// be attributed to a guild member's Discord id, which made every page read as
+// though someone had checked it — the specific thing the unverified banner
+// exists to stop. Revisions from here are marked 'ai' and named as such, and a
+// page counts as unverified until a human revision or two chronicler vouches.
+const AUTHOR = { id: 'chronicle-ai', name: 'Chronicle drafting pass', kind: 'ai' };
 const NOTE = 'Seeded from the chronicle research corpus';
 
 const { articles } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'wiki', 'seed-articles.json'), 'utf8'));
