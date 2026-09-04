@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       if (await isChronicler(getPool(), discordUser.id)) {
         const storedRedirect = request.cookies.get('oauth_redirect')?.value;
         const response = NextResponse.redirect(
-          new URL(storedRedirect?.startsWith('/chronicles') ? storedRedirect : '/chronicles', baseUrl),
+          new URL(storedRedirect?.startsWith('/chronicle') ? storedRedirect : '/chronicle', baseUrl),
         );
         setChroniclerSessionCookie(response, {
           discord_id: discordUser.id,

@@ -3,7 +3,7 @@
  *
  * A Wikipedia-style guild-history system: typed pages in one flat namespace,
  * full revision history, exec-driven with community suggestions (Phase 2).
- * Server-side data access lives in lib/wiki-db.ts. Design: docs/chronicles-wiki-plan.md.
+ * Server-side data access lives in lib/wiki-db.ts. Design: docs/chronicle-wiki-plan.md.
  */
 
 // ---------------------------------------------------------------------------

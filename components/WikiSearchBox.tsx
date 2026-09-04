@@ -63,7 +63,7 @@ export default function WikiSearchBox({ autoFocus = false }: { autoFocus?: boole
             <div style={{ padding: "0.6rem 0.9rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>No pages found.</div>
           )}
           {!loading && results.map(r => (
-            <Link key={r.slug} href={`/chronicles/${r.slug}`} style={{
+            <Link key={r.slug} href={`/chronicle/${r.slug}`} style={{
               display: "flex", alignItems: "baseline", gap: "0.5rem",
               padding: "0.45rem 0.9rem", textDecoration: "none",
               borderBottom: "1px solid var(--border-color)",

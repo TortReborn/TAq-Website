@@ -17,7 +17,7 @@ import {
 /**
  * Bespoke split-pane wiki editor: metadata fields + markdown textarea with a
  * small formatting toolbar on the left, live rendered preview on the right.
- * Used by /chronicles/new and /chronicles/[slug]/edit (exec, Phase 1) and by
+ * Used by /chronicle/new and /chronicle/[slug]/edit (exec, Phase 1) and by
  * the suggestion flow later (Phase 2).
  */
 
@@ -88,8 +88,8 @@ export default function WikiEditor({
   );
 
   const leave = () => {
-    if (targetId === null) router.push('/chronicles');
-    else router.push(`/chronicles/${initial.slug}`);
+    if (targetId === null) router.push('/chronicle');
+    else router.push(`/chronicle/${initial.slug}`);
   };
 
   const cancel = () => {
@@ -127,7 +127,7 @@ export default function WikiEditor({
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? 'Save failed'); return; }
       if (mode === 'suggest') { setSuggested(true); return; }
-      router.push(`/chronicles/${data.slug}`);
+      router.push(`/chronicle/${data.slug}`);
       router.refresh();
     } catch {
       setError('Network error');

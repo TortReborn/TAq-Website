@@ -142,7 +142,7 @@ export default function WikiReviewQueue() {
                     <X size={13} /> Reject
                   </button>
                   {!isNew && s.current && (
-                    <Link href={`/chronicles/${s.current.slug}`} target="_blank"
+                    <Link href={`/chronicle/${s.current.slug}`} target="_blank"
                       style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
                       View current page →
                     </Link>

@@ -55,7 +55,7 @@ export default async function ReferencesIndex() {
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
+        <Link href="/chronicle" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
       </div>
       <h1 style={{
         fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)',
@@ -101,7 +101,7 @@ export default async function ReferencesIndex() {
               // Source titles are sometimes a raw repository path with no spaces
               // in it, which runs off a phone screen unless it may break anywhere.
               <li key={id} style={{ padding: '0.3rem 0', borderBottom: '1px solid var(--border-color)', fontSize: '0.82rem', overflowWrap: 'anywhere' }}>
-                <Link href={`/chronicles/references/${id}`} target="_blank"
+                <Link href={`/chronicle/references/${id}`} target="_blank"
                   style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
                   {s.title ?? id}
                 </Link>

@@ -768,7 +768,7 @@ export default function ChroniclePanel({
               </button>
             )}
             {a.wikiSlug && (
-              <a href={`/chronicles/${a.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
+              <a href={`/chronicle/${a.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
                 Wiki article →
               </a>
             )}
@@ -817,7 +817,7 @@ export default function ChroniclePanel({
               </button>
             )}
             {e.wikiSlug && (
-              <a href={`/chronicles/${e.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none', alignSelf: 'center' }}>
+              <a href={`/chronicle/${e.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none', alignSelf: 'center' }}>
                 Wiki article →
               </a>
             )}

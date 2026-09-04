@@ -6,7 +6,7 @@
  *   node scripts/check-citations.mjs --strict   exit non-zero if anything is unresolved
  *
  * A citation resolves when its ref is an archived source id (which gets a page
- * at /chronicles/references/<id>) or an absolute http(s) URL. Anything else
+ * at /chronicle/references/<id>) or an absolute http(s) URL. Anything else
  * renders as plain text in the reference list and leads nowhere, which is the
  * thing this guards against.
  *
