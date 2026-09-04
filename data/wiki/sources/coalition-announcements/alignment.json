@@ -1,0 +1,145 @@
+{
+ "$comment": "VERIFIED image records for the Coalition alliance-announcements channel. Ten \"Image\" markers and ten attachments, and each pair sits inside the message it illustrates, so ordinal alignment holds here — checked, not assumed. Note the provenance of the whole source: this is the alliance's SECOND Discord, built on 11 January 2018 after the first was deleted, so these are the last six weeks of the Coalition and none of its founding.",
+ "images": [
+  {
+   "marker": 1,
+   "line": 19,
+   "file": "coalition-announcements-01.jpg",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-01.webp",
+   "textBefore": [
+    "Immortalish [Smd]: South Ocean (Yellow)",
+    "Paladins United [PUN]: Corkus (White)",
+    "Free for all territories are in black."
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map, whole province, territories tinted by holder with coloured blob markers",
+   "alignmentVerdict": "matches — posted with the 16 Jan 2018 territory list, whose last line reads 'Free for all territories are in black'"
+  },
+  {
+   "marker": 2,
+   "line": 20,
+   "file": "coalition-announcements-02.jpg",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-02.webp",
+   "textBefore": [
+    "Paladins United [PUN]: Corkus (White)",
+    "Free for all territories are in black.",
+    "Image"
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map, ocean and island view, tinted by holder",
+   "alignmentVerdict": "matches — the second of the two maps under the same 16 Jan 2018 message"
+  },
+  {
+   "marker": 3,
+   "line": 41,
+   "file": "coalition-announcements-03.png",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-03.webp",
+   "textBefore": [
+    "LE Flowers [LEF]: Quartz Mines, Llevigar Entrance, Leadin Fortress, Road to Light Forest (Cyan)",
+    "Paladins United [PUN]: Corkus, West Ocean (White)",
+    "Immortalish [Smd]: East Ocean (Light Green)"
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map, whole province, tinted by holder",
+   "alignmentVerdict": "matches — posted with the 23 Jan 2018 revised allocation, under the line for Immortalish"
+  },
+  {
+   "marker": 4,
+   "line": 42,
+   "file": "coalition-announcements-04.png",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-04.webp",
+   "textBefore": [
+    "Paladins United [PUN]: Corkus, West Ocean (White)",
+    "Immortalish [Smd]: East Ocean (Light Green)",
+    "Image"
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map, ocean and islands, tinted by holder",
+   "alignmentVerdict": "matches — the second map under the same 23 Jan 2018 message"
+  },
+  {
+   "marker": 5,
+   "line": 51,
+   "file": "coalition-announcements-05.jpg",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-05.webp",
+   "textBefore": [
+    "@Captain",
+    "Considering right now nobody can defend territories, please refrain from attacking any allied territories that have defenses until this is fixed. This is an attempt to minimize the losses due to this glitch. Thank you!",
+    "Drew1011 — 1/30/2018 7:27 AM"
+   ],
+   "verified": true,
+   "depicts": "in-game chat screenshot: server shouts about mobs being bought for territories and quest fixes on WC1 and WC9",
+   "alignmentVerdict": "matches — posted by Drew1011 on 30 Jan 2018"
+  },
+  {
+   "marker": 6,
+   "line": 55,
+   "file": "coalition-announcements-06.png",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-06.webp",
+   "textBefore": [
+    "@Captain",
+    "@Guild Leader",
+    "Angry — 1/30/2018 7:28 AM"
+   ],
+   "verified": true,
+   "depicts": "in-game chat screenshot: players trading and discussing quest fixes on WC1 and WC9",
+   "alignmentVerdict": "matches — posted by Angry a minute later"
+  },
+  {
+   "marker": 7,
+   "line": 82,
+   "file": "coalition-announcements-07.jpg",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-07.webp",
+   "textBefore": [
+    "LE Flowers [LEF]: Llevigar (Cyan)",
+    "Paladins United [PUN]: Corkus and Ocean (White)",
+    "Note: A few of the territories will be made ffa, but we haven’t decided which yet."
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map, whole province, tinted by holder, over a note that some territories would be made free-for-all",
+   "alignmentVerdict": "matches — posted with the 1 Feb 2018 allocation"
+  },
+  {
+   "marker": 8,
+   "line": 85,
+   "file": "coalition-announcements-08.gif",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-08.webp",
+   "textBefore": [
+    "Image",
+    "Pepinho — 2/3/2018 12:18 PM",
+    "✤ | Event"
+   ],
+   "verified": true,
+   "depicts": "a flat cyan field; the attachment is an animated GIF whose captured frame carries no legible content",
+   "alignmentVerdict": "matches — posted by Pepinho under an event announcement, 3 Feb 2018"
+  },
+  {
+   "marker": 9,
+   "line": 133,
+   "file": "coalition-announcements-09.png",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-09.webp",
+   "textBefore": [
+    "Emorians [ERN]: Llevigar, Quartz Mines, Leadin Fortress, Llevigar Entrance, Road to Light Forest, and Desert (Gray)",
+    "Immortalish [Smd]: Pigman Ravines (Green)",
+    "Paladins United [PUN]: Corkus and Ocean"
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map with a guild-count panel at the left edge, whole province, tinted by holder",
+   "alignmentVerdict": "matches — THE division of Wynn announced on 16 Feb 2018 — the announcement Drew1011 identified as the cause of the Coalition split"
+  },
+  {
+   "marker": 10,
+   "line": 134,
+   "file": "coalition-announcements-10.png",
+   "web": "/images/chronicles/coalition-announcements/coalition-announcements-10.webp",
+   "textBefore": [
+    "Immortalish [Smd]: Pigman Ravines (Green)",
+    "Paladins United [PUN]: Corkus and Ocean",
+    "Image"
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map, whole province, tinted by holder in the colours the message assigns",
+   "alignmentVerdict": "matches — the second map under the 16 Feb 2018 division"
+  }
+ ]
+}

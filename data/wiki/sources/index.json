@@ -243,6 +243,42 @@
    "note": "The reviewed alliance and event records behind the map's Chronicle layer. Each entry was submitted, sourced and approved before entry; membership stints carry join and leave dates.",
    "tier": "derived"
   },
+  "coalition-announcements": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "Coalition alliance-announcements channel (Discord export, Jan-Feb 2018)",
+   "fetchedAt": "2026-09-04T21:52:14.063Z",
+   "textChars": 7362,
+   "note": "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". Six weeks of alliance direction to 17 February 2018, ending with the division of Wynn that split the alliance and the roster of the bloc that replaced it.",
+   "tier": "primary"
+  },
+  "coalition-information": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "Coalition information channel (Discord export, 11 Jan 2018)",
+   "fetchedAt": "2026-09-04T21:52:22.810Z",
+   "textChars": 832,
+   "note": "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". A single post of 11 January 2018 listing the alliance's fourteen member guilds and, separately, fourteen named enemy guilds.",
+   "tier": "primary"
+  },
+  "coalition-public-announcements": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "Coalition public-announcements channel (Discord export, 12 Jan 2018)",
+   "fetchedAt": "2026-09-04T21:52:22.957Z",
+   "textChars": 286,
+   "note": "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". One post, about server permissions the day after the rebuild.",
+   "tier": "primary"
+  },
+  "coalition-welcome": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "Coalition welcome channel (Discord export, 23 Jan 2018)",
+   "fetchedAt": "2026-09-04T21:52:23.095Z",
+   "textChars": 1188,
+   "note": "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". The rebuilt server's rules and channel list, including a #storytime channel 'for leaders to tell their Wynn stories'.",
+   "tier": "primary"
+  },
   "community-guild-timeline": {
    "url": "https://docs.google.com/document/d/1Sv4TGCKng4qQvqMsjRnbRA16nccatHM1QNVy1_-gJoU/edit",
    "kind": "community-document",
