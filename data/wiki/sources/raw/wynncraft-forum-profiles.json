@@ -1,0 +1,59 @@
+{
+  "id": "wynncraft-forum-profiles",
+  "kind": "capture",
+  "tier": "primary",
+  "title": "Wynncraft forum member profiles — public guild-history fields",
+  "captured": "2026-09-04",
+  "note": "Curated extracts from public Wynncraft forum member profiles, read 4 Sep 2026. Only fields bearing on guild history are recorded: forum join date, message count, rank title, the guild shown on the profile, and any guild offices the profile lists. The profiles also expose birthday, location and occupation fields; those are real-world personal details and are deliberately NOT recorded here, in line with the rule that player articles carry public in-game and forum facts only. Each entry links to the profile it came from so the reading can be rechecked.",
+  "profiles": [
+    {
+      "username": "Pretzule",
+      "url": "https://forums.wynncraft.com/members/pretzule.5/",
+      "memberId": 5,
+      "joined": "2013-11-25",
+      "messages": 3607,
+      "likesReceived": 21512,
+      "followers": 706,
+      "trophyPoints": 215,
+      "rankTitle": "HERO",
+      "lastActivity": "2026-08-31",
+      "note": "Member id 5 — among the earliest forum accounts on record, and still active in 2026."
+    },
+    {
+      "username": "ElegantDeath",
+      "url": "https://forums.wynncraft.com/members/elegantdeath.69528/",
+      "memberId": 69528,
+      "joined": "2016-08-10",
+      "messages": 2219,
+      "likesReceived": 2853,
+      "trophyPoints": 184,
+      "rankTitle": "HERO",
+      "guildShown": "Hall of Fame",
+      "note": "The chronicle places him in KingdomPhoenixes and the Emperium of Wynn; the profile's guild field shows Hall of Fame, a later affiliation not otherwise recorded."
+    },
+    {
+      "username": "Lego_DW",
+      "url": "https://forums.wynncraft.com/members/lego_dw.88629/",
+      "memberId": 88629,
+      "joined": "2017-07-07",
+      "messages": 1266,
+      "likesReceived": 2539,
+      "trophyPoints": 162,
+      "rankTitle": "HERO",
+      "guildOfficesListed": [
+        "Chief, The Mage Legacy",
+        "Chief, Sins of Seedia",
+        "Owner, ZephraShredders"
+      ],
+      "officesWindow": "2017-10 to 2020-07",
+      "note": "The chronicle knows him only as a Federation member who answered the 2018 tribute thread. The profile records a guild-office history the corpus does not have."
+    },
+    {
+      "username": "Icey_Diamond",
+      "url": "https://forums.wynncraft.com/members/icey_diamond.90055/",
+      "memberId": 90055,
+      "rankTitle": "Well-Known Adventurer",
+      "note": "Co-leader of DiamondDeities with Nitrogen2Oxygen in the Aesir Pact leadership table. Profile confirms the account exists; no guild-office fields were shown."
+    }
+  ]
+}

@@ -2273,6 +2273,15 @@
       "note": "Idiot Co [ICo] recruitment thread final page — most recent ICo activity; checking for 2024-2026 war/alliance mentions",
       "tier": "primary"
     },
+    "thread-304707": {
+      "url": "https://forums.wynncraft.com/threads/time-to-fleega-we-cant-defer-these-new-lunatic-discord-trials-any-longer.304707/",
+      "kind": "forum-thread",
+      "title": "Info - Time to Fleega! We can't Defer these new Lunatic Discord Trials any longer! | Wynncraft Forums",
+      "fetchedAt": "2026-09-04T03:47:54.435Z",
+      "textChars": 6043,
+      "rawSha256": "8d43089868870598",
+      "note": "Wynncraft moderation team announcement, 3 Nov 2022: Defervesco, Fleega and Lunatic_Lady added to the mod team. The only staff appointment attested anywhere in the corpus."
+    },
     "thread-305152": {
       "url": "https://forums.wynncraft.com/threads/305152/",
       "kind": "forum-thread",
@@ -2683,6 +2692,15 @@
       "note": "The January 2019 Wynncraft 1.18 announcement tweet (posted 15 Jan 2019, snowflake-decoded from the status id). Wayback's ONLY capture is this 3 Dec 2025 one and it preserves NOTHING: an empty x.com JS shell reading 'JavaScript is not available'. The tweet text is not recoverable from Wayback or the live site — do not re-try this.",
       "tier": "secondary"
     },
+    "youtube-channel-therapueticliz": {
+      "url": "https://www.youtube.com/@TherapueticLiz/videos",
+      "kind": "capture",
+      "fetchedAt": "2026-09-02T00:00:00.000Z",
+      "textChars": 4960,
+      "rawSha256": "03a11e98f6bafedd",
+      "note": "Video listing for the channel of TherapueticLiz, the Sins of Seedia member who posted Cucumber Company's 14-guild roster to the forum megalist on 26 Jun 2022. Extracted from a browser capture of the channel page; 27 videos with titles, durations and relative upload ages as displayed.",
+      "tier": "primary"
+    },
     "youtube-com-feeds-videos-xml-channel-id-ucjooggtimerj6rxphwebgxg": {
       "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCjoOgGtimerj6RXphwebgxg",
       "kind": "video",
@@ -2733,13 +2751,22 @@
       "note": "YouTube watch page for 'SMTN ELSE SLANDER', cited on therapeuticliz and smtn-elf; archived to establish title, channel and upload date",
       "tier": "primary"
     },
-    "youtube-channel-therapueticliz": {
-      "url": "https://www.youtube.com/@TherapueticLiz/videos",
+    "wynncraft-forum-profiles": {
+      "url": "https://forums.wynncraft.com/members/",
       "kind": "capture",
-      "fetchedAt": "2026-09-02T00:00:00.000Z",
-      "textChars": 4960,
-      "rawSha256": "03a11e98f6bafedd",
-      "note": "Video listing for the channel of TherapueticLiz, the Sins of Seedia member who posted Cucumber Company's 14-guild roster to the forum megalist on 26 Jun 2022. Extracted from a browser capture of the channel page; 27 videos with titles, durations and relative upload ages as displayed.",
+      "fetchedAt": "2026-09-04T03:45:00.000Z",
+      "textChars": 2690,
+      "rawSha256": "c718b1afbf53ec1e",
+      "note": "Curated extracts from public Wynncraft forum member profiles (Pretzule, ElegantDeath, Lego_DW, Icey_Diamond): join date, message count, rank, guild shown and guild offices listed. Personal fields the profiles expose (birthday, location, occupation) are deliberately excluded.",
+      "tier": "primary"
+    },
+    "kingdomfoxes-com-members": {
+      "url": "https://kingdomfoxes.com/members",
+      "kind": "capture",
+      "fetchedAt": "2026-09-04T03:52:00.000Z",
+      "textChars": 7637,
+      "rawSha256": "128030bbb95a1d92",
+      "note": "The guild runs its own site. This is the live roster page as rendered on 4 Sep 2026: 101 members shown, grouped by an in-house role-play rank ladder mapped onto Wynncraft ranks. The home page states \"est 2014\" and gives guild level 96. Note that many rows read \"joined May 28, 2026\", which looks like the date the site began tracking rather than a true join date, so those should not be read as guild join dates.",
       "tier": "primary"
     }
   }
