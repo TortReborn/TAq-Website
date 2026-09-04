@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Loader2, Plus, Trash2, Users } from "lucide-react";
+import { Check, Loader2, Pencil, Plus, Trash2, Users, X } from "lucide-react";
 import { useWikiSession } from "@/hooks/useWikiSession";
 
 interface Chronicler {
@@ -30,6 +30,11 @@ export default function ChroniclerManager() {
   const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
+  // The row being corrected, and the values as edited so far. Held here rather
+  // than in the list so cancelling restores what the server actually has.
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editNote, setEditNote] = useState('');
 
   const load = useCallback(async () => {
     const res = await fetch('/api/wiki/chroniclers');
@@ -59,6 +64,28 @@ export default function ChroniclerManager() {
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? 'Could not add'); return; }
       setId(''); setName(''); setNote('');
+      await load();
+    } catch { setError('Network error'); } finally { setBusy(false); }
+  };
+
+  const startEdit = (c: Chronicler) => {
+    setEditing(c.discordId);
+    setEditName(c.displayName);
+    setEditNote(c.note);
+    setError(null);
+  };
+
+  const saveEdit = async (discordId: string) => {
+    setBusy(true); setError(null);
+    try {
+      const res = await fetch('/api/wiki/chroniclers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ discordId, displayName: editName.trim(), note: editNote.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { setError(data.error ?? 'Could not save'); return; }
+      setEditing(null);
       await load();
     } catch { setError('Network error'); } finally { setBusy(false); }
   };
@@ -122,28 +149,92 @@ export default function ChroniclerManager() {
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.35rem' }}>
           {list.map((c) => (
             <li key={c.discordId} style={{
-              display: 'flex', alignItems: 'center', gap: '0.55rem',
+              display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'wrap',
               fontSize: '0.82rem', opacity: c.active ? 1 : 0.5,
             }}>
               <Check size={13} style={{ color: c.active ? '#2e7d32' : 'var(--text-secondary)', flexShrink: 0 }} />
-              <strong>{c.displayName || c.discordId}</strong>
-              {c.note && <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{c.note}</span>}
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.68rem', fontFamily: 'monospace' }}>{c.discordId}</span>
-              {!c.active && <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>removed</span>}
-              {canManageChroniclers && c.active && (
-                <button
-                  onClick={() => remove(c.discordId, c.displayName || c.discordId)}
-                  disabled={busy}
-                  title="Revoke — past edits and vouches stay attributed"
-                  style={{
-                    marginLeft: 'auto', height: '25px', padding: '0 0.55rem', borderRadius: '0.375rem',
-                    border: '1px solid var(--border-color)', background: 'var(--bg-secondary)',
-                    color: 'var(--text-primary)', fontSize: '0.72rem', cursor: 'pointer',
-                    display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
-                  }}
-                >
-                  <Trash2 size={12} /> Remove
-                </button>
+
+              {editing === c.discordId ? (
+                <>
+                  <input
+                    style={{ ...input, width: '150px', height: '27px' }}
+                    placeholder="Name to show"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(c.discordId); if (e.key === 'Escape') setEditing(null); }}
+                    autoFocus
+                  />
+                  <input
+                    style={{ ...input, flex: 1, minWidth: '190px', height: '27px' }}
+                    placeholder="Why they are a chronicler"
+                    value={editNote}
+                    onChange={(e) => setEditNote(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(c.discordId); if (e.key === 'Escape') setEditing(null); }}
+                  />
+                  <button
+                    onClick={() => saveEdit(c.discordId)}
+                    disabled={busy}
+                    style={{
+                      height: '27px', padding: '0 0.7rem', borderRadius: '0.375rem', border: 'none',
+                      background: '#2e7d32', color: '#fff', fontSize: '0.72rem', fontWeight: 600,
+                      cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1,
+                      display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
+                    }}
+                  >
+                    {busy ? <Loader2 size={12} /> : <Check size={12} />} Save
+                  </button>
+                  <button
+                    onClick={() => setEditing(null)}
+                    disabled={busy}
+                    style={{
+                      height: '27px', padding: '0 0.55rem', borderRadius: '0.375rem',
+                      border: '1px solid var(--border-color)', background: 'var(--bg-secondary)',
+                      color: 'var(--text-secondary)', fontSize: '0.72rem', cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
+                    }}
+                  >
+                    <X size={12} /> Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <strong>{c.displayName || c.discordId}</strong>
+                  {c.note && <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{c.note}</span>}
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.68rem', fontFamily: 'monospace' }}>{c.discordId}</span>
+                  {!c.active && <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>removed</span>}
+                  {canManageChroniclers && (
+                    <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: '0.35rem' }}>
+                      <button
+                        onClick={() => startEdit(c)}
+                        disabled={busy}
+                        title="Correct the name shown, or the reason recorded"
+                        style={{
+                          height: '25px', padding: '0 0.55rem', borderRadius: '0.375rem',
+                          border: '1px solid var(--border-color)', background: 'var(--bg-secondary)',
+                          color: 'var(--text-primary)', fontSize: '0.72rem', cursor: 'pointer',
+                          display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
+                        }}
+                      >
+                        <Pencil size={12} /> Edit
+                      </button>
+                      {c.active && (
+                        <button
+                          onClick={() => remove(c.discordId, c.displayName || c.discordId)}
+                          disabled={busy}
+                          title="Revoke — past edits and vouches stay attributed"
+                          style={{
+                            height: '25px', padding: '0 0.55rem', borderRadius: '0.375rem',
+                            border: '1px solid var(--border-color)', background: 'var(--bg-secondary)',
+                            color: 'var(--text-primary)', fontSize: '0.72rem', cursor: 'pointer',
+                            display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
+                          }}
+                        >
+                          <Trash2 size={12} /> Remove
+                        </button>
+                      )}
+                    </span>
+                  )}
+                </>
               )}
             </li>
           ))}
