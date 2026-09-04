@@ -1,3 +1,4 @@
+const DB = require('./lib/db-config.cjs');
 const { Pool } = require('pg');
 
 // Convert type back from TEXT[] to VARCHAR(20), keep system as TEXT[]
@@ -35,25 +36,9 @@ async function migrate(label, config) {
 }
 
 (async () => {
-  await migrate('DEV', {
-    user: 'tortuser',
-    password: 'UserPass123',
-    host: '127.0.0.1',
-    port: 5432,
-    database: 'tortreborn',
-    ssl: false,
-    connectionTimeoutMillis: 5000,
-  });
+  await migrate('DEV', DB.dev());
 
-  await migrate('PROD', {
-    user: 'tortuser',
-    password: 'npg_5ngEHUhkWNd6',
-    host: 'ep-billowing-dream-aasb5bu7-pooler.westus3.azure.neon.tech',
-    port: 5432,
-    database: 'tortreborn',
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 10000,
-  });
+  await migrate('PROD', DB.prod());
 
   console.log('Done.');
 })();
