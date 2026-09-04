@@ -86,7 +86,7 @@ export default function WikiUnverifiedBanner({
           wrong — particularly on treaties, dates and who was involved.{' '}
           <Link href={`/chronicle/${slug}/edit`} className="wiki-unverified__link">Correct it</Link>
           {' '}if you were there, or{' '}
-          <Link href="/chronicle/admin" className="wiki-unverified__link">see everything awaiting review</Link>.
+          <Link href="/chronicle/admin#checking" className="wiki-unverified__link">see everything awaiting review</Link>.
         </p>
 
         {!loading && canReview && (

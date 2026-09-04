@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { Archive, ExternalLink, Search } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ExternalLink, Search } from "lucide-react";
 
 /**
  * What the source archive holds, and what is not yet being used.
@@ -12,9 +12,12 @@ import { Archive, ExternalLink, Search } from "lucide-react";
  * citation can name a document nobody archived, leaving a footnote a reader
  * cannot follow. Both are jobs a chronicler could pick up in an evening if they
  * could see them.
+ *
+ * The fetch lives in the editorial desk rather than here, because the same
+ * numbers head the page — one request, not two.
  */
 
-interface ArchiveEntry {
+export interface ArchiveEntry {
   id: string;
   title: string;
   tier: string;
@@ -26,14 +29,14 @@ interface ArchiveEntry {
   articles: string[];
 }
 
-interface ArchiveGap {
+export interface ArchiveGap {
   id: string;
   citations: number;
   articles: string[];
   isRawUrl: boolean;
 }
 
-interface Totals {
+export interface ArchiveTotals {
   archived: number;
   cited: number;
   uncited: number;
@@ -54,28 +57,17 @@ const TIER_COLOR: Record<string, string> = {
 
 type Filter = 'all' | 'uncited' | 'cited' | 'thin';
 
-export default function SourceArchivePanel() {
-  const [entries, setEntries] = useState<ArchiveEntry[]>([]);
-  const [gaps, setGaps] = useState<ArchiveGap[]>([]);
-  const [totals, setTotals] = useState<Totals | null>(null);
-  const [error, setError] = useState<string | null>(null);
+interface Props {
+  entries: ArchiveEntry[];
+  gaps: ArchiveGap[];
+  totals: ArchiveTotals;
+  imageBackend?: 'blob' | 'blob-private' | 's3' | null;
+}
+
+export default function SourceArchivePanel({ entries, gaps, totals, imageBackend }: Props) {
   const [filter, setFilter] = useState<Filter>('uncited');
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/wiki/archive')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((d) => {
-        if (cancelled) return;
-        setEntries(d.entries ?? []);
-        setGaps(d.gaps ?? []);
-        setTotals(d.totals ?? null);
-      })
-      .catch(() => !cancelled && setError('Could not read the source archive.'));
-    return () => { cancelled = true; };
-  }, []);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -96,31 +88,15 @@ export default function SourceArchivePanel() {
       ));
   }, [entries, filter, query]);
 
-  const visible = expanded ? shown : shown.slice(0, 25);
-
-  if (error) return <p style={{ color: '#ef5350', fontSize: '0.85rem', margin: 0 }}>{error}</p>;
-  if (!totals) return <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>Reading the archive…</p>;
+  const visible = expanded ? shown : shown.slice(0, 40);
 
   return (
     <div>
-      <h2 style={{ fontSize: '1rem', margin: '0 0 0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-        <Archive size={16} /> The source archive
-      </h2>
-      <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: '0 0 0.9rem' }}>
-        Every document the wiki holds a copy of. An uncited one is material nobody has written up
-        yet — the fastest way to add something the Chronicle does not know.
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: '0 0 1rem', lineHeight: 1.55 }}>
+        Every document the Chronicle holds a copy of. An uncited one is material nobody has written
+        up yet — the fastest way to add something the Chronicle does not know. The public index is
+        at <Link href="/chronicle/references" style={{ color: 'var(--accent-primary)' }}>References</Link>.
       </p>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
-        <Stat label="Documents archived" value={totals.archived} />
-        <Stat label="Cited by a page" value={totals.cited} />
-        <Stat label="Not yet used" value={totals.uncited} accent={totals.uncited > 0} />
-        <Stat label="Words unused" value={totals.uncitedWords >= 1000 ? `${Math.round(totals.uncitedWords / 1000)}k` : totals.uncitedWords} accent={totals.uncited > 0} />
-        {/* Distinct source-to-page links, not raw citation markers: a page
-            citing one document eight times is one link, and that is the useful
-            number for seeing how widely a source carries the wiki. */}
-        <Stat label="Source–page links" value={totals.citations} />
-      </div>
 
       {gaps.length > 0 && (
         <div style={{
@@ -150,7 +126,7 @@ export default function SourceArchivePanel() {
         </div>
       )}
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginBottom: '0.85rem' }}>
         {([
           ['uncited', `Not yet used (${totals.uncited})`],
           ['cited', `In use (${totals.cited})`],
@@ -167,7 +143,7 @@ export default function SourceArchivePanel() {
               cursor: 'pointer',
               border: `1px solid ${filter === key ? 'var(--accent-primary)' : 'var(--border-color)'}`,
               background: filter === key ? 'var(--accent-primary)' : 'transparent',
-              color: filter === key ? '#fff' : 'var(--text-secondary)',
+              color: filter === key ? 'var(--text-on-accent, #fff)' : 'var(--text-secondary)',
             }}
           >
             {label}
@@ -264,17 +240,19 @@ export default function SourceArchivePanel() {
           )}
         </>
       )}
-    </div>
-  );
-}
 
-function Stat({ label, value, accent }: { label: string; value: number | string; accent?: boolean }) {
-  return (
-    <div>
-      <div style={{ fontSize: '1.35rem', fontWeight: 700, color: accent ? '#d97706' : 'var(--text-primary)' }}>
-        {typeof value === 'number' ? value.toLocaleString() : value}
-      </div>
-      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{label}</div>
+      {imageBackend && (
+        <p style={{ margin: '1.1rem 0 0', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          Uploaded images go to{' '}
+          <strong>
+            {imageBackend === 'blob'
+              ? 'Vercel Blob (public, CDN-served)'
+              : imageBackend === 'blob-private'
+                ? 'Vercel Blob (private, streamed through the site)'
+                : 'Supabase storage'}
+          </strong>.
+        </p>
+      )}
     </div>
   );
 }

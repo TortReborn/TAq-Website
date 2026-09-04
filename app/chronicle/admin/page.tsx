@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import ChroniclesAdmin from '@/components/ChroniclesAdmin';
 
 export const metadata: Metadata = {
-  title: 'Chronicle — editorial',
-  description: 'Review queue, unverified pages and chronicler management for the Chronicle.',
+  title: 'Chronicle — editorial desk',
+  description: 'Pages still unchecked, sources not yet written up, and suggestions awaiting a decision.',
 };
 
 /**
