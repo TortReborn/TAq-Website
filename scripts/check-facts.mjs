@@ -84,6 +84,11 @@ function norm(s) {
     // ("control it.And the thing"). Applied to article and source alike, so a
     // faithful quotation stops reading as an altered one.
     .replace(/([.,;:!?])(?=[A-Za-z])/g, '$1 ')
+    // A forum listing wraps a hyphenated title across two lines, so the thread
+    // "Come Join! The Odeus Anti-Validus Pact" is archived as "Anti- Validus".
+    .replace(/([A-Za-z])-\s+([A-Za-z])/g, '$1-$2')
+    // Quote-style list markers are the post's formatting, not its words.
+    .replace(/(^|\s)>\s*/g, '$1')
     .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
@@ -241,7 +246,18 @@ for (const a of articles) {
       for (const quote of quotationsIn(prose)) {
         if (quote.length < 12) continue;
         // An elided quotation is several fragments; each must be present.
-        const parts = norm(quote).split(/\s*\.\.\.\s*|\s*\[…\]\s*/).filter((p) => p.length >= 12);
+        //
+        // Punctuation at a fragment's edges is not part of what the quotation
+        // marks promise. A quotation carried inside a sentence conventionally
+        // takes that sentence's punctuation — the source ends "internal
+        // affairs." and the article writes "internal affairs," because a clause
+        // follows. The words are what must be verbatim, so the edges are
+        // trimmed before the comparison and a difference there stops being a
+        // finding. A difference anywhere else still is.
+        const edges = (p) => p.replace(/^[^a-z0-9]+/i, '').replace(/[^a-z0-9]+$/i, '');
+        const parts = norm(quote).split(/\s*\.\.\.\s*|\s*\[…\]\s*/)
+          .map(edges)
+          .filter((p) => p.length >= 12);
         const missing = parts.filter((p) => !pool.includes(p));
         if (missing.length) {
           // Much of this corpus is Discord screenshots, and a quotation read off
