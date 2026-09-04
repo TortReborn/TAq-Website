@@ -64,6 +64,13 @@ function deriveId(url) {
     const page = u.pathname.match(/page-(\d+)/);
     if (thread) return `thread-${thread[1]}${page ? `-p${String(page[1]).padStart(2, '0')}` : ''}`;
   }
+  // Google Docs URLs are all /document/d/<44-char key>/edit — the path slug
+  // carries no meaning, so key off the document id instead.
+  const gdoc = u.pathname.match(/\/(document|spreadsheets|presentation)\/d\/([A-Za-z0-9_-]{16,})/);
+  if (gdoc && /docs\.google\.com$/.test(u.hostname)) {
+    return `gdoc-${gdoc[2].slice(0, 16).toLowerCase()}`;
+  }
+
   const host = u.hostname.replace(/^www\./, '').replace(/\./g, '-');
   const slug = (u.pathname + u.search)
     .replace(/[^A-Za-z0-9]+/g, '-')
@@ -192,10 +199,33 @@ function extractTitle(html) {
 // fetching
 // ---------------------------------------------------------------------------
 
+/**
+ * A Google Docs /edit URL serves an empty JavaScript shell — fetching it gets
+ * you an app, not a document. The export endpoint returns the real content as
+ * plain text (or CSV for a sheet), and works for anything link-shared, which is
+ * how these were given to us.
+ */
+function googleExportUrl(url) {
+  const m = url.match(/docs\.google\.com\/(document|spreadsheets|presentation)\/d\/([A-Za-z0-9_-]{16,})/);
+  if (!m) return null;
+  const [, kind, id] = m;
+  if (kind === 'spreadsheets') return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`;
+  if (kind === 'presentation') return `https://docs.google.com/presentation/d/${id}/export/txt`;
+  return `https://docs.google.com/document/d/${id}/export?format=txt`;
+}
+
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'text/html,*/*' }, redirect: 'follow' });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return { html: await res.text(), finalUrl: res.url };
+  const exportUrl = googleExportUrl(url);
+  const target = exportUrl ?? url;
+  const res = await fetch(target, { headers: { 'User-Agent': UA, Accept: 'text/html,*/*' }, redirect: 'follow' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${target}`);
+  const body = await res.text();
+  // A doc that is not link-shared redirects to a sign-in page rather than
+  // failing, so check for that instead of trusting the status code.
+  if (exportUrl && /<html|accounts\.google\.com\/(v3\/)?signin/i.test(body.slice(0, 2000))) {
+    throw new Error(`not publicly shared (got a sign-in page) for ${url}`);
+  }
+  return { html: body, finalUrl: res.url, isPlainText: !!exportUrl };
 }
 
 /**
@@ -277,9 +307,13 @@ async function cmdAdd(args) {
     console.log(`wayback capture ${snap.timestamp}`);
   }
 
-  const { html, finalUrl } = await fetchText(fetchUrl);
-  const text = extractText(html, finalUrl);
-  const title = extractTitle(html);
+  const { html, finalUrl, isPlainText } = await fetchText(fetchUrl);
+  // Exported documents arrive as text; running the tag-stripper over them would
+  // only mangle any angle brackets the author actually wrote.
+  const text = isPlainText ? html.replace(/\r\n/g, '\n').trim() : extractText(html, finalUrl);
+  const title = isPlainText
+    ? (text.split('\n').find((l) => l.trim())?.trim().slice(0, 200) ?? '')
+    : extractTitle(html);
   const sha = crypto.createHash('sha256').update(html).digest('hex').slice(0, 16);
 
   fs.mkdirSync(DOCS, { recursive: true });
@@ -300,7 +334,8 @@ async function cmdAdd(args) {
 
   if (keepRaw) {
     fs.mkdirSync(RAW, { recursive: true });
-    fs.writeFileSync(path.join(RAW, `${id}.html.gz`), zlib.gzipSync(Buffer.from(html, 'utf8'), { level: 9 }));
+    const ext = isPlainText ? 'txt' : 'html';
+    fs.writeFileSync(path.join(RAW, `${id}.${ext}.gz`), zlib.gzipSync(Buffer.from(html, 'utf8'), { level: 9 }));
   }
 
   idx.sources[id] = {
@@ -373,6 +408,7 @@ async function cmdThread(args) {
 }
 
 function guessKind(url) {
+  if (/docs\.google\.com/.test(url)) return 'document';
   if (/forums\.wynncraft\.com/.test(url)) return 'forum-thread';
   if (/titantimes|titansvalor/.test(url)) return 'titan-times';
   if (/wynncraft\.wiki|wiki\.gg/.test(url)) return 'wiki';
