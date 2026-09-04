@@ -13,10 +13,9 @@
     "skipLibCheck": true,
     "noEmit": true,
     "strict": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "*"
+        "./*"
       ]
     },
     "forceConsistentCasingInFileNames": true,
