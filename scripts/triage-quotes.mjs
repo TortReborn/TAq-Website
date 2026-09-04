@@ -33,6 +33,13 @@ const norm = (s) =>
   s.replace(/[‘’ʼ′]/g, "'").replace(/[“”″]/g, '"').replace(/[–—−]/g, '-')
     .replace(/…/g, '...').replace(/&nbsp;|&#160;/g, ' ').replace(/&amp;/g, '&')
     .replace(/\[\/?[A-Za-z][^\]]{0,40}\]/g, '')
+    // The same markup also survives unclosed — "@NeonRider[/USER," — and the
+    // bracketed form above needs a closing bracket it never gets.
+    .replace(/\[\/?[A-Za-z]{2,12}(?![^\]\n]*\])/g, '')
+    // Some posts lose the space after sentence punctuation in extraction
+    // ("control it.And the thing"). Applied to article and source alike, so a
+    // faithful quotation stops reading as an altered one.
+    .replace(/([.,;:!?])(?=[A-Za-z])/g, '$1 ')
     .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
