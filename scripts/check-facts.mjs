@@ -85,6 +85,7 @@ function norm(s) {
     // nests it as 'pity price'. Treat both as one character for comparison, or
     // every nested quotation reads as a mismatch.
     .replace(/['"]/g, '')
+    .split(' / ').join(' ')
     .replace(/[︀-️​-‍﻿]/g, '')
     .replace(/\s+/g, ' ')
     .toLowerCase()
