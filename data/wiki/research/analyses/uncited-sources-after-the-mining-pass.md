@@ -85,3 +85,31 @@ hours and returns nothing publishable.
 - **`sequoia-ooo-index-wb20240322`** and **`-wb20250209`** are captures of the
   same page eleven months apart, and the page never got past its template text.
   They establish only that the site existed and did not change.
+
+## Addendum, 4 September 2026: the ingested Discord channels
+
+Twelve channels were archived from four guilds and alliances that day. Eleven
+are cited. The exception is `coalition-public-announcements`: 169 words, one
+post, about who could do what after a server rebuild. There is nothing in it
+about guild history and it is not expected to be cited.
+
+The rest were mined at very different depths, which is worth recording because
+words-per-citation is the honest measure of how much is left:
+
+| Source | Words | Citations | Words per citation |
+| --- | --- | --- | --- |
+| emperium-voting | 2,825 | 3 | 942 |
+| emperium-announcements | 19,605 | 24 | 817 |
+| coalition-welcome | 326 | 1 | 326 |
+| coalition-announcements | 1,333 | 6 | 222 |
+| kingdomphoenixes-announcements | 2,465 | 14 | 176 |
+| holders-of-le-announcements | 2,141 | 14 | 153 |
+
+The corpus writes about thirty words of article per citation, so these numbers
+are not comparable to that — a channel is raw material, and most of any
+announcement channel is scheduling, promotions and jokes. But the Emperium's
+two channels are the ones with real depth left. The announcements were read
+through the June 2017 split debate; from late June to the October
+fall they have been skimmed, not mined. The voting channel has been used for
+its mechanics and not for its individual votes, of which there are dozens, each
+one a dated decision by a named alliance.
