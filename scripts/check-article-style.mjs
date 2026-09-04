@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Style linter for the Chronicles wiki corpus (data/wiki/seed-articles.json).
+ * Style linter for the Chronicle wiki corpus (data/wiki/seed-articles.json).
  * The rules it enforces are the chronicle-article skill's
  * (.claude/skills/chronicle-article/): provenance lives in footnotes, not prose.
  *

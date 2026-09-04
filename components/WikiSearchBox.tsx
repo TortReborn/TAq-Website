@@ -41,7 +41,7 @@ export default function WikiSearchBox({ autoFocus = false }: { autoFocus?: boole
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder="Search the Chronicles…"
+          placeholder="Search the Chronicle…"
           style={{
             width: "100%", boxSizing: "border-box",
             padding: "0.6rem 0.9rem 0.6rem 2.3rem",

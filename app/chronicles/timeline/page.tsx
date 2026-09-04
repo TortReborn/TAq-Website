@@ -9,7 +9,7 @@ import { slugify } from '@/lib/wiki';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Timeline — Chronicles',
+  title: 'Timeline — Chronicle',
   description: 'The master timeline of Wynncraft guild history.',
 };
 
@@ -93,7 +93,7 @@ export default async function ChroniclesTimeline() {
   return (
     <div style={{ maxWidth: '820px', margin: '0 auto', padding: '2rem 1rem 3rem' }}>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicles</Link>
+        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
         {' › Timeline'}
       </div>
       <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', borderBottom: '2px solid var(--border-color)', paddingBottom: '0.4rem' }}>
@@ -102,7 +102,7 @@ export default async function ChroniclesTimeline() {
       <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0.6rem 0 1.5rem' }}>
         Every recorded alliance and event, 2018 to today. Dates link to the{' '}
         <Link href="/map/history/chronicle" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>history map</Link>{' '}
-        at that moment; titles link to their Chronicles article where one exists.
+        at that moment; titles link to their Chronicle article where one exists.
       </p>
 
       {[...byYear.entries()].map(([year, list]) => (

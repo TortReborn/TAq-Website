@@ -12,9 +12,9 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const found = await getWikiPage(getPool(), slug).catch(() => null);
-  if (!found) return { title: 'Chronicles' };
+  if (!found) return { title: 'Chronicle' };
   return {
-    title: `${found.page.title} — Chronicles`,
+    title: `${found.page.title} — Chronicle`,
     description: found.page.summary || undefined,
   };
 }

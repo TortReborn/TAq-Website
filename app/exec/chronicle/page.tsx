@@ -13,6 +13,7 @@ import {
 } from '@/lib/chronicle';
 import { SubmitForm, FormState } from '@/components/ChroniclePanel';
 import WikiReviewQueue from '@/components/WikiReviewQueue';
+import ChroniclerManager from '@/components/ChroniclerManager';
 
 // Date-only values (stored as UTC midnight) display as bare dates in UTC so
 // they never shift a day; values with a time-of-day display in local time.
@@ -55,7 +56,10 @@ function AlliancePayloadView({ p }: { p: AlliancePayload }) {
       {p.description && <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>{p.description}</div>}
       <table style={{ fontSize: '0.78rem', borderSpacing: 0 }}>
         <tbody>
-          {p.memberships.map((m, i) => (
+          {/* Older approved submissions were stored without a memberships
+              array, and mapping over the missing field took the whole page
+              down rather than the one row that could not be rendered. */}
+          {(p.memberships ?? []).map((m, i) => (
             <tr key={i}>
               <td style={{ paddingRight: '1rem' }}>{m.guild}</td>
               <td style={{ color: 'var(--text-secondary)' }}>{fmtDate(m.joinedAt)} → {fmtDate(m.leftAt)}</td>
@@ -78,10 +82,10 @@ function EventPayloadView({ p }: { p: EventPayload }) {
         </span>
       </div>
       {(p.alliances ?? []).length > 0 && (
-        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>Alliances: {p.alliances.join(', ')}</div>
+        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>Alliances: {(p.alliances ?? []).join(', ')}</div>
       )}
-      {p.guilds.length > 0 && (
-        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>Guilds: {p.guilds.join(', ')}</div>
+      {(p.guilds ?? []).length > 0 && (
+        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>Guilds: {(p.guilds ?? []).join(', ')}</div>
       )}
       {p.description && <div style={{ color: 'var(--text-secondary)' }}>{p.description}</div>}
     </div>
@@ -204,13 +208,17 @@ export default function ExecChroniclePage() {
         the audit trail.
       </p>
 
+      <div style={{ ...cardStyle, marginBottom: '1.5rem' }}>
+        <ChroniclerManager />
+      </div>
+
       <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
-        Chronicles Wiki — suggestion queue
+        Chronicle Wiki — suggestion queue
       </h2>
       <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
         Community-suggested wiki pages and edits. Approving publishes immediately, credited to the
         suggester with you recorded as reviewer. Exec edits are made directly on the{' '}
-        <a href="/chronicles" style={{ color: 'var(--accent-primary)' }}>Chronicles pages</a> themselves.
+        <a href="/chronicles" style={{ color: 'var(--accent-primary)' }}>Chronicle pages</a> themselves.
       </p>
       <div style={{ marginBottom: '2rem' }}>
         <WikiReviewQueue />

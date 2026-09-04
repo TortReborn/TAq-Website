@@ -1,5 +1,5 @@
 /**
- * Authorisation for the Chronicles wiki.
+ * Authorisation for the Chronicle wiki.
  *
  * The wiki has a different membership problem from the rest of the site. Every
  * other authenticated surface answers "is this person in the guild, and what

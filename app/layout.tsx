@@ -12,7 +12,8 @@ import BottomBar from '@/components/BottomBar';
 import { Analytics } from "@vercel/analytics/react";
 import { useExecSession } from '@/hooks/useExecSession';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
-import { ViewAsContext } from '@/hooks/useViewAs';
+import { ViewAsContext, type ViewAsMode } from '@/hooks/useViewAs';
+import { useWikiSession } from '@/hooks/useWikiSession';
 
 const roboto = Roboto({
   weight: ['400', '500', '700', '900'],
@@ -39,13 +40,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [splashFading, setSplashFading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [viewAs, setViewAs] = useState<'normal' | 'non-member' | 'below-angler' | 'angler'>('normal');
+  const [viewAs, setViewAs] = useState<ViewAsMode>('normal');
   const [viewAsOpen, setViewAsOpen] = useState(false);
   const { authenticated: realAuthenticated, isExec: realIsExec, user: realUser } = useExecSession();
+  const { reallyChronicler: isReallyChronicler } = useWikiSession();
 
   // "View as" overrides for exec members to test other perspectives
   const authenticated = viewAs === 'non-member' ? false : realAuthenticated;
-  const isExec = viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' ? false : realIsExec;
+  const isExec =
+    viewAs === 'non-member' || viewAs === 'below-angler' || viewAs === 'angler' ? false : realIsExec;
   const user = viewAs === 'non-member' ? null
     : viewAs === 'below-angler' ? (realUser ? { ...realUser, rank: 'Piranha', role: 'member' as const } : realUser)
     : viewAs === 'angler' ? (realUser ? { ...realUser, rank: 'Angler', role: 'member' as const } : realUser)
@@ -492,7 +495,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.boxShadow = 'none';
               }}
-            >Chronicles</NavLink>
+            >Chronicle</NavLink>
             <NavLink
               href="/lootpools"
               style={{
@@ -731,6 +734,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     { value: 'non-member' as const, label: 'Non-guild Member' },
                     { value: 'below-angler' as const, label: 'Guild Member (Below Angler)' },
                     { value: 'angler' as const, label: 'Angler+' },
+                    ...(isReallyChronicler
+                      ? [{ value: 'non-chronicler' as const, label: 'Non-chronicler (Chronicle)' }]
+                      : []),
                   ]).map(opt => (
                     <button
                       key={opt.value}
@@ -992,7 +998,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Chronicles</NavLink>
+              >Chronicle</NavLink>
               <NavLink
                 href="/lootpools"
                 onClick={() => setMobileMenuOpen(false)}

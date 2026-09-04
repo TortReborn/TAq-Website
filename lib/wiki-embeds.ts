@@ -1,5 +1,5 @@
 /**
- * Chronicles Wiki live-data embeds.
+ * Chronicle Wiki live-data embeds.
  *
  * Directives are block-level: a line containing nothing but
  *   {{alliance:Name}}

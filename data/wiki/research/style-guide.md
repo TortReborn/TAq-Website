@@ -1,4 +1,4 @@
-# Chronicles wiki — seeding task sheet
+# Chronicle wiki — seeding task sheet
 
 > **The house style now lives in the `chronicle-article` skill**
 > (`.claude/skills/chronicle-article/`). Read `SKILL.md` and its `references/`

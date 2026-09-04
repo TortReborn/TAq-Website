@@ -28,7 +28,7 @@ export default function WikiHistoryView({ page, revisions }: { page: WikiPage; r
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicles</Link>
+        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
         {' › '}
         <Link href={`/chronicles/${page.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>{page.title}</Link>
       </div>

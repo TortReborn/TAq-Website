@@ -1,5 +1,5 @@
 /**
- * Chronicles Wiki — client-safe types, validation and helpers.
+ * Chronicle Wiki — client-safe types, validation and helpers.
  *
  * A Wikipedia-style guild-history system: typed pages in one flat namespace,
  * full revision history, exec-driven with community suggestions (Phase 2).

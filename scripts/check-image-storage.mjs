@@ -58,7 +58,7 @@ const svg = Buffer.from(
   `<svg width="900" height="600" xmlns="http://www.w3.org/2000/svg">
      <rect width="900" height="600" fill="#0b3d5c"/>
      <text x="40" y="300" font-family="sans-serif" font-size="54" fill="#7fd1ff">
-       chronicles storage check
+       chronicle storage check
      </text>
    </svg>`,
 );

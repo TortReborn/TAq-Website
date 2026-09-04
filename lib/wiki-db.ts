@@ -1,5 +1,5 @@
 /**
- * Chronicles Wiki — server-side data access. Client-safe types/validation in
+ * Chronicle Wiki — server-side data access. Client-safe types/validation in
  * lib/wiki.ts; design in docs/chronicles-wiki-plan.md.
  *
  * Conventions follow lib/chronicle-db.ts: lazy table creation, every content

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Source archive — a local, citable corpus for the Chronicles wiki.
+ * Source archive — a local, citable corpus for the Chronicle wiki.
  *
  * Every page we consult for guild history gets fetched ONCE and stored in
  * data/wiki/sources/, so drafting and fact-checking read from disk instead of the
@@ -42,7 +42,7 @@ const UA = 'Mozilla/5.0 (compatible; TAqChronicles/1.0; +https://theaquarium.wyn
 // ---------------------------------------------------------------------------
 
 function loadIndex() {
-  if (!fs.existsSync(INDEX)) return { $comment: 'Archived sources for the Chronicles wiki. Managed by scripts/source-archive.mjs — add entries with `add`, never by hand.', sources: {} };
+  if (!fs.existsSync(INDEX)) return { $comment: 'Archived sources for the Chronicle wiki. Managed by scripts/source-archive.mjs — add entries with `add`, never by hand.', sources: {} };
   return JSON.parse(fs.readFileSync(INDEX, 'utf8'));
 }
 

@@ -50,13 +50,13 @@ export interface EventPayload {
 
 export interface ChronicleAlliance extends AlliancePayload {
   id: number;
-  /** Slug of a matching Chronicles wiki article, attached by the API when one exists */
+  /** Slug of a matching Chronicle wiki article, attached by the API when one exists */
   wikiSlug?: string;
 }
 
 export interface ChronicleEvent extends EventPayload {
   id: number;
-  /** Slug of a matching Chronicles wiki article, attached by the API when one exists */
+  /** Slug of a matching Chronicle wiki article, attached by the API when one exists */
   wikiSlug?: string;
 }
 

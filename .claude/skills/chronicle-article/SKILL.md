@@ -1,11 +1,11 @@
 ---
 name: chronicle-article
-description: Write and revise articles in the Chronicles wiki (Wynncraft guild history). Use when creating a new chronicle article, revising an existing one, or propagating a corrected fact across articles. Encodes the project's Wikipedia-style voice, section order, sourcing and citation rules.
+description: Write and revise articles in the Chronicle wiki (Wynncraft guild history). Use when creating a new chronicle article, revising an existing one, or propagating a corrected fact across articles. Encodes the project's Wikipedia-style voice, section order, sourcing and citation rules.
 ---
 
-# Writing Chronicles articles
+# Writing Chronicle articles
 
-The Chronicles wiki documents Wynncraft guild warfare, 2014–2026. It is written
+The Chronicle wiki documents Wynncraft guild warfare, 2014–2026. It is written
 to Wikipedia's conventions, **shorter than Wikipedia writes**, and every claim is
 sourced.
 

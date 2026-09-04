@@ -271,7 +271,7 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   // tiny and server-cached for 1h, and fetching it up front takes one request
   // out of the already-busy moment when the user switches to the history tab.
   const seasons = useSeasons(true);
-  // Deep-linked start time (?t=YYYY-MM-DD, used by Chronicles timeline links):
+  // Deep-linked start time (?t=YYYY-MM-DD, used by Chronicle timeline links):
   // seed the history scrubber at UTC noon of that day, once, on mount. This
   // runs in an effect, not the state initializer — the server renders without
   // query params and an initializer that reads them breaks hydration.

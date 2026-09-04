@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Fact auditor for the Chronicles — does each claim survive contact with the
+ * Fact auditor for the Chronicle — does each claim survive contact with the
  * source it cites?
  *
  *   node scripts/check-facts.mjs [--slug foo] [--only quotes,locators] [--json out.json]

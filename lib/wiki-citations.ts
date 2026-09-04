@@ -1,5 +1,5 @@
 /**
- * Chronicles Wiki citations — Wikipedia-style inline references.
+ * Chronicle Wiki citations — Wikipedia-style inline references.
  *
  * Inline syntax (anywhere in a line, unlike the block embeds):
  *   {{cite:thread-237070}}                     archived source id

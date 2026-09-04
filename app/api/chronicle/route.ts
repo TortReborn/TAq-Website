@@ -12,7 +12,7 @@ export async function GET() {
     const pool = getPool();
     const data = await loadChronicleData(pool);
 
-    // Cross-link to the Chronicles wiki: alliances/events whose slugified
+    // Cross-link to the Chronicle wiki: alliances/events whose slugified
     // name matches an existing article carry its slug for "Read more" links.
     const candidates = [
       ...data.alliances.map(a => slugify(a.name)),

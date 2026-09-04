@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Fetch Visage skin renders for Chronicles player articles.
+ * Fetch Visage skin renders for Chronicle player articles.
  *
  *   node scripts/fetch-player-renders.mjs <slug>:<ign> [<slug>:<ign> ...]
  *   node scripts/fetch-player-renders.mjs --dry-run <slug>:<ign>

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Media archive — images for the Chronicles wiki, with provenance.
+ * Media archive — images for the Chronicle wiki, with provenance.
  *
  * The wiki is text-heavy; guild emblems, alliance logos and territory maps sit
  * in forum posts whose image hosts eventually die. This mirrors
@@ -34,7 +34,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const SRC_RAW = path.join(ROOT, 'data', 'wiki', 'sources', 'raw');
 const MEDIA = path.join(ROOT, 'data', 'wiki', 'sources', 'media');
-const WEB_OUT = path.join(ROOT, 'public', 'images', 'chronicles', 'media');
+const WEB_OUT = path.join(ROOT, 'public', 'images', 'chronicle', 'media');
 const MANIFEST = path.join(MEDIA, 'manifest.json');
 const UA = 'Mozilla/5.0 (compatible; TAqChronicles/1.0)';
 
@@ -46,7 +46,7 @@ const flag = (args, name, fb) => {
 function load() {
   if (!fs.existsSync(MANIFEST)) {
     return {
-      $comment: 'Images for the Chronicles wiki with provenance. Managed by scripts/media-archive.mjs. Game and forum content only; entries with an "excluded" field are kept as evidence but never published.',
+      $comment: 'Images for the Chronicle wiki with provenance. Managed by scripts/media-archive.mjs. Game and forum content only; entries with an "excluded" field are kept as evidence but never published.',
       media: {},
     };
   }

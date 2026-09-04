@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(discordUser.id) >> 22n) % 6}.png`;
 
     if (!linkCheck.ok) {
-      // Not a guild member — but the Chronicles wiki is deliberately open to
+      // Not a guild member — but the Chronicle wiki is deliberately open to
       // people outside the guild, so check for a chronicler role before
       // turning them away. They get a wiki-only session with no rank attached.
       if (await isChronicler(getPool(), discordUser.id)) {

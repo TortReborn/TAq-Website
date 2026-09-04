@@ -7,7 +7,7 @@ import { WikiSubmission, WIKI_TYPE_LABELS } from "@/lib/wiki";
 import { diffCollapsed } from "@/lib/wiki-diff";
 
 /**
- * Exec review queue for Chronicles wiki suggestions: pending list, per-item
+ * Exec review queue for Chronicle wiki suggestions: pending list, per-item
  * rendered line diff against the current page (or full body for new pages),
  * approve / reject with note. Rendered inside /exec/chronicle.
  */
