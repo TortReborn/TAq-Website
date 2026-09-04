@@ -31,6 +31,8 @@ if (!useTest && !args.includes('--prod')) {
 }
 
 // .env is read directly: this is a one-shot maintenance script, not app code.
+const unquote = (v) => v.replace(/^(['"])(.*)\1$/s, '$2');
+
 const envText = fs.readFileSync(path.join(__dirname, '..', '.env'), 'utf8');
 const envMap = Object.fromEntries(
   envText
@@ -38,7 +40,8 @@ const envMap = Object.fromEntries(
     .filter((l) => l.trim() && !l.trim().startsWith('#'))
     .map((l) => {
       const i = l.indexOf('=');
-      return [l.slice(0, i).trim(), l.slice(i + 1).trim()];
+      // vercel env pull quotes its values; those quotes are not part of the value.
+      return [l.slice(0, i).trim(), unquote(l.slice(i + 1).trim())];
     }),
 );
 const env = (k) => (useTest ? envMap[`TEST_${k}`] ?? envMap[k] : envMap[k]);
