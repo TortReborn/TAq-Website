@@ -27,5 +27,11 @@ test-results/
 playwright-report/
 .playwright-mcp/
 
+# --- Planning notes and specs (kept locally, not in the repo) ---
+/docs/
+
+# --- Stray build output ---
+/dist/
+
 # --- Claude Code local settings ---
 .claude/settings.local.json
