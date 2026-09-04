@@ -117,6 +117,25 @@ for (const a of articles) {
     const bare = sentence.replace(/\{\{cite:[^}]*\}\}/g, ' ').replace(/\s+/g, ' ');
     const ents = entitiesIn(bare);
 
+    // Every date the sentence states, so a claim can be told apart from its
+    // neighbours. A sentence like "it collapsed on 23 Nov 2019, two days after
+    // Titans Valor left" names two events; matching on guild names alone
+    // cheerfully paired the collapse date with the departure entry and called
+    // the article two days wrong when it was exactly right.
+    const sentenceDays = [...bare.matchAll(DATE_RE)].map((m) => dayNo({
+      day: Number(m[1]), month: MONTHS[m[2].slice(0, 3).toLowerCase()], year: Number(m[3]),
+    }));
+    // Prose drops the year on a second date in the same breath — "on 9 March
+    // 2016 — 11 March by the community timeline". That second date is the
+    // source's own, stated and attributed, and missing it made the article look
+    // like it had quietly disagreed with a document it was openly citing.
+    const years = [...new Set([...bare.matchAll(DATE_RE)].map((m) => Number(m[3])))];
+    for (const m of bare.matchAll(/\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\b(?!\s+20\d\d)/g)) {
+      for (const year of years) {
+        sentenceDays.push(dayNo({ day: Number(m[1]), month: MONTHS[m[2].slice(0, 3).toLowerCase()], year }));
+      }
+    }
+
     for (const dm of bare.matchAll(DATE_RE)) {
       const claim = {
         day: Number(dm[1]),
@@ -136,11 +155,24 @@ for (const a of articles) {
       }
       if (!best) { unmatched++; findings.push({ kind: 'UNMATCHED', slug: a.slug, claim: dm[0], sentence: bare.slice(0, 150) }); continue; }
       matched++;
+      // The entry is already accounted for in this sentence, so the article is
+      // reconciling two events rather than misdating one: either it states the
+      // entry's own date as well, or a different date of its own sits closer to
+      // the entry and is the claim the entry actually describes.
+      const entryDay = dayNo(best.e);
+      if (sentenceDays.includes(entryDay)) continue;
+      if (sentenceDays.some((d) => Math.abs(d - entryDay) < best.delta)) continue;
       if (best.signed !== 0) {
         offBy++;
         findings.push({
           kind: 'OFF-BY', slug: a.slug, claim: dm[0], signed: best.signed,
           source: `${iso(best.e)} — ${best.e.text.slice(0, 95)}`,
+          // The matcher pairs on shared entity names, so it will happily line a
+          // claim up against a timeline entry about a different event involving
+          // the same guilds. Without the sentence there is no way to tell that
+          // from a real disagreement, and every finding has to be opened by
+          // hand before it can even be triaged.
+          sentence: bare.slice(0, 220),
         });
       }
     }
@@ -165,6 +197,7 @@ for (const f of findings.filter((x) => x.kind === 'OFF-BY')) {
   console.log(`OFF-BY ${String(f.signed).padStart(3)}  ${f.slug}`);
   console.log(`   article: ${f.claim}`);
   console.log(`   source:  ${f.source}`);
+  console.log(`   in:      ${f.sentence}`);
 }
 for (const f of findings.filter((x) => x.kind === 'UNMATCHED')) {
   console.log(`UNMATCHED  ${f.slug}  "${f.claim}"  ${f.sentence}`);
