@@ -43,11 +43,39 @@ than none — the wiki then disagrees with itself.
    ```bash
    node scripts/check-article-style.mjs --strict
    node scripts/check-citations.mjs --strict
+   node scripts/check-fact-drift.mjs              # see below — required after a bulk pass
    node scripts/seed-wiki-articles.mjs --dry-run
    node scripts/seed-wiki-articles.mjs --dev      # then --prod once verified
    ```
    The seeder is idempotent: existing slugs get a new revision, never a
    duplicate page.
+
+## After a bulk rewrite: check for drift
+
+A style pass is supposed to change wording only. Across many articles that is
+impossible to eyeball, so diff the facts:
+
+```bash
+node scripts/check-fact-drift.mjs                # against HEAD
+node scripts/check-fact-drift.mjs --rev <sha>    # against any revision
+```
+
+It reports every date, figure, citation and wiki link that appeared or vanished,
+and separately flags **dropped source disagreements** — the class a
+de-attribution pass is most likely to eat, because a sentence saying "the
+timeline gives 14 December, Drew1011 gives the 21st" looks exactly like the
+attribution the pass is there to remove. It is one of the four cases that keeps
+its attribution, and it must survive.
+
+Every line it prints is either a deliberate correction or a mistake; the script
+cannot tell them apart, so check each one. Expect some false positives — a
+sentence rewritten tightly enough will look deleted, and image-filename hashes
+look like figures. That is the right failure mode for a safety net.
+
+Typical benign findings after a real pass: numbers that were thread metadata
+(view counts, sweep totals), dates that were archive mechanics ("captured on
+30 January 2024"), and wiki links lost because the sentence naming the source
+was cut. Anything else deserves the article opened.
 
 ## What a correction does NOT leave behind
 
