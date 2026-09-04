@@ -26,6 +26,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const usesFixedBg = !(pathname === '/map' || pathname.startsWith('/map/'));
   const isMembersPage = pathname === '/members';
+  // Long-form reading surfaces sit on a near-opaque panel. It has to live out
+  // here rather than in the route layout: inside PageTransition it would be
+  // caught by the wrapper's fade-in and the undarkened background photo would
+  // show through for the length of the animation on every navigation.
+  const isReadingSurface = pathname.startsWith('/chronicles');
   const [darkMode, setDarkMode] = useState(true);
   // Starts true so the splash is in the server-rendered HTML — a document
   // load is (almost) always a splash case, and this way it covers the
@@ -264,6 +269,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             break position: fixed. */}
         {usesFixedBg && <div className="site-bg-fixed" aria-hidden="true" />}
         {usesFixedBg && <div className={`site-bg-dark-overlay${isMembersPage ? ' is-active' : ''}`} aria-hidden="true" />}
+        {usesFixedBg && isReadingSurface && <div className="site-bg-reading" aria-hidden="true" />}
 
         {/* Splash Screen */}
         {showSplash && (

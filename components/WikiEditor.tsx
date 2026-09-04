@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, X, Eye, EyeOff, ImagePlus } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
@@ -59,6 +59,7 @@ export default function WikiEditor({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [suggested, setSuggested] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const set = <K extends keyof WikiPagePayload>(key: K, value: WikiPagePayload[K]) =>
@@ -78,6 +79,38 @@ export default function WikiEditor({
   };
 
   const validation = useMemo(() => validateWikiPagePayload(form), [form]);
+
+  // Unsaved-change tracking, so Cancel can warn before throwing work away.
+  const dirty = useMemo(
+    () => JSON.stringify(form) !== JSON.stringify(initial) || note.trim() !== '',
+    [form, initial, note],
+  );
+
+  const leave = () => {
+    if (targetId === null) router.push('/chronicles');
+    else router.push(`/chronicles/${initial.slug}`);
+  };
+
+  const cancel = () => {
+    if (!dirty) { leave(); return; }
+    setConfirmDiscard(true);
+  };
+
+  // Also catch tab close and browser navigation while there is unsaved work.
+  useEffect(() => {
+    if (!dirty || suggested) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty, suggested]);
+
+  // Escape closes the discard dialog rather than leaving the page.
+  useEffect(() => {
+    if (!confirmDiscard) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setConfirmDiscard(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [confirmDiscard]);
 
   const save = async () => {
     setError(null);
@@ -339,6 +372,18 @@ export default function WikiEditor({
         <button
           type="button"
           disabled={busy}
+          onClick={cancel}
+          style={{
+            ...inputStyle, width: 'auto', cursor: 'pointer', fontWeight: 600,
+            background: 'transparent', color: 'var(--text-secondary)',
+            opacity: busy ? 0.6 : 1, padding: '0.45rem 1rem',
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          disabled={busy}
           onClick={save}
           style={{
             ...inputStyle, width: 'auto', cursor: 'pointer', fontWeight: 700,
@@ -354,6 +399,60 @@ export default function WikiEditor({
         </button>
       </div>
       {error && <div style={{ color: '#e57373', fontSize: '0.8rem', marginTop: '0.5rem' }}>{error}</div>}
+
+      {confirmDiscard && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wiki-discard-title"
+          onClick={() => setConfirmDiscard(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100, display: 'flex',
+            alignItems: 'center', justifyContent: 'center', padding: '1rem',
+            background: 'rgba(0,0,0,0.6)',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+              borderRadius: '0.5rem', padding: '1.25rem', maxWidth: '26rem', width: '100%',
+            }}
+          >
+            <div id="wiki-discard-title" style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>
+              Discard your changes?
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              {targetId === null
+                ? 'This page has not been created yet. Leaving now loses everything you have written.'
+                : 'Your edits to this page have not been saved, and leaving now loses them.'}
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1.1rem' }}>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setConfirmDiscard(false)}
+                style={{
+                  ...inputStyle, width: 'auto', cursor: 'pointer', fontWeight: 600,
+                  background: 'transparent', color: 'var(--text-secondary)', padding: '0.4rem 0.9rem',
+                }}
+              >
+                Keep editing
+              </button>
+              <button
+                type="button"
+                onClick={leave}
+                style={{
+                  ...inputStyle, width: 'auto', cursor: 'pointer', fontWeight: 700,
+                  background: '#b3261e', color: '#fff', border: 'none', padding: '0.4rem 1rem',
+                }}
+              >
+                Discard changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,17 +1,11 @@
 /**
- * Chronicles layout: long-form reading needs a calm, near-opaque surface —
- * the site's decorative background art stays as a faint tint only.
+ * Chronicles layout: long-form reading needs a calm, near-opaque surface, but
+ * that surface is painted by `.site-bg-reading` in the root layout rather than
+ * here. Inside this layout it would be a child of PageTransition's animated
+ * wrapper, so the wrapper's opacity fade-in would run over the darkening
+ * itself and the undarkened background photo would flash through on every
+ * navigation between Chronicles pages.
  */
 export default function ChroniclesLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'color-mix(in srgb, var(--bg-primary, #0b0f17) 96%, transparent)',
-        backdropFilter: 'saturate(0.85)',
-      }}
-    >
-      {children}
-    </div>
-  );
+  return <div style={{ minHeight: '100vh' }}>{children}</div>;
 }

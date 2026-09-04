@@ -706,6 +706,21 @@ body.site-fixed-bg-active > footer {
   pointer-events: none;
 }
 
+/* Near-opaque reading surface for long-form pages (the Chronicles). Rendered
+   in the root layout as a sibling of PageTransition, deliberately: when this
+   darkening lived inside the route layout it was a child of the transition
+   wrapper, so the wrapper's opacity fade-in ran over it and the undarkened
+   background photo flashed through on every navigation. Out here it never
+   animates. */
+.site-bg-reading {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--bg-primary, #0b0f17);
+  opacity: 0.96;
+  pointer-events: none;
+}
+
 /* Separate layer (not baked into .site-bg-fixed) so opacity can be transitioned */
 .site-bg-dark-overlay {
   position: fixed;
