@@ -1165,27 +1165,55 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
     return () => { bgAbortRef.current?.abort(); };
   }, []);
 
-  // Restore history mode from cached viewMode — fires exactly once
+  // Open history mode on a moment and load the data for it — fires exactly once
+  //
+  // A deep link (?t=YYYY-MM-DD from a Chronicle timeline link) sets
+  // historyTimestamp on mount, before the bounds request comes back. This
+  // effect used to bail whenever a timestamp was already set, so on a deep link
+  // it chose no moment and, more to the point, never called loadEvents: the
+  // scrubber sat on the linked date with no data behind it and the map showed
+  // "Loading territory data..." for ever. A timestamp already chosen is a
+  // reason to load *that* moment, not a reason to load nothing.
+  const historyBootstrappedRef = useRef(false);
   useEffect(() => {
-    if (isInitialized && viewMode === 'history' && historyBounds && !exchangeStoreRef.current && !historyTimestamp) {
-      // Restore cached slider position if available
-      const cachedPos = sessionStorage.getItem('history-slider-position');
-      let targetDate: Date;
-      if (cachedPos) {
-        const parsed = new Date(cachedPos);
-        const earliest = new Date(historyBounds.earliest).getTime();
-        const latest = new Date(historyBounds.latest).getTime();
-        if (!isNaN(parsed.getTime()) && parsed.getTime() >= earliest && parsed.getTime() <= latest) {
-          targetDate = parsed;
-        } else {
-          targetDate = new Date(historyBounds.latest);
+    if (!isInitialized || viewMode !== 'history' || !historyBounds) return;
+    if (historyBootstrappedRef.current || exchangeStoreRef.current) return;
+    historyBootstrappedRef.current = true;
+
+    const earliest = new Date(historyBounds.earliest).getTime();
+    const latest = new Date(historyBounds.latest).getTime();
+    const withinBounds = (d: Date) => !isNaN(d.getTime()) && d.getTime() >= earliest && d.getTime() <= latest;
+
+    // A deep-linked moment wins; then the cached scrubber position; then the
+    // latest data we have. Anything outside the bounds falls through, because
+    // loading a range the archive does not cover leaves an empty map.
+    const cachedPos = sessionStorage.getItem('history-slider-position');
+    const cached = cachedPos ? new Date(cachedPos) : null;
+    const targetDate =
+      historyTimestamp && withinBounds(historyTimestamp) ? historyTimestamp
+      : cached && withinBounds(cached) ? cached
+      : new Date(historyBounds.latest);
+
+    if (targetDate.getTime() !== historyTimestamp?.getTime()) setHistoryTimestamp(targetDate);
+
+    // Instant first paint, as when switching modes by hand: one server snapshot
+    // alongside the event load, snapped to the 10-minute grid so the URL is
+    // stable and CDN-cacheable.
+    const snapMs = targetDate.getTime() - (targetDate.getTime() % (10 * 60 * 1000));
+    fetch(`/api/map-history/snapshot?timestamp=${new Date(snapMs).toISOString()}`)
+      .then(async (snapRes) => {
+        if (!snapRes.ok) return;
+        const snapData = await snapRes.json();
+        if (snapData.territories) {
+          setInitialSnapshot({
+            timestamp: new Date(snapData.timestamp),
+            territories: snapData.territories,
+          });
         }
-      } else {
-        targetDate = new Date(historyBounds.latest);
-      }
-      setHistoryTimestamp(targetDate);
-      loadEvents(targetDate);
-    }
+      })
+      .catch((e) => mapError('snapshot', 'Failed to load initial snapshot', e));
+
+    loadEvents(targetDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, viewMode, historyBounds]);
 
@@ -1451,9 +1479,13 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   // The loading overlay only appears once loading has taken a beat —
   // cache-hit history entries resolve in tens of ms, and flashing the gray
   // overlay for a single frame reads as a glitch rather than feedback.
+  // null means "nothing loaded yet"; {} means "loaded, and nobody held anything
+  // at that moment" — a real answer, and a common one early in the archive.
+  // Treating the two alike left the overlay up permanently on any timestamp
+  // before the first recorded exchange.
   const historyOverlayWanted =
     viewMode === 'history' &&
-    (!historyTerritories || Object.keys(historyTerritories).length === 0) &&
+    !historyTerritories &&
     (isLoadingHistory || !!historyTimestamp);
   const [showHistoryLoadingOverlay, setShowHistoryLoadingOverlay] = useState(false);
   useEffect(() => {
@@ -1993,7 +2025,7 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
           so first paint under the splash is the finished map */}
       {(viewMode === 'live'
         ? Object.keys(territories).length === 0
-        : !historyTerritories || Object.keys(historyTerritories).length === 0) && (
+        : !historyTerritories) && (
         <div data-splash-hold="" hidden />
       )}
       <div style={{
