@@ -1,20 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { requireGuildSession } from '@/lib/exec-auth';
+import { requireWikiEditor } from '@/lib/wiki-auth';
 import { WIKI_LIMITS, validateWikiPagePayload } from '@/lib/wiki';
 import { createWikiPage, editWikiPage, setWikiPageStatus } from '@/lib/wiki-db';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Exec-only: create or edit a wiki page directly. Every change is stored as a
- * full revision with author + edit note (the revision log is the audit trail,
- * mirroring the map chronicle's direct-edit convention).
+ * Create or edit a wiki page directly. Open to execs and to chroniclers, who
+ * may be outside the guild entirely. Every change is stored as a full revision
+ * with author + edit note (the revision log is the audit trail, mirroring the
+ * map chronicle's direct-edit convention).
  */
 export async function POST(request: NextRequest) {
-  const session = await requireGuildSession(request);
-  if (!session || session.role !== 'exec') {
-    return NextResponse.json({ error: 'Exec access required' }, { status: 401 });
+  const principal = await requireWikiEditor(request);
+  if (!principal) {
+    return NextResponse.json({ error: 'Chronicler or exec access required' }, { status: 401 });
   }
 
   let body: unknown;
@@ -37,7 +39,9 @@ export async function POST(request: NextRequest) {
   const validated = validateWikiPagePayload(b.payload);
   if (!validated.ok) return NextResponse.json({ error: validated.error }, { status: 400 });
 
-  const author = { id: session.discord_id, name: session.ign || session.discord_username };
+  // Anything typed into the editor is a human revision by definition, and that
+  // is exactly what clears a page's unverified banner.
+  const author = { id: principal.discordId, name: principal.name, kind: 'human' as const };
   try {
     if (targetId === null) {
       const result = await createWikiPage(getPool(), validated.value, author, note);

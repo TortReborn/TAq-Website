@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getPool } from '@/lib/db';
-import { getWikiPage, wikiBacklinks, resolveWikiSlugs, listWikiRevisions } from '@/lib/wiki-db';
+import { getWikiPage, wikiBacklinks, resolveWikiSlugs, listWikiRevisions, getPageVerification } from '@/lib/wiki-db';
 import { resolveWikiEmbeds } from '@/lib/wiki-embed-db';
 import { resolveWikiCitations } from '@/lib/wiki-sources';
 import { extractWikiLinks } from '@/lib/wiki';
@@ -30,11 +30,12 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
     ...extractWikiLinks(page.body),
     ...page.infobox.flatMap(row => extractWikiLinks(row.value)),
   ];
-  const [backlinks, existing, revisions, embeds] = await Promise.all([
+  const [backlinks, existing, revisions, embeds, verification] = await Promise.all([
     wikiBacklinks(pool, page.slug),
     resolveWikiSlugs(pool, linkTargets),
     listWikiRevisions(pool, page.id),
     resolveWikiEmbeds(pool, page.body),
+    getPageVerification(pool, page.id),
   ]);
   const last = revisions[0] ?? null;
   // Citations resolve against the local source archive (no DB, no network)
@@ -48,7 +49,8 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
       embeds={embeds}
       citations={citations}
       redirectedFrom={redirectedFrom}
-      lastEditor={last ? { name: last.authorName, note: last.note } : null}
+      verification={verification}
+      lastEditor={last ? { name: last.authorName, note: last.note, kind: last.authorKind } : null}
     />
   );
 }

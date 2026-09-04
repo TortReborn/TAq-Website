@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { Pencil, History, Link2 } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
-import { WikiPage, WikiPageSummary, WIKI_TYPE_LABELS, extractToc } from "@/lib/wiki";
+import { WikiPage, WikiPageSummary, WikiVerification, WIKI_TYPE_LABELS, extractToc } from "@/lib/wiki";
+import WikiUnverifiedBanner from "./WikiUnverifiedBanner";
 import { WikiEmbedMap } from "@/lib/wiki-embeds";
 import { WikiCitationMap, citationAnchor, citationList, splitManualSources } from "@/lib/wiki-citations";
 import { useExecSession } from "@/hooks/useExecSession";
@@ -26,6 +27,7 @@ export default function WikiArticleView({
   embeds,
   citations,
   redirectedFrom,
+  verification,
   lastEditor,
 }: {
   page: WikiPage;
@@ -34,7 +36,8 @@ export default function WikiArticleView({
   embeds?: WikiEmbedMap;
   citations?: WikiCitationMap;
   redirectedFrom?: string;
-  lastEditor?: { name: string; note: string } | null;
+  verification?: WikiVerification;
+  lastEditor?: { name: string; note: string; kind?: 'ai' | 'human' } | null;
 }) {
   const { isExec, authenticated } = useExecSession();
   const references = useMemo(() => (citations ? citationList(citations) : []), [citations]);
@@ -102,6 +105,11 @@ export default function WikiArticleView({
       {redirectedFrom && (
         <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '0.25rem', fontStyle: 'italic' }}>
           (Redirected from “{redirectedFrom}”)
+        </div>
+      )}
+      {verification && !verification.verified && (
+        <div style={{ marginTop: '0.9rem' }}>
+          <WikiUnverifiedBanner slug={page.slug} verification={verification} />
         </div>
       )}
       {page.status !== 'published' && (
@@ -273,7 +281,7 @@ export default function WikiArticleView({
             )}
             <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
               This page was last edited on {DATE_FMT.format(new Date(page.updatedAt))}
-              {lastEditor ? <> by {lastEditor.name}{lastEditor.note ? <> — “{lastEditor.note}”</> : null}</> : null}.
+              {lastEditor ? <> by {lastEditor.kind === 'ai' ? 'an automated drafting pass' : lastEditor.name}{lastEditor.note ? <> — “{lastEditor.note}”</> : null}</> : null}.
               {' '}<Link href={`/chronicles/${page.slug}/history`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>View history</Link>
             </div>
           </footer>
