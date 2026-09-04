@@ -8,7 +8,7 @@ raw_sha256: 57cce5aa402502dd
 note: "Valkyrie Alliance FOUNDING thread (LoveLusting 'Queen of the Foxes', Sep 10 2015): Valkyrie founded Jun 2 2015 by Kingdom of Foxes + Imperial; the 'Valkyrie Electorate' governance text"
 ---
 
-### post #1 — LoveLusting — Jun 11, 2018 at 1:18 AM
+### post #1 — LoveLusting (Queen of the Foxes) — Jun 11, 2018 at 1:18 AM
 
 [image: [​IMG]] ​
 
@@ -33,13 +33,13 @@ While guild governments may still maintain their powers with regards to their re
 
 ---
 
-### post #2 — Antra — Sep 10, 2015 at 12:34 AM
+### post #2 — Antra (Malding since 2014) — Sep 10, 2015 at 12:34 AM
 
 i am going to rate this 7/9, jk
 
 ---
 
-### post #3 — Kvmilla — Sep 10, 2015 at 12:49 AM
+### post #3 — Kvmilla (Goddess of Blood and Devourer of Hearts) — Sep 10, 2015 at 12:49 AM
 
 moist ~
 
@@ -47,7 +47,7 @@ and some characters
 
 ---
 
-### post #4 — n4ver — Sep 10, 2015 at 2:36 AM
+### post #4 — n4ver ()) — Sep 10, 2015 at 2:36 AM
 
 oh.
 
@@ -55,7 +55,7 @@ oh.
 
 ---
 
-### post #5 — Sanae_pls — Sep 10, 2015 at 6:25 AM
+### post #5 — Sanae_pls (That Fucking Dark Wizard) — Sep 10, 2015 at 6:25 AM
 
 nice
 
@@ -63,13 +63,13 @@ I'll continue the trend
 
 ---
 
-### post #6 — Yuno F Gasai — Sep 10, 2015 at 9:28 AM
+### post #6 — Yuno F Gasai (Forum God, FW) — Sep 10, 2015 at 9:28 AM
 
 dank guilds cant melt steel beams
 
 ---
 
-### post #7 — K™ — Sep 10, 2015 at 9:57 AM
+### post #7 — K™ (Had a happy journey) — Sep 10, 2015 at 9:57 AM
 
 kewl
 
@@ -77,7 +77,7 @@ does anybody even like 10 chars?
 
 ---
 
-### post #8 — Antra — Sep 10, 2015 at 9:59 AM
+### post #8 — Antra (Malding since 2014) — Sep 10, 2015 at 9:59 AM
 
 no
 
@@ -85,7 +85,7 @@ no one does
 
 ---
 
-### post #9 — otakugirl1279 — Sep 10, 2015 at 10:00 AM
+### post #9 — otakugirl1279 ("Don't make me say it again!") — Sep 10, 2015 at 10:00 AM
 
 The Valkyrie anthem can only be
 
@@ -93,7 +93,7 @@ The Valkyrie anthem can only be
 
 ---
 
-### post #10 — Yuno F Gasai — Sep 20, 2015 at 2:08 AM
+### post #10 — Yuno F Gasai (Forum God, FW) — Sep 20, 2015 at 2:08 AM
 
 LoveLusting said:
 
@@ -109,7 +109,7 @@ Click to expand...
 
 ---
 
-### post #11 — Antra — Sep 20, 2015 at 2:13 AM
+### post #11 — Antra (Malding since 2014) — Sep 20, 2015 at 2:13 AM
 
 Lucy/Lilium said:
 
@@ -124,31 +124,31 @@ You are not worthy!
 
 ---
 
-### post #12 — Ha_Ha_Redstone — Sep 30, 2015 at 7:08 AM
+### post #12 — Ha_Ha_Redstone (Pixel Prince) — Sep 30, 2015 at 7:08 AM
 
 Wait, so are you only accepting subguilds into this Alliance as of now?
 
 ---
 
-### post #13 — Kvmilla — Oct 16, 2015 at 10:53 AM
+### post #13 — Kvmilla (Goddess of Blood and Devourer of Hearts) — Oct 16, 2015 at 10:53 AM
 
 *accidentally bumps with my bumbum* oops :x
 
 ---
 
-### post #14 — Yuno F Gasai — Nov 9, 2015 at 10:27 AM
+### post #14 — Yuno F Gasai (Forum God, FW) — Nov 9, 2015 at 10:27 AM
 
 Cor Nostrum Deae
 
 ---
 
-### post #15 — Ha_Ha_Redstone — Nov 9, 2015 at 10:39 AM
+### post #15 — Ha_Ha_Redstone (Pixel Prince) — Nov 9, 2015 at 10:39 AM
 
 multa collegia versare potest ferro trabes
 
 ---
 
-### post #16 — LoveLusting — Jan 7, 2016 at 4:04 AM
+### post #16 — LoveLusting (Queen of the Foxes) — Jan 7, 2016 at 4:04 AM
 
 (12.12.15) Just an update passing by . . .
 
@@ -172,13 +172,13 @@ Welcome, Lightly Toasted. ​
 
 ---
 
-### post #17 — Selvut283 — Dec 12, 2015 at 5:24 PM
+### post #17 — Selvut283 (Circadian rhythm stuck on Tokyo time) — Dec 12, 2015 at 5:24 PM
 
 and then theres just me sitting in the corner
 
 ---
 
-### post #18 — Ascended Kitten — Dec 12, 2015 at 5:32 PM
+### post #18 — Ascended Kitten (The Greatest) — Dec 12, 2015 at 5:32 PM
 
 [image: [​IMG]]
 
@@ -188,12 +188,12 @@ This is how I ended up.
 
 ---
 
-### post #19 — Hiryu — Dec 12, 2015 at 5:45 PM
+### post #19 — Hiryu (honestly a lazy artist) — Dec 12, 2015 at 5:45 PM
 
 Heh, it was a fun ceremony! I find it interesting to see how guilds get to be allies :D
 
 ---
 
-### post #20 — Flubby — Dec 12, 2015 at 6:24 PM
+### post #20 — Flubby (left and accidentally became leftist) — Dec 12, 2015 at 6:24 PM
 
 Just to be clear, I was a hallucination that the drinks caused. If you drank enough you could see me riding a circle.

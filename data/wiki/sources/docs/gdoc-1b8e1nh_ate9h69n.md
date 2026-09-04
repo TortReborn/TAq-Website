@@ -8,6 +8,7 @@ raw_sha256: d3b9d288cc118f2d
 note: "Kingdom of Foxes member handbook — rules, ranks, the State Council, war policies, and a historical timeline."
 ---
 
+
 [image: ]
 
 ♕ Kingdom of Foxes Member Handbook: Table of Contents

@@ -8,7 +8,8 @@ raw_sha256: ff99794cc5172c37
 note: "Goated thread for Ordo documentation. We announced on the thread every time a guild left/got kicked/joined/etc"
 ---
 
-### post #1 — Paladin A'renos — Mar 9, 2016 at 4:15 AM
+
+### post #1 — Paladin A'renos (High Grand Master of the Ordo Malleus) — Mar 9, 2016 at 4:15 AM
 
 [image: [​IMG]]
 
@@ -202,19 +203,19 @@ From which we, Our Justice, shall come to reap.
 
 ---
 
-### post #2 — Misty — Nov 6, 2015 at 6:28 PM
+### post #2 — Misty (Chimera) — Nov 6, 2015 at 6:28 PM
 
 Love it, it seems like a good alliance
 
 ---
 
-### post #3 — Drew1011 — Nov 6, 2015 at 7:44 PM
+### post #3 — Drew1011 (Former Viceroy of the Foxes / Reviver of Kingdoms) — Nov 6, 2015 at 7:44 PM
 
 Glad my guild can be a part of such an alliance.
 
 ---
 
-### post #4 — Fangiii — Nov 6, 2015 at 6:31 PM
+### post #4 — Fangiii (Twinsies with Kurumiii | Fan of Gяιмм) — Nov 6, 2015 at 6:31 PM
 
 xXQueenMistXx said:
 
@@ -231,13 +232,13 @@ How everyone is going to be like...
 
 ---
 
-### post #5 — Yamipanda — Nov 6, 2015 at 6:31 PM
+### post #5 — Yamipanda (Well-Known Adventurer) — Nov 6, 2015 at 6:31 PM
 
 Glad to be a part <3
 
 ---
 
-### post #6 — Killerfish — Nov 6, 2015 at 6:39 PM
+### post #6 — Killerfish (Procrastinating Artist) — Nov 6, 2015 at 6:39 PM
 
 Fangs said:
 
@@ -254,7 +255,7 @@ Yeah cus the merchant and community guilds are obviously too op
 
 ---
 
-### post #7 — roboblock93 — Nov 6, 2015 at 7:19 PM
+### post #7 — roboblock93 (its a me) — Nov 6, 2015 at 7:19 PM
 
 *high fives*
 
@@ -262,13 +263,13 @@ Nice work! I'm very glad to hear that there will be more CE's to plan with.
 
 ---
 
-### post #8 — its_Carlos — Nov 7, 2015 at 5:30 AM
+### post #8 — its_Carlos (Kangronomicon [Fuq] Veteran) — Nov 7, 2015 at 5:30 AM
 
 Great m8!!!
 
 ---
 
-### post #9 — Antra — Nov 7, 2015 at 6:50 AM
+### post #9 — Antra (Malding since 2014) — Nov 7, 2015 at 6:50 AM
 
 X_Egoraptor_X said:
 
@@ -285,7 +286,7 @@ CANCER ALERT, please dont start this cancer
 
 ---
 
-### post #10 — Yuno F Gasai — Nov 7, 2015 at 7:06 AM
+### post #10 — Yuno F Gasai (Forum God, FW) — Nov 7, 2015 at 7:06 AM
 
 Antra said:
 
@@ -300,7 +301,7 @@ Remember that you are a member of Imperial and of the hyper aliance, anything th
 
 ---
 
-### post #11 — Antra — Nov 7, 2015 at 7:09 AM
+### post #11 — Antra (Malding since 2014) — Nov 7, 2015 at 7:09 AM
 
 YunoFuckingGasai said:
 
@@ -315,13 +316,13 @@ i am saying as a real person opinion. like if i wasn't in any guild right now. c
 
 ---
 
-### post #12 — Ha_Ha_Redstone — Nov 7, 2015 at 7:55 AM
+### post #12 — Ha_Ha_Redstone (Pixel Prince) — Nov 7, 2015 at 7:55 AM
 
 Psssst... The Alliance Rules paragraph doesn't work for dark users.
 
 ---
 
-### post #13 — 3zPz — Nov 7, 2015 at 8:08 AM
+### post #13 — 3zPz (Historical Leader [UEZ]) — Nov 7, 2015 at 8:08 AM
 
 May the wars begin! Kinda looking forward to this.
 
@@ -329,13 +330,13 @@ Try to not start much flame Pls.
 
 ---
 
-### post #14 — px_1 — Nov 7, 2015 at 8:42 AM
+### post #14 — px_1 (Famous Adventurer) — Nov 7, 2015 at 8:42 AM
 
 guys, no more fighting in the comments :)
 
 ---
 
-### post #15 — Kvmilla — Nov 7, 2015 at 9:10 AM
+### post #15 — Kvmilla (Goddess of Blood and Devourer of Hearts) — Nov 7, 2015 at 9:10 AM
 
 px_1 said:
 
@@ -348,7 +349,7 @@ patata
 
 ---
 
-### post #16 — Antra — Nov 7, 2015 at 9:13 AM
+### post #16 — Antra (Malding since 2014) — Nov 7, 2015 at 9:13 AM
 
 Kvmilla said:
 
@@ -361,7 +362,7 @@ Click to expand...
 
 ---
 
-### post #17 — 3zPz — Nov 7, 2015 at 9:29 AM
+### post #17 — 3zPz (Historical Leader [UEZ]) — Nov 7, 2015 at 9:29 AM
 
 Kvmilla said:
 
@@ -376,7 +377,7 @@ DW we are more derpy
 
 ---
 
-### post #18 — Drew1011 — Nov 7, 2015 at 10:12 AM
+### post #18 — Drew1011 (Former Viceroy of the Foxes / Reviver of Kingdoms) — Nov 7, 2015 at 10:12 AM
 
 Ha_Ha_Redstone said:
 
@@ -389,13 +390,13 @@ Heck yea! Dark theme!
 
 ---
 
-### post #19 — Qira_ — Nov 7, 2015 at 10:03 PM
+### post #19 — Qira_ (The Worst HERO Donator) — Nov 7, 2015 at 10:03 PM
 
 Kinda late, but Im glad to be apart of a Awesome and Unbreakable Alliance.
 
 ---
 
-### post #20 — huge6446 — Nov 8, 2015 at 5:11 AM
+### post #20 — huge6446 (nether pvp guy) — Nov 8, 2015 at 5:11 AM
 
 RevanYT said:
 

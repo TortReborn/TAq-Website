@@ -8,6 +8,7 @@ raw_sha256: 96f7cac0ebfbb863
 note: "Structure of the Kingdom of Phoenixes [Phx]."
 ---
 
+
 Rank
 Title
 In-game Rank
