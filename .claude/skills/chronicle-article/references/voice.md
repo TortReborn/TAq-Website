@@ -11,8 +11,42 @@ The corpus is checked against these; `check-article-style.mjs` reports them.
 | In-prose attributions per 1,000 words | **≤ 1.0** | Ten historical Wikipedia articles average 0.89. The chronicle began this pass at 2.00. |
 | Lede (the `summary` field) | **1–3 sentences**, ≤ 500 chars | Defines the subject and places it in time. |
 | Sentences per paragraph | 2–5 | Single-sentence paragraphs are notes, not prose. |
+| Words per citation | **25–45** | The corpus sits at 29. Above 45 the prose has run ahead of what supports it. |
+| Quotation | ~17% of body text | Wikipedia runs 2.4%; we quote primary posts where the wording is often the artifact. Not a target to hit — see below. |
 
-Word budgets by page type are in `structure.md`.
+## Length is judged against the evidence, not a word budget
+
+There are no per-type word budgets, and the ones that used to be here were
+wrong. Across the corpus, article length tracks citation count almost exactly
+(r = 0.95, roughly 27 words per citation), and words-per-citation is a steady
+25–33 for **every** page type. A long article is therefore not a fault; a long
+article with thin sourcing is.
+
+So `hackforums` at 1,879 words and 72 citations is fine, and a 320-word alliance
+stub resting on 6 citations is the one to look at. The linter flags articles
+above 45 words per citation — prose running ahead of what supports it, which is
+the fault the project actually cares about.
+
+Depth still follows the sources: a thin record means a short article, never
+padding.
+
+## On quotation
+
+We quote far more than Wikipedia, and mostly that is right — it writes from
+abundant secondary scholarship, while we work from primary forum posts where the
+exact wording is often the only surviving trace. Keep a quote when the wording
+**is** the artifact: a coined name, a boast, a self-description, a
+characterisation, a claim someone made about their own conduct.
+
+Paraphrase when the quote merely carries facts — dates, rosters, mechanics,
+sequences. The archive holds the verbatim either way, one click from the
+footnote, so nothing is lost.
+
+Two specific faults:
+
+- **Quote sandwiches.** Prose states a fact, then a quote restates it. Cut one.
+- **Very long quotations.** Anything past about 60 words is nearly always
+  trimmable to the clause that carries the voice. The linter flags these.
 
 ## The four attributions worth keeping
 
