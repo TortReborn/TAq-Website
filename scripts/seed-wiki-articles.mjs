@@ -22,6 +22,8 @@ const pg = require('pg');
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const useProd = args.includes('--prod');
+/** Overwrite pages a person has edited. Off by default — see the skip below. */
+const force = args.includes('--force');
 if (!dryRun && !useProd && !args.includes('--dev')) {
   console.error('Pass --dry-run, --dev (TEST_DB_*) or --prod (DB_*).');
   process.exit(2);
@@ -82,7 +84,7 @@ if (!dryRun) {
   console.log('wiki tables ensured');
 }
 
-let created = 0, updated = 0, failed = 0;
+let created = 0, updated = 0, failed = 0, skipped = 0;
 const seen = new Set();
 for (const raw of articles) {
   const v = wiki.validateWikiPagePayload(raw);
@@ -92,6 +94,27 @@ for (const raw of articles) {
   seen.add(p.slug);
   if (dryRun) { console.log(`ok ${p.pageType.padEnd(8)} ${p.slug}`); continue; }
   const existing = await pool.query('SELECT id FROM wiki_pages WHERE slug = $1', [p.slug]);
+
+  // Never overwrite a page a person has edited. The seed file is generated from
+  // the research corpus and knows nothing about corrections made in the editor,
+  // so re-seeding over a chronicler's work would silently revert it — and they
+  // would have no reason to suspect it had happened. --force overrides, for the
+  // case where the seed file is genuinely the better text.
+  if (existing.rows.length && !force) {
+    const human = await pool.query(
+      `SELECT author_name, created_at FROM wiki_page_revisions
+        WHERE page_id = $1 AND author_kind = 'human'
+        ORDER BY rev_number DESC LIMIT 1`,
+      [existing.rows[0].id],
+    );
+    if (human.rows.length) {
+      skipped++;
+      const { author_name, created_at } = human.rows[0];
+      console.log(`SKIPPED ${p.slug} — edited by ${author_name} on ${created_at.toISOString().slice(0, 10)} (--force to overwrite)`);
+      continue;
+    }
+  }
+
   const r = existing.rows.length
     ? await wikiDb.editWikiPage(pool, existing.rows[0].id, p, AUTHOR, NOTE)
     : await wikiDb.createWikiPage(pool, p, AUTHOR, NOTE);
@@ -125,7 +148,7 @@ if (!dryRun) {
   }
 }
 
-console.log(`\n${dryRun ? 'DRY RUN — ' : ''}created ${created}, updated ${updated}, failed ${failed}, total ${seen.size}`);
+console.log(`\n${dryRun ? 'DRY RUN — ' : ''}created ${created}, updated ${updated}, skipped ${skipped}, failed ${failed}, total ${seen.size}`);
 if (pool) await pool.end();
 fs.rmSync(tmp, { recursive: true, force: true });
 process.exit(failed ? 1 : 0);
