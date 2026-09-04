@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { requireWikiAdmin, resolveWikiPrincipal } from '@/lib/wiki-auth';
-import { addChronicler, deactivateChronicler, listChroniclers } from '@/lib/wiki-db';
+import { addChronicler, deactivateChronicler, listChroniclers, updateChronicler } from '@/lib/wiki-db';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +63,45 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[api:wiki/chroniclers] add failed:', error);
     return NextResponse.json({ error: 'Failed to add chronicler' }, { status: 500 });
+  }
+}
+
+/**
+ * Exec-only: correct a chronicler's display name or the note saying why they
+ * are one. Names get typed wrong and reasons go stale, and the alternative was
+ * removing someone and re-adding them, which is a heavier act than fixing a
+ * spelling. Touches only those two fields — never their status.
+ */
+export async function PATCH(request: NextRequest) {
+  const principal = await requireWikiAdmin(request);
+  if (!principal) {
+    return NextResponse.json({ error: 'Exec access required' }, { status: 401 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  const b = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
+
+  const discordId = typeof b.discordId === 'string' ? b.discordId.trim() : '';
+  if (!SNOWFLAKE_RE.test(discordId)) {
+    return NextResponse.json({ error: 'A numeric Discord user ID is required' }, { status: 400 });
+  }
+  const displayName = typeof b.displayName === 'string' ? b.displayName.slice(0, 60).trim() : '';
+  const note = typeof b.note === 'string' ? b.note.slice(0, 200).trim() : '';
+
+  try {
+    const updated = await updateChronicler(getPool(), { discordId, displayName, note });
+    if (!updated) {
+      return NextResponse.json({ error: 'No chronicler with that ID' }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('[api:wiki/chroniclers] update failed:', error);
+    return NextResponse.json({ error: 'Failed to update chronicler' }, { status: 500 });
   }
 }
 

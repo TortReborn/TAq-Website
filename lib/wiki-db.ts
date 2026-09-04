@@ -629,6 +629,29 @@ export async function addChronicler(
   );
 }
 
+/**
+ * Correct how a chronicler is described, without touching anything else.
+ *
+ * Deliberately not addChronicler with new values: that upsert sets active =
+ * TRUE, so fixing a typo on someone who had been removed would quietly restore
+ * their rights. This changes the two display fields and nothing else — not
+ * their status, not who added them, not when.
+ *
+ * Returns false if no such chronicler exists, so the caller can 404 rather than
+ * report a silent success.
+ */
+export async function updateChronicler(
+  pool: Pool,
+  args: { discordId: string; displayName: string; note: string },
+): Promise<boolean> {
+  await ensureWikiTables(pool);
+  const r = await pool.query(
+    `UPDATE wiki_chroniclers SET display_name = $2, note = $3 WHERE discord_id = $1`,
+    [args.discordId, args.displayName, args.note],
+  );
+  return (r.rowCount ?? 0) > 0;
+}
+
 /** Soft-remove: their past validations and revisions stay attributed. */
 export async function deactivateChronicler(pool: Pool, discordId: string): Promise<void> {
   await ensureWikiTables(pool);
