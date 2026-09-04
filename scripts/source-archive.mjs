@@ -181,9 +181,38 @@ function extractXenForo(html) {
   }
 
   if (!blocks.length) return null;
-  return blocks
+  const posts = blocks
     .map(b => `### post ${b.num ? `#${b.num} ` : ''}— ${b.author}${b.userTitle ? ` (${b.userTitle})` : ''}${b.date ? ` — ${b.date}` : ''}\n\n${b.body}`)
     .join('\n\n---\n\n');
+  const poll = extractPoll(html);
+  return poll ? `${poll}\n\n---\n\n${posts}` : posts;
+}
+
+/**
+ * A thread's poll, which lives outside every post and so outside everything the
+ * post loop can see.
+ *
+ * The Banhammer's whole argument is in its poll — options running from "yes hax
+ * is ruining the guild experience for me" to "no you are just salty and mad" —
+ * and the article quoting them had to admit in its own footnote that the words
+ * were only in the page markup. They are ordinary visible text on the page;
+ * they were simply never extracted. Results are deliberately not captured: on
+ * these threads they were visible only to voters.
+ */
+function extractPoll(html) {
+  const start = html.search(/class="[^"]*\bpollContent\b[^"]*"/i);
+  if (start === -1) return null;
+  const region = html.slice(start, start + 20000);
+  const question = decodeEntities(
+    (region.match(/class="[^"]*questionText[^"]*"[^>]*>([\s\S]*?)</i) ?? [])[1] ?? '',
+  ).trim();
+  const options = [...region.matchAll(/class="[^"]*optionText[^"]*"[^>]*>([\s\S]*?)</gi)]
+    .map((m) => decodeEntities(m[1]).trim())
+    .filter(Boolean);
+  if (!question && !options.length) return null;
+  return ['### thread poll', question, ...options.map((o) => `- ${o}`)]
+    .filter(Boolean)
+    .join('\n\n');
 }
 
 function extractText(html, url) {
