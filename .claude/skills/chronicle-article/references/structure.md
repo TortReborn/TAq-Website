@@ -65,7 +65,10 @@ linked somewhere in the body.
 
 Drop any section with no sourced content. `(opt)` marks the commonly dropped ones.
 
-### alliance — 300–700 words
+There are no word budgets: length is judged against the evidence (see
+`voice.md`). Write what the sources support and stop.
+
+### alliance
 ```
 lede
 ## The record        (opt — only when one contested account carries the article)
@@ -78,7 +81,7 @@ lede
 ```
 Infobox: Tag, Kind (War alliance / Community alliance), Active, Peak size, Founder.
 
-### war — 250–600 words
+### war
 ```
 lede
 {{map:YYYY-MM-DD|The map when the war began}}
@@ -91,7 +94,7 @@ Add `{{war-chart:Guild A|Guild B|YYYY-MM-DD|YYYY-MM-DD}}` where both principals
 and the window are known; guild names must be full in-game names, and the data
 only exists from January 2018.
 
-### guild — 150–400 words
+### guild
 ```
 lede
 ## History           (chronological ### subsections, usually by era or alliance)
@@ -100,13 +103,13 @@ lede
 ```
 Infobox: Tag, Founded (only if known), Also known as (opt), Status.
 
-### player — 100–300 words
+### player
 Public in-game and forum facts only: guild roles, foundings, posts, offices.
 **No real-world information of any kind.** No headings under about 300 words;
 above that, `## Guild career` and, rarely, `## Views`.
 Infobox: Known for, Active, Guilds.
 
-### era — 400–900 words
+### era
 ```
 lede
 {{map:YYYY-MM-DD|A representative date}}
@@ -115,7 +118,7 @@ lede
 ## Legacy            (opt)
 ```
 
-### update — 150–400 words
+### update
 ```
 lede
 ## Background
@@ -123,7 +126,7 @@ lede
 ## Reception         (opt)
 ```
 
-### general — 150–500 words
+### general
 Free-form, but still definition-first and chronological where it can be.
 
 ## Infoboxes

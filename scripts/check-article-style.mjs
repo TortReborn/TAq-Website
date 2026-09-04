@@ -66,6 +66,16 @@ const proseOf = (text) =>
 
 const wordCount = (text) => proseOf(text).split(/\s+/).filter(Boolean).length;
 
+// Same markup stripping, but quotations left intact — quoted words are still
+// words on the page, so length and quote density must both count them.
+const readableText = (text) =>
+  (text ?? '')
+    .replace(/\{\{[^}]*\}\}/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '$2')
+    .replace(/\[\[([^\]]+)\]\]/g, '$1');
+const readableWords = (text) => readableText(text).split(/\s+/).filter(Boolean).length;
+
 // ERROR patterns — research-layer language and coinages with no place in prose.
 const BANNED = [
   [/quiet[- ]territor/i, 'banned jargon "quiet territor…" — write "territory exchanges" ([[territory-warfare]] explains the FFA filter)'],
@@ -103,13 +113,45 @@ const SOURCE_TALK = [
 
 const PEACOCK = [/\b(legendary|iconic|infamous(ly)?|remarkabl[ey]|dominant beyond|unstoppable|storied)\b/i, 'peacock word'];
 
-const BUDGETS = { alliance: 700, war: 600, guild: 400, player: 300, era: 900, update: 400, general: 500 };
+// Length is judged per citation rather than per page type — see the check below.
+// 45 sits about half again above the corpus trend of 25-33.
+const WORDS_PER_CITATION = 45;
+
+// Wikipedia's quotation density over the ten historical articles this style was
+// calibrated against. Reported for context; not a gate.
+const WIKIPEDIA_QUOTE_PCT = 2.4;
+
+// Pair quote marks by parity, per line. A minimum-length filter applied before
+// pairing would skip short quotes and then pair a CLOSING mark with the next
+// OPENING one, swallowing the prose between them and inflating the count.
+function quotedSpans(text) {
+  const out = [];
+  for (const line of text.split('\n')) {
+    for (const [open, close] of [['"', '"'], ['“', '”']]) {
+      let i = 0;
+      for (;;) {
+        const a = line.indexOf(open, i);
+        if (a === -1) break;
+        const b = line.indexOf(close, a + 1);
+        if (b === -1) break;
+        out.push(line.slice(a + 1, b));
+        i = b + 1;
+      }
+    }
+    // Single quotes only when the closing mark is followed by a boundary, so
+    // apostrophes in contractions and possessives cannot open a span.
+    const re = /(^|[\s(—–-])'([^'\n]{2,})'(?=$|[\s.,;:!?)\]—–-])/g;
+    let m;
+    while ((m = re.exec(line))) out.push(m[2]);
+  }
+  return out;
+}
 
 // In-prose attribution density (voice.md target: corpus average <= 1.0 per
 // 1,000 words). Counts the phrasings that name a source or witness in prose.
 const ATTRIB = /\baccording to\b|\battested\b|\bwayback\b|\bmap[- ]data\b|\btestimon(y|ies)\b|\bmemoirs?\b|\brecall(s|ed)?\b|\brecollection\b|\bstorytimes?\b|\bcommunity timeline\b|\bcorroborat/gi;
 
-let errors = 0, warns = 0, totalWords = 0, totalAttrib = 0;
+let errors = 0, warns = 0, totalWords = 0, totalAttrib = 0, totalCites = 0, totalQuoted = 0;
 const scanned = onlySlug ? articles.filter((a) => a.slug === onlySlug) : articles;
 if (onlySlug && !scanned.length) { console.error(`no article with slug ${onlySlug}`); process.exit(2); }
 
@@ -175,10 +217,34 @@ for (const a of scanned) {
     if ((row.value ?? '').length > 90) findings.push(['WARN', `infobox "${row.label}" is ${row.value.length} chars — a fact sheet, not prose`]);
   }
 
-  const words = wordCount(a.body);
+  const words = readableWords(a.body);
   totalWords += words;
-  const budget = BUDGETS[a.pageType];
-  if (budget && words > budget * 1.25) findings.push(['WARN', `${words} words (budget for ${a.pageType}: ${budget})`]);
+
+  // Length is judged against the evidence, not a flat budget. Across the corpus
+  // article length tracks citation count almost exactly (r = 0.95,
+  // words ~ 27 x citations), and words-per-citation sits at 25-33 for every
+  // page type. So a long article is not the problem; a long article with thin
+  // sourcing is. This flags prose running ahead of what supports it, which is
+  // the same fault the project cares about anyway.
+  const citeCount = (a.body?.match(/\{\{cite:/g) ?? []).length;
+  totalCites += citeCount;
+  if (citeCount === 0 && words > 40) findings.push(['ERROR', `${words} words and no citations`]);
+  else if (citeCount && words / citeCount > WORDS_PER_CITATION)
+    findings.push(['WARN', `${words} words for ${citeCount} citations = ${Math.round(words / citeCount)}w each ` +
+      `(corpus runs 25-33) — the prose is running ahead of its sourcing`]);
+  // A backstop for genuine sprawl, well above anything the corpus now contains.
+  if (words > 2600) findings.push(['WARN', `${words} words — long enough to want splitting`]);
+
+  // Quotation density. Wikipedia runs ~2.4%; this corpus quotes far more
+  // because it works from primary forum posts where the wording is often the
+  // artifact. That is legitimate, but a single very long quote rarely is.
+  const qSpans = quotedSpans(readableText(a.body));
+  const qWords = qSpans.reduce((s, x) => s + x.split(/\s+/).filter(Boolean).length, 0);
+  totalQuoted += qWords;
+  for (const s of qSpans) {
+    const n = s.split(/\s+/).filter(Boolean).length;
+    if (n >= 60) findings.push(['WARN', `${n}-word quotation — trim to the part that carries the voice: "${s.slice(0, 60)}…"`]);
+  }
 
   const attribs = [...proseOf(a.body).matchAll(ATTRIB)].length;
   totalAttrib += attribs;
@@ -195,7 +261,10 @@ for (const a of scanned) {
 }
 
 const density = totalWords ? ((totalAttrib / totalWords) * 1000).toFixed(2) : '0';
-console.log(`\n${scanned.length} article(s), ${totalWords.toLocaleString()} words.`);
+const quotePct = totalWords ? ((totalQuoted / totalWords) * 100).toFixed(1) : '0';
+const perCite = totalCites ? (totalWords / totalCites).toFixed(0) : 'n/a';
+console.log(`\n${scanned.length} article(s), ${totalWords.toLocaleString()} words, ${totalCites.toLocaleString()} citations (${perCite}w each).`);
+console.log(`quotation: ${quotePct}% of body text (Wikipedia benchmark ${WIKIPEDIA_QUOTE_PCT}% — this corpus quotes primary posts, so it runs higher by design).`);
 console.log(`${errors} error(s), ${warns} warning(s). In-prose attribution density: ${density}/1,000 words (target ≤ 1.0).`);
 if (warns) console.log('Warnings need the attribution test: delete the attributing phrase — does the reader lose anything the footnote does not carry?');
 if (strict && errors) process.exitCode = 1;
