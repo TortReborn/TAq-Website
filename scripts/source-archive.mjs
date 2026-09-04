@@ -142,6 +142,11 @@ function extractXenForo(html) {
         ?? block.match(/<abbr[^>]*class="DateTime"[^>]*>([^<]*)</i)
         ?? [])[1] ?? '';
       const num = (block.match(/class="[^"]*postNumber[^"]*"[^>]*>#(\d+)</i) ?? [])[1] ?? '';
+      // The forum user title sits beside the author, and articles quote it
+      // ("posting under the forum title ..."), so it has to survive extraction.
+      const userTitle = decodeEntities(
+        (block.match(/class="[^"]*userTitle[^"]*"[^>]*>([^<]*)</i) ?? [])[1] ?? '',
+      ).trim();
       const bodyStart = block.search(/class="messageText\b/i);
       let body = '';
       if (bodyStart !== -1) {
@@ -150,7 +155,7 @@ function extractXenForo(html) {
         const to = marker === -1 ? block.length : block.lastIndexOf('<div', marker);
         body = stripTags(block.slice(from, to));
       }
-      if (body) blocks.push({ num, author, date, body });
+      if (body) blocks.push({ num, author, date, body, userTitle });
     }
   }
 
@@ -163,16 +168,21 @@ function extractXenForo(html) {
       const author = decodeEntities((block.match(/data-author="([^"]*)"/i) ?? [])[1] ?? 'unknown');
       const date = (block.match(/<time\b[^>]*datetime="([^"]*)"/i) ?? [])[1] ?? '';
       const num = (block.match(/>#(\d+)<\/a>/) ?? [])[1] ?? '';
+      // The forum user title sits beside the author, and articles quote it
+      // ("posting under the forum title ..."), so it has to survive extraction.
+      const userTitle = decodeEntities(
+        (block.match(/class="[^"]*userTitle[^"]*"[^>]*>([^<]*)</i) ?? [])[1] ?? '',
+      ).trim();
       const bodyMatch = block.match(/<div\b[^>]*class="[^"]*\bbbWrapper\b[^"]*"[^>]*>([\s\S]*?)<\/div>\s*(?:<\/div>|<div\b[^>]*class="[^"]*message-signature)/i)
         ?? block.match(/<div\b[^>]*class="[^"]*\bbbWrapper\b[^"]*"[^>]*>([\s\S]*)/i);
       const body = stripTags(bodyMatch ? bodyMatch[1] : '');
-      if (body) blocks.push({ num, author, date, body });
+      if (body) blocks.push({ num, author, date, body, userTitle });
     }
   }
 
   if (!blocks.length) return null;
   return blocks
-    .map(b => `### post ${b.num ? `#${b.num} ` : ''}— ${b.author}${b.date ? ` — ${b.date}` : ''}\n\n${b.body}`)
+    .map(b => `### post ${b.num ? `#${b.num} ` : ''}— ${b.author}${b.userTitle ? ` (${b.userTitle})` : ''}${b.date ? ` — ${b.date}` : ''}\n\n${b.body}`)
     .join('\n\n---\n\n');
 }
 
