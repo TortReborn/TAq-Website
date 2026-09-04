@@ -49,11 +49,11 @@ function prod() {
 /** The local development database, as configured by TEST_DB_*. */
 function dev() {
   return {
-    user: require_('TEST_DB_USER'),
-    password: require_('TEST_DB_PASSWORD'),
+    user: require_('TEST_DB_LOGIN'),
+    password: require_('TEST_DB_PASS'),
     host: process.env.TEST_DB_HOST ?? '127.0.0.1',
     port: Number(process.env.TEST_DB_PORT ?? 5432),
-    database: process.env.TEST_DB_NAME ?? 'tortreborn',
+    database: process.env.TEST_DB_DATABASE ?? 'tortreborn',
     ssl: false,
     connectionTimeoutMillis: 5000,
   };
