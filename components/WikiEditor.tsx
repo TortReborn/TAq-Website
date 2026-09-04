@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { compressImageInBrowser } from "@/lib/compress-image-client";
 import { useRouter } from "next/navigation";
 import { Plus, X, Eye, EyeOff, ImagePlus } from "lucide-react";
 import WikiMarkdown from "./WikiMarkdown";
@@ -135,39 +136,39 @@ export default function WikiEditor({
     }
   };
 
-  /** Upload and set the lead image, rather than inserting into the body. */
-  const uploadLeadImage = async (file: File) => {
+  /**
+   * Shrink in the browser, then POST. The shrink is not cosmetic: a Vercel
+   * Function refuses request bodies over 4.5 MB, so a phone screenshot has to
+   * be reduced here or it never reaches the server to be compressed at all.
+   */
+  const sendImage = async (file: File): Promise<{ url: string; name: string } | null> => {
     setUploading(true);
     setError(null);
     try {
+      const { file: toSend } = await compressImageInBrowser(file);
       const fd = new FormData();
-      fd.append('file', file);
+      fd.append('file', toSend);
       const res = await fetch('/api/wiki/upload', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error ?? 'Upload failed'); return; }
-      set('leadImage', data.url);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { setError(data.error ?? 'Upload failed'); return null; }
+      return { url: data.url, name: file.name.replace(/\.[a-z0-9]+$/i, '') };
     } catch {
       setError('Upload failed — network error');
+      return null;
     } finally {
       setUploading(false);
     }
   };
 
+  /** Upload and set the lead image, rather than inserting into the body. */
+  const uploadLeadImage = async (file: File) => {
+    const result = await sendImage(file);
+    if (result) set('leadImage', result.url);
+  };
+
   const uploadImage = async (file: File) => {
-    setUploading(true);
-    setError(null);
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await fetch('/api/wiki/upload', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error ?? 'Upload failed'); return; }
-      insertSnippet(`\n![${file.name.replace(/\.[a-z]+$/i, '')}](${data.url})\n`, '');
-    } catch {
-      setError('Upload failed — network error');
-    } finally {
-      setUploading(false);
-    }
+    const result = await sendImage(file);
+    if (result) insertSnippet(`\n![${result.name}](${result.url})\n`, '');
   };
 
   const toolbar: Array<[string, () => void]> = [
