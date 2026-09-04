@@ -642,6 +642,24 @@
    "note": "The guild runs its own site. This is the live roster page as rendered on 4 Sep 2026: 101 members shown, grouped by an in-house role-play rank ladder mapped onto Wynncraft ranks. The home page states \"est 2014\" and gives guild level 96. Note that many rows read \"joined May 28, 2026\", which looks like the date the site began tracking rather than a true join date, so those should not be read as guild join dates.",
    "tier": "primary"
   },
+  "kingdomphoenixes-announcements": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "KingdomPhoenixes guild announcements (Discord export, Nov 2017 - May 2022)",
+   "fetchedAt": "2026-09-04T21:32:00.755Z",
+   "textChars": 14122,
+   "note": "The guild's internal announcement channel from a fortnight after the November 2017 split to 2022. Coalition territory allocations and rosters, Prime Minister elections, promotions, the January 2018 kicking incident, AurumKitsune's abdication and her plan to install a viceroy, and Whimsy's return in April 2018. A treasure-hunt hint pointing at a birthday and age, and two private server addresses, were removed before archiving.",
+   "tier": "primary"
+  },
+  "kingdomphoenixes-public-announcements": {
+   "url": "(Discord export — no public URL)",
+   "kind": "discord-export",
+   "title": "KingdomPhoenixes public announcements (Discord export, 2017-2022)",
+   "fetchedAt": "2026-09-04T21:32:10.332Z",
+   "textChars": 460,
+   "note": "Two messages: AurumKitsune's abdication of 22 November 2017 in her own words, and a 2022 greeting. The abdication is the only first-person account of the handover.",
+   "tier": "primary"
+  },
   "map-seqwawa-com-index": {
    "url": "https://map.seqwawa.com/",
    "kind": "guild-site",
