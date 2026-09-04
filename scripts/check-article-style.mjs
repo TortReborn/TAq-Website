@@ -160,6 +160,12 @@ for (const a of scanned) {
       const covers = ob.length ? run / ob.length : 0;
       if (run >= 12 && covers >= 0.6)
         findings.push(['WARN', `body restates the lede (${run} consecutive words, ${Math.round(covers * 100)}% of the opening paragraph) — the summary is the lede; open at the first section`]);
+
+      // Removing a redefining first sentence can leave the next one opening on
+      // a pronoun with no antecedent. The summary sits above it on the page, so
+      // it half-reads — but the body must name its own subject.
+      if (/^(Its|Their|His|Her|It|They|He|She|This|These|Those|That)\b/.test(opener.trim()))
+        findings.push(['ERROR', `body opens on a pronoun with no antecedent ("${opener.trim().split(/\s+/)[0]}") — name the subject`]);
     }
   }
   if ((a.title ?? '').length > 120) findings.push(['ERROR', `title is ${a.title.length} chars (max 120)`]);
