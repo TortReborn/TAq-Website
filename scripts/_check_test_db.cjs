@@ -3,17 +3,17 @@
 // repository is public.
 const pg = require('pg');
 
-if (!process.env.TEST_DB_USER || !process.env.TEST_DB_PASSWORD) {
-  process.stdout.write('set TEST_DB_USER and TEST_DB_PASSWORD first\n');
+if (!process.env.TEST_DB_LOGIN || !process.env.TEST_DB_PASS) {
+  process.stdout.write('set TEST_DB_LOGIN and TEST_DB_PASS first\n');
   process.exit(1);
 }
 
 const pool = new pg.Pool({
-  user: process.env.TEST_DB_USER,
-  password: process.env.TEST_DB_PASSWORD,
+  user: process.env.TEST_DB_LOGIN,
+  password: process.env.TEST_DB_PASS,
   host: process.env.TEST_DB_HOST ?? '127.0.0.1',
   port: Number(process.env.TEST_DB_PORT ?? 5432),
-  database: process.env.TEST_DB_NAME ?? 'tortreborn',
+  database: process.env.TEST_DB_DATABASE ?? 'tortreborn',
   ssl: false,
 });
 
