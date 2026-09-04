@@ -7,13 +7,19 @@ export const dynamic = 'force-dynamic';
 /**
  * Serve a wiki image.
  *
- * Images are addressed by row id rather than by their storage URL so the
- * backend can move between S3 and Vercel Blob without rewriting URLs already
- * embedded in article bodies, and so quarantined uploads stay unreachable.
+ * Images are addressed by row id rather than storage URL so the backend can
+ * move between S3 and Vercel Blob without rewriting URLs already embedded in
+ * article bodies, and so quarantined uploads stay unreachable.
  *
- * Only 'active' images are served. An image uploaded by someone without publish
- * rights stays 'pending' until the suggestion using it is approved, so it
- * cannot be surfaced by linking straight to its id.
+ * Blob-backed images are redirected to rather than proxied. Vercel Blob serves
+ * public objects from its own CDN, and streaming them back through this
+ * function would put a serverless invocation in front of every image and
+ * discard exactly the benefit Blob is there for. S3 has no public URL, so those
+ * are streamed.
+ *
+ * Only 'active' images are served either way. An upload from someone without
+ * publish rights stays 'pending' and gets neither a redirect nor bytes, so it
+ * cannot be surfaced by guessing an id.
  */
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const { id: rawId } = await context.params;
@@ -35,10 +41,17 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       return NextResponse.json({ error: 'Image not available' }, { status: 404 });
     }
 
-    const bytes = await getWikiImage({
-      backend: (row.backend as WikiImageBackend) ?? 's3',
-      location: row.s3_key,
-    });
+    const backend = (row.backend as WikiImageBackend) ?? 's3';
+    if (backend === 'blob') {
+      // 308 rather than 302: the mapping from id to blob URL never changes, so
+      // browsers and intermediaries may cache the redirect permanently.
+      return NextResponse.redirect(row.s3_key, {
+        status: 308,
+        headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
+      });
+    }
+
+    const bytes = await getWikiImage({ backend, location: row.s3_key });
     if (!bytes) return NextResponse.json({ error: 'Image data is unavailable' }, { status: 404 });
 
     return new NextResponse(new Uint8Array(bytes), {

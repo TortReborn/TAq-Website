@@ -35,9 +35,12 @@ export async function putWikiImage(
     const blob = await put(key, body, {
       access: 'public',
       contentType,
-      // Vercel Blob adds a random suffix by default; the key already carries a
-      // uuid, and a stable pathname makes an image traceable from its row.
+      // The key already carries a uuid, so Blob's own random suffix would only
+      // make an image harder to trace back to its row.
       addRandomSuffix: false,
+      // Content at a given key never changes — a re-upload gets a new uuid —
+      // so let the CDN hold it for a year.
+      cacheControlMaxAge: 31536000,
     });
     return { backend: 'blob', location: blob.url };
   }
