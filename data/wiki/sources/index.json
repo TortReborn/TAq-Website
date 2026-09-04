@@ -322,6 +322,16 @@
       "note": "Drew1011's Wynncraft forum profile (member 2157). The dated custom-title chain recording his guild and alliance offices is rendered for logged-in viewers, so the archived copy holds little text; the original is linked and the titles were read from it directly.",
       "tier": "primary"
     },
+    "gdoc-12gia5l_mo0yig84": {
+      "url": "https://docs.google.com/document/d/12GIA5l_MO0yIg84QhJ52vHyLAo2T3ftf8RkYadfdjMQ/edit",
+      "kind": "document",
+      "title": "Alliance Event",
+      "fetchedAt": "2026-09-04T08:27:45.192Z",
+      "textChars": 1621,
+      "rawSha256": "d964b8253c3058cf",
+      "note": "Federation alliance-event organising document, addressed to member guild leaders — tournament fighters, bounties and scheduling.",
+      "tier": "primary"
+    },
     "gdoc-16kljroe67z_p80r": {
       "url": "https://docs.google.com/document/d/16KljroE67z_P80RPYAp-AUNi2MJoKDMFMkav6RuPFGk/edit",
       "kind": "document",
@@ -360,6 +370,16 @@
       "textChars": 1941,
       "rawSha256": "d33072f6e94fb74d",
       "note": "\"Plan B / Legio Praetoria v2\" — a plan to take the Wynn province, naming the guilds involved.",
+      "tier": "primary"
+    },
+    "gdoc-1b8e1nh_ate9h69n": {
+      "url": "https://docs.google.com/document/d/1b8E1NH_aTe9H69N09_xOSbCLeY6IcmrJ1bhU8XP7Kfw/edit",
+      "kind": "document",
+      "title": "Kingdom of Foxes—Member Handbook",
+      "fetchedAt": "2026-09-04T08:27:43.739Z",
+      "textChars": 13098,
+      "rawSha256": "d3b9d288cc118f2d",
+      "note": "Kingdom of Foxes member handbook — the guild's own governing document: rules, values, ranks, the State Council, titles, decorations, territory and war policy, its alliance, and both a historical and a State Council timeline.",
       "tier": "primary"
     },
     "gdoc-1bbnalbfij8cjnog": {
@@ -430,6 +450,16 @@
       "rawSha256": "ab4260f5a2dacf2c",
       "note": "Owner/alliance/event table. Tier UNSET: whether this was kept as events happened or compiled afterwards is not established, and that determines how much weight it carries. Establish before citing."
     },
+    "gdoc-1q2iebjuyn91dxov": {
+      "url": "https://docs.google.com/document/d/1Q2IeBJuyN91dXovHR6kvJHjcS_fkeU3MkPgxsYye27w/edit",
+      "kind": "document",
+      "title": "Structure of Phx",
+      "fetchedAt": "2026-09-04T08:27:44.443Z",
+      "textChars": 1367,
+      "rawSha256": "96f7cac0ebfbb863",
+      "note": "Rank structure of the Kingdom of Phoenixes [Phx], mapping court titles to in-game ranks — King/Queen to Owner, Prince/Princess to Chief, Viceroy/Vicereine as second-in-command, Prime Minister to Captain.",
+      "tier": "primary"
+    },
     "gdoc-1sqfxhjwewtphua7": {
       "url": "https://docs.google.com/document/d/1sQfXhJWEwTPhua7yb2ot4vjdusFfsnfwinjgFSObhW0/edit",
       "kind": "document",
@@ -458,6 +488,16 @@
       "textChars": 20737,
       "rawSha256": "38236f25382b120c",
       "note": "\"The Emperial Truth\" — the Emperium of Wynn’s own alliance structure document.",
+      "tier": "primary"
+    },
+    "gdoc-1v5kpnrdnydscdrz": {
+      "url": "https://docs.google.com/document/d/1v5kPNrDNyDSCDRzJ6WCnRxCm59XD1-cIN-ZIEP98878/edit",
+      "kind": "document",
+      "title": "History of Kingdom of Phoenixes",
+      "fetchedAt": "2026-09-04T08:27:42.699Z",
+      "textChars": 1319,
+      "rawSha256": "376dd3603d01cfb4",
+      "note": "History of the Kingdom of Phoenixes from September 2017, tabulating ruling monarch, serving viceroy and events by month. A record the Kingdom maintained itself; individual entries may have been added after the events they describe.",
       "tier": "primary"
     },
     "gdoc-1wlfun90rphwpjoy": {
