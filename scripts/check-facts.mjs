@@ -80,6 +80,12 @@ function norm(s) {
     .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+    // An article quoting a passage that itself contains quotation marks must
+    // switch them to the other kind: the source wrote "pity price", the article
+    // nests it as 'pity price'. Treat both as one character for comparison, or
+    // every nested quotation reads as a mismatch.
+    .replace(/['"]/g, '')
+    .replace(/[︀-️​-‍﻿]/g, '')
     .replace(/\s+/g, ' ')
     .toLowerCase()
     .trim();
@@ -241,6 +247,9 @@ for (const a of articles) {
             severity: fromImage ? 'low' : 'high',
             slug: a.slug,
             detail: quote.slice(0, 160),
+            // Untruncated, so downstream triage re-checks the real quotation
+            // rather than the shortened string shown in the report.
+            quote,
             cited: [...new Set(cites.map((c) => c.id))].join(', '),
             note: fromImage
               ? 'citation names a screenshot; open the image to settle it'

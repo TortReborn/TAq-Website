@@ -35,7 +35,11 @@ const norm = (s) =>
     .replace(/\[\/?[A-Za-z][^\]]{0,40}\]/g, '')
     .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
-    .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']').replace(/\s+/g, ' ').toLowerCase().trim();
+    .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+    // Nested quotation marks switch kind when quoted, so treat both as one.
+    .replace(/['"]/g, '')
+    .replace(/[︀-️​-‍﻿]/g, '')
+    .replace(/\s+/g, ' ').toLowerCase().trim();
 
 // Load every archived document once; the corpus is small enough to hold.
 const corpus = new Map();
@@ -76,7 +80,7 @@ function longestRun(words, text) {
 
 const out = [];
 for (const f of quotes) {
-  const q = norm(f.detail);
+  const q = norm(f.quote ?? f.detail);
   const words = q.split(' ').filter(Boolean);
   const cited = new Set(f.cited.split(', '));
 
