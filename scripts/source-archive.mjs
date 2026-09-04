@@ -214,15 +214,43 @@ function googleExportUrl(url) {
   return `https://docs.google.com/document/d/${id}/export?format=txt`;
 }
 
+/**
+ * The server-rendered view of a Google Doc. Two things make this necessary:
+ *
+ *  - A document can be readable while its export endpoint returns 401, because
+ *    "viewers can download, print and copy" is a separate switch its owner can
+ *    turn off. Export failing therefore does NOT mean we lack access.
+ *  - Google Docs paints the document body onto a canvas, so scraping the
+ *    /edit page yields chrome and no text however visible the words are.
+ *
+ * /mobilebasic renders the whole document as plain HTML and honours ordinary
+ * link sharing, so it works where both of the above fail.
+ */
+function googleMobileUrl(url) {
+  const m = url.match(/docs\.google\.com\/document\/d\/([A-Za-z0-9_-]{16,})/);
+  return m ? `https://docs.google.com/document/d/${m[1]}/mobilebasic` : null;
+}
+
 async function fetchText(url) {
   const exportUrl = googleExportUrl(url);
   const target = exportUrl ?? url;
   const res = await fetch(target, { headers: { 'User-Agent': UA, Accept: 'text/html,*/*' }, redirect: 'follow' });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${target}`);
-  const body = await res.text();
-  // A doc that is not link-shared redirects to a sign-in page rather than
-  // failing, so check for that instead of trusting the status code.
-  if (exportUrl && /<html|accounts\.google\.com\/(v3\/)?signin/i.test(body.slice(0, 2000))) {
+  const body = res.ok ? await res.text() : null;
+  const blocked =
+    !res.ok || (exportUrl && /<html|accounts\.google\.com\/(v3\/)?signin/i.test(body.slice(0, 2000)));
+
+  if (blocked) {
+    const mobile = googleMobileUrl(url);
+    if (mobile) {
+      const alt = await fetch(mobile, { headers: { 'User-Agent': UA, Accept: 'text/html,*/*' }, redirect: 'follow' });
+      if (alt.ok) {
+        const altBody = await alt.text();
+        if (!/accounts\.google\.com\/(v3\/)?signin/i.test(altBody.slice(0, 2000))) {
+          return { html: altBody, finalUrl: alt.url, isPlainText: false, via: 'mobilebasic' };
+        }
+      }
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${target}`);
     throw new Error(`not publicly shared (got a sign-in page) for ${url}`);
   }
   return { html: body, finalUrl: res.url, isPlainText: !!exportUrl };
@@ -307,7 +335,8 @@ async function cmdAdd(args) {
     console.log(`wayback capture ${snap.timestamp}`);
   }
 
-  const { html, finalUrl, isPlainText } = await fetchText(fetchUrl);
+  const { html, finalUrl, isPlainText, via } = await fetchText(fetchUrl);
+  if (via) console.log(`fetched via ${via} (export was unavailable)`);
   // Exported documents arrive as text; running the tag-stripper over them would
   // only mangle any angle brackets the author actually wrote.
   const text = isPlainText ? html.replace(/\r\n/g, '\n').trim() : extractText(html, finalUrl);
