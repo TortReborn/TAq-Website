@@ -3078,21 +3078,19 @@
    "url": "https://www.youtube.com/watch?v=RLRh14ns6ok",
    "kind": "video",
    "title": "Wynncraft Warring - The Long Raid - YouTube",
-   "fetchedAt": "2026-09-03T07:05:58.436Z",
-   "textChars": 169,
-   "rawSha256": "26d2931213060b39",
-   "note": "Frank Wynncraft, 'Wynncraft Warring - The Long Raid' (premiered Aug 4 2024): the week-long siege of Aequitas's Sky-province claim; attacker never named in indexed text",
-   "tier": "primary"
+   "fetchedAt": "2026-09-04T09:05:55.211Z",
+   "textChars": 494,
+   "rawSha256": "f52cc2d650bdad27",
+   "note": "Wynncraft Warring - The Long Raid, by Frank Wynncraft."
   },
   "youtube-com-watch-v-tfcs3b6emlq": {
    "url": "https://www.youtube.com/watch?v=TFCs3b6EmlQ",
    "kind": "video",
    "title": "SMTN ELSE SLANDER - YouTube",
-   "fetchedAt": "2026-09-03T21:36:32.125Z",
-   "textChars": 169,
-   "rawSha256": "6f2544b34ace5584",
-   "note": "YouTube watch page for 'SMTN ELSE SLANDER', cited on therapeuticliz and smtn-elf; archived to establish title, channel and upload date",
-   "tier": "primary"
+   "fetchedAt": "2026-09-04T09:05:56.116Z",
+   "textChars": 215,
+   "rawSha256": "e41a69caf6147166",
+   "note": "SMTN ELSE SLANDER, by TherapueticLiz."
   }
  }
 }

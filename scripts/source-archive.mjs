@@ -188,6 +188,11 @@ function extractText(html, url) {
   // page. Drew1011's profile archived as the fourteen characters "Foxton
   // Forever" while the thing actually worth citing — a dated chain of alliance
   // titles — sat in a list further down and was cited fourteen times regardless.
+  if (/youtube\.com\/watch|youtu\.be\//.test(original)) {
+    const yt = extractYouTube(clean, original);
+    if (yt) return yt;
+  }
+
   const isMemberProfile = /forums\.wynncraft\.com\/members\//.test(original);
 
   // Generic: prefer <main>/<article>/<body> if present
@@ -197,6 +202,38 @@ function extractText(html, url) {
       ?? clean.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)
       ?? clean.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
   return stripTags(scoped ? scoped[1] : clean);
+}
+
+/**
+ * A YouTube watch page is an application, and stripping its tags yields the
+ * consent banner — "about press copyright contact us…" — which is what five
+ * citations here were pointing at. Everything worth citing (title, channel,
+ * upload date, description) is in the JSON the player is initialised with.
+ */
+function extractYouTube(html, url) {
+  const pick = (re) => (html.match(re) ?? [])[1] ?? '';
+  const unescape = (v) =>
+    v.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\u0026/g, '&').replace(/\\\//g, '/');
+
+  const title = unescape(pick(/"videoDetails":\{[^]*?"title":"((?:[^"\\]|\\.)*)"/));
+  const author = unescape(pick(/"videoDetails":\{[^]*?"author":"((?:[^"\\]|\\.)*)"/));
+  const desc = unescape(pick(/"shortDescription":"((?:[^"\\]|\\.)*)"/));
+  const uploaded = pick(/"uploadDate":"([^"]+)"/);
+  const published = pick(/"publishDate":"([^"]+)"/);
+  const views = pick(/"viewCount":"(\d+)"/);
+  const lengthSec = pick(/"lengthSeconds":"(\d+)"/);
+  if (!title && !desc) return null;
+
+  return [
+    title && `Title: ${title}`,
+    author && `Channel: ${author}`,
+    uploaded && `Uploaded: ${uploaded}`,
+    published && published !== uploaded ? `Published: ${published}` : null,
+    lengthSec && `Length: ${lengthSec}s`,
+    views && `Views at capture: ${views}`,
+    `URL: ${url}`,
+    desc && `\nDescription:\n${desc}`,
+  ].filter(Boolean).join('\n');
 }
 
 function extractTitle(html) {
@@ -240,10 +277,20 @@ function googleMobileUrl(url) {
   return m ? `https://docs.google.com/document/d/${m[1]}/mobilebasic` : null;
 }
 
+const BROWSER_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
+
 async function fetchText(url) {
   const exportUrl = googleExportUrl(url);
   const target = exportUrl ?? url;
-  const res = await fetch(target, { headers: { 'User-Agent': UA, Accept: 'text/html,*/*' }, redirect: 'follow' });
+  // YouTube shows a consent wall to anything that does not look like a browser
+  // and carry the cookie, and the wall is what gets archived: the citation
+  // resolves, the document says "about press copyright contact us".
+  const isYouTube = /youtube\.com|youtu\.be/.test(target);
+  const headers = isYouTube
+    ? { 'User-Agent': BROWSER_UA, Accept: 'text/html,*/*', Cookie: 'CONSENT=YES+cb' }
+    : { 'User-Agent': UA, Accept: 'text/html,*/*' };
+  const res = await fetch(target, { headers, redirect: 'follow' });
   const body = res.ok ? await res.text() : null;
   const blocked =
     !res.ok || (exportUrl && /<html|accounts\.google\.com\/(v3\/)?signin/i.test(body.slice(0, 2000)));
