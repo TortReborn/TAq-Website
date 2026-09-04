@@ -29,8 +29,37 @@ BAD   One of the longest arcs in Wynncraft warring: attested from 2015 as
       (A comma-spliced inventory. The body's job, not the lede's.)
 ```
 
-The body's first sentence repeats the title in **bold** and defines it again, as
-Wikipedia does: `The **Federation** (tag **Fed**) was ...`
+**The summary IS the lede — the body must not restate it.** This is where we
+differ from Wikipedia, and the difference is easy to get wrong. On Wikipedia the
+lede *is* the article's first paragraph. Here `summary` is a separate field that
+renders as its own paragraph above the body, so a body that opens by defining
+the subject again shows the reader the same sentences twice, one after the
+other.
+
+So the body opens at its **first section heading**, or with a paragraph that
+carries the story forward:
+
+```
+BAD   summary: "Valhalla was the dominant war alliance of mid-to-late 2021,
+                formed on 11 May 2021 by thirteen guilds …"
+      body:    "**Valhalla** was the dominant war alliance of mid-to-late 2021,
+                formed on 11 May 2021 by thirteen guilds …"
+      (Word for word. The reader reads it twice.)
+
+GOOD  body:    "## History
+                ### Founding
+                On 11 May 2021, in The Great Collapse, Goose and Artemis
+                dissolved on the same day …"
+```
+
+Elaboration is not repetition. A body paragraph that restates a summary fact
+**and adds a citation, an exact date or a figure the summary lacks** is doing
+real work — the summary says "created in September 2023", the body says
+"created on 28 September 2023{{cite:…}}". Keep those.
+
+One consequence to plan around: the summary renders as plain text, so
+`[[links]]` in it do not resolve. Every subject worth linking must therefore be
+linked somewhere in the body.
 
 ## Skeletons by page type
 

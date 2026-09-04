@@ -134,6 +134,34 @@ for (const a of scanned) {
   }
 
   if ((a.summary ?? '').length > 500) findings.push(['ERROR', `summary is ${a.summary.length} chars (max 500)`]);
+
+  // The summary renders as its own paragraph above the body, so a body opening
+  // that restates it verbatim shows the reader the same sentences twice.
+  // Measured as the longest run of consecutive shared words: a short article's
+  // summary and body necessarily share vocabulary, and only verbatim
+  // repetition is the fault. An opener that adds its own citation is
+  // elaboration, not repetition, and is left alone.
+  {
+    const blocks = (a.body ?? '').split(/\n\n+/);
+    // a bullet needs a space after its marker; "**Bold**" opens a paragraph
+    const opener = blocks.find((b) => b.trim() && !/^#/.test(b) && !/^\{\{/.test(b) && !/^!\[/.test(b) && !/^([-*]\s|[|>])/.test(b));
+    if (opener) {
+      const tok = (s) => proseOf(s).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
+      const s = tok(a.summary ?? ''), ob = tok(opener);
+      const b = ' ' + ob.join(' ') + ' ';
+      let run = 0;
+      for (let i = 0; i < s.length; i++)
+        for (let len = s.length - i; len > run; len--)
+          if (b.includes(' ' + s.slice(i, i + len).join(' ') + ' ')) { run = len; break; }
+      // Elaboration vs repetition: if the shared run is most of the opener, the
+      // paragraph is the summary again. If the opener is substantially longer,
+      // it is adding dates, figures or citations and earns its place — even
+      // though it restates the definition to get there.
+      const covers = ob.length ? run / ob.length : 0;
+      if (run >= 12 && covers >= 0.6)
+        findings.push(['WARN', `body restates the lede (${run} consecutive words, ${Math.round(covers * 100)}% of the opening paragraph) — the summary is the lede; open at the first section`]);
+    }
+  }
   if ((a.title ?? '').length > 120) findings.push(['ERROR', `title is ${a.title.length} chars (max 120)`]);
   if ((a.infobox ?? []).length > 24) findings.push(['ERROR', `infobox has ${a.infobox.length} rows (max 24)`]);
   for (const row of a.infobox ?? []) {
