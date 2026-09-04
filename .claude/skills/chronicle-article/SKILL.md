@@ -111,7 +111,13 @@ only witness. Most articles need no such section.
    ```bash
    node scripts/check-article-style.mjs --slug <slug>
    node scripts/check-citations.mjs --slug <slug>
+   node scripts/check-facts.mjs --slug <slug>
    ```
+   The first two check how the article is written and that its footnotes
+   resolve. The third checks whether it is *true to its sources*: it reads every
+   quotation against the archived document cited for it, and every figure too.
+   See "The fact auditor" below — a new finding here is a defect you just
+   introduced, not a number to accept.
 6. Seed it: `node scripts/seed-wiki-articles.mjs`.
 
 ## Workflow B — a fact changed
@@ -126,13 +132,59 @@ membership date), and the same fact is usually stated in five articles. Follow
 3. Update each hit, including infoboxes and ledes, not just body prose.
 4. Where a claim was **refuted**, record it in
    `data/wiki/research/analyses/` so nobody re-proposes it.
-5. Re-run both checkers, re-seed, and verify dev and prod match.
+5. Re-run all three checkers, re-seed, and verify dev and prod match. A
+   corrected fact usually arrives with a new source or a new quotation, so
+   `check-facts.mjs` matters most on exactly this workflow.
+
+## The fact auditor
+
+`check-facts.mjs` is the one that reads an article against its sources rather
+than against a style rule. Run it on any article you touch.
+
+```bash
+node scripts/check-facts.mjs --slug <slug>
+node scripts/check-facts.mjs                    # the whole corpus
+node scripts/triage-quotes.mjs                  # sorts quote findings by cause
+node scripts/show-quote-diff.mjs <slug>         # article quote beside its source
+node scripts/check-source-dates.mjs             # dated claims vs a dated source
+node scripts/verify-map-figures.mjs             # re-runs the map-data queries
+```
+
+**The corpus currently stands at zero findings above LOW.** A new HIGH or MEDIUM
+finding on an article you edited is something you just introduced.
+
+What the severities mean:
+
+- **HIGH `quote-not-in-source`** — the words are not in the document cited. Fix
+  the quotation, not the finding. Quotation marks promise verbatim text: mark
+  every omission with `...` including mid-sentence ones, never change
+  punctuation inside a quotation, never repair the poster's grammar, and where a
+  source prints a line break and you need both lines, join them with ` / `. If
+  you cannot reproduce it exactly, drop the quotation marks and paraphrase.
+- **HIGH `source-thinner-than-claim`** — the citation resolves to a document too
+  small to support the claim, and is the only one on the segment.
+- **MEDIUM `figure-not-in-source`** — a number with no matching figure in the
+  cited text.
+- **LOW `quote-only-verifiable-in-image` / `figure-only-verifiable-in-dataset`**
+  — the checker structurally cannot settle these. Open the screenshot, or run
+  the query. Record what you find in `data/wiki/research/` so nobody repeats it.
+
+**Rule out a source-side failure before editing prose.** Twice in this corpus a
+true, well-cited claim looked invented because the *extractor* had dropped the
+text — a XenForo user title, a thread poll. `node scripts/source-archive.mjs
+reextract <id>` re-runs extraction over the stored HTML without re-fetching.
+Check the raw HTML before you conclude an article is wrong.
+
+**A figure from a dataset needs its query in the locator.** `{{cite:territory-exchanges|territory_exchanges map-data analysis}}` says nothing and cannot be
+rechecked by anyone, ever. Write the window and the measure:
+`{{cite:territory-exchanges|captures between Idiot Co and The Aquarium, Apr 2024 - Jan 2025: weekly peak 5,045}}`.
 
 ## Before you call it done
 
 ```bash
 node scripts/check-article-style.mjs --strict   # voice, structure, length
 node scripts/check-citations.mjs --strict       # every citation resolves
+node scripts/check-facts.mjs                    # quotations and figures vs sources
 npm test
 ```
 
