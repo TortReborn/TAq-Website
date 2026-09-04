@@ -2760,6 +2760,15 @@
    "rawSha256": "0d7a52693d31c9c2",
    "note": "Ordo Malleus official alliance thread — departures, admissions and expulsions were announced here as they happened"
   },
+  "thundderr-oral-history": {
+   "url": "",
+   "kind": "testimony",
+   "title": "Thundderr (KingdomPhoenixes and Holders of LE) — oral testimony",
+   "fetchedAt": "2026-09-04T21:07:16.509Z",
+   "textChars": 2019,
+   "note": "Recollections from a participant in the November 2017 KingdomPhoenixes split, relayed in 2026. A chief of the guild at the time who took its crown eighteen days later, so a witness rather than a compiler — but still memory, nine years on.",
+   "tier": "retrospective"
+  },
   "titansvalor-org-news-vol14": {
    "url": "https://titansvalor.org/news/vol14",
    "kind": "newsletter",
