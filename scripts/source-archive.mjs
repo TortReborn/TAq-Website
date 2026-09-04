@@ -449,6 +449,48 @@ async function cmdAdd(args) {
   return { id, textSha: crypto.createHash('sha256').update(text).digest('hex') };
 }
 
+/**
+ * Re-run extraction over the raw HTML we already stored, without re-fetching.
+ *
+ * The extractor improves — it learned to read XenForo user titles, so
+ * "urbymine (Former Chief of Avicia)" now survives where the bare name did
+ * before. Documents archived under an older extractor keep its blind spots,
+ * and a quotation the article took from the page then reads as unsourced. The
+ * raw HTML is kept precisely so this costs nothing and touches no server.
+ *
+ * Frontmatter is preserved verbatim: the notes and tiers in it are written by
+ * hand and are not derivable from the page.
+ */
+function cmdReextract(args) {
+  const only = args.filter((a) => !a.startsWith('--'));
+  const idx = loadIndex();
+  const ids = only.length ? only : Object.keys(idx.sources);
+  let changed = 0;
+  let skipped = 0;
+  for (const id of ids) {
+    const rawHtml = path.join(RAW, `${id}.html.gz`);
+    const docPath = path.join(DOCS, `${id}.md`);
+    if (!fs.existsSync(rawHtml) || !fs.existsSync(docPath)) { skipped++; continue; }
+    const html = zlib.gunzipSync(fs.readFileSync(rawHtml)).toString('utf8');
+    const src = idx.sources[id] ?? {};
+    const text = extractText(html, src.fetchedFrom ?? src.url ?? '');
+    const doc = fs.readFileSync(docPath, 'utf8');
+    // Find the closing frontmatter delimiter rather than matching it with a
+    // regex: these documents are CRLF and that regex is easy to get wrong.
+    const close = doc.search(/\r?\n---\r?\n/);
+    if (!doc.startsWith('---') || close === -1) { skipped++; continue; }
+    const head = doc.slice(0, doc.indexOf('\n', close + 5) + 1);
+    const next = `${head}\n${text}\n`;
+    if (next === doc) continue;
+    fs.writeFileSync(docPath, next);
+    idx.sources[id].textChars = text.length;
+    changed++;
+    console.log(`re-extracted ${id}: ${doc.length} -> ${next.length} chars`);
+  }
+  saveIndex(idx);
+  console.log(`
+${changed} document(s) rewritten, ${skipped} skipped (no raw copy)`);
+}
 /** Remove a source completely — doc, raw copy and manifest entry. */
 function removeSource(id) {
   for (const f of [path.join(DOCS, `${id}.md`), path.join(RAW, `${id}.html.gz`)]) {
@@ -574,8 +616,9 @@ try {
   else if (cmd === 'show') cmdShow(rest);
   else if (cmd === 'search') cmdSearch(rest);
   else if (cmd === 'verify') cmdVerify();
+  else if (cmd === 'reextract') cmdReextract(rest);
   else {
-    console.error('usage: source-archive.mjs <add|thread|list|show|search|verify> [...]');
+    console.error('usage: source-archive.mjs <add|thread|list|show|search|verify|reextract> [...]');
     process.exit(2);
   }
 } catch (e) {

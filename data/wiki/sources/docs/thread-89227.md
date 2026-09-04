@@ -8,7 +8,7 @@ raw_sha256: da477c91a0ad8d49
 note: "cited in research dossiers (backfill sweep)"
 ---
 
-### post #1 — LoveLusting — Aug 8, 2022 at 2:23 AM
+### post #1 — LoveLusting (Queen of the Foxes) — Aug 8, 2022 at 2:23 AM
 
 [image: [​IMG]]
 
@@ -91,7 +91,7 @@ Note: Only the Owner or Chiefs are allowed to review applications, and it may ta
 
 ---
 
-### post #2 — Wynntastic — Sep 7, 2015 at 8:24 PM
+### post #2 — Wynntastic (Well-Known Adventurer) — Sep 7, 2015 at 8:24 PM
 
 first
 
@@ -99,7 +99,7 @@ first
 
 ---
 
-### post #3 — Nightkay — Sep 7, 2015 at 8:25 PM
+### post #3 — Nightkay (George Michael Never Dies) — Sep 7, 2015 at 8:25 PM
 
 Wynntastic said:
 
@@ -114,7 +114,7 @@ wuteves
 
 ---
 
-### post #4 — Einja — Sep 7, 2015 at 8:53 PM
+### post #4 — Einja (Well-Known Adventurer) — Sep 7, 2015 at 8:53 PM
 
 LoveLusting said:
 
@@ -283,7 +283,7 @@ Sweet guild thread!
 
 ---
 
-### post #5 — CRAFTER876 — Sep 7, 2015 at 8:34 PM
+### post #5 — CRAFTER876 (Polar Bear) — Sep 7, 2015 at 8:34 PM
 
 Guild Immigration Form
 
@@ -307,7 +307,7 @@ Additional Notes: Never eat a sandwich with cat hair
 
 ---
 
-### post #6 — HaloNoobs_com — Sep 8, 2015 at 12:00 PM
+### post #6 — HaloNoobs_com (THE ONE AND ONLY) — Sep 8, 2015 at 12:00 PM
 
 Guild Immigration Form
 
@@ -329,7 +329,7 @@ Who invited you (if possible): No one
 
 ---
 
-### post #7 — creeperreaper206 — Sep 8, 2015 at 5:01 PM
+### post #7 — creeperreaper206 (Well-Known Adventurer) — Sep 8, 2015 at 5:01 PM
 
 In-Game Username: creeperreaper206
 
@@ -351,7 +351,7 @@ Additional Notes: ive got great sence of humor and im usally on lobby 1 worlds
 
 ---
 
-### post #8 — gb — Sep 10, 2015 at 6:16 PM
+### post #8 — gb (Well-Known Adventurer) — Sep 10, 2015 at 6:16 PM
 
 In-Game Username: xxpxrytuw
 
@@ -373,7 +373,7 @@ Additional Notes (Optional): I'm good at Pvp and fighting mobs
 
 ---
 
-### post #9 — curtissimulation — Sep 11, 2015 at 1:27 AM
+### post #9 — curtissimulation (Skilled Adventurer) — Sep 11, 2015 at 1:27 AM
 
 In-Game Username: Curtissimulation
 
@@ -395,7 +395,7 @@ Additional Notes (Optional):=)
 
 ---
 
-### post #10 — TrystanX — Sep 12, 2015 at 3:07 AM
+### post #10 — TrystanX (He Always Wynn's No Matter What!) — Sep 12, 2015 at 3:07 AM
 
 In-Game Name:
 
@@ -433,13 +433,13 @@ I do well in dungeons and combat, an average in parkour and puzzles
 
 ---
 
-### post #11 — Yuno F Gasai — Sep 20, 2015 at 2:05 AM
+### post #11 — Yuno F Gasai (Forum God, FW) — Sep 20, 2015 at 2:05 AM
 
 nice thread
 
 ---
 
-### post #12 — wijiji1 — Sep 20, 2015 at 2:46 PM
+### post #12 — wijiji1 (T best VIP+ to ever be on wynncraft) — Sep 20, 2015 at 2:46 PM
 
 I did apply before the forums went down so this is a redo
 
@@ -465,13 +465,13 @@ thank you I'm looking forward to being in this guild
 
 ---
 
-### post #13 — Efilim — Sep 22, 2015 at 3:06 AM
+### post #13 — Efilim (Memento Mori) — Sep 22, 2015 at 3:06 AM
 
 People should join this guild ;D
 
 ---
 
-### post #14 — LeafyWizard — Sep 22, 2015 at 6:55 PM
+### post #14 — LeafyWizard (Well-Known Adventurer) — Sep 22, 2015 at 6:55 PM
 
 Guild Immigration Form
 
@@ -495,13 +495,13 @@ Additional Notes (Optional): Thank you for reading this and I really hope you co
 
 ---
 
-### post #15 — Kvmilla — Sep 23, 2015 at 3:11 AM
+### post #15 — Kvmilla (Goddess of Blood and Devourer of Hearts) — Sep 23, 2015 at 3:11 AM
 
 moissssst~
 
 ---
 
-### post #16 — Killer5252 — Sep 24, 2015 at 9:26 PM
+### post #16 — Killer5252 (#YoloSweg - Pls i fna) — Sep 24, 2015 at 9:26 PM
 
 In-Game Username: Killer5252
 
@@ -523,7 +523,7 @@ Additional Notes (Optional): nope
 
 ---
 
-### post #17 — Ryujin — Sep 26, 2015 at 12:09 PM
+### post #17 — Ryujin (Well-Known Adventurer) — Sep 26, 2015 at 12:09 PM
 
 In-Game Username: Boxic101
 
@@ -545,7 +545,7 @@ Additional Notes (Optional):
 
 ---
 
-### post #18 — GoodVibes — Sep 26, 2015 at 8:37 PM
+### post #18 — GoodVibes (I vibrate good!) — Sep 26, 2015 at 8:37 PM
 
 Kingdom of Foxes Guild Application
 
@@ -571,7 +571,7 @@ Additional Notes : Hello! I feel as if I genuinely did not get to disclose enoug
 
 ---
 
-### post #19 — Sanae_pls — Sep 26, 2015 at 8:49 PM
+### post #19 — Sanae_pls (That Fucking Dark Wizard) — Sep 26, 2015 at 8:49 PM
 
 GoodVibes said:
 
@@ -604,7 +604,7 @@ Denied
 
 ---
 
-### post #20 — GentleProphet — Sep 26, 2015 at 9:32 PM
+### post #20 — GentleProphet (Famous Adventurer) — Sep 26, 2015 at 9:32 PM
 
 In-Game Username: Aitsudips
 

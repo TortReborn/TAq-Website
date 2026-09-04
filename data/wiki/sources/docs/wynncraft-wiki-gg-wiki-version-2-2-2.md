@@ -7,6 +7,7 @@ fetched_at: 2026-09-04T10:24:29.023Z
 raw_sha256: d27b4c9e016c64b8
 ---
 
+
 Version 2.2.2
 
 From Wynncraft Wiki
