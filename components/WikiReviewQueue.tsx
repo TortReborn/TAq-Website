@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, X, ChevronDown, ChevronRight } from "lucide-react";
 import { WikiSubmission, WIKI_TYPE_LABELS } from "@/lib/wiki";
 import { diffCollapsed } from "@/lib/wiki-diff";
@@ -9,7 +9,8 @@ import { diffCollapsed } from "@/lib/wiki-diff";
 /**
  * Exec review queue for Chronicle wiki suggestions: pending list, per-item
  * rendered line diff against the current page (or full body for new pages),
- * approve / reject with note. Rendered inside /exec/chronicle.
+ * approve / reject with note. Rendered inside /exec/chronicle and on the
+ * editorial desk.
  */
 
 interface QueueItem extends WikiSubmission {
@@ -18,19 +19,29 @@ interface QueueItem extends WikiSubmission {
 
 const DT_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-export default function WikiReviewQueue() {
+/**
+ * `onCount` reports how many are pending after every load, so a page that shows
+ * this queue in a tab can put the number on the tab without fetching it twice.
+ */
+export default function WikiReviewQueue({ onCount }: { onCount?: (n: number) => void } = {}) {
   const [items, setItems] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<number | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+  // Held in a ref so an inline callback from the caller does not become a
+  // dependency of `load` and re-fetch the queue on every render.
+  const onCountRef = useRef(onCount);
+  onCountRef.current = onCount;
 
   const load = useCallback(async () => {
     try {
       const res = await fetch('/api/wiki/review?status=pending');
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? 'Failed to load'); return; }
-      setItems(data.submissions ?? []);
+      const submissions = data.submissions ?? [];
+      setItems(submissions);
+      onCountRef.current?.(submissions.length);
       setError(null);
     } catch {
       setError('Network error');

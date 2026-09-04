@@ -23,7 +23,7 @@ export default function WikiLandingActions() {
   return (
     <span style={{ display: 'inline-flex', gap: '0.9rem', alignItems: 'center' }}>
       <Link href="/chronicle/admin" style={linkStyle}>
-        {canReview ? 'Editorial' : 'What needs checking'}
+        {canReview ? 'Editorial desk' : 'What needs checking'}
       </Link>
       {canPublish && (
         <Link href="/chronicle/new" style={linkStyle}>
