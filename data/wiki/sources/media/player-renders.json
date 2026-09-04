@@ -1,321 +1,423 @@
 {
- "$comment": "Player-article IGNs resolved to Minecraft UUIDs for Visage avatar renders. A render shows the account's CURRENT skin, which is not necessarily the skin worn during the period an article describes — captions must say so. Players whose accounts no longer resolve get no render.",
- "resolved": [
-  {
-   "slug": "99loulou999",
-   "ign": "99loulou999",
-   "uuid": "b5e32494-3358-4ae0-9fd0-ba25f9705940",
-   "lastJoin": "2026-01-05T05:01:17.553000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/b5e32494-3358-4ae0-9fd0-ba25f9705940"
-  },
-  {
-   "slug": "arkada",
-   "ign": "Arkada",
-   "status": "ok",
-   "uuid": "99f8bc7e-a5e1-42fa-8c28-fa78a9d32ab0",
-   "mojangName": "Arkada",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/99f8bc7e-a5e1-42fa-8c28-fa78a9d32ab0"
-  },
-  {
-   "slug": "aurumkitsune",
-   "ign": "AurumKitsune",
-   "uuid": "e4efe9e2-ae11-4524-b900-3673076e1a5b",
-   "lastJoin": "2019-03-27T15:18:09.155000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/e4efe9e2-ae11-4524-b900-3673076e1a5b"
-  },
-  {
-   "slug": "bitesizedbee4",
-   "ign": "bitesizedbee4",
-   "uuid": "dba2ade1-1367-4699-9599-44954d34e402",
-   "lastJoin": "2023-12-11T00:55:27.514000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/dba2ade1-1367-4699-9599-44954d34e402"
-  },
-  {
-   "slug": "c0rupted",
-   "ign": "C0rupted",
-   "status": "ok",
-   "uuid": "31b35756-731e-4d8d-8691-7cb8f782bfee",
-   "mojangName": "C0rupted",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/31b35756-731e-4d8d-8691-7cb8f782bfee"
-  },
-  {
-   "slug": "calluum",
-   "ign": "Calluum",
-   "uuid": "911a950a-839d-4150-bfe8-d901a3b85316",
-   "lastJoin": "2026-08-31T16:25:20.933000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/911a950a-839d-4150-bfe8-d901a3b85316"
-  },
-  {
-   "slug": "chownick",
-   "ign": "Chownick",
-   "uuid": "806fcdeb-07ac-40c0-93ee-1d719e94cf97",
-   "lastJoin": "2026-05-03T15:38:17.185000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/806fcdeb-07ac-40c0-93ee-1d719e94cf97"
-  },
-  {
-   "slug": "crokee",
-   "ign": "Crokee",
-   "uuid": "10c4cbf4-657b-4c03-bdc5-a708180347aa",
-   "lastJoin": "2026-07-25T17:52:46.785000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/10c4cbf4-657b-4c03-bdc5-a708180347aa"
-  },
-  {
-   "slug": "drasalia",
-   "ign": "Drasalia",
-   "status": "ok",
-   "uuid": "e0fa9939-b53a-4bda-bab1-7c74d21e56f5",
-   "mojangName": "Drasalia",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/e0fa9939-b53a-4bda-bab1-7c74d21e56f5"
-  },
-  {
-   "slug": "drew1011",
-   "ign": "Drew1011",
-   "uuid": "9289d67c-8485-4a0d-bc5a-a19d6b62b9cd",
-   "lastJoin": "2025-03-27T04:39:14.114000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/9289d67c-8485-4a0d-bc5a-a19d6b62b9cd"
-  },
-  {
-   "slug": "frank-wynncraft",
-   "ign": "Frank Wynncraft",
-   "status": "ok",
-   "uuid": "28561b28-0391-424f-808d-a6c95bf83671",
-   "mojangName": "Defervesco",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/28561b28-0391-424f-808d-a6c95bf83671"
-  },
-  {
-   "slug": "frozengalaxy",
-   "ign": "FrozenGalaxy",
-   "status": "ok",
-   "uuid": "276ad75f-f2a3-4f40-9336-b076826d3648",
-   "mojangName": "FrozenGalaxy",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/276ad75f-f2a3-4f40-9336-b076826d3648"
-  },
-  {
-   "slug": "gazthecat",
-   "ign": "GaztheCat",
-   "status": "ok",
-   "uuid": "66efb975-31b4-499e-9b46-a34980edd8ee",
-   "mojangName": "GaztheCat",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/66efb975-31b4-499e-9b46-a34980edd8ee"
-  },
-  {
-   "slug": "goulartjj",
-   "ign": "GoulartJJ",
-   "uuid": "929cfb3f-ea1e-4de2-8dfd-bb926753fca1",
-   "lastJoin": "2026-08-02T00:49:39.680000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/929cfb3f-ea1e-4de2-8dfd-bb926753fca1"
-  },
-  {
-   "slug": "hunghung",
-   "ign": "HungHung",
-   "status": "ok",
-   "uuid": "0f70a79e-45d7-4a94-ba33-0e5621b99a18",
-   "mojangName": "HungHung",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/0f70a79e-45d7-4a94-ba33-0e5621b99a18"
-  },
-  {
-   "slug": "iceresistance",
-   "ign": "IceResistance",
-   "uuid": "b8e715c7-4eed-4126-a41d-bbaed3a739aa",
-   "lastJoin": "2026-08-05T07:00:41.141000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/b8e715c7-4eed-4126-a41d-bbaed3a739aa"
-  },
-  {
-   "slug": "killerfish",
-   "ign": "Killerfish",
-   "uuid": "6fdde2e9-2785-49c7-aa73-87ddfe4653b8",
-   "lastJoin": "2026-08-15T05:24:45.631000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/6fdde2e9-2785-49c7-aa73-87ddfe4653b8"
-  },
-  {
-   "slug": "l1npengtul",
-   "ign": "l1npengtul",
-   "uuid": "2c07e0ec-8113-48c9-a07f-96d7233fecd8",
-   "lastJoin": "2026-08-24T11:08:46.565000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/2c07e0ec-8113-48c9-a07f-96d7233fecd8"
-  },
-  {
-   "slug": "lamplesspost",
-   "ign": "Lamplesspost",
-   "uuid": "1efe7553-9747-4074-8622-bb35059dc74c",
-   "lastJoin": "2026-08-15T14:46:22.699000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/1efe7553-9747-4074-8622-bb35059dc74c"
-  },
-  {
-   "slug": "lovelusting",
-   "ign": "LoveLusting",
-   "uuid": "63cfa49b-646c-4649-a329-bc155c828ff7",
-   "lastJoin": "2022-03-22T07:06:01.728000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/63cfa49b-646c-4649-a329-bc155c828ff7"
-  },
-  {
-   "slug": "motoki317",
-   "ign": "motoki317",
-   "status": "not found — no render",
-   "evidence": "The name no longer resolves at Mojang, Ashcon, Laby or PlayerDB. Note the research corpus distinguishes motoki317 (moto-bot author) from motoki1 (UltimateXeons) — do not substitute one for the other."
-  },
-  {
-   "slug": "mr-robin-hood",
-   "ign": "Mr_Robin_Hood",
-   "uuid": "9896b44f-290a-409a-811f-2ca9b051b19d",
-   "lastJoin": "2019-08-06T15:39:22.669000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/9896b44f-290a-409a-811f-2ca9b051b19d"
-  },
-  {
-   "slug": "naraka00",
-   "ign": "Naraka00",
-   "uuid": "50dc09ff-4e54-49ed-99ac-f8a54fd70e9d",
-   "lastJoin": "2026-08-26T17:45:01.362000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/50dc09ff-4e54-49ed-99ac-f8a54fd70e9d"
-  },
-  {
-   "slug": "neonrider",
-   "ign": "NeonRider",
-   "uuid": "13c41278-dfd0-4060-a3da-7497f547645b",
-   "lastJoin": "2026-09-03T16:14:20.631000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/13c41278-dfd0-4060-a3da-7497f547645b"
-  },
-  {
-   "slug": "nitrogen2oxygen",
-   "ign": "Nitrogen2Oxygen",
-   "status": "ok",
-   "uuid": "8f52f20c-39f6-49a4-b08a-c2232a6b8f60",
-   "resolvedVia": "ashcon (historical) + confirmed via Wynncraft API",
-   "currentName": "GaseousSubstance",
-   "evidence": "Mojang no longer resolves the name Nitrogen2Oxygen; Ashcon holds the historical mapping, and the Wynncraft API confirms that UUID is an active player now named GaseousSubstance (last join 8 Aug 2026)."
-  },
-  {
-   "slug": "paladinsorcerer",
-   "ign": "PaladinSorcerer",
-   "uuid": "0ff8160b-895e-433f-b27d-db942bcbe3ac",
-   "lastJoin": "2026-07-05T15:36:54.648000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/0ff8160b-895e-433f-b27d-db942bcbe3ac"
-  },
-  {
-   "slug": "sg-voltage",
-   "ign": "Sg_Voltage",
-   "uuid": "d686a583-b929-4467-b392-2120cc0d95f7",
-   "lastJoin": "2026-05-31T15:53:46.295000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/d686a583-b929-4467-b392-2120cc0d95f7"
-  },
-  {
-   "slug": "sheepn",
-   "ign": "Sheepn",
-   "uuid": "09642c14-71f6-4dae-807c-0ef2428a315a",
-   "lastJoin": "2021-11-28T21:41:52.454000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/09642c14-71f6-4dae-807c-0ef2428a315a"
-  },
-  {
-   "slug": "simplyinfinity",
-   "ign": "simplyinfinity_",
-   "status": "unconfirmed candidate — no render used",
-   "candidateUuid": "b03f09fd-ad59-4082-becd-d3cf20038872",
-   "evidence": "An account named \"simplyinfinity\" (no trailing underscore) exists and played Wynncraft Oct 2016 - Feb 2022, which fits the period. But the article subject is \"simplyinfinity_\", and nothing establishes the two are the same account. Not used: an avatar is a claim about a person's identity."
-  },
-  {
-   "slug": "slayne",
-   "ign": "Slayne",
-   "status": "ok",
-   "uuid": "87c73e8b-354d-4462-864f-8fb689ae820f",
-   "mojangName": "Slayne",
-   "resolvedVia": "mojang",
-   "render": "https://visage.surgeplay.com/bust/512/87c73e8b-354d-4462-864f-8fb689ae820f"
-  },
-  {
-   "slug": "talkair",
-   "ign": "Talkair",
-   "uuid": "e0e48ca9-9687-4f0a-87a2-247b4e13443e",
-   "lastJoin": "2026-06-27T13:22:39.958000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/e0e48ca9-9687-4f0a-87a2-247b4e13443e"
-  },
-  {
-   "slug": "tapu-fini",
-   "ign": "Tapu_Fini",
-   "uuid": "11f1dd10-cd7c-44e1-aedc-e9efbb17da63",
-   "lastJoin": "2022-09-30T22:22:42.887000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/11f1dd10-cd7c-44e1-aedc-e9efbb17da63"
-  },
-  {
-   "slug": "thedarksoul",
-   "ign": "TheDarkSoul",
-   "uuid": "fa7a69c4-ba28-4962-ba6b-8fb4cf1d071d",
-   "lastJoin": "2026-04-05T13:06:14.050000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/fa7a69c4-ba28-4962-ba6b-8fb4cf1d071d"
-  },
-  {
-   "slug": "therapeuticliz",
-   "ign": "TherapueticLiz",
-   "uuid": "43428c27-78b5-4e76-a95b-bea27f3d146f",
-   "lastJoin": "2026-08-31T12:29:14.917000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/43428c27-78b5-4e76-a95b-bea27f3d146f"
-  },
-  {
-   "slug": "urbymine",
-   "ign": "urbymine",
-   "uuid": "1c823651-4902-4b69-9ffa-39af6c218d55",
-   "lastJoin": "2023-09-18T17:31:25.691000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/1c823651-4902-4b69-9ffa-39af6c218d55"
-  },
-  {
-   "slug": "viaire",
-   "ign": "Viaire",
-   "uuid": "7b18a580-a737-4233-95a4-90da72506f23",
-   "lastJoin": "2026-08-24T20:36:59.703000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/7b18a580-a737-4233-95a4-90da72506f23"
-  },
-  {
-   "slug": "vmark03",
-   "ign": "Vmark03",
-   "status": "not found — no render",
-   "evidence": "An account named \"Vmark\" exists but has no Wynncraft record at all, so it is almost certainly a different person. \"Vmark03\" itself no longer resolves."
-  },
-  {
-   "slug": "yosteric5",
-   "ign": "yosteric5",
-   "uuid": "7c9c4670-4571-4b6e-9ff6-6c324d2036df",
-   "lastJoin": "2026-05-08T09:38:39.932000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/7c9c4670-4571-4b6e-9ff6-6c324d2036df"
-  },
-  {
-   "slug": "yugito",
-   "ign": "Yugito",
-   "uuid": "64b7db83-318c-4a18-8c5b-535484b74403",
-   "lastJoin": "2026-08-02T20:08:01.761000Z",
-   "status": "ok",
-   "render": "https://visage.surgeplay.com/bust/512/64b7db83-318c-4a18-8c5b-535484b74403"
-  }
- ]
+  "$comment": "Player-article IGNs resolved to Minecraft UUIDs for Visage avatar renders. A render shows the account's CURRENT skin, which is not necessarily the skin worn during the period an article describes — captions must say so. Players whose accounts no longer resolve get no render.",
+  "resolved": [
+    {
+      "slug": "3zpz",
+      "ign": "3zPz",
+      "resolvedName": "3zPz",
+      "uuid": "64031f36-c59b-4db8-8a99-0930803ea673",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/64031f36-c59b-4db8-8a99-0930803ea673"
+    },
+    {
+      "slug": "99loulou999",
+      "ign": "99loulou999",
+      "uuid": "b5e32494-3358-4ae0-9fd0-ba25f9705940",
+      "lastJoin": "2026-01-05T05:01:17.553000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/b5e32494-3358-4ae0-9fd0-ba25f9705940"
+    },
+    {
+      "slug": "angry-will",
+      "ign": "Angry_will",
+      "resolvedName": "Angry_will",
+      "uuid": "b149b7b1-0ec5-4269-8085-3ac644256289",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/b149b7b1-0ec5-4269-8085-3ac644256289"
+    },
+    {
+      "slug": "arkada",
+      "ign": "Arkada",
+      "status": "ok",
+      "uuid": "99f8bc7e-a5e1-42fa-8c28-fa78a9d32ab0",
+      "mojangName": "Arkada",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/99f8bc7e-a5e1-42fa-8c28-fa78a9d32ab0"
+    },
+    {
+      "slug": "aurumkitsune",
+      "ign": "AurumKitsune",
+      "uuid": "e4efe9e2-ae11-4524-b900-3673076e1a5b",
+      "lastJoin": "2019-03-27T15:18:09.155000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/e4efe9e2-ae11-4524-b900-3673076e1a5b"
+    },
+    {
+      "slug": "bitesizedbee4",
+      "ign": "bitesizedbee4",
+      "uuid": "dba2ade1-1367-4699-9599-44954d34e402",
+      "lastJoin": "2023-12-11T00:55:27.514000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/dba2ade1-1367-4699-9599-44954d34e402"
+    },
+    {
+      "slug": "c0rupted",
+      "ign": "C0rupted",
+      "status": "ok",
+      "uuid": "31b35756-731e-4d8d-8691-7cb8f782bfee",
+      "mojangName": "C0rupted",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/31b35756-731e-4d8d-8691-7cb8f782bfee"
+    },
+    {
+      "slug": "calluum",
+      "ign": "Calluum",
+      "uuid": "911a950a-839d-4150-bfe8-d901a3b85316",
+      "lastJoin": "2026-08-31T16:25:20.933000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/911a950a-839d-4150-bfe8-d901a3b85316"
+    },
+    {
+      "slug": "chownick",
+      "ign": "Chownick",
+      "uuid": "806fcdeb-07ac-40c0-93ee-1d719e94cf97",
+      "lastJoin": "2026-05-03T15:38:17.185000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/806fcdeb-07ac-40c0-93ee-1d719e94cf97"
+    },
+    {
+      "slug": "crokee",
+      "ign": "Crokee",
+      "uuid": "10c4cbf4-657b-4c03-bdc5-a708180347aa",
+      "lastJoin": "2026-07-25T17:52:46.785000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/10c4cbf4-657b-4c03-bdc5-a708180347aa"
+    },
+    {
+      "slug": "drasalia",
+      "ign": "Drasalia",
+      "status": "ok",
+      "uuid": "e0fa9939-b53a-4bda-bab1-7c74d21e56f5",
+      "mojangName": "Drasalia",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/e0fa9939-b53a-4bda-bab1-7c74d21e56f5"
+    },
+    {
+      "slug": "drew1011",
+      "ign": "Drew1011",
+      "uuid": "9289d67c-8485-4a0d-bc5a-a19d6b62b9cd",
+      "lastJoin": "2025-03-27T04:39:14.114000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/9289d67c-8485-4a0d-bc5a-a19d6b62b9cd"
+    },
+    {
+      "slug": "elegantdeath",
+      "ign": "ElegantDeath",
+      "resolvedName": "ElegantDeath",
+      "uuid": "69a9802f-3ccf-4a91-b2b7-2fc8b9cf86ba",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/69a9802f-3ccf-4a91-b2b7-2fc8b9cf86ba"
+    },
+    {
+      "slug": "ezura",
+      "ign": "Ezura",
+      "resolvedName": "Ezura",
+      "uuid": "6bde8dd1-610f-4e40-9a45-e945a431827a",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/6bde8dd1-610f-4e40-9a45-e945a431827a"
+    },
+    {
+      "slug": "frank-wynncraft",
+      "ign": "Frank Wynncraft",
+      "status": "ok",
+      "uuid": "28561b28-0391-424f-808d-a6c95bf83671",
+      "mojangName": "Defervesco",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/28561b28-0391-424f-808d-a6c95bf83671"
+    },
+    {
+      "slug": "frozengalaxy",
+      "ign": "FrozenGalaxy",
+      "status": "ok",
+      "uuid": "276ad75f-f2a3-4f40-9336-b076826d3648",
+      "mojangName": "FrozenGalaxy",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/276ad75f-f2a3-4f40-9336-b076826d3648"
+    },
+    {
+      "slug": "gazthecat",
+      "ign": "GaztheCat",
+      "status": "ok",
+      "uuid": "66efb975-31b4-499e-9b46-a34980edd8ee",
+      "mojangName": "GaztheCat",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/66efb975-31b4-499e-9b46-a34980edd8ee"
+    },
+    {
+      "slug": "goden",
+      "ign": "Goden",
+      "resolvedName": "Goden",
+      "uuid": "016727dd-a882-42f3-85d1-44d1a8eee5d8",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/016727dd-a882-42f3-85d1-44d1a8eee5d8"
+    },
+    {
+      "slug": "goulartjj",
+      "ign": "GoulartJJ",
+      "uuid": "929cfb3f-ea1e-4de2-8dfd-bb926753fca1",
+      "lastJoin": "2026-08-02T00:49:39.680000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/929cfb3f-ea1e-4de2-8dfd-bb926753fca1"
+    },
+    {
+      "slug": "hunghung",
+      "ign": "HungHung",
+      "status": "ok",
+      "uuid": "0f70a79e-45d7-4a94-ba33-0e5621b99a18",
+      "mojangName": "HungHung",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/0f70a79e-45d7-4a94-ba33-0e5621b99a18"
+    },
+    {
+      "slug": "iceresistance",
+      "ign": "IceResistance",
+      "uuid": "b8e715c7-4eed-4126-a41d-bbaed3a739aa",
+      "lastJoin": "2026-08-05T07:00:41.141000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/b8e715c7-4eed-4126-a41d-bbaed3a739aa"
+    },
+    {
+      "slug": "icey-diamond",
+      "ign": "Icey_Diamond",
+      "resolvedName": "Icey_Diamond",
+      "uuid": "114cda23-b2e3-4716-9646-93587d62ed65",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/114cda23-b2e3-4716-9646-93587d62ed65"
+    },
+    {
+      "slug": "killerfish",
+      "ign": "Killerfish",
+      "uuid": "6fdde2e9-2785-49c7-aa73-87ddfe4653b8",
+      "lastJoin": "2026-08-15T05:24:45.631000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/6fdde2e9-2785-49c7-aa73-87ddfe4653b8"
+    },
+    {
+      "slug": "l1npengtul",
+      "ign": "l1npengtul",
+      "uuid": "2c07e0ec-8113-48c9-a07f-96d7233fecd8",
+      "lastJoin": "2026-08-24T11:08:46.565000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/2c07e0ec-8113-48c9-a07f-96d7233fecd8"
+    },
+    {
+      "slug": "lamplesspost",
+      "ign": "Lamplesspost",
+      "uuid": "1efe7553-9747-4074-8622-bb35059dc74c",
+      "lastJoin": "2026-08-15T14:46:22.699000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/1efe7553-9747-4074-8622-bb35059dc74c"
+    },
+    {
+      "slug": "lego-dw",
+      "ign": "Lego_DW",
+      "resolvedName": "Lego_DW",
+      "uuid": "c173e626-61d7-4dae-8fcc-9f9809901e76",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/c173e626-61d7-4dae-8fcc-9f9809901e76"
+    },
+    {
+      "slug": "lev98bug",
+      "ign": "Lev98bug",
+      "resolvedName": "Lev98bug",
+      "uuid": "e9f6f130-c5b3-4a1a-86a7-a33e0be37ec0",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/e9f6f130-c5b3-4a1a-86a7-a33e0be37ec0"
+    },
+    {
+      "slug": "lotuss",
+      "ign": "lotuss",
+      "resolvedName": "Lotuss",
+      "uuid": "ae18c97c-07f7-4e12-8522-c66d111fd687",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/ae18c97c-07f7-4e12-8522-c66d111fd687"
+    },
+    {
+      "slug": "lovelusting",
+      "ign": "LoveLusting",
+      "uuid": "63cfa49b-646c-4649-a329-bc155c828ff7",
+      "lastJoin": "2022-03-22T07:06:01.728000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/63cfa49b-646c-4649-a329-bc155c828ff7"
+    },
+    {
+      "slug": "motoki317",
+      "ign": "motoki317",
+      "status": "not found — no render",
+      "evidence": "The name no longer resolves at Mojang, Ashcon, Laby or PlayerDB. Note the research corpus distinguishes motoki317 (moto-bot author) from motoki1 (UltimateXeons) — do not substitute one for the other."
+    },
+    {
+      "slug": "mr-robin-hood",
+      "ign": "Mr_Robin_Hood",
+      "uuid": "9896b44f-290a-409a-811f-2ca9b051b19d",
+      "lastJoin": "2019-08-06T15:39:22.669000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/9896b44f-290a-409a-811f-2ca9b051b19d"
+    },
+    {
+      "slug": "naraka00",
+      "ign": "Naraka00",
+      "uuid": "50dc09ff-4e54-49ed-99ac-f8a54fd70e9d",
+      "lastJoin": "2026-08-26T17:45:01.362000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/50dc09ff-4e54-49ed-99ac-f8a54fd70e9d"
+    },
+    {
+      "slug": "neonrider",
+      "ign": "NeonRider",
+      "uuid": "13c41278-dfd0-4060-a3da-7497f547645b",
+      "lastJoin": "2026-09-03T16:14:20.631000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/13c41278-dfd0-4060-a3da-7497f547645b"
+    },
+    {
+      "slug": "nitrogen2oxygen",
+      "ign": "Nitrogen2Oxygen",
+      "status": "ok",
+      "uuid": "8f52f20c-39f6-49a4-b08a-c2232a6b8f60",
+      "resolvedVia": "ashcon (historical) + confirmed via Wynncraft API",
+      "currentName": "GaseousSubstance",
+      "evidence": "Mojang no longer resolves the name Nitrogen2Oxygen; Ashcon holds the historical mapping, and the Wynncraft API confirms that UUID is an active player now named GaseousSubstance (last join 8 Aug 2026)."
+    },
+    {
+      "slug": "paladinsorcerer",
+      "ign": "PaladinSorcerer",
+      "uuid": "0ff8160b-895e-433f-b27d-db942bcbe3ac",
+      "lastJoin": "2026-07-05T15:36:54.648000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/0ff8160b-895e-433f-b27d-db942bcbe3ac"
+    },
+    {
+      "slug": "pretzule",
+      "ign": "Pretzule",
+      "resolvedName": "pretzule",
+      "uuid": "d96a7728-153a-48b9-995f-3a85b4e32bdb",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/d96a7728-153a-48b9-995f-3a85b4e32bdb"
+    },
+    {
+      "slug": "pyrias",
+      "ign": "Pyrias",
+      "resolvedName": "Pyrias",
+      "uuid": "8a5426b6-6c5e-45c9-a34f-f38a733e74a5",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/8a5426b6-6c5e-45c9-a34f-f38a733e74a5"
+    },
+    {
+      "slug": "sg-voltage",
+      "ign": "Sg_Voltage",
+      "uuid": "d686a583-b929-4467-b392-2120cc0d95f7",
+      "lastJoin": "2026-05-31T15:53:46.295000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/d686a583-b929-4467-b392-2120cc0d95f7"
+    },
+    {
+      "slug": "sheepn",
+      "ign": "Sheepn",
+      "uuid": "09642c14-71f6-4dae-807c-0ef2428a315a",
+      "lastJoin": "2021-11-28T21:41:52.454000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/09642c14-71f6-4dae-807c-0ef2428a315a"
+    },
+    {
+      "slug": "simplyinfinity",
+      "ign": "simplyinfinity_",
+      "status": "unconfirmed candidate — no render used",
+      "candidateUuid": "b03f09fd-ad59-4082-becd-d3cf20038872",
+      "evidence": "An account named \"simplyinfinity\" (no trailing underscore) exists and played Wynncraft Oct 2016 - Feb 2022, which fits the period. But the article subject is \"simplyinfinity_\", and nothing establishes the two are the same account. Not used: an avatar is a claim about a person's identity."
+    },
+    {
+      "slug": "slayne",
+      "ign": "Slayne",
+      "status": "ok",
+      "uuid": "87c73e8b-354d-4462-864f-8fb689ae820f",
+      "mojangName": "Slayne",
+      "resolvedVia": "mojang",
+      "render": "https://visage.surgeplay.com/bust/512/87c73e8b-354d-4462-864f-8fb689ae820f"
+    },
+    {
+      "slug": "sseebbyz",
+      "ign": "SSEEBBYZ",
+      "uuid": null,
+      "status": "no account (404)"
+    },
+    {
+      "slug": "talkair",
+      "ign": "Talkair",
+      "uuid": "e0e48ca9-9687-4f0a-87a2-247b4e13443e",
+      "lastJoin": "2026-06-27T13:22:39.958000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/e0e48ca9-9687-4f0a-87a2-247b4e13443e"
+    },
+    {
+      "slug": "tapu-fini",
+      "ign": "Tapu_Fini",
+      "uuid": "11f1dd10-cd7c-44e1-aedc-e9efbb17da63",
+      "lastJoin": "2022-09-30T22:22:42.887000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/11f1dd10-cd7c-44e1-aedc-e9efbb17da63"
+    },
+    {
+      "slug": "thedarksoul",
+      "ign": "TheDarkSoul",
+      "uuid": "fa7a69c4-ba28-4962-ba6b-8fb4cf1d071d",
+      "lastJoin": "2026-04-05T13:06:14.050000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/fa7a69c4-ba28-4962-ba6b-8fb4cf1d071d"
+    },
+    {
+      "slug": "therapeuticliz",
+      "ign": "TherapueticLiz",
+      "uuid": "43428c27-78b5-4e76-a95b-bea27f3d146f",
+      "lastJoin": "2026-08-31T12:29:14.917000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/43428c27-78b5-4e76-a95b-bea27f3d146f"
+    },
+    {
+      "slug": "thundderr",
+      "ign": "Thundderr",
+      "resolvedName": "Thundderr",
+      "uuid": "ea7ca108-8e11-4a4e-9cd6-03d1c5cd2484",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/ea7ca108-8e11-4a4e-9cd6-03d1c5cd2484"
+    },
+    {
+      "slug": "urbymine",
+      "ign": "urbymine",
+      "uuid": "1c823651-4902-4b69-9ffa-39af6c218d55",
+      "lastJoin": "2023-09-18T17:31:25.691000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/1c823651-4902-4b69-9ffa-39af6c218d55"
+    },
+    {
+      "slug": "viaire",
+      "ign": "Viaire",
+      "uuid": "7b18a580-a737-4233-95a4-90da72506f23",
+      "lastJoin": "2026-08-24T20:36:59.703000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/7b18a580-a737-4233-95a4-90da72506f23"
+    },
+    {
+      "slug": "vmark03",
+      "ign": "Vmark03",
+      "status": "not found — no render",
+      "evidence": "An account named \"Vmark\" exists but has no Wynncraft record at all, so it is almost certainly a different person. \"Vmark03\" itself no longer resolves."
+    },
+    {
+      "slug": "yosteric5",
+      "ign": "yosteric5",
+      "uuid": "7c9c4670-4571-4b6e-9ff6-6c324d2036df",
+      "lastJoin": "2026-05-08T09:38:39.932000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/7c9c4670-4571-4b6e-9ff6-6c324d2036df"
+    },
+    {
+      "slug": "yugito",
+      "ign": "Yugito",
+      "uuid": "64b7db83-318c-4a18-8c5b-535484b74403",
+      "lastJoin": "2026-08-02T20:08:01.761000Z",
+      "status": "ok",
+      "render": "https://visage.surgeplay.com/bust/512/64b7db83-318c-4a18-8c5b-535484b74403"
+    }
+  ]
 }
