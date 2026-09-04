@@ -1,8 +1,20 @@
+// Credentials come from TEST_DB_*, the same variables the vitest suite reads.
+// They are not written here: a password in a file gets committed, and this
+// repository is public.
 const pg = require('pg');
+
+if (!process.env.TEST_DB_USER || !process.env.TEST_DB_PASSWORD) {
+  process.stdout.write('set TEST_DB_USER and TEST_DB_PASSWORD first\n');
+  process.exit(1);
+}
+
 const pool = new pg.Pool({
-  user: 'tortuser', password: 'UserPass123',
-  host: '127.0.0.1', port: 5432,
-  database: 'tortreborn', ssl: false,
+  user: process.env.TEST_DB_USER,
+  password: process.env.TEST_DB_PASSWORD,
+  host: process.env.TEST_DB_HOST ?? '127.0.0.1',
+  port: Number(process.env.TEST_DB_PORT ?? 5432),
+  database: process.env.TEST_DB_NAME ?? 'tortreborn',
+  ssl: false,
 });
 
 const needed = [
