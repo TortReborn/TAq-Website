@@ -60,7 +60,7 @@ const btn = (kind: 'go' | 'plain' | 'danger'): React.CSSProperties => ({
 });
 
 export default function ChroniclesAdmin() {
-  const { user, authenticated, canReview, canManageChroniclers } = useWikiSession();
+  const { user, authenticated, canReview, canManageChroniclers, imageBackend } = useWikiSession();
 
   const [chroniclers, setChroniclers] = useState<Chronicler[]>([]);
   const [unverified, setUnverified] = useState<UnverifiedPageRow[]>([]);
@@ -162,6 +162,18 @@ export default function ChroniclesAdmin() {
             <Stat label="Revisions written by a person" value={stats.humanRevisions} />
             <Stat label="Revisions written by AI" value={stats.aiRevisions} />
           </div>
+          {imageBackend && (
+            <p style={{ margin: '0.8rem 0 0', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              Uploaded images go to{' '}
+              <strong>
+                {imageBackend === 'blob'
+                  ? 'Vercel Blob (public, CDN-served)'
+                  : imageBackend === 'blob-private'
+                    ? 'Vercel Blob (private, streamed through the site)'
+                    : 'Supabase storage'}
+              </strong>.
+            </p>
+          )}
         </section>
       )}
 

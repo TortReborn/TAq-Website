@@ -22,6 +22,8 @@ export interface WikiUser {
 interface WikiSessionResponse {
   authenticated: boolean;
   user?: WikiUser;
+  /** Present only for reviewers — which image store this deployment uses. */
+  imageBackend?: 'blob' | 'blob-private' | 's3';
 }
 
 export function useWikiSession() {
@@ -42,6 +44,7 @@ export function useWikiSession() {
     canPublish: data?.user?.canPublish ?? false,
     canReview: data?.user?.canReview ?? false,
     canManageChroniclers: data?.user?.canManageChroniclers ?? false,
+    imageBackend: data?.imageBackend ?? null,
     loading: isLoading,
     error: error?.message ?? null,
     refresh: () => mutate(),
