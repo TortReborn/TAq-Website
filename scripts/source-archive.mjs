@@ -183,10 +183,19 @@ function extractText(html, url) {
     const posts = extractXenForo(clean);
     if (posts) return posts;
   }
+  // A XenForo member profile puts each status update in its own <article>, so
+  // scoping to the first one captures the user's latest status and discards the
+  // page. Drew1011's profile archived as the fourteen characters "Foxton
+  // Forever" while the thing actually worth citing — a dated chain of alliance
+  // titles — sat in a list further down and was cited fourteen times regardless.
+  const isMemberProfile = /forums\.wynncraft\.com\/members\//.test(original);
+
   // Generic: prefer <main>/<article>/<body> if present
-  const scoped = clean.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)
-    ?? clean.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)
-    ?? clean.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
+  const scoped = isMemberProfile
+    ? clean.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i)
+    : clean.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)
+      ?? clean.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)
+      ?? clean.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
   return stripTags(scoped ? scoped[1] : clean);
 }
 

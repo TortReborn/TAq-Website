@@ -108,6 +108,15 @@ function sourceText(id) {
   if (docCache.has(id)) return docCache.get(id);
   const p = path.join(DOCS, `${id}.md`);
   let text = null;
+  // Some sources are curated JSON rather than a fetched page — the forum-profile
+  // extract, for instance, which deliberately records only guild-history fields
+  // and omits the birthday and location the profiles also expose. Those have no
+  // .md, so read the raw file instead of reporting them unarchived.
+  const rawJson = path.join(ROOT, "data/wiki/sources/raw", `${id}.json`);
+  if (!fs.existsSync(p) && fs.existsSync(rawJson)) {
+    docCache.set(id, norm(fs.readFileSync(rawJson, "utf8")));
+    return docCache.get(id);
+  }
   if (fs.existsSync(p)) {
     const raw = fs.readFileSync(p, 'utf8');
     // Drop the frontmatter so its note cannot satisfy a quotation. Our notes
