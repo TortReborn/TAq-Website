@@ -78,8 +78,9 @@ for (const pair of flags('redact')) {
 
 // A live invite is an ongoing grant of access to somebody's server, not a
 // historical fact, and it does not belong in a public archive.
-text = text.replace(/https?:\/\/discord\.gg\/[A-Za-z0-9]+/g, '(Discord invite, removed)');
-text = text.replace(/https?:\/\/(?:www\.)?discord(?:app)?\.com\/invite\/[A-Za-z0-9]+/g, '(Discord invite, removed)');
+// Written with or without a scheme — people paste "discord.gg/abc" bare.
+text = text.replace(/(?:https?:\/\/)?discord\.gg\/[A-Za-z0-9]+/g, '(Discord invite, removed)');
+text = text.replace(/(?:https?:\/\/)?(?:www\.)?discord(?:app)?\.com\/invite\/[A-Za-z0-9]+/g, '(Discord invite, removed)');
 // Attachment CDN links carry signed parameters and expire; the image itself is
 // archived beside this file, so the URL is noise that also leaks a token.
 text = text.replace(/https?:\/\/cdn\.discordapp\.com\/attachments\/\S+/g, '(attachment, archived alongside)');

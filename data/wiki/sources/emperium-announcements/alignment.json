@@ -1,0 +1,186 @@
+{
+ "$comment": "VERIFIED image records for the Emperium of Wynn announcements channel. The export holds 39 \"Image\" markers and 13 attachments, the rest being link previews, so ordinal placement was checked against content rather than trusted. Marker 10 is EXCLUDED: it is a critic's post alleging that a member guild had a racist name, an unsubstantiated accusation this wiki will not republish. Its original is kept as evidence; the web derivative has been deleted and nothing may cite it.",
+ "images": [
+  {
+   "marker": 1,
+   "line": 27,
+   "file": "emperium-announcements-01.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-01.webp",
+   "textBefore": [
+    "XYZ - Shadow Kittens - Physics2017 (Rep: Hitoro)",
+    "LetJPlay — 4/16/2017 6:08 PM",
+    "Tl;dr Leader Plan Meeting"
+   ],
+   "verified": true,
+   "depicts": "text screenshot of notes from a leaders' planning meeting: judges to be trialled for bias, three leaders (war, community, economy), how territory is assigned or negotiated, monthly 'Ice Cave' territories awarded on effort, free-for-all at ToA, Qira and Ice Caves, and Ragni, Detlas and Nemract rotating between guilds",
+   "alignmentVerdict": "matches — posted under 'Tl;dr Leader Plan Meeting'"
+  },
+  {
+   "marker": 2,
+   "line": 41,
+   "file": "emperium-announcements-02.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-02.webp",
+   "textBefore": [
+    "Google Docs",
+    "Position Application",
+    "Here you can reply to any position in our alliance, The Emperium of Wynn. If you do not know every role, click this to find out (Also all answers and applications are confidential). https://docs.google.com/document/d/1MAbKHa_ASik5lMJO_LlhoYo8S4YgXcw8zoufXOrwn6M/edit?usp=sharing"
+   ],
+   "verified": true,
+   "depicts": "the alliance crest: three green crystals on a brown shield over crossed sword, mace, spear and arrow, with a ribbon reading 'The Emperium'",
+   "alignmentVerdict": "matches — posted as 'New logo for Emperium'"
+  },
+  {
+   "marker": 3,
+   "line": 44,
+   "file": "emperium-announcements-03.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-03.webp",
+   "textBefore": [
+    "Image",
+    "Rani — 4/18/2017 4:03 PM",
+    "New logo for Emperium 😃"
+   ],
+   "verified": true,
+   "depicts": "forum poll, closed: 'Who would you like to see as the Community Leader of the Emperium?' Angry_will 4 votes (4.9%), Uriah 11 (13.6%), Hitoro 29 (35.8%), joshaftel 27 (33.3%), Jack_Riddle 10 (12.3%)",
+   "alignmentVerdict": "matches — the community leader vote the channel discusses"
+  },
+  {
+   "marker": 4,
+   "line": 63,
+   "file": "emperium-announcements-04.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-04.webp",
+   "textBefore": [
+    "Google Docs",
+    "Blades of the Emperium",
+    "Blades of the Emperium ​ The Demon Hunters​ Professional and exceptional slayers of boss monsters and demons around the Wynn Province. High level, smart and efficient each Demon Hunter is able to fight their way through the toughest of adversaries no matter the challenge. These fighters are per..."
+   ],
+   "verified": true,
+   "depicts": "Discord #general, 13 May 2017: Rani asks Phasing whether they used multiple forum accounts to vote for themselves in the community leader voting; Phasing answers 'You Can Accuse me All You Want This Is Called Being A Bully'; Rani replies that they are no longer allowed back in the guild",
+   "alignmentVerdict": "matches — the vote-rigging accusation that followed the community leader poll"
+  },
+  {
+   "marker": 5,
+   "line": 79,
+   "file": "emperium-announcements-05.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-05.webp",
+   "textBefore": [
+    "Google Docs",
+    "Position Application",
+    "Here you can reply to any position in our alliance, The Emperium of Wynn. If you do not know every role, click this to find out (Also all answers and applications are confidential). https://docs.google.com/document/d/1MAbKHa_ASik5lMJO_LlhoYo8S4YgXcw8zoufXOrwn6M/edit?usp=sharing"
+   ],
+   "verified": true,
+   "depicts": "the alliance organisation chart. Highest Powers: Community Leader, War Leader, Economy Leader, Shadow Advisor. Secondary Powers: High Council, Judge. Under the Community Leader: Community Organisers, Event Planners. Under the War and Economy Leaders: Generals, Captains, Land Consolidators. Notes that Honorary Members are chosen by the High Council, and that the High Council chooses the Leaders, each Leader choosing those below them",
+   "alignmentVerdict": "matches — posted alongside the constitution link"
+  },
+  {
+   "marker": 6,
+   "line": 85,
+   "file": "emperium-announcements-06.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-06.webp",
+   "textBefore": [
+    "Google Docs",
+    "Emperium War Leader",
+    "War Leader - ORDO MALLEUS - ELECTED MONTHLY - Will be in charge of ensuring that guilds fight for the territories they have agreed to have. Their role will be to ensure that each guild has a good understanding of how to Fight wars, Bank Management, After war defense purchase as well as other tips and tricks. War leaders should maintain good communication between each guilds and help coordinate wars if necessary"
+   ],
+   "verified": true,
+   "depicts": "Wynncraft territory map annotated for the alliance: regions boxed and lettered A1 to A12 in red and yellow, a large blue box over the ocean, and a boxed area labelled 'GUILD EVENT AREA'",
+   "alignmentVerdict": "matches — the file is named Wynn_Map_TERRITORIES_FOR_TEoW"
+  },
+  {
+   "marker": 7,
+   "line": 112,
+   "file": "emperium-announcements-07.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-07.webp",
+   "textBefore": [
+    "The Demon Hunters",
+    "Professional and exceptional slayers of boss monsters and demons around the Wynn Province...."
+   ],
+   "verified": true,
+   "depicts": "in-game screenshot: a group of players gathered in a stone-walled room",
+   "alignmentVerdict": "matches — an alliance event"
+  },
+  {
+   "marker": 8,
+   "line": 116,
+   "file": "emperium-announcements-08.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-08.webp",
+   "textBefore": [
+    "Torus — 5/9/2017 12:06 PM",
+    "Could everyone please put their IGN after their discord name, Thanks!",
+    "Eggcellent — 5/12/2017 2:45 PM"
+   ],
+   "verified": true,
+   "depicts": "the Wynncraft guild leaderboard, page 1: HackForums [Hax] 285 territories, level 70, 79 members; LE Flowers [LEF] 23, 52, 42; Libertas [Lir] 8, 63, 57; BuildCraftia [BCr] 8, 44, 33; TitanZ [TTZ] 6, 43, 42; Demios [DMI] 5, 39, 17; TheOldKeepers [Tok] 5, 31, 5; The Divine Souls [DsO] 2, 43, 29; The Dark Phoenix [TNI] 1, 54, 55; Jaguars [JAT] 1, 50, 46",
+   "alignmentVerdict": "matches — a snapshot of the map while HackForums held 285 of it"
+  },
+  {
+   "marker": 9,
+   "line": 125,
+   "file": "emperium-announcements-09.jpg",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-09.webp",
+   "textBefore": [
+    "Also Everyone please cut down in bumping the thread from now on, do it maybe every 3-4 days",
+    "Thank you",
+    "Eggcellent — 5/13/2017 8:40 AM"
+   ],
+   "verified": true,
+   "depicts": "photograph of a pencil drawing on paper: ranks of armoured knights with ornate tabards and banners advancing on a hooded figure, one shield lettered 'Emperium' and a tabard lettered 'TEOW'. Fan art, not a photograph of a person",
+   "alignmentVerdict": "matches — guild art posted to the channel"
+  },
+  {
+   "marker": 10,
+   "line": 139,
+   "file": "emperium-announcements-10.png",
+   "web": null,
+   "textBefore": [
+    "@everyone Please welcome all of the traveling guests into our Alliance Discord! Remember to follow all Alliance Rules, including all the new comers (They are in ⁠unknown)",
+    "LetJPlay — 5/15/2017 1:07 PM",
+    "(Peek-a-boo I see you @Valere ) This is for those people who do not understand the hierarchy of the alliance, as I have tried to make it simplified into simple catagories. If you have questions, tag me in chat or PM me. @unknown-role"
+   ],
+   "verified": true,
+   "depicts": "A critic's post alleging a member guild had a racist name. EXCLUDED — an unsubstantiated accusation about a named group, not republished. Web derivative deleted.",
+   "alignmentVerdict": "matches, and excluded from publication",
+   "excluded": true
+  },
+  {
+   "marker": 11,
+   "line": 166,
+   "file": "emperium-announcements-11.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-11.webp",
+   "textBefore": [
+    "As for myself, I am A’renos. I am a simple member of this alliance just like any of you. In fact, there are so many others in this alliance who are greater than me. Motoki1 and yosterics for example, they own guilds that has been around for a long time and has essentially made it number 2 and 3 on the leader boards. That is a great achievement. Others such as smatsu7 and Tntdestroyd, their constant effort within wars and the maintenance of the alliance is spectacular. There are many others within the alliance who are far more active and overall are better than myself, and I only ever want them to be. I want everyone to become greater than me, and I will show them how. I will teach all who come to me in how they should treat others, how to war or to lead, how to create events and execute grand balls within the community.",
+    "I am the Shadow Advisor of this alliance, but I am not its leader. I oversee what happens, and I advise. I have brought each one of you here together for a purpose, which is to make one of my dreams come true. The unification of the whole guild community of Wynn as well as the destruction of all guild hate. Those are the main goals of this alliance, and I will continue to be with the TEoW until they are complete. Lastly, I want to share something with you.",
+    "They can destroy what i care about, but i can remake it."
+   ],
+   "verified": true,
+   "depicts": "forum post by Serbia accusing the alliance of 'threats of becoming the next Hax? Hacking accusations, spying and sabotage, targetting etc.' and of being 'power hungry and looking to overthrow Hax so you can have everything for yourselves'",
+   "alignmentVerdict": "matches — an outside critic of the alliance"
+  },
+  {
+   "marker": 12,
+   "line": 180,
+   "file": "emperium-announcements-12.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-12.webp",
+   "textBefore": [
+    "The Emperium Of Wynn",
+    "The Emperium of Wynn (TEoW) is a Dynamic alliance that was formed on the 21st of April with the goal of..."
+   ],
+   "verified": true,
+   "depicts": "Discord #voting, 2 August 2017: A'renos announces the Emperator election — 'the time has come for the alliance to elect the @Emperator. Today and for 3 days, the vote will be held in here' — N for Nitrogen2Oxygen, D for Drew1011. The reaction counts read D 30, N 31",
+   "alignmentVerdict": "matches — THE decisive record of the Emperator election"
+  },
+  {
+   "marker": 13,
+   "line": 203,
+   "file": "emperium-announcements-13.png",
+   "web": "/images/chronicles/emperium-announcements/emperium-announcements-13.webp",
+   "textBefore": [
+    "(form link, removed) @unknown-role Greetings all the time has come for us to recruit more Judges. If you'd like to apply please click the link, any questions ask Meekio",
+    "Google Docs",
+    "Trial Judge Application"
+   ],
+   "verified": true,
+   "depicts": "in-game screenshot: a cluster of players with name tags including Luminosity112, Saidleg, Snowythewolf, Fluffy and Pepper",
+   "alignmentVerdict": "matches — an alliance gathering"
+  }
+ ]
+}
