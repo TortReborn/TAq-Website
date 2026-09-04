@@ -69,6 +69,14 @@ const NOTE = 'Seeded from the chronicle research corpus';
 
 const { articles } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'wiki', 'seed-articles.json'), 'utf8'));
 
+// Create the wiki schema if this database has never had it. The app does this
+// lazily on first request, but a fresh production database is seeded before
+// anyone visits a page, so the seeder has to be able to bootstrap itself.
+if (!dryRun) {
+  await wikiDb.ensureWikiTables(pool);
+  console.log('wiki tables ensured');
+}
+
 let created = 0, updated = 0, failed = 0;
 const seen = new Set();
 for (const raw of articles) {
