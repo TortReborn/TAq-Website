@@ -1128,7 +1128,7 @@
       "fetchedAt": "2026-09-03T06:59:27.921Z",
       "textChars": 11565,
       "rawSha256": "34dfd09fad9acb43",
-      "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately",
+      "note": "Cited: #34, 11 Dec 2017, quoting the opening post — Titans Valor on itself as a community guild moving into warring, its stated values, the rule against attacking allied guilds, the two-week inactivity rule, and the Dec 2017 hierarchy (IceResistance leader; KnixFice and AnDr3i_FTW chiefs/advisers).",
       "tier": "primary"
     },
     "thread-206094-p03": {
@@ -1138,7 +1138,7 @@
       "fetchedAt": "2026-09-03T06:59:29.374Z",
       "textChars": 10482,
       "rawSha256": "827dff585f2115af",
-      "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately",
+      "note": "Titans Valor thread — applications and replies. Answers carry ages and guild history only; nothing citable beyond what the quoted opening posts give. Read 4 Sep 2026. Do not re-read.",
       "tier": "primary"
     },
     "thread-206094-p04": {
@@ -1148,7 +1148,7 @@
       "fetchedAt": "2026-09-03T06:59:30.814Z",
       "textChars": 8119,
       "rawSha256": "edb25e85dec70f6c",
-      "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately",
+      "note": "Cited: #73, 24 Feb 2018, quoting the opening post — the same three officers restyled Emperor and Consuls, dating the guild’s Roman titling to between Dec 2017 and Feb 2018.",
       "tier": "primary"
     },
     "thread-206094-p05": {
@@ -1158,7 +1158,7 @@
       "fetchedAt": "2026-09-03T06:59:32.271Z",
       "textChars": 12328,
       "rawSha256": "0a9317f7f2268b54",
-      "note": "Titans Valor [ANO] recruitment thread (IceResistance, opened 15 Oct 2017): guild est. 2 Jul 2017. TRUNCATED to pages 1-5 of ~100+ for budget; cited p97 archived separately",
+      "note": "Titans Valor thread — applications and replies. Answers carry ages and guild history only; nothing citable beyond what the quoted opening posts give. Read 4 Sep 2026. Do not re-read.",
       "tier": "primary"
     },
     "thread-206094-p97": {
@@ -1482,7 +1482,8 @@
       "fetchedAt": "2026-09-03T21:39:32.370Z",
       "textChars": 5911,
       "rawSha256": "de0676247fd207d6",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "Cited: post #1 (OP as last edited 16 Sep 2020) — the four founders of The Simple Ones (Goatylicious, Saethar, GrandAdmiralAce_, _Infected_gaming), the 8 Feb 2019 merger with XeraAndromeda's [Aeu] The Aetherius, the Sep 2020 imperial roster, and a \"Wynnic Union\" community alliance recorded in no other source. The OP was edited in sections: its roster is Sep 2020 but its Foreign Relations block still lists the Council of Canyon Kingdoms, which collapsed Nov 2019 — see analyses/aeu-tag-and-ilq-alliances.md before using it for alliances."
     },
     "thread-255067-p02": {
       "url": "https://forums.wynncraft.com/threads/255067/page-2",
@@ -1491,7 +1492,8 @@
       "fetchedAt": "2026-09-03T21:39:33.823Z",
       "textChars": 5863,
       "rawSha256": "64bac95a129c071f",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p03": {
       "url": "https://forums.wynncraft.com/threads/255067/page-3",
@@ -1500,7 +1502,8 @@
       "fetchedAt": "2026-09-03T21:39:35.270Z",
       "textChars": 5043,
       "rawSha256": "3b5a8968751f3149",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p04": {
       "url": "https://forums.wynncraft.com/threads/255067/page-4",
@@ -1509,7 +1512,8 @@
       "fetchedAt": "2026-09-03T21:39:36.729Z",
       "textChars": 4524,
       "rawSha256": "8770d72a7835ae6d",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p05": {
       "url": "https://forums.wynncraft.com/threads/255067/page-5",
@@ -1518,7 +1522,8 @@
       "fetchedAt": "2026-09-03T21:39:38.171Z",
       "textChars": 6526,
       "rawSha256": "19c8e16e12bb6824",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p06": {
       "url": "https://forums.wynncraft.com/threads/255067/page-6",
@@ -1527,7 +1532,8 @@
       "fetchedAt": "2026-09-03T21:39:39.626Z",
       "textChars": 3214,
       "rawSha256": "5c7cdc86fb22399a",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p07": {
       "url": "https://forums.wynncraft.com/threads/255067/page-7",
@@ -1536,7 +1542,8 @@
       "fetchedAt": "2026-09-03T21:39:41.073Z",
       "textChars": 4601,
       "rawSha256": "c5af16147ae66422",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p08": {
       "url": "https://forums.wynncraft.com/threads/255067/page-8",
@@ -1545,7 +1552,8 @@
       "fetchedAt": "2026-09-03T21:39:42.525Z",
       "textChars": 4813,
       "rawSha256": "d39d4515a1c5d5be",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p09": {
       "url": "https://forums.wynncraft.com/threads/255067/page-9",
@@ -1554,7 +1562,8 @@
       "fetchedAt": "2026-09-03T21:39:43.959Z",
       "textChars": 3058,
       "rawSha256": "6e8b2bfb21d1e24b",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p10": {
       "url": "https://forums.wynncraft.com/threads/255067/page-10",
@@ -1563,7 +1572,8 @@
       "fetchedAt": "2026-09-03T21:39:45.399Z",
       "textChars": 3792,
       "rawSha256": "1f3921ad206e17f0",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-255067-p11": {
       "url": "https://forums.wynncraft.com/threads/255067/page-11",
@@ -1572,7 +1582,8 @@
       "fetchedAt": "2026-09-03T21:39:46.831Z",
       "textChars": 982,
       "rawSha256": "33c6cd8b2ccc80a1",
-      "tier": "primary"
+      "tier": "primary",
+      "note": "The Simple Ones thread — applications and guild banter (long stretches of it Blackadder quotation). Application answers carry Discord tags, country and stated gender, which are not publishable. Read 4 Sep 2026. Do not re-read."
     },
     "thread-256130": {
       "url": "https://forums.wynncraft.com/threads/256130/",
