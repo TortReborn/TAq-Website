@@ -78,6 +78,8 @@ function norm(s) {
     // invented. Strip the tags and the stray spacing they leave behind.
     .replace(/\[\/?[A-Za-z][^\]]{0,40}\]/g, '')
     .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
+    .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
     .replace(/\s+/g, ' ')
     .toLowerCase()
     .trim();

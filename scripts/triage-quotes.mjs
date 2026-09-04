@@ -33,7 +33,9 @@ const norm = (s) =>
   s.replace(/[‘’ʼ′]/g, "'").replace(/[“”″]/g, '"').replace(/[–—−]/g, '-')
     .replace(/…/g, '...').replace(/&nbsp;|&#160;/g, ' ').replace(/&amp;/g, '&')
     .replace(/\[\/?[A-Za-z][^\]]{0,40}\]/g, '')
-    .replace(/\s+([,.;:!?])/g, '$1').replace(/\s+/g, ' ').toLowerCase().trim();
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
+    .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']').replace(/\s+/g, ' ').toLowerCase().trim();
 
 // Load every archived document once; the corpus is small enough to hold.
 const corpus = new Map();
@@ -41,7 +43,13 @@ for (const dir of [DOCS, RAW]) {
   if (!fs.existsSync(dir)) continue;
   for (const f of fs.readdirSync(dir)) {
     if (!/\.(md|json|txt)$/.test(f)) continue;
-    corpus.set(f.replace(/\.(md|json|txt)$/, ''), norm(fs.readFileSync(path.join(dir, f), 'utf8')));
+    // Strip frontmatter. Our own notes quote the documents they describe, so
+    // leaving it in reports a quotation as "found in another source" when it
+    // was only ever present in a note we wrote about that source.
+    const body = fs
+      .readFileSync(path.join(dir, f), 'utf8')
+      .replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
+    corpus.set(f.replace(/\.(md|json|txt)$/, ''), norm(body));
   }
 }
 
