@@ -71,24 +71,24 @@ export default function WikiArticleView({
       {/* Kicker row: breadcrumb + type badge */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-          <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
+          <Link href="/chronicle" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
           {' › '}
-          <Link href={`/chronicles?type=${page.pageType}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
+          <Link href={`/chronicle?type=${page.pageType}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
             {WIKI_TYPE_LABELS[page.pageType]}s
           </Link>
         </div>
         {/* MediaWiki-style tab row */}
         <div style={{ display: 'flex', gap: '0.25rem' }}>
           <span style={tabStyle(true)}>Read</span>
-          <Link href={`/chronicles/${page.slug}/history`} style={tabStyle(false)}>
+          <Link href={`/chronicle/${page.slug}/history`} style={tabStyle(false)}>
             <History size={12} /> History
           </Link>
           {isExec ? (
-            <Link href={`/chronicles/${page.slug}/edit`} style={tabStyle(false)}>
+            <Link href={`/chronicle/${page.slug}/edit`} style={tabStyle(false)}>
               <Pencil size={12} /> Edit
             </Link>
           ) : authenticated ? (
-            <Link href={`/chronicles/${page.slug}/edit`} style={tabStyle(false)}>
+            <Link href={`/chronicle/${page.slug}/edit`} style={tabStyle(false)}>
               <Pencil size={12} /> Suggest edit
             </Link>
           ) : null}
@@ -274,7 +274,7 @@ export default function WikiArticleView({
                 {backlinks.map((b, i) => (
                   <span key={b.slug}>
                     {i > 0 && ', '}
-                    <Link href={`/chronicles/${b.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>{b.title}</Link>
+                    <Link href={`/chronicle/${b.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>{b.title}</Link>
                   </span>
                 ))}
               </div>
@@ -282,7 +282,7 @@ export default function WikiArticleView({
             <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
               This page was last edited on {DATE_FMT.format(new Date(page.updatedAt))}
               {lastEditor ? <> by {lastEditor.kind === 'ai' ? 'an automated drafting pass' : lastEditor.name}{lastEditor.note ? <> — “{lastEditor.note}”</> : null}</> : null}.
-              {' '}<Link href={`/chronicles/${page.slug}/history`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>View history</Link>
+              {' '}<Link href={`/chronicle/${page.slug}/history`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>View history</Link>
             </div>
           </footer>
         </article>

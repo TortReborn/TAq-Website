@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // here rather than in the route layout: inside PageTransition it would be
   // caught by the wrapper's fade-in and the undarkened background photo would
   // show through for the length of the animation on every navigation.
-  const isReadingSurface = pathname.startsWith('/chronicles');
+  const isReadingSurface = pathname.startsWith('/chronicle');
   const [darkMode, setDarkMode] = useState(true);
   // Starts true so the splash is in the server-rendered HTML — a document
   // load is (almost) always a splash case, and this way it covers the
@@ -477,7 +477,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               }}
             >Map</Link>
             <NavLink
-              href="/chronicles"
+              href="/chronicle"
               style={{
                 color: 'var(--text-primary)',
                 fontWeight: 'bold',
@@ -981,7 +981,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 }}
               >Map</Link>
               <NavLink
-                href="/chronicles"
+                href="/chronicle"
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
                   color: 'var(--text-primary)',

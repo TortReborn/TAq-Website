@@ -35,7 +35,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
           <WikiSearchBox />
         </div>
         <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/chronicles/timeline" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
+          <Link href="/chronicle/timeline" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
             Master timeline →
           </Link>
           <Link href="/map/history/chronicle" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>
@@ -48,7 +48,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
       {/* Category tabs */}
       <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
         <Link
-          href="/chronicles"
+          href="/chronicle"
           style={{
             padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none',
             background: !activeType ? 'var(--accent-primary)' : 'var(--bg-card)',
@@ -61,7 +61,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
         {WIKI_PAGE_TYPES.map(t => (
           <Link
             key={t}
-            href={`/chronicles?type=${t}`}
+            href={`/chronicle?type=${t}`}
             style={{
               padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none',
               background: activeType === t ? 'var(--accent-primary)' : 'var(--bg-card)',
@@ -84,7 +84,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.6rem' }}>
               {pages.map(p => (
-                <Link key={p.slug} href={`/chronicles/${p.slug}`} style={{
+                <Link key={p.slug} href={`/chronicle/${p.slug}`} style={{
                   display: 'block', padding: '0.6rem 0.75rem', borderRadius: '0.5rem',
                   background: 'var(--bg-card)', border: '1px solid var(--border-color)', textDecoration: 'none',
                 }}>
@@ -116,7 +116,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
           {recent.length === 0 && <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Nothing yet.</div>}
           {recent.map((r, i) => (
             <div key={i} style={{ fontSize: '0.76rem', marginBottom: '0.45rem', lineHeight: 1.4 }}>
-              <Link href={`/chronicles/${r.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>{r.title}</Link>
+              <Link href={`/chronicle/${r.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>{r.title}</Link>
               <span style={{ color: 'var(--text-secondary)' }}> · r{r.revNumber} by {r.authorName} · {DT_FMT.format(new Date(r.updatedAt))}</span>
               {r.note && <div style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>“{r.note}”</div>}
             </div>

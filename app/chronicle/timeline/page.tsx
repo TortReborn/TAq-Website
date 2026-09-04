@@ -93,7 +93,7 @@ export default async function ChroniclesTimeline() {
   return (
     <div style={{ maxWidth: '820px', margin: '0 auto', padding: '2rem 1rem 3rem' }}>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
+        <Link href="/chronicle" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
         {' › Timeline'}
       </div>
       <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', borderBottom: '2px solid var(--border-color)', paddingBottom: '0.4rem' }}>
@@ -133,7 +133,7 @@ export default async function ChroniclesTimeline() {
                     {e.dateLabel}
                   </Link>
                   {e.wikiSlug ? (
-                    <Link href={`/chronicles/${e.wikiSlug}`} style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
+                    <Link href={`/chronicle/${e.wikiSlug}`} style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
                       {e.title}
                     </Link>
                   ) : (

@@ -89,7 +89,7 @@ function AllianceCard({ data }: { data: AllianceEmbedData }) {
           <span aria-hidden style={{ width: 12, height: 12, borderRadius: 3, background: data.color, flexShrink: 0 }} />
           <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
             {data.wikiSlug
-              ? <Link href={`/chronicles/${data.wikiSlug}`} style={{ color: 'var(--text-primary)', textDecoration: 'none' }}>{data.name}</Link>
+              ? <Link href={`/chronicle/${data.wikiSlug}`} style={{ color: 'var(--text-primary)', textDecoration: 'none' }}>{data.name}</Link>
               : data.name}
           </span>
           <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)' }}>[{data.tag}]</span>
@@ -136,7 +136,7 @@ function AllianceCard({ data }: { data: AllianceEmbedData }) {
           View on the map
         </Link>
         {data.wikiSlug && (
-          <Link href={`/chronicles/${data.wikiSlug}`} style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
+          <Link href={`/chronicle/${data.wikiSlug}`} style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
             <ExternalLink size={11} style={{ verticalAlign: '-1px', marginRight: '0.25rem' }} />
             Read article
           </Link>

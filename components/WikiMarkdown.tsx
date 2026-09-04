@@ -15,7 +15,7 @@ import WikiEmbed from "./WikiEmbeds";
  *
  * GitHub-flavored markdown, sanitized (no raw HTML — bodies are ultimately
  * community input), plus the wiki dialect:
- *   [[Page Title]] / [[page-slug|shown label]]  →  internal /chronicles links.
+ *   [[Page Title]] / [[page-slug|shown label]]  →  internal /chronicle links.
  * Links whose target doesn't exist render "red" (dashed underline) when the
  * caller provides `existingSlugs` — Wikipedia's create-me affordance.
  */
@@ -52,7 +52,7 @@ function splitWikiLinks(node: MdNode): MdNode[] | null {
     const slug = slugify(target);
     out.push({
       type: "link",
-      url: `/chronicles/${slug}`,
+      url: `/chronicle/${slug}`,
       data: { hProperties: { "data-wiki-slug": slug } },
       children: [{ type: "text", value: label }],
     });

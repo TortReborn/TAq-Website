@@ -1,6 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // The feature is called the Chronicle, and its route used to be
+  // /chronicles. Every article cross-link, the map, the timeline and anyone's
+  // bookmarks point at the old path, so it redirects permanently rather than
+  // 404ing. Note this must NOT catch /images/chronicles/... — those are asset
+  // files under public/ and never moved.
+  async redirects() {
+    return [
+      { source: '/chronicles', destination: '/chronicle', permanent: true },
+      { source: '/chronicles/:path*', destination: '/chronicle/:path*', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

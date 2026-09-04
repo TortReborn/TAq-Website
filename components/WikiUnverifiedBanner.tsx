@@ -84,9 +84,9 @@ export default function WikiUnverifiedBanner({
         <p className="wiki-unverified__text">
           It was drafted from archived sources by an automated pass, and may be incomplete or
           wrong — particularly on treaties, dates and who was involved.{' '}
-          <Link href={`/chronicles/${slug}/edit`} className="wiki-unverified__link">Correct it</Link>
+          <Link href={`/chronicle/${slug}/edit`} className="wiki-unverified__link">Correct it</Link>
           {' '}if you were there, or{' '}
-          <Link href="/chronicles/admin" className="wiki-unverified__link">see everything awaiting review</Link>.
+          <Link href="/chronicle/admin" className="wiki-unverified__link">see everything awaiting review</Link>.
         </p>
 
         {!loading && canReview && (

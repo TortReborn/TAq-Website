@@ -218,7 +218,7 @@ export default function ExecChroniclePage() {
       <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
         Community-suggested wiki pages and edits. Approving publishes immediately, credited to the
         suggester with you recorded as reviewer. Exec edits are made directly on the{' '}
-        <a href="/chronicles" style={{ color: 'var(--accent-primary)' }}>Chronicle pages</a> themselves.
+        <a href="/chronicle" style={{ color: 'var(--accent-primary)' }}>Chronicle pages</a> themselves.
       </p>
       <div style={{ marginBottom: '2rem' }}>
         <WikiReviewQueue />

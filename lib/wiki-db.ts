@@ -1,6 +1,6 @@
 /**
  * Chronicle Wiki — server-side data access. Client-safe types/validation in
- * lib/wiki.ts; design in docs/chronicles-wiki-plan.md.
+ * lib/wiki.ts; design in docs/chronicle-wiki-plan.md.
  *
  * Conventions follow lib/chronicle-db.ts: lazy table creation, every content
  * change stored as a full revision (the revision log doubles as the audit

@@ -75,9 +75,9 @@ export default async function ReferencePage({ params }: { params: Promise<{ id: 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-        <Link href="/chronicles" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
+        <Link href="/chronicle" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Chronicle</Link>
         {' › '}
-        <Link href="/chronicles/references" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>References</Link>
+        <Link href="/chronicle/references" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>References</Link>
       </div>
 
       <h1 style={{

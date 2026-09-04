@@ -106,7 +106,7 @@ export default function ChroniclesAdmin() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.3rem' }}>
             {unverified.map((p) => (
               <li key={p.slug} style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', fontSize: '0.85rem' }}>
-                <Link href={`/chronicles/${p.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
+                <Link href={`/chronicle/${p.slug}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
                   {p.title}
                 </Link>
                 <span style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>

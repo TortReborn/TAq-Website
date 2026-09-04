@@ -65,7 +65,7 @@ export function resolveWikiCitations(body: string): WikiCitationMap {
         waybackCapture: archived.waybackCapture,
         archived: true,
         tier: archived.tier,
-        referencePath: `/chronicles/references/${ref.ref}`,
+        referencePath: `/chronicle/references/${ref.ref}`,
         waybackUrl: archived.waybackCapture && /^https?:///.test(archived.url)
           ? `https://web.archive.org/web/${archived.waybackCapture}/${archived.url}`
           : undefined,
