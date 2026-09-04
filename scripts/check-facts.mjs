@@ -184,8 +184,16 @@ function splitSentences(para) {
   let start = 0;
   let open = false; // inside a straight-quoted passage
   let curly = 0; // depth of curly-quoted passages
+  let cite = false; // inside {{cite:…}}
   for (let i = 0; i < para.length; i++) {
     const ch = para[i];
+    // A locator is prose and can carry a full stop: "…reproducing the form.
+    // Applicants sometimes copied a superseded version…". Splitting there left
+    // half a citation stranded in the next segment, where the thread id in it
+    // read as a numeric claim about a document that is that very thread.
+    if (ch === '{' && para[i + 1] === '{') cite = true;
+    else if (ch === '}' && para[i - 1] === '}') cite = false;
+    if (cite) continue;
     if (ch === '"') open = !open;
     else if (ch === '“') curly++;
     else if (ch === '”') curly = Math.max(0, curly - 1);
@@ -309,20 +317,35 @@ for (const a of articles) {
     // ---- figures ---------------------------------------------------------
     if (ONLY.includes('figures') && pool) {
       // Only distinctive numbers: small counts appear everywhere by chance.
-      const textCites = [...new Set(cites.map((c) => c.id))].filter((id) => !isDerived(id));
+      const allIds = [...new Set(cites.map((c) => c.id))];
+      const textCites = allIds.filter((id) => !isDerived(id));
+      // A derived source is a database, and what is archived for it is a
+      // description of the data rather than the data. A figure computed from
+      // one will never appear in any text however sound it is, so where a
+      // segment cites one at all, a text search cannot settle the question and
+      // must not pretend to — the same honesty the screenshot case gets.
+      const fromDataset = allIds.some(isDerived);
       // Nothing to check a figure against if every source here is derived.
       for (const nm of (textCites.length ? prose.matchAll(/\b(\d[\d,]{2,})\b/g) : [])) {
         const raw = nm[1];
         const plain = raw.replace(/,/g, '');
         if (/^(19|20)\d\d$/.test(plain)) continue; // years handled by the date checker
+        // A forum thread's id is an address, not a quantity. Naming one in
+        // prose ("Wynncraft forums thread 188024") was being read as a claim
+        // about a number and reported against a document that is that thread.
+        if (allIds.includes(`thread-${plain}`)) continue;
+        if (/\bthreads?\s+$/i.test(prose.slice(Math.max(0, nm.index - 12), nm.index))) continue;
         const withCommas = Number(plain).toLocaleString('en-US');
         if (!pool.includes(plain) && !pool.includes(raw.toLowerCase()) && !pool.includes(withCommas)) {
           add({
-            kind: 'figure-not-in-source',
-            severity: 'medium',
+            kind: fromDataset ? 'figure-only-verifiable-in-dataset' : 'figure-not-in-source',
+            severity: fromDataset ? 'low' : 'medium',
             slug: a.slug,
             detail: `${raw} — "${prose.slice(Math.max(0, nm.index - 45), nm.index + 55).trim()}"`,
-            cited: [...new Set(cites.map((c) => c.id))].join(', '),
+            cited: allIds.join(', '),
+            note: fromDataset
+              ? 'figure is computed from a cited dataset; run the query to settle it'
+              : undefined,
           });
         }
       }
@@ -335,7 +358,15 @@ for (const a of articles) {
     // The citation resolves, the locator looks specific, and there is nothing
     // behind it — a failure no other detector here can see.
     if (ONLY.includes('thin')) {
+      // A thin source standing beside a substantial one is a pointer, not the
+      // evidence: a forum post announcing a video, cited next to the video, or
+      // a video cited next to the newsletter carrying the quotation. What this
+      // detector exists to catch is a thin source cited *alone* — Drew1011's
+      // 387-byte forum profile carrying a dated chain of alliance titles by
+      // itself.
+      const hasSubstantialSibling = cites.some((c) => (sourceText(c.id)?.length ?? 0) >= 400);
       for (const c of cites) {
+        if (hasSubstantialSibling) continue;
         const text = sourceText(c.id);
         if (text === null) continue;
         if (text.length >= 400) continue;
