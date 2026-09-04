@@ -114,8 +114,11 @@ export default function WikiArticleView({
         </div>
       )}
 
-      {/* Body grid: sticky TOC rail (wide screens) + article column */}
-      <div className="wiki-grid">
+      {/* Body grid: sticky TOC rail (wide screens) + article column.
+          The rail only exists when there are enough headings, so the two-column
+          template is conditional — otherwise the article itself lands in the
+          narrow rail column and the wide one sits empty. */}
+      <div className={showToc ? 'wiki-grid wiki-grid--toc' : 'wiki-grid'}>
         {showToc && (
           <nav className="wiki-toc" aria-label="Contents">
             <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
@@ -307,7 +310,7 @@ export default function WikiArticleView({
           margin: 0.9rem 0;
         }
         @media (min-width: 900px) {
-          .wiki-grid { grid-template-columns: 200px minmax(0, 1fr); }
+          .wiki-grid--toc { grid-template-columns: 200px minmax(0, 1fr); }
           .wiki-toc {
             display: block;
             position: sticky;
