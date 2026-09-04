@@ -52,10 +52,32 @@ GOOD  body:    "## History
                 dissolved on the same day …"
 ```
 
+Word-for-word repetition is the rare case. The common one is a body that opens
+by defining the subject again in *fresh* words — no shared phrasing, and still
+two ledes stacked on the page:
+
+```
+BAD   summary: "Niflheim was a community alliance of 2020-2021 whose four
+                members … simultaneously belonged to the era's war blocs. It
+                officially dissolved on 18 December 2021 …"
+      body:    "Niflheim's four members were simultaneously war-alliance
+                guilds, and it dissolved on 18 December 2021 …"
+      (Not one shared phrase. Says nothing the summary has not.)
+```
+
 Elaboration is not repetition. A body paragraph that restates a summary fact
 **and adds a citation, an exact date or a figure the summary lacks** is doing
 real work — the summary says "created in September 2023", the body says
 "created on 28 September 2023{{cite:…}}". Keep those.
+
+That is the test `check-article-style.mjs` applies, to the opening paragraph and
+again to its first sentence: does this span cite a source found nowhere else in
+the body, or state a date, figure or quotation the summary lacks? A span that
+does neither exists only to restate, and is reported as a second lede. When the
+warning is right, the fix is rarely deletion alone — move the sentence's
+citation and its `[[links]]` to the section where the fact belongs, and check
+that the next paragraph still names its own subject rather than opening on a
+pronoun.
 
 One consequence to plan around: the summary renders as plain text, so
 `[[links]]` in it do not resolve. Every subject worth linking must therefore be

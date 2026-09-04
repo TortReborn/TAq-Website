@@ -209,6 +209,66 @@ for (const a of scanned) {
       if (/^(Its|Their|His|Her|It|They|He|She|This|These|Those|That)\b/.test(opener.trim()))
         findings.push(['ERROR', `body opens on a pronoun with no antecedent ("${opener.trim().split(/\s+/)[0]}") — name the subject`]);
     }
+
+    // The second lede. The check above only catches word-for-word repetition,
+    // which is the rare case; the common one is a body that opens by defining
+    // the subject again in fresh words, so the reader meets two ledes stacked.
+    // Rewriting cannot be detected by string overlap, so test what the
+    // paragraph is FOR: a real opening paragraph carries a citation the rest of
+    // the body does not, or a date, figure or quotation the summary lacks.
+    // One that carries neither exists only to restate the summary.
+    const first = blocks.find((b) => b.trim());
+    if (first && !/^#/.test(first.trim()) && !/^(\{\{|!\[|[-*]\s|[|>])/.test(first.trim())) {
+      const t = (a.title ?? '').trim();
+      const esc = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const head = first.trim().slice(0, Math.max(t.length + 60, 100));
+      const redefines = new RegExp(`^\\*{0,2}${esc}\\b`, 'i').test(first.trim().replace(/^\*\*/, '**')) &&
+        /\b(was|is|were|are)\b/.test(head);
+      if (redefines) {
+        const rest = blocks.slice(blocks.indexOf(first) + 1).join('\n\n');
+        const cited = new Set([...rest.matchAll(/\{\{cite:([^|}]+)/g)].map((m) => m[1]));
+        // Dates, counts and quoted wording are what an elaborating span adds.
+        // Single quotes are bounded as in proseOf, so possessives ("HackForums'
+        // dominance") cannot pair up into a spurious quotation.
+        const marks = (s) => {
+          const txt = readableText(s);
+          const out = new Set([...txt.matchAll(/\b\d[\d,.]*\b/g)].map((m) => m[0].replace(/[.,]$/, '')));
+          const quotes = [
+            /"([^"\n]{4,1500})"/g,
+            /[“]([^”\n]{4,1500})[”]/g,
+            /(?:^|[\s(—–-])'([^'\n]{4,1500})'(?=$|[\s.,;:!?)\]—–-])/g,
+            /(?:^|[\s(—–-])[‘]([^’\n]{4,1500})[’](?=$|[\s.,;:!?)\]—–-])/g,
+          ];
+          for (const re of quotes) for (const m of txt.matchAll(re)) out.add('q:' + m[1].slice(0, 30));
+          return out;
+        };
+        const inSummary = marks(a.summary ?? '');
+        // Does this span do work the summary does not? A span that cites a
+        // source found nowhere else, or states a date, figure or quotation the
+        // summary lacks, is elaborating. One that does neither only restates.
+        const restatesOnly = (span) =>
+          ![...new Set([...span.matchAll(/\{\{cite:([^|}]+)/g)].map((m) => m[1]))].some((c) => !cited.has(c)) &&
+          ![...marks(span)].some((m) => !inSummary.has(m));
+
+        // Split off the first sentence without letting a citation's own full
+        // stops ("vol. 14, ...") break it: mask citations to equal-length runs,
+        // find the boundary there, then cut the original at that index.
+        const masked = first.replace(/\{\{[^}]*\}\}/g, (m) => ' '.repeat(m.length));
+        const at = masked.search(/[.!?]["'”’)]?\s/);
+        let sentence1 = at === -1 ? first : first.slice(0, at + 1);
+        // A full stop inside a quotation is not a sentence end. If the cut left
+        // an unclosed quote, the sentence is still carrying quoted evidence, so
+        // judge the paragraph as a whole rather than a fragment of it.
+        if ((sentence1.match(/"/g) ?? []).length % 2 === 1) sentence1 = first;
+
+        if (restatesOnly(first))
+          findings.push(['WARN', 'body opens by defining the subject again, adding no citation or fact the ' +
+            'summary lacks — the summary is the lede; open at the first section']);
+        else if (restatesOnly(sentence1))
+          findings.push(['WARN', 'the body\'s first sentence redefines the subject, adding no citation or fact ' +
+            'the summary lacks — cut it and let the paragraph open on its own work']);
+      }
+    }
   }
   if ((a.title ?? '').length > 120) findings.push(['ERROR', `title is ${a.title.length} chars (max 120)`]);
   if ((a.infobox ?? []).length > 24) findings.push(['ERROR', `infobox has ${a.infobox.length} rows (max 24)`]);
