@@ -19,6 +19,13 @@
    "note": "Wynncraft official API v3 guild record for Avicia, captured Sep 2026 — authoritative live roster: owner, chiefs, creation date, level, total wars, territory count",
    "tier": "primary"
   },
+  "api-wynncraft-com-v3-guild-avoquarium": {
+   "url": "https://api.wynncraft.com/v3/guild/Avoquarium",
+   "kind": "api",
+   "fetchedAt": "2026-09-04T10:24:30.297Z",
+   "textChars": 15199,
+   "rawSha256": "7beb9b3cbe3ac440"
+  },
   "api-wynncraft-com-v3-guild-blacklisted": {
    "url": "https://api.wynncraft.com/v3/guild/Blacklisted",
    "kind": "api",
@@ -1102,6 +1109,14 @@
    "rawSha256": "a00ac084c48bb744",
    "note": "'Petition To Get Into Hax' (Jmberger307, Jun 30 2016): Mrussell75 Jul 1 2016 — 'there is 2 anti hax alliances' (only contemporaneous evidence of mid-2016 anti-Hax blocs)",
    "tier": "primary"
+  },
+  "thread-135149": {
+   "url": "https://forums.wynncraft.com/threads/135149/",
+   "kind": "forum-thread",
+   "title": "Alliance - ⌠ Valkyrie Alliance ⌡ - Repost | Wynncraft Forums",
+   "fetchedAt": "2026-09-04T10:24:29.818Z",
+   "textChars": 3565,
+   "rawSha256": "810faf3f834a0734"
   },
   "thread-135191": {
    "url": "https://forums.wynncraft.com/threads/135191/",
@@ -2545,6 +2560,14 @@
    "note": "'Goose Alliance - Edn, Gsw, Cxz, Shy, Tni, And Avo' (Drasalia, Apr 6 2021): the Goose fanart roster part 2 — the only visual artifact of an alliance roster in the era",
    "tier": "primary"
   },
+  "thread-292974": {
+   "url": "https://forums.wynncraft.com/threads/292974/",
+   "kind": "forum-thread",
+   "title": "Patch - 1.20.3 Full Changelog | Wynncraft Forums",
+   "fetchedAt": "2026-09-04T10:24:28.529Z",
+   "textChars": 18370,
+   "rawSha256": "0e9283c3e78c1348"
+  },
   "thread-295680": {
    "url": "https://forums.wynncraft.com/threads/295680/",
    "kind": "forum-thread",
@@ -2603,6 +2626,15 @@
    "rawSha256": "3a80622694ce2d70",
    "note": "cited in research dossiers (backfill sweep)",
    "tier": "primary"
+  },
+  "thread-306790": {
+   "url": "https://forums.wynncraft.com/threads/306790/",
+   "kind": "forum-thread",
+   "title": "Guild - Selling Guild Crown 2 - Electric Boogaloo - Season 10 | Wynncraft Forums",
+   "fetchedAt": "2026-09-04T10:22:49.195Z",
+   "textChars": 6393,
+   "rawSha256": "f6c77fc7a5118d26",
+   "note": "Forum thread of 17 Feb 2023 calling smtn elf the greatest super-alliance of 2023."
   },
   "thread-308780": {
    "url": "https://forums.wynncraft.com/threads/308780/",
@@ -3000,6 +3032,14 @@
    "note": "Wynncraft wiki Guild War page — documents the in-game Diplomacy system (ally tax rates, alliance/enemy status) that replaced private-Discord diplomacy; the mechanical backbone of the 2023-2026 era",
    "tier": "secondary"
   },
+  "wynncraft-wiki-gg-wiki-guilds": {
+   "url": "https://wynncraft.wiki.gg/wiki/Guilds",
+   "kind": "wiki",
+   "title": "Guilds - Official Wynncraft Wiki",
+   "fetchedAt": "2026-09-04T10:24:27.685Z",
+   "textChars": 14045,
+   "rawSha256": "823734081593d57d"
+  },
   "wynncraft-wiki-gg-wiki-version-1-18": {
    "url": "https://wynncraft.wiki.gg/wiki/Version_1.18",
    "kind": "wiki",
@@ -3019,6 +3059,22 @@
    "rawSha256": "baa1daceb634bea1",
    "note": "Official wiki page for Version 1.20 Gavel Reborn (20 Jan 2021) — canonical feature list for the guild/territory rework (guild bank, 4-letter tags, tower upgrades, territory bonuses)",
    "tier": "secondary"
+  },
+  "wynncraft-wiki-gg-wiki-version-2-2-1": {
+   "url": "https://wynncraft.wiki.gg/wiki/Version_2.2.1",
+   "kind": "wiki",
+   "title": "Version 2.2.1 - Official Wynncraft Wiki",
+   "fetchedAt": "2026-09-04T10:24:28.038Z",
+   "textChars": 10947,
+   "rawSha256": "3ec0d0523b933dca"
+  },
+  "wynncraft-wiki-gg-wiki-version-2-2-2": {
+   "url": "https://wynncraft.wiki.gg/wiki/Version_2.2.2",
+   "kind": "wiki",
+   "title": "Version 2.2.2 - Official Wynncraft Wiki",
+   "fetchedAt": "2026-09-04T10:24:29.026Z",
+   "textChars": 5059,
+   "rawSha256": "d27b4c9e016c64b8"
   },
   "x-com-wynncraft-status-1084983171920351232-wb20251203": {
    "url": "https://x.com/wynncraft/status/1084983171920351232",
