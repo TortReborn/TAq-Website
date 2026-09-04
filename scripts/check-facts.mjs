@@ -24,6 +24,7 @@
  *   locators  A citation pointing at "post #94" of a document with no post #94.
  *   figures   A number in a claim that appears nowhere in the cited source.
  *   roster    A membership claim contradicting the chronicle database.
+ *   thin      A citation resolving to a document too small to support it.
  *   dates     Handled by check-source-dates.mjs, which needs a source parsed
  *             into dated entries and so cannot be generic.
  *
@@ -43,7 +44,7 @@ const flag = (n, d = null) => {
 };
 const ONLY_SLUG = flag('slug');
 const JSON_OUT = flag('json');
-const ONLY = (flag('only') ?? 'quotes,locators,figures,roster').split(',').map((s) => s.trim());
+const ONLY = (flag('only') ?? 'quotes,locators,figures,roster,thin').split(',').map((s) => s.trim());
 
 // ---------------------------------------------------------------------------
 // corpus
@@ -51,6 +52,16 @@ const ONLY = (flag('only') ?? 'quotes,locators,figures,roster').split(',').map((
 
 const { articles } = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/wiki/seed-articles.json'), 'utf8'));
 const DOCS = path.join(ROOT, 'data/wiki/sources/docs');
+const { sources: SOURCE_INDEX } = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'data/wiki/sources/index.json'), 'utf8'),
+);
+
+/**
+ * A derived source is our own computation over map data, not a document. Its
+ * numbers were produced by us and will never appear as text inside it, so
+ * checking a figure against one only manufactures noise.
+ */
+const isDerived = (id) => SOURCE_INDEX[id]?.tier === 'derived' || /^(territory-exchanges|chronicle-records|wynncraft-api|pre2018-territory-snapshots)$/.test(id);
 
 /** Normalise so a quotation and its source differ only where it matters. */
 function norm(s) {
@@ -61,6 +72,12 @@ function norm(s) {
     .replace(/…/g, '...')
     .replace(/&nbsp;|&#160;/g, ' ')
     .replace(/&amp;/g, '&')
+    // XenForo mention markup survives extraction as debris — "@NeonRider[/USER,
+    // @Naraka00 , and I". An article quoting that sentence tidies it up, quite
+    // correctly, so leaving the debris in makes a faithful quotation look
+    // invented. Strip the tags and the stray spacing they leave behind.
+    .replace(/\[\/?[A-Za-z][^\]]{0,40}\]/g, '')
+    .replace(/\s+([,.;:!?])/g, '$1')
     .replace(/\s+/g, ' ')
     .toLowerCase()
     .trim();
@@ -93,8 +110,12 @@ function sourceText(id) {
   let text = null;
   if (fs.existsSync(p)) {
     const raw = fs.readFileSync(p, 'utf8');
-    // drop the frontmatter block so its note text cannot satisfy a quotation
-    text = norm(raw.replace(/^---\n[\s\S]*?\n---\n/, ''));
+    // Drop the frontmatter so its note cannot satisfy a quotation. Our notes
+    // often quote the document they describe, so leaving the block in lets a
+    // claim be "verified" against our own summary of the source rather than the
+    // source. The line endings here are CRLF, and an LF-only pattern silently
+    // matched nothing at all — leaving every frontmatter block in place.
+    text = norm(raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ''));
   }
   docCache.set(id, text);
   return text;
@@ -119,24 +140,67 @@ const add = (f) => findings.push(f);
 const CITE_G = /\{\{cite:([a-z0-9._-]+)(?:\|([^}]*))?\}\}/gi;
 // A run of prose ending in citations. Splitting on sentence boundaries alone
 // separates a claim from the citation that follows it.
+/**
+ * Split a paragraph into claim-sized pieces, never inside a quotation.
+ *
+ * A naive sentence split breaks on the full stop in "Such a sad time. Arenos
+ * leaves…", stranding one quotation mark in each half. Every straight-quoted
+ * passage after that point then pairs up wrongly, and the checker reports the
+ * prose *between* two real quotations as an unsourced quote.
+ */
+function splitSentences(para) {
+  const out = [];
+  let start = 0;
+  let open = false; // inside a straight-quoted passage
+  let curly = 0; // depth of curly-quoted passages
+  for (let i = 0; i < para.length; i++) {
+    const ch = para[i];
+    if (ch === '"') open = !open;
+    else if (ch === '“') curly++;
+    else if (ch === '”') curly = Math.max(0, curly - 1);
+    if (open || curly > 0) continue;
+
+    const boundary =
+      (/[.!?]/.test(ch) || (ch === '}' && para[i - 1] === '}')) &&
+      /\s/.test(para[i + 1] ?? '') &&
+      /[A-Z"“[]/.test((para.slice(i + 1).match(/\S/) ?? [''])[0]);
+    if (boundary) {
+      out.push(para.slice(start, i + 1));
+      start = i + 1;
+    }
+  }
+  out.push(para.slice(start));
+  return out;
+}
+
 function segments(text) {
   return text
     .split(/\n{2,}/)
-    .flatMap((para) => para.split(/(?<=\}\})\s+(?=[A-Z"“[])|(?<=[.!?])\s+(?=[A-Z"“[])/))
+    .flatMap(splitSentences)
     .filter((s) => s.trim());
 }
 
 let checked = 0;
 for (const a of articles) {
   if (ONLY_SLUG && a.slug !== ONLY_SLUG) continue;
-  const body = `${a.summary}\n\n${a.body}`;
+  // Strip images before segmenting rather than after. A caption is not a claim,
+  // and a quotation mark inside one shifts the parity of every straight-quoted
+  // passage that follows — which made the checker report the prose *between*
+  // two genuine quotations as an unsourced quote. Segmenting first cuts a
+  // caption in half, so the stray mark survives however carefully the segment
+  // is cleaned afterwards.
+  const body = `${a.summary}\n\n${a.body}`.replace(/!\[[\s\S]*?\]\([^)]*\)/g, ' ');
 
   for (const seg of segments(body)) {
     const cites = [...seg.matchAll(CITE_G)].map((m) => ({ id: m[1], locator: m[2] ?? '' }));
     if (!cites.length) continue;
     checked++;
 
-    const prose = seg.replace(CITE_G, ' ').replace(/\s+/g, ' ').trim();
+    const prose = seg
+      .replace(/!\[[\s\S]*?\]\([^)]*\)/g, ' ')
+      .replace(CITE_G, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
     // pooled text of every source this segment cites, plus sibling pages
     const ids = [...new Set(cites.flatMap((c) => relatedIds(c.id)))];
@@ -187,7 +251,9 @@ for (const a of articles) {
     // ---- figures ---------------------------------------------------------
     if (ONLY.includes('figures') && pool) {
       // Only distinctive numbers: small counts appear everywhere by chance.
-      for (const nm of prose.matchAll(/\b(\d[\d,]{2,})\b/g)) {
+      const textCites = [...new Set(cites.map((c) => c.id))].filter((id) => !isDerived(id));
+      // Nothing to check a figure against if every source here is derived.
+      for (const nm of (textCites.length ? prose.matchAll(/\b(\d[\d,]{2,})\b/g) : [])) {
         const raw = nm[1];
         const plain = raw.replace(/,/g, '');
         if (/^(19|20)\d\d$/.test(plain)) continue; // years handled by the date checker
@@ -201,6 +267,30 @@ for (const a of articles) {
             cited: [...new Set(cites.map((c) => c.id))].join(', '),
           });
         }
+      }
+    }
+
+    // ---- thin sources ----------------------------------------------------
+    // A citation can point at a document that exists and still support nothing.
+    // Drew1011's forum profile is archived as 387 bytes reading "Foxton
+    // Forever", yet is cited three times for a dated chain of alliance titles.
+    // The citation resolves, the locator looks specific, and there is nothing
+    // behind it — a failure no other detector here can see.
+    if (ONLY.includes('thin')) {
+      for (const c of cites) {
+        const text = sourceText(c.id);
+        if (text === null) continue;
+        if (text.length >= 400) continue;
+        // Only complain when the claim is more substantial than its evidence.
+        if (prose.length < text.length) continue;
+        add({
+          kind: 'source-thinner-than-claim',
+          severity: 'high',
+          slug: a.slug,
+          detail: `${c.id} holds ${text.length} chars: "${text.slice(0, 60)}"`,
+          cited: c.id,
+          note: `locator promises "${(c.locator || '(none)').slice(0, 70)}"`,
+        });
       }
     }
 
