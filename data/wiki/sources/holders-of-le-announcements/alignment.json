@@ -1,0 +1,60 @@
+{
+ "$comment": "VERIFIED image records for the Holders of LE announcements channel. Every image was opened and described. ORDINAL ALIGNMENT FAILED HERE: the export holds ten \"Image\" markers but only five attachments, because Discord writes a marker for every link preview as well. Markers at lines 87, 105 and 107 are embed thumbnails (a Google Forms preview and the Siegfried Says forum embed) with no attachment behind them. The mapping below was made by opening each image and matching it to the message it belongs to, not by counting.",
+ "images": [
+  {
+   "marker": 1,
+   "line": 59,
+   "author": "PikaLegend",
+   "postedAt": "3/15/2018 2:49 AM",
+   "file": "holders-of-le-announcements-01.png",
+   "web": "/images/chronicles/holders-of-le-announcements/holders-of-le-announcements-01.webp",
+   "verified": true,
+   "depicts": "Wynncraft website territory map, isometric render, zoomed to Cinfras County / Aldorei / Light Forest, every territory labelled with its holder. Holders of LE holds a contiguous teal block across Cinfras County (Upper, Mid-Upper, Mid-Lower, Lower, Guild Hall, Cinfras, Cinfras Entrance, Cinfras' Small Farm, Light Forest North Exit, Light Forest South Exit) and Aldorei (North Exit, River, Waterfall, Lowlands, Valley Upper, Valley Mid, Valley Lower, Valley South Entrance). A 'Territory Counts (382/382)' panel reads: Imperial 50, Kingdom Foxes 47, Paladins United 44, [one name obscured] 38, BuildCraftia 36, Fantasy 25, The Hive 22, Holders of LE 21, Titans Valor 16, KingdomPhoenixes 15, Angels Of Eternal 13, IceBlue Team 13, The Divine Swords 12, LE Flowers 9, As Darkness Falls 8, UltimateXeons 5, TheEnchanted 2, DogsAmongUs 2, Hall of Fame 2, Roma 1, [one name obscured] 1.",
+   "alignmentVerdict": "matches — posted under PikaLegend's 3/15 message, and the teal block is the Cinfras/Aldorei allocation the 3/10 announcement had just described"
+  },
+  {
+   "marker": 5,
+   "line": 150,
+   "author": "PikaLegend",
+   "postedAt": "3/24/2018 3:26 PM",
+   "file": "holders-of-le-announcements-02.png",
+   "web": "/images/chronicles/holders-of-le-announcements/holders-of-le-announcements-02.webp",
+   "verified": true,
+   "depicts": "Wynncraft website territory map, whole-province view, every territory tinted by holder with coloured blob markers. Ocean occupies the centre; the map is the alliance-wide distribution rather than one guild's holding.",
+   "alignmentVerdict": "matches — the message ends 'Here is a visual of the distribution map for all that is curious. Our territories is shown as the color Teal (Light Blue).' NOT the second marker in the file, which is a Google Forms preview."
+  },
+  {
+   "marker": 6,
+   "line": 170,
+   "author": "PikaLegend",
+   "postedAt": "4/2/2018 4:48 PM",
+   "file": "holders-of-le-announcements-03.jpg",
+   "web": "/images/chronicles/holders-of-le-announcements/holders-of-le-announcements-03.webp",
+   "verified": true,
+   "depicts": "Event poster headed 'IMPERIAL ALLIANCE EVENT', over a faint watermark of a jousting knight and the word ALLIANCE. DATE: Sunday 8th of April, 2018, 2pm EST. LOCATION: Gavel province, Llevigar, Llevigar bank. JOIN US FOR: Award Ceremony, Pvp Duelling Tournament. Below, two numbered instructions to confirm attendance through a Google Form and to read the tournament rules on a linked thread.",
+   "alignmentVerdict": "matches — posted inside PikaLegend's 4/2 announcement of Imperial's jousting event"
+  },
+  {
+   "marker": 9,
+   "line": 244,
+   "author": "PikaLegend",
+   "postedAt": "4/9/2018 6:37 PM",
+   "file": "holders-of-le-announcements-04.png",
+   "web": "/images/chronicles/holders-of-le-announcements/holders-of-le-announcements-04.webp",
+   "verified": true,
+   "depicts": "Wynncraft website territory map, whole-province view, territories tinted by holder with coloured blob markers and no labels. A wide teal holding runs across the lower right of the landmass.",
+   "alignmentVerdict": "matches — the 9 April distribution map, posted at the end of the revised territory list"
+  },
+  {
+   "marker": 10,
+   "line": 248,
+   "author": "Thundderr",
+   "postedAt": "4/28/2018 5:13 PM",
+   "file": "holders-of-le-announcements-05.gif",
+   "web": "/images/chronicles/holders-of-le-announcements/holders-of-le-announcements-05.webp",
+   "verified": true,
+   "depicts": "Animated forum signature banner: a wide teal field carrying a pattern of white dotted waves. No text is legible in the frame captured.",
+   "alignmentVerdict": "matches — 'Someone has made us a new signature for the forums... It's made by @ojomFox'"
+  }
+ ]
+}
