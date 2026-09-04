@@ -295,8 +295,35 @@ export function allianceTimelineSpans(alliances: ChronicleAlliance[]): AllianceT
 }
 
 /** Display label for an event type ("war" → "War") */
-export function eventTypeLabel(type: ChronicleEventType): string {
+export function eventTypeLabel(type: ChronicleEventType | null | undefined): string {
+  // Some stored submission payloads use snake_case keys, so a caller reading
+  // `eventType` gets undefined and this used to throw on .charAt, taking the
+  // whole review page down over one unrenderable row. normaliseEventPayload
+  // fixes the reading; this makes the fall-through harmless either way.
+  if (!type) return 'Event';
   return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
+/**
+ * Accept a submission payload written with either key style.
+ *
+ * Payloads have been stored both camelCase and snake_case over the life of the
+ * feature, and a component reading only one style silently renders a row with
+ * no type, no dates and no guilds — or crashes on it.
+ */
+export function normaliseEventPayload(raw: Record<string, unknown>): EventPayload {
+  const pick = <T>(camel: string, snake: string): T | undefined =>
+    (raw[camel] ?? raw[snake]) as T | undefined;
+  return {
+    id: pick<number>('id', 'id'),
+    title: pick<string>('title', 'title') ?? '',
+    eventType: pick<ChronicleEventType>('eventType', 'event_type') ?? ('other' as ChronicleEventType),
+    startsAt: pick<string>('startsAt', 'starts_at') ?? '',
+    endsAt: pick<string>('endsAt', 'ends_at') ?? null,
+    alliances: pick<string[]>('alliances', 'alliances') ?? [],
+    guilds: pick<string[]>('guilds', 'guilds') ?? [],
+    description: pick<string>('description', 'description') ?? '',
+  } as EventPayload;
 }
 
 export function chronicleEventColor(type: ChronicleEventType): string {
