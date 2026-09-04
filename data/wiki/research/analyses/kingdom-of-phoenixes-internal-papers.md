@@ -31,15 +31,28 @@ The break that followed Drew1011's appointment is given twice, differently.
 | Event log | 4 November 2017 | Whimsicality, ElegantDeath and Alhecks **removed** "for high treason, forever forbidden from coming back", having pressed the Queen to hand the guild over | three named officers |
 | History table | 3 November 2017 | after failing to force the Queen's resignation, "many KoP members **leave**"; they found the Serpentem Empire | unnamed members |
 
-One day apart, and an expulsion in one against a walkout in the other. The
-articles give both and prefer neither. It is worth noting that a guild's
-official log calling three officers traitors and its history calling the same
-break a departure are exactly the two things a guild would write at different
-distances from the event.
+One day apart, and an expulsion in one against a walkout in the other. That was
+recorded here as a contradiction. It is not one.
 
-That disagreement is also the best evidence about what these documents are:
-they are two compilations rather than one running log, since a single
-contemporaneous record could not differ from itself.
+**Resolved, 4 September 2026.** Thundderr — one of the guild's two chiefs at the
+time, and its king three weeks later — gives the two as a sequence: Whimsicality
+and AurumKitsune fell out badly, AurumKitsune removed her, and Whimsicality and
+others then founded the Serpentem Empire. Under that reading both documents are
+describing true and consecutive things: the log the removal, the history table
+what the removed did next. Recorded as `thundderr-oral-history`.
+
+Two things it does not settle. The one-day difference stands. And nothing
+outside the event log supports its charge of "high treason", which remains that
+document's characterisation rather than an established fact.
+
+The founding is attested outside the guild. The Serpentem Empire [SNK] stood in
+the Coalition's roster at the declaration of war on 21 December 2017, and the
+War Syndicate charter names ElegantDeath — one of the three the log says were
+removed — as its leader. It has its own page now.
+
+The disagreement is still the best evidence about what these documents are: two
+compilations rather than one running log, since a single contemporaneous record
+could not differ from itself.
 
 ## The tier question is still open
 
