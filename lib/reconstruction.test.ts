@@ -61,12 +61,22 @@ describe('reconstructed states', () => {
     expect(anchorAt(RECONSTRUCTION_START)!.label).toBe('Guilds are released');
   });
 
-  it('claims the map gradually over the first months rather than at once', () => {
+  it('has the whole province claimed by the end of the first day', () => {
     const held = (iso: string) => Object.keys(reconstructAt(at(iso), geo)!.territories).length;
+    const full = held('2014-12-23');
     expect(held('2014-12-22')).toBe(0);
-    expect(held('2015-03-01')).toBeGreaterThan(0);
-    expect(held('2015-03-01')).toBeLessThan(held('2015-07-01'));
-    expect(held('2015-07-01')).toBeLessThanOrEqual(held('2015-08-15'));
+    expect(full).toBeGreaterThan(100);
+    // and it stays claimed — no drifting back towards an empty map
+    expect(held('2015-03-01')).toBe(full);
+    expect(held('2015-08-15')).toBe(full);
+  });
+
+  it('fills during the first day rather than at a stroke', () => {
+    const held = (h: number) =>
+      Object.keys(reconstructAt(new Date(Date.UTC(2014, 11, 22, h)), geo)!.territories).length;
+    expect(held(0)).toBe(0);
+    expect(held(12)).toBeGreaterThan(0);
+    expect(held(12)).toBeLessThan(held(23));
   });
 
   it('reproduces the leader each anchor is built around', () => {
