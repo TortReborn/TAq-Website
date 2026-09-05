@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { X, Plus, Pencil, CornerDownLeft, Check, Maximize2, Minimize2 } from "lucide-react";
+import { X, Plus, Pencil, CornerDownLeft, Check, Maximize2, Minimize2, ChevronDown } from "lucide-react";
 import {
   AlliancePayload,
   ChronicleAlliance,
@@ -578,6 +578,9 @@ export function SubmitForm({
 // Panel
 // ---------------------------------------------------------------------------
 
+/** Below this the panel docks to the bottom rather than floating. */
+const DOCK_WIDTH = 768;
+
 export default function ChroniclePanel({
   isOpen,
   onClose,
@@ -587,6 +590,14 @@ export default function ChroniclePanel({
   availableGuilds,
   containerBounds,
 }: ChroniclePanelProps) {
+  const [docked, setDocked] = useState(false);
+  const [minimized, setMinimized] = useState(false);
+  useEffect(() => {
+    const check = () => setDocked(window.innerWidth <= DOCK_WIDTH);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const { authenticated } = useExecSession();
   const [form, setForm] = useState<FormState>({ mode: 'closed' });
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -834,7 +845,24 @@ export default function ChroniclePanel({
       data-map-ui=""
       onMouseDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
-      style={{
+      style={docked ? {
+        // Docked to the top: the bottom of a phone screen belongs to the
+        // timeline, which is full width there and cannot share the space.
+        position: 'absolute',
+        left: '0.5rem',
+        right: '0.5rem',
+        top: '4.25rem',
+        width: 'auto',
+        maxHeight: '34vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--bg-card-solid)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '0.75rem',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        zIndex: 30,
+        overflow: 'hidden',
+      } : {
         position: 'absolute',
         right: '1rem',
         bottom: '4.25rem',
@@ -854,14 +882,15 @@ export default function ChroniclePanel({
     >
       {/* Header — drag handle */}
       <div
-        onMouseDown={handleDragStart}
+        onMouseDown={docked ? undefined : handleDragStart}
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0.7rem 0.9rem 0.5rem',
-          cursor: isDragging ? 'grabbing' : 'grab',
+          padding: docked ? '0.55rem 0.75rem 0.4rem' : '0.7rem 0.9rem 0.5rem',
+          cursor: docked ? 'default' : isDragging ? 'grabbing' : 'grab',
           userSelect: 'none',
+          flexShrink: 0,
         }}
       >
         <div>
@@ -873,6 +902,21 @@ export default function ChroniclePanel({
         <div style={{ display: 'flex', gap: '0.25rem' }}>
           <button
             type="button"
+            data-testid="chronicle-minimize"
+            onClick={() => setMinimized(prev => !prev)}
+            onMouseDown={(e) => e.stopPropagation()}
+            aria-expanded={!minimized}
+            title={minimized ? 'Show the chronicle' : 'Minimise to the title bar'}
+            style={{ border: 'none', background: 'transparent', color: 'var(--text-primary)', opacity: 0.7, cursor: 'pointer', display: 'flex', padding: '0.25rem' }}
+          >
+            <ChevronDown
+              size={16}
+              style={{ transform: minimized ? 'rotate(180deg)' : 'none', transition: 'transform .15s ease' }}
+            />
+          </button>
+          {!minimized && (
+          <button
+            type="button"
             data-testid="chronicle-expand"
             onClick={() => setExpandedView(prev => !prev)}
             onMouseDown={(e) => e.stopPropagation()}
@@ -881,6 +925,7 @@ export default function ChroniclePanel({
           >
             {expandedView ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
+          )}
           <button type="button" onClick={onClose} title="Close"
             onMouseDown={(e) => e.stopPropagation()}
             style={{ border: 'none', background: 'transparent', color: 'var(--text-primary)', opacity: 0.7, cursor: 'pointer', display: 'flex', padding: '0.25rem' }}>
@@ -890,7 +935,7 @@ export default function ChroniclePanel({
       </div>
 
       {/* Body */}
-      <div style={{ overflowY: 'auto', padding: '0 0.9rem 0.9rem' }}>
+      <div style={{ display: minimized ? 'none' : undefined, overflowY: 'auto', padding: '0 0.9rem 0.9rem' }}>
         {form.mode !== 'closed' ? (
           <SubmitForm
             form={form}
