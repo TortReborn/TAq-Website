@@ -7,8 +7,10 @@
  * and the events that turned the map over.
  *
  * Every date and roster below comes from the Chronicle wiki (data/wiki/
- * seed-articles.json), which cites its sources per claim. Where an alliance's
- * end was never recorded the membership is left open rather than invented.
+ * seed-articles.json), which cites its sources per claim. Every membership is
+ * closed: an unrecorded dissolution is not an alliance that never ended, and an
+ * open row draws a band from 2016 to the present day. Where no end was recorded
+ * the band closes at the last dated evidence, and the description says so.
  *
  * Idempotent: alliances are matched by name and events by title, so re-running
  * changes nothing. Existing rows are never modified except to add pre-2018
@@ -55,6 +57,14 @@ if (!useProd && !process.argv.includes('--dev')) {
 const env = (n) => (useProd ? process.env[n] : process.env['TEST_' + n]);
 
 const D = (s) => `${s}T00:00:00Z`;
+
+/** Every membership here must have an end. An unrecorded dissolution is not an
+ *  alliance that never ended, and an open row draws a band to the present day. */
+function assertAllClosed(groups) {
+  const open = [];
+  for (const g of groups) for (const [guild, , left] of g.members) if (!left) open.push(`${g.name} / ${guild}`);
+  if (open.length) { console.error('Open memberships are not allowed:\n  ' + open.join('\n  ')); process.exit(1); }
+}
 
 /* ---------------------------------------------------------------- alliances */
 const ALLIANCES = [
@@ -108,38 +118,38 @@ const ALLIANCES = [
   },
   {
     name: 'Halcyon', tag: 'Hal', color: '#26a69a', kind: 'community',
-    description: 'A two-guild community alliance founded on 5 June 2016 between ToastedPandas and Holders of LE, announced by Yamipanda with Drew1011 as co-signatory. Explicitly a mutual-aid and social pact rather than a war bloc; its later history was never recorded.',
-    members: [['ToastedPandas', '2016-06-05', null], ['Holders of LE', '2016-06-05', null]],
+    description: 'A two-guild community alliance founded on 5 June 2016 between ToastedPandas and Holders of LE, announced by Yamipanda with Drew1011 as co-signatory. Explicitly a mutual-aid and social pact rather than a war bloc. No dissolution was recorded and it was never mentioned again after June 2016, which is where the band ends.',
+    members: [['ToastedPandas', '2016-06-05', '2016-06-30'], ['Holders of LE', '2016-06-05', '2016-06-30']],
   },
   {
     name: 'The Banhammer', tag: 'Ban', color: '#ef6c00', kind: 'war',
-    description: 'An open anti-HackForums alliance of June 2016, opened by Mr_Robin_Hood on 8 June as a universal non-aggression pact among smaller guilds against a guild then holding 94 territories. Ten days later participants reported Hax reduced to almost none, a reversal disputed at the time which did not last.',
+    description: 'An open anti-HackForums alliance of June 2016, opened by Mr_Robin_Hood on 8 June as a universal non-aggression pact among smaller guilds against a guild then holding 94 territories. Ten days later participants reported Hax reduced to almost none, a reversal disputed at the time which did not last. No end was recorded; it was active through at least 29 June 2016, which is where the band ends.',
     members: [
-      ['World of Crafters', '2016-06-08', null],
-      ['The Wynn Guard', '2016-06-08', null],
-      ['MythicZodiac', '2016-06-10', null],
+      ['World of Crafters', '2016-06-08', '2016-06-29'],
+      ['The Wynn Guard', '2016-06-08', '2016-06-29'],
+      ['MythicZodiac', '2016-06-10', '2016-06-29'],
     ],
   },
   {
     name: 'The Separatists', tag: 'Sep', color: '#795548', kind: 'war',
-    description: 'A Star Wars-themed open-enrolment alliance founded on 26 June 2016 by Tapu_Fini around the guild The Anarchy, the second of the two anti-HackForums blocs of that month. Its founder claimed attacks on the Hax-Libertas bloc around Ragni and Katoa Ranch; neither anti-Hax bloc changed the map.',
-    members: [['The Anarchy', '2016-06-26', null]],
+    description: 'A Star Wars-themed open-enrolment alliance founded on 26 June 2016 by Tapu_Fini around the guild The Anarchy, the second of the two anti-HackForums blocs of that month. Its founder claimed attacks on the Hax-Libertas bloc around Ragni and Katoa Ranch; neither anti-Hax bloc changed the map. No dissolution was recorded and it was last mentioned on 1 July 2016, which is where the band ends.',
+    members: [['The Anarchy', '2016-06-26', '2016-07-01']],
   },
   {
     name: 'Seraphim', tag: 'Ser', color: '#c9a227', kind: 'community',
-    description: 'A self-consciously unserious community alliance opened on 8 August 2016 by Dacleos, declaring itself "100% community based" with "no intention of actively providing support for guild wars". Its four recorded members included Libertas, then the second-largest territory holder on the map.',
+    description: 'A self-consciously unserious community alliance opened on 8 August 2016 by Dacleos, declaring itself "100% community based" with "no intention of actively providing support for guild wars". Its four recorded members included Libertas, then the second-largest territory holder on the map. No dissolution was recorded; the opening post was last revised on 20 August 2016, which is where the band ends.',
     members: [
-      ['Saltiest', '2016-08-08', null], ['Libertas', '2016-08-08', null],
-      ['FOX', '2016-08-08', null], ['Holders of LE', '2016-08-08', null],
+      ['Saltiest', '2016-08-08', '2016-08-20'], ['Libertas', '2016-08-08', '2016-08-20'],
+      ['FOX', '2016-08-08', '2016-08-20'], ['Holders of LE', '2016-08-08', '2016-08-20'],
     ],
   },
   {
     name: 'Lux Imperius', tag: 'Lux', color: '#7e57c2', kind: 'community',
-    description: 'A closed, invite-only community alliance of late 2016 founded by five guild leaders around Dragon\'s Arise and UltimateXeons. Its roster reached seven guilds, it took no part in the territory war, and no dissolution was ever recorded.',
+    description: 'A closed, invite-only community alliance of late 2016 founded by five guild leaders around Dragon\'s Arise and UltimateXeons. Its roster reached seven guilds and it took no part in the territory war. No dissolution was ever recorded; the last roster stood on 25 October 2016, which is where the band ends.',
     members: [
-      ["Dragon's Arise", '2016-09-16', null], ['UltimateXeons', '2016-09-16', null],
-      ['Eternal Legacy', '2016-09-16', null], ['WarLords', '2016-09-16', null],
-      ['GrimNation', '2016-09-16', null], ['Beasts', '2016-09-16', null],
+      ["Dragon's Arise", '2016-09-16', '2016-10-25'], ['UltimateXeons', '2016-09-16', '2016-10-25'],
+      ['Eternal Legacy', '2016-09-16', '2016-10-25'], ['WarLords', '2016-09-16', '2016-10-25'],
+      ['GrimNation', '2016-09-16', '2016-10-25'], ['Beasts', '2016-09-16', '2016-10-25'],
       ['Aquafinity', '2016-10-02', '2016-10-25'],
     ],
   },
@@ -183,13 +193,15 @@ const ALLIANCES = [
 const BACKFILL = [
   {
     name: 'Valkyrie',
-    members: [['Kingdom Foxes', '2015-06-02', null], ['Imperial', '2015-06-02', null]],
+    // Valkyrie outlived the era; the band closes at its last dated appearance.
+    members: [['Kingdom Foxes', '2015-06-02', '2022-09-19'], ['Imperial', '2015-06-02', '2022-09-19']],
   },
   {
     name: 'Coalition',
     members: [
-      ['Kingdom Foxes', '2017-10-19', null], ['KingdomPhoenixes', '2017-10-19', null],
-      ['Gilded Sparrows', '2017-11-17', null], ['House of Sentinels', '2017-11-01', null],
+      // The Coalition shattered on 16 February 2018 when Alliance Alliance split.
+      ['Kingdom Foxes', '2017-10-19', '2018-02-16'], ['KingdomPhoenixes', '2017-10-19', '2018-02-16'],
+      ['Gilded Sparrows', '2017-11-17', '2018-02-16'], ['House of Sentinels', '2017-11-01', '2018-02-16'],
     ],
   },
 ];
@@ -233,6 +245,8 @@ const pool = new pg.Pool({
   max: 1,
 });
 console.log(`target: ${useProd ? 'prod (DB_*)' : 'dev (TEST_DB_*)'}`);
+
+assertAllClosed([...ALLIANCES, ...BACKFILL]);
 
 const existingAlliances = new Map(
   (await pool.query('SELECT id, name FROM chronicle_alliances')).rows.map(r => [r.name.toLowerCase(), r.id]),
@@ -302,5 +316,28 @@ for (const [type, title, desc, starts, ends, guilds] of EVENTS) {
   addedEvents++;
 }
 
-console.log(`\n${apply ? 'APPLIED' : 'DRY RUN'} — alliances ${addedAlliances}, memberships ${addedMemberships}, events ${addedEvents}, skipped ${skipped}`);
+/* Alliances seeded before the end dates were curated left their memberships
+   open, which ran month-long blocs to the present on the timeline. Bring any
+   row that this file now bounds into line. */
+let corrected = 0;
+for (const a of [...ALLIANCES, ...BACKFILL]) {
+  const id = existingAlliances.get(a.name.toLowerCase());
+  if (!id) continue;
+  for (const [guild, joined, left] of a.members) {
+    if (!left) continue;
+    const row = await pool.query(
+      `SELECT id, left_at FROM chronicle_memberships WHERE alliance_id=$1 AND guild_name=$2 AND joined_at=$3`,
+      [id, guild, D(joined)],
+    );
+    for (const r of row.rows) {
+      const have = r.left_at ? new Date(r.left_at).toISOString().slice(0, 10) : null;
+      if (have === left) continue;
+      console.log(`fix  member    ${a.name} / ${guild}: ${have ?? 'open'} -> ${left}`);
+      corrected++;
+      if (apply) await pool.query(`UPDATE chronicle_memberships SET left_at=$1 WHERE id=$2`, [D(left), r.id]);
+    }
+  }
+}
+
+console.log(`\n${apply ? 'APPLIED' : 'DRY RUN'} — alliances ${addedAlliances}, memberships ${addedMemberships}, events ${addedEvents}, corrected ${corrected}, skipped ${skipped}`);
 await pool.end();
