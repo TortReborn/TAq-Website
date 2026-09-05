@@ -4,6 +4,7 @@ import { getPool } from '@/lib/db';
 import { USE_TEST_DATA, getTestBounds } from '@/lib/test-history-data';
 import { getExchangeBounds, getExchangeGaps, getInitialOwners } from '@/lib/exchange-data';
 import { createTiming } from '@/lib/server-timing';
+import { RECONSTRUCTION_START } from '@/lib/reconstruction';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,8 +88,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // The timeline runs from the Guild Update, not from the first exchange:
+    // everything before the log is served by lib/reconstruction.ts and flagged
+    // in the UI as synthetic. `recordedFrom` is where real data starts, so the
+    // client can tell the two halves apart.
     return NextResponse.json({
-      earliest: exchangeBounds.earliest.toISOString(),
+      earliest: RECONSTRUCTION_START.toISOString(),
+      recordedFrom: exchangeBounds.earliest.toISOString(),
       latest: exchangeBounds.latest.toISOString(),
       gaps: meta.gaps,
       initialOwners: meta.initialOwners,

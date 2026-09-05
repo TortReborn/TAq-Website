@@ -43,6 +43,7 @@ import {
 } from "@/lib/history-data";
 import { loadCachedHistory, saveHistoryCache, clearHistoryCache } from "@/lib/history-cache";
 import { shouldRenderTerritory } from "@/lib/retired-territories";
+import { isReconstructed, reconstructAt } from "@/lib/reconstruction";
 import { ROL_UPDATE_CUTOFF_MS } from "@/lib/territory-abbreviations";
 import { mapLog, mapError, mapTime, timedFetch } from "@/lib/map-logger";
 import { fetchVerboseData } from "@/lib/verbose-data-client";
@@ -1449,6 +1450,14 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
   // Falls back to initialSnapshot (fetched for instant first paint) before the store is ready.
   const historyTerritories = useMemo(() => {
     if (viewMode !== 'history' || !historyTimestamp) return null;
+
+    // Before 3 Jan 2018 no exchanges exist. Serve the reconstruction instead.
+    // The map keeps a standing banner through this period so it is never
+    // taken for recorded data. See lib/reconstruction.ts.
+    if (isReconstructed(historyTimestamp)) {
+      const rec = reconstructAt(historyTimestamp, verboseData);
+      return rec ? expandSnapshot(rec.territories, verboseData) : {};
+    }
 
     // Prefer exchange store — instant reconstruction at any timestamp
     const store = exchangeStoreRef.current;

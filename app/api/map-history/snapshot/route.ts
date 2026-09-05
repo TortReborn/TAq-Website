@@ -3,6 +3,15 @@ import { getPool } from '@/lib/db';
 import { USE_TEST_DATA, getTestSnapshots } from '@/lib/test-history-data';
 import { reconstructSingleSnapshot } from '@/lib/exchange-data';
 import { createTiming } from '@/lib/server-timing';
+import { isReconstructed, reconstructAt } from '@/lib/reconstruction';
+import verboseJson from '@/public/territories_verbose.json';
+
+// Territory geometry, used to order reconstructed changes spatially so this
+// endpoint agrees with what the map draws.
+const VERBOSE = verboseJson as unknown as Record<
+  string,
+  { Location: { start: [number, number]; end: [number, number] } }
+>;
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +58,25 @@ export async function GET(request: NextRequest) {
         'Cache-Control': 'public, max-age=60, s-maxage=60',
       },
     });
+  }
+
+  // Before the exchange log begins there is nothing to look up. Serve the
+  // reconstruction, flagged so no caller mistakes it for recorded data.
+  if (isReconstructed(targetDate)) {
+    const rec = reconstructAt(targetDate, VERBOSE);
+    if (rec) {
+      return NextResponse.json({
+        timestamp: targetDate.toISOString(),
+        territories: rec.territories,
+        requestedTimestamp: targetDate.toISOString(),
+        timeDiffSeconds: 0,
+        synthetic: true,
+        anchor: rec.anchor,
+        provenance: { guessed: rec.provenance[0], inferred: rec.provenance[1], attested: rec.provenance[2] },
+      }, {
+        headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=86400' },
+      });
+    }
   }
 
   const pool = getPool();
