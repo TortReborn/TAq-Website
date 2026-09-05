@@ -135,6 +135,14 @@ function MapHistoryControls({
   // Community (non-war) alliances are hidden from the timeline by default —
   // they're social groupings, so their bands mostly add noise when scrubbing wars
   const [showCommunityAlliances, setShowCommunityAlliances] = useState(false);
+  const [secondaryOpen, setSecondaryOpen] = useState(false);
+  const [viewportNarrow, setViewportNarrow] = useState(false);
+  useEffect(() => {
+    const check = () => setViewportNarrow(window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   const seasonSelRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const resizeStartRef = useRef({ x: 0, y: 0, width: 1200, height: DEFAULT_VERTICAL_HEIGHT, posX: 0, posY: 0 });
@@ -173,6 +181,10 @@ function MapHistoryControls({
 
   // Layout breakpoints based on component widths (horizontal mode only)
   const showSpeedInPlayback = panelWidth >= 540;
+  // Speed, season, community and date entry are secondary: on a narrow screen
+  // they fold behind a disclosure so the scrubber and transport still fit.
+  const secondaryFolds = viewportNarrow && !showSpeedInPlayback;
+  const showSecondary = !secondaryFolds || secondaryOpen;
   const stackDateRow = panelWidth < 420;
 
   // Clamp position to the map container's edges only. The panel may slide
@@ -869,7 +881,39 @@ function MapHistoryControls({
         )}
       </div>
 
-      {!showSpeedInPlayback && (
+      {secondaryFolds && (
+        <button
+          type="button"
+          data-testid="timeline-more-controls"
+          onClick={() => setSecondaryOpen(v => !v)}
+          onMouseDown={(e) => e.stopPropagation()}
+          aria-expanded={secondaryOpen}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+            padding: '0.3rem 0.7rem',
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+            background: 'transparent',
+            border: '1px solid var(--border-color)',
+            borderRadius: '999px',
+            cursor: 'pointer',
+          }}
+        >
+          {secondaryOpen ? 'Fewer controls' : 'Speed, season & date'}
+          <svg
+            width="11" height="11" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+            style={{ transform: secondaryOpen ? 'rotate(180deg)' : 'none', transition: 'transform .15s ease' }}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      )}
+
+      {!showSpeedInPlayback && showSecondary && (
         <div style={{
           display: 'flex',
           flexWrap: 'wrap',

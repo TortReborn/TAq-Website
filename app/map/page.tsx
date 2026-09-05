@@ -2777,7 +2777,9 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
             onMouseDown={(e) => e.stopPropagation()}
             style={{
               position: 'absolute',
-              bottom: '1.25rem',
+              // On a phone the panel is full width, so it would sit under the
+              // Live/History toolbar rather than beside it.
+              bottom: isMobile ? '4.5rem' : '1.25rem',
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: 15,

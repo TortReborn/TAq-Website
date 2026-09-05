@@ -3,6 +3,10 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Territory, getContrastColor, coordToPixel } from "@/lib/utils";
 
+/** Collapsed-state preference, remembered separately per breakpoint. */
+const storageKey = (small: boolean) =>
+  small ? 'territoryLeadersCollapsed:mobile' : 'territoryLeadersCollapsed';
+
 interface GuildTerritoryCountProps {
   territories: Record<string, Territory>;
   onGuildClick?: (guildName: string) => void;
@@ -60,15 +64,20 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
       setIsMobile(mobile);
     };
 
-    // On first load, check localStorage for cached state
+    // On first load, check localStorage for cached state. The key is scoped to
+    // the breakpoint: opening the panel on a desktop must not leave it open on
+    // a phone, where it covers most of the map.
     if (!hasInitialized) {
-      const cached = localStorage.getItem('territoryLeadersCollapsed');
-      if (cached !== null) {
-        setIsCollapsed(cached === 'true');
-      } else {
-        // Default to collapsed on mobile if no cached value
-        setIsCollapsed(window.innerWidth <= 768);
+      const small = window.innerWidth <= 768;
+      let cached: string | null = null;
+      try {
+        cached = localStorage.getItem(storageKey(small));
+      } catch {
+        // storage blocked — fall through to the size-based default
       }
+      // No stored preference means collapsed on a small screen, where an open
+      // panel covers most of the map.
+      setIsCollapsed(cached !== null ? cached === 'true' : small);
       setHasInitialized(true);
     }
 
@@ -77,12 +86,17 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
     return () => window.removeEventListener('resize', checkMobile);
   }, [hasInitialized]);
 
-  // Save collapsed state to localStorage when it changes
-  useEffect(() => {
-    if (hasInitialized) {
-      localStorage.setItem('territoryLeadersCollapsed', String(isCollapsed));
+  // Persist only a deliberate open/close. Writing on every state change would
+  // also fire when a resize crosses the breakpoint, copying the desktop
+  // preference onto the phone key it is meant to be kept apart from.
+  const setCollapsed = (next: boolean) => {
+    setIsCollapsed(next);
+    try {
+      localStorage.setItem(storageKey(window.innerWidth <= 768), String(next));
+    } catch {
+      // private mode or blocked storage — the preference just won't stick
     }
-  }, [isCollapsed, hasInitialized]);
+  };
 
 
   const guildStats = useMemo(() => {
@@ -151,7 +165,7 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
       {/* Toggle button when collapsed */}
       {isCollapsed && (
         <button
-          onClick={() => setIsCollapsed(false)}
+          onClick={() => setCollapsed(false)}
           style={{
             position: 'absolute',
             top: '1rem',
@@ -195,7 +209,7 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
             right: '0',
             width: isMobile ? '90vw' : '280px',
             maxWidth: '320px',
-            maxHeight: isMobile ? '60vh' : '70vh',
+            maxHeight: isMobile ? '45vh' : '70vh',
             background: 'var(--bg-card)',
             border: '2px solid var(--border-color)',
             borderRight: 'none',
@@ -253,7 +267,7 @@ function GuildTerritoryCount({ territories, onGuildClick, guildColors, showLandV
               color: 'var(--accent-color)',
             }}>{showLandView ? 'Land Held' : 'Territory Leaders'}</h3>
             <button
-              onClick={() => setIsCollapsed(true)}
+              onClick={() => setCollapsed(true)}
               style={{
                 background: 'transparent',
                 border: 'none',
