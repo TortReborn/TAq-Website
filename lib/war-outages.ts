@@ -29,9 +29,12 @@ export interface WarOutageWindow {
 }
 
 export const WAR_OUTAGE_WINDOWS: WarOutageWindow[] = [
-  // One ~6-week outage; a single stray exchange on 2019-05-05 splits it into
-  // two detected gaps (0/319 and 0/378 territories changed at resume).
-  { start: '2019-04-06', end: '2019-05-22', reason: 'Wars offline (1.18 era); zero ownership changes across the window' },
+  // The long one. Six and a half weeks with wars switched off: April 2019
+  // carries 4,726 exchanges against 54,935 in March, and a single stray
+  // exchange on 2019-05-05 splits it into two detected gaps (0/319 and 0/378
+  // territories changed at resume). Nothing is missing from the record —
+  // the map genuinely did not move.
+  { start: '2019-04-06', end: '2019-05-22', reason: 'Wars offline for six and a half weeks (1.18 era); zero ownership changes across the whole window' },
   // 1.19 Silent Expanse release; wars re-enabled in 1.19.1 (Dec 12, 2019).
   { start: '2019-12-08', end: '2019-12-13', reason: '1.19 Silent Expanse release; wars brought back online in 1.19.1' },
   // 2.1 Rekindled World release (Aug 10, 2024). No guild-vs-guild exchanges
