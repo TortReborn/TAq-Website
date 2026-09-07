@@ -6,7 +6,7 @@ import {
   setExecSessionCookie,
   getBaseUrl,
 } from '@/lib/exec-auth';
-import { setChroniclerSessionCookie } from '@/lib/wiki-auth';
+import { setWikiSessionCookie } from '@/lib/wiki-auth';
 import { isChronicler } from '@/lib/wiki-db';
 import { getPool } from '@/lib/db';
 
@@ -50,28 +50,35 @@ export async function GET(request: NextRequest) {
       : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(discordUser.id) >> 22n) % 6}.png`;
 
     if (!linkCheck.ok) {
-      // Not a guild member — but the Chronicle wiki is deliberately open to
-      // people outside the guild, so check for a chronicler role before
-      // turning them away. They get a wiki-only session with no rank attached.
-      if (await isChronicler(getPool(), discordUser.id)) {
-        const storedRedirect = request.cookies.get('oauth_redirect')?.value;
-        const response = NextResponse.redirect(
-          new URL(storedRedirect?.startsWith('/chronicle') ? storedRedirect : '/chronicle', baseUrl),
-        );
-        setChroniclerSessionCookie(response, {
-          discord_id: discordUser.id,
-          discord_username: discordUser.username,
-          discord_avatar: avatarUrl,
-        });
-        response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
-        response.cookies.set('oauth_redirect', '', { maxAge: 0, path: '/' });
-        return response;
+      // Not a guild member. The rest of the site stays shut to them, but the
+      // Chronicle is deliberately open to people outside the guild — anyone
+      // signed in with Discord may suggest an edit, and a chronicler may
+      // publish. So mint the wiki-only session either way; it carries no rank,
+      // so it unlocks nothing beyond /chronicle.
+      const storedRedirect = request.cookies.get('oauth_redirect')?.value;
+      const chronicler = await isChronicler(getPool(), discordUser.id);
+      const params = new URLSearchParams({ reason: 'not_linked', discord_id: linkCheck.discord_id, discord_name: discordUser.username });
+      // Back where they came from if that was the Chronicle; otherwise the
+      // page explaining what they can and cannot do here — except for a
+      // chronicler, for whom the Chronicle *is* the destination.
+      const target = storedRedirect?.startsWith('/chronicle')
+        ? storedRedirect
+        : chronicler
+          ? '/chronicle'
+          : `/unauthorized?${params.toString()}`;
+
+      if (!chronicler) {
+        console.warn(`[auth] Guild access denied: Discord user ${discordUser.username} (${linkCheck.discord_id}) not found in discord_links — signed in to the Chronicle only`);
       }
 
-      console.warn(`[auth] Login denied: Discord user ${discordUser.username} (${linkCheck.discord_id}) not found in discord_links`);
-      const params = new URLSearchParams({ reason: 'not_linked', discord_id: linkCheck.discord_id, discord_name: discordUser.username });
-      const response = NextResponse.redirect(new URL(`/unauthorized?${params.toString()}`, baseUrl));
+      const response = NextResponse.redirect(new URL(target, baseUrl));
+      setWikiSessionCookie(response, {
+        discord_id: discordUser.id,
+        discord_username: discordUser.username,
+        discord_avatar: avatarUrl,
+      });
       response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
+      response.cookies.set('oauth_redirect', '', { maxAge: 0, path: '/' });
       return response;
     }
 

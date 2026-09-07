@@ -8,11 +8,11 @@ import { useWikiSession } from "@/hooks/useWikiSession";
 /**
  * Editor gate.
  *
- * Execs and chroniclers edit directly; any other linked guild account gets the
- * same editor in suggestion mode, queued for review; anonymous visitors are
- * asked to sign in.
+ * Execs and chroniclers edit directly; everyone else signed in with Discord
+ * gets the same editor in suggestion mode, queued for review; anonymous
+ * visitors are asked to sign in.
  *
- * Gated on the wiki session rather than the exec session, because a chronicler
+ * Gated on the wiki session rather than the exec session, because a contributor
  * may never have been in the guild — the exec session reports those people as
  * unauthenticated, which is right everywhere else on the site and wrong here.
  */
@@ -35,8 +35,8 @@ export default function WikiEditorGate({
         <Link href="/exec/login" style={{ color: 'var(--accent-primary)' }}>Sign in with Discord</Link>
         {' '}to edit the Chronicle.
         <div style={{ marginTop: '0.6rem', fontSize: '0.8rem' }}>
-          You do not need to be in the guild — ask an exec to add you as a chronicler and
-          sign in with the same Discord account.
+          You do not need to be in the guild. Anyone signed in can suggest an edit, and a
+          chronicler reads it before it goes live.
         </div>
       </div>
     );

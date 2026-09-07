@@ -8,7 +8,7 @@ import { WikiPage, WikiPageSummary, WikiVerification, WIKI_TYPE_LABELS, extractT
 import WikiUnverifiedBanner from "./WikiUnverifiedBanner";
 import { WikiEmbedMap } from "@/lib/wiki-embeds";
 import { WikiCitationMap, citationAnchor, citationList, splitManualSources } from "@/lib/wiki-citations";
-import { useExecSession } from "@/hooks/useExecSession";
+import { useWikiSession } from "@/hooks/useWikiSession";
 
 /**
  * Article layout, modeled on MediaWiki (Wikipedia Vector / wiki.gg) idioms:
@@ -39,7 +39,10 @@ export default function WikiArticleView({
   verification?: WikiVerification;
   lastEditor?: { name: string; note: string; kind?: 'ai' | 'human' } | null;
 }) {
-  const { isExec, authenticated } = useExecSession();
+  // The wiki session, not the exec one: a contributor may never have been in
+  // the guild, and the exec session reports those people as unauthenticated —
+  // which is right everywhere else on the site and would hide the tab here.
+  const { authenticated, canPublish } = useWikiSession();
   const references = useMemo(() => (citations ? citationList(citations) : []), [citations]);
   // Pre-citation articles end in a hand-written "## Sources" list. Split it out
   // so the page shows a single reference section rather than two.
@@ -83,7 +86,7 @@ export default function WikiArticleView({
           <Link href={`/chronicle/${page.slug}/history`} style={tabStyle(false)}>
             <History size={12} /> History
           </Link>
-          {isExec ? (
+          {canPublish ? (
             <Link href={`/chronicle/${page.slug}/edit`} style={tabStyle(false)}>
               <Pencil size={12} /> Edit
             </Link>
