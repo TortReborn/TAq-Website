@@ -110,8 +110,9 @@ export default function ChroniclerManager() {
         <Users size={15} /> Chroniclers ({list.filter((c) => c.active).length})
       </h3>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', margin: '0 0 0.75rem' }}>
-        Chroniclers publish without review and decide on suggested edits. They need no guild rank
-        and no guild membership — only a Discord account. Adding and removing them is exec-only.
+        Anyone signed in with Discord can suggest an edit. Chroniclers are the people who publish
+        without review and decide on those suggestions — no guild rank or membership needed, just
+        the Discord account. Adding and removing them is exec-only.
       </p>
 
       {error && <div style={{ color: '#ef5350', fontSize: '0.8rem', marginBottom: '0.6rem' }}>{error}</div>}

@@ -16,6 +16,17 @@ function UnauthorizedContent() {
     message = 'Your Discord account is not associated with a guild member. If you believe this is an error, contact a guild leader.';
   }
 
+  // Reaching this page still means signing in worked, and the Chronicle asks
+  // only for a Discord account. Saying so here is the difference between
+  // "you are locked out" and "the guild pages are, the history is not".
+  const chronicleNote = (
+    <>
+      You are signed in, though — the{' '}
+      <Link href="/chronicle" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Chronicle</Link>{' '}
+      is open to you, and you can suggest edits to any article there.
+    </>
+  );
+
   return (
     <main style={{
       display: 'flex',
@@ -58,6 +69,15 @@ function UnauthorizedContent() {
           lineHeight: '1.5',
         }}>
           {message}
+        </p>
+
+        <p style={{
+          color: 'var(--text-secondary)',
+          fontSize: '0.85rem',
+          margin: '-1rem 0 2rem',
+          lineHeight: '1.5',
+        }}>
+          {chronicleNote}
         </p>
 
         <Link

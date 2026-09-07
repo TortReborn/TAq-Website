@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
 import { getPool } from '@/lib/db';
-import { requireGuildSession } from '@/lib/exec-auth';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
 import { recordWikiImage } from '@/lib/wiki-db';
 import { putWikiImage, activeImageBackend } from '@/lib/wiki-image-storage';
@@ -29,21 +28,21 @@ const ALLOWED = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
  * it fits the stored-size target — the browser pass is a convenience, not a
  * thing to trust, since anyone can post to this endpoint directly.
  *
- * Anyone who can publish gets an image live immediately. A linked guild member
- * without publish rights may still upload, but the image stays 'pending' and is
- * unreachable until a suggestion using it is approved.
+ * Anyone who can publish gets an image live immediately. Anyone else signed in
+ * may still upload — an illustrated suggestion needs its illustration — but the
+ * image stays 'pending' and is unreachable until a suggestion using it is
+ * approved, so an unreviewed upload is never served to anybody.
  */
 export async function POST(request: NextRequest) {
   const principal = await resolveWikiPrincipal(request);
-  const guildSession = principal ? null : await requireGuildSession(request);
-  if (!principal && !guildSession) {
+  if (!principal) {
     return NextResponse.json(
-      { error: 'Sign in as a chronicler or a linked guild account to upload images' },
+      { error: 'Sign in with Discord to upload images' },
       { status: 401 },
     );
   }
-  const uploaderId = principal?.discordId ?? guildSession!.discord_id;
-  const canPublish = principal?.canPublish ?? false;
+  const uploaderId = principal.discordId;
+  const canPublish = principal.canPublish;
 
   const form = await request.formData().catch(() => null);
   const file = form?.get('file');

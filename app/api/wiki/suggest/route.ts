@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
-import { requireGuildSession } from '@/lib/exec-auth';
+import { resolveWikiPrincipal } from '@/lib/wiki-auth';
 import { WIKI_LIMITS, WIKI_PENDING_PER_USER, validateWikiPagePayload } from '@/lib/wiki';
 import { countPendingWikiBy, createWikiSubmission, getWikiPage } from '@/lib/wiki-db';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Any linked guild account can suggest a new page or an edit; suggestions go
- * to the exec review queue (mirrors the map chronicle's submission flow).
+ * Any signed-in Discord account can suggest a new page or an edit; suggestions
+ * go to the review queue and nothing here publishes.
+ *
+ * Deliberately not `requireGuildSession`: the people who remember this history
+ * are often not in the guild, and a suggestion is the one contribution that is
+ * safe to accept from a stranger, because a reviewer reads every one of them
+ * before it becomes an article. The per-user pending cap below is what keeps
+ * that open door from being a flood.
  */
 export async function POST(request: NextRequest) {
-  const session = await requireGuildSession(request);
-  if (!session) {
-    return NextResponse.json({ error: 'A linked guild account is required' }, { status: 401 });
+  const principal = await resolveWikiPrincipal(request);
+  if (!principal) {
+    return NextResponse.json({ error: 'Sign in with Discord to suggest an edit' }, { status: 401 });
   }
 
   let body: unknown;
@@ -37,7 +43,7 @@ export async function POST(request: NextRequest) {
   if (!validated.ok) return NextResponse.json({ error: validated.error }, { status: 400 });
 
   const pool = getPool();
-  const pending = await countPendingWikiBy(pool, session.discord_id);
+  const pending = await countPendingWikiBy(pool, principal.discordId);
   if (pending >= WIKI_PENDING_PER_USER) {
     return NextResponse.json(
       { error: `You already have ${pending} pending suggestions — wait for review before submitting more` },
@@ -55,8 +61,8 @@ export async function POST(request: NextRequest) {
       targetPageId,
       payload: validated.value,
       note,
-      submittedBy: session.discord_id,
-      submittedName: session.ign || session.discord_username,
+      submittedBy: principal.discordId,
+      submittedName: principal.name,
     });
     return NextResponse.json({ ok: true, id });
   } catch (error) {
