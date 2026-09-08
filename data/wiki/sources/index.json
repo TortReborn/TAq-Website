@@ -3553,6 +3553,24 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T05:34:02.910Z"
+  },
+  "enemy-alliances-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Round Table / Confederation (from the Federation's channels) guild Discord, May – July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T05:53:35.398Z"
+  },
+  "federation-governance-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, May – July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T05:53:35.484Z"
   }
  }
 }
