@@ -29,6 +29,21 @@ That is a light editorial pass rather than corruption. But two of the four chang
 a fact, and this document is cited nineteen times across ten articles as
 first-person testimony.
 
+## The announcement channels were checked and are sound
+
+The same comparison was run over the twelve other Discord-derived documents in
+`data/wiki/sources/docs/`. Every Coalition and Federation document matches its
+original exactly. Across all twelve, seventeen lines diverge, nine of them on
+messages edited on Discord after this project fetched them, and the rest fall on
+dates no article quotes.
+
+**No line the wiki quotes diverges from what was posted** — including the
+Emperium announcement of 1 September 2017 that maps the handle Ice to the player
+IceResistance, which two articles name a person on the strength of.
+
+So the transcription problem is specific to this document rather than general to
+the archive.
+
 ## What follows for editors
 
 - **Do not quote this document as verbatim text on a load-bearing sentence.**
