@@ -3769,6 +3769,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T17:46:57.752Z"
+  },
+  "espionage-as-institution-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / Federation / Luna / Terra guild Discord, January 2018 – November 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:57:09.884Z"
   }
  }
 }
