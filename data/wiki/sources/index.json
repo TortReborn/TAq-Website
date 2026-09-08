@@ -3535,6 +3535,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T04:37:30.906Z"
+  },
+  "illustratus-naming-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Illustratus / War Syndicate guild Discord, January 2018 – September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T04:53:37.185Z"
   }
  }
 }
