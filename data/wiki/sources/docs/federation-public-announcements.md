@@ -5,6 +5,7 @@ kind: discord-export
 title: "Federation public-announcements channel (Discord export, 2018)"
 fetched_at: 2026-09-03T22:11:34.657Z
 note: "The Federation's public announcement channel, exported from Discord, 2018. Server-wide notices rather than war direction. 2 attached images are archived alongside."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 Gas — 2/19/2018 12:09 PM
 I just want to remind everyone that if someone accidently tags everyone please do not add to the spam. We want to keep this discord in working order and your spam is not necessary. Thank you for your cooperation and have a fantastic day/night!

@@ -5,6 +5,7 @@ kind: discord-export
 title: "KingdomPhoenixes guild announcements (Discord export, Nov 2017 - May 2022)"
 fetched_at: 2026-09-04T21:32:00.752Z
 note: "The guild's internal announcement channel from a fortnight after the November 2017 split to 2022. Coalition territory allocations and rosters, Prime Minister elections, promotions, the January 2018 kicking incident, AurumKitsune's abdication and her plan to install a viceroy, and Whimsy's return in April 2018. A treasure-hunt hint pointing at a birthday and age, and two private server addresses, were removed before archiving."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 AurumKitsune 🎀 [AME],  — 11/4/2017 6:22 PM

@@ -5,6 +5,7 @@ kind: discord-export
 title: "Federation alliance-announcements channel (Discord export, 2018)"
 fetched_at: 2026-09-03T22:11:34.657Z
 note: "The Federation's internal alliance announcement channel, exported from Discord. Official first-person announcements by the alliance's leadership during 2018: territory assignments, war orders, membership changes. 79 attached images are archived alongside (see data/wiki/sources/federation/)."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 Drew1011 — 2/17/2018 6:35 PM
 @unknown-role 

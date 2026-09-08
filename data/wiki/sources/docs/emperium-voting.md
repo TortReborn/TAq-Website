@@ -5,6 +5,7 @@ kind: discord-export
 title: "The Emperium of Wynn voting channel (Discord export, Aug-Sep 2017)"
 fetched_at: 2026-09-04T21:42:41.930Z
 note: "The channel where the alliance actually decided things, by Discord reaction: triarch shift length, whether to keep the war advisor, tax levels, guild admissions, and the elections for Shadow Advisor and Community Leader. Shows weighted votes and the exclusion of visitor votes."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 Gas — 8/27/2017 10:28 AM

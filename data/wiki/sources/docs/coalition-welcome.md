@@ -5,6 +5,7 @@ kind: discord-export
 title: "Coalition welcome channel (Discord export, 23 Jan 2018)"
 fetched_at: 2026-09-04T21:52:23.093Z
 note: "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". The rebuilt server's rules and channel list, including a #storytime channel 'for leaders to tell their Wynn stories'."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 Drew1011 — 1/23/2018 7:25 AM
