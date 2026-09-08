@@ -3724,6 +3724,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T16:57:59.316Z"
+  },
+  "emperium-voting-record-2017-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Emperium of Wynn guild Discord, August – October 2017 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:05:52.382Z"
   }
  }
 }
