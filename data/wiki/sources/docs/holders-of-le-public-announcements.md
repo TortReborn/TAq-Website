@@ -5,6 +5,7 @@ kind: discord-export
 title: "Holders of LE public announcements (Discord export, 2018-2019)"
 fetched_at: 2026-09-04T21:24:55.065Z
 note: "The guild's public announcement channel. Four notices: the red-panda banner of April 2018, Drew1011 reviving HoL as an open community in June 2018, an inactivity purge three days later, and a new icon in March 2019."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 PikaLegend [MONU],  — 4/4/2018 5:16 PM

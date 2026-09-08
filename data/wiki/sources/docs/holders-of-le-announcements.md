@@ -5,6 +5,7 @@ kind: discord-export
 title: "Holders of LE guild announcements (Discord export, Feb-Jul 2018)"
 fetched_at: 2026-09-04T21:22:51.556Z
 note: "The guild's internal announcement channel during its Federation year: territory assignments and defence orders, promotions, alliance joins, and the events it entered. Two real first names and the live invite, attachment and form links were removed before archiving."
+timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 COO Thundderr Holderson [TAq],  — 2/17/2018 1:12 PM

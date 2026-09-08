@@ -49,8 +49,11 @@ function loadSource(id: string): { meta: SourceMeta; body: string } | null {
     meta = { url: '' };
   }
   const raw = fs.readFileSync(docPath, 'utf8');
-  // Strip the frontmatter block; its fields are already in the manifest
-  const body = raw.replace(/^---\n[\s\S]*?\n---\n?/, '').trim();
+  // Strip the frontmatter block; its fields are already in the manifest.
+  // Must tolerate CRLF: most documents were written with Windows endings, and
+  // an LF-only pattern silently published the header — fetch timestamps, file
+  // hashes and archivists' notes — on 272 of 329 reference pages.
+  const body = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '').trim();
   return { meta, body };
 }
 
