@@ -3742,6 +3742,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T17:08:55.352Z"
+  },
+  "holders-of-le-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Holders of LE [HoL] guild Discord, 2015 – 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:16:33.649Z"
   }
  }
 }
