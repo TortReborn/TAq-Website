@@ -3778,6 +3778,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T17:57:09.884Z"
+  },
+  "subguilds-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / Federation / Terra guild Discord, 2015 – September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T18:00:01.092Z"
   }
  }
 }
