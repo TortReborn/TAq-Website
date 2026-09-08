@@ -3877,6 +3877,33 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T20:27:57.429Z"
+  },
+  "terra-terms-of-surrender-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:33:57.346Z"
+  },
+  "terra-victory-september-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:33:57.463Z"
+  },
+  "terra-institutions-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:33:57.585Z"
   }
  }
 }
