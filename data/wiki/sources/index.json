@@ -3706,6 +3706,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T16:39:28.794Z"
+  },
+  "buildcraftia-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "BuildCraftia [BCr] guild Discord, February – June 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:45:23.823Z"
   }
  }
 }
