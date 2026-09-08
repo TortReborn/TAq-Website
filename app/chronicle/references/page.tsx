@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
+import { canSeeRedacted, redactText } from '@/lib/wiki-redaction';
 
 /**
  * Index of every archived source the wiki cites, so a reader can browse the
@@ -42,6 +44,17 @@ export default async function ReferencesIndex() {
     sources = JSON.parse(fs.readFileSync(path.join(root, 'index.json'), 'utf8')).sources ?? {};
   } catch { /* index unavailable — render an empty list rather than failing */ }
 
+  // Source titles are auto-extracted from the page they were captured from, so
+  // a forum thread titled after its subject carries that name into this index.
+  const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
+  if (!canSeeRedacted(principal)) {
+    sources = Object.fromEntries(
+      Object.entries(sources).map(([id, s]) => [
+        id,
+        { ...s, title: s.title ? redactText(s.title) : s.title, note: s.note ? redactText(s.note) : s.note },
+      ]),
+    );
+  }
   const byKind = new Map<string, [string, SourceMeta][]>();
   for (const entry of Object.entries(sources)) {
     const kind = entry[1].kind ?? 'web';

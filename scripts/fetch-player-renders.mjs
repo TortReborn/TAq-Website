@@ -14,6 +14,14 @@
  * A render shows the account's CURRENT skin, not necessarily the one worn
  * during the period an article covers. Accounts that no longer resolve get no
  * render, and that is recorded rather than guessed at.
+ *
+ * THE IGN IS NOT THE SLUG. An article slug is the name the community used,
+ * which is often not the Minecraft account name — the Chronicle published a
+ * stranger's skin on a player page for months because "Goden" resolves to a
+ * real account and the player is "Godenn". A name resolving is no evidence it
+ * is the right person. Pass an IGN you have corroborated from a forum profile,
+ * a roster or the player themselves, and record where it came from with
+ * --source; the script warns when the IGN is merely the slug spelled back.
  */
 import fs from 'fs';
 import path from 'path';
@@ -29,6 +37,8 @@ const MANIFEST = path.join(ROOT, 'data/wiki/sources/media/player-renders.json');
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
+/** Where the IGN came from, recorded in the manifest so a later reader can check it. */
+const sourceArg = (args.find((a) => a.startsWith('--source=')) ?? '').slice('--source='.length);
 const pairs = args.filter((a) => !a.startsWith('--'));
 if (!pairs.length) {
   console.error('usage: fetch-player-renders.mjs [--dry-run] <slug>:<ign> ...');
@@ -48,6 +58,16 @@ for (const pair of pairs) {
 
   const already = manifest.resolved.find((r) => r.slug === slug);
   if (already && already.status === 'ok') { console.log(`${slug}: already resolved`); continue; }
+
+  // The slug is a display name. If the IGN is just the slug spelled back, no
+  // one has checked it against the account, and a plausible-looking render may
+  // belong to an unrelated player who happens to hold that name.
+  const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const assumed = norm(ign) === norm(slug);
+  if (assumed && !sourceArg) {
+    console.warn(`${slug.padEnd(18)} WARNING: the IGN matches the slug and no --source was given.`);
+    console.warn(`${''.padEnd(18)} Corroborate the Minecraft name before publishing this render.`);
+  }
 
   let uuid = null, resolvedName = null, status = 'unresolved';
   try {
@@ -88,7 +108,11 @@ for (const pair of pairs) {
   }
 
   manifest.resolved = manifest.resolved.filter((r) => r.slug !== slug);
-  manifest.resolved.push({ slug, ign, resolvedName, uuid, status: 'ok', render });
+  manifest.resolved.push({
+    slug, ign, resolvedName, uuid, status: 'ok', render,
+    // How the IGN was established. 'assumed-from-slug' means nobody checked.
+    ignSource: sourceArg || (assumed ? 'assumed-from-slug' : 'given'),
+  });
   console.log(`${slug.padEnd(18)} ${ign.padEnd(18)} ok  ${resolvedName !== ign ? `(now "${resolvedName}") ` : ''}${uuid}`);
   await sleep(400);
 }

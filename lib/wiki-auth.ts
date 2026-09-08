@@ -225,6 +225,25 @@ export async function resolveWikiPrincipal(request: NextRequest): Promise<WikiPr
   return null;
 }
 
+/**
+ * The same question, asked from a server component.
+ *
+ * Route handlers get a `NextRequest`; pages under `app/` do not, they get the
+ * `cookies()` store. Both session readers touch the request only through
+ * `request.cookies.get(name)`, and the store exposes exactly that method, so a
+ * two-field shim spares us a second copy of the cookie-verifying logic — which
+ * is the part that must not drift between the two paths.
+ *
+ * Used for read-gating pages (see lib/wiki-redaction.ts). Anything that writes
+ * still goes through a route handler and `requireWikiEditor`.
+ */
+export async function resolveWikiPrincipalFromCookies(): Promise<WikiPrincipal | null> {
+  const { cookies } = await import('next/headers');
+  const store = cookies();
+  const shim = { cookies: { get: (name: string) => store.get(name) } } as unknown as NextRequest;
+  return resolveWikiPrincipal(shim);
+}
+
 /** Guard for routes that publish or review. */
 export async function requireWikiEditor(request: NextRequest): Promise<WikiPrincipal | null> {
   const p = await resolveWikiPrincipal(request);

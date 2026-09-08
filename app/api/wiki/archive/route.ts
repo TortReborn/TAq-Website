@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { canSeeRedacted, isRedactedSlug, redactText } from '@/lib/wiki-redaction';
+import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
 import fs from 'fs';
 import path from 'path';
 import { getPool } from '@/lib/db';
@@ -100,6 +102,13 @@ const CITATION_SQL = `
 
 export async function GET() {
   try {
+    // The editorial desk lists which article cites which source. A redacted
+    // page must not appear in that list, and a source title must not name its
+    // subject there either.
+    const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
+    const unredacted = canSeeRedacted(principal);
+    const slugsOut = (slugs: Set<string>) =>
+      (unredacted ? [...slugs] : [...slugs].filter((s) => !isRedactedSlug(s))).sort();
     const root = path.join(process.cwd(), 'data', 'wiki', 'sources');
     let sources: Record<string, SourceMeta> = {};
     try {
@@ -130,7 +139,7 @@ export async function GET() {
       const cited = usage.get(id);
       return {
         id,
-        title: s.title?.trim() || id,
+        title: unredacted ? (s.title?.trim() || id) : redactText(s.title?.trim() || id),
         tier: s.tier ?? 'unclassified',
         kind: s.kind ?? 'web',
         url: s.url ?? '',
@@ -138,9 +147,9 @@ export async function GET() {
         // Trimmed here rather than in the browser: the panel shows 160
         // characters, and a few hundred notes at full length is the bulk of
         // this response.
-        note: s.note?.trim() ? s.note.trim().slice(0, 200) : null,
-        citations: cited ? cited.size : 0,
-        articles: cited ? [...cited].sort() : [],
+        note: s.note?.trim() ? (unredacted ? s.note.trim() : redactText(s.note.trim())).slice(0, 200) : null,
+        citations: cited ? slugsOut(cited).length : 0,
+        articles: cited ? slugsOut(cited) : [],
       };
     }).sort((a, b) => a.title.localeCompare(b.title));
 
@@ -149,8 +158,8 @@ export async function GET() {
       .filter(([id]) => !archived.has(id))
       .map(([id, slugs]) => ({
         id,
-        citations: slugs.size,
-        articles: [...slugs].sort(),
+        citations: slugsOut(slugs).length,
+        articles: slugsOut(slugs),
         isRawUrl: /^https?:\/\//i.test(id),
       }))
       .sort((a, b) => b.citations - a.citations);
