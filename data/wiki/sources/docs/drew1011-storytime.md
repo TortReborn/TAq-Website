@@ -466,7 +466,7 @@ In the days after Ordo’s death, it became obvious that we would be let in to V
 Never the one to take risks though, I️ had already joined Astrafteri. We would remain there until we officially joined Valkyrie, just in case.
 We became more closely acquainted with Ari, who spent much time explaining exactly how Valkyrie was run.
 She questioned both of us to make sure we would be a good fit for the alliance.
-On one night she asked me a few odd questions such as whether or not I️ had both parents and how many friends I️ had at school.
+[redacted: a question about the narrator’s family and schooling. Removed under the project’s rule that personal details are never published; the sentence carried no guild-history content.]
 I shrugged it off and answered these questions, assuming she had good reasoning behind asking.
 Finally, it was confirmed that we would be joining.
 On March 18th, 2016, 9 days after Ordo’s collapse, the Holders of LE, Kingdom of Foxes, HaHaUnited, and Imperial all gathered at a ceremony in Llevigar.
