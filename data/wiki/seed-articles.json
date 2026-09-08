@@ -806,6 +806,31 @@
       "leadImageCaption": "Wynncraft territory map reproduced in Drew1011's account as a view of the map in late September or early October 2015."
     },
     {
+      "slug": "confederation",
+      "title": "Confederation",
+      "pageType": "alliance",
+      "summary": "A Wynncraft war alliance of 2018 assembled to fight the Federation, known only from the records of the alliance it attacked. Its September offensive left the Federation's smallest guilds holding with two defenders apiece; it was finished by 15 September with every guild gone but two, and rebuilt within three days by the same leader.",
+      "infobox": [
+        {
+          "label": "Type",
+          "value": "War alliance"
+        },
+        {
+          "label": "Known from",
+          "value": "The Federation's channels only"
+        },
+        {
+          "label": "Collapsed",
+          "value": "15 Sep 2018, all but two guilds gone"
+        },
+        {
+          "label": "Rebuilt",
+          "value": "by 18 Sep 2018, under the same leader"
+        }
+      ],
+      "body": "The **Confederation** was a war alliance of 2018, assembled against [[the-federation|the Federation]] and led from [[buildcraftia|BuildCraftia]] after that guild's expulsion in April.\n\n## Known only from its enemy\n\nThe Confederation kept no channel this project can read. Everything below was written down by the alliance it was attacking, in that alliance's own rooms, and almost all of it is in the accusative: things the Confederation did to somebody else.{{cite:confederation-collapse-2018-discord-private|September 2018}} What it wanted, how it was organised and what its members thought they were doing went unrecorded.\n\n## The September offensive\n\nIt was felt hardest by the smallest guilds. On 2 September 2018 members of two of them reported in the Federation's war channel that they were being attacked three times in a minute, that the fighting was five against three, that two defenders were carrying it, and that the attackers were moving faster than they could answer.{{cite:confederation-collapse-2018-discord-private|2 Sep 2018}}\n\nA member watching the same fighting noticed that all the attacking guilds but one appeared to be operating alone rather than in concert.{{cite:confederation-collapse-2018-discord-private|2 Sep 2018}}\n\n## Dead on the fifteenth, rebuilt by the eighteenth\n\nOn 15 September a Federation member reported that the Confederation was finished and that every guild had left it except two.{{cite:confederation-collapse-2018-discord-private|15 Sep 2018}}\n\nThree days later another told the leadership channel that BuildCraftia's leader had confirmed to him directly that three further guilds — [[blacklisted|Blacklisted]], Fuq and [[kingdomphoenixes|Kingdom Phoenixes]] — had each agreed to enter the alliance he was assembling.{{cite:confederation-collapse-2018-discord-private|18 Sep 2018}}\n\nBy 20 September a Federation member could say that the only alliances left standing were the [[aesir-pact|Aesir Pact]] and [[valkyrie|Valkyrie]].{{cite:confederation-collapse-2018-discord-private|20 Sep 2018}}\n\n## What the guilds did instead\n\nUnderneath all this, guilds were settling territory between themselves. On 18 September a member described an arrangement he had reached with two others: he would leave two named territories alone while they held them, and they would leave a third to him while he held it.{{cite:confederation-collapse-2018-discord-private|18 Sep 2018}} Bilateral, unwritten, and outside any alliance."
+    },
+    {
       "slug": "council-of-canyon-kingdoms",
       "title": "Council of Canyon Kingdoms",
       "pageType": "alliance",
