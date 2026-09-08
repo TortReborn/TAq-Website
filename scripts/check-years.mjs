@@ -16,7 +16,18 @@ import fs from 'fs';
 import path from 'path';
 
 const YEAR = /\b1[0-9]{3}\b/g;
-const strip = (s) => s.replace(/\{\{cite:[^}]*\}\}/g, '');
+// Citation locators carry line and post numbers — "L1044", "p97 #1922" — which
+// look exactly like years. Strip those two forms and keep the rest of the
+// locator in scope: a locator is also where a date most often lives, and a typo
+// there is as wrong as one in the prose. Not scanning locators at all was how
+// "early 1016" reached a published page.
+const strip = (s) =>
+  s
+    // Storytime line refs, including ranges: L1044, L1044-1056
+    .replace(/\bL\d+(?:\s*[\u2013\u2014-]\s*\d+)*/g, '')
+    // Forum post and page refs: "#1922", "p97"
+    .replace(/#\s*\d+/g, '')
+    .replace(/\bp\d+/g, '');
 
 const idx = process.argv.indexOf('--text');
 if (idx !== -1) {
