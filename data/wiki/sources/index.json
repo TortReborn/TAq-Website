@@ -3949,6 +3949,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T21:37:28.772Z"
+  },
+  "federation-admissions-under-suspicion-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 22–23 October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T21:41:49.978Z"
   }
  }
 }
