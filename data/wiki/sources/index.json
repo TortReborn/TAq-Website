@@ -3409,6 +3409,42 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-08T00:50:21.335Z"
+  },
+  "kingdom-of-foxes-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes guild Discord, 2014–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.509Z"
+  },
+  "hackforums-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "HackForums guild Discord, 2014–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.566Z"
+  },
+  "paladins-united-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Paladins United guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.652Z"
+  },
+  "imperial-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Imperial guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.746Z"
   }
  }
 }
