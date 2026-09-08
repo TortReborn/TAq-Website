@@ -4129,6 +4129,31 @@
       "leadImageCaption": "A tier 1 guild banner, the customisable emblem each guild carries."
     },
     {
+      "slug": "the-hive",
+      "title": "The Hive",
+      "pageType": "guild",
+      "summary": "The Hive [THI] was a Wynncraft guild of 2018 named after a territory, which it took 621 times — more than any other guild. It belonged to the Federation and to Valkyrie at once, argued the small guilds' case inside the first, and left on 27 October 2018 without giving a reason, leaving its own leaders unable to say which alliance it had left.",
+      "infobox": [
+        {
+          "label": "Tag",
+          "value": "THI"
+        },
+        {
+          "label": "Alliances",
+          "value": "[[the-federation|Federation]] and [[valkyrie|Valkyrie]], simultaneously"
+        },
+        {
+          "label": "Left the Federation",
+          "value": "27 Oct 2018"
+        },
+        {
+          "label": "Most-taken territory",
+          "value": "Hive, 621 times in 2018"
+        }
+      ],
+      "body": "## The guild and the territory\n\nThe guild was named after a piece of ground, and the capture record shows how literally it meant it. Hive was the fourth most contested territory in the game between 30 March and 8 October 2018, changing hands 3,205 times — and The Hive took it 621 times, more than any other guild.{{cite:the-hive-guild-profile-discord-private|Hive territory captures, 30 Mar – 8 Oct 2018: 3,205 total, 621 by The Hive}} Three times a day for six months, on the same ground.\n\nIts own war activity rose sharply through the same period: 44 recorded transitions in March 2018, 787 in April, 856 in May, 3,340 in June and 2,589 in July.{{cite:the-hive-guild-profile-discord-private|war transitions by month, Mar–Jul 2018: 44, 787, 856, 3,340, 2,589}} The fourfold rise in June is the month at least four guilds attacked it at once.{{cite:the-hive-guild-profile-discord-private|June 2018}}\n\n## In two alliances at once\n\nIt joined [[valkyrie|Valkyrie]] around March 2018 while sitting inside [[the-federation|the Federation]], one of several guilds in both at the same time.{{cite:chronicle-records|Chronicle alliance and event records}} For most of its membership it argued the small guilds' case: in March 2018 its leader raised that the larger allies were taking territory assigned to weaker guilds and defending it as their own{{cite:the-hive-guild-profile-discord-private|March 2018}} — the complaint that runs through the whole of the alliance's second half.\n\nIn September 2018, when a map revision moved several high-value territories away from the guild, its representative confronted the alliance's map-maker, and in the same discussion its leader offered to hand her position to someone else.{{cite:the-hive-guild-profile-discord-private|September 2018}} Whether anyone took up the offer was never recorded.\n\n## The departure nobody could define\n\nThe Hive left the Federation on 27 October 2018 without giving a public reason, announcing that it would go independent and fight no more wars.{{cite:the-hive-guild-profile-discord-private|27 Oct 2018}}{{cite:federation-collapse-2018-discord-private|Federation leadership channels, 27 Oct 2018}} A leader then asked in the channel whether it had left Valkyrie as well or only the Federation, and nothing in the record answers him.{{cite:the-hive-guild-profile-discord-private|October 2018}} That is a fact about the alliances rather than about the guild: two overlapping memberships, one guild holding both, and no mechanism anywhere for saying which of them a departure ended.\n\nIts neutrality lasted about a fortnight. It began retaliating against whoever had taken its old ground; two days after the announcement a player from a Federation member guild attacked it on his own initiative, which members recorded as pushing a guild that had been inclined to help them into hostility instead; and a further row over a member taking a toll territory for the experience finished it.{{cite:the-hive-guild-profile-discord-private|late October 2018}}{{cite:federation-collapse-2018-discord-private|Federation war channel, late October 2018}} The alliance was left arguing whether an unwritten understanding not to attack the guild still applied, one member observing that sparing it while fighting its allies made no sense.{{cite:the-hive-guild-profile-discord-private|November 2018}}\n\nIts departure was the first of the five that emptied the Federation in the fortnight before [[the-federation-dies|it dissolved]] on 10 November 2018.{{cite:federation-collapse-2018-discord-private|Federation leadership channels, 27–30 Oct 2018}} Nothing connects the September argument to the October silence, and no reason for the departure was ever given."
+    },
+    {
       "slug": "the-long-raid",
       "title": "The Long Raid",
       "pageType": "war",
