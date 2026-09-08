@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
 import { listUnverifiedPages, wikiAuthorshipStats } from '@/lib/wiki-db';
+import { canSeeRedacted, redactSummaries } from '@/lib/wiki-redaction';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
       resolveWikiPrincipal(request),
     ]);
     return NextResponse.json({
-      pages,
+      pages: canSeeRedacted(principal) ? pages : redactSummaries(pages),
       stats,
       canValidate: principal?.canReview ?? false,
     });

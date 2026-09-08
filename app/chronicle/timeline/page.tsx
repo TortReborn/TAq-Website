@@ -4,6 +4,8 @@ import { getPool } from '@/lib/db';
 import { loadChronicleData } from '@/lib/chronicle-db';
 import { chronicleEventColor, allianceTimelineSpans } from '@/lib/chronicle';
 import { resolveWikiSlugs } from '@/lib/wiki-db';
+import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
+import { canSeeRedacted, redactSlugSet } from '@/lib/wiki-redaction';
 import { slugify } from '@/lib/wiki';
 
 export const dynamic = 'force-dynamic';
@@ -77,9 +79,16 @@ export default async function ChroniclesTimeline() {
     candidates.add(e.wikiSlug ?? slugify(e.title));
   }
   const existing = await resolveWikiSlugs(pool, [...candidates]);
+  // The timeline auto-links any entry whose title matches a page. A redacted
+  // page must not be linked from here either, or the timeline becomes the way
+  // in that the article pages closed.
+  const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
+  const linkable = canSeeRedacted(principal)
+    ? existing
+    : new Set(redactSlugSet(existing));
   for (const e of entries) {
     const candidate = e.wikiSlug ?? slugify(e.title);
-    e.wikiSlug = existing.has(candidate) ? candidate : undefined;
+    e.wikiSlug = linkable.has(candidate) ? candidate : undefined;
   }
 
   // Group by year

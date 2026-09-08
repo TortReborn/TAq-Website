@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ExternalLink, Archive } from 'lucide-react';
+import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
+import { canSeeRedacted, redactText } from '@/lib/wiki-redaction';
 
 /**
  * A reference page: our archived copy of one source, so every citation in the
@@ -55,7 +57,10 @@ function loadSource(id: string): { meta: SourceMeta; body: string } | null {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const found = loadSource(id);
-  return { title: found ? `${found.meta.title ?? id} — Reference` : 'Reference' };
+  if (!found) return { title: 'Reference' };
+  const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
+  const title = found.meta.title ?? id;
+  return { title: `${canSeeRedacted(principal) ? title : redactText(title)} — Reference` };
 }
 
 const fmtCapture = (stamp: string) =>
@@ -65,7 +70,18 @@ export default async function ReferencePage({ params }: { params: Promise<{ id: 
   const { id } = await params;
   const found = loadSource(id);
   if (!found) notFound();
-  const { meta, body } = found;
+
+  // The archived documents are verbatim captures and stay that way on disk —
+  // an archivist checking a citation has to see exactly what the source said.
+  // The copy served to everyone else has redacted names replaced, the same as
+  // the articles that cite it, so a name cannot be recovered one click down
+  // from the page that hid it.
+  const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
+  const unredacted = canSeeRedacted(principal);
+  const meta = unredacted
+    ? found.meta
+    : { ...found.meta, title: found.meta.title ? redactText(found.meta.title) : found.meta.title };
+  const body = unredacted ? found.body : redactText(found.body);
 
   const isUrl = /^https?:\/\//.test(meta.url ?? '');
   const waybackUrl = meta.waybackCapture && isUrl

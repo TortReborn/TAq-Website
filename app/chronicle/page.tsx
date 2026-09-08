@@ -5,6 +5,8 @@ import { listWikiPages, recentWikiChanges } from '@/lib/wiki-db';
 import { WIKI_PAGE_TYPES, WIKI_TYPE_LABELS, WikiPageType } from '@/lib/wiki';
 import WikiSearchBox from '@/components/WikiSearchBox';
 import WikiLandingActions from '@/components/WikiLandingActions';
+import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
+import { canSeeRedacted, redactSummaries } from '@/lib/wiki-redaction';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,10 +21,16 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
   const { type } = await searchParams;
   const pool = getPool();
   const activeType = WIKI_PAGE_TYPES.includes(type as WikiPageType) ? (type as WikiPageType) : undefined;
-  const [pages, recent] = await Promise.all([
+  const [allPages, allRecent, principal] = await Promise.all([
     listWikiPages(pool, { pageType: activeType }),
     recentWikiChanges(pool, 15),
+    resolveWikiPrincipalFromCookies().catch(() => null),
   ]);
+  // A restricted page is absent from the index and from recent changes, not
+  // merely unlinked: a title in a list is enough to identify its subject.
+  const unredacted = canSeeRedacted(principal);
+  const pages = unredacted ? allPages : redactSummaries(allPages);
+  const recent = unredacted ? allRecent : redactSummaries(allRecent);
 
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem 3rem' }}>
