@@ -37,3 +37,6 @@ playwright-report/
 .claude/settings.local.json
 # Subagent worktrees — separate checkouts, never part of this one
 .claude/worktrees/
+
+# --- Private Discord archive: findings that cross from the vault, never committed ---
+docs/discord-findings/
