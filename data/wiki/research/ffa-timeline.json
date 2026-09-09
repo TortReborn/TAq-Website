@@ -1,7 +1,16 @@
 {
-  "$comment": "Free-for-all territories declared by the Coalition and then the Federation. FFA ground was open to anyone: a capture there is churn, not an act of war. Any claim that reads capture counts as evidence of allegiance or hostility must exclude the FFA territories in force for that window. Source is Tier A (announcement channels) and quotable.",
+  "$comment": "Free-for-all territories declared by the Coalition and then the Federation. FFA ground was open to anyone: a capture there is churn, not an act of war. Any claim that reads capture counts as evidence of allegiance or hostility must exclude the FFA territories in force for that window. Sources are Tier A (announcement channels) and quotable. Ten declarations are known, January 2018 to September 2019; the two earliest are map images whose territory names were never written in text, so windows before 10 March 2018 can only be bounded, not filtered.",
   "rule": "Use the list whose date is on or before the window start. Never borrow a neighbouring month: the lists change size from 12 to 23 across 2018.",
   "lists": [
+    {
+      "date": "2018-01-16",
+      "source": "coalition-announcements",
+      "locator": "1/16/2018 Gavel assignment",
+      "kind": "map-only",
+      "count": null,
+      "territories": null,
+      "note": "The Coalition's assignment for thirteen guilds, ending 'Free for all territories are in black.' The FFA ground is only on the image, so no names are recoverable. On 1 February the alliance said further territories would be made free-for-all but that it had not yet chosen which."
+    },
     {
       "date": "2018-02-21",
       "source": "federation-alliance-announcements",
@@ -227,6 +236,36 @@
       ],
       "alsoUnassigned": [],
       "note": "The list in force through the Confederation offensive and collapse."
+    },
+    {
+      "date": "2019-09-14",
+      "source": "terra-alliance-announcements-discord-private",
+      "locator": "14 Sep 2019",
+      "kind": "listed",
+      "count": 18,
+      "territories": [
+        "Cinfras",
+        "Guild Hall",
+        "Hive",
+        "Lava Lake",
+        "Molten Reach",
+        "Sky Falls",
+        "Raider's Base Upper",
+        "Qira's Battle Room",
+        "Factory Entrance",
+        "Avos Temple",
+        "Detlas",
+        "Mine Base Plains",
+        "Bob's Tomb",
+        "Battle Tower",
+        "Herb Cave",
+        "Jungle Lake",
+        "Temple of Legends",
+        "Emerald Trail"
+      ],
+      "alsoUnassigned": [],
+      "note": "Terra, published two days before the Luna war ended and maintained afterwards in the same channel: Avos Temple confirmed still free on 30 Sep; Raiders Base Lower released 10 Oct after diplomacy with TheNoLifes; a further change 15 Nov; Mine Base Plains back to free-for-all on 11 Dec when Titans Valor dropped it. The institution did not lapse after 2018.",
+      "provenanceNote": "Reported by the research session from Terra's own announcements channel, which is announcement tier but is NOT one of the thirteen sanctioned discord-export documents in this repo. The names are kept here because the filter cannot work without them and because they are public game geography — fifteen of the eighteen already appear in the published 2018 Federation lists, and the same ground is on the public forum list of 9 March 2020. No document for this channel exists or may be created; the citation id is private and resolves to provenance only."
     }
   ]
 }
