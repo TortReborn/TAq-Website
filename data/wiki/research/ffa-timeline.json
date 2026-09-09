@@ -183,9 +183,10 @@
       ],
       "alsoUnassigned": [],
       "amendedOn": [
+        "2018-07-25",
         "2018-08-05"
       ],
-      "note": "Amended after publication on 2018-08-05, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here."
+      "note": "Territory names for the amendments are not held here. Amended twice: on 25 July 2018 two territories were removed from the pool by drawing a new map, voted through in the leaders channel and published as images with no list, so no text record of the removal exists; and on 5 August they were restored by announcement. A search of the announcement tier finds the restoration and not the removal, and a search of the maps finds the reverse. This list is therefore wrong for 26 July to 5 August 2018."
     },
     {
       "date": "2018-08-06",
@@ -321,5 +322,5 @@
       ]
     }
   ],
-  "amendmentNote": "A declaration was in force AS AMENDED. At least six dated amendments are known — two by the Federation in 2018 and four by Terra between September and December 2019 — and only the announcement tier was searched, so amendments agreed in a leadership channel and never published are not counted. ffa-filter.mjs applies a declaration unchanged and therefore reports a slightly stale list for any window after an amendment; it warns when it is doing so."
+  "amendmentNote": "A declaration was in force AS AMENDED. At least seven dated amendments are known — two by the Federation in 2018 and four by Terra between September and December 2019 — and only the announcement tier was searched, so amendments agreed in a leadership channel and never published are not counted. ffa-filter.mjs applies a declaration unchanged and therefore reports a slightly stale list for any window after an amendment; it warns when it is doing so. A change could also be made by map alone, with no announcement at all: the 25 July 2018 removal exists only as a map. A map-borne change takes effect on the day the map was published, not the day the vote passed."
 }

@@ -4367,6 +4367,60 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-09T02:59:15.304Z"
+  },
+  "coalition-collapse-as-remembered-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Coalition guild Discord, 2018, remembered 2018–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T03:10:18.454Z"
+  },
+  "storytime-as-a-source-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "multiple guilds guild Discord, 2015–2019, narrated 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T03:10:18.691Z"
+  },
+  "standing-documents-as-retrospection-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "multiple alliances guild Discord, 2017–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T03:10:18.911Z"
+  },
+  "federation-free-for-all-pool-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T03:10:19.310Z"
+  },
+  "federation-map-votes-july-august-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, July – August 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T03:10:19.679Z"
+  },
+  "federation-fox-withdrawal-july-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation and Kingdom of Foxes guild Discord, July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T03:10:19.981Z"
   }
  }
 }
