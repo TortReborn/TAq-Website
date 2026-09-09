@@ -4033,6 +4033,15 @@
    "tier": "primary",
    "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
    "registeredAt": "2026-09-09T00:20:33.029Z"
+  },
+  "roles-outlive-membership-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Coalition, The Federation guild Discord, January – August 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T00:29:21.334Z"
   }
  }
 }
