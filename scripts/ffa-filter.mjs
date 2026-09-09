@@ -77,21 +77,58 @@ if (days > STALE_DAYS) {
   process.exit(1);
 }
 
+// Two different reasons a list can have no names here, and they are not the
+// same fact about the past. A map-only declaration's names were never written
+// down by anybody. A withheld one's names exist, in the research vault, and are
+// kept out of this file because the declaration — this alliance, these
+// territories, this date — is archive content from a channel that is not one of
+// the thirteen sanctioned exports. Saying "not recorded" for the second would be
+// this file telling a lie about the record in order to keep a secret.
 if (inForce.territories === null) {
-  const size = inForce.count === null || inForce.count === undefined
-    ? 'an unrecorded number of'
-    : `${inForce.count}`;
-  console.log(`FFA declaration in force at ${from}: ${inForce.date} — ${inForce.kind}, ${size} territories, names not recorded.`);
+  const withheld = inForce.kind === 'listed';
+  const size = inForce.count ?? 'an unpublished number of';
+  console.log(`FFA declaration in force at ${from}: ${inForce.date} — ${inForce.kind}, ${size} territories, ` +
+    (withheld ? 'names held in the research vault.' : 'names never written down.'));
   console.log(inForce.note ?? '');
-  console.log('\nThe count cannot be filtered, only bounded. Report the raw figure and say in');
-  console.log('the prose that the free-for-all position for this window is not recoverable.');
-  console.log('Do not substitute a later list: the earliest enumerated one is 10 March 2018.');
-  process.exit(1);
+  if (withheld) {
+    console.log('\nRun with --territories to get the list this window needs filtered, send it');
+    console.log('to the research session, and it returns raw / free-for-all / contested.');
+    console.log('The figures come back the same; the declaration does not move.');
+  } else {
+    console.log('\nThe count cannot be filtered, only bounded. Report the raw figure and say in');
+    console.log('the prose that the free-for-all position for this window is not recoverable.');
+    console.log('Do not substitute a later list: the earliest enumerated one is 10 March 2018.');
+  }
+  if (!args.includes('--territories')) process.exit(1);
 }
 
 const ffa = [...(inForce.territories ?? []), ...(inForce.alsoUnassigned ?? [])];
 
 const pool = new Pool(DB.prod());
+
+// --territories: emit the window's ground and its volume, for a window whose
+// declaration this file does not hold. This is our data going out, not theirs
+// coming in — the research session marks which of these were free-for-all on
+// the date in force and returns the totals.
+if (args.includes('--territories')) {
+  const w = ['exchange_time >= $1::timestamptz', 'exchange_time < $2::timestamptz'];
+  const p = [from, to];
+  if (attacker) { p.push(attacker); w.push(`attacker_name = $${p.length}`); }
+  if (defender) { p.push(defender); w.push(`defender_name = $${p.length}`); }
+  if (involving) { p.push(involving); w.push(`(attacker_name = $${p.length} OR defender_name = $${p.length})`); }
+  const { rows: t } = await pool.query(
+    `SELECT territory, count(*)::int AS n FROM territory_exchanges
+     WHERE ${w.join(' AND ')} GROUP BY 1 ORDER BY 2 DESC, 1`, p);
+  const total = t.reduce((a, r) => a + r.n, 0);
+  console.log(`\n# window ${from} to ${to}${involving ? ', involving ' + involving : ''}` +
+    `${attacker ? ', attacker ' + attacker : ''}${defender ? ', defender ' + defender : ''}`);
+  console.log(`# ${total.toLocaleString()} exchanges across ${t.length} territories.`);
+  console.log(`# FFA declaration in force: ${inForce.date} (${inForce.count} territories).`);
+  console.log('# Mark the free-for-all ones and return raw / free-for-all / contested.\n');
+  for (const r of t) console.log(String(r.n).padStart(6) + '  ' + r.territory);
+  await pool.end();
+  process.exit(0);
+}
 const where = ['exchange_time >= $1::timestamptz', 'exchange_time < $2::timestamptz'];
 const params = [from, to];
 if (attacker) { params.push(attacker); where.push(`attacker_name = $${params.length}`); }

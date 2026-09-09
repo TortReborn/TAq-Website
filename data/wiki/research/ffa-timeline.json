@@ -243,29 +243,9 @@
       "locator": "14 Sep 2019",
       "kind": "listed",
       "count": 18,
-      "territories": [
-        "Cinfras",
-        "Guild Hall",
-        "Hive",
-        "Lava Lake",
-        "Molten Reach",
-        "Sky Falls",
-        "Raider's Base Upper",
-        "Qira's Battle Room",
-        "Factory Entrance",
-        "Avos Temple",
-        "Detlas",
-        "Mine Base Plains",
-        "Bob's Tomb",
-        "Battle Tower",
-        "Herb Cave",
-        "Jungle Lake",
-        "Temple of Legends",
-        "Emerald Trail"
-      ],
+      "territories": null,
       "alsoUnassigned": [],
-      "note": "Terra, published two days before the Luna war ended and maintained afterwards in the same channel: Avos Temple confirmed still free on 30 Sep; Raiders Base Lower released 10 Oct after diplomacy with TheNoLifes; a further change 15 Nov; Mine Base Plains back to free-for-all on 11 Dec when Titans Valor dropped it. The institution did not lapse after 2018.",
-      "provenanceNote": "Reported by the research session from Terra's own announcements channel, which is announcement tier but is NOT one of the thirteen sanctioned discord-export documents in this repo. The names are kept here because the filter cannot work without them and because they are public game geography — fifteen of the eighteen already appear in the published 2018 Federation lists, and the same ground is on the public forum list of 9 March 2020. No document for this channel exists or may be created; the citation id is private and resolves to provenance only."
+      "note": "Terra, published a week after it won the map and maintained in the same channel until at least December 2019 — so the institution did not lapse after 2018. The eighteen names are NOT held here: this file is tracked and public, and while the territory names are public game geography, the declaration itself (this alliance, these territories, this date) is archive content from a channel that is not one of the thirteen sanctioned exports. The list lives in the research vault. To filter a 2019 window, send the research session the distinct territories in it with their exchange counts and it returns raw, free-for-all and contested totals; nothing of the archive moves."
     }
   ]
 }
