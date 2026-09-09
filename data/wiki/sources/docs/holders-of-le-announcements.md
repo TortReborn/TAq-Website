@@ -6,6 +6,7 @@ title: "Holders of LE guild announcements (Discord export, Feb-Jul 2018)"
 fetched_at: 2026-09-04T21:22:51.556Z
 note: "The guild's internal announcement channel during its Federation year: territory assignments and defence orders, promotions, alliance joins, and the events it entered. Two real first names and the live invite, attachment and form links were removed before archiving."
 timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+edits: "This export holds each message's final text, not the text as posted. Messages revised on a later day: 24 Mar 2018 → 9 Apr 2018 (pinned); 5 Apr 2018 → 6 Apr 2018; 5 Jul 2018 → 6 Jul 2018. For those, the contents are evidence of what the document said on the edit date, and of the posting date only by inference — most are standing documents such as rosters, rules cards or territory lists, kept current rather than rewritten in response to events."
 ---
 
 COO Thundderr Holderson [TAq],  — 2/17/2018 1:12 PM

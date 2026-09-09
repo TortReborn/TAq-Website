@@ -1,6 +1,42 @@
 {
  "$comment": "Archived sources for the Chronicles wiki. Managed by scripts/source-archive.mjs — add entries with `add`, never by hand. Each entry carries a `tier`: primary (contemporaneous record), retrospective (first-person but recalled later), secondary (compiled by others afterwards), or derived (our own records and analysis).",
  "sources": {
+  "aesir-pact-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Aesir Pact guild Discord, October 2018 – January 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.151Z"
+  },
+  "after-the-federation-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Aesir Pact guild Discord, 8–11 November 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T22:14:39.851Z"
+  },
+  "alliance-governance-mechanics-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation / Emperium of Wynn / Kingdom of Foxes guild Discord, 2016–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.226Z"
+  },
+  "angels-of-eternal-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Angels of Eternal [AoE], with Peace and Tranquility [PaT] guild Discord, January – October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T15:11:50.450Z"
+  },
   "api-wynncraft-com-v3-guild-aequitas": {
    "url": "https://api.wynncraft.com/v3/guild/Aequitas",
    "kind": "api",
@@ -206,6 +242,15 @@
    "note": "The census and sweep techniques used to prove that a thread or roster never existed, rather than merely failing to find it. Cited where an article states that something is unrecorded.",
    "tier": "derived"
   },
+  "artemis-elysium-negotiation-may-2021-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Artemis and Goose negotiators guild Discord, 9–11 May 2021 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T02:13:31.414Z"
+  },
   "avicia-info-index": {
    "url": "https://www.avicia.info/",
    "kind": "guild-site",
@@ -216,6 +261,24 @@
    "note": "Avicia [AVO] official site — checking for history/war-log/alliance pages covering the 2023 Avicia-Sequoia and 2025 Aequitas-Avicia wars",
    "tier": "primary"
   },
+  "buildcraftia-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "BuildCraftia [BCr] guild Discord, July 2017 – June 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:45:23.823Z"
+  },
+  "buildcraftia-war-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, March–September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.287Z"
+  },
   "cameron-oral-history": {
    "url": "",
    "kind": "testimony",
@@ -224,6 +287,15 @@
    "textChars": 1435,
    "note": "Recollections from a long-serving TAq member covering the smtn elf and Avocado Aquarium period, relayed in 2026. Uncorroborated testimony unless a written source or map data confirms it.",
    "tier": "retrospective"
+  },
+  "cheating-and-enforcement-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Emperium of Wynn / Coalition / Federation / Terra guild Discord, May 2017 – September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:46:57.752Z"
   },
   "chronicle-map-methodology": {
    "url": "",
@@ -252,6 +324,33 @@
    "note": "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". Six weeks of alliance direction to 17 February 2018, ending with the division of Wynn that split the alliance and the roster of the bloc that replaced it.",
    "tier": "primary"
   },
+  "coalition-founding-2017-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition guild Discord, October 2017 – February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.367Z"
+  },
+  "coalition-fracture-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation guild Discord, February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.447Z"
+  },
+  "coalition-hol-ownership-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition [COA] guild Discord, 31 January – 1 February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:57:59.316Z"
+  },
   "coalition-information": {
    "url": "(Discord export — no public URL)",
    "kind": "discord-export",
@@ -260,6 +359,15 @@
    "textChars": 832,
    "note": "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". A single post of 11 January 2018 listing the alliance's fourteen member guilds and, separately, fourteen named enemy guilds.",
    "tier": "primary"
+  },
+  "coalition-last-fortnight-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition [COA] guild Discord, 1 – 16 February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T15:18:32.045Z"
   },
   "coalition-public-announcements": {
    "url": "(Discord export — no public URL)",
@@ -288,6 +396,42 @@
    "note": "The community-maintained dated timeline of Wynncraft guild history, exported from Google Docs. Cited across the research corpus as the Community Timeline document; previously free-text because no copy was held. Dates are UTC by its own convention. Community-compiled and therefore secondary — corroborate against forum posts where possible.",
    "tier": "secondary"
   },
+  "confederation-collapse-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed], observing the Confederation guild Discord, September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T23:10:39.365Z"
+  },
+  "consortium-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Consortium guild Discord, March–April 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.525Z"
+  },
+  "corkus-contested-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "command-bunker war feed (all guilds) guild Discord, 30 March – 8 October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T03:29:57.688Z"
+  },
+  "divine-swords-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Divine Swords (DsQ) guild Discord, 2017 – 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T06:00:24.230Z"
+  },
   "drew1011-storytime": {
    "url": "(Discord, private guild channel)",
    "kind": "testimony",
@@ -296,6 +440,15 @@
    "textChars": 135283,
    "note": "Partisan first-person account by the Federation founder; 62 images in data/sources/storytime/",
    "tier": "retrospective"
+  },
+  "emorians-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Emorians [ERN] guild Discord, February – June 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:08:55.352Z"
   },
   "emperium-announcements": {
    "url": "(Discord export — no public URL)",
@@ -306,6 +459,15 @@
    "note": "The alliance's own announcement channel from its founding in April 2017 to the eve of its fall that October: the founding roster, role applications and appointments, the judges, events, and the leadership contests. A member's birthday and a live invite were removed before archiving, and one display name was replaced with the poster's guild tag.",
    "tier": "primary"
   },
+  "emperium-constitution-2017-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Emperium of Wynn guild Discord, April – October 2017 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:19:11.623Z"
+  },
   "emperium-info": {
    "url": "(Discord export — no public URL)",
    "kind": "discord-export",
@@ -314,6 +476,15 @@
    "textChars": 1455,
    "note": "Three pinned posts: the role list naming the Emperator, Shadow Advisor and Triarch in September 2017, the application links, and the alliance's nine rules.",
    "tier": "primary"
+  },
+  "emperium-of-wynn-constitution-2017-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Emperium of Wynn guild Discord, April–December 2017 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.603Z"
   },
   "emperium-voting": {
    "url": "(Discord export — no public URL)",
@@ -324,6 +495,96 @@
    "note": "The channel where the alliance actually decided things, by Discord reaction: triarch shift length, whether to keep the war advisor, tax levels, guild admissions, and the elections for Shadow Advisor and Community Leader. Shows weighted votes and the exclusion of visitor votes.",
    "tier": "primary"
   },
+  "emperium-voting-record-2017-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Emperium of Wynn guild Discord, August – October 2017 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:05:52.382Z"
+  },
+  "enemy-alliances-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Round Table / Confederation (from the Federation's channels) guild Discord, May – July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T05:53:35.398Z"
+  },
+  "espionage-and-infiltration-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation / Terra / Kingdom of Foxes guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.663Z"
+  },
+  "espionage-as-institution-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / Federation / Luna / Terra guild Discord, January 2018 – November 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:57:09.884Z"
+  },
+  "ex-nihilo-odysseia-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Ex Nihilo (Nih) and Odysseia (Oys) guild Discord, June – October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T06:04:05.697Z"
+  },
+  "fantasy-leaving-and-returning-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Fantasy, The Federation, The Aesir Pact guild Discord, September – October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T00:20:33.029Z"
+  },
+  "federation-25-june-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, 25 June 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T06:12:10.054Z"
+  },
+  "federation-admissions-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, July – October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:28:57.749Z"
+  },
+  "federation-admissions-under-suspicion-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 22–23 October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T21:41:49.978Z"
+  },
+  "federation-air-temple-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 11–13 October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T21:28:50.225Z"
+  },
   "federation-alliance-announcements": {
    "url": "(Discord, Federation guild server)",
    "kind": "discord-export",
@@ -333,6 +594,240 @@
    "note": "The Federation's internal alliance announcement channel, exported from Discord. Official first-person announcements by the alliance's leadership during 2018: territory assignments, war orders, membership changes. 79 attached images are archived alongside (see data/wiki/sources/federation/).",
    "tier": "primary"
   },
+  "federation-allied-defence-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, August – September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:20:42.761Z"
+  },
+  "federation-allocation-series-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, February – September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:22:21.447Z"
+  },
+  "federation-at-its-height-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, August–September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.746Z"
+  },
+  "federation-august-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, August 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T04:20:06.393Z"
+  },
+  "federation-blocs-within-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 23–24 October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T21:37:28.772Z"
+  },
+  "federation-collapse-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation / Aesir Pact guild Discord, October–November 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.811Z"
+  },
+  "federation-corkus-campaign-march-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 3–5 March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T21:23:17.581Z"
+  },
+  "federation-decline-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, September – November 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T04:05:19.917Z"
+  },
+  "federation-enemy-list-july-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 2–3 July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T22:22:25.628Z"
+  },
+  "federation-first-counterattack-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 27–28 February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:01:30.873Z"
+  },
+  "federation-first-map-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T15:50:05.314Z"
+  },
+  "federation-first-month-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, late February – March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.870Z"
+  },
+  "federation-founding-week-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, 16 – 21 February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T06:29:12.751Z"
+  },
+  "federation-governance-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, May – July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T05:53:35.484Z"
+  },
+  "federation-guild-swap-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 22 October – 2 November 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T22:30:19.141Z"
+  },
+  "federation-inactive-members-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 10–18 September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:38:06.057Z"
+  },
+  "federation-july-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T19:20:05.599Z"
+  },
+  "federation-late-july-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 13–21 July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T19:18:02.737Z"
+  },
+  "federation-libertas-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 6–12 August 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T21:46:05.126Z"
+  },
+  "federation-map-disputes-march-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T15:50:05.380Z"
+  },
+  "federation-map-round-september-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 21–28 September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:56:14.456Z"
+  },
+  "federation-mapmakers-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, September – October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T19:38:59.152Z"
+  },
+  "federation-march-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:05:45.285Z"
+  },
+  "federation-nobody-came-september-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:28:57.499Z"
+  },
+  "federation-obligation-to-attack-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, April 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:20:43.123Z"
+  },
+  "federation-october-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T19:38:59.253Z"
+  },
   "federation-public-announcements": {
    "url": "(Discord, Federation guild server)",
    "kind": "discord-export",
@@ -341,6 +836,24 @@
    "textChars": 8027,
    "note": "The Federation's public announcement channel, exported from Discord, 2018. Server-wide notices rather than war direction. 2 attached images are archived alongside.",
    "tier": "primary"
+  },
+  "federation-territory-committee-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:35:48.572Z"
+  },
+  "federation-territory-doctrine-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, August 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:39:28.794Z"
   },
   "forums-wynncraft-com-forums-guilds-72-page-2-prefix-id-82-order-post-date-directi": {
    "url": "https://forums.wynncraft.com/forums/guilds.72/page-2?prefix_id=82&order=post_date&direction=asc",
@@ -390,6 +903,24 @@
    "textChars": 8849,
    "rawSha256": "6c43d794400c71ee",
    "note": "Drew1011's Wynncraft forum profile (member 2157), carrying his dated chain of guild and alliance titles."
+  },
+  "foxes-imperial-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes and Imperial guild Discord, 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T04:37:30.906Z"
+  },
+  "free-for-all-territories-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, February – July 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:20:42.984Z"
   },
   "gdoc-12gia5l_mo0yig84": {
    "url": "https://docs.google.com/document/d/12GIA5l_MO0yIg84QhJ52vHyLAo2T3ftf8RkYadfdjMQ/edit",
@@ -678,6 +1209,51 @@
    "note": "titantimes/valor — Titans Valor's Discord bot; consumed an alliance-claims feed built on Avicia's site code, commits Apr 23 - Dec 26 2022, corroborating ANO/AVO shared alliance infrastructure in the Cucumber Company window",
    "tier": "secondary"
   },
+  "guild-community-and-institutions-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes / Coalition / The Federation / Emperium of Wynn guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.928Z"
+  },
+  "guild-finance-and-war-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes / Coalition / Emperium guild Discord, January 2017 – April 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T18:06:02.778Z"
+  },
+  "guild-lineage-and-succession-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation / Kingdom of Foxes guild Discord, 2014–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:20.986Z"
+  },
+  "hackforums-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "HackForums guild Discord, 2014–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.566Z"
+  },
+  "hall-of-fame-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Hall of Fame (HoF) guild Discord, 2017-2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:56:36.920Z"
+  },
   "holders-of-le-announcements": {
    "url": "(Discord export — no public URL)",
    "kind": "discord-export",
@@ -687,6 +1263,15 @@
    "note": "The guild's internal announcement channel during its Federation year: territory assignments and defence orders, promotions, alliance joins, and the events it entered. Two real first names and the live invite, attachment and form links were removed before archiving.",
    "tier": "primary"
   },
+  "holders-of-le-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Holders of LE [HoL] guild Discord, 2015 – 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:16:33.649Z"
+  },
   "holders-of-le-public-announcements": {
    "url": "(Discord export — no public URL)",
    "kind": "discord-export",
@@ -695,6 +1280,69 @@
    "textChars": 845,
    "note": "The guild's public announcement channel. Four notices: the red-panda banner of April 2018, Drew1011 reviving HoL as an open community in June 2018, an inactivity purge three days later, and a new icon in March 2019.",
    "tier": "primary"
+  },
+  "how-guilds-ended-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "multiple guilds guild Discord, 2016 – 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T18:29:36.933Z"
+  },
+  "illustratus-naming-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Illustratus / War Syndicate guild Discord, January 2018 – September 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T04:53:37.185Z"
+  },
+  "imperial-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Imperial guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.746Z"
+  },
+  "kingdom-of-foxes-government-2016-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes guild Discord, December 2016 – February 2017 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:21.045Z"
+  },
+  "kingdom-of-foxes-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes guild Discord, 2014–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.509Z"
+  },
+  "kingdom-of-foxes-parliament-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes [Fox] guild Discord, February 2017 – February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T15:11:50.362Z"
+  },
+  "kingdom-phoenixes-september-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom Phoenixes guild Discord, September – October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T23:39:13.599Z"
   },
   "kingdomfoxes-com-members": {
    "url": "https://kingdomfoxes.com/members",
@@ -714,6 +1362,15 @@
    "note": "The guild's internal announcement channel from a fortnight after the November 2017 split to 2022. Coalition territory allocations and rosters, Prime Minister elections, promotions, the January 2018 kicking incident, AurumKitsune's abdication and her plan to install a viceroy, and Whimsy's return in April 2018. A treasure-hunt hint pointing at a birthday and age, and two private server addresses, were removed before archiving.",
    "tier": "primary"
   },
+  "kingdomphoenixes-november-2017-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "KingdomPhoenixes (Phx) guild Discord, 3 – 26 November 2017 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T05:34:02.910Z"
+  },
   "kingdomphoenixes-public-announcements": {
    "url": "(Discord export — no public URL)",
    "kind": "discord-export",
@@ -722,6 +1379,15 @@
    "textChars": 460,
    "note": "Two messages: AurumKitsune's abdication of 22 November 2017 in her own words, and a 2022 greeting. The abdication is the only first-person account of the handover.",
    "tier": "primary"
+  },
+  "lunatic-mox-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Lunatic (Mox) guild Discord, 2018-2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T03:03:31.673Z"
   },
   "map-seqwawa-com-index": {
    "url": "https://map.seqwawa.com/",
@@ -732,6 +1398,42 @@
    "rawSha256": "dd4cabc2c3903b9b",
    "note": "Sequoia's public territory map (seqwawa) — live + /history mode; the era's main territory-tracking tool, built by Sequoia",
    "tier": "primary"
+  },
+  "ordo-malleus-and-the-first-alliances-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation (retrospective) guild Discord, events 2014–2016, narrated January–March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:21.119Z"
+  },
+  "ordo-malleus-informal-power-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Ordo Malleus / Holders of LE guild Discord, 2015 – February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T17:19:50.178Z"
+  },
+  "paladins-united-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Paladins United guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T02:18:32.652Z"
+  },
+  "pasta-treaties-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation guild Discord, January–February 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:21.178Z"
   },
   "pre2018-territory-snapshots": {
    "url": "https://web.archive.org/web/*/wynncraft.com/api*",
@@ -750,6 +1452,15 @@
    "rawSha256": "a1806425a2018690",
    "note": "Sequoia-mod ChatManagerTest — captured in-game alliance system messages naming real guilds: 'Sequoia formed an alliance with Silk Road', 'Anime Lovers revoked the alliance with Sequoia', 'GaztheCat revoked the alliance with Chiefs Of Corkus', 'Tannslee formed an alliance with Radiant Roses'; also '[NewM] captured the territory Detlas Suburbs'",
    "tier": "secondary"
+  },
+  "roles-outlive-membership-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Coalition, The Federation guild Discord, January – August 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T00:29:21.334Z"
   },
   "sequoia-ooo-index-wb20240322": {
    "url": "https://sequoia.ooo/",
@@ -795,6 +1506,105 @@
    "note": "Sequoia's public war statistics page — 161,494 lifetime wars, 64 territories, per-member war leaderboard (lindafelix 21,232; SoloMap 18,616) and a season-by-season territory-completion history",
    "tier": "primary"
   },
+  "sins-of-seedia-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Sins of Seedia (SDU) guild Discord, 2017-2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T03:06:55.925Z"
+  },
+  "subguild-rule-and-the-games-staff-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation [Fed] guild Discord, 10–13 April 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T22:53:42.966Z"
+  },
+  "subguilds-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / Federation / Terra guild Discord, 2015 – September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T18:00:01.092Z"
+  },
+  "terra-alliance-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, August–December 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:21.257Z"
+  },
+  "terra-alliance-announcements-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September – December 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:26:26.018Z"
+  },
+  "terra-institutions-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:33:57.585Z"
+  },
+  "terra-mid-september-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, 14–27 September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:27:57.429Z"
+  },
+  "terra-october-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, October 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-09T01:19:11.803Z"
+  },
+  "terra-terms-of-surrender-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:33:57.346Z"
+  },
+  "terra-victory-september-2019-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Terra guild Discord, September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:33:57.463Z"
+  },
+  "territory-economy-and-warfare-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition / The Federation / Terra guild Discord, 2015–2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T00:50:21.335Z"
+  },
   "territory-exchanges": {
    "url": "https://theaquarium.wynn/map/history",
    "kind": "dataset",
@@ -812,6 +1622,24 @@
    "textChars": 4931,
    "note": "Google Doc linked inline in Drew1011s storytime account (link 35 of the storytime dump), concerning the Emperium of Wynn. Partisan in the same way the storytime is.",
    "tier": "secondary"
+  },
+  "the-hive-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Hive (THI) guild Discord, 2018 – 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T06:20:43.882Z"
+  },
+  "the-trench-war-january-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Coalition [COA] guild Discord, January 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T19:45:09.331Z"
   },
   "thread-109319": {
    "url": "https://forums.wynncraft.com/threads/109319/",
@@ -1602,6 +2430,70 @@
    "rawSha256": "3c658829ae4b5f88",
    "note": "Alliance-prefixed thread from complete guilds.72 prefix_id=82 census (round-2 sweep)",
    "tier": "primary"
+  },
+  "thread-226798": {
+   "url": "https://forums.wynncraft.com/threads/226798/",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:03.355Z",
+   "textChars": 40247,
+   "rawSha256": "8307596ae0fb3939"
+  },
+  "thread-226798-p02": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-2",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 2 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:04.836Z",
+   "textChars": 43013,
+   "rawSha256": "fb36adc1e9599036"
+  },
+  "thread-226798-p03": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-3",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 3 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:06.287Z",
+   "textChars": 44906,
+   "rawSha256": "ee9a279c07790429"
+  },
+  "thread-226798-p04": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-4",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 4 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:07.745Z",
+   "textChars": 28570,
+   "rawSha256": "f9f2536ba8a728a9"
+  },
+  "thread-226798-p05": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-5",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 5 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:09.211Z",
+   "textChars": 21252,
+   "rawSha256": "c266577f84f43824"
+  },
+  "thread-226798-p06": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-6",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 6 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:10.653Z",
+   "textChars": 19257,
+   "rawSha256": "5501d3ce057d63de"
+  },
+  "thread-226798-p07": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-7",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 7 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:12.093Z",
+   "textChars": 17718,
+   "rawSha256": "6159211eb3a0344c"
+  },
+  "thread-226798-p08": {
+   "url": "https://forums.wynncraft.com/threads/226798/page-8",
+   "kind": "forum-thread",
+   "title": "Guild Feeding Rules Clarification (mods Read Plz) | Page 8 | Wynncraft Forums",
+   "fetchedAt": "2026-09-09T02:38:13.517Z",
+   "textChars": 2375,
+   "rawSha256": "8c10453e53845267"
   },
   "thread-227373": {
    "url": "https://forums.wynncraft.com/threads/227373/",
@@ -2871,6 +3763,15 @@
    "note": "Recollections from a participant in the November 2017 KingdomPhoenixes split, relayed in 2026. A chief of the guild at the time who took its crown eighteen days later, so a witness rather than a compiler — but still memory, nine years on.",
    "tier": "retrospective"
   },
+  "titans-valor-guild-profile-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Titans Valor (ANO) guild Discord, 2017-2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T03:47:02.032Z"
+  },
   "titansvalor-org-news-vol14": {
    "url": "https://titansvalor.org/news/vol14",
    "kind": "newsletter",
@@ -3091,6 +3992,33 @@
    "note": "Titan Times volume 9 — Titans Valor newsletter: alliance/war/season records (Cucumber Company, Adonis, Hestia decline, FOOL betrayal, ANO leadership)",
    "tier": "secondary"
   },
+  "valkyrie-revival-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Kingdom of Foxes [Fox] / Holders of LE [HoL] guild Discord, February – March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T16:30:47.279Z"
+  },
+  "war-syndicate-successors-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "War Syndicate successors guild Discord, 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T20:08:20.084Z"
+  },
+  "war-update-march-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "The Federation guild Discord, 1 – 10 March 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T04:28:27.347Z"
+  },
   "wattpad-com-784189853-inside-myself-recent-wynncraft-guild-history": {
    "url": "https://www.wattpad.com/784189853-inside-myself-recent-wynncraft-guild-history",
    "kind": "memoir",
@@ -3100,6 +4028,24 @@
    "rawSha256": "19b3ca5e87563bc5",
    "note": "'Inside Myself - Recent Wynncraft Guild History' (Leonhart_Arkada/A_Challenger_Arrives, ANO Aedile, ~Sep 14 2019): near-contemporaneous memoir — Valkyrie->Luna rename, Emorians revolt mechanism, Terra's ~15-guild merger, the failed Sep 14 raid",
    "tier": "retrospective"
+  },
+  "who-fought-2018-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "command-bunker war feed (all guilds) guild Discord, 30 March – 8 October 2018 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T03:56:07.698Z"
+  },
+  "who-gets-a-vote-discord-private": {
+   "url": "",
+   "kind": "discord-private",
+   "private": true,
+   "title": "Ordo Malleus / Coalition / Federation / Terra guild Discord, 2015 – September 2019 (private archive, not published)",
+   "tier": "primary",
+   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
+   "registeredAt": "2026-09-08T18:22:09.820Z"
   },
   "wynncraft-api": {
    "url": "https://api.wynncraft.com/v3/",
@@ -3250,888 +4196,6 @@
    "textChars": 215,
    "rawSha256": "e41a69caf6147166",
    "note": "SMTN ELSE SLANDER, by TherapueticLiz."
-  },
-  "aesir-pact-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Aesir Pact guild Discord, October 2018 – January 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.151Z"
-  },
-  "alliance-governance-mechanics-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation / Emperium of Wynn / Kingdom of Foxes guild Discord, 2016–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.226Z"
-  },
-  "buildcraftia-war-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, March–September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.287Z"
-  },
-  "coalition-founding-2017-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition guild Discord, October 2017 – February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.367Z"
-  },
-  "coalition-fracture-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation guild Discord, February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.447Z"
-  },
-  "consortium-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Consortium guild Discord, March–April 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.525Z"
-  },
-  "emperium-of-wynn-constitution-2017-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Emperium of Wynn guild Discord, April–December 2017 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.603Z"
-  },
-  "espionage-and-infiltration-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation / Terra / Kingdom of Foxes guild Discord, 2015–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.663Z"
-  },
-  "federation-at-its-height-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, August–September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.746Z"
-  },
-  "federation-collapse-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation / Aesir Pact guild Discord, October–November 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.811Z"
-  },
-  "federation-first-month-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, late February – March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.870Z"
-  },
-  "guild-community-and-institutions-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes / Coalition / The Federation / Emperium of Wynn guild Discord, 2015–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.928Z"
-  },
-  "guild-lineage-and-succession-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation / Kingdom of Foxes guild Discord, 2014–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:20.986Z"
-  },
-  "kingdom-of-foxes-government-2016-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes guild Discord, December 2016 – February 2017 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:21.045Z"
-  },
-  "ordo-malleus-and-the-first-alliances-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation (retrospective) guild Discord, events 2014–2016, narrated January–March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:21.119Z"
-  },
-  "pasta-treaties-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation guild Discord, January–February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:21.178Z"
-  },
-  "terra-alliance-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, August–December 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:21.257Z"
-  },
-  "territory-economy-and-warfare-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / The Federation / Terra guild Discord, 2015–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T00:50:21.335Z"
-  },
-  "kingdom-of-foxes-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes guild Discord, 2014–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T02:18:32.509Z"
-  },
-  "hackforums-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "HackForums guild Discord, 2014–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T02:18:32.566Z"
-  },
-  "paladins-united-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Paladins United guild Discord, 2015–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T02:18:32.652Z"
-  },
-  "imperial-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Imperial guild Discord, 2015–2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T02:18:32.746Z"
-  },
-  "hall-of-fame-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Hall of Fame (HoF) guild Discord, 2017-2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T02:56:36.920Z"
-  },
-  "lunatic-mox-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Lunatic (Mox) guild Discord, 2018-2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T03:03:31.673Z"
-  },
-  "sins-of-seedia-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Sins of Seedia (SDU) guild Discord, 2017-2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T03:06:55.925Z"
-  },
-  "corkus-contested-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "command-bunker war feed (all guilds) guild Discord, 30 March – 8 October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T03:29:57.688Z"
-  },
-  "titans-valor-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Titans Valor (ANO) guild Discord, 2017-2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T03:47:02.032Z"
-  },
-  "who-fought-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "command-bunker war feed (all guilds) guild Discord, 30 March – 8 October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T03:56:07.698Z"
-  },
-  "federation-decline-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, September – November 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T04:05:19.917Z"
-  },
-  "federation-august-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, August 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T04:20:06.393Z"
-  },
-  "war-update-march-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, 1 – 10 March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T04:28:27.347Z"
-  },
-  "foxes-imperial-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes and Imperial guild Discord, 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T04:37:30.906Z"
-  },
-  "illustratus-naming-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Illustratus / War Syndicate guild Discord, January 2018 – September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T04:53:37.185Z"
-  },
-  "kingdomphoenixes-november-2017-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "KingdomPhoenixes (Phx) guild Discord, 3 – 26 November 2017 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T05:34:02.910Z"
-  },
-  "enemy-alliances-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Round Table / Confederation (from the Federation's channels) guild Discord, May – July 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T05:53:35.398Z"
-  },
-  "federation-governance-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, May – July 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T05:53:35.484Z"
-  },
-  "divine-swords-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Divine Swords (DsQ) guild Discord, 2017 – 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T06:00:24.230Z"
-  },
-  "ex-nihilo-odysseia-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Ex Nihilo (Nih) and Odysseia (Oys) guild Discord, June – October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T06:04:05.697Z"
-  },
-  "federation-25-june-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, 25 June 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T06:12:10.054Z"
-  },
-  "the-hive-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Hive (THI) guild Discord, 2018 – 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T06:20:43.882Z"
-  },
-  "federation-founding-week-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, 16 – 21 February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T06:29:12.751Z"
-  },
-  "kingdom-of-foxes-parliament-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes [Fox] guild Discord, February 2017 – February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T15:11:50.362Z"
-  },
-  "angels-of-eternal-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Angels of Eternal [AoE], with Peace and Tranquility [PaT] guild Discord, January – October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T15:11:50.450Z"
-  },
-  "coalition-last-fortnight-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition [COA] guild Discord, 1 – 16 February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T15:18:32.045Z"
-  },
-  "federation-first-map-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T15:50:05.314Z"
-  },
-  "federation-map-disputes-march-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T15:50:05.380Z"
-  },
-  "federation-first-counterattack-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 27–28 February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:01:30.873Z"
-  },
-  "federation-march-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:05:45.285Z"
-  },
-  "valkyrie-revival-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes [Fox] / Holders of LE [HoL] guild Discord, February – March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:30:47.279Z"
-  },
-  "federation-territory-committee-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:35:48.572Z"
-  },
-  "federation-territory-doctrine-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, August 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:39:28.794Z"
-  },
-  "buildcraftia-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "BuildCraftia [BCr] guild Discord, July 2017 – June 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:45:23.823Z"
-  },
-  "coalition-hol-ownership-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition [COA] guild Discord, 31 January – 1 February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T16:57:59.316Z"
-  },
-  "emperium-voting-record-2017-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Emperium of Wynn guild Discord, August – October 2017 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T17:05:52.382Z"
-  },
-  "emorians-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Emorians [ERN] guild Discord, February – June 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T17:08:55.352Z"
-  },
-  "holders-of-le-guild-profile-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Holders of LE [HoL] guild Discord, 2015 – 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T17:16:33.649Z"
-  },
-  "ordo-malleus-informal-power-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Ordo Malleus / Holders of LE guild Discord, 2015 – February 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T17:19:50.178Z"
-  },
-  "cheating-and-enforcement-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Emperium of Wynn / Coalition / Federation / Terra guild Discord, May 2017 – September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T17:46:57.752Z"
-  },
-  "espionage-as-institution-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / Federation / Luna / Terra guild Discord, January 2018 – November 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T17:57:09.884Z"
-  },
-  "subguilds-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition / Federation / Terra guild Discord, 2015 – September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T18:00:01.092Z"
-  },
-  "guild-finance-and-war-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom of Foxes / Coalition / Emperium guild Discord, January 2017 – April 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T18:06:02.778Z"
-  },
-  "who-gets-a-vote-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Ordo Malleus / Coalition / Federation / Terra guild Discord, 2015 – September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T18:22:09.820Z"
-  },
-  "how-guilds-ended-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "multiple guilds guild Discord, 2016 – 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T18:29:36.933Z"
-  },
-  "federation-late-july-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 13–21 July 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T19:18:02.737Z"
-  },
-  "federation-july-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, July 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T19:20:05.599Z"
-  },
-  "federation-mapmakers-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, September – October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T19:38:59.152Z"
-  },
-  "federation-october-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T19:38:59.253Z"
-  },
-  "the-trench-war-january-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Coalition [COA] guild Discord, January 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T19:45:09.331Z"
-  },
-  "war-syndicate-successors-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "War Syndicate successors guild Discord, 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:08:20.084Z"
-  },
-  "terra-mid-september-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, 14–27 September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:27:57.429Z"
-  },
-  "terra-terms-of-surrender-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:33:57.346Z"
-  },
-  "terra-victory-september-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:33:57.463Z"
-  },
-  "terra-institutions-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, September 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:33:57.585Z"
-  },
-  "federation-inactive-members-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 10–18 September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:38:06.057Z"
-  },
-  "federation-map-round-september-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 21–28 September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T20:56:14.456Z"
-  },
-  "federation-corkus-campaign-march-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 3–5 March 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T21:23:17.581Z"
-  },
-  "federation-air-temple-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 11–13 October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T21:28:50.225Z"
-  },
-  "federation-blocs-within-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 23–24 October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T21:37:28.772Z"
-  },
-  "federation-admissions-under-suspicion-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 22–23 October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T21:41:49.978Z"
-  },
-  "federation-libertas-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 6–12 August 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T21:46:05.126Z"
-  },
-  "after-the-federation-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Aesir Pact guild Discord, 8–11 November 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T22:14:39.851Z"
-  },
-  "federation-enemy-list-july-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 2–3 July 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T22:22:25.628Z"
-  },
-  "federation-guild-swap-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 22 October – 2 November 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T22:30:19.141Z"
-  },
-  "subguild-rule-and-the-games-staff-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed] guild Discord, 10–13 April 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T22:53:42.966Z"
-  },
-  "confederation-collapse-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation [Fed], observing the Confederation guild Discord, September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T23:10:39.365Z"
-  },
-  "kingdom-phoenixes-september-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Kingdom Phoenixes guild Discord, September – October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-08T23:39:13.599Z"
-  },
-  "fantasy-leaving-and-returning-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Fantasy, The Federation, The Aesir Pact guild Discord, September – October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T00:20:33.029Z"
-  },
-  "roles-outlive-membership-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Coalition, The Federation guild Discord, January – August 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T00:29:21.334Z"
-  },
-  "emperium-constitution-2017-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Emperium of Wynn guild Discord, April – October 2017 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:19:11.623Z"
-  },
-  "terra-october-2019-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, October 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:19:11.803Z"
-  },
-  "federation-allied-defence-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, August – September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:20:42.761Z"
-  },
-  "free-for-all-territories-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, February – July 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:20:42.984Z"
-  },
-  "federation-obligation-to-attack-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, April 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:20:43.123Z"
-  },
-  "federation-allocation-series-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, February – September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:22:21.447Z"
-  },
-  "terra-alliance-announcements-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Terra guild Discord, September – December 2019 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:26:26.018Z"
-  },
-  "federation-nobody-came-september-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, September 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:28:57.499Z"
-  },
-  "federation-admissions-2018-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "The Federation guild Discord, July – October 2018 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T01:28:57.749Z"
-  },
-  "artemis-elysium-negotiation-may-2021-discord-private": {
-   "url": "",
-   "kind": "discord-private",
-   "private": true,
-   "title": "Artemis and Goose negotiators guild Discord, 9–11 May 2021 (private archive, not published)",
-   "tier": "primary",
-   "note": "Private archive held offline. Not published, not quoted, and not readable here: claims drawn from it are paraphrased and audited against a concordance kept with the archive.",
-   "registeredAt": "2026-09-09T02:13:31.414Z"
   }
  }
 }

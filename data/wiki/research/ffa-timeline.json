@@ -9,7 +9,8 @@
       "kind": "map-only",
       "count": null,
       "territories": null,
-      "note": "The Coalition's assignment for thirteen guilds, ending 'Free for all territories are in black.' The FFA ground is only on the image, so no names are recoverable. On 1 February the alliance said further territories would be made free-for-all but that it had not yet chosen which."
+      "note": "The Coalition's assignment for thirteen guilds, ending 'Free for all territories are in black.' The FFA ground is only on the image, so no names are recoverable. On 1 February the alliance said further territories would be made free-for-all but that it had not yet chosen which. The announcement was edited on 2018-01-20, so its contents are evidence of what it said on the edit date and of the posting date only by inference. Do not filter a capture falling between the two against it.",
+      "editedAfterPosting": "2018-01-20"
     },
     {
       "date": "2018-02-21",
@@ -80,7 +81,9 @@
         "Wybel Island",
         "Herb Cave"
       ],
-      "alsoUnassigned": []
+      "alsoUnassigned": [],
+      "editedAfterPosting": "2018-03-27",
+      "note": "The announcement was edited on 2018-03-27, so its contents are evidence of what it said on the edit date and of the posting date only by inference. Do not filter a capture falling between the two against it."
     },
     {
       "date": "2018-04-22",
@@ -112,7 +115,9 @@
         "Herb Cave",
         "Jungle Lake"
       ],
-      "alsoUnassigned": []
+      "alsoUnassigned": [],
+      "editedAfterPosting": "2018-04-27",
+      "note": "The announcement was edited on 2018-04-27, so its contents are evidence of what it said on the edit date and of the posting date only by inference. Do not filter a capture falling between the two against it."
     },
     {
       "date": "2018-05-10",
