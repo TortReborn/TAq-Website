@@ -172,6 +172,14 @@ if (defender) console.log(`defender   ${defender}`);
 if (involving) console.log(`involving  ${involving} (either side)`);
 console.log(`FFA list   ${inForce.date} (${ffa.length} territories, declared ${days} day(s) before the window)`);
 if (days > 45) console.log(`           ^ stale: nothing was published nearer. Say so if the figure is used.`);
+// A declaration stayed in force as amended, not unchanged. This script holds the
+// list as published, so for a window after an amendment it is filtering against
+// a slightly superseded document.
+const amended = (inForce.amendedOn ?? []).filter((d) => d <= from);
+if (amended.length) {
+  console.log(`           ^ amended on ${amended.join(', ')} — this filter uses the list as`);
+  console.log(`             published, so it is out by whatever those amendments changed.`);
+}
 console.log('');
 console.log(`raw captures        ${r.total.toLocaleString()}  across ${r.terrs} territories`);
 console.log(`on FFA ground       ${r.on_ffa.toLocaleString()}  (${pct}%)`);

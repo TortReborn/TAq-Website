@@ -181,7 +181,11 @@
         "Herb Cave",
         "Jungle Lake"
       ],
-      "alsoUnassigned": []
+      "alsoUnassigned": [],
+      "amendedOn": [
+        "2018-08-05"
+      ],
+      "note": "Amended after publication on 2018-08-05, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here."
     },
     {
       "date": "2018-08-06",
@@ -213,7 +217,11 @@
         "Factory Entrance",
         "Mine Base Plains"
       ],
-      "alsoUnassigned": []
+      "alsoUnassigned": [],
+      "amendedOn": [
+        "2018-09-11"
+      ],
+      "note": "Amended after publication on 2018-09-11, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here."
     },
     {
       "date": "2018-09-08",
@@ -281,7 +289,14 @@
       "count": 18,
       "territories": null,
       "alsoUnassigned": [],
-      "note": "Terra, published a week after it won the map and maintained in the same channel until at least December 2019 — so the institution did not lapse after 2018. The eighteen names are NOT held here: this file is tracked and public, and while the territory names are public game geography, the declaration itself (this alliance, these territories, this date) is archive content from a channel that is not one of the thirteen sanctioned exports. The list lives in the research vault. To filter a 2019 window, send the research session the distinct territories in it with their exchange counts and it returns raw, free-for-all and contested totals; nothing of the archive moves."
+      "note": "Terra, published a week after it won the map and maintained in the same channel until at least December 2019 — so the institution did not lapse after 2018. The eighteen names are NOT held here: this file is tracked and public, and while the territory names are public game geography, the declaration itself (this alliance, these territories, this date) is archive content from a channel that is not one of the thirteen sanctioned exports. The list lives in the research vault. To filter a 2019 window, send the research session the distinct territories in it with their exchange counts and it returns raw, free-for-all and contested totals; nothing of the archive moves. Amended after publication on 2019-09-30, 2019-10-10, 2019-11-15, 2019-12-11, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here.",
+      "amendedOn": [
+        "2019-09-30",
+        "2019-10-10",
+        "2019-11-15",
+        "2019-12-11"
+      ]
     }
-  ]
+  ],
+  "amendmentNote": "A declaration was in force AS AMENDED. At least six dated amendments are known — two by the Federation in 2018 and four by Terra between September and December 2019 — and only the announcement tier was searched, so amendments agreed in a leadership channel and never published are not counted. ffa-filter.mjs applies a declaration unchanged and therefore reports a slightly stale list for any window after an amendment; it warns when it is doing so."
 }
