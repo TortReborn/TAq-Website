@@ -60,11 +60,32 @@ if (!inForce) {
 
 const days = Math.round((Date.parse(from) - Date.parse(inForce.date)) / 86400000);
 
+// Beyond this the list is not evidence about the window, and saying so with a
+// warning is not enough: a run that printed "stale" and then a contested count
+// put a September 2018 free-for-all share onto a September 2019 war page. The
+// lists were reissued every three to eight weeks while the institution was
+// alive, so a gap this long means it had lapsed or moved somewhere unrecorded.
+const STALE_DAYS = 90;
+if (days > STALE_DAYS) {
+  console.error(`Nearest FFA declaration is ${inForce.date}, ${days} days before ${from}.`);
+  console.error(`Nothing was published within ${STALE_DAYS} days of this window, so the`);
+  console.error('free-for-all position for it is not recoverable. Refusing to filter.');
+  console.error('');
+  console.error('Say in the prose that no list was published for the window. Do not');
+  console.error('subtract an older one, and do not quote a share computed against it —');
+  console.error('that share is a fact about the older list, not about this window.');
+  process.exit(1);
+}
+
 if (inForce.territories === null) {
-  console.log(`FFA list in force at ${from}: ${inForce.date} — ${inForce.kind}, ${inForce.count} territories, names not recorded.`);
+  const size = inForce.count === null || inForce.count === undefined
+    ? 'an unrecorded number of'
+    : `${inForce.count}`;
+  console.log(`FFA declaration in force at ${from}: ${inForce.date} — ${inForce.kind}, ${size} territories, names not recorded.`);
   console.log(inForce.note ?? '');
-  console.log('\nThe count cannot be filtered, only bounded. Report the raw figure with the');
-  console.log(`caveat that up to ${inForce.count} territories in it were open ground.`);
+  console.log('\nThe count cannot be filtered, only bounded. Report the raw figure and say in');
+  console.log('the prose that the free-for-all position for this window is not recoverable.');
+  console.log('Do not substitute a later list: the earliest enumerated one is 10 March 2018.');
   process.exit(1);
 }
 
