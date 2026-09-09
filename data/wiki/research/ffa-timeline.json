@@ -327,8 +327,15 @@
   "noListInForce": [
     {
       "from": "2018-11-10",
-      "to": "2019-09-14",
-      "reason": "The Federation dissolved on 10 November 2018 and the Aesir Pact, which held the ground after it, never published a free-for-all list — a search of the whole announcement tier returns no such message from any Aesir channel. So captures after the dissolution cannot be filtered against the Federation declaration of 12 October, because the body that issued it was gone, and there is nothing else. What the archive shows instead is guilds carrying the old arrangements forward bilaterally, over the same ground, with nothing published and nothing binding."
+      "to": "2018-12-05",
+      "reason": "The Federation dissolved on 10 November 2018 and nothing replaced its declarations for the rest of the month. The Aesir Pact, which held the ground, issued its first instrument on 5 December."
+    }
+  ],
+  "guildStatusRegime": [
+    {
+      "from": "2018-12-05",
+      "alliance": "The Aesir Pact",
+      "reason": "From 5 December 2018 the pact kept an instrument of a different kind: a card naming six enemy guilds and eight truces, closing with a residual clause that anything on neither list could be freely attacked. Hostility inside its sphere was settled by a guild status rather than a territory designation, so a capture is meaningful according to WHO was attacked rather than WHERE. That is a different filter, not the absence of one, and it cannot be applied by this script — ask the research session. The card is dated 5 December and its surviving text is of 1 January, so it does not date its own contents."
     }
   ]
 }
