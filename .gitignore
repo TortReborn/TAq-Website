@@ -40,3 +40,6 @@ playwright-report/
 
 # --- Private Discord archive: findings that cross from the vault, never committed ---
 docs/discord-findings/
+
+# Throwaway query scripts written by writing agents; never committed.
+scripts/_tmp-*
