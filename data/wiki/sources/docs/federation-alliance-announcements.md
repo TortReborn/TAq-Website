@@ -6,6 +6,7 @@ title: "Federation alliance-announcements channel (Discord export, 2018)"
 fetched_at: 2026-09-03T22:11:34.657Z
 note: "The Federation's internal alliance announcement channel, exported from Discord. Official first-person announcements by the alliance's leadership during 2018: territory assignments, war orders, membership changes. 79 attached images are archived alongside (see data/wiki/sources/federation/)."
 timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+edits: "This export holds each message's final text, not the text as posted. Messages revised on a later day: 24 Mar 2018 → 27 Mar 2018; 22 Apr 2018 → 27 Apr 2018; 8 Sep 2018 → 11 Sep 2018; 10 Sep 2018 → 11 Sep 2018. For those, the contents are evidence of what the document said on the edit date, and of the posting date only by inference — most are standing documents such as rosters, rules cards or territory lists, kept current rather than rewritten in response to events."
 ---
 Drew1011 — 2/17/2018 6:35 PM
 @unknown-role 

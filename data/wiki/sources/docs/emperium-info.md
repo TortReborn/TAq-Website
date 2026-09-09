@@ -6,6 +6,7 @@ title: "The Emperium of Wynn info channel (Discord export, Sep 2017)"
 fetched_at: 2026-09-04T21:42:42.100Z
 note: "Three pinned posts: the role list naming the Emperator, Shadow Advisor and Triarch in September 2017, the application links, and the alliance's nine rules."
 timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+edits: "This export holds each message's final text, not the text as posted. Messages revised on a later day: 21 Sep 2017 → 27 Sep 2017 (two cards); 26 Sep 2017 → 8 Oct 2017. For those, the contents are evidence of what the document said on the edit date, and of the posting date only by inference — most are standing documents such as rosters, rules cards or territory lists, kept current rather than rewritten in response to events."
 ---
 
 Gas — 9/21/2017 5:20 PM

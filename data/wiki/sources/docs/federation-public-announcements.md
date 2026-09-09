@@ -6,6 +6,7 @@ title: "Federation public-announcements channel (Discord export, 2018)"
 fetched_at: 2026-09-03T22:11:34.657Z
 note: "The Federation's public announcement channel, exported from Discord, 2018. Server-wide notices rather than war direction. 2 attached images are archived alongside."
 timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+edits: "This export holds each message's final text, not the text as posted. Messages revised on a later day: 8 Sep 2018 → 11 Sep 2018; 20 Sep 2018 → 26 Sep 2018 (pinned); 12 Oct 2018 → 2 Nov 2018. For those, the contents are evidence of what the document said on the edit date, and of the posting date only by inference — most are standing documents such as rosters, rules cards or territory lists, kept current rather than rewritten in response to events."
 ---
 Gas — 2/19/2018 12:09 PM
 I just want to remind everyone that if someone accidently tags everyone please do not add to the spam. We want to keep this discord in working order and your spam is not necessary. Thank you for your cooperation and have a fantastic day/night!

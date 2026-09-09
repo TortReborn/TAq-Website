@@ -6,6 +6,7 @@ title: "Coalition alliance-announcements channel (Discord export, Jan-Feb 2018)"
 fetched_at: 2026-09-04T21:52:14.060Z
 note: "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". Six weeks of alliance direction to 17 February 2018, ending with the division of Wynn that split the alliance and the roster of the bloc that replaced it."
 timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+edits: "This export holds each message's final text, not the text as posted. Messages revised on a later day: 16 Jan 2018 → 20 Jan 2018; 23 Jan 2018 → 28 Jan 2018. For those, the contents are evidence of what the document said on the edit date, and of the posting date only by inference — most are standing documents such as rosters, rules cards or territory lists, kept current rather than rewritten in response to events."
 ---
 
 Drew1011 — 1/16/2018 12:20 PM

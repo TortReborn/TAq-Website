@@ -102,6 +102,21 @@ if (inForce.territories === null) {
   if (!args.includes('--territories')) process.exit(1);
 }
 
+// Discord exports keep only a message's final text. Where a declaration was
+// revised days later, the list we hold is the revised one, and a capture that
+// happened between the posting and the revision would be filtered against a
+// document that may not yet have said what it now says.
+if (inForce.editedAfterPosting && from < inForce.editedAfterPosting) {
+  console.error(`The declaration of ${inForce.date} was edited on ${inForce.editedAfterPosting},`);
+  console.error(`and this window opens on ${from}, inside that gap. The archive holds only the`);
+  console.error('revised text, so filtering these captures against it would test them against a');
+  console.error('list that may not yet have said what it now says. Refusing.');
+  console.error('');
+  console.error(`Start the window on ${inForce.editedAfterPosting} or later, or use the previous`);
+  console.error('declaration and say in the prose which document the figure rests on.');
+  process.exit(1);
+}
+
 const ffa = [...(inForce.territories ?? []), ...(inForce.alsoUnassigned ?? [])];
 
 const pool = new Pool(DB.prod());
