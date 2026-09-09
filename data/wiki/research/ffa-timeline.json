@@ -1,5 +1,5 @@
 {
-  "$comment": "Free-for-all territories declared by the Coalition and then the Federation. FFA ground was open to anyone: a capture there is churn, not an act of war. Any claim that reads capture counts as evidence of allegiance or hostility must exclude the FFA territories in force for that window. Sources are Tier A (announcement channels) and quotable. Eleven declarations are known, January 2018 to September 2019; the two earliest are map images whose territory names were never written in text, so windows before 10 March 2018 can only be bounded, not filtered.",
+  "$comment": "Free-for-all territories declared by the Coalition and then the Federation. FFA ground was open to anyone: a capture there is churn, not an act of war. Any claim that reads capture counts as evidence of allegiance or hostility must exclude the FFA territories in force for that window. Sources are Tier A (announcement channels) and quotable. Thirteen declarations are known, January 2018 to September 2019; the two earliest are map images whose territory names were never written in text, so windows before 10 March 2018 can only be bounded, not filtered.",
   "rule": "Use the list whose date is on or before the window start. Never borrow a neighbouring month: the lists change size from 12 to 23 across 2018.",
   "lists": [
     {
@@ -224,6 +224,16 @@
       "note": "Amended after publication on 2018-09-11, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here."
     },
     {
+      "date": "2018-08-30",
+      "source": "federation-alliance-announcements",
+      "locator": "2018-08-30",
+      "kind": "map-only",
+      "count": 22,
+      "territories": null,
+      "alsoUnassigned": [],
+      "note": "Published as a map image with the free-for-all ground shown rather than listed, so no names are recoverable. Supersedes the 6 August text list for any window from this date."
+    },
+    {
       "date": "2018-09-08",
       "source": "federation-alliance-announcements",
       "locator": "9/8/2018",
@@ -248,8 +258,21 @@
         "Temple of Legends"
       ],
       "alsoUnassigned": [],
-      "note": "The list in force through the Confederation offensive and collapse. The message was edited on 11 September 2018, so the text in the archived document is the 11 September version, not what was posted on the 8th. Figures filtered against it for windows from the 14th onward are unaffected in substance; a claim about what the alliance declared ON the 8th is not supported by it.",
-      "editedAfterPosting": "2018-09-11"
+      "note": "The list in force through the Confederation offensive and collapse. The message was edited on 11 September 2018, so the text in the archived document is the 11 September version, not what was posted on the 8th. Figures filtered against it for windows from the 14th onward are unaffected in substance; a claim about what the alliance declared ON the 8th is not supported by it. Amended on 11 September 2018, when Thesead was assigned to a member guild and ceased to be free-for-all — announced in the alliance channel, which is why the message carries an edit of that date.",
+      "editedAfterPosting": "2018-09-11",
+      "amendedOn": [
+        "2018-09-11"
+      ]
+    },
+    {
+      "date": "2018-09-10",
+      "source": "federation-alliance-announcements",
+      "locator": "2018-09-10",
+      "kind": "map-only",
+      "count": 16,
+      "territories": null,
+      "alsoUnassigned": [],
+      "note": "A full census on one sheet: sixteen guilds holding 369 assigned territories plus sixteen free-for-all, totalling 385 — the number of distinct territories the capture log records changing hands between 30 March and 8 October 2018. The sheet captions seventeen free-for-all and lists sixteen. Borne on an image; no names recoverable."
     },
     {
       "date": "2018-10-12",
