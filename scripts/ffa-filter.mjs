@@ -58,6 +58,28 @@ if (!inForce) {
   process.exit(1);
 }
 
+// Periods with no declaring body at all. After an alliance dissolves, its last
+// declaration is not "the list still in force" — it is a document issued by
+// something that no longer exists. The ground kept being fought over and the
+// arrangements were carried forward guild to guild, unpublished and unbinding.
+for (const gap of timeline.noListInForce ?? []) {
+  if (from >= gap.from && from < gap.to) {
+    console.error(`No alliance free-for-all list was in force between ${gap.from} and ${gap.to}.`);
+    console.error(gap.reason);
+    console.error('');
+    console.error('Report the raw figure and say in the prose that no list governed the window.');
+    console.error('Do not reach back for the last declaration before it.');
+    process.exit(1);
+  }
+}
+
+// Declarations the research session has ruled unusable for a stated span.
+if (inForce.unusableUntil && from < inForce.unusableUntil) {
+  console.error(`The declaration of ${inForce.date} may not be used for windows before ${inForce.unusableUntil}.`);
+  console.error(inForce.note?.match(/RULING:[\s\S]*/)?.[0] ?? '');
+  process.exit(1);
+}
+
 const days = Math.round((Date.parse(from) - Date.parse(inForce.date)) / 86400000);
 
 // Beyond this the list is not evidence about the window, and saying so with a
