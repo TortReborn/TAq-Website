@@ -26,17 +26,15 @@
       "uuid": "b149b7b1-0ec5-4269-8085-3ac644256289",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/b149b7b1-0ec5-4269-8085-3ac644256289",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "declared-in-source",
+      "ignEvidence": "emperium-info role list, 21 Sep 2017 (rev. 27 Sep 2017): \"Economy Leader: @Angry (Angry_will)\" maps the Discord handle to the in-game name; emperium-announcements repeats it as \"@Angry (IGN: Angry_will)\"."
     },
     {
       "slug": "arkada",
       "ign": "Arkada",
-      "status": "ok",
-      "uuid": "99f8bc7e-a5e1-42fa-8c28-fa78a9d32ab0",
-      "mojangName": "Arkada",
-      "resolvedVia": "mojang",
-      "render": "https://visage.surgeplay.com/bust/512/99f8bc7e-a5e1-42fa-8c28-fa78a9d32ab0",
-      "ignSource": "assumed-from-slug"
+      "status": "withheld",
+      "ignSource": "contradicted",
+      "note": "CONTRADICTED. His own memoir and the forum thread the article rests on give the name as Leonhart_Arkada, published under an alias; Arkada is how he signs off. The Mojang account resolved from the bare slug appears in no Wynncraft record in this repo — nothing shows it ever played. Render withheld."
     },
     {
       "slug": "aurumkitsune",
@@ -64,7 +62,8 @@
       "mojangName": "C0rupted",
       "resolvedVia": "mojang",
       "render": "https://visage.surgeplay.com/bust/512/31b35756-731e-4d8d-8691-7cb8f782bfee",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-titans-20valor: uuid 31b35756 listed as strategist C0rupted, the guild the article places him in; corroborated by Titan Times vol. 19 strategist promotions and the Season 24 war standings."
     },
     {
       "slug": "calluum",
@@ -73,7 +72,8 @@
       "lastJoin": "2026-08-31T16:25:20.933000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/911a950a-839d-4150-bfe8-d901a3b85316",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-titans-20valor: uuid 911a950a listed as owner Calluum, matching the article; thread-206094 guild roster gives \"Archmage @Calluum [Owner]\"."
     },
     {
       "slug": "chownick",
@@ -91,7 +91,8 @@
       "lastJoin": "2026-07-25T17:52:46.785000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/10c4cbf4-657b-4c03-bdc5-a708180347aa",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-profession-20heaven: uuid 10c4cbf4 listed as chief Crokee, the guild the article says he founded."
     },
     {
       "slug": "drasalia",
@@ -110,7 +111,8 @@
       "lastJoin": "2025-03-27T04:39:14.114000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/9289d67c-8485-4a0d-bc5a-a19d6b62b9cd",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "declared-in-source",
+      "ignEvidence": "the-emperial-truth, his own Emperator candidacy document, opens \"IGN: Drew1011\"; emperium-info role list gives \"Shadow Advisor: @Drew1011 (Drew1011)\"."
     },
     {
       "slug": "elegantdeath",
@@ -138,7 +140,8 @@
       "mojangName": "Defervesco",
       "resolvedVia": "mojang",
       "render": "https://visage.surgeplay.com/bust/512/28561b28-0391-424f-808d-a6c95bf83671",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "self-declared-in-source",
+      "ignEvidence": "NOT assumed from the slug: the render resolves to Defervesco, which the subject states is his in-game name in his own upload footer (\"my ign is defervesco\") and which the moderator announcement of 3 Nov 2022 ties to the name Frank. The `ign` field on this entry holds the YouTube channel name, not the Minecraft name - see report."
     },
     {
       "slug": "frozengalaxy",
@@ -158,7 +161,8 @@
       "mojangName": "GaztheCat",
       "resolvedVia": "mojang",
       "render": "https://visage.surgeplay.com/bust/512/66efb975-31b4-499e-9b46-a34980edd8ee",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-sequoia: uuid 66efb975 listed as owner GaztheCat, matching the article; seqwawa-com-statistics-guilds-war lists \"GaztheCat Owner 11,999\" in game-derived war totals."
     },
     {
       "slug": "goulartjj",
@@ -186,7 +190,8 @@
       "lastJoin": "2026-08-05T07:00:41.141000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/b8e715c7-4eed-4126-a41d-bbaed3a739aa",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-titans-20valor: uuid b8e715c7 listed as chief IceResistance in the guild he founded; emperium-info role list gives \"Community Leader: @Ice (IceResistance)\"."
     },
     {
       "slug": "icey-diamond",
@@ -195,7 +200,8 @@
       "uuid": "114cda23-b2e3-4716-9646-93587d62ed65",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/114cda23-b2e3-4716-9646-93587d62ed65",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "declared-in-source",
+      "ignEvidence": "thread-227373 (Aesir Pact) leader table declares \"IceyDiamond [DDT] ign: Icey_Diamond\"; an account of that name with uuid 114cda23 is in the Lux Nova roster capture."
     },
     {
       "slug": "killerfish",
@@ -222,7 +228,8 @@
       "lastJoin": "2026-08-15T14:46:22.699000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/1efe7553-9747-4074-8622-bb35059dc74c",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-titans-20valor: uuid 1efe7553 listed as strategist Lamplesspost; Titan Times records the same member under the earlier name thatlamppostguy and the rename, so the two are one account."
     },
     {
       "slug": "lego-dw",
@@ -245,11 +252,9 @@
     {
       "slug": "lotuss",
       "ign": "lotuss",
-      "resolvedName": "Lotuss",
-      "uuid": "ae18c97c-07f7-4e12-8522-c66d111fd687",
-      "status": "ok",
-      "render": "https://visage.surgeplay.com/bust/512/ae18c97c-07f7-4e12-8522-c66d111fd687",
-      "ignSource": "assumed-from-slug"
+      "status": "withheld",
+      "ignSource": "contradicted",
+      "note": "CONTRADICTED. The forum account displaying as lotuss was named simplyinfinity_ in 2017-18, stated in its own posts and in the replies quoting it. This project already withheld a render for simplyinfinity because nothing established the account; publishing one here routed around that. Render withheld."
     },
     {
       "slug": "lovelusting",
@@ -258,7 +263,8 @@
       "lastJoin": "2022-03-22T07:06:01.728000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/63cfa49b-646c-4649-a329-bc155c828ff7",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-kingdom-20foxes: uuid 63cfa49b listed as LoveLusting in the guild she founded; community-guild-timeline records Kingdom Foxes \"created in-game by LoveLusting\" and the Emperium voting form gives \"Guild Leader? LoveLusting\"."
     },
     {
       "slug": "motoki317",
@@ -302,7 +308,8 @@
       "resolvedVia": "ashcon (historical) + confirmed via Wynncraft API",
       "currentName": "GaseousSubstance",
       "evidence": "Mojang no longer resolves the name Nitrogen2Oxygen; Ashcon holds the historical mapping, and the Wynncraft API confirms that UUID is an active player now named GaseousSubstance (last join 8 Aug 2026).",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "declared-in-source",
+      "ignEvidence": "thread-119596-p25 gives \"In-game Name: Nitrogen2Oxygen\" in his own application, and thread-227373 declares \"Nitrogen2Oxygen [DDT] ign: Nitrogen2Oxygen\". GaseousSubstance is the same account renamed."
     },
     {
       "slug": "paladinsorcerer",
@@ -311,7 +318,8 @@
       "lastJoin": "2026-07-05T15:36:54.648000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/0ff8160b-895e-433f-b27d-db942bcbe3ac",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-titans-20valor: uuid 0ff8160b listed as strategist PaladinSorcerer, the guild the article places him in."
     },
     {
       "slug": "pretzule",
@@ -347,7 +355,8 @@
       "lastJoin": "2021-11-28T21:41:52.454000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/09642c14-71f6-4dae-807c-0ef2428a315a",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "game-log",
+      "ignEvidence": "An alliance war-tracking bot logged war transitions on 3 May 2018 under the in-game username together with the guild - generated from game state, not recollection. See docs/discord-findings/_mailbox/to-wiki/20260908-031829-both-joins-yes-retracting-my-account-id-method-o.md, Request 6."
     },
     {
       "slug": "simplyinfinity",
@@ -381,16 +390,15 @@
       "lastJoin": "2026-06-27T13:22:39.958000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/e0e48ca9-9687-4f0a-87a2-247b4e13443e",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "wynncraft-api",
+      "ignEvidence": "api-wynncraft-com-v3-guild-titans-20valor: uuid e0e48ca9 listed as strategist Talkair; Titan Times records the same name in in-game rank promotions and as Champion of the Ocean for guild Season 18."
     },
     {
       "slug": "tapu-fini",
       "ign": "Tapu_Fini",
-      "uuid": "11f1dd10-cd7c-44e1-aedc-e9efbb17da63",
-      "lastJoin": "2022-09-30T22:22:42.887000Z",
-      "status": "ok",
-      "render": "https://visage.surgeplay.com/bust/512/11f1dd10-cd7c-44e1-aedc-e9efbb17da63",
-      "ignSource": "assumed-from-slug"
+      "status": "withheld",
+      "ignSource": "contradicted",
+      "note": "CONTRADICTED. He posted as Supermariowifi, and his own guild roster gives that as the in-game name with a level beside it. Tapu_Fini is the current forum display name of that account, captured in 2026. Nothing ties the Mojang account of that name to him. Render withheld."
     },
     {
       "slug": "thedarksoul",
@@ -435,7 +443,8 @@
       "lastJoin": "2026-08-24T20:36:59.703000Z",
       "status": "ok",
       "render": "https://visage.surgeplay.com/bust/512/7b18a580-a737-4233-95a4-90da72506f23",
-      "ignSource": "assumed-from-slug"
+      "ignSource": "declared-in-source",
+      "ignEvidence": "thread-227373 (Aesir Pact) leader table declares \"Viaire [Fux] ign: Viaire\"."
     },
     {
       "slug": "vmark03",
