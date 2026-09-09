@@ -5,7 +5,7 @@ kind: discord-export
 title: "KingdomPhoenixes public announcements (Discord export, 2017-2022)"
 fetched_at: 2026-09-04T21:32:10.330Z
 note: "Two messages: AurumKitsune's abdication of 22 November 2017 in her own words, and a 2022 greeting. The abdication is the only first-person account of the handover."
-timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 AurumKitsune 🎀 [AME],  — 11/22/2017 5:57 PM

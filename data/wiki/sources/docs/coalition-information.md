@@ -5,7 +5,7 @@ kind: discord-export
 title: "Coalition information channel (Discord export, 11 Jan 2018)"
 fetched_at: 2026-09-04T21:52:22.807Z
 note: "IMPORTANT PROVENANCE: this is the Coalition's SECOND Discord server. The original was deleted by its owner on 11 January 2018 during internal strife, and this one was created the same day — which is why the record begins six weeks before the alliance's end and holds nothing from its founding or the Gavel Invasion. The deletion is independently attested: Drew1011 told KingdomPhoenixes that day that \"The Coalition discord was deleted by its owner. Please join this new one\". A single post of 11 January 2018 listing the alliance's fourteen member guilds and, separately, fourteen named enemy guilds."
-timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 Drew1011 — 1/11/2018 9:33 PM
