@@ -5,7 +5,7 @@ kind: discord-export
 title: "The Emperium of Wynn announcements channel (Discord export, Apr-Oct 2017)"
 fetched_at: 2026-09-04T21:43:17.650Z
 note: "The alliance's own announcement channel from its founding in April 2017 to the eve of its fall that October: the founding roster, role applications and appointments, the judges, events, and the leadership contests. A member's birthday and a live invite were removed before archiving, and one display name was replaced with the poster's guild tag."
-timestamps: "Displayed in the export tool's local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
+timestamps: "Displayed in the export tool's local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."
 ---
 
 motoki317 [MOKU],  — 4/7/2017 5:10 AM

@@ -5,10 +5,10 @@
  *   node scripts/stamp-discord-offset.mjs [--check]
  *
  * These documents are served at /chronicle/references/<id> with their original
- * timestamps, which come from the export tool and carry UTC-07:00 — the offset
- * of the machine the export was made on, not of any participant. Roughly thirty
- * per cent of them fall after 17:00 and therefore sit on a different day in UTC
- * than they display.
+ * timestamps, which come from the export tool and are US Pacific with daylight
+ * saving — the machine the export ran on, not any participant. A flat -07:00
+ * rule is an hour out for every winter date. Roughly thirty per cent of stamps
+ * fall late enough to sit on a different day in UTC than they display.
  *
  * The corpus dates Discord material by this clock and capture-log figures by
  * UTC, and says which in the citation locator. That is a defensible convention
@@ -22,7 +22,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const LINE = 'timestamps: "Displayed in the export tool\'s local clock, UTC-07:00. Times after 17:00 fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."';
+const LINE = 'timestamps: "Displayed in the export tool\'s local clock, which is US Pacific and observes daylight saving: UTC-07:00 from spring to autumn, UTC-08:00 in winter. Times after 17:00 (16:00 in winter) fall on the following day in UTC. Capture-log figures elsewhere in this corpus are UTC."';
 const check = process.argv.includes('--check');
 
 const index = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'data/wiki/sources/index.json'), 'utf8')).sources;
@@ -34,7 +34,7 @@ for (const id of exports_) {
   const p = path.join(process.cwd(), 'data/wiki/sources/docs', id + '.md');
   if (!fs.existsSync(p)) continue;
   const text = fs.readFileSync(p, 'utf8');
-  if (text.includes('timestamps: "Displayed in the export')) continue;
+  if (text.includes(LINE)) continue;
   if (check) { missing.push(id); continue; }
   // Some documents were written with CRLF endings; keep whatever the file uses.
   const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
