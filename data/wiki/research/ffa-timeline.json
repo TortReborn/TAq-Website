@@ -50,7 +50,7 @@
         "Light Forest East Mid",
         "Light Forest East Upper"
       ],
-      "note": "Plus 7 listed as \"available for the future (FFA for now)\" — unassigned and equally free to take."
+      "note": "Plus 7 listed as \"available for the future (FFA for now)\" — unassigned and equally free to take. The list carries no edit stamp. The allocation posted at the same time was edited five minutes later; that stamp belongs to the allocation, not here. Checked 9 Sep 2026 - do not add it."
     },
     {
       "date": "2018-03-24",
@@ -117,8 +117,7 @@
         "Jungle Lake"
       ],
       "alsoUnassigned": [],
-      "editedAfterPosting": "2018-04-27",
-      "note": "The announcement was edited on 2018-04-27, so its contents are evidence of what it said on the edit date and of the posting date only by inference. Do not filter a capture falling between the two against it."
+      "note": "The free-for-all list is the 18:22 message and carries no edit stamp. It previously carried editedAfterPosting 2018-04-27; that edit belongs to the ALLOCATION posted at 14:34 the same day, a different message, and the misattribution made this filter refuse windows opening 22-26 April that it should have filtered normally. Verified against the archive 9 Sep 2026. The allocation and the list are two documents and their stamps differ by month - never treat them as one."
     },
     {
       "date": "2018-05-10",
@@ -151,7 +150,8 @@
         "Jungle Lake",
         "Twisted Ridge"
       ],
-      "alsoUnassigned": []
+      "alsoUnassigned": [],
+      "note": "Posted 22:32 and edited three minutes later - somebody correcting their own message before anyone could act on it. Recorded so that a later reader does not rediscover the stamp and treat it as a revision. No guard is set for it."
     },
     {
       "date": "2018-06-04",
@@ -184,10 +184,103 @@
       ],
       "alsoUnassigned": [],
       "amendedOn": [
-        "2018-07-25",
+        "2018-07-26",
+        "2018-08-01",
         "2018-08-05"
       ],
-      "note": "Territory names for the amendments are not held here. Amended twice: on 25 July 2018 two territories were removed from the pool by drawing a new map, voted through in the leaders channel and published as images with no list, so no text record of the removal exists; and on 5 August they were restored by announcement. A search of the announcement tier finds the restoration and not the removal, and a search of the maps finds the reverse. This list is therefore wrong for 26 July to 5 August 2018."
+      "note": "Posted 14:38 and edited 19:05 the same evening, four hours twenty-seven minutes later, so its contents are undated between those two times. Date granularity cannot express a same-day gap, so the editedAfterPosting guard will NOT refuse a window opening on 4 June - a capture from that afternoon is being filtered against text that may postdate it. Say so if such a figure is used. Territory names for the amendments are not held here. Amended twice. On 25 July 2018 the pool changed by a new map drawn and voted in the leaders channel; a text record DOES exist, in the war channel on 27 July at 17:07 - Avos Temple and Factory Entrance out, Guild Hall and Mine Base Plains in, the pool still at twenty-one. It was a SWAP preserving the count, not a net removal of two, and an earlier note here said otherwise. Confirmed by the research session 9 Sep 2026. On 5 August the earlier pair was restored by announcement. This list is therefore wrong for 26 July to 5 August 2018.",
+      "editedAfterPosting": "2018-06-04",
+      "resolvedQuestions": [
+        {
+          "date": "2018-07-13",
+          "question": "A map was ratified on 13 July 2018 and published as images. Nobody has read it for its free-for-all pool.",
+          "why": "This list is recorded as amended on 25 July and 5 August, both of which were map changes. A map that changes the pool without a text list is exactly how the 25 July amendment happened, so a 13 July map is a candidate for the same thing and nothing rules it out.",
+          "consequence": "Every figure filtered against this list for 13-24 July 2018 rests on the assumption that the 13 July map left the pool alone. That assumption is unverified. It is NOT recorded as an amendment here, because inventing an amendment would be as wrong as ignoring one — but a figure from that window should say the pool is assumed unchanged.",
+          "resolvedBy": "Read the 13 July 2018 map images for their pool markings. The images mark pooled ground with a distinct disc, and marker detection is unstable for counting but two of four regions read reliably (see the 2018-08-30 note).",
+          "raisedBy": "the research session, 10 Sep 2026, while demoting federation-under-attack-july-2018 c7 back to medium",
+          "resolved": "2026-09-10",
+          "answer": "THE POOL WAS NOT CHANGED. The 13 July 2018 ratification was posted as five images with no text. The fifth is a legend — a table of guild, territory count, colour and location — and beneath it a yellow box stating the pool in words. It is the 4 June list unchanged: the same twenty-one territories in the same order, ending Raider's Base Upper, Herb Cave, Jungle Lake, (21). Compared name by name, with no addition, removal or reordering. The map re-posted on 18 July carries the same twenty-one identically. So there was no silent amendment between 4 June and 18 July, and the first change after 4 June remains the one of 25 July.",
+          "answeredBy": "the research session, 10 Sep 2026, reading the legend image",
+          "note": "It was answerable all along. The legend had been legible since the day it was posted, and both sides reasoned around it for hours — one building this block, the other capping a confidence — because the message carrying it has no text and reads as an empty attachment. Machinery kept deliberately: the reasoning was right and the next map may not restate its pool."
+        }
+      ]
+    },
+    {
+      "date": "2018-07-26",
+      "source": "federation-allocation-legends-2018-discord-private",
+      "locator": "legend of the map published 26 Jul 2018",
+      "kind": "listed",
+      "count": 21,
+      "territories": [
+        "Qira's Battle Room",
+        "Hive",
+        "Lava Lake",
+        "Temple of Legends",
+        "Bob's Tomb",
+        "Battle Tower (ToA)",
+        "Detlas",
+        "Cinfras",
+        "Emerald Trail",
+        "Rodoroc",
+        "Molten Reach",
+        "Molten Heights Portal",
+        "Lava Lake Bridge",
+        "Active Volcano",
+        "Volcanic Slope",
+        "Crater Descent",
+        "Raider's Base Upper",
+        "Herb Cave",
+        "Jungle Lake",
+        "Mine Base Plains",
+        "Swamp Dark Forest Transition Mid"
+      ],
+      "alsoUnassigned": [],
+      "note": "THE AMENDMENT THAT DOES NOT CHANGE THE COUNT. The 4 June list and every legend through 18 July give twenty-one. This one also gives twenty-one, and it is not the same twenty-one: Avos Temple and Factory Entrance out, Mine Base Plains and Swamp Dark Forest Transition Mid in. The alliance printed the bracketed count beside both lists, correctly, so the one number anybody would check is identical either side of a real amendment. A tool that detects pool changes by comparing sizes sees nothing here, and neither does a person glancing at the total. THE POOL MUST BE COMPARED NAME BY NAME. That is the same list which produced the Battle Tower bug, where a name in the list failed to match the same name in the log and silently made every capture there contested — same list, opposite failure, both silent. Nothing establishes intent and this is not written as concealment: the amended list was published, correctly counted, in a picture."
+    },
+    {
+      "date": "2018-08-01",
+      "source": "federation-allocation-legends-2018-discord-private",
+      "locator": "legend of the map published 1 Aug 2018",
+      "kind": "listed",
+      "count": 20,
+      "territories": [
+        "Qira's Battle Room",
+        "Hive",
+        "Lava Lake",
+        "Temple of Legends",
+        "Bob's Tomb",
+        "Battle Tower (ToA)",
+        "Detlas",
+        "Cinfras",
+        "Emerald Trail",
+        "Rodoroc",
+        "Molten Reach",
+        "Molten Heights Portal",
+        "Lava Lake Bridge",
+        "Active Volcano",
+        "Volcanic Slope",
+        "Crater Descent",
+        "Raider's Base Upper",
+        "Herb Cave",
+        "Jungle Lake",
+        "Swamp Dark Forest Transition Mid"
+      ],
+      "alsoUnassigned": [],
+      "behaviouralEvidence": [
+        {
+          "territory": "Guild Hall",
+          "window": {
+            "from": "2018-08-01",
+            "to": "2018-08-06"
+          },
+          "finding": "superseded",
+          "basis": "Changed hands eleven times among ten guilds between 1 and 5 August 2018, including five Federation members taking it off one another; six of those movements fell on 4 August alone, four of them member-to-member, with no complaint recorded anywhere. Members repeatedly taking ground off members without objection is what open ground looks like and what assigned ground never looks like.",
+          "circularity": "THIS IS INFERRED FROM CAPTURE BEHAVIOUR. A pool inferred from captures and then used to filter those same captures is circular and would read as a result. Any figure filtered using this entry must say in the prose that the territory's status was inferred from the exchanges being counted.",
+          "established": "2018-08-01 window, confirmed by the research session 9 Sep 2026",
+          "supersededBy": "The legend of 26 July 2018 names the amended pool in words: Avos Temple and Factory Entrance out, Mine Base Plains and Swamp Dark Forest Transition Mid in. Guild Hall is not on it, and is not on the 6 August list either. So the behavioural reading — eleven exchanges among ten guilds with no complaint — was not evidence that Guild Hall was open; it was ordinary contested fighting. The rule held: a document nobody had opened outranked a quantity from the map."
+        }
+      ],
+      "note": "From the legend of the map published 1 August 2018, which states the pool in words: twenty territories, the 26 July pool of twenty-one with Mine Base Plains removed. Previously DERIVED here by reconstruction, and the reconstruction was wrong in composition though right in size — it carried Guild Hall where the legend has Swamp Dark Forest Transition Mid. It passed a cross-check against the 6 August list of twenty-two only because that check was built to reach twenty-two, adding Swamp and dropping Guild Hall to get there: a checksum arranged around its own answer tests nothing. Two compositions of the same size both satisfied it."
     },
     {
       "date": "2018-08-06",
@@ -233,7 +326,7 @@
       "count": 22,
       "territories": null,
       "alsoUnassigned": [],
-      "note": "Published as a map image with the free-for-all ground shown rather than listed, so no names are recoverable. Supersedes the 6 August text list for any window from this date."
+      "note": "Published as a map image with the free-for-all ground shown rather than listed, so no names are recoverable. Supersedes the 6 August text list for any window from this date. UPDATE 9 Sep 2026: \"never written down\" is too strong and is now known to be wrong about the instrument. The map images mark each territory with the tag of the guild holding it and mark pooled ground with a separate disc, so the names ARE on the map — what is missing is a reliable way to read them. A marker detector built on 9 Sep 2026 produced totals ranging from 15 to 52 across a plausible threshold range with no plateau, so it cannot yet be used for a count. Two of the four regions do read stably (zero pooled territory on both, at every threshold tested) and that much may be cited. Until glyph-level detection lands, treat this declaration as unfilterable and report raw — but do not tell a reader the names were never recorded."
     },
     {
       "date": "2018-09-08",
@@ -315,12 +408,38 @@
       "count": 18,
       "territories": null,
       "alsoUnassigned": [],
-      "note": "Terra, published a week after it won the map and maintained in the same channel until at least December 2019 — so the institution did not lapse after 2018. The eighteen names are NOT held here: this file is tracked and public, and while the territory names are public game geography, the declaration itself (this alliance, these territories, this date) is archive content from a channel that is not one of the thirteen sanctioned exports. The list lives in the research vault. To filter a 2019 window, send the research session the distinct territories in it with their exchange counts and it returns raw, free-for-all and contested totals; nothing of the archive moves. Amended after publication on 2019-09-30, 2019-10-10, 2019-11-15, 2019-12-11, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here.",
+      "note": "Terra, published a week after it won the map and maintained in the same channel until at least December 2019 — so the institution did not lapse after 2018. The eighteen names are NOT held here: this file is tracked and public, and while the territory names are public game geography, the declaration itself (this alliance, these territories, this date) is archive content from a channel that is not one of the thirteen sanctioned exports. The list lives in the research vault. To filter a 2019 window, send the research session the distinct territories in it with their exchange counts and it returns raw, free-for-all and contested totals; nothing of the archive moves. Amended after publication on 2019-09-30, 2019-10-10, 2019-11-15, 2019-12-11, so it was in force as amended rather than unchanged until the next declaration. Territory names for the amendments are not held here, but all four amendments name what moved on the research side, so the pool is recoverable for every day from declaration to the end of 2019 — see amendmentStates for the size in force in each span. Because the composition changes are expressible only as names, this file cannot hold the amended lists and ffa-filter.mjs refuses any window opening on or after the first amendment rather than filtering against the list as published. Send the research session a window and a set of guilds and it returns figures computed against the state actually in force.",
       "amendedOn": [
         "2019-09-30",
         "2019-10-10",
         "2019-11-15",
         "2019-12-11"
+      ],
+      "amendmentStates": [
+        {
+          "from": "2019-09-14",
+          "to": "2019-10-09",
+          "count": 18,
+          "note": "As declared. The 30 September note changed nothing — it confirmed a territory already listed was still listed."
+        },
+        {
+          "from": "2019-10-10",
+          "to": "2019-11-14",
+          "count": 18,
+          "note": "Still eighteen, but NOT the same eighteen: one territory released into the pool by the guild holding it, one granted away to a member guild. The alliance said in terms that the territory it granted away had been in the pool mainly to keep the total at eighteen — so the constant count here is a managed number, not evidence that nothing moved. Any check comparing counts to detect an amendment would miss this one."
+        },
+        {
+          "from": "2019-11-15",
+          "to": "2019-12-10",
+          "count": 17,
+          "note": "One territory withdrawn over an arrangement between two member guilds."
+        },
+        {
+          "from": "2019-12-11",
+          "to": null,
+          "count": 18,
+          "note": "That territory restored."
+        }
       ]
     }
   ],

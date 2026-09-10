@@ -263,7 +263,32 @@ for (const a of articles) {
         // trimmed before the comparison and a difference there stops being a
         // finding. A difference anywhere else still is.
         const edges = (p) => p.replace(/^[^a-z0-9]+/i, '').replace(/[^a-z0-9]+$/i, '');
-        const parts = norm(quote).split(/\s*\.\.\.\s*|\s*\[…\]\s*/)
+        // Square brackets inside a quotation are the ordinary editorial signal
+        // that the words within are the editor's and not the speaker's — a
+        // pronoun resolved, a name supplied, a tense fitted to the sentence.
+        // This corpus uses them for one thing in particular: replacing a real
+        // first name with the person's in-game name, which is the only form of
+        // the substitution the privacy rule allows to be published.
+        //
+        // Treating a bracketed span as text that must appear verbatim in the
+        // source turns every one of those into a permanent quote-not-in-source
+        // at HIGH, which is worse than missing them: two such findings had been
+        // standing on `arenos` and `emperium-of-wynn` long enough that a writer
+        // reported the auditor's own documentation as out of date. A check that
+        // cries fabrication at correct practice teaches people to skip it.
+        //
+        // So a bracketed span ends a fragment, exactly as an elision does. What
+        // it does not do is excuse the words around it: every fragment either
+        // side must still be present verbatim, so bracketing cannot be used to
+        // smuggle a paraphrase through.
+        // The split has to happen before norm(), which deletes bracketed spans
+        // outright in order to strip XenForo mention debris. The pattern is
+        // deliberately narrower than that one: letters and ordinary name
+        // punctuation only, so "[ElegantDeath]" is a boundary while "[/USER,"
+        // is left for norm to handle as the markup it is.
+        const parts = quote
+          .split(/\s*\[[A-Za-z][A-Za-z0-9 '’.\-]{0,40}\]\s*/)
+          .flatMap((p) => norm(p).split(/\s*\.\.\.\s*/))
           .map(edges)
           .filter((p) => p.length >= 12);
         const missing = parts.filter((p) => !pool.includes(p));

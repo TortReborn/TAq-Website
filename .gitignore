@@ -43,3 +43,7 @@ docs/discord-findings/
 
 # Throwaway query scripts written by writing agents; never committed.
 scripts/_tmp-*
+
+# Local state for check-session-sync.mjs — records which findings existed last
+# run so a withdrawal is detectable. Machine-local, never shared.
+docs/discord-findings/.sync-last-seen.json
