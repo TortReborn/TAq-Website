@@ -42,11 +42,26 @@ export interface WarChartEmbedData {
   guildA: string;
   guildB: string;
   start: string;
+  /** Window end as drawn — clipped to the last day in the log, see truncatedTo */
   end: string;
-  /** Weekly buckets (ISO date of the bucket start), zero-filled */
+  /**
+   * Weekly buckets (ISO date of the bucket start), zero-filled. `a` and `b` are
+   * the average number of territories each guild held across that week, so a
+   * square held for half the week counts 0.5.
+   */
   weeks: { week: string; a: number; b: number }[];
-  totalA: number;
-  totalB: number;
+  /** Mean territories held across the whole window */
+  meanA: number;
+  meanB: number;
+  /**
+   * Exchanges between the two guilds over the window. This measures how hard
+   * they were fighting, not who was winning — see the note in wiki-embed-db.
+   */
+  exchanges: number;
+  /** Runs of two or more days inside the window with nothing in the capture log */
+  gaps: { from: string; to: string; days: number }[];
+  /** Set when the directive's end date ran past the log and the window was cut back */
+  truncatedTo: string | null;
 }
 
 export interface MapEmbedData {
@@ -126,3 +141,45 @@ export const WIKI_EMBED_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Longest window a war-chart may cover (weeks) — keeps queries and SVGs sane. */
 export const WAR_CHART_MAX_WEEKS = 160;
+
+export const WAR_CHART_WEEK_MS = 7 * 24 * 3600 * 1000;
+
+/**
+ * Clip a war-chart window to the end of the capture log.
+ *
+ * The live wars carry directive end dates in the future — they were written
+ * while still being fought. Holdings are drawn from spans that run to the
+ * window's end, so an end date past the log would extend the last known holder
+ * over days nothing is recorded about and draw a settled front out of nothing.
+ *
+ * The returned end is exclusive, so `lastLoggedDay` itself is drawn in full.
+ */
+export function clipWarChartEnd(
+  end: string,
+  lastLoggedDay: string | null,
+): { end: string; truncatedTo: string | null } {
+  if (!lastLoggedDay || end <= lastLoggedDay) return { end, truncatedTo: null };
+  const clipped = new Date(Date.parse(`${lastLoggedDay}T00:00:00Z`) + 86400000)
+    .toISOString()
+    .slice(0, 10);
+  return { end: clipped, truncatedTo: clipped };
+}
+
+/**
+ * Mean of a weekly series over a window whose last bucket is usually short.
+ * Each bucket is a mean already, so a plain average would let three trailing
+ * days weigh as much as a full week.
+ */
+export function weightedWeekMean(values: number[], startMs: number, endMs: number): number {
+  if (values.length === 0) return 0;
+  let sum = 0;
+  let total = 0;
+  for (let i = 0; i < values.length; i++) {
+    const from = startMs + i * WAR_CHART_WEEK_MS;
+    const w = Math.min(from + WAR_CHART_WEEK_MS, endMs) - from;
+    if (w <= 0) continue;
+    sum += values[i] * w;
+    total += w;
+  }
+  return total === 0 ? 0 : Math.round((sum / total) * 10) / 10;
+}

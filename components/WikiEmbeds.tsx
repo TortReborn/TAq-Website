@@ -224,24 +224,37 @@ function WarChart({ data }: { data: WarChartEmbedData }) {
   return (
     <figure className="wiki-warchart" style={{ ...cardStyle, padding: '0.6rem 0.9rem', margin: '0.9rem 0' }}>
       <figcaption style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-        Weekly territory captures — {data.guildA} vs {data.guildB}
+        Territories held — {data.guildA} vs {data.guildB}
       </figcaption>
       <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-        {fmtDate(data.start)} – {fmtDate(data.end)} · {data.totalA + data.totalB} exchanges
+        {fmtDate(data.start)} – {fmtDate(data.end)} · weekly average ·{' '}
+        {data.exchanges.toLocaleString()} exchanges between them
+        {data.truncatedTo && ' · drawn to the end of the capture log'}
       </div>
 
       {/* Legend (identity chips; text in ink tokens) */}
       <div style={{ display: 'flex', gap: '1rem', fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
-        <span><span aria-hidden style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 2, background: 'var(--wiki-series-a)', marginRight: '0.3rem', verticalAlign: '-1px' }} />{data.guildA} ({data.totalA})</span>
-        <span><span aria-hidden style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 2, background: 'var(--wiki-series-b)', marginRight: '0.3rem', verticalAlign: '-1px' }} />{data.guildB} ({data.totalB})</span>
+        <span><span aria-hidden style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 2, background: 'var(--wiki-series-a)', marginRight: '0.3rem', verticalAlign: '-1px' }} />{data.guildA} (mean {data.meanA})</span>
+        <span><span aria-hidden style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 2, background: 'var(--wiki-series-b)', marginRight: '0.3rem', verticalAlign: '-1px' }} />{data.guildB} (mean {data.meanB})</span>
       </div>
+
+      {/* A holdings line carries the last known holder across a hole in the log,
+          so it draws a steady front where there is simply no record. Say so. */}
+      {data.gaps.length > 0 && (
+        <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+          The capture log has no rows for{' '}
+          {data.gaps.map(g => `${fmtDate(g.from)}–${fmtDate(g.to)}`).join(', ')}
+          {' '}— the lines carry the last known holder across{' '}
+          {data.gaps.length === 1 ? 'that stretch' : 'those stretches'}.
+        </div>
+      )}
 
       <svg
         ref={svgRef}
         viewBox={`0 0 ${CHART_W} ${CHART_H}`}
         style={{ width: '100%', height: 'auto', display: 'block', touchAction: 'pan-y' }}
         role="img"
-        aria-label={`Weekly captures: ${data.guildA} ${data.totalA}, ${data.guildB} ${data.totalB}`}
+        aria-label={`Territories held, weekly average: ${data.guildA} mean ${data.meanA}, ${data.guildB} mean ${data.meanB}`}
         onPointerMove={onMove}
         onPointerLeave={() => setHover(null)}
       >

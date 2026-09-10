@@ -29,6 +29,30 @@ if (!dryRun && !useProd && !args.includes('--dev')) {
   process.exit(2);
 }
 
+// State shared with the research session drifts across session boundaries and
+// nothing compares it: a dead mailbox watcher, findings promoted there and
+// unregistered here, a claim believed on both sides that had been checked once.
+// Publishing is the moment that drift starts to matter, so the reconciliation
+// runs here — as an advisory. It deliberately does not gate: a divergence that
+// has nothing to do with the page being seeded should never block the seed, or
+// the habit becomes passing whatever flag turns it off.
+if (!args.includes('--no-sync-check')) {
+  try {
+    const { execFileSync } = await import('child_process');
+    const out = execFileSync(process.execPath,
+      [path.join(__dirname, 'check-session-sync.mjs')],
+      { encoding: 'utf8', cwd: path.join(__dirname, '..') });
+    const diffs = out.split('\n').filter((l) => l.startsWith(' DIFF '));
+    if (diffs.length) {
+      console.log('Session sync — advisory, not blocking:');
+      for (const d of diffs) console.log(d);
+      console.log('');
+    }
+  } catch {
+    // The advisory must never be the reason a seed fails.
+  }
+}
+
 const unquote = (v) => v.replace(/^(['"])(.*)\1$/s, '$2');
 
 for (const name of ['.env', '.env.local']) {
