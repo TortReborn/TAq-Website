@@ -1420,10 +1420,11 @@ body.site-fixed-bg-active > footer {
 
 @font-face {
   font-family: 'GameFont';
-  /* 5KB Latin+punctuation subset (preloaded in the layout head) — the full
-     14MB game.ttf stays only as a fallback for browsers without woff2 */
-  src: url('/images/profile/game.subset.woff2') format('woff2'),
-       url('/images/profile/game.ttf') format('truetype');
+  /* 5KB Latin+punctuation subset (preloaded in the layout head), cut from
+     data/fonts/game.ttf by scripts/subset-game-font.cjs. The 14MB original is
+     deliberately not listed as a truetype fallback: it shipped with every
+     deployment, and html-to-image fetched it on every profile-card export. */
+  src: url('/images/profile/game.subset.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

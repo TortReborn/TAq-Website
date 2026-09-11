@@ -4,6 +4,10 @@ Reference data that ships with the repo, as opposed to anything in Postgres.
 
 ```
 data/
+  fonts/                        source fonts that are subset before shipping;
+                                scripts/subset-game-font.cjs cuts game.ttf
+                                down to the woff2 under public/
+
   guild-prefix-overrides.json   guild-name → prefix corrections, written by
                                 scripts/resolve-guild-prefixes.cjs
 

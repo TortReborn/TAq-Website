@@ -1,6 +1,6 @@
 /**
  * Regenerates public/images/profile/game.subset.woff2 — the 5KB
- * Latin+punctuation subset of the 14MB game.ttf that the site actually
+ * Latin+punctuation subset of the 14MB data/fonts/game.ttf that the site actually
  * loads (see the GameFont @font-face in app/globals.css).
  *
  * Run after replacing game.ttf:  node scripts/subset-game-font.cjs
@@ -9,7 +9,7 @@ const subsetFont = require('subset-font');
 const fs = require('fs');
 const path = require('path');
 
-const SRC = path.join(__dirname, '../public/images/profile/game.ttf');
+const SRC = path.join(__dirname, '../data/fonts/game.ttf');
 const OUT = path.join(__dirname, '../public/images/profile/game.subset.woff2');
 
 // ASCII, Latin-1 supplement, general punctuation (dashes, quotes, bullet,
