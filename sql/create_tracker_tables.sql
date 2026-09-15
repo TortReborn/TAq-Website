@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS tracker_tickets (
   due_date      DATE,
   position      INT           NOT NULL DEFAULT 0,
   created_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+  updated_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+  resolved_at   TIMESTAMPTZ                            -- set on deployed/declined (TAQ-78)
 );
 
 CREATE TABLE IF NOT EXISTS tracker_comments (
