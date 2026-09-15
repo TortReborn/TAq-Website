@@ -10,6 +10,16 @@ import {
   scopeFromParams, scopeFilter, EXEC_RANK_NAMES,
 } from './activity-trends';
 
+describe('scopeFilter cohorts (TAQ-76)', () => {
+  it('scopes rank cohorts on the rank currently held, never on the retired linked flag', () => {
+    const values: unknown[] = [];
+    const sql = scopeFilter(scopeFromParams(undefined, 'rank:Piranha'), 'p', values);
+    expect(sql).toContain('dl.rank IS NOT NULL');
+    expect(sql).not.toContain('linked');
+    expect(values).toEqual([['Piranha']]);
+  });
+});
+
 describe('parameter validation', () => {
   it('accepts known metrics and ranges', () => {
     expect(isMetric('presence')).toBe(true);

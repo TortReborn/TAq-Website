@@ -3,10 +3,12 @@ import type { Pool, PoolClient } from 'pg';
 /**
  * Count accepted guild applicants who haven't joined the guild yet.
  *
- * An applicant has joined once they are on the roster, or a membership
- * stint opened for the Minecraft account on their discord_links row from
- * around the time they applied (TAQ-76; a week of slack covers players who
- * joined in-game just before applying). "On the roster now" would be wrong here: someone who joined and
+ * An applicant has joined once a membership stint exists for the Minecraft
+ * account on their discord_links row that is either still open (they are a
+ * current member -- the bot opens the stint in the same transaction that
+ * adds the roster row, so "open stint" and "on guild_roster" never disagree)
+ * or started from around the time they applied (TAQ-76; a week of slack
+ * covers players who joined in-game just before applying). "On the roster now" would be wrong here: someone who joined and
  * later left must not become pending again. NOT EXISTS keeps applicants
  * with no link at all counted as pending.
  *
