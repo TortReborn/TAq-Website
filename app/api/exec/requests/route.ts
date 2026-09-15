@@ -82,6 +82,10 @@ export async function GET(request: NextRequest) {
     const sortColumn = allowedSorts[sortParam] || 't.created_at';
     const order = searchParams.get('order') === 'asc' ? 'ASC' : 'DESC';
 
+    // Terminal columns (deployed / declined / archived) read newest-resolved
+    // first; the manual drag order only means something while a ticket is
+    // active (TAQ-78). resolved_at is NULL for active tickets, so the first
+    // key is a no-op for them.
     const result = await pool.query(
       `SELECT t.*,
               dl1.ign AS submitted_by_ign,
@@ -91,7 +95,8 @@ export async function GET(request: NextRequest) {
        LEFT JOIN discord_links dl1 ON dl1.discord_id = t.submitted_by
        LEFT JOIN discord_links dl2 ON dl2.discord_id = t.assigned_to
        ${whereClause}
-       ORDER BY t.position ASC, ${sortColumn} ${order}`,
+       ORDER BY (CASE WHEN t.status IN ('deployed', 'declined', 'archived') THEN t.resolved_at END) DESC NULLS LAST,
+                t.position ASC, ${sortColumn} ${order}`,
       params
     );
 
@@ -120,6 +125,7 @@ export async function GET(request: NextRequest) {
         dueDate: row.due_date || null,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
+        resolvedAt: row.resolved_at || null,
       })),
       execMembers: execResult.rows.map(row => ({
         discordId: row.discord_id?.toString(),
