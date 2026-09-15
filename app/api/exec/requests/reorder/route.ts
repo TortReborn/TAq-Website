@@ -50,8 +50,10 @@ export async function POST(request: NextRequest) {
 
       if (statusChanged) {
         await client.query(
-          `UPDATE tracker_tickets SET status = $1, updated_at = NOW(),
-             resolved_at = CASE WHEN $1 IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END
+          // $1 is used twice; without the casts Postgres cannot deduce one type for it
+          // (varchar column vs text literals) and rejects the statement.
+          `UPDATE tracker_tickets SET status = $1::text, updated_at = NOW(),
+             resolved_at = CASE WHEN $1::text IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END
            WHERE id = $2`,
           [targetStatus, ticketId]
         );

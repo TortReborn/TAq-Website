@@ -124,9 +124,11 @@ export async function PATCH(
       if (!['untriaged', 'todo', 'blocked', 'in_progress', 'deployed', 'declined', 'archived'].includes(body.status)) {
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
       }
-      updates.push(`status = $${paramIdx}`);
+      // The same parameter is used twice; cast both uses or Postgres cannot
+      // deduce its type (varchar column vs text literals) and rejects the UPDATE.
+      updates.push(`status = $${paramIdx}::text`);
       // Entering a terminal column stamps resolved_at; leaving one clears it (TAQ-78).
-      updates.push(`resolved_at = CASE WHEN $${paramIdx} IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END`);
+      updates.push(`resolved_at = CASE WHEN $${paramIdx}::text IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END`);
       values.push(body.status);
       paramIdx++;
     }
