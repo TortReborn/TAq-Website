@@ -63,6 +63,16 @@ SELECT (m->>'uuid')::uuid, m->>'name', m->>'rank', NULLIF(m->>'joined', '')::tim
    AND m->>'uuid' IS NOT NULL
 ON CONFLICT (uuid) DO NOTHING;
 
+-- The rank cleanup in step 7 nulls every member rank not on the roster, so an
+-- empty or malformed guildData cache would lock every exec out. Refuse to go
+-- on unless the seed produced a plausible roster (prod: 150 on 2026-09-15).
+DO $$
+BEGIN
+  IF (SELECT COUNT(*) FROM guild_roster) < 50 THEN
+    RAISE EXCEPTION 'guild_roster seed produced % rows (cache_entries.guildData missing or malformed) -- aborting', (SELECT COUNT(*) FROM guild_roster);
+  END IF;
+END $$;
+
 -- Rank names must be current before the stint backfill below reads them:
 -- 'Barracuda' was collapsed into 'Piranha' (rank_restructure_*.sql) but 29
 -- ex-member rows still carried it, and a stale rank only lands on the stint
@@ -210,6 +220,23 @@ SELECT dl.uuid, dl.discord_id, dl.ign, h.honorific, 0, 'backfill: discord_links 
    AND NOT EXISTS (
      SELECT 1 FROM member_honorifics mh
       WHERE mh.uuid = dl.uuid AND mh.honorific = h.honorific AND mh.revoked_at IS NULL
+   );
+
+-- A legacy row with no uuid (none in prod on 2026-09-15, but the old schema
+-- allowed them) keeps its honorific keyed by Discord id; the identity row
+-- itself is deleted in step 7 because a row without a uuid is not an identity.
+INSERT INTO member_honorifics (uuid, discord_id, ign, honorific, granted_by, note)
+SELECT NULL, dl.discord_id, dl.ign, h.honorific, 0, 'backfill: discord_links flag (no uuid)'
+  FROM discord_links dl
+  CROSS JOIN LATERAL (
+    SELECT 'honored_fish'::text AS honorific WHERE dl.was_honored_fish
+    UNION ALL
+    SELECT 'retired_chief' WHERE dl.was_retired_chief
+  ) h
+ WHERE dl.uuid IS NULL
+   AND NOT EXISTS (
+     SELECT 1 FROM member_honorifics mh
+      WHERE mh.discord_id = dl.discord_id AND mh.uuid IS NULL AND mh.honorific = h.honorific AND mh.revoked_at IS NULL
    );
 
 -- ---------------------------------------------------------------------------
