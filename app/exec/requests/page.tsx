@@ -36,7 +36,7 @@ export default function ExecTrackerPage() {
     ...(searchQuery && { q: searchQuery }),
   }), [typeFilter, systemFilter, priorityFilter, searchQuery]);
 
-  const { tickets, execMembers, loading, error, refresh, createTicket, updateTicketLocally } = useExecTracker(filters);
+  const { tickets, execMembers, loading, error, refresh, createTicket, moveTicket, updateTicketLocally } = useExecTracker(filters);
 
   // Client-side assignee filter
   const filteredTickets = useMemo(() => {
@@ -61,13 +61,11 @@ export default function ExecTrackerPage() {
   const [showModal, setShowModal] = useState(false);
 
   const handleMoveTicket = async (ticketId: number, newStatus: TicketStatus, position: number) => {
-    updateTicketLocally(ticketId, { status: newStatus });
-    await fetch('/api/exec/requests/reorder', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ticketId, status: newStatus, position }),
-    });
-    refresh();
+    try {
+      await moveTicket(ticketId, newStatus, position);
+    } catch (e) {
+      console.error(e);   // SWR has already rolled the card back
+    }
   };
 
   const handleDelete = async () => {

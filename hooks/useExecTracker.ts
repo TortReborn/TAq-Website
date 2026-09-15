@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import useSWR, { mutate as mutateKey } from 'swr';
 import { fetcher } from './fetcher';
 
 export type TicketType = 'bug' | 'feature';
@@ -61,8 +61,9 @@ function buildQueryString(filters: TrackerFilters): string {
 
 export function useExecTracker(filters: TrackerFilters = {}) {
   const qs = buildQueryString(filters);
+  const key = `/api/exec/requests${qs}`;
   const { data, error, isLoading, mutate } = useSWR<TrackerData>(
-    `/api/exec/requests${qs}`,
+    key,
     fetcher,
     { revalidateOnFocus: false, refreshInterval: 30000, dedupingInterval: 10000 }
   );
@@ -84,6 +85,33 @@ export function useExecTracker(filters: TrackerFilters = {}) {
     return data.id;
   };
 
+  /**
+   * Move a card (drag/drop or the detail panel's status select). Runs as an
+   * SWR async mutation: the optimistic list shows at once, any background
+   * revalidation that overlaps the write is discarded instead of putting
+   * the card back, and the cache is populated from a fresh fetch only after
+   * the write has committed. The detail panel's own cache is refreshed too
+   * so its status select agrees with the column.
+   */
+  const moveTicket = async (id: number, status: TicketStatus, position: number) => {
+    const optimistic = data
+      ? { ...data, tickets: data.tickets.map(t => t.id === id ? { ...t, status } : t) }
+      : undefined;
+    await mutate(
+      async () => {
+        const res = await fetch('/api/exec/requests/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticketId: id, status, position }),
+        });
+        if (!res.ok) throw new Error(`Move failed (HTTP ${res.status})`);
+        return fetcher(key) as Promise<TrackerData>;
+      },
+      { optimisticData: optimistic, rollbackOnError: true, populateCache: true, revalidate: false },
+    );
+    mutateKey(`/api/exec/requests/${id}`);
+  };
+
   const updateTicketLocally = (id: number, fields: Partial<Ticket>) => {
     if (!data) return;
     mutate(
@@ -100,8 +128,11 @@ export function useExecTracker(filters: TrackerFilters = {}) {
     execMembers: data?.execMembers ?? [],
     loading: isLoading,
     error: error?.message ?? null,
-    refresh: () => mutate(),
+    // A promise as the mutation, not a bare revalidate: a bare mutate() reuses
+    // any in-flight background fetch, which may predate the write we just made.
+    refresh: () => mutate(fetcher(key) as Promise<TrackerData>, { revalidate: false }),
     createTicket,
+    moveTicket,
     updateTicketLocally,
   };
 }

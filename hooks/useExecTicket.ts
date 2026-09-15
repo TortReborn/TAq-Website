@@ -43,12 +43,20 @@ export function useExecTicket(id: number | null) {
     due_date?: string | null;
   }) => {
     if (!id) return;
-    await fetch(`/api/exec/requests/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fields),
-    });
-    mutate();
+    const key = `/api/exec/requests/${id}`;
+    const optimistic = data ? { ...data, ticket: { ...data.ticket, ...fields } as Ticket } : undefined;
+    await mutate(
+      async () => {
+        const res = await fetch(key, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fields),
+        });
+        if (!res.ok) throw new Error(`Update failed (HTTP ${res.status})`);
+        return fetcher(key) as Promise<TicketDetailData>;
+      },
+      { optimisticData: optimistic, rollbackOnError: true, populateCache: true, revalidate: false },
+    );
   };
 
   const deleteTicket = async () => {
