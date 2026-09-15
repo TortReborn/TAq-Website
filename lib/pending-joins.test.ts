@@ -5,8 +5,9 @@ import { countPendingJoins } from './pending-joins';
 // Integration test against the local test database (same instance
 // scripts/_check_test_db.cjs targets, overridable via TEST_DB_* env vars).
 // All data lives in session-scoped TEMP tables, which shadow the real
-// applications/discord_links tables for unqualified names — nothing in the
-// test database is touched. Skipped when the database is unreachable.
+// applications/discord_links/membership_stints tables for unqualified names —
+// nothing in the test database is touched. Skipped when the database is
+// unreachable.
 const config = {
   user: process.env.TEST_DB_LOGIN || 'tortuser',
   password: process.env.TEST_DB_PASS || 'UserPass123',
@@ -33,23 +34,31 @@ async function probeDatabase(): Promise<boolean> {
 
 const available = await probeDatabase();
 
+const UUID_A = '11111111-1111-1111-1111-111111111111';
+const UUID_B = '22222222-2222-2222-2222-222222222222';
+const UUID_C = '33333333-3333-3333-3333-333333333333';
+
 describe.skipIf(!available)('countPendingJoins', () => {
   let pool: Pool;
   let nextId = 1;
 
-  async function insertApp(discordId: string, status: string, type = 'guild') {
+  async function insertApp(discordId: string, status: string, type = 'guild', submittedAt = '2026-06-01') {
     await pool.query(
-      `INSERT INTO applications (id, application_type, discord_id, status)
-       VALUES ($1, $2, $3, $4)`,
-      [nextId++, type, discordId, status]
+      `INSERT INTO applications (id, application_type, discord_id, status, submitted_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [nextId++, type, discordId, status, submittedAt]
     );
   }
 
-  async function insertLink(discordId: string, linked: boolean) {
+  async function insertLink(discordId: string, uuid: string) {
     await pool.query(
-      `INSERT INTO discord_links (discord_id, linked) VALUES ($1, $2)`,
-      [discordId, linked]
+      `INSERT INTO discord_links (discord_id, uuid) VALUES ($1, $2::uuid)`,
+      [discordId, uuid]
     );
+  }
+
+  async function stint(uuid: string, joinedAt: string, leftAt: string | null = null) {
+    await pool.query(`INSERT INTO membership_stints (uuid, joined_at, left_at) VALUES ($1::uuid, $2, $3)`, [uuid, joinedAt, leftAt]);
   }
 
   beforeAll(async () => {
@@ -59,13 +68,23 @@ describe.skipIf(!available)('countPendingJoins', () => {
         id INT PRIMARY KEY,
         application_type VARCHAR(20) NOT NULL,
         discord_id VARCHAR(30) NOT NULL,
-        status VARCHAR(20) NOT NULL
+        status VARCHAR(20) NOT NULL,
+        submitted_at TIMESTAMPTZ,
+        reviewed_at TIMESTAMPTZ
       )
     `);
     await pool.query(`
       CREATE TEMP TABLE discord_links (
-        discord_id BIGINT NOT NULL,
-        linked BOOLEAN NOT NULL
+        discord_id BIGINT PRIMARY KEY,
+        uuid UUID NOT NULL UNIQUE
+      )
+    `);
+    await pool.query(`
+      CREATE TEMP TABLE membership_stints (
+        id SERIAL PRIMARY KEY,
+        uuid UUID NOT NULL,
+        joined_at TIMESTAMPTZ NOT NULL,
+        left_at TIMESTAMPTZ
       )
     `);
   });
@@ -75,13 +94,13 @@ describe.skipIf(!available)('countPendingJoins', () => {
   });
 
   beforeEach(async () => {
-    await pool.query('TRUNCATE applications, discord_links');
+    await pool.query('TRUNCATE applications, discord_links, membership_stints');
     nextId = 1;
   });
 
-  it('counts an accepted guild applicant with no live link', async () => {
+  it('counts an accepted guild applicant who is linked but has no stint', async () => {
     await insertApp('100', 'accepted');
-    await insertLink('100', false);
+    await insertLink('100', UUID_A);
     expect(await countPendingJoins(pool)).toBe(1);
   });
 
@@ -90,31 +109,52 @@ describe.skipIf(!available)('countPendingJoins', () => {
     expect(await countPendingJoins(pool)).toBe(1);
   });
 
-  it('excludes applicants who joined (live linked row)', async () => {
+  it('excludes applicants who joined (stint opened after applying)', async () => {
     await insertApp('100', 'accepted');
-    await insertLink('100', true);
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2026-06-03');
     expect(await countPendingJoins(pool)).toBe(0);
   });
 
-  it('excludes joined applicants who also carry a stale unlinked row', async () => {
-    // The old JOIN-on-linked=FALSE query counted this player via the stale row.
+  it('still excludes them after they leave again — joined is sticky', async () => {
     await insertApp('100', 'accepted');
-    await insertLink('100', true);
-    await insertLink('100', false);
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2026-06-03', '2026-08-01');
     expect(await countPendingJoins(pool)).toBe(0);
   });
 
-  it('counts an applicant once even with several unlinked rows', async () => {
-    // The old JOIN query counted one application per unlinked row.
+  it('excludes a player who joined in-game just before applying', async () => {
+    await insertApp('100', 'accepted', 'guild', '2026-06-01');
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2026-05-29');
+    expect(await countPendingJoins(pool)).toBe(0);
+  });
+
+  it('excludes a current member who applied again (open stint predates the application)', async () => {
+    await insertApp('100', 'accepted', 'guild', '2026-06-01');
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2025-01-01');
+    expect(await countPendingJoins(pool)).toBe(0);
+  });
+
+  it('counts a returning applicant whose only stint predates the application', async () => {
+    await insertApp('100', 'accepted', 'guild', '2026-06-01');
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2025-01-01', '2025-03-01');
+    expect(await countPendingJoins(pool)).toBe(1);
+  });
+
+  it('does not count a stint that belongs to someone else', async () => {
     await insertApp('100', 'accepted');
-    await insertLink('100', false);
-    await insertLink('100', false);
+    await insertLink('100', UUID_A);
+    await insertLink('200', UUID_B);
+    await stint(UUID_B, '2026-06-03');
     expect(await countPendingJoins(pool)).toBe(1);
   });
 
   it('excludes expired applications (ticket closed, never joined)', async () => {
     await insertApp('100', 'expired');
-    await insertLink('100', false);
+    await insertLink('100', UUID_A);
     expect(await countPendingJoins(pool)).toBe(0);
   });
 
@@ -126,12 +166,13 @@ describe.skipIf(!available)('countPendingJoins', () => {
   });
 
   it('counts each distinct pending applicant', async () => {
-    await insertApp('100', 'accepted'); // genuine pending, unlinked row
-    await insertLink('100', false);
+    await insertApp('100', 'accepted'); // genuine pending, linked, no stint
+    await insertLink('100', UUID_A);
     await insertApp('200', 'accepted'); // joined
-    await insertLink('200', true);
+    await insertLink('200', UUID_B);
+    await stint(UUID_B, '2026-06-03');
     await insertApp('300', 'expired'); // retired
-    await insertLink('300', false);
+    await insertLink('300', UUID_C);
     await insertApp('400', 'accepted'); // pending, no link row yet
     expect(await countPendingJoins(pool)).toBe(2);
   });

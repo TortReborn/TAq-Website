@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
     checkGuildMembership(session.uuid),
   ]);
   if (!linkCheck.ok) {
-    console.warn(`[exec-session] ${session.discord_username} (${session.discord_id}) not found in discord_links`);
-    const response = NextResponse.json({ authenticated: false, reason: 'not_linked' });
+    console.warn(`[exec-session] ${session.discord_username} (${session.discord_id}) refused: ${linkCheck.reason}`);
+    const response = NextResponse.json({ authenticated: false, reason: linkCheck.reason });
     clearExecSessionCookie(response);
     return response;
   }

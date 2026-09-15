@@ -14,6 +14,8 @@ function UnauthorizedContent() {
   let message: string;
   if (reason === 'not_linked') {
     message = `Discord account "${discordName || 'unknown'}" is not linked to any Minecraft account in the database. Make sure your Discord is linked via the bot.`;
+  } else if (reason === 'not_in_guild') {
+    message = `"${ign || discordName || 'unknown'}" is not currently a member of The Aquarium in-game, so the exec panel is closed.`;
   } else if (reason === 'rank_not_allowed') {
     message = `Account "${ign || discordName || 'unknown'}" has rank "${rank || 'unknown'}" which does not have exec panel access. Hammerhead or higher is required.`;
   } else {

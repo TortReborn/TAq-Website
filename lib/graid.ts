@@ -220,7 +220,6 @@ async function buildRows(client: any, event: ActiveEvent): Promise<Row[]> {
          SELECT ign, rank
          FROM discord_links
          WHERE uuid = glp.uuid
-         ORDER BY linked DESC, (rank <> '') DESC, discord_id
          LIMIT 1
        ) dl ON TRUE
        WHERE gl.event_id = $1
@@ -295,7 +294,6 @@ async function buildLegacyRows(client: any, event: ActiveEvent): Promise<Row[]> 
          SELECT ign, rank
          FROM discord_links
          WHERE uuid = get.uuid
-         ORDER BY linked DESC, (rank <> '') DESC, discord_id
          LIMIT 1
        ) dl ON TRUE
        WHERE get.event_id = $1
