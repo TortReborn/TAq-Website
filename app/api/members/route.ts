@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
         return {
           ...member,
           raids: allTimeGraidRaids.get(member.uuid) || 0,
-          discordRank: discord ? discord.rank : '',
+          discordRank: (discord && discord.rank) || '',   // rank is NULL for linked non-members (TAQ-76)
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',
           online: member.online === true || member.online === 'true',
