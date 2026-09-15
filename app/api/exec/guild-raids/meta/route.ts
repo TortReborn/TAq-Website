@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
           SELECT ign
           FROM discord_links
           WHERE uuid = glp.uuid
-          ORDER BY linked DESC, (rank <> '') DESC, discord_id
           LIMIT 1
         ) dl ON TRUE
         WHERE glp.ign IS NOT NULL
