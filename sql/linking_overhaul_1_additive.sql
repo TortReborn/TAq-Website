@@ -63,6 +63,13 @@ SELECT (m->>'uuid')::uuid, m->>'name', m->>'rank', NULLIF(m->>'joined', '')::tim
    AND m->>'uuid' IS NOT NULL
 ON CONFLICT (uuid) DO NOTHING;
 
+-- Rank names must be current before the stint backfill below reads them:
+-- 'Barracuda' was collapsed into 'Piranha' (rank_restructure_*.sql) but 29
+-- ex-member rows still carried it, and a stale rank only lands on the stint
+-- as rank_at_leave if it is a known member rank. (Found on the 2026-09-15
+-- prod run; repaired by hand there.)
+UPDATE discord_links SET rank = 'Piranha' WHERE rank = 'Barracuda';
+
 -- ---------------------------------------------------------------------------
 -- 3. membership_stints -- one row per stint in the guild. Opened on join,
 --    closed on leave. Backfilled from player_activity daily snapshots.
@@ -249,7 +256,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS discord_links_uuid_uq ON discord_links (uuid);
 -- rank: '' -> NULL, retired names mapped, unknowns dropped, then FK.
 ALTER TABLE discord_links ALTER COLUMN rank DROP NOT NULL;
 UPDATE discord_links SET rank = NULL     WHERE rank = '';
-UPDATE discord_links SET rank = 'Piranha' WHERE rank = 'Barracuda';
+-- (Barracuda -> Piranha already done ahead of the stint backfill)
 UPDATE discord_links SET rank = NULL
  WHERE rank IS NOT NULL AND rank NOT IN (SELECT name FROM rank_definitions);
 
