@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireExecSession, isNarwhalRank } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       // Pending queue
       pool.query(
         `SELECT id, uuid, ign, current_rank, new_rank, action_type,
-                queued_by_ign, created_at, status, completed_at, error_message
+                queued_by_ign, created_at, status, completed_at, error_message, grant_honorific
          FROM promotion_queue
          WHERE status = 'pending'
          ORDER BY created_at ASC`
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       // Recent history
       pool.query(
         `SELECT id, uuid, ign, current_rank, new_rank, action_type,
-                queued_by_ign, created_at, status, completed_at, error_message
+                queued_by_ign, created_at, status, completed_at, error_message, grant_honorific
          FROM promotion_queue
          WHERE status IN ('completed', 'failed')
          ORDER BY completed_at DESC
@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
            SELECT discord_id
            FROM discord_links
            WHERE uuid = ps.uuid
-           ORDER BY linked DESC, (rank <> '') DESC, discord_id
            LIMIT 1
          ) dl ON TRUE
          ORDER BY ps.created_at DESC`
@@ -63,17 +62,23 @@ export async function GET(request: NextRequest) {
     // Historical data for 7-day deltas
     const hist7 = allSnapshots[7] || {};
 
-    // Batch lookup discord_links for all guild members
+    // Batch lookup discord_links (+ honorifics on record) for all guild members
     let memberRanks: Record<string, string> = {};
     let memberDiscordIds: Record<string, string> = {};
+    let memberHonorifics: Record<string, string[]> = {};
     if (memberUuids.length > 0) {
       const dlResult = await pool.query(
-        `SELECT uuid, ign, rank, discord_id FROM discord_links WHERE uuid = ANY($1::uuid[])`,
+        `SELECT dl.uuid, dl.ign, dl.rank, dl.discord_id,
+                COALESCE((SELECT array_agg(mh.honorific ORDER BY mh.honorific)
+                            FROM member_honorifics mh
+                           WHERE mh.uuid = dl.uuid AND mh.revoked_at IS NULL), '{}') AS honorifics
+           FROM discord_links dl WHERE dl.uuid = ANY($1::uuid[])`,
         [memberUuids]
       );
       for (const row of dlResult.rows) {
         memberRanks[row.uuid] = row.rank;
         memberDiscordIds[row.uuid] = row.discord_id;
+        memberHonorifics[row.uuid] = row.honorifics ?? [];
       }
     }
 
@@ -87,6 +92,7 @@ export async function GET(request: NextRequest) {
         ign: m.name,
         rank: memberRanks[m.uuid] || '',
         discordId: memberDiscordIds[m.uuid] || null,
+        honorifics: memberHonorifics[m.uuid] || [],
         playtime7d: h ? Math.max(0, playtime - h.playtime) : 0,
         wars7d: h ? Math.max(0, wars - h.wars) : 0,
         raids7d: h ? Math.max(0, raids - h.raids) : 0,
@@ -107,6 +113,7 @@ export async function GET(request: NextRequest) {
       status: row.status,
       completedAt: row.completed_at,
       errorMessage: row.error_message,
+      grantHonorific: row.grant_honorific ?? null,
     });
 
     const promoSuggestions = suggestionsResult.rows.map((row: any) => ({
@@ -152,7 +159,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { uuid, ign, currentRank, newRank, actionType } = await request.json();
+    const { uuid, ign, currentRank, newRank, actionType, grantHonorific } = await request.json();
 
     if (!uuid || !ign || !currentRank || !actionType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -167,6 +174,22 @@ export async function POST(request: NextRequest) {
     const targetRankIdx = RANK_HIERARCHY.indexOf(currentRank);
     if (userRankIdx === -1 || targetRankIdx === -1 || targetRankIdx >= userRankIdx) {
       return NextResponse.json({ error: 'You cannot manage members at or above your rank' }, { status: 403 });
+    }
+
+    // A removal may carry an honorific grant (TAQ-76). Retired Chief is the
+    // higher honor: Narwhal or above only. The bot re-checks on processing.
+    let honorific: string | null = null;
+    if (grantHonorific) {
+      if (actionType !== 'remove') {
+        return NextResponse.json({ error: 'An honorific can only be attached to a removal' }, { status: 400 });
+      }
+      if (!['honored_fish', 'retired_chief'].includes(grantHonorific)) {
+        return NextResponse.json({ error: 'Invalid honorific' }, { status: 400 });
+      }
+      if (grantHonorific === 'retired_chief' && !isNarwhalRank(session.rank)) {
+        return NextResponse.json({ error: 'Retired Chief can only be granted by Narwhal or higher' }, { status: 403 });
+      }
+      honorific = grantHonorific;
     }
 
     // Validate rank direction
@@ -199,9 +222,9 @@ export async function POST(request: NextRequest) {
     }
 
     await pool.query(
-      `INSERT INTO promotion_queue (uuid, ign, current_rank, new_rank, action_type, queued_by_discord_id, queued_by_ign)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [uuid, ign, currentRank, newRank || null, actionType, session.discord_id, session.ign]
+      `INSERT INTO promotion_queue (uuid, ign, current_rank, new_rank, action_type, queued_by_discord_id, queued_by_ign, grant_honorific)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [uuid, ign, currentRank, newRank || null, actionType, session.discord_id, session.ign, honorific]
     );
 
     // Auto-remove from promo suggestions if present

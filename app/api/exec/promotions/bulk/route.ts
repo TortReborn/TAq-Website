@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireExecSession, isNarwhalRank } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
 
@@ -36,6 +36,17 @@ export async function POST(request: NextRequest) {
       }
       if (!['promote', 'demote', 'remove'].includes(entry.actionType)) {
         return NextResponse.json({ error: `Invalid action type for ${entry.ign}` }, { status: 400 });
+      }
+      if (entry.grantHonorific) {
+        if (entry.actionType !== 'remove') {
+          return NextResponse.json({ error: `An honorific can only be attached to a removal (${entry.ign})` }, { status: 400 });
+        }
+        if (!['honored_fish', 'retired_chief'].includes(entry.grantHonorific)) {
+          return NextResponse.json({ error: `Invalid honorific for ${entry.ign}` }, { status: 400 });
+        }
+        if (entry.grantHonorific === 'retired_chief' && !isNarwhalRank(session.rank)) {
+          return NextResponse.json({ error: `Retired Chief can only be granted by Narwhal or higher (${entry.ign})` }, { status: 403 });
+        }
       }
       if (entry.actionType !== 'remove') {
         if (!entry.newRank) {
@@ -78,10 +89,10 @@ export async function POST(request: NextRequest) {
           continue;
         }
         await client.query(
-          `INSERT INTO promotion_queue (uuid, ign, current_rank, new_rank, action_type, queued_by_discord_id, queued_by_ign)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          `INSERT INTO promotion_queue (uuid, ign, current_rank, new_rank, action_type, queued_by_discord_id, queued_by_ign, grant_honorific)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
           [entry.uuid, entry.ign, entry.currentRank, entry.newRank || null,
-           entry.actionType, session.discord_id, session.ign]
+           entry.actionType, session.discord_id, session.ign, entry.grantHonorific || null]
         );
         inserted++;
       }
