@@ -1,3 +1,5 @@
+-- NOTE (TAQ-76): historical one-off, applied 2026-08. Do not re-run after
+-- linking_overhaul_2_drop_columns.sql -- discord_links.linked no longer exists.
 -- TAQ-77: accepted guild applications whose ticket was closed without the
 -- player ever joining stayed 'accepted' forever and inflated the pending-join
 -- count on the kick list / activity pages. Add a terminal 'expired' status
