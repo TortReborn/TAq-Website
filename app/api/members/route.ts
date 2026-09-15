@@ -147,8 +147,12 @@ export async function GET(request: NextRequest) {
         'recruit': 'Recruit'
       };
 
+      // Guild-owned storage accounts are on the roster but are not members
+      // to display or count (TAQ-88).
+      const people = allMembers.filter(member => !guildAccounts.has(uuidKey(member.uuid)));
+
       // Map Discord ranks to members by uuid
-      const mappedMembers = allMembers.map(member => {
+      const mappedMembers = people.map(member => {
         const discord = discordLinks[member.uuid];
         return {
           ...member,
@@ -156,7 +160,6 @@ export async function GET(request: NextRequest) {
           discordRank: (discord && discord.rank) || '',   // rank is NULL for linked non-members (TAQ-76)
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',
-          guildAccount: guildAccounts.has(uuidKey(member.uuid)),   // guild-owned storage account, no person behind it (TAQ-88)
           online: member.online === true || member.online === 'true',
           server: member.server || null,
         };
@@ -198,7 +201,7 @@ export async function GET(request: NextRequest) {
           prefix: guildData.prefix || 'TORT',
           level: guildData.level || 0,
           territories: guildData.territories || 0,
-          totalMembers: Array.isArray(guildData.members) ? guildData.members.length : (guildData.members?.total || 0),
+          totalMembers: mappedMembers.length,   // people, not storage accounts (TAQ-88)
           onlineMembers: onlineCount
         },
         members: mappedMembers
