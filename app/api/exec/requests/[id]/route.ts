@@ -75,6 +75,7 @@ export async function GET(
         dueDate: row.due_date || null,
         createdAt: row.created_at,
         updatedAt: row.updated_at,
+        resolvedAt: row.resolved_at || null,
       },
       comments: commentsResult.rows.map(c => ({
         id: c.id,
@@ -124,6 +125,8 @@ export async function PATCH(
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
       }
       updates.push(`status = $${paramIdx}`);
+      // Entering a terminal column stamps resolved_at; leaving one clears it (TAQ-78).
+      updates.push(`resolved_at = CASE WHEN $${paramIdx} IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END`);
       values.push(body.status);
       paramIdx++;
     }
