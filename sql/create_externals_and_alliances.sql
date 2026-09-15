@@ -42,13 +42,29 @@ INSERT INTO management_exceptions (
 )
 SELECT *
 FROM (VALUES
-  ('Woealer', 'alt', 'Gonner', 'Gonner', 'Chief', 'Chief', '@Woealer Access', 'Consumable and ingredient storage account.'),
-  ('GordLonner', 'alt', 'Gonner', 'Gonner', 'Chief', 'Chief', 'Kenji, Rippi, Gonner', NULL),
+  ('Woealer', 'guild_account', NULL, 'The Aquarium', 'Chief', 'Chief', '@Woealer Access', 'Guild-owned consumable and ingredient storage account (TAQ-88).'),
+  ('GordLonner', 'guild_account', NULL, 'The Aquarium', 'Chief', 'Chief', 'Kenji, Rippi, Gonner', 'Guild-owned LE storage account (TAQ-88).'),
   ('Sunveil', 'role_exception', 'Sunveil', 'Sunveil', 'Chief', 'Narwhal', 'Kio, Kenji, Sunveil', NULL),
   ('CuzImTimer', 'role_exception', 'Timer', 'Timer', 'Chief', 'Narwhal', 'Kenji, Wood, Tex, Timer', NULL),
   ('_SlyGuy_', 'rank_exception', 'Lava', 'Gonner', 'Strategist', 'Manatee', 'Lava', 'Discord username: lava286.')
 ) AS seed(ign, exception_type, linked_main, account_owner, in_game_rank, taq_role, access_notes, notes)
 WHERE NOT EXISTS (SELECT 1 FROM management_exceptions);
+
+-- Guild-owned accounts are keyed by Minecraft uuid for the member views
+-- (lib/guild-accounts.ts). Fill it from the roster when that table exists
+-- (it comes from the TAQ-76 linking migration), so a fresh install reaches
+-- the same state as prod.
+DO $
+BEGIN
+  IF to_regclass('guild_roster') IS NOT NULL THEN
+    UPDATE management_exceptions me
+       SET minecraft_uuid = gr.uuid
+      FROM guild_roster gr
+     WHERE me.exception_type = 'guild_account'
+       AND me.minecraft_uuid IS NULL
+       AND LOWER(gr.ign) = LOWER(me.ign);
+  END IF;
+END $;
 
 INSERT INTO guild_alliances (
   guild_name, guild_prefix, discord_role_id, display_rank, notes, enabled

@@ -45,11 +45,16 @@ export async function GET(request: NextRequest) {
     ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
-    // People, not guild-owned storage accounts (TAQ-88).
+    // People, not guild-owned storage accounts (TAQ-88). A storage account
+    // added to the kick list before it was typed as such is dropped here too.
     const memberCount = [...guildUUIDs].filter(u => !guildAccounts.has(uuidKey(u))).length;
+    const entries = result.rows.filter(row => !guildAccounts.has(uuidKey(row.uuid)));
+    if (entries.length !== result.rows.length) {
+      await pool.query(`DELETE FROM kick_list WHERE replace(uuid, '-', '') = ANY($1::varchar[])`, [[...guildAccounts]]);
+    }
 
     return NextResponse.json({
-      entries: result.rows.map(row => ({
+      entries: entries.map(row => ({
         uuid: row.uuid,
         ign: row.ign,
         tier: row.tier,
