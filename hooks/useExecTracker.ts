@@ -23,6 +23,7 @@ export interface Ticket {
   dueDate: string | null;
   createdAt: string;
   updatedAt: string;
+  resolvedAt: string | null;
 }
 
 export interface ExecMember {

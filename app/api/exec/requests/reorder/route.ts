@@ -55,7 +55,9 @@ export async function POST(request: NextRequest) {
       // Update moved ticket's status if it changed
       if (targetStatus !== ticket.status) {
         await client.query(
-          'UPDATE tracker_tickets SET status = $1, updated_at = NOW() WHERE id = $2',
+          `UPDATE tracker_tickets SET status = $1, updated_at = NOW(),
+             resolved_at = CASE WHEN $1 IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END
+           WHERE id = $2`,
           [targetStatus, ticketId]
         );
       }
