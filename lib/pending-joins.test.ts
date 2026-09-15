@@ -144,6 +144,20 @@ describe.skipIf(!available)('countPendingJoins', () => {
     expect(await countPendingJoins(pool)).toBe(1);
   });
 
+  it('excludes a member who applied while already in the guild and left afterwards (philyyy, prod 2026-09-15)', async () => {
+    await insertApp('100', 'accepted', 'guild', '2026-07-21');
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2025-08-30', '2026-08-27');
+    expect(await countPendingJoins(pool)).toBe(0);
+  });
+
+  it('counts an applicant whose previous stay ended the day before they applied', async () => {
+    await insertApp('100', 'accepted', 'guild', '2026-06-01');
+    await insertLink('100', UUID_A);
+    await stint(UUID_A, '2026-01-01', '2026-05-31');
+    expect(await countPendingJoins(pool)).toBe(1);
+  });
+
   it('does not count a stint that belongs to someone else', async () => {
     await insertApp('100', 'accepted');
     await insertLink('100', UUID_A);
