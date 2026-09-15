@@ -184,7 +184,6 @@ export async function getPlayerGraidStats(ign: string): Promise<PlayerGraidStats
          SELECT ign
          FROM discord_links
          WHERE uuid = glp.uuid
-         ORDER BY linked DESC, (rank <> '') DESC, discord_id
          LIMIT 1
        ) dl ON TRUE
        WHERE glp.log_id IN (${placeholders}) AND ${excludeClause}
@@ -224,7 +223,6 @@ export async function getPlayerGraidStats(ign: string): Promise<PlayerGraidStats
          SELECT ign
          FROM discord_links
          WHERE uuid = glp.uuid
-         ORDER BY linked DESC, (rank <> '') DESC, discord_id
          LIMIT 1
        ) dl ON TRUE
        WHERE glp.log_id IN (${placeholders})`,

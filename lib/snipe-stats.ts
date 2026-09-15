@@ -176,7 +176,6 @@ export async function getPlayerSnipeStats(ign: string, uuid?: string | null): Pr
          SELECT ign
          FROM discord_links
          WHERE uuid = sp.uuid
-         ORDER BY linked DESC, (rank <> '') DESC, discord_id
          LIMIT 1
        ) dl ON TRUE`;
 

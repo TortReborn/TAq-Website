@@ -31,7 +31,7 @@ describe('resolveUuidsByIgns', () => {
     expect(query.mock.calls[0][1]).toEqual([['alice']]);
   });
 
-  it('keeps a null uuid when discord_links has a row without one', async () => {
+  it('keeps a null uuid when the query returns none for the name', async () => {
     const { pool } = fakePool([{ key: 'alice', uuid: null }]);
     const result = await resolveUuidsByIgns(pool, ['Alice']);
     expect(result.get('alice')).toBeNull();
@@ -51,7 +51,7 @@ describe('resolveUuidByIgn', () => {
 });
 
 describe('lookupIgnByUuid', () => {
-  it('returns the best-link ign for a uuid', async () => {
+  it('returns the ign for a uuid', async () => {
     const { pool, query } = fakePool([{ ign: 'Alice' }]);
     expect(await lookupIgnByUuid(pool, 'uuid-a')).toBe('Alice');
     expect(query.mock.calls[0][1]).toEqual(['uuid-a']);
