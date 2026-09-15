@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
       // so it unlocks nothing beyond /chronicle.
       const storedRedirect = request.cookies.get('oauth_redirect')?.value;
       const chronicler = await isChronicler(getPool(), discordUser.id);
-      const params = new URLSearchParams({ reason: 'not_linked', discord_id: linkCheck.discord_id, discord_name: discordUser.username });
+      const params = new URLSearchParams({ reason: linkCheck.reason, discord_id: linkCheck.discord_id, discord_name: discordUser.username });
+      if (linkCheck.reason === 'not_in_guild') params.set('ign', linkCheck.ign);
       // Back where they came from if that was the Chronicle; otherwise the
       // page explaining what they can and cannot do here — except for a
       // chronicler, for whom the Chronicle *is* the destination.
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
           : `/unauthorized?${params.toString()}`;
 
       if (!chronicler) {
-        console.warn(`[auth] Guild access denied: Discord user ${discordUser.username} (${linkCheck.discord_id}) not found in discord_links — signed in to the Chronicle only`);
+        console.warn(`[auth] Guild access denied: Discord user ${discordUser.username} (${linkCheck.discord_id}) ${linkCheck.reason} — signed in to the Chronicle only`);
       }
 
       const response = NextResponse.redirect(new URL(target, baseUrl));

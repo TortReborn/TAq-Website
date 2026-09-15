@@ -3,11 +3,14 @@ import type { Pool, PoolClient } from 'pg';
 /**
  * Count accepted guild applicants who haven't joined the guild yet.
  *
- * An applicant has joined once they have a live discord_links row
- * (linked = TRUE). NOT EXISTS is used rather than a JOIN on
- * linked = FALSE because discord_links keeps historical unlinked rows
- * alongside the live one — a JOIN would count players who already joined
- * but still carry a stale row, once per stale row.
+ * An applicant has joined once a membership stint exists for the Minecraft
+ * account on their discord_links row that is either still open (they are a
+ * current member -- the bot opens the stint in the same transaction that
+ * adds the roster row, so "open stint" and "on guild_roster" never disagree)
+ * or started from around the time they applied (TAQ-76; a week of slack
+ * covers players who joined in-game just before applying). "On the roster now" would be wrong here: someone who joined and
+ * later left must not become pending again. NOT EXISTS keeps applicants
+ * with no link at all counted as pending.
  *
  * Accepted applications whose ticket is closed before the player ever
  * joins are moved to status 'expired' by the bot (and by the
@@ -22,8 +25,10 @@ export async function countPendingJoins(db: Pool | PoolClient): Promise<number> 
        AND a.application_type = 'guild'
        AND NOT EXISTS (
          SELECT 1 FROM discord_links dl
+         JOIN membership_stints ms ON ms.uuid = dl.uuid
          WHERE dl.discord_id = CAST(a.discord_id AS BIGINT)
-           AND dl.linked = TRUE
+           AND (ms.left_at IS NULL
+                OR ms.joined_at >= COALESCE(a.submitted_at, a.reviewed_at, ms.joined_at) - INTERVAL '7 days')
        )`
   );
   return result.rows[0]?.count ?? 0;

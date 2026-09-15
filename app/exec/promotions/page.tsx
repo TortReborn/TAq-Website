@@ -5,6 +5,11 @@ import { useExecPromotions } from '@/hooks/useExecPromotions';
 import { useExecSession } from '@/hooks/useExecSession';
 import { RANK_HIERARCHY, RANK_ORDER, getRankColor, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
 
+type Honorific = 'honored_fish' | 'retired_chief';
+const HONORIFIC_LABELS: Record<Honorific, string> = { honored_fish: 'Honored Fish', retired_chief: 'Retired Chief' };
+const HONORIFIC_SHORT: Record<Honorific, string> = { honored_fish: 'HF', retired_chief: 'RC' };
+const HONORIFIC_COLORS: Record<Honorific, string> = { honored_fish: '#38bdf8', retired_chief: '#f59e0b' };
+
 interface StagedAction {
   uuid: string;
   ign: string;
@@ -12,6 +17,28 @@ interface StagedAction {
   newRank: string | null;
   actionType: 'promote' | 'demote' | 'remove';
   discordId: string | null;
+  grantHonorific?: Honorific | null;
+}
+
+function HonorificBadges({ honorifics }: { honorifics?: Honorific[] }) {
+  if (!honorifics || honorifics.length === 0) return null;
+  return (
+    <>
+      {honorifics.map(h => (
+        <span
+          key={h}
+          title={`${HONORIFIC_LABELS[h]} on record`}
+          style={{
+            marginLeft: '0.3rem', padding: '0 0.28rem', borderRadius: '0.25rem', fontSize: '0.55rem',
+            fontWeight: 700, letterSpacing: '0.02em', verticalAlign: 'middle',
+            color: HONORIFIC_COLORS[h], border: `1px solid ${HONORIFIC_COLORS[h]}55`, background: `${HONORIFIC_COLORS[h]}14`,
+          }}
+        >
+          {HONORIFIC_SHORT[h]}
+        </span>
+      ))}
+    </>
+  );
 }
 
 export default function ExecPromotionsPage() {
@@ -166,6 +193,10 @@ export default function ExecPromotionsPage() {
 
   const removeStagedAction = (uuid: string) => {
     setStagedActions(prev => prev.filter(a => a.uuid !== uuid));
+  };
+
+  const setStagedHonorific = (uuid: string, grantHonorific: Honorific | null) => {
+    setStagedActions(prev => prev.map(a => (a.uuid === uuid ? { ...a, grantHonorific } : a)));
   };
 
   const handleSingleStage = (uuid: string, ign: string, currentRank: string, newRank: string | null, actionType: 'promote' | 'demote' | 'remove', discordId: string | null = null) => {
@@ -546,6 +577,7 @@ export default function ExecPromotionsPage() {
                         </td>
                         <td style={{ padding: '0.425rem 0.64rem', fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: '500' }}>
                           {member.ign}
+                          <HonorificBadges honorifics={member.honorifics} />
                           {isPending && <span style={{ fontSize: '0.6rem', color: '#f59e0b', marginLeft: '0.425rem' }}>Queued</span>}
                           {isStaged && <span style={{ fontSize: '0.6rem', color: 'var(--color-ocean-400)', marginLeft: '0.425rem' }}>Staged</span>}
                           {isSuggested && !isStaged && <span style={{ fontSize: '0.6rem', color: '#a855f7', marginLeft: '0.425rem' }}>Suggested</span>}
@@ -699,7 +731,20 @@ export default function ExecPromotionsPage() {
                         <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{action.ign}</div>
                         <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           {action.actionType === 'remove' ? (
-                            <span><span style={{ color: getRankColor(action.currentRank) }}>{action.currentRank}</span> {'\u2192'} Remove</span>
+                            <span>
+                              <span style={{ color: getRankColor(action.currentRank) }}>{action.currentRank}</span> {'\u2192'} Remove
+                              {' '}
+                              <select
+                                value={action.grantHonorific ?? ''}
+                                onChange={(e) => setStagedHonorific(action.uuid, (e.target.value || null) as Honorific | null)}
+                                title="Honorific to record with this removal"
+                                style={{ marginLeft: '0.3rem', fontSize: '0.62rem', padding: '0.05rem 0.2rem', background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '0.25rem' }}
+                              >
+                                <option value="">No honorific</option>
+                                <option value="honored_fish">+ Honored Fish</option>
+                                {userRankIdx >= RANK_HIERARCHY.indexOf('Narwhal') && <option value="retired_chief">+ Retired Chief</option>}
+                              </select>
+                            </span>
                           ) : (
                             <span>
                               <span style={{ color: getRankColor(action.currentRank) }}>{action.currentRank}</span>
@@ -780,7 +825,7 @@ export default function ExecPromotionsPage() {
                         <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{entry.ign}</div>
                         <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
                           {entry.actionType === 'remove' ? (
-                            <span><span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span> {'\u2192'} Remove</span>
+                            <span><span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span> {'\u2192'} Remove{entry.grantHonorific ? ` (+ ${HONORIFIC_LABELS[entry.grantHonorific]})` : ''}</span>
                           ) : (
                             <span>
                               <span style={{ color: getRankColor(entry.currentRank) }}>{entry.currentRank}</span>

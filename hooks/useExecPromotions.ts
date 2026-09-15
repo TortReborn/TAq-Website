@@ -6,6 +6,7 @@ export interface GuildMember {
   ign: string;
   rank: string;
   discordId: string | null;
+  honorifics: ('honored_fish' | 'retired_chief')[];
   playtime7d: number;
   wars7d: number;
   raids7d: number;
@@ -25,6 +26,7 @@ export interface QueueEntry {
   status: 'pending' | 'completed' | 'failed';
   completedAt: string | null;
   errorMessage: string | null;
+  grantHonorific: 'honored_fish' | 'retired_chief' | null;
 }
 
 export interface PromoSuggestion {
@@ -76,6 +78,7 @@ export function useExecPromotions() {
     currentRank: string;
     newRank: string | null;
     actionType: 'promote' | 'demote' | 'remove';
+    grantHonorific?: 'honored_fish' | 'retired_chief' | null;
   }[]) => {
     const res = await fetch('/api/exec/promotions/bulk', {
       method: 'POST',

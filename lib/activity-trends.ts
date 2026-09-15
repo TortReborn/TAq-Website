@@ -213,7 +213,7 @@ export function scopeFilter(scope: MemberScope, alias: string, values: unknown[]
     : `dl.rank = ANY($${values.push(scope.ranks)}::text[])`;
   return `AND ${alias}.uuid IN (
             SELECT dl.uuid FROM discord_links dl
-            WHERE dl.linked AND dl.uuid IS NOT NULL AND ${test})`;
+            WHERE dl.rank IS NOT NULL AND ${test})`;
 }
 
 /** First record for a metric family, as a SQL expression for the `all` floor. */
