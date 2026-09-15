@@ -4,7 +4,19 @@ import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const EXCEPTION_TYPES = new Set(['alt', 'rank_exception', 'role_exception', 'other']);
+const EXCEPTION_TYPES = new Set(['alt', 'rank_exception', 'role_exception', 'guild_account', 'other']);
+
+/**
+ * A guild-owned account is only useful to the member views if its uuid is
+ * recorded (guildAccountUuids() keys on it). Take the submitted uuid, else
+ * resolve it from the roster by IGN; refuse if neither works (TAQ-88).
+ */
+async function resolveGuildAccountUuid(pool: ReturnType<typeof getPool>, ign: string, submitted: string | null): Promise<string | null> {
+  if (submitted) return submitted;
+  const result = await pool.query(`SELECT uuid::text AS uuid FROM guild_roster WHERE LOWER(ign) = LOWER($1) LIMIT 1`, [ign]);
+  return result.rows[0]?.uuid ?? null;
+}
+
 
 function text(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
@@ -37,6 +49,13 @@ export async function PATCH(
       if (!ign || !EXCEPTION_TYPES.has(exceptionType)) {
         return NextResponse.json({ error: 'IGN and a valid exception type are required.' }, { status: 400 });
       }
+      let minecraftUuid = text(body.minecraftUuid);
+      if (exceptionType === 'guild_account') {
+        minecraftUuid = await resolveGuildAccountUuid(pool, ign, minecraftUuid);
+        if (!minecraftUuid) {
+          return NextResponse.json({ error: 'A guild-owned account needs a Minecraft UUID (none given, and the IGN is not on the roster).' }, { status: 400 });
+        }
+      }
       await pool.query(
         `UPDATE management_exceptions
          SET discord_user = $1, discord_id = $2, ign = $3, minecraft_uuid = $4,
@@ -45,7 +64,7 @@ export async function PATCH(
              updated_by = $12, updated_at = NOW()
          WHERE id = $13`,
         [
-          text(body.discordUser), text(body.discordId), ign, text(body.minecraftUuid),
+          text(body.discordUser), text(body.discordId), ign, minecraftUuid,
           exceptionType, text(body.linkedMain), text(body.accountOwner), text(body.inGameRank),
           text(body.taqRole), text(body.accessNotes), text(body.notes), session.ign, id,
         ]

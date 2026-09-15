@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { guildAccountUuids, uuidKey } from '@/lib/guild-accounts';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
@@ -134,6 +135,7 @@ export async function GET(request: NextRequest) {
         discordLinks[row.uuid] = row;
       });
       const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
+      const guildAccounts = await guildAccountUuids(client);
 
       // Convert guild ranks to readable names
       const guildRankNames: Record<string, string> = {
@@ -145,8 +147,12 @@ export async function GET(request: NextRequest) {
         'recruit': 'Recruit'
       };
 
+      // Guild-owned storage accounts are on the roster but are not members
+      // to display or count (TAQ-88).
+      const people = allMembers.filter(member => !guildAccounts.has(uuidKey(member.uuid)));
+
       // Map Discord ranks to members by uuid
-      const mappedMembers = allMembers.map(member => {
+      const mappedMembers = people.map(member => {
         const discord = discordLinks[member.uuid];
         return {
           ...member,
@@ -195,7 +201,7 @@ export async function GET(request: NextRequest) {
           prefix: guildData.prefix || 'TORT',
           level: guildData.level || 0,
           territories: guildData.territories || 0,
-          totalMembers: Array.isArray(guildData.members) ? guildData.members.length : (guildData.members?.total || 0),
+          totalMembers: mappedMembers.length,   // people, not storage accounts (TAQ-88)
           onlineMembers: onlineCount
         },
         members: mappedMembers
