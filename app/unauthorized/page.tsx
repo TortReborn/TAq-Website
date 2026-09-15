@@ -10,8 +10,11 @@ function UnauthorizedContent() {
   const discordName = searchParams.get('discord_name');
 
   let message: string;
+  const ign = searchParams.get('ign');
   if (reason === 'not_linked') {
-    message = `Discord account "${discordName || 'unknown'}" is not linked to any Minecraft account in the guild. Make sure your Discord is linked via the bot and you are a member of the guild.`;
+    message = `Discord account "${discordName || 'unknown'}" is not linked to any Minecraft account. Make sure your Discord is linked via the bot.`;
+  } else if (reason === 'not_in_guild') {
+    message = `"${ign || discordName || 'unknown'}" is not currently a member of The Aquarium in-game. Guild pages open up again once you are on the roster.`;
   } else {
     message = 'Your Discord account is not associated with a guild member. If you believe this is an error, contact a guild leader.';
   }

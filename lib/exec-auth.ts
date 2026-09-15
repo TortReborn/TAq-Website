@@ -117,10 +117,10 @@ export function clearExecSessionCookie(response: NextResponse): void {
 
 /**
  * Helper for protected exec API routes.
- * Verifies the session cookie, then re-checks the user's rank from
- * discord_links to ensure they haven't been demoted since login. The same
- * query also refreshes the ign, so consumers never see the cookie's stale
- * name after a rename.
+ * Verifies the session cookie, then re-checks membership (guild_roster) and
+ * rank (discord_links) on every request, so a demotion or an in-game leave
+ * takes effect immediately. The same query also refreshes the ign, so
+ * consumers never see the cookie's stale name after a rename.
  * Returns the session data or null. If null, the caller should return a 401 response.
  */
 export async function requireExecSession(request: NextRequest): Promise<ExecSessionData | null> {
@@ -239,57 +239,82 @@ export async function getDiscordUser(accessToken: string): Promise<{
 export type RankCheckResult =
   | { ok: true; uuid: string; ign: string; rank: string }
   | { ok: false; reason: 'not_linked'; discord_id: string }
+  | { ok: false; reason: 'not_in_guild'; discord_id: string; ign: string }
   | { ok: false; reason: 'rank_not_allowed'; discord_id: string; ign: string; rank: string; allowed: string[] };
-
-/**
- * Check if a Discord user has a qualifying rank in discord_links (Hammerhead or higher).
- * Returns detailed result explaining success or specific failure reason.
- */
-export async function checkDiscordLinkRank(discordId: string): Promise<RankCheckResult> {
-  const { getPool } = await import('@/lib/db');
-  const pool = getPool();
-
-  const result = await pool.query(
-    `SELECT uuid, ign, rank FROM discord_links WHERE discord_id = $1`,
-    [discordId]
-  );
-
-  if (result.rows.length === 0) {
-    return { ok: false, reason: 'not_linked', discord_id: discordId };
-  }
-
-  const row = result.rows[0];
-  if (!ALLOWED_RANKS.includes(row.rank)) {
-    return { ok: false, reason: 'rank_not_allowed', discord_id: discordId, ign: row.ign, rank: row.rank, allowed: ALLOWED_RANKS };
-  }
-
-  return { ok: true, uuid: row.uuid, ign: row.ign, rank: row.rank };
-}
 
 export type GuildMemberCheckResult =
   | { ok: true; uuid: string; ign: string; rank: string; role: 'exec' | 'member' }
-  | { ok: false; reason: 'not_linked'; discord_id: string };
+  | { ok: false; reason: 'not_linked'; discord_id: string }
+  | { ok: false; reason: 'not_in_guild'; discord_id: string; ign: string };
+
+export type LinkedMemberLookup =
+  | { linked: false }
+  | { linked: true; uuid: string; ign: string; rank: string | null; inGuild: boolean };
 
 /**
- * Check if a Discord user exists in discord_links (any rank).
- * Returns user data with role derived from rank.
+ * The identity + membership question in one query (TAQ-76): the Discord
+ * account's discord_links row, and whether that player is on guild_roster.
+ * `rank` is the Discord rank role they hold, or null.
  */
-export async function checkDiscordLink(discordId: string): Promise<GuildMemberCheckResult> {
+export async function lookupLinkedMember(discordId: string): Promise<LinkedMemberLookup> {
   const { getPool } = await import('@/lib/db');
   const pool = getPool();
 
   const result = await pool.query(
-    `SELECT uuid, ign, rank FROM discord_links WHERE discord_id = $1`,
+    `SELECT dl.uuid, dl.ign, dl.rank,
+            EXISTS (SELECT 1 FROM guild_roster gr WHERE gr.uuid = dl.uuid) AS in_guild
+       FROM discord_links dl
+      WHERE dl.discord_id = $1`,
     [discordId]
   );
+  if (result.rows.length === 0) return { linked: false };
+  const row = result.rows[0];
+  return { linked: true, uuid: row.uuid, ign: row.ign, rank: row.rank ?? null, inGuild: row.in_guild === true };
+}
 
-  if (result.rows.length === 0) {
+/** Pure decision for checkDiscordLinkRank, exported for tests. */
+export function rankCheckFromLookup(discordId: string, link: LinkedMemberLookup): RankCheckResult {
+  if (!link.linked) {
     return { ok: false, reason: 'not_linked', discord_id: discordId };
   }
+  if (!link.inGuild) {
+    return { ok: false, reason: 'not_in_guild', discord_id: discordId, ign: link.ign };
+  }
+  if (!link.rank || !ALLOWED_RANKS.includes(link.rank)) {
+    return { ok: false, reason: 'rank_not_allowed', discord_id: discordId, ign: link.ign, rank: link.rank ?? '', allowed: ALLOWED_RANKS };
+  }
+  return { ok: true, uuid: link.uuid, ign: link.ign, rank: link.rank };
+}
 
-  const row = result.rows[0];
-  const role = EXEC_RANKS.includes(row.rank) ? 'exec' : 'member';
-  return { ok: true, uuid: row.uuid, ign: row.ign, rank: row.rank, role };
+/** Pure decision for checkDiscordLink, exported for tests. */
+export function memberCheckFromLookup(discordId: string, link: LinkedMemberLookup): GuildMemberCheckResult {
+  if (!link.linked) {
+    return { ok: false, reason: 'not_linked', discord_id: discordId };
+  }
+  if (!link.inGuild) {
+    return { ok: false, reason: 'not_in_guild', discord_id: discordId, ign: link.ign };
+  }
+  const rank = link.rank ?? '';
+  const role = EXEC_RANKS.includes(rank) ? 'exec' : 'member';
+  return { ok: true, uuid: link.uuid, ign: link.ign, rank, role };
+}
+
+/**
+ * Check if a Discord user is a current guild member with a qualifying rank
+ * (Hammerhead or higher). Membership comes from guild_roster, so a former
+ * exec keeps nothing once their uuid leaves the in-game guild -- rank alone
+ * was the whole check before TAQ-76.
+ */
+export async function checkDiscordLinkRank(discordId: string): Promise<RankCheckResult> {
+  return rankCheckFromLookup(discordId, await lookupLinkedMember(discordId));
+}
+
+/**
+ * Check if a Discord user is a current guild member (any rank).
+ * Returns user data with role derived from rank.
+ */
+export async function checkDiscordLink(discordId: string): Promise<GuildMemberCheckResult> {
+  return memberCheckFromLookup(discordId, await lookupLinkedMember(discordId));
 }
 
 /**
@@ -317,9 +342,9 @@ const MEMBERSHIP_CACHE_TTL_MS = 60 * 1000;
 const membershipCache = new Map<string, { inGuild: boolean; expires: number }>();
 
 /**
- * Check if a UUID is currently a member of the guild using cached guildData from cache_entries.
- * The membership test runs inside Postgres so only a boolean crosses the wire,
- * instead of the full multi-hundred-KB roster blob on every authenticated request.
+ * Is this uuid on the in-game roster right now? guild_roster is kept in step
+ * with the Wynncraft API by the bot (TAQ-76); one indexed probe replaces the
+ * old jsonb scan over the cached guildData blob.
  */
 export async function checkGuildMembership(uuid: string): Promise<boolean> {
   const normalizedUuid = uuid.replace(/-/g, '');
@@ -334,46 +359,10 @@ export async function checkGuildMembership(uuid: string): Promise<boolean> {
     const pool = getPool();
 
     const result = await pool.query(
-      `SELECT jsonb_typeof(data->'members') AS mtype,
-              CASE WHEN jsonb_typeof(data->'members') = 'array' THEN
-                EXISTS (
-                  SELECT 1 FROM jsonb_array_elements(data->'members') AS m
-                  WHERE replace(m->>'uuid', '-', '') = $1
-                )
-              END AS in_guild
-       FROM cache_entries WHERE cache_key = 'guildData'`,
-      [normalizedUuid]
+      `SELECT EXISTS (SELECT 1 FROM guild_roster WHERE uuid = $1::uuid) AS in_guild`,
+      [uuid]
     );
-
-    if (result.rows.length === 0) {
-      return false;
-    }
-
-    let inGuild: boolean;
-    if (result.rows[0].mtype === 'array') {
-      // New format: flat array with uuid field on each member
-      inGuild = result.rows[0].in_guild === true;
-    } else {
-      // Old format: members organized by rank groups { owner: { username: { uuid, ... } }, ... }
-      // Rare legacy path — only here do we pull the blob and scan in JS.
-      const blob = await pool.query(
-        `SELECT data->'members' AS members FROM cache_entries WHERE cache_key = 'guildData'`
-      );
-      const members = blob.rows[0]?.members;
-      inGuild = false;
-      if (members && typeof members === 'object') {
-        for (const rankGroup of Object.values(members)) {
-          if (typeof rankGroup !== 'object' || rankGroup === null) continue;
-          for (const memberData of Object.values(rankGroup as Record<string, any>)) {
-            if (memberData?.uuid && memberData.uuid.replace(/-/g, '') === normalizedUuid) {
-              inGuild = true;
-              break;
-            }
-          }
-          if (inGuild) break;
-        }
-      }
-    }
+    const inGuild = result.rows[0]?.in_guild === true;
 
     membershipCache.set(normalizedUuid, { inGuild, expires: Date.now() + MEMBERSHIP_CACHE_TTL_MS });
     return inGuild;
