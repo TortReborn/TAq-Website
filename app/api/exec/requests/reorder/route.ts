@@ -35,25 +35,20 @@ export async function POST(request: NextRequest) {
 
     const ticket = ticketResult.rows[0];
     const targetStatus = status || ticket.status;
+    const statusChanged = targetStatus !== ticket.status;
 
-    // Get all tickets in the target column ordered by position
-    const columnResult = await pool.query(
-      'SELECT id, position FROM tracker_tickets WHERE status = $1 AND id != $2 ORDER BY position ASC, created_at DESC',
-      [targetStatus, ticketId]
-    );
+    // Terminal columns sort by resolved_at (TAQ-78); their drag position is
+    // meaningless, so only the status changes. Active columns get their
+    // positions rewritten in ONE statement -- this used to be one UPDATE per
+    // card in the column, sequentially, and a drop into a 70-card column
+    // took long enough for the board's background refresh to overtake it.
+    const terminal = ['deployed', 'declined', 'archived'].includes(targetStatus);
 
-    // Build new position order: insert the ticket at the desired index
-    const ids = columnResult.rows.map((r: { id: number }) => r.id);
-    const clampedPos = Math.max(0, Math.min(position, ids.length));
-    ids.splice(clampedPos, 0, ticketId);
-
-    // Update all positions in a single transaction
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
 
-      // Update moved ticket's status if it changed
-      if (targetStatus !== ticket.status) {
+      if (statusChanged) {
         await client.query(
           `UPDATE tracker_tickets SET status = $1, updated_at = NOW(),
              resolved_at = CASE WHEN $1 IN ('deployed', 'declined', 'archived') THEN COALESCE(resolved_at, NOW()) ELSE NULL END
@@ -62,11 +57,19 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Update positions for all tickets in this column
-      for (let i = 0; i < ids.length; i++) {
+      if (!terminal) {
+        const columnResult = await client.query(
+          'SELECT id FROM tracker_tickets WHERE status = $1 AND id != $2 ORDER BY position ASC, created_at DESC',
+          [targetStatus, ticketId]
+        );
+        const ids: number[] = columnResult.rows.map((r: { id: number }) => r.id);
+        const clampedPos = Math.max(0, Math.min(position, ids.length));
+        ids.splice(clampedPos, 0, ticketId);
         await client.query(
-          'UPDATE tracker_tickets SET position = $1 WHERE id = $2',
-          [i, ids[i]]
+          `UPDATE tracker_tickets AS t SET position = v.pos
+             FROM unnest($1::int[], $2::int[]) AS v(id, pos)
+            WHERE t.id = v.id`,
+          [ids, ids.map((_, i) => i)]
         );
       }
 
