@@ -4,11 +4,12 @@ import type { Pool, PoolClient } from 'pg';
  * Count accepted guild applicants who haven't joined the guild yet.
  *
  * An applicant has joined once a membership stint exists for the Minecraft
- * account on their discord_links row that is either still open (they are a
- * current member -- the bot opens the stint in the same transaction that
- * adds the roster row, so "open stint" and "on guild_roster" never disagree)
- * or started from around the time they applied (TAQ-76; a week of slack
- * covers players who joined in-game just before applying). "On the roster now" would be wrong here: someone who joined and
+ * account on their discord_links row that was still active when they
+ * applied, or later: open (a current member -- the bot opens the stint in
+ * the same transaction that adds the roster row, so "open stint" and "on
+ * guild_roster" never disagree) or closed after the application date. A
+ * returning applicant whose previous stay ended before they applied counts
+ * as pending, which is right (TAQ-76). "On the roster now" would be wrong here: someone who joined and
  * later left must not become pending again. NOT EXISTS keeps applicants
  * with no link at all counted as pending.
  *
@@ -28,7 +29,7 @@ export async function countPendingJoins(db: Pool | PoolClient): Promise<number> 
          JOIN membership_stints ms ON ms.uuid = dl.uuid
          WHERE dl.discord_id = CAST(a.discord_id AS BIGINT)
            AND (ms.left_at IS NULL
-                OR ms.joined_at >= COALESCE(a.submitted_at, a.reviewed_at, ms.joined_at) - INTERVAL '7 days')
+                OR ms.left_at >= COALESCE(a.submitted_at, a.reviewed_at))
        )`
   );
   return result.rows[0]?.count ?? 0;
