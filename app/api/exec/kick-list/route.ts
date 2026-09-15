@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { countPendingJoins } from '@/lib/pending-joins';
+import { guildAccountUuids, uuidKey } from '@/lib/guild-accounts';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [result, lastUpdatedResult, pendingJoins] = await Promise.all([
+    const [result, lastUpdatedResult, pendingJoins, guildAccounts] = await Promise.all([
       pool.query(
         `SELECT uuid, ign, tier, added_by, created_at
          FROM kick_list
@@ -40,13 +41,20 @@ export async function GET(request: NextRequest) {
         `SELECT created_at, added_by FROM kick_list ORDER BY created_at DESC LIMIT 1`
       ),
       countPendingJoins(pool),
+      guildAccountUuids(pool),
     ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
-    const memberCount = guildUUIDs.size;
+    // People, not guild-owned storage accounts (TAQ-88). A storage account
+    // added to the kick list before it was typed as such is dropped here too.
+    const memberCount = [...guildUUIDs].filter(u => !guildAccounts.has(uuidKey(u))).length;
+    const entries = result.rows.filter(row => !guildAccounts.has(uuidKey(row.uuid)));
+    if (entries.length !== result.rows.length) {
+      await pool.query(`DELETE FROM kick_list WHERE replace(uuid, '-', '') = ANY($1::varchar[])`, [[...guildAccounts]]);
+    }
 
     return NextResponse.json({
-      entries: result.rows.map(row => ({
+      entries: entries.map(row => ({
         uuid: row.uuid,
         ign: row.ign,
         tier: row.tier,

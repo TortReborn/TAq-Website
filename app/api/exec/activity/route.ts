@@ -4,6 +4,7 @@ import { getPool } from '@/lib/db';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 import { countPendingJoins } from '@/lib/pending-joins';
+import { guildAccountUuids, withoutGuildAccounts } from '@/lib/guild-accounts';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,6 +96,10 @@ export async function GET(request: NextRequest) {
     const client = await pool.connect();
 
     try {
+      // Guild-owned accounts (ingredient / LE storage) are on the roster but
+      // are not members to be judged for activity (TAQ-88).
+      allMembers = withoutGuildAccounts(allMembers, await guildAccountUuids(client));
+
       const discordLinksResult = await client.query(
         'SELECT uuid, rank, discord_id, ign FROM discord_links'
       );
