@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS management_exceptions (
   ign             TEXT        NOT NULL,
   minecraft_uuid  UUID,
   exception_type  TEXT        NOT NULL DEFAULT 'other'
-                              CHECK (exception_type IN ('alt', 'rank_exception', 'role_exception', 'other')),
+                              CHECK (exception_type IN ('alt', 'rank_exception', 'role_exception', 'guild_account', 'other')),
   linked_main     TEXT,
   account_owner   TEXT,
   in_game_rank    TEXT,

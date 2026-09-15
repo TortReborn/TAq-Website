@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { guildAccountUuids, uuidKey } from '@/lib/guild-accounts';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
@@ -134,6 +135,7 @@ export async function GET(request: NextRequest) {
         discordLinks[row.uuid] = row;
       });
       const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
+      const guildAccounts = await guildAccountUuids(client);
 
       // Convert guild ranks to readable names
       const guildRankNames: Record<string, string> = {
@@ -154,6 +156,7 @@ export async function GET(request: NextRequest) {
           discordRank: (discord && discord.rank) || '',   // rank is NULL for linked non-members (TAQ-76)
           discordId: discord ? discord.discord_id : '',
           discordUsername: discord ? discord.ign : '',
+          guildAccount: guildAccounts.has(uuidKey(member.uuid)),   // guild-owned storage account, no person behind it (TAQ-88)
           online: member.online === true || member.online === 'true',
           server: member.server || null,
         };

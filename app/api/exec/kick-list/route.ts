@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { countPendingJoins } from '@/lib/pending-joins';
+import { guildAccountUuids, uuidKey } from '@/lib/guild-accounts';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [result, lastUpdatedResult, pendingJoins] = await Promise.all([
+    const [result, lastUpdatedResult, pendingJoins, guildAccounts] = await Promise.all([
       pool.query(
         `SELECT uuid, ign, tier, added_by, created_at
          FROM kick_list
@@ -40,10 +41,12 @@ export async function GET(request: NextRequest) {
         `SELECT created_at, added_by FROM kick_list ORDER BY created_at DESC LIMIT 1`
       ),
       countPendingJoins(pool),
+      guildAccountUuids(pool),
     ]);
 
     const lastRow = lastUpdatedResult.rows[0] ?? null;
-    const memberCount = guildUUIDs.size;
+    // People, not guild-owned storage accounts (TAQ-88).
+    const memberCount = [...guildUUIDs].filter(u => !guildAccounts.has(uuidKey(u))).length;
 
     return NextResponse.json({
       entries: result.rows.map(row => ({

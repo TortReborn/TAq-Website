@@ -13,7 +13,7 @@ interface ExceptionRecord {
   discordId: string;
   ign: string;
   minecraftUuid: string;
-  exceptionType: 'alt' | 'rank_exception' | 'role_exception' | 'other';
+  exceptionType: 'alt' | 'rank_exception' | 'role_exception' | 'guild_account' | 'other';
   linkedMain: string;
   accountOwner: string;
   inGameRank: string;
@@ -178,7 +178,7 @@ export default function ExternalsPage() {
             <div className={styles.modalHeader}><h2>{exceptionDraft.id ? 'Edit exception' : 'Add exception'}</h2><button type="button" onClick={() => setExceptionDraft(null)}>×</button></div>
             <div className={styles.formGrid}>
               <label>IGN<input required value={exceptionDraft.ign} onChange={event => setExceptionDraft({ ...exceptionDraft, ign: event.target.value })} /></label>
-              <label>Exception type<select value={exceptionDraft.exceptionType} onChange={event => setExceptionDraft({ ...exceptionDraft, exceptionType: event.target.value as ExceptionRecord['exceptionType'] })}><option value="alt">Alt account</option><option value="rank_exception">Rank exception</option><option value="role_exception">Role exception</option><option value="other">Other</option></select></label>
+              <label>Exception type<select value={exceptionDraft.exceptionType} onChange={event => setExceptionDraft({ ...exceptionDraft, exceptionType: event.target.value as ExceptionRecord['exceptionType'] })}><option value="alt">Alt account</option><option value="rank_exception">Rank exception</option><option value="role_exception">Role exception</option><option value="guild_account">Guild-owned account</option><option value="other">Other</option></select></label>
               <label>Discord username<input value={exceptionDraft.discordUser} onChange={event => setExceptionDraft({ ...exceptionDraft, discordUser: event.target.value })} /></label>
               <label>Discord ID<input inputMode="numeric" value={exceptionDraft.discordId} onChange={event => setExceptionDraft({ ...exceptionDraft, discordId: event.target.value })} /></label>
               <label>Minecraft UUID<input value={exceptionDraft.minecraftUuid} onChange={event => setExceptionDraft({ ...exceptionDraft, minecraftUuid: event.target.value })} /></label>

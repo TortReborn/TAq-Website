@@ -4,7 +4,7 @@ import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const EXCEPTION_TYPES = new Set(['alt', 'rank_exception', 'role_exception', 'other']);
+const EXCEPTION_TYPES = new Set(['alt', 'rank_exception', 'role_exception', 'guild_account', 'other']);
 
 function text(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
