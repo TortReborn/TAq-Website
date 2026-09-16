@@ -11,6 +11,7 @@ import { getDifficultyColor, ROLE_COLORS } from '@/lib/snipe-constants';
 import { formatLePayout, formatPoints } from '@/lib/currency';
 import { toPng } from 'html-to-image';
 import BackgroundShopModal from '@/components/BackgroundShopModal';
+import UniformModal from '@/components/UniformModal';
 
 // --- HSV color utilities (porting bot's Color class from Helpers/functions.py) ---
 
@@ -166,6 +167,7 @@ export default function ProfilePage() {
   const [periodCache, setPeriodCache] = useState<Record<string, { playtime: number; wars: number; raids: number; contributed: number; hasCompleteData: boolean }>>({});
   const [periodLoading, setPeriodLoading] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [uniformOpen, setUniformOpen] = useState(false);
   const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
@@ -863,6 +865,23 @@ export default function ProfilePage() {
           >
             Backgrounds
           </button>
+          {/* Uniform button (TAQ-89) */}
+          <button
+            onClick={() => setUniformOpen(true)}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-card)',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1.25rem',
+              color: 'var(--text-secondary)',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              fontFamily: "'MinecraftFont', monospace",
+              letterSpacing: '0.5px',
+            }}
+          >
+            Uniform
+          </button>
         </div>
 
         {/* Time frame selector */}
@@ -1067,6 +1086,7 @@ export default function ProfilePage() {
       </div>
 
       <BackgroundShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} onBackgroundChange={() => mutateProfile()} />
+      <UniformModal isOpen={uniformOpen} onClose={() => setUniformOpen(false)} />
     </main>
   );
 }

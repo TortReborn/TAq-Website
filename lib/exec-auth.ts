@@ -35,6 +35,15 @@ function getSecret(): string {
   return secret;
 }
 
+/**
+ * The session secret, for other short-lived signed tokens (uniform skin
+ * links, TAQ-89). Callers must namespace what they sign so a token minted
+ * for one purpose can never verify as another.
+ */
+export function getSessionSecret(): string {
+  return getSecret();
+}
+
 function signPayload(payload: string, secret: string): string {
   return createHmac('sha256', secret).update(payload).digest('base64url');
 }
