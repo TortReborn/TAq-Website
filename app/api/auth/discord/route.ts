@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateOAuthState, getDiscordOAuthUrl, getBaseUrl } from '@/lib/exec-auth';
+import { generateOAuthState, getDiscordOAuthUrl, getBaseUrl, safeRedirectPath } from '@/lib/exec-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
       maxAge: 300, // 5 minutes
     });
 
-    // Store post-login redirect path if provided
-    const redirect = new URL(request.url).searchParams.get('redirect');
+    // Store post-login redirect path if provided and it stays on this site
+    const redirect = safeRedirectPath(new URL(request.url).searchParams.get('redirect'));
     if (redirect) {
       response.cookies.set('oauth_redirect', redirect, {
         httpOnly: true,

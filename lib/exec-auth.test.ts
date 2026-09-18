@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 // of exec-auth (which reads env at load) side-effect free here.
 vi.mock('@/lib/db', () => ({ getPool: () => ({}) }));
 
-const { rankCheckFromLookup, memberCheckFromLookup, EXEC_RANKS } = await import('./exec-auth');
+const { rankCheckFromLookup, memberCheckFromLookup, EXEC_RANKS, safeRedirectPath } = await import('./exec-auth');
 
 const ID = '500332699928494100';
 const linked = (rank: string | null, inGuild: boolean) =>
@@ -58,5 +58,28 @@ describe('memberCheckFromLookup (any-member gate)', () => {
 
   it('treats a member with no rank as a plain member with an empty rank', () => {
     expect(memberCheckFromLookup(ID, linked(null, true))).toMatchObject({ ok: true, role: 'member', rank: '' });
+  });
+});
+
+describe('safeRedirectPath (post-login destination)', () => {
+  it('keeps ordinary same-site paths, including query and hash', () => {
+    expect(safeRedirectPath('/exec')).toBe('/exec');
+    expect(safeRedirectPath('/chronicle/foo?x=1#top')).toBe('/chronicle/foo?x=1#top');
+  });
+
+  it('rejects anything that would leave the site', () => {
+    // Each of these resolves off-site under `new URL(candidate, baseUrl)`.
+    for (const bad of [
+      'https://evil.example/',
+      '//evil.example/exec',
+      '/\\evil.example',
+      'javascript:alert(1)',
+      'exec',
+      '',
+      null,
+      undefined,
+    ]) {
+      expect(safeRedirectPath(bad), String(bad)).toBeNull();
+    }
   });
 });
