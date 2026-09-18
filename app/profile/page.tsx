@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { getRankColor, getWynnRankInfo } from '@/lib/rank-constants';
 import { getDifficultyColor, ROLE_COLORS } from '@/lib/snipe-constants';
 import { formatLePayout, formatPoints } from '@/lib/currency';
+import { logoutAndRedirect } from '@/lib/logout-client';
 import { toPng } from 'html-to-image';
 import BackgroundShopModal from '@/components/BackgroundShopModal';
 import UniformModal from '@/components/UniformModal';
@@ -1070,7 +1071,8 @@ export default function ProfilePage() {
       {/* Logout */}
       <div className="profile-bottom" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
         <a
-          href="/api/auth/discord/logout"
+          href="/login"
+          onClick={logoutAndRedirect}
           style={{
             color: 'var(--text-secondary)',
             textDecoration: 'none',

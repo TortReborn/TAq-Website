@@ -63,7 +63,9 @@ export async function GET(request: NextRequest) {
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const orderClause = LIST_ORDER_SQL[sort] || LIST_ORDER_SQL['Newest'];
+    // Own-property check: `sort` is a query param, and a plain object lookup
+    // would resolve 'constructor' or '__proto__' to something truthy.
+    const orderClause = Object.hasOwn(LIST_ORDER_SQL, sort) ? LIST_ORDER_SQL[sort] : LIST_ORDER_SQL['Newest'];
 
     // Fetch all matching logs
     const logsResult = await pool.query(

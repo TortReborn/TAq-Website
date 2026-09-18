@@ -5,6 +5,7 @@ import {
   checkDiscordLink,
   setExecSessionCookie,
   getBaseUrl,
+  safeRedirectPath,
 } from '@/lib/exec-auth';
 import { setWikiSessionCookie } from '@/lib/wiki-auth';
 import { isChronicler } from '@/lib/wiki-db';
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
       // signed in with Discord may suggest an edit, and a chronicler may
       // publish. So mint the wiki-only session either way; it carries no rank,
       // so it unlocks nothing beyond /chronicle.
-      const storedRedirect = request.cookies.get('oauth_redirect')?.value;
+      const storedRedirect = safeRedirectPath(request.cookies.get('oauth_redirect')?.value);
       const chronicler = await isChronicler(getPool(), discordUser.id);
       const params = new URLSearchParams({ reason: linkCheck.reason, discord_id: linkCheck.discord_id, discord_name: discordUser.username });
       if (linkCheck.reason === 'not_in_guild') params.set('ign', linkCheck.ign);
@@ -83,8 +84,9 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // Redirect: use stored redirect path if present, otherwise role-based default
-    const storedRedirect = request.cookies.get('oauth_redirect')?.value;
+    // Redirect: use stored redirect path if present (re-validated — the cookie
+    // is ours but cheap to check), otherwise role-based default
+    const storedRedirect = safeRedirectPath(request.cookies.get('oauth_redirect')?.value);
     const redirectPath = storedRedirect || (linkCheck.role === 'exec' ? '/exec' : '/profile');
     const response = NextResponse.redirect(new URL(redirectPath, baseUrl));
     setExecSessionCookie(response, {
