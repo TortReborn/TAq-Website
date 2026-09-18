@@ -61,7 +61,9 @@ export async function GET(request: NextRequest) {
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const orderClause = LIST_ORDER_SQL[sort] || LIST_ORDER_SQL['Newest'];
+    // Own-property check: `sort` is a query param, and a plain object lookup
+    // would resolve 'constructor' or '__proto__' to something truthy.
+    const orderClause = Object.hasOwn(LIST_ORDER_SQL, sort) ? LIST_ORDER_SQL[sort] : LIST_ORDER_SQL['Newest'];
 
     const countResult = await pool.query(
       `SELECT COUNT(*) as total FROM graid_logs gl ${whereClause}`,
