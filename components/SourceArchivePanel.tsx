@@ -249,7 +249,7 @@ export default function SourceArchivePanel({ entries, gaps, totals, imageBackend
               ? 'Vercel Blob (public, CDN-served)'
               : imageBackend === 'blob-private'
                 ? 'Vercel Blob (private, streamed through the site)'
-                : 'Supabase storage'}
+                : 'the site S3 bucket (Railway)'}
           </strong>.
         </p>
       )}

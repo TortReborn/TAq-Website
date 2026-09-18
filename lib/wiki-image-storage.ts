@@ -2,7 +2,7 @@
  * Where wiki images are stored.
  *
  * Vercel Blob is used when BLOB_READ_WRITE_TOKEN is set, and the site's S3
- * bucket (Supabase Storage) otherwise. Both are kept because they fail in
+ * bucket (Railway Buckets) otherwise. Both are kept because they fail in
  * opposite ways: Blob needs a token provisioned in the Vercel dashboard, and S3
  * is already configured but is not a CDN. Supporting both means uploads keep
  * working through provisioning, with no flag day.
