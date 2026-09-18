@@ -239,7 +239,7 @@ export async function resolveWikiPrincipal(request: NextRequest): Promise<WikiPr
  */
 export async function resolveWikiPrincipalFromCookies(): Promise<WikiPrincipal | null> {
   const { cookies } = await import('next/headers');
-  const store = cookies();
+  const store = await cookies();
   const shim = { cookies: { get: (name: string) => store.get(name) } } as unknown as NextRequest;
   return resolveWikiPrincipal(shim);
 }

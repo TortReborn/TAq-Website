@@ -47,10 +47,11 @@ async function getPlaceholder(): Promise<Buffer> {
     pixels[i + 3] = 0xff;
   }
 
-  _placeholder = await sharp(pixels, { raw: { width: size, height: size, channels: 4 } })
+  const png = await sharp(pixels, { raw: { width: size, height: size, channels: 4 } })
     .png()
     .toBuffer();
-  return _placeholder;
+  _placeholder = png;
+  return png;
 }
 
 let _s3: S3Client | null = null;
