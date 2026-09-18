@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 
 const content = `# Tort Reborn Bot - Privacy Policy
 
-**Last Updated:** March 23, 2026
+**Last Updated:** September 18, 2026
 
 ## 1. Introduction
 
@@ -65,9 +65,9 @@ We share limited data with the following third-party services:
 - **Data Sent:** Minecraft UUID
 - **Purpose:** Rendering Minecraft player skin/avatar images for profile cards
 
-### 4.5 Supabase Storage (S3)
-- **Data Stored:** Cached avatar images (3-day expiry), profile background images
-- **Purpose:** Performance caching to reduce API calls
+### 4.5 Railway Corp. (Railway Buckets, S3-compatible object storage)
+- **Data Stored:** Profile background images, shell exchange item icons, and files uploaded through the website (wiki images, tracker ticket attachments)
+- **Purpose:** Storing and serving images for profile cards and website features
 
 ## 5. Data Storage & Security
 
@@ -81,7 +81,7 @@ We share limited data with the following third-party services:
 - **Account Links** - Retained as long as you are a guild member. Removed upon request.
 - **Activity Snapshots** - Retained indefinitely for historical leaderboard tracking.
 - **Application Records** - Retained indefinitely for guild management purposes.
-- **Avatar Cache** - Automatically expires after 3 days.
+- **Uploaded Files** - Wiki images and tracker ticket attachments are retained until the content they belong to is deleted.
 - **Profile Customization** - Retained until you request removal or unlink your account.
 
 ## 7. Your Rights
