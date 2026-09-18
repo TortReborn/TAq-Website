@@ -29,7 +29,9 @@ setInterval(() => {
 export function getRateLimitKey(request: NextRequest): string {
   // Use IP address as the primary identifier
   const forwarded = request.headers.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown';
+  // NextRequest.ip went away in Next 15; on Vercel x-forwarded-for is set by
+  // the platform, with x-real-ip as the fallback.
+  const ip = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || 'unknown';
   
   // You could also include user agent or other identifiers
   const userAgent = request.headers.get('user-agent') || 'unknown';

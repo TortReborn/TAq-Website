@@ -8,10 +8,8 @@ const RESPONSE_HEADERS = {
   'Cache-Control': 'public, max-age=2592000, s-maxage=2592000',
 };
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const id = params.id;
 
   // Validate: must be a positive integer
@@ -25,7 +23,7 @@ export async function GET(
       return NextResponse.json({ error: 'Background not found' }, { status: 404 });
     }
 
-    const ifNoneMatch = _request.headers.get('if-none-match');
+    const ifNoneMatch = request.headers.get('if-none-match');
     if (ifNoneMatch === entry.etag) {
       return new NextResponse(null, { status: 304, headers: { 'ETag': entry.etag } });
     }

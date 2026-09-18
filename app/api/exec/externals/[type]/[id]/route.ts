@@ -24,8 +24,9 @@ function text(value: unknown): string | null {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { type: string; id: string } }
+  props: { params: Promise<{ type: string; id: string }> }
 ) {
+  const params = await props.params;
   const session = await requireNarwhalSession(request);
   if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
 
