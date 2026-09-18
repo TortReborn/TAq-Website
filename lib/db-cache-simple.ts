@@ -211,70 +211,6 @@ class SimpleDatabaseCache {
     return this.get('lootpoolData', requestId);
   }
 
-  // Get cache status for admin dashboard
-  async getCacheStatus() {
-    const client = await this.pool.connect();
-    try {
-      const result = await client.query(`
-        SELECT 
-          cache_key,
-          EXTRACT(EPOCH FROM created_at) * 1000 as timestamp,
-          EXTRACT(EPOCH FROM expires_at) * 1000 as expires_at,
-          expires_at > NOW() as is_fresh,
-          fetch_count,
-          error_count,
-          last_error
-        FROM cache_entries
-        ORDER BY cache_key
-      `);
-
-      const status: Record<string, any> = {};
-      
-      for (const row of result.rows) {
-        status[row.cache_key] = {
-          cached: true,
-          timestamp: Math.floor(row.timestamp),
-          expiresAt: Math.floor(row.expires_at),
-          expired: !row.is_fresh,
-          fetchCount: row.fetch_count,
-          errorCount: row.error_count,
-          lastError: row.last_error,
-          managedBy: 'External Bot'
-        };
-      }
-
-      // Add missing keys as not cached
-      const expectedKeys = ['territories', 'guildData', 'lootpoolData', 'aspectData'];
-      for (const key of expectedKeys) {
-        if (!status[key]) {
-          status[key] = {
-            cached: false,
-            timestamp: null,
-            expiresAt: null,
-            expired: null,
-            fetchCount: 0,
-            errorCount: 0,
-            lastError: null,
-            managedBy: 'External Bot'
-          };
-        }
-      }
-
-      return status;
-    } catch (error) {
-      console.error('❌ Failed to get cache status:', error);
-      // Return empty status on error
-      return {
-        territories: { cached: false, timestamp: null, expiresAt: null, expired: null, managedBy: 'External Bot' },
-        guildData: { cached: false, timestamp: null, expiresAt: null, expired: null, managedBy: 'External Bot' },
-        lootpoolData: { cached: false, timestamp: null, expiresAt: null, expired: null, managedBy: 'External Bot' },
-        aspectData: { cached: false, timestamp: null, expiresAt: null, expired: null, managedBy: 'External Bot' }
-      };
-    } finally {
-      client.release();
-    }
-  }
-
   // Cleanup expired entries (can be called by admin or maintenance)
   async cleanupExpired(): Promise<number> {
     const client = await this.pool.connect();
@@ -295,29 +231,6 @@ class SimpleDatabaseCache {
     } finally {
       client.release();
     }
-  }
-
-  // Get rate limit status for monitoring
-  getRateLimitStatus() {
-    const now = Date.now();
-    const status: Record<string, any> = {};
-    
-    for (const [key, data] of this.rateLimitMap.entries()) {
-      if (now <= data.resetTime) {
-        const [type, requestId] = key.split(':');
-        const config = this.RATE_LIMITS[type as keyof typeof this.RATE_LIMITS] || this.RATE_LIMITS.default;
-        
-        status[key] = {
-          requests: data.count,
-          limit: config.maxRequests,
-          remaining: Math.max(0, config.maxRequests - data.count),
-          resetTime: data.resetTime,
-          resetIn: Math.max(0, data.resetTime - now)
-        };
-      }
-    }
-    
-    return status;
   }
 
   // Guild colors specific methods
