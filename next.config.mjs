@@ -28,6 +28,38 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Baseline security headers on every response. Vercel adds HSTS on
+        // its own; the rest is ours. The CSP is report-only for now: the
+        // theme-flash script in layout.tsx and the early-fetch in map/page.tsx
+        // are inline, so enforcing it needs nonces first. Watch the browser
+        // console for violations, tighten, then rename the header to
+        // Content-Security-Policy.
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=()' },
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://api.wynncraft.com https://api.mojang.com https://athena.wynntils.com https://vitals.vercel-insights.com",
+              "worker-src 'self' blob:",
+              "media-src 'self' blob:",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "object-src 'none'",
+            ].join('; '),
+          },
+        ],
+      },
+      {
         // Versioned map assets (bump the filename to invalidate, e.g. fruma_map.v3.webp)
         source: '/images/map/:path*',
         headers: [
