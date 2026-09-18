@@ -65,7 +65,7 @@ We share limited data with the following third-party services:
 - **Data Sent:** Minecraft UUID
 - **Purpose:** Rendering Minecraft player skin/avatar images for profile cards
 
-### 4.5 Supabase Storage (S3)
+### 4.5 Railway Buckets (S3 Storage)
 - **Data Stored:** Cached avatar images (3-day expiry), profile background images
 - **Purpose:** Performance caching to reduce API calls
 
