@@ -4,7 +4,8 @@ import { checkRateLimit, incrementRateLimit, createRateLimitResponse } from './l
 export function middleware(request: NextRequest) {
   // Only apply rate limiting to API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    // Exempt analytics tracking from rate limiting (frequent heartbeats)
+    // Analytics flushes every 15s from every open tab, so it stays out of the
+    // global budget; the route enforces its own per-client bucket instead.
     if (request.nextUrl.pathname === '/api/analytics/track') {
       return NextResponse.next();
     }

@@ -10,6 +10,7 @@ import { useEffect, useMemo } from 'react';
 import OnboardingTour from '@/components/OnboardingTour';
 import OnboardingTrigger from '@/components/OnboardingTrigger';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { logoutAndRedirect } from '@/lib/logout-client';
 
 // Auth-required pages (login and unauthorized are public)
 const PUBLIC_PATHS = ['/exec/login', '/exec/unauthorized'];
@@ -235,7 +236,8 @@ export default function ExecLayout({ children }: { children: React.ReactNode }) 
             }
           }} />
           <a
-            href="/api/auth/discord/logout"
+            href="/login"
+            onClick={logoutAndRedirect}
             style={{
               display: 'flex',
               alignItems: 'center',
