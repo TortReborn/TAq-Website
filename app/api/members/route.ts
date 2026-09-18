@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
     
     try {
       const discordLinksResult = await client.query(
-        'SELECT uuid, rank, discord_id, ign FROM discord_links'
+        'SELECT uuid, rank FROM discord_links'
       );
       const discordLinks: Record<string, any> = {};
       discordLinksResult.rows.forEach((row: any) => {
@@ -151,15 +151,27 @@ export async function GET(request: NextRequest) {
       // to display or count (TAQ-88).
       const people = allMembers.filter(member => !guildAccounts.has(uuidKey(member.uuid)));
 
-      // Map Discord ranks to members by uuid
+      // Map Discord ranks to members by uuid. This endpoint is public, so the
+      // response is an explicit allowlist of what the members page renders:
+      // everything here is already on the Wynncraft guild page or player
+      // stats, plus the Discord rank name. Discord ids and anything else in
+      // the bot's blob stay server-side.
       const mappedMembers = people.map(member => {
         const discord = discordLinks[member.uuid];
         return {
-          ...member,
+          username: member.username,
+          uuid: member.uuid,
+          guildRank: member.guildRank,
+          guildRankName: member.guildRankName,
+          contributed: member.contributed || 0,
+          contributionRank: member.contributionRank,
+          joined: member.joined,
+          lastJoin: member.lastJoin ?? null,
+          playtime: member.playtime || 0,
+          wars: member.wars || 0,
+          shells: member.shells || 0,
           raids: allTimeGraidRaids.get(member.uuid) || 0,
           discordRank: (discord && discord.rank) || '',   // rank is NULL for linked non-members (TAQ-76)
-          discordId: discord ? discord.discord_id : '',
-          discordUsername: discord ? discord.ign : '',
           online: member.online === true || member.online === 'true',
           server: member.server || null,
         };
