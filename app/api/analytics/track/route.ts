@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { getExecSession } from '@/lib/exec-auth';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse } from '@/lib/rate-limit';
+import { clientIp, consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 // Hard cap on events per request to bound work and DB write size.
 const MAX_EVENTS_PER_REQUEST = 50;
+// Requests per minute per client, enforced across every serverless instance.
+// The tracker flushes at most every 15s per tab, so 40 leaves room for a
+// handful of tabs and is still far below what a flood looks like.
+const SHARED_LIMIT_PER_MINUTE = 40;
 // Action metadata is free-form JSON from the client; bound it so a single
 // event can't carry an arbitrarily large payload into the table.
 const MAX_METADATA_BYTES = 2048;
@@ -90,12 +95,19 @@ function parseAction(e: RawEvent, who: Identity): ActionRow | null {
 export async function POST(request: NextRequest) {
   // The middleware lets this path through without counting it against the
   // global budget (the tracker flushes every 15s from every open tab), so
-  // the endpoint enforces its own per-client bucket here instead.
+  // the endpoint enforces its own per-client bucket here instead. Two
+  // layers: the in-memory check is a free first filter, but it is per
+  // serverless instance, so the shared Postgres counter is the one that
+  // actually bounds a public write endpoint at deployment scale.
   const rateLimitCheck = checkRateLimit(request, 'analytics');
   if (!rateLimitCheck.allowed) {
     return createRateLimitResponse(rateLimitCheck.resetTime);
   }
   incrementRateLimit(request, 'analytics');
+  const shared = await consumeSharedRateLimit('analytics', clientIp(request), SHARED_LIMIT_PER_MINUTE);
+  if (!shared.allowed) {
+    return createRateLimitResponse(shared.resetTime);
+  }
 
   const session = getExecSession(request);
   const who: Identity = session
