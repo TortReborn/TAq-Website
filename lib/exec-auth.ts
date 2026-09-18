@@ -150,6 +150,25 @@ export function generateOAuthState(): string {
   return randomBytes(32).toString('hex');
 }
 
+/**
+ * A post-login destination is only ever a path on this site. `new URL(x, base)`
+ * lets an absolute `x` win over `base`, so anything that isn't a single-slash
+ * relative path (`//host`, `https:`, `javascript:`, backslash tricks) would
+ * send a freshly authenticated user off-site. Returns the path or null.
+ */
+export function safeRedirectPath(candidate: string | null | undefined): string | null {
+  if (!candidate) return null;
+  if (!candidate.startsWith('/') || candidate.startsWith('//') || candidate.startsWith('/\\')) return null;
+  try {
+    const base = 'https://redirect.invalid';
+    const url = new URL(candidate, base);
+    if (url.origin !== base) return null;
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return null;
+  }
+}
+
 export function getBaseUrl(): string {
   return pickEnv('NEXT_PUBLIC_BASE_URL', 'TEST_NEXT_PUBLIC_BASE_URL') || 'http://localhost:3000';
 }
