@@ -32,10 +32,8 @@ function nonNegativeInteger(value: unknown, nullable = false): number | null {
   return number;
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireInventoryEditorSession(request);
   if (!session) return NextResponse.json({ error: 'Inventory edit access required.' }, { status: 403 });
 
@@ -106,10 +104,8 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireInventoryEditorSession(request);
   if (!session) return NextResponse.json({ error: 'Inventory edit access required.' }, { status: 403 });
 
