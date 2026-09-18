@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
+import { getExecSession } from '@/lib/exec-auth';
+import { checkRateLimit, incrementRateLimit, createRateLimitResponse } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 // Hard cap on events per request to bound work and DB write size.
 const MAX_EVENTS_PER_REQUEST = 50;
+// Action metadata is free-form JSON from the client; bound it so a single
+// event can't carry an arbitrarily large payload into the table.
+const MAX_METADATA_BYTES = 2048;
+
+// Who the events belong to. Taken from the signed session cookie, never from
+// the request body: the body is client-controlled, so trusting it would let
+// anyone attribute activity to any member. Anonymous visitors get nulls.
+type Identity = { discord_id: string | null; ign: string | null };
 
 type RawEvent = Record<string, unknown>;
 
@@ -37,14 +47,14 @@ function asInt(v: unknown): number | null {
   return Math.max(0, Math.floor(v));
 }
 
-function parsePageview(e: RawEvent): PageviewRow | null {
+function parsePageview(e: RawEvent, who: Identity): PageviewRow | null {
   const page_path = asString(e.page_path, 500);
   const session_id = asString(e.session_id, 64);
   const duration_ms = asInt(e.duration_ms);
   if (!page_path || !session_id || duration_ms === null) return null;
   return {
-    discord_id: asString(e.discord_id, 64),
-    ign: asString(e.ign, 64),
+    discord_id: who.discord_id,
+    ign: who.ign,
     page_path,
     referrer: asString(e.referrer, 500),
     session_id,
@@ -52,7 +62,7 @@ function parsePageview(e: RawEvent): PageviewRow | null {
   };
 }
 
-function parseAction(e: RawEvent): ActionRow | null {
+function parseAction(e: RawEvent, who: Identity): ActionRow | null {
   const page_path = asString(e.page_path, 500);
   const action_type = asString(e.action_type, 50);
   const action_label = asString(e.action_label, 200);
@@ -60,14 +70,15 @@ function parseAction(e: RawEvent): ActionRow | null {
   let metadata: string | null = null;
   if (e.metadata && typeof e.metadata === 'object') {
     try {
-      metadata = JSON.stringify(e.metadata);
+      const json = JSON.stringify(e.metadata);
+      metadata = Buffer.byteLength(json, 'utf8') <= MAX_METADATA_BYTES ? json : null;
     } catch {
       metadata = null;
     }
   }
   return {
-    discord_id: asString(e.discord_id, 64),
-    ign: asString(e.ign, 64),
+    discord_id: who.discord_id,
+    ign: who.ign,
     page_path,
     action_type,
     action_label,
@@ -77,6 +88,20 @@ function parseAction(e: RawEvent): ActionRow | null {
 }
 
 export async function POST(request: NextRequest) {
+  // The middleware lets this path through without counting it against the
+  // global budget (the tracker flushes every 15s from every open tab), so
+  // the endpoint enforces its own per-client bucket here instead.
+  const rateLimitCheck = checkRateLimit(request, 'analytics');
+  if (!rateLimitCheck.allowed) {
+    return createRateLimitResponse(rateLimitCheck.resetTime);
+  }
+  incrementRateLimit(request, 'analytics');
+
+  const session = getExecSession(request);
+  const who: Identity = session
+    ? { discord_id: session.discord_id, ign: session.ign }
+    : { discord_id: null, ign: null };
+
   let body: Record<string, unknown>;
   try {
     const contentType = request.headers.get('content-type') || '';
@@ -101,10 +126,10 @@ export async function POST(request: NextRequest) {
   for (const e of rawEvents) {
     if (!e || typeof e !== 'object') continue;
     if (e.type === 'pageview') {
-      const row = parsePageview(e);
+      const row = parsePageview(e, who);
       if (row) pageviews.push(row);
     } else if (e.type === 'action') {
-      const row = parseAction(e);
+      const row = parseAction(e, who);
       if (row) actions.push(row);
     }
   }

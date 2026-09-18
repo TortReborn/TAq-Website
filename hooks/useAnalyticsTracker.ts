@@ -14,6 +14,9 @@ import { useExecSession } from './useExecSession';
 //   spawning new rows, so tab switches don't inflate view counts.
 // - Queue flushes on a timer, on size threshold, and on visibility hidden
 //   / pagehide via sendBeacon so events survive tab close.
+// - discord_id / ign travel with each event only so a login or logout ends
+//   the current pageview cleanly. The server ignores them and attributes
+//   events from the session cookie, so nothing here is trusted.
 
 type PageviewEvent = {
   type: 'pageview';
