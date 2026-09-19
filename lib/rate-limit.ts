@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Helper function to check if TEST_MODE is enabled
-function isTestMode(): boolean {
-  const testMode = process.env.TEST_MODE;
-  if (!testMode) return false;
-  const s = testMode.toLowerCase().trim();
-  return s === "1" || s === "true" || s === "yes" || s === "on";
+/**
+ * Local-development escape hatch: RATE_LIMIT_DISABLED=1 in .env turns every
+ * limiter off (this one, the cache limiter, and the shared Postgres one).
+ * It used to ride along on TEST_MODE, which also picked the credential set;
+ * since TAQ-96 the two are separate and this is the only thing the flag does.
+ * Never set it on Vercel.
+ */
+export function rateLimitDisabled(): boolean {
+  const v = process.env.RATE_LIMIT_DISABLED;
+  if (!v) return false;
+  const s = v.toLowerCase().trim();
+  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
 }
 
 // Rate limiting configuration
@@ -41,8 +47,7 @@ export function getRateLimitKey(request: NextRequest): string {
 }
 
 export function checkRateLimit(request: NextRequest, endpoint?: string): { allowed: boolean; remainingRequests: number; resetTime: number } {
-  // Skip rate limiting in TEST_MODE
-  if (isTestMode()) {
+  if (rateLimitDisabled()) {
     return {
       allowed: true,
       remainingRequests: 999999,
@@ -95,8 +100,7 @@ export function checkRateLimit(request: NextRequest, endpoint?: string): { allow
 }
 
 export function incrementRateLimit(request: NextRequest, endpoint?: string): void {
-  // Skip rate limiting in TEST_MODE
-  if (isTestMode()) {
+  if (rateLimitDisabled()) {
     return;
   }
 

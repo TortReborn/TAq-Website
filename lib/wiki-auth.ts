@@ -40,22 +40,13 @@ import { EXEC_RANKS } from '@/lib/exec-auth';
 const COOKIE_NAME = 'chronicler_session';
 const SESSION_TTL = 30 * 24 * 60 * 60; // 30 days — contributors edit sporadically
 
-function isTestMode(): boolean {
-  const v = process.env.TEST_MODE;
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
-}
-
 /**
  * Reuses the exec session secret rather than introducing another env var to
  * provision. The cookie name differs, so the two can never be confused, and a
  * wiki cookie carries no rank for anything else to trust.
  */
 function getSecret(): string {
-  const secret = isTestMode()
-    ? process.env.TEST_EXEC_SESSION_SECRET
-    : process.env.EXEC_SESSION_SECRET;
+  const secret = process.env.EXEC_SESSION_SECRET;
   if (!secret) throw new Error('EXEC_SESSION_SECRET is not set');
   return secret;
 }

@@ -2,17 +2,6 @@ import { Pool } from "pg";
 
 let _pool: Pool | null = null;
 
-function truthy(v?: string | null) {
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === "1" || s === "true" || s === "yes" || s === "on";
-}
-
-function pickEnv(name: string, nameTest: string) {
-  const isTest = truthy(process.env.TEST_MODE);
-  return isTest ? process.env[nameTest] : process.env[name];
-}
-
 function parsePort(v?: string) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 5432;
@@ -31,15 +20,18 @@ function sslFor(mode?: string) {
 export function getPool(): Pool {
   if (_pool) return _pool;
 
-  const user = pickEnv("DB_LOGIN", "TEST_DB_LOGIN");
-  const password = pickEnv("DB_PASS", "TEST_DB_PASS");
-  const host = pickEnv("DB_HOST", "TEST_DB_HOST");
-  const port = parsePort(pickEnv("DB_PORT", "TEST_DB_PORT"));
-  const database = pickEnv("DB_DATABASE", "TEST_DB_DATABASE");
-  const sslmode = pickEnv("DB_SSLMODE", "TEST_DB_SSLMODE");
+  // One set of names. The repo .env carries dev values; Vercel carries prod.
+  // There is no switch between them any more (TAQ-96): which database this
+  // process talks to is decided by where it runs, not by a boolean.
+  const user = process.env.DB_LOGIN;
+  const password = process.env.DB_PASS;
+  const host = process.env.DB_HOST;
+  const port = parsePort(process.env.DB_PORT);
+  const database = process.env.DB_DATABASE;
+  const sslmode = process.env.DB_SSLMODE;
 
   if (!user || !host || !database) {
-    throw new Error("Database env vars missing. Check .env and TEST_MODE.");
+    throw new Error("Database env vars missing: set DB_LOGIN, DB_HOST and DB_DATABASE.");
   }
 
   _pool = new Pool({

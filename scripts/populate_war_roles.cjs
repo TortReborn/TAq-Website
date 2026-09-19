@@ -3,9 +3,11 @@
  * and populates the member_war_roles table via discord_links UUID mapping.
  *
  * Usage:
- *   node scripts/populate_war_roles.cjs --target test
- *   node scripts/populate_war_roles.cjs --target prod
- *   node scripts/populate_war_roles.cjs --target both
+ *   node scripts/populate_war_roles.cjs             (dev: DB_* and DISCORD_BOT_TOKEN from .env)
+ *   prodctx node scripts/populate_war_roles.cjs     (prod: the vault, via the workspace wrapper)
+ *
+ * One process, one context (TAQ-96): the target is whichever environment the
+ * credentials belong to, detected by prodctx's PROD_DB_HOST marker.
  */
 
 const pg = require('pg');
@@ -23,10 +25,12 @@ for (const line of envLines) {
   if (idx === -1) continue;
   env[trimmed.slice(0, idx)] = trimmed.slice(idx + 1);
 }
+// The real environment wins over .env: that is how prodctx hands in prod values.
+for (const [k, v] of Object.entries(process.env)) {
+  if (v !== undefined) env[k] = v;
+}
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const TEST_MODE = (env.TEST_MODE || '').toLowerCase() === 'true';
-
 const GUILD_IDS = {
   prod: '729147655875199017',
   test: '1369134564450107412',
@@ -39,29 +43,20 @@ const ROLE_MAP = {
   'Healer': 'HEALER',
 };
 
-const DB_CONFIGS = {
-  test: {
-    user: env.TEST_DB_LOGIN,
-    password: env.TEST_DB_PASS,
-    host: env.TEST_DB_HOST,
-    port: parseInt(env.TEST_DB_PORT || '5432'),
-    database: env.TEST_DB_DATABASE,
-    ssl: env.TEST_DB_SSLMODE === 'require' ? { rejectUnauthorized: false } : false,
-  },
-  prod: {
-    user: env.DB_LOGIN,
-    password: env.DB_PASS,
-    host: env.DB_HOST,
-    port: parseInt(env.DB_PORT || '5432'),
-    database: env.DB_DATABASE,
-    ssl: env.DB_SSLMODE === 'require' ? { rejectUnauthorized: false } : false,
-  },
+// prodctx sets DB_* / DISCORD_BOT_TOKEN to prod values in the child process
+// and leaves PROD_DB_HOST as the marker; without it, .env supplies dev.
+const TARGET = process.env.PROD_DB_HOST ? 'prod' : 'test';
+
+const DB_CONFIG = {
+  user: env.DB_LOGIN,
+  password: env.DB_PASS,
+  host: env.DB_HOST,
+  port: parseInt(env.DB_PORT || '5432'),
+  database: env.DB_DATABASE,
+  ssl: env.DB_SSLMODE === 'require' ? { rejectUnauthorized: false } : false,
 };
 
-const BOT_TOKENS = {
-  test: env.TEST_DISCORD_BOT_TOKEN,
-  prod: env.DISCORD_BOT_TOKEN,
-};
+const BOT_TOKEN = env.DISCORD_BOT_TOKEN;
 
 // ── Discord REST helpers ────────────────────────────────────────────────────
 const DISCORD_API = 'https://discord.com/api/v10';
@@ -99,9 +94,9 @@ async function fetchAllMembers(guildId, token) {
 
 // ── Main ────────────────────────────────────────────────────────────────────
 async function populateTarget(target) {
-  const token = BOT_TOKENS[target];
+  const token = BOT_TOKEN;
   const guildId = GUILD_IDS[target];
-  const dbConfig = DB_CONFIGS[target];
+  const dbConfig = DB_CONFIG;
 
   if (!token) {
     console.error(`  No bot token for ${target}, skipping.`);
@@ -221,20 +216,14 @@ async function populateTarget(target) {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  const targetIdx = args.indexOf('--target');
-  const target = targetIdx !== -1 ? args[targetIdx + 1] : null;
-
-  if (!target || !['test', 'prod', 'both'].includes(target)) {
-    console.error('Usage: node scripts/populate_war_roles.cjs --target test|prod|both');
+  if (process.argv.includes('--target')) {
+    console.error('--target is gone: run plainly for dev, or through `prodctx` for prod.');
     process.exit(1);
   }
+  const target = TARGET;
+  console.log(`Target: ${target} (${target === 'prod' ? 'prodctx' : '.env'})`);
 
-  const targets = target === 'both' ? ['test', 'prod'] : [target];
-
-  for (const t of targets) {
-    await populateTarget(t);
-  }
+  await populateTarget(target);
 
   console.log('\nDone.');
 }

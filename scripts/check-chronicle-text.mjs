@@ -3,8 +3,8 @@
  * Style check for chronicle text held in the DATABASE — alliance and event
  * descriptions, which appear on the map and the timeline.
  *
- *   node scripts/check-chronicle-text.mjs            # dev (TEST_DB_*)
- *   node scripts/check-chronicle-text.mjs --prod     # prod (DB_*)
+ *   node scripts/check-chronicle-text.mjs                 # dev (DB_* from .env)
+ *   prodctx node scripts/check-chronicle-text.mjs --prod  # prod (DB_* from the vault)
  *   node scripts/check-chronicle-text.mjs --strict   # non-zero exit on errors
  *
  * check-article-style.mjs reads data/wiki/seed-articles.json and so never saw
@@ -27,7 +27,10 @@ for (const line of fs.readFileSync(path.join(ROOT, '.env'), 'utf8').split(/\r?\n
   const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
   if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
 }
-const env = (n) => (prod ? process.env[n] : process.env[`TEST_${n}`]);
+// One set of names (TAQ-96): --prod asserts the context, prodctx supplies it.
+if (prod && !process.env.PROD_DB_HOST) { console.error('--prod needs `prodctx node …`.'); process.exit(2); }
+if (!prod && process.env.PROD_DB_HOST) { console.error('dev run inside prodctx would hit production; drop prodctx.'); process.exit(2); }
+const env = (n) => process.env[n];
 const pool = new pg.Pool({
   host: env('DB_HOST'),
   port: Number(env('DB_PORT') || 5432),

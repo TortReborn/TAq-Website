@@ -4,15 +4,8 @@ import { getPool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-function isTestMode(): boolean {
-  const v = process.env.TEST_MODE;
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
-}
-
 function getBotToken(): string | undefined {
-  return isTestMode() ? process.env.TEST_DISCORD_BOT_TOKEN : process.env.DISCORD_BOT_TOKEN;
+  return process.env.DISCORD_BOT_TOKEN;
 }
 
 async function fetchDiscordAvatar(discordId: string): Promise<string> {

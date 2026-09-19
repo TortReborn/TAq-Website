@@ -1,11 +1,15 @@
 /**
- * Database connection settings for the one-off scripts in this directory,
- * read from .env.
+ * Database connection settings for the one-off scripts in this directory.
  *
  * These scripts used to carry the dev and production passwords inline. That is
  * how a live Neon credential ended up in a public repository's history. Nothing
  * here writes a secret down; a missing variable is a loud failure rather than a
  * silent fallback to someone's machine.
+ *
+ * Since TAQ-96 there is one set of names, DB_*. The repo .env holds the dev
+ * database; production is reached only by running the script through the
+ * workspace's `prodctx` wrapper, which loads the vault into the child
+ * environment. prod() refuses to run outside it.
  */
 const fs = require('fs');
 const path = require('path');
@@ -33,8 +37,16 @@ function require_(name) {
   return v;
 }
 
-/** The deployed database, as configured in .env. */
+/**
+ * The deployed database. Only available under `prodctx`, which is the single
+ * door to production from a dev machine: it sets DB_* to the prod values and
+ * leaves PROD_DB_HOST in the environment as the tell. Outside it, DB_* is the
+ * dev database and calling this would silently target the wrong one.
+ */
 function prod() {
+  if (!process.env.PROD_DB_HOST) {
+    throw new Error('prod() needs the production context — run this script via `prodctx node …`');
+  }
   return {
     user: require_('DB_LOGIN'),
     password: require_('DB_PASS'),
@@ -46,14 +58,17 @@ function prod() {
   };
 }
 
-/** The local development database, as configured by TEST_DB_*. */
+/** The local development database, as configured by DB_* in .env. */
 function dev() {
+  if (process.env.PROD_DB_HOST) {
+    throw new Error('dev() called inside prodctx — DB_* is production here; use prod() or drop prodctx');
+  }
   return {
-    user: require_('TEST_DB_LOGIN'),
-    password: require_('TEST_DB_PASS'),
-    host: process.env.TEST_DB_HOST ?? '127.0.0.1',
-    port: Number(process.env.TEST_DB_PORT ?? 5432),
-    database: process.env.TEST_DB_DATABASE ?? 'tortreborn',
+    user: require_('DB_LOGIN'),
+    password: require_('DB_PASS'),
+    host: process.env.DB_HOST ?? '127.0.0.1',
+    port: Number(process.env.DB_PORT ?? 5432),
+    database: process.env.DB_DATABASE ?? 'tortreborn',
     ssl: false,
     connectionTimeoutMillis: 5000,
   };
