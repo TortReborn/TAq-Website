@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { getWikiImage, isPubliclyAddressable, type WikiImageBackend } from '@/lib/wiki-image-storage';
+import { resolveWikiPrincipal } from '@/lib/wiki-auth';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +23,11 @@ export const dynamic = 'force-dynamic';
  * publish rights stays 'pending' and gets neither a redirect nor bytes, so it
  * cannot be surfaced by guessing an id.
  */
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Under construction: images are Chronicle content too (TAQ-90).
+  const principal = await resolveWikiPrincipal(request).catch(() => null);
+  if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
   const { id: rawId } = await context.params;
   const id = Number(rawId);
   if (!Number.isInteger(id) || id <= 0) {
