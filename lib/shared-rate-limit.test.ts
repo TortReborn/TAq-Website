@@ -8,8 +8,9 @@ import { Pool } from 'pg';
 // is what makes the temp table win. Skipped when the database is unreachable.
 
 const config = {
-  user: process.env.DB_LOGIN || 'tortuser',
-  password: process.env.DB_PASS || 'UserPass123',
+  // Credentials come from .env via vitest.config.ts; no literal fallback here.
+  user: process.env.DB_LOGIN,
+  password: process.env.DB_PASS,
   host: process.env.DB_HOST || '127.0.0.1',
   port: Number(process.env.DB_PORT) || 5432,
   database: process.env.DB_DATABASE || 'tortreborn',
