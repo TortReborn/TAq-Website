@@ -20,6 +20,8 @@ import {
   validateEventPayload,
 } from "@/lib/chronicle";
 import { useExecSession } from "@/hooks/useExecSession";
+import { useWikiSession } from "@/hooks/useWikiSession";
+import { canEnterChronicle } from "@/lib/chronicle-gate";
 import PickerField from "./PickerField";
 import { EVENT_LEADUP_MS } from "./HistoryTimeline";
 
@@ -599,6 +601,10 @@ export default function ChroniclePanel({
     return () => window.removeEventListener('resize', check);
   }, []);
   const { authenticated } = useExecSession();
+  // The panel is public; the wiki behind its "Wiki article" links is not while
+  // the Chronicle is under construction (TAQ-90). canReview honours "view as".
+  const { canReview: wikiCanReview } = useWikiSession();
+  const showWikiLinks = canEnterChronicle({ canReview: wikiCanReview });
   const [form, setForm] = useState<FormState>({ mode: 'closed' });
   const [expanded, setExpanded] = useState<string | null>(null);
   // Expanded view: a wider two-column browse of ALL alliances and events,
@@ -778,7 +784,7 @@ export default function ChroniclePanel({
                 <Pencil size={11} /> Suggest edit
               </button>
             )}
-            {a.wikiSlug && (
+            {showWikiLinks && a.wikiSlug && (
               <a href={`/chronicle/${a.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none' }}>
                 Wiki article →
               </a>
@@ -827,7 +833,7 @@ export default function ChroniclePanel({
                 <Pencil size={11} /> Suggest edit
               </button>
             )}
-            {e.wikiSlug && (
+            {showWikiLinks && e.wikiSlug && (
               <a href={`/chronicle/${e.wikiSlug}`} style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', textDecoration: 'none', alignSelf: 'center' }}>
                 Wiki article →
               </a>

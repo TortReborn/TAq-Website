@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { CHRONICLE_RESTRICTED } from '@/lib/chronicle-gate';
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams();
@@ -22,7 +23,10 @@ function UnauthorizedContent() {
   // Reaching this page still means signing in worked, and the Chronicle asks
   // only for a Discord account. Saying so here is the difference between
   // "you are locked out" and "the guild pages are, the history is not".
-  const chronicleNote = (
+  // Not while the Chronicle is under construction, though: anyone landing
+  // here is not a chronicler (the callback sends chroniclers straight to it),
+  // so the note would point at a 404 (TAQ-90).
+  const chronicleNote = CHRONICLE_RESTRICTED ? null : (
     <>
       You are signed in, though — the{' '}
       <Link href="/chronicle" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Chronicle</Link>{' '}
@@ -74,14 +78,16 @@ function UnauthorizedContent() {
           {message}
         </p>
 
-        <p style={{
-          color: 'var(--text-secondary)',
-          fontSize: '0.85rem',
-          margin: '-1rem 0 2rem',
-          lineHeight: '1.5',
-        }}>
-          {chronicleNote}
-        </p>
+        {chronicleNote && (
+          <p style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.85rem',
+            margin: '-1rem 0 2rem',
+            lineHeight: '1.5',
+          }}>
+            {chronicleNote}
+          </p>
+        )}
 
         <Link
           href="/"

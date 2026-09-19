@@ -14,6 +14,7 @@ import { useExecSession } from '@/hooks/useExecSession';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
 import { ViewAsContext, type ViewAsMode } from '@/hooks/useViewAs';
 import { useWikiSession } from '@/hooks/useWikiSession';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 
 const roboto = Roboto({
   weight: ['400', '500', '700', '900'],
@@ -43,7 +44,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [viewAs, setViewAs] = useState<ViewAsMode>('normal');
   const [viewAsOpen, setViewAsOpen] = useState(false);
   const { authenticated: realAuthenticated, isExec: realIsExec, user: realUser } = useExecSession();
-  const { reallyChronicler: isReallyChronicler } = useWikiSession();
+  // canReview honours the "view as" preview, so previewing as a non-chronicler
+  // hides the tab exactly as a real non-chronicler would see it (TAQ-90).
+  const { reallyChronicler: isReallyChronicler, canReview: wikiCanReview } = useWikiSession();
+  const showChronicle = canEnterChronicle({ canReview: wikiCanReview });
 
   // "View as" overrides for exec members to test other perspectives
   const authenticated = viewAs === 'non-member' ? false : realAuthenticated;
@@ -476,6 +480,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >Map</Link>
+            {showChronicle && (
             <NavLink
               href="/chronicle"
               style={{
@@ -496,6 +501,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >Chronicle</NavLink>
+            )}
             <NavLink
               href="/lootpools"
               style={{
@@ -980,6 +986,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   e.currentTarget.style.background = 'transparent';
                 }}
               >Map</Link>
+              {showChronicle && (
               <NavLink
                 href="/chronicle"
                 onClick={() => setMobileMenuOpen(false)}
@@ -999,6 +1006,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   e.currentTarget.style.background = 'transparent';
                 }}
               >Chronicle</NavLink>
+              )}
               <NavLink
                 href="/lootpools"
                 onClick={() => setMobileMenuOpen(false)}
