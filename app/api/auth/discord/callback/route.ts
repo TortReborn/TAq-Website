@@ -8,6 +8,7 @@ import {
   safeRedirectPath,
 } from '@/lib/exec-auth';
 import { setWikiSessionCookie } from '@/lib/wiki-auth';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 import { isChronicler } from '@/lib/wiki-db';
 import { getPool } from '@/lib/db';
 
@@ -62,8 +63,11 @@ export async function GET(request: NextRequest) {
       if (linkCheck.reason === 'not_in_guild') params.set('ign', linkCheck.ign);
       // Back where they came from if that was the Chronicle; otherwise the
       // page explaining what they can and cannot do here — except for a
-      // chronicler, for whom the Chronicle *is* the destination.
-      const target = storedRedirect?.startsWith('/chronicle')
+      // chronicler, for whom the Chronicle *is* the destination. While the
+      // Chronicle is under construction only a chronicler may go back to it;
+      // anyone else who started there would just land on its 404 (TAQ-90).
+      const mayEnterChronicle = canEnterChronicle({ canReview: chronicler });
+      const target = storedRedirect?.startsWith('/chronicle') && mayEnterChronicle
         ? storedRedirect
         : chronicler
           ? '/chronicle'

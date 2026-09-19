@@ -3,6 +3,7 @@ import { getPool } from '@/lib/db';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
 import { listUnverifiedPages, wikiAuthorshipStats } from '@/lib/wiki-db';
 import { canSeeRedacted, redactSummaries } from '@/lib/wiki-redaction';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,11 +17,12 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
+    const principal = await resolveWikiPrincipal(request);
+    if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     const pool = getPool();
-    const [pages, stats, principal] = await Promise.all([
+    const [pages, stats] = await Promise.all([
       listUnverifiedPages(pool),
       wikiAuthorshipStats(pool),
-      resolveWikiPrincipal(request),
     ]);
     return NextResponse.json({
       pages: canSeeRedacted(principal) ? pages : redactSummaries(pages),

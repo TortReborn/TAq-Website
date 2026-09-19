@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 import { WIKI_LIMITS, WIKI_PENDING_PER_USER, validateWikiPagePayload } from '@/lib/wiki';
 import { countPendingWikiBy, createWikiSubmission, getWikiPage } from '@/lib/wiki-db';
 
@@ -18,6 +19,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: NextRequest) {
   const principal = await resolveWikiPrincipal(request);
+  if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (!principal) {
     return NextResponse.json({ error: 'Sign in with Discord to suggest an edit' }, { status: 401 });
   }
