@@ -1,5 +1,5 @@
 // TAQ-26: Apply the blocked/archived status migration to dev + prod.
-// Reads DB_* (prod/Neon) and TEST_DB_* (dev/local) from .env.
+// Reads DB_* from .env (dev), or from prodctx when run through it (prod).
 
 const fs = require('fs');
 const path = require('path');
@@ -40,17 +40,10 @@ async function migrate(label, config) {
 }
 
 (async () => {
-  await migrate('DEV', {
-    user: process.env.TEST_DB_LOGIN,
-    password: process.env.TEST_DB_PASS,
-    host: process.env.TEST_DB_HOST,
-    port: parseInt(process.env.TEST_DB_PORT, 10),
-    database: process.env.TEST_DB_DATABASE,
-    ssl: process.env.TEST_DB_SSLMODE === 'require' ? { rejectUnauthorized: false } : false,
-    connectionTimeoutMillis: 5000,
-  });
-
-  await migrate('PROD', {
+  // One process, one database (TAQ-96): DB_* is dev from .env, or prod when
+  // run through `prodctx`. Run it twice to migrate both.
+  const label = process.env.PROD_DB_HOST ? 'PROD (prodctx)' : 'DEV (.env)';
+  await migrate(label, {
     user: process.env.DB_LOGIN,
     password: process.env.DB_PASS,
     host: process.env.DB_HOST,

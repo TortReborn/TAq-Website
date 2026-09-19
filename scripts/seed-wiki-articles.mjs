@@ -1,8 +1,8 @@
 // Seed Chronicle wiki articles from data/wiki/seed-articles.json.
 //
 //   node scripts/seed-wiki-articles.mjs --dry-run     validate only
-//   node scripts/seed-wiki-articles.mjs --dev         seed the TEST_DB_* database
-//   node scripts/seed-wiki-articles.mjs --prod        seed the DB_* database
+//   node scripts/seed-wiki-articles.mjs --dev            seed the dev database (DB_* from .env)
+//   prodctx node scripts/seed-wiki-articles.mjs --prod   seed production (DB_* from the vault)
 //
 // Pages are validated with lib/wiki validateWikiPagePayload and written through
 // lib/wiki-db (createWikiPage / editWikiPage), so every page lands with a
@@ -25,7 +25,7 @@ const useProd = args.includes('--prod');
 /** Overwrite pages a person has edited. Off by default — see the skip below. */
 const force = args.includes('--force');
 if (!dryRun && !useProd && !args.includes('--dev')) {
-  console.error('Pass --dry-run, --dev (TEST_DB_*) or --prod (DB_*).');
+  console.error('Pass --dry-run, --dev or --prod.');
   process.exit(2);
 }
 
@@ -81,7 +81,10 @@ for (const [src, out] of [['lib/wiki.ts', 'x-wiki.cjs'], ['lib/wiki-db.ts', 'x-w
 const wiki = require(path.join(tmp, 'x-wiki.cjs'));
 const wikiDb = require(path.join(tmp, 'x-wiki-db.cjs'));
 
-const env = (name) => (useProd ? process.env[name] : process.env[`TEST_${name}`]);
+// One set of names (TAQ-96): the flag asserts the context, prodctx supplies prod.
+if (useProd && !process.env.PROD_DB_HOST) { console.error('--prod needs `prodctx node …`.'); process.exit(2); }
+if (!useProd && process.env.PROD_DB_HOST) { console.error('--dev inside prodctx would hit production; drop prodctx.'); process.exit(2); }
+const env = (name) => process.env[name];
 const pool = dryRun ? null : new pg.Pool({
   host: env('DB_HOST'),
   port: parseInt(env('DB_PORT') || '5432'),

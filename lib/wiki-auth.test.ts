@@ -13,7 +13,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const SECRET = 'test-secret-for-wiki-auth';
 process.env.EXEC_SESSION_SECRET = SECRET;
-delete process.env.TEST_MODE;
 
 const chroniclers = new Set<string>();
 const links = new Map<string, { uuid: string; ign: string; rank: string }>();

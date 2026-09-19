@@ -9,19 +9,12 @@ export const dynamic = 'force-dynamic';
 
 // --- Discord channel posting helpers ---
 
-function isTestMode(): boolean {
-  const v = process.env.TEST_MODE;
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
-}
-
 function getBotToken(): string | undefined {
-  return isTestMode() ? process.env.TEST_DISCORD_BOT_TOKEN : process.env.DISCORD_BOT_TOKEN;
+  return process.env.DISCORD_BOT_TOKEN;
 }
 
 function getSnipeLogChannelId(): string | undefined {
-  return isTestMode() ? process.env.TEST_SNIPE_LOG_CHANNEL_ID : process.env.SNIPE_LOG_CHANNEL_ID;
+  return process.env.SNIPE_LOG_CHANNEL_ID;
 }
 
 function formatParticipantsLog(participants: { ign: string; role: string }[]): string {
