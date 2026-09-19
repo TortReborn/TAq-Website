@@ -14,26 +14,33 @@ const pg = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-// ── Load .env ───────────────────────────────────────────────────────────────
+// ── Load .env (optional) ────────────────────────────────────────────────────
+// Dev credentials come from the repo .env; under prodctx they arrive in the
+// real environment instead, and .env may not exist at all (clean checkout).
 const envPath = path.resolve(__dirname, '..', '.env');
-const envLines = fs.readFileSync(envPath, 'utf-8').split('\n');
 const env = {};
-for (const line of envLines) {
-  const trimmed = line.trim();
-  if (!trimmed || trimmed.startsWith('#')) continue;
-  const idx = trimmed.indexOf('=');
-  if (idx === -1) continue;
-  env[trimmed.slice(0, idx)] = trimmed.slice(idx + 1);
+if (fs.existsSync(envPath)) {
+  for (const line of fs.readFileSync(envPath, 'utf-8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const idx = trimmed.indexOf('=');
+    if (idx === -1) continue;
+    env[trimmed.slice(0, idx)] = trimmed.slice(idx + 1);
+  }
 }
 // The real environment wins over .env: that is how prodctx hands in prod values.
 for (const [k, v] of Object.entries(process.env)) {
   if (v !== undefined) env[k] = v;
 }
+if (!env.DB_HOST || !env.DB_LOGIN) {
+  console.error('No database credentials: add DB_* to .env for dev, or run through `prodctx` for prod.');
+  process.exit(1);
+}
 
 // ── Config ──────────────────────────────────────────────────────────────────
 const GUILD_IDS = {
   prod: '729147655875199017',
-  test: '1369134564450107412',
+  dev: '1369134564450107412',
 };
 
 // Discord role names → DB role values
@@ -45,7 +52,7 @@ const ROLE_MAP = {
 
 // prodctx sets DB_* / DISCORD_BOT_TOKEN to prod values in the child process
 // and leaves PROD_DB_HOST as the marker; without it, .env supplies dev.
-const TARGET = process.env.PROD_DB_HOST ? 'prod' : 'test';
+const TARGET = process.env.PROD_DB_HOST ? 'prod' : 'dev';
 
 const DB_CONFIG = {
   user: env.DB_LOGIN,
