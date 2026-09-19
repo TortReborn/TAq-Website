@@ -19,7 +19,8 @@
  * Target follows the convention of seed-wiki-articles.mjs:
  *   node scripts/_seed-chronicle-pre2018.mjs --prod --dry-run
  *   node scripts/_seed-chronicle-pre2018.mjs --prod --apply
- *   node scripts/_seed-chronicle-pre2018.mjs --dev  --apply   (TEST_DB_*)
+ *   node scripts/_seed-chronicle-pre2018.mjs --dev  --apply   (DB_* from .env)
+ *   --prod must be run through `prodctx`, which supplies the production DB_*.
  */
 import fs from 'fs';
 import path from 'path';
@@ -50,11 +51,20 @@ if (!apply && !process.argv.includes('--dry-run')) {
   process.exit(2);
 }
 if (!useProd && !process.argv.includes('--dev')) {
-  console.error('Pass --dev (TEST_DB_*) or --prod (DB_*).');
+  console.error('Pass --dev or --prod.');
   process.exit(2);
 }
-/** DB_* in prod, TEST_DB_* in dev — the app picks the same way via TEST_MODE. */
-const env = (n) => (useProd ? process.env[n] : process.env['TEST_' + n]);
+// One set of names (TAQ-96). --prod/--dev only assert which context this
+// process is in; the credentials themselves come from .env (dev) or prodctx.
+if (useProd && !process.env.PROD_DB_HOST) {
+  console.error('--prod needs the production context: run via `prodctx node …`.');
+  process.exit(2);
+}
+if (!useProd && process.env.PROD_DB_HOST) {
+  console.error('--dev inside prodctx would hit production; drop prodctx.');
+  process.exit(2);
+}
+const env = (n) => process.env[n];
 
 const D = (s) => `${s}T00:00:00Z`;
 
@@ -244,7 +254,7 @@ const pool = new pg.Pool({
   ssl: env('DB_SSLMODE') === 'disable' ? undefined : { rejectUnauthorized: false },
   max: 1,
 });
-console.log(`target: ${useProd ? 'prod (DB_*)' : 'dev (TEST_DB_*)'}`);
+console.log(`target: ${useProd ? 'prod (prodctx)' : 'dev (.env)'}`);
 
 assertAllClosed([...ALLIANCES, ...BACKFILL]);
 

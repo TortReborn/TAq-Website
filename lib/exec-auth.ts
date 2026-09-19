@@ -18,19 +18,8 @@ export interface ExecSessionData {
 const COOKIE_NAME = 'exec_session';
 const SESSION_TTL = 7 * 24 * 60 * 60; // 7 days in seconds
 
-function isTestMode(): boolean {
-  const v = process.env.TEST_MODE;
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
-}
-
-function pickEnv(name: string, nameTest: string): string | undefined {
-  return isTestMode() ? process.env[nameTest] : process.env[name];
-}
-
 function getSecret(): string {
-  const secret = pickEnv('EXEC_SESSION_SECRET', 'TEST_EXEC_SESSION_SECRET');
+  const secret = process.env.EXEC_SESSION_SECRET;
   if (!secret) throw new Error('EXEC_SESSION_SECRET is not set');
   return secret;
 }
@@ -170,7 +159,7 @@ export function safeRedirectPath(candidate: string | null | undefined): string |
 }
 
 export function getBaseUrl(): string {
-  return pickEnv('NEXT_PUBLIC_BASE_URL', 'TEST_NEXT_PUBLIC_BASE_URL') || 'http://localhost:3000';
+  return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 }
 
 // --- Discord OAuth2 configuration ---
@@ -202,8 +191,8 @@ export async function requireDolphinSession(request: NextRequest): Promise<ExecS
 }
 
 export function getDiscordOAuthUrl(state: string): string {
-  const clientId = pickEnv('DISCORD_CLIENT_ID', 'TEST_DISCORD_CLIENT_ID');
-  const redirectUri = pickEnv('DISCORD_REDIRECT_URI', 'TEST_DISCORD_REDIRECT_URI');
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  const redirectUri = process.env.DISCORD_REDIRECT_URI;
   if (!clientId || !redirectUri) {
     throw new Error('DISCORD_CLIENT_ID or DISCORD_REDIRECT_URI not set');
   }
@@ -220,9 +209,9 @@ export function getDiscordOAuthUrl(state: string): string {
 }
 
 export async function exchangeCodeForToken(code: string): Promise<string> {
-  const clientId = pickEnv('DISCORD_CLIENT_ID', 'TEST_DISCORD_CLIENT_ID');
-  const clientSecret = pickEnv('DISCORD_CLIENT_SECRET', 'TEST_DISCORD_CLIENT_SECRET');
-  const redirectUri = pickEnv('DISCORD_REDIRECT_URI', 'TEST_DISCORD_REDIRECT_URI');
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+  const redirectUri = process.env.DISCORD_REDIRECT_URI;
   if (!clientId || !clientSecret || !redirectUri) {
     throw new Error('Discord OAuth2 env vars not set');
   }

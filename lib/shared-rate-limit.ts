@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import type { NextRequest } from 'next/server';
 import { getPool } from '@/lib/db';
+import { rateLimitDisabled } from '@/lib/rate-limit';
 
 /**
  * A rate limiter that every serverless instance agrees on.
@@ -45,13 +46,6 @@ async function ensureTable(): Promise<void> {
   tableReady = true;
 }
 
-function isTestMode(): boolean {
-  const v = process.env.TEST_MODE;
-  if (!v) return false;
-  const s = v.toLowerCase().trim();
-  return s === '1' || s === 'true' || s === 'yes' || s === 'on';
-}
-
 /** The client's IP as the platform reports it. */
 export function clientIp(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for');
@@ -93,7 +87,7 @@ export async function consumeSharedRateLimit(
   const windowStartMs = Math.floor(now / WINDOW_MS) * WINDOW_MS;
   const resetTime = windowStartMs + WINDOW_MS;
 
-  if (isTestMode()) {
+  if (rateLimitDisabled()) {
     return { allowed: true, count: 0, limit, resetTime };
   }
 

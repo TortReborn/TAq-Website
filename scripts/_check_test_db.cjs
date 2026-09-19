@@ -1,19 +1,23 @@
-// Credentials come from TEST_DB_*, the same variables the vitest suite reads.
-// They are not written here: a password in a file gets committed, and this
-// repository is public.
+// Credentials come from DB_* (the dev database in .env), the same variables
+// the vitest suite reads. They are not written here: a password in a file
+// gets committed, and this repository is public.
 const pg = require('pg');
 
-if (!process.env.TEST_DB_LOGIN || !process.env.TEST_DB_PASS) {
-  process.stdout.write('set TEST_DB_LOGIN and TEST_DB_PASS first\n');
+if (process.env.PROD_DB_HOST) {
+  process.stdout.write('this checks the dev database; do not run it through prodctx\n');
+  process.exit(1);
+}
+if (!process.env.DB_LOGIN || !process.env.DB_PASS) {
+  process.stdout.write('set DB_LOGIN and DB_PASS first\n');
   process.exit(1);
 }
 
 const pool = new pg.Pool({
-  user: process.env.TEST_DB_LOGIN,
-  password: process.env.TEST_DB_PASS,
-  host: process.env.TEST_DB_HOST ?? '127.0.0.1',
-  port: Number(process.env.TEST_DB_PORT ?? 5432),
-  database: process.env.TEST_DB_DATABASE ?? 'tortreborn',
+  user: process.env.DB_LOGIN,
+  password: process.env.DB_PASS,
+  host: process.env.DB_HOST ?? '127.0.0.1',
+  port: Number(process.env.DB_PORT ?? 5432),
+  database: process.env.DB_DATABASE ?? 'tortreborn',
   ssl: false,
 });
 

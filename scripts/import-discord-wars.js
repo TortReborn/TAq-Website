@@ -6,7 +6,7 @@
  *   node scripts/import-discord-wars.js [path-to-deduped-csv]
  *
  * Defaults to the deduped file produced by dedup-war-log.js.
- * Uses DB_* env vars from .env (or TEST_DB_* if TEST_MODE=true).
+ * Uses DB_* from .env (dev); run through `prodctx` to target production.
  */
 
 import fs from 'fs';
@@ -81,16 +81,14 @@ function parseContent(content) {
 async function main() {
   loadEnv();
 
-  const isTest = (process.env.TEST_MODE || '').toLowerCase() === 'true';
-  const pick = (prod, test) => isTest ? process.env[test] : process.env[prod];
 
   const dbConfig = {
-    user:     pick('DB_LOGIN', 'TEST_DB_LOGIN'),
-    password: pick('DB_PASS', 'TEST_DB_PASS') || undefined,
-    host:     pick('DB_HOST', 'TEST_DB_HOST'),
-    port:     parseInt(pick('DB_PORT', 'TEST_DB_PORT')) || 5432,
-    database: pick('DB_DATABASE', 'TEST_DB_DATABASE'),
-    ssl:      (pick('DB_SSLMODE', 'TEST_DB_SSLMODE') || '').toLowerCase() === 'require'
+    user:     process.env.DB_LOGIN,
+    password: process.env.DB_PASS || undefined,
+    host:     process.env.DB_HOST,
+    port:     parseInt(process.env.DB_PORT) || 5432,
+    database: process.env.DB_DATABASE,
+    ssl:      (process.env.DB_SSLMODE || '').toLowerCase() === 'require'
                 ? { rejectUnauthorized: false } : undefined,
   };
 
