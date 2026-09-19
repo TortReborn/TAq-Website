@@ -25,11 +25,11 @@ function loadEnv() {
 loadEnv();
 
 const pool = new pg.Pool({
-  user: process.env.DB_LOGIN || process.env.TEST_DB_LOGIN,
-  password: process.env.DB_PASS || process.env.TEST_DB_PASS,
-  host: process.env.DB_HOST || process.env.TEST_DB_HOST,
-  port: parseInt(process.env.DB_PORT || process.env.TEST_DB_PORT || '5432'),
-  database: process.env.DB_DATABASE || process.env.TEST_DB_DATABASE,
+  user: process.env.DB_LOGIN,
+  password: process.env.DB_PASS,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_DATABASE,
   ssl: { rejectUnauthorized: false },
 });
 

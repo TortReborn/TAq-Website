@@ -8,8 +8,8 @@
  *   npx tsx --env-file=.env scripts/_check-activity-queries.ts
  *
  * --env-file is what supplies the credentials; without it the script has no
- * database to talk to. TEST_MODE in that file (or the environment) selects
- * dev over prod, exactly as lib/db.ts does.
+ * database to talk to. .env is the dev database; for prod run it through
+ * `prodctx` instead of --env-file, exactly as lib/db.ts is wired.
  */
 // pg is CommonJS: under a plain ESM run its named exports are not bindable,
 // unlike inside the Next bundler where lib/db.ts imports { Pool } directly.
@@ -21,15 +21,14 @@ import {
   type RangeKey,
 } from '../lib/activity-trends';
 
-const isTest = (process.env.TEST_MODE ?? '').toLowerCase().trim() === 'true';
-const p = (name: string) => process.env[`${isTest ? 'TEST_' : ''}${name}`];
+const p = (name: string) => process.env[name];
 
 if (!p('DB_HOST')) {
   console.error('No database configured. Run with:  npx tsx --env-file=.env scripts/_check-activity-queries.ts');
   process.exit(1);
 }
 
-console.log(`database: ${p('DB_DATABASE')} @ ${p('DB_HOST')} (TEST_MODE=${isTest})\n`);
+console.log(`database: ${p('DB_DATABASE')} @ ${p('DB_HOST')}${process.env.PROD_DB_HOST ? ' (prodctx)' : ''}\n`);
 
 const pool = new pg.Pool({
   user: p('DB_LOGIN'),

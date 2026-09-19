@@ -1,18 +1,11 @@
 import { getPool } from './db';
+import { rateLimitDisabled } from './rate-limit';
 
 interface CacheEntry<T> {
   cache_key: string;
   data: T;
   created_at: Date;
   expires_at: Date;
-}
-
-// Helper function to check if TEST_MODE is enabled
-function isTestMode(): boolean {
-  const testMode = process.env.TEST_MODE;
-  if (!testMode) return false;
-  const s = testMode.toLowerCase().trim();
-  return s === "1" || s === "true" || s === "yes" || s === "on";
 }
 
 class SimpleDatabaseCache {
@@ -82,8 +75,7 @@ class SimpleDatabaseCache {
 
   // Rate limiting check
   private checkRateLimit(key: string, requestId?: string): { allowed: boolean; remaining: number; resetTime: number } {
-    // Skip rate limiting in TEST_MODE
-    if (isTestMode()) {
+    if (rateLimitDisabled()) {
       return {
         allowed: true,
         remaining: 999999,

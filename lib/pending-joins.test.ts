@@ -3,17 +3,17 @@ import { Pool } from 'pg';
 import { countPendingJoins } from './pending-joins';
 
 // Integration test against the local test database (same instance
-// scripts/_check_test_db.cjs targets, overridable via TEST_DB_* env vars).
+// scripts/_check_test_db.cjs targets, overridable via DB_* env vars).
 // All data lives in session-scoped TEMP tables, which shadow the real
 // applications/discord_links/membership_stints tables for unqualified names —
 // nothing in the test database is touched. Skipped when the database is
 // unreachable.
 const config = {
-  user: process.env.TEST_DB_LOGIN || 'tortuser',
-  password: process.env.TEST_DB_PASS || 'UserPass123',
-  host: process.env.TEST_DB_HOST || '127.0.0.1',
-  port: Number(process.env.TEST_DB_PORT) || 5432,
-  database: process.env.TEST_DB_DATABASE || 'tortreborn',
+  user: process.env.DB_LOGIN || 'tortuser',
+  password: process.env.DB_PASS || 'UserPass123',
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: Number(process.env.DB_PORT) || 5432,
+  database: process.env.DB_DATABASE || 'tortreborn',
   ssl: undefined,
   // One connection so every query sees the same temp tables.
   max: 1,
