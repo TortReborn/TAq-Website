@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { canSeeRedacted, isRedactedSlug, redactText } from '@/lib/wiki-redaction';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
 import fs from 'fs';
 import path from 'path';
@@ -106,6 +107,7 @@ export async function GET() {
     // page must not appear in that list, and a source title must not name its
     // subject there either.
     const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
+    if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     const unredacted = canSeeRedacted(principal);
     const slugsOut = (slugs: Set<string>) =>
       (unredacted ? [...slugs] : [...slugs].filter((s) => !isRedactedSlug(s))).sort();

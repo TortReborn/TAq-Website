@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { getWikiImage, isPubliclyAddressable, type WikiImageBackend } from '@/lib/wiki-image-storage';
+import { resolveWikiPrincipal } from '@/lib/wiki-auth';
+import { CHRONICLE_RESTRICTED, canEnterChronicle } from '@/lib/chronicle-gate';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +23,11 @@ export const dynamic = 'force-dynamic';
  * publish rights stays 'pending' and gets neither a redirect nor bytes, so it
  * cannot be surfaced by guessing an id.
  */
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Under construction: images are Chronicle content too (TAQ-90).
+  const principal = await resolveWikiPrincipal(request).catch(() => null);
+  if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
   const { id: rawId } = await context.params;
   const id = Number(rawId);
   if (!Number.isInteger(id) || id <= 0) {
@@ -41,13 +47,23 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       return NextResponse.json({ error: 'Image not available' }, { status: 404 });
     }
 
+    // Content at a given id never changes, so it may be cached for a year --
+    // but while the Chronicle is restricted only in the viewer's own browser.
+    // A shared (CDN) copy fetched by a reviewer would otherwise be served to
+    // the next anonymous request, sidestepping the gate above.
+    const cacheControl = CHRONICLE_RESTRICTED
+      ? 'private, max-age=31536000, immutable'
+      : 'public, max-age=31536000, immutable';
+
     const backend = (row.backend as WikiImageBackend) ?? 's3';
     if (isPubliclyAddressable(backend)) {
       // 308 rather than 302: the mapping from id to blob URL never changes, so
-      // browsers and intermediaries may cache the redirect permanently.
+      // browsers and intermediaries may cache the redirect permanently. While
+      // restricted the redirect itself is not cached at all: the target is a
+      // public blob URL, and the redirect is the only thing that hands it out.
       return NextResponse.redirect(row.s3_key, {
         status: 308,
-        headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
+        headers: { 'Cache-Control': CHRONICLE_RESTRICTED ? 'private, no-store' : 'public, max-age=31536000, immutable' },
       });
     }
 
@@ -57,8 +73,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return new NextResponse(new Uint8Array(bytes), {
       headers: {
         'Content-Type': row.mime || 'image/webp',
-        // Content at a given id never changes — a new upload gets a new id.
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Cache-Control': cacheControl,
       },
     });
   } catch (error) {

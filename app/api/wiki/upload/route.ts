@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import sharp from 'sharp';
 import { getPool } from '@/lib/db';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
+import { canEnterChronicle } from '@/lib/chronicle-gate';
 import { recordWikiImage } from '@/lib/wiki-db';
 import { putWikiImage, activeImageBackend } from '@/lib/wiki-image-storage';
 import {
@@ -35,6 +36,7 @@ const ALLOWED = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
  */
 export async function POST(request: NextRequest) {
   const principal = await resolveWikiPrincipal(request);
+  if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (!principal) {
     return NextResponse.json(
       { error: 'Sign in with Discord to upload images' },
