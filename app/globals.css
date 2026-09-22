@@ -1370,27 +1370,37 @@ body.site-fixed-bg-active > footer {
   border-radius: 0.5rem;
 }
 
-/* ========== THEMED SCROLLBAR ========== */
-.themed-scrollbar {
+/* ========== SCROLLBAR ==========
+   Applied globally so every scrollable element — the page, exec panels,
+   modals — uses the same themed scrollbar instead of the browser default. */
+* {
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
 }
 
-.themed-scrollbar::-webkit-scrollbar {
-  width: 6px;
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.themed-scrollbar::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.themed-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 6px;
 }
 
-.themed-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* ========== PAGE TRANSITIONS ========== */
