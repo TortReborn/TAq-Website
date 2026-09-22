@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useExecActivity } from '@/hooks/useExecActivity';
 import { useKickList } from '@/hooks/useKickList';
+import { useMemberNotes } from '@/hooks/useMemberNotes';
 import ExecActivityTable from '@/components/ExecActivityTable';
 import KickListPanel from '@/components/KickListPanel';
 
 export default function ExecActivityPage() {
   const { data, loading, error, refresh } = useExecActivity();
   const kickList = useKickList();
+  const memberNotes = useMemberNotes();
   const [timeFrame, setTimeFrame] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('exec_activity_timeframe') || '7';
     return '7';
@@ -149,7 +151,7 @@ export default function ExecActivityPage() {
       <div style={{
         display: 'flex',
         gap: '1.25rem',
-        alignItems: 'flex-start',
+        alignItems: 'stretch',
         flexWrap: 'wrap',
       }}>
         {/* Left panel — Activity */}
@@ -284,6 +286,10 @@ export default function ExecActivityPage() {
           onAddToKickList={kickList.addToKickList}
           onRemoveFromKickList={kickList.removeFromKickList}
           kickListUuids={new Set(kickList.entries.map(e => e.uuid))}
+          notesByUuid={memberNotes.notesByUuid}
+          onRequestActivitySort={() => handleSortMode('activity')}
+          onSaveNote={memberNotes.saveNote}
+          onDeleteNote={memberNotes.deleteNote}
         />
       </div>
 

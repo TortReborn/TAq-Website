@@ -3,7 +3,9 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { ExecMember } from '@/hooks/useExecActivity';
+import type { MemberNote } from '@/hooks/useMemberNotes';
 import { RANK_ORDER, RANK_COLORS } from '@/lib/rank-constants';
+import MemberNoteIcon from './MemberNoteIcon';
 
 type SortKey = 'username' | 'discordRank' | 'playtime' | 'wars' | 'raids' | 'inactiveDays' | 'kickScore' | 'daysInGuild';
 
@@ -31,6 +33,10 @@ interface Props {
   onAddToKickList?: (uuid: string, ign: string, tier: number) => void;
   onRemoveFromKickList?: (uuid: string) => void;
   kickListUuids?: Set<string>;
+  notesByUuid?: Record<string, MemberNote>;
+  onSaveNote?: (uuid: string, note: string) => Promise<void>;
+  onDeleteNote?: (uuid: string) => Promise<void>;
+  onRequestActivitySort?: () => void;
 }
 
 const TIER_BUTTONS = [
@@ -39,13 +45,16 @@ const TIER_BUTTONS = [
   { tier: 3, label: 'T3', color: '#3b82f6' },
 ];
 
-export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, weeklyHours, onAddToKickList, onRemoveFromKickList, kickListUuids }: Props) {
+export default function ExecActivityTable({ members, timeFrame, searchTerm, sortMode, weeklyHours, onAddToKickList, onRemoveFromKickList, kickListUuids, notesByUuid, onSaveNote, onDeleteNote, onRequestActivitySort }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>(sortMode === 'kick' ? 'kickScore' : 'playtime');
   const [sortDir, setSortDir] = useState<SortDirection>(sortMode === 'kick' ? 'asc' : 'desc');
   const [hoveredUuid, setHoveredUuid] = useState<string | null>(null);
 
   const handleSort = (key: SortKey) => {
-    if (sortMode === 'kick') return;
+    // Clicking a column header always sorts by it — like every other exec
+    // table — even while "Kick Suitability" is active; it just steps out of
+    // that curated ordering back to a plain column sort to do it.
+    if (sortMode === 'kick') onRequestActivitySort?.();
     if (sortKey === key) {
       setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
@@ -125,30 +134,52 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
 
   const isKickMode = sortMode === 'kick';
 
-  const SortHeader = ({ label, sortKeyName, width }: { label: string; sortKeyName: SortKey; width?: string }) => (
-    <th
-      onClick={() => handleSort(sortKeyName)}
-      style={{
-        padding: '0.75rem 0.5rem',
-        textAlign: 'left',
-        fontSize: '0.75rem',
-        fontWeight: '600',
-        color: !isKickMode && sortKey === sortKeyName ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        cursor: isKickMode ? 'default' : 'pointer',
-        userSelect: 'none',
-        width: width || 'auto',
-        whiteSpace: 'nowrap',
-        borderBottom: '1px solid var(--border-card)',
-      }}
-    >
-      {label} {!isKickMode && sortKey === sortKeyName ? (sortDir === 'asc' ? '\u25B2' : '\u25BC') : ''}
-    </th>
-  );
+  const SortHeader = ({ label, sortKeyName, width, align = 'left' }: { label: string; sortKeyName: SortKey; width?: string; align?: 'left' | 'right' }) => {
+    const active = !isKickMode && sortKey === sortKeyName;
+    const arrow = active ? (sortDir === 'asc' ? '\u25B2' : '\u25BC') : '\u2195';
+    return (
+      <th
+        style={{
+          padding: '0.6rem 0.4rem',
+          textAlign: align,
+          fontSize: '0.75rem',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          width: width || 'auto',
+          whiteSpace: 'nowrap',
+          borderBottom: '1px solid var(--border-card)',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => handleSort(sortKeyName)}
+          aria-label={`Sort by ${label}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+            padding: 0,
+            border: 'none',
+            background: 'transparent',
+            color: active ? 'var(--color-ocean-400)' : 'var(--text-secondary)',
+            font: 'inherit',
+            letterSpacing: 'inherit',
+            textTransform: 'inherit',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-ocean-400)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = active ? 'var(--color-ocean-400)' : 'var(--text-secondary)'; }}
+        >
+          <span>{label}</span>
+          <span aria-hidden="true" style={{ fontSize: '0.65rem', opacity: active ? 1 : 0.5 }}>{arrow}</span>
+        </button>
+      </th>
+    );
+  };
 
   const thStyle: React.CSSProperties = {
-    padding: '0.75rem 0.5rem',
+    padding: '0.6rem 0.4rem',
     textAlign: 'left',
     fontSize: '0.75rem',
     fontWeight: '600',
@@ -159,34 +190,43 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
   };
 
   const cellBorder = '1px solid rgba(255,255,255,0.05)';
+  const numericTd: React.CSSProperties = {
+    padding: '0.5rem 0.4rem',
+    borderBottom: cellBorder,
+    textAlign: 'right',
+    whiteSpace: 'nowrap',
+  };
 
   return (
-    <div style={{
-      overflowX: 'auto',
+    <div className="themed-scrollbar" style={{
+      overflow: 'auto',
+      height: 'clamp(320px, calc(100vh - 24rem), 900px)',
+      width: 'fit-content',
+      maxWidth: '100%',
       borderRadius: '0.75rem',
       border: '1px solid var(--border-card)',
-      background: 'var(--bg-card)',
+      background: 'var(--bg-card-solid)',
     }}>
       <table style={{
-        width: '100%',
+        tableLayout: 'fixed',
         borderCollapse: 'collapse',
         fontSize: '0.85rem',
       }}>
-        <thead>
+        <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-card-solid)' }}>
           <tr>
             {onAddToKickList && (
               <th style={{ ...thStyle, textAlign: 'center', width: '80px' }}>
                 Kick List
               </th>
             )}
-            <SortHeader label="Player" sortKeyName="username" width="160px" />
+            <SortHeader label="Player" sortKeyName="username" width="175px" />
             <SortHeader label="Rank" sortKeyName="discordRank" width="100px" />
-            <SortHeader label={`Playtime (${timeFrame}d)`} sortKeyName="playtime" />
-            <SortHeader label={`Wars (${timeFrame}d)`} sortKeyName="wars" />
-            <SortHeader label={`Raids (${timeFrame}d)`} sortKeyName="raids" />
-            <SortHeader label="Last Seen" sortKeyName="inactiveDays" />
-            <SortHeader label="Member For" sortKeyName="daysInGuild" />
-            <th style={thStyle}>
+            <SortHeader label={`Playtime (${timeFrame}d)`} sortKeyName="playtime" width="126px" align="right" />
+            <SortHeader label={`Wars (${timeFrame}d)`} sortKeyName="wars" width="96px" align="right" />
+            <SortHeader label={`Raids (${timeFrame}d)`} sortKeyName="raids" width="102px" align="right" />
+            <SortHeader label="Last Seen" sortKeyName="inactiveDays" width="100px" align="right" />
+            <SortHeader label="Member For" sortKeyName="daysInGuild" width="108px" align="right" />
+            <th style={{ ...thStyle, width: '90px' }}>
               Status
             </th>
           </tr>
@@ -221,7 +261,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
               >
                 {onAddToKickList && (
                   <td style={{
-                    padding: '0.625rem 0.5rem',
+                    padding: '0.5rem 0.4rem',
                     borderBottom: cellBorder,
                     textAlign: 'center',
                   }}>
@@ -274,12 +314,12 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   </td>
                 )}
                 <td style={{
-                  padding: '0.625rem 0.5rem',
+                  padding: '0.5rem 0.4rem',
                   borderBottom: cellBorder,
                   fontWeight: '600',
                   color: 'var(--text-primary)',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     {member.online && (
                       <div style={{
                         width: '6px', height: '6px', borderRadius: '50%',
@@ -296,14 +336,25 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                         color: 'inherit',
                         textDecoration: isHovered ? 'underline' : 'none',
                         textUnderlineOffset: '2px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {member.username}
                     </Link>
+                    {notesByUuid?.[member.uuid] && onSaveNote && onDeleteNote && (
+                      <MemberNoteIcon
+                        uuid={member.uuid}
+                        username={member.username}
+                        note={notesByUuid[member.uuid]}
+                        onSave={onSaveNote}
+                        onDelete={onDeleteNote}
+                      />
+                    )}
                   </div>
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
+                  padding: '0.5rem 0.4rem',
                   borderBottom: cellBorder,
                 }}>
                   <span style={{
@@ -315,30 +366,26 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   </span>
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: cellBorder,
+                  ...numericTd,
                   color: belowThreshold ? '#ef4444' : 'var(--text-primary)',
                   fontWeight: belowThreshold ? '600' : '400',
                 }}>
                   {tf?.hasCompleteData ? `${tf.playtime.toFixed(1)}h` : '-'}
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: cellBorder,
+                  ...numericTd,
                   color: 'var(--text-primary)',
                 }}>
                   {tf?.hasCompleteData ? tf.wars : '-'}
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: cellBorder,
+                  ...numericTd,
                   color: 'var(--text-primary)',
                 }}>
                   {tf?.hasCompleteData ? tf.raids : '-'}
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: cellBorder,
+                  ...numericTd,
                   color: member.inactiveDays !== null && member.inactiveDays > 7 ? '#f59e0b' : 'var(--text-secondary)',
                 }}>
                   {member.online
@@ -349,15 +396,14 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   }
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
-                  borderBottom: cellBorder,
+                  ...numericTd,
                   color: member.isNewMember ? '#a855f7' : 'var(--text-secondary)',
                   fontWeight: member.isNewMember ? '600' : '400',
                 }}>
                   {member.daysInGuild}d
                 </td>
                 <td style={{
-                  padding: '0.625rem 0.5rem',
+                  padding: '0.5rem 0.4rem',
                   borderBottom: cellBorder,
                 }}>
                   {PINNED_BOTTOM.has(member.username) ? (

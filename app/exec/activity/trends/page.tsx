@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useExecActivity } from '@/hooks/useExecActivity';
+import { useMemberNotes } from '@/hooks/useMemberNotes';
 import TrendChart from '@/components/charts/TrendChart';
 import ActivityHeatmap from '@/components/charts/ActivityHeatmap';
 import StatTile from '@/components/charts/StatTile';
+import MemberNoteEditor from '@/components/MemberNoteEditor';
 import {
   useActivityTrend, useActivityHeatmap,
   type TrendMetric, type TrendRange,
@@ -273,6 +275,9 @@ export default function ExecTrendsPage() {
   const [heatMetric, setHeatMetric] = useState<TrendMetric>('captures');
   const [tz, setTz] = useState('UTC');
   const [showNotes, setShowNotes] = useState(false);
+  const memberNotes = useMemberNotes();
+  const [noteEditorOpen, setNoteEditorOpen] = useState(false);
+  const currentNote = uuid ? memberNotes.notesByUuid[uuid] : undefined;
 
   // Resolved after mount: the server cannot know the viewer's zone, and
   // guessing during render would desync hydration. A remembered choice wins
@@ -346,6 +351,57 @@ export default function ExecTrendsPage() {
             status is missing from the hour-by-hour view, because Wynncraft will not say
             {' '}<em>which</em> members are online.
           </p>
+
+          {uuid && (
+            <div style={{
+              marginTop: '0.75rem', maxWidth: '62ch',
+              background: 'var(--bg-card)', border: '1px solid var(--border-card)',
+              borderRadius: '0.625rem', padding: '0.75rem 0.9rem',
+              display: 'flex', gap: '0.75rem',
+              alignItems: currentNote ? 'flex-start' : 'center',
+              justifyContent: currentNote ? 'space-between' : 'center',
+            }}>
+              {currentNote ? (
+                <>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.25rem' }}>
+                      Note
+                    </div>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-primary)', margin: 0, whiteSpace: 'pre-wrap' }}>
+                      {currentNote.note}
+                    </p>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
+                      {currentNote.updatedBy} &middot; {new Date(currentNote.updatedAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setNoteEditorOpen(true)}
+                    style={{
+                      flexShrink: 0, padding: '0.3rem 0.7rem', borderRadius: '0.375rem',
+                      border: '1px solid var(--border-card)', background: 'transparent',
+                      color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
+                    }}
+                  >
+                    Edit
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>No note on this member</span>
+                  <button
+                    onClick={() => setNoteEditorOpen(true)}
+                    style={{
+                      flexShrink: 0, padding: '0.3rem 0.7rem', borderRadius: '0.375rem',
+                      border: '1px solid var(--color-ocean-500)', background: 'transparent',
+                      color: 'var(--color-ocean-400)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
+                    }}
+                  >
+                    Add note
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: '0 0 1.25rem', maxWidth: '62ch' }}>
@@ -571,6 +627,16 @@ export default function ExecTrendsPage() {
             Switch any chart to its table view to see what share of each bucket was adjusted.
           </p>
         </div>
+      )}
+
+      {uuid && noteEditorOpen && (
+        <MemberNoteEditor
+          username={scopeLabel}
+          initialNote={currentNote?.note ?? ''}
+          onClose={() => setNoteEditorOpen(false)}
+          onSave={(text) => memberNotes.saveNote(uuid, text)}
+          onDelete={currentNote ? () => memberNotes.deleteNote(uuid) : undefined}
+        />
       )}
     </div>
   );

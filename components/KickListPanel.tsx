@@ -67,10 +67,12 @@ export default function KickListPanel({
       borderRadius: '0.75rem',
       border: '1px solid var(--border-card)',
       padding: '1.25rem',
-      height: 'fit-content',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       {/* Header */}
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1rem', flexShrink: 0 }}>
         <h2 style={{
           fontSize: '1.1rem',
           fontWeight: '700',
@@ -112,7 +114,7 @@ export default function KickListPanel({
       {/* Add player (only when members data is available) */}
       {members && onAdd && (
         <>
-          <div style={{ position: 'relative', marginBottom: '1rem' }}>
+          <div style={{ position: 'relative', marginBottom: '1rem', flexShrink: 0 }}>
             <div style={{ display: 'flex', gap: '0.375rem' }}>
               <input
                 type="text"
@@ -207,7 +209,8 @@ export default function KickListPanel({
         </>
       )}
 
-      {/* Tier sections */}
+      {/* Tier sections — the one part of the panel that scrolls */}
+      <div className="themed-scrollbar" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
       {loading && entries.length === 0 ? (
         <div style={{
           color: 'var(--text-secondary)',
@@ -375,6 +378,7 @@ export default function KickListPanel({
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }
