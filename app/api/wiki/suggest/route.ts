@@ -4,8 +4,14 @@ import { resolveWikiPrincipal } from '@/lib/wiki-auth';
 import { canEnterChronicle } from '@/lib/chronicle-gate';
 import { WIKI_LIMITS, WIKI_PENDING_PER_USER, validateWikiPagePayload } from '@/lib/wiki';
 import { countPendingWikiBy, createWikiSubmission, getWikiPage } from '@/lib/wiki-db';
+import { createRateLimitResponse } from '@/lib/rate-limit';
+import { consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 
 export const dynamic = 'force-dynamic';
+
+// The pending cap bounds how much waits for review; this bounds how fast one
+// account can hit the validation and database work to get there.
+const SHARED_LIMIT_PER_MINUTE = 10;
 
 /**
  * Any signed-in Discord account can suggest a new page or an edit; suggestions
@@ -22,6 +28,10 @@ export async function POST(request: NextRequest) {
   if (!canEnterChronicle(principal)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (!principal) {
     return NextResponse.json({ error: 'Sign in with Discord to suggest an edit' }, { status: 401 });
+  }
+  const shared = await consumeSharedRateLimit('wiki-suggest', `discord:${principal.discordId}`, SHARED_LIMIT_PER_MINUTE);
+  if (!shared.allowed) {
+    return createRateLimitResponse(shared.resetTime);
   }
 
   let body: unknown;
