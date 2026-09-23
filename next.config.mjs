@@ -28,11 +28,12 @@ const nextConfig = {
     return [
       {
         // Baseline security headers on every response. Vercel adds HSTS on
-        // its own; the rest is ours. The CSP is report-only for now: the
-        // theme-flash script in layout.tsx and the early-fetch in map/page.tsx
-        // are inline, so enforcing it needs nonces first. Watch the browser
-        // console for violations, tighten, then rename the header to
-        // Content-Security-Policy.
+        // its own; the rest is ours. script-src keeps 'unsafe-inline': Next's
+        // inline flight-data scripts can only be allowed by nonce, and a nonce
+        // forces every page to render per request. Dropping it only pays off
+        // while something renders untrusted HTML, and nothing does — the only
+        // dangerouslySetInnerHTML uses are the static scripts in layout.tsx
+        // and map/page.tsx, and react-markdown runs without rehype-raw.
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -40,7 +41,7 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=()' },
           {
-            key: 'Content-Security-Policy-Report-Only',
+            key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
