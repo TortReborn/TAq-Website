@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
+import { clientIp, consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
+
+// A cache miss fetches the whole guild list upstream and writes it back, so the
+// bound has to hold across serverless instances, not just within one.
+const SHARED_LIMIT_PER_MINUTE = 20;
 
 interface GuildColorData {
   _id: string;
@@ -20,6 +25,10 @@ export async function POST(request: NextRequest) {
 
   // Increment rate limit counter
   incrementRateLimit(request, 'guild-colors');
+  const shared = await consumeSharedRateLimit('guild-colors', clientIp(request), SHARED_LIMIT_PER_MINUTE);
+  if (!shared.allowed) {
+    return createRateLimitResponse(shared.resetTime);
+  }
 
   try {
     // Get requested guild names from request body
