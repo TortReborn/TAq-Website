@@ -11,10 +11,16 @@ import {
   compressWikiImage,
   formatBytes,
 } from '@/lib/wiki-image-compress';
+import { createRateLimitResponse } from '@/lib/rate-limit';
+import { consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 const ALLOWED = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
+
+// Any signed-in Discord account may upload, and every upload is a sharp
+// re-encode plus a stored object, so this is the one bound on that cost.
+const SHARED_LIMIT_PER_MINUTE = 15;
 
 /**
  * Wiki image upload.
@@ -42,6 +48,10 @@ export async function POST(request: NextRequest) {
       { error: 'Sign in with Discord to upload images' },
       { status: 401 },
     );
+  }
+  const shared = await consumeSharedRateLimit('wiki-upload', `discord:${principal.discordId}`, SHARED_LIMIT_PER_MINUTE);
+  if (!shared.allowed) {
+    return createRateLimitResponse(shared.resetTime, SHARED_LIMIT_PER_MINUTE);
   }
   const uploaderId = principal.discordId;
   const canPublish = principal.canPublish;

@@ -400,28 +400,6 @@ class SimpleDatabaseCache {
       client.release();
     }
   }
-
-  async setGuildColors(guilds: any[], clientIP: string): Promise<void> {
-    try {
-      await this.initializeTable();
-      
-      const client = await this.pool.connect();
-      try {
-        await client.query(
-          `INSERT INTO cache_entries (cache_key, data, expires_at) 
-           VALUES ('guildColors', $1, NOW() + INTERVAL '1 hour')
-           ON CONFLICT (cache_key) 
-           DO UPDATE SET data = $1, expires_at = NOW() + INTERVAL '1 hour'`,
-          [JSON.stringify(guilds)]
-        );
-      } finally {
-        client.release();
-      }
-    } catch (error) {
-      console.error('Error setting guild colors in cache:', error);
-      // Don't throw - let the caller handle fallback
-    }
-  }
 }
 
 // Singleton instance
