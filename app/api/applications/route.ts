@@ -3,8 +3,13 @@ import { getPool } from '@/lib/db';
 import { getSession, clearSessionCookie } from '@/lib/auth';
 import { getQuestionsForType } from '@/lib/application-questions';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
+import { consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 
 export const dynamic = 'force-dynamic';
+
+// The 30-minute cooldown below only counts accepted submissions; this bounds
+// attempts per account across every serverless instance.
+const SHARED_LIMIT_PER_MINUTE = 10;
 
 export async function POST(request: NextRequest) {
   // Rate limit
@@ -21,6 +26,10 @@ export async function POST(request: NextRequest) {
       { error: 'Discord authentication required. Please use the link from Discord.' },
       { status: 401 }
     );
+  }
+  const shared = await consumeSharedRateLimit('applications', `discord:${session.discord_id}`, SHARED_LIMIT_PER_MINUTE);
+  if (!shared.allowed) {
+    return createRateLimitResponse(shared.resetTime, SHARED_LIMIT_PER_MINUTE);
   }
 
   try {

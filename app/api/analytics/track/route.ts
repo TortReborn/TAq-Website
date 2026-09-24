@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
   incrementRateLimit(request, 'analytics');
   const shared = await consumeSharedRateLimit('analytics', clientIp(request), SHARED_LIMIT_PER_MINUTE);
   if (!shared.allowed) {
-    return createRateLimitResponse(shared.resetTime);
+    return createRateLimitResponse(shared.resetTime, SHARED_LIMIT_PER_MINUTE);
   }
 
   const session = getExecSession(request);
