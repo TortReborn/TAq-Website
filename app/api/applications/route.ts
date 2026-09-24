@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
   const shared = await consumeSharedRateLimit('applications', `discord:${session.discord_id}`, SHARED_LIMIT_PER_MINUTE);
   if (!shared.allowed) {
-    return createRateLimitResponse(shared.resetTime);
+    return createRateLimitResponse(shared.resetTime, SHARED_LIMIT_PER_MINUTE);
   }
 
   try {

@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
   const shared = await consumeSharedRateLimit('wiki-upload', `discord:${principal.discordId}`, SHARED_LIMIT_PER_MINUTE);
   if (!shared.allowed) {
-    return createRateLimitResponse(shared.resetTime);
+    return createRateLimitResponse(shared.resetTime, SHARED_LIMIT_PER_MINUTE);
   }
   const uploaderId = principal.discordId;
   const canPublish = principal.canPublish;
