@@ -117,7 +117,8 @@ export function incrementRateLimit(request: NextRequest, endpoint?: string): voi
   }
 }
 
-export function createRateLimitResponse(resetTime: number): NextResponse {
+/** `limit` is what X-RateLimit-Limit advertises: pass the limit that refused the request. */
+export function createRateLimitResponse(resetTime: number, limit: number = MAX_REQUESTS_PER_WINDOW): NextResponse {
   const timeUntilReset = Math.ceil((resetTime - Date.now()) / 1000);
   
   return NextResponse.json(
@@ -130,7 +131,7 @@ export function createRateLimitResponse(resetTime: number): NextResponse {
       status: 429,
       headers: {
         'Retry-After': timeUntilReset.toString(),
-        'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
+        'X-RateLimit-Limit': limit.toString(),
         'X-RateLimit-Remaining': '0',
         'X-RateLimit-Reset': Math.ceil(resetTime / 1000).toString()
       }
