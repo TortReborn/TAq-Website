@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse } from './lib/rate-limit';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Only apply rate limiting to API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     // Analytics flushes every 15s from every open tab, so it stays out of the
