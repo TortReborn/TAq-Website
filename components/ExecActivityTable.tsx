@@ -134,14 +134,14 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
 
   const isKickMode = sortMode === 'kick';
 
-  const SortHeader = ({ label, sortKeyName, width, align = 'left' }: { label: string; sortKeyName: SortKey; width?: string; align?: 'left' | 'right' }) => {
+  const SortHeader = ({ label, sortKeyName, width }: { label: string; sortKeyName: SortKey; width?: string }) => {
     const active = !isKickMode && sortKey === sortKeyName;
     const arrow = active ? (sortDir === 'asc' ? '\u25B2' : '\u25BC') : '\u2195';
     return (
       <th
         style={{
-          padding: '0.6rem 0.4rem',
-          textAlign: align,
+          padding: '0.75rem 0.5rem',
+          textAlign: 'left',
           fontSize: '0.75rem',
           fontWeight: '600',
           textTransform: 'uppercase',
@@ -179,7 +179,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
   };
 
   const thStyle: React.CSSProperties = {
-    padding: '0.6rem 0.4rem',
+    padding: '0.75rem 0.5rem',
     textAlign: 'left',
     fontSize: '0.75rem',
     fontWeight: '600',
@@ -190,25 +190,17 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
   };
 
   const cellBorder = '1px solid rgba(255,255,255,0.05)';
-  const numericTd: React.CSSProperties = {
-    padding: '0.5rem 0.4rem',
-    borderBottom: cellBorder,
-    textAlign: 'right',
-    whiteSpace: 'nowrap',
-  };
 
   return (
     <div className="themed-scrollbar" style={{
       overflow: 'auto',
       height: 'clamp(320px, calc(100vh - 24rem), 900px)',
-      width: 'fit-content',
-      maxWidth: '100%',
       borderRadius: '0.75rem',
       border: '1px solid var(--border-card)',
       background: 'var(--bg-card-solid)',
     }}>
       <table style={{
-        tableLayout: 'fixed',
+        width: '100%',
         borderCollapse: 'collapse',
         fontSize: '0.85rem',
       }}>
@@ -219,14 +211,14 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                 Kick List
               </th>
             )}
-            <SortHeader label="Player" sortKeyName="username" width="175px" />
+            <SortHeader label="Player" sortKeyName="username" width="160px" />
             <SortHeader label="Rank" sortKeyName="discordRank" width="100px" />
-            <SortHeader label={`Playtime (${timeFrame}d)`} sortKeyName="playtime" width="126px" align="right" />
-            <SortHeader label={`Wars (${timeFrame}d)`} sortKeyName="wars" width="96px" align="right" />
-            <SortHeader label={`Raids (${timeFrame}d)`} sortKeyName="raids" width="102px" align="right" />
-            <SortHeader label="Last Seen" sortKeyName="inactiveDays" width="100px" align="right" />
-            <SortHeader label="Member For" sortKeyName="daysInGuild" width="108px" align="right" />
-            <th style={{ ...thStyle, width: '90px' }}>
+            <SortHeader label={`Playtime (${timeFrame}d)`} sortKeyName="playtime" />
+            <SortHeader label={`Wars (${timeFrame}d)`} sortKeyName="wars" />
+            <SortHeader label={`Raids (${timeFrame}d)`} sortKeyName="raids" />
+            <SortHeader label="Last Seen" sortKeyName="inactiveDays" />
+            <SortHeader label="Member For" sortKeyName="daysInGuild" />
+            <th style={thStyle}>
               Status
             </th>
           </tr>
@@ -261,7 +253,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
               >
                 {onAddToKickList && (
                   <td style={{
-                    padding: '0.5rem 0.4rem',
+                    padding: '0.625rem 0.5rem',
                     borderBottom: cellBorder,
                     textAlign: 'center',
                   }}>
@@ -314,12 +306,12 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   </td>
                 )}
                 <td style={{
-                  padding: '0.5rem 0.4rem',
+                  padding: '0.625rem 0.5rem',
                   borderBottom: cellBorder,
                   fontWeight: '600',
                   color: 'var(--text-primary)',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {member.online && (
                       <div style={{
                         width: '6px', height: '6px', borderRadius: '50%',
@@ -336,8 +328,6 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                         color: 'inherit',
                         textDecoration: isHovered ? 'underline' : 'none',
                         textUnderlineOffset: '2px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
                       }}
                     >
                       {member.username}
@@ -354,7 +344,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   </div>
                 </td>
                 <td style={{
-                  padding: '0.5rem 0.4rem',
+                  padding: '0.625rem 0.5rem',
                   borderBottom: cellBorder,
                 }}>
                   <span style={{
@@ -366,26 +356,30 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   </span>
                 </td>
                 <td style={{
-                  ...numericTd,
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
                   color: belowThreshold ? '#ef4444' : 'var(--text-primary)',
                   fontWeight: belowThreshold ? '600' : '400',
                 }}>
                   {tf?.hasCompleteData ? `${tf.playtime.toFixed(1)}h` : '-'}
                 </td>
                 <td style={{
-                  ...numericTd,
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
                   color: 'var(--text-primary)',
                 }}>
                   {tf?.hasCompleteData ? tf.wars : '-'}
                 </td>
                 <td style={{
-                  ...numericTd,
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
                   color: 'var(--text-primary)',
                 }}>
                   {tf?.hasCompleteData ? tf.raids : '-'}
                 </td>
                 <td style={{
-                  ...numericTd,
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
                   color: member.inactiveDays !== null && member.inactiveDays > 7 ? '#f59e0b' : 'var(--text-secondary)',
                 }}>
                   {member.online
@@ -396,14 +390,15 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
                   }
                 </td>
                 <td style={{
-                  ...numericTd,
+                  padding: '0.625rem 0.5rem',
+                  borderBottom: cellBorder,
                   color: member.isNewMember ? '#a855f7' : 'var(--text-secondary)',
                   fontWeight: member.isNewMember ? '600' : '400',
                 }}>
                   {member.daysInGuild}d
                 </td>
                 <td style={{
-                  padding: '0.5rem 0.4rem',
+                  padding: '0.625rem 0.5rem',
                   borderBottom: cellBorder,
                 }}>
                   {PINNED_BOTTOM.has(member.username) ? (
