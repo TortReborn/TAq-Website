@@ -161,7 +161,7 @@ export default function ExecChroniclePage() {
       }
       await Promise.all([loadPublished(), load()]);
     } catch {
-      alert('Network error — please try again');
+      alert('Could not reach the server. Try again.');
     }
   };
 
@@ -213,7 +213,7 @@ export default function ExecChroniclePage() {
       </div>
 
       <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
-        Chronicle Wiki — suggestion queue
+        Chronicle Wiki: suggestion queue
       </h2>
       <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
         Community-suggested wiki pages and edits. Approving publishes immediately, credited to the
@@ -228,7 +228,7 @@ export default function ExecChroniclePage() {
         Published entries
       </h2>
       <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-        Direct edits publish immediately — no review step. They still appear in the decision log.
+        Direct edits publish immediately without review. They still appear in the decision log.
       </p>
       {editForm.mode !== 'closed' ? (
         <div style={{ ...cardStyle, maxWidth: '440px' }}>

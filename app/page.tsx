@@ -81,10 +81,7 @@ export default function HomePage() {
           <div className="home-hero-right">
             <h1 className="home-hero-title">The Aquarium</h1>
             <p className="home-hero-description">
-              Dive into Wynncraft's most established aquatic guild! Whether it's sniping HQs,
-              wiping claims, completing guild raids, participating in events, or just hanging
-              out with an active, welcoming and stress-free community, there's a place for
-              you here.
+              The Fish Tank themed Guild for wars, guild raids, events and a &quot;Community Home&quot;
             </p>
             <a
               href="https://discord.gg/njRpZwKVaa"
@@ -92,7 +89,7 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="home-cta-button"
             >
-              Join Our Discord
+              Join Discord
             </a>
           </div>
         </div>
@@ -111,7 +108,7 @@ export default function HomePage() {
       {/* Stats Section - animated counters */}
       <section className="home-section home-stats-section">
         <div className="home-section-content">
-          <h2 className="home-section-title">Our Numbers</h2>
+          <h2 className="home-section-title">Guild Stats</h2>
           <div className="home-stats-grid">
             <div className="home-stat-card">
               <AnimatedCounter
@@ -128,7 +125,7 @@ export default function HomePage() {
                 value={stats?.guild.raids ?? null}
                 className="home-stat-value"
               />
-              <span className="home-stat-label">Guild Raids Done</span>
+              <span className="home-stat-label">Guild Raids</span>
               {stats?.guild.raidsPlacement && (
                 <span className="home-stat-badge">Server Rank #{stats.guild.raidsPlacement}</span>
               )}
@@ -160,7 +157,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="home-section home-section-dark">
         <div className="home-section-content">
-          <h2 className="home-section-title">What We Offer</h2>
+          <h2 className="home-section-title">Inside TAq</h2>
           <div className="home-features">
             <div className="home-feature">
               <div className="home-feature-icon">
@@ -172,11 +169,8 @@ export default function HomePage() {
                   style={{ objectFit: 'contain', borderRadius: '50%' }}
                 />
               </div>
-              <h3>Advanced Ecosystem</h3>
-              <p>A big, established ecosystem including this website and our very own
-                bot Tort plus regular events with huge payouts and contribution that's
-                rewarded properly and many statistics that our members can easily access.
-              </p>
+              <h3>Guild Tools</h3>
+              <p>This website, our Discord Bot Tort and our own guild mod provide a lot of utility for you and come together in a big ecosystem.</p>
             </div>
             <div className="home-feature">
               <div className="home-feature-icon">
@@ -189,10 +183,7 @@ export default function HomePage() {
                 />
               </div>
               <h3>Wars &amp; Raids</h3>
-              <p>A dedicated core of warriors and raiders, ready to help you deep dive into
-                either area, with a big forum for optimal raid builds and guides for them,
-                as well as cutting edge war tech and builds.
-              </p>
+              <p>Join regular war and raid parties, find builds, comprehensive guides and learn from experienced players.</p>
             </div>
             <div className="home-feature">
               <div className="home-feature-icon">
@@ -205,9 +196,7 @@ export default function HomePage() {
                 />
               </div>
               <h3>Active Community</h3>
-              <p>150 members, stable leadership, a welcoming community, and an easy way
-                for you to find new friends.
-              </p>
+              <p>Meet new people and chat around, participate in regular events, or just play along while the guild chat plays like a podcast.</p>
             </div>
           </div>
         </div>
@@ -216,40 +205,40 @@ export default function HomePage() {
       {/* Quick Links Section */}
       <section className="home-section">
         <div className="home-section-content">
-          <h2 className="home-section-title">Explore</h2>
+          <h2 className="home-section-title">Guild Tools</h2>
           <div className="home-links">
             <a href="/map" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Territory Map</span>
-                <span className="home-link-desc">Various views of the Wynncraft map</span>
+                <span className="home-link-desc">View live territory, history, and custom map layers</span>
               </div>
               <span className="home-link-arrow">→</span>
             </a>
             <Link href="/members" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Members</span>
-                <span className="home-link-desc">Browse our roster and member profiles</span>
+                <span className="home-link-desc">Browse the roster and member profiles</span>
               </div>
               <span className="home-link-arrow">→</span>
             </Link>
             <Link href="/leaderboard" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Leaderboard</span>
-                <span className="home-link-desc">See our top contributors ranked</span>
+                <span className="home-link-desc">Rank members by contribution</span>
               </div>
               <span className="home-link-arrow">→</span>
             </Link>
             <Link href="/graid-event" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Guild Raid Events</span>
-                <span className="home-link-desc">Track ongoing and previous graid events</span>
+                <span className="home-link-desc">Follow current and past graid events</span>
               </div>
               <span className="home-link-arrow">→</span>
             </Link>
             <Link href="/lootpools" className="home-link">
               <div className="home-link-content">
                 <span className="home-link-title">Lootpools</span>
-                <span className="home-link-desc">View raid loot distributions and drops</span>
+                <span className="home-link-desc">Check weekly lootrun and raid rotations</span>
               </div>
               <span className="home-link-arrow">→</span>
             </Link>
@@ -260,15 +249,15 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="home-section home-section-cta">
         <div className="home-section-content">
-          <h2 className="home-cta-title">Ready to Dive In?</h2>
-          <p className="home-cta-text">Join our Discord and become part of the crew.</p>
+          <h2 className="home-cta-title">Want to join TAq?</h2>
+          <p className="home-cta-text">Apply through our Discord.</p>
           <a
             href="https://discord.gg/njRpZwKVaa"
             target="_blank"
             rel="noopener noreferrer"
             className="home-cta-button"
           >
-            Apply Now
+            Open Discord
           </a>
         </div>
       </section>

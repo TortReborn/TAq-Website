@@ -153,7 +153,7 @@ export default function WikiEditor({
       if (!res.ok) { setError(data.error ?? 'Upload failed'); return null; }
       return { url: data.url, name: file.name.replace(/\.[a-z0-9]+$/i, '') };
     } catch {
-      setError('Upload failed — network error');
+      setError('Upload failed. Check your connection and try again.');
       return null;
     } finally {
       setUploading(false);
@@ -199,7 +199,7 @@ export default function WikiEditor({
           Suggestion submitted
         </div>
         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          An exec will review it — approved changes appear with you credited as the author.
+          An exec will review it. Approved changes will credit you as the author.
         </div>
       </div>
     );
@@ -303,7 +303,7 @@ export default function WikiEditor({
         </div>
       </div>
 
-      <div style={labelStyle}>Summary (the lede — one or two sentences shown above the article and in search)</div>
+      <div style={labelStyle}>Summary (one or two sentences shown above the article and in search)</div>
       <textarea
         style={{ ...inputStyle, minHeight: '3.2rem', resize: 'vertical' }}
         value={form.summary}
@@ -414,7 +414,7 @@ export default function WikiEditor({
       <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap', marginTop: '0.9rem' }}>
         <input
           style={{ ...inputStyle, flex: 1 }}
-          placeholder="Edit summary (what changed and why — shown in page history)"
+          placeholder="Edit summary (what changed and why; shown in page history)"
           value={note}
           maxLength={WIKI_LIMITS.noteMax}
           onChange={(e) => setNote(e.target.value)}

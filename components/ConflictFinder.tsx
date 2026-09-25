@@ -892,7 +892,7 @@ function ConflictCard({
           fontSize: "0.65rem",
           color: "var(--text-secondary)",
         }}>
-          <div>{formatDateTime(conflict.startTime)} — {formatDateTime(conflict.endTime)}</div>
+          <div>{formatDateTime(conflict.startTime)} – {formatDateTime(conflict.endTime)}</div>
           <div>Peak: {conflict.peakHourly}/hr · {conflict.territoriesInvolved} territories · Confidence: {(conflict.confidence * 100).toFixed(0)}%</div>
           {conflict.factions.length > 2 && (
             <div style={{ color: "#ce93d8" }}>{conflict.factions.length} factions detected</div>

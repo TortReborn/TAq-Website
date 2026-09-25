@@ -724,7 +724,7 @@ export default function Builds() {
                                 !versionsEqual(prevRef, memberVersion);
 
                               const tooltip = isOutdated && latest
-                                ? `Outdated — latest is v${formatVersion(latest)}`
+                                ? `Outdated. Latest is v${formatVersion(latest)}`
                                 : def.name;
 
                               return (
@@ -767,7 +767,7 @@ export default function Builds() {
                                   {canUndo && prevRef && (
                                     <button
                                       onClick={() => assignBuild(member.uuid, memberBuild.buildKey, prevRef)}
-                                      title={`Undo — revert to v${formatVersion(prevRef)}`}
+                                      title={`Undo and revert to v${formatVersion(prevRef)}`}
                                       style={{
                                         background: 'transparent',
                                         border: 'none',
@@ -928,7 +928,7 @@ export default function Builds() {
                               return (
                                 <span
                                   key={`${ref.buildKey}-${ref.major}-${ref.minor}`}
-                                  title={def.archived ? `${def.name} — build archived` : `${def.name} v${formatVersion(ref)} — version archived`}
+                                  title={def.archived ? `${def.name}: build archived` : `${def.name} v${formatVersion(ref)}: version archived`}
                                   style={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -965,7 +965,7 @@ export default function Builds() {
                                   <button
                                     type="button"
                                     onClick={() => removeBuild(member.uuid, ref.buildKey)}
-                                    aria-label={`Remove ${def.name} from ${member.ign} — erases the record that they had it`}
+                                    aria-label={`Remove ${def.name} from ${member.ign} and erase their assignment record`}
                                     style={{
                                       background: 'transparent',
                                       border: 'none',
@@ -977,7 +977,7 @@ export default function Builds() {
                                       cursor: 'pointer',
                                       lineHeight: 1,
                                     }}
-                                    title={`Remove — erases the record that ${member.ign} had ${def.name}`}
+                                    title={`Remove and erase ${member.ign}'s ${def.name} assignment record`}
                                     onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
                                     onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
                                   >
@@ -1136,7 +1136,7 @@ export default function Builds() {
                               Delete &quot;{def.name}&quot;?
                             </div>
                             <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
-                              This will remove this build (all versions) from all members and erase who had it — unlike Archive, this cannot be undone.
+                              This removes every version and member assignment. Unlike Archive, it cannot be undone.
                             </div>
                             <div style={{ display: 'flex', gap: '0.32rem' }}>
                               <button
@@ -1175,7 +1175,7 @@ export default function Builds() {
                                 </button>
                                 <button
                                   onClick={() => { setArchivingBuild(def.key); setEditingBuild(null); setDeletingBuild(null); setShowAddBuild(false); setDefError(null); }}
-                                  title="Archive — members keep the assignment but stop getting the role"
+                                  title="Archive. Members keep the assignment but stop getting the role."
                                   style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8' }}
                                 >
                                   Arc
@@ -1250,7 +1250,7 @@ export default function Builds() {
                                 <button
                                   onClick={() => handleSetArchived(def.key, 'archive', { major: latestVersion.major, minor: latestVersion.minor })}
                                   style={{ ...btnStyle, padding: '0.1rem 0.425rem', fontSize: '0.58rem', borderRadius: '9999px', background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8' }}
-                                  title={`Archive v${formatVersion(latestVersion)} — members on it lose the role until upgraded; the next active version becomes latest`}
+                                  title={`Archive v${formatVersion(latestVersion)}. Members on it lose the role until upgraded; the next active version becomes latest.`}
                                 >
                                   Archive v{formatVersion(latestVersion)}
                                 </button>
@@ -1391,7 +1391,7 @@ export default function Builds() {
                                         )}
                                         <button
                                           onClick={() => handleSetArchived(def.key, v.archived ? 'restore' : 'archive', versionRef)}
-                                          title={v.archived ? 'Restore this version' : 'Archive — members on it lose the role until upgraded'}
+                                          title={v.archived ? 'Restore this version' : 'Archive. Members on it lose the role until upgraded.'}
                                           style={{ ...btnStyle, padding: '0.08rem 0.25rem', fontSize: '0.55rem', background: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8' }}
                                         >
                                           {v.archived ? 'Restore' : 'Arc'}
@@ -1435,7 +1435,7 @@ export default function Builds() {
                         Delete &quot;{def.name}&quot; permanently?
                       </div>
                       <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', marginBottom: '0.425rem' }}>
-                        This removes the build, all versions, and every member&apos;s assignment record — unlike Archive, this cannot be undone.
+                        This removes the build, all versions, and every member&apos;s assignment record. Unlike Archive, this cannot be undone.
                       </div>
                       <div style={{ display: 'flex', gap: '0.32rem' }}>
                         <button
@@ -1464,7 +1464,7 @@ export default function Builds() {
                         <div style={{ display: 'flex', gap: '0.21rem' }}>
                           <button
                             onClick={() => handleSetArchived(def.key, 'restore')}
-                            title="Restore — the build becomes assignable again and roles come back on the next sync"
+                            title="Restore. The build becomes assignable again, and roles return on the next sync."
                             style={{ ...btnStyle, padding: '0.1rem 0.32rem', fontSize: '0.58rem', background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}
                           >
                             Restore

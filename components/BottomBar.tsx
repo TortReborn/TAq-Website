@@ -48,7 +48,7 @@ export default function BottomBar() {
             color: 'var(--text-muted)',
             fontSize: '0.75rem'
           }}>
-            Wynncraft's premier aquatic-themed guild
+            A Wynncraft guild
           </div>
         </div>
 

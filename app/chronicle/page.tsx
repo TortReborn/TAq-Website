@@ -11,7 +11,7 @@ import { canSeeRedacted, redactSummaries } from '@/lib/wiki-redaction';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Chronicle — The Aquarium',
+  title: 'Chronicle | The Aquarium',
   description: 'The history of Wynncraft’s guild scene: guilds, alliances, wars and eras.',
 };
 
@@ -37,7 +37,7 @@ export default async function ChroniclesLanding({ searchParams }: { searchParams
       <header style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.3rem' }}>Chronicle</h1>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
-          The history of Wynncraft’s guild scene — its guilds, alliances, wars and eras.
+          The history of Wynncraft’s guilds, alliances, wars, and eras.
         </p>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <WikiSearchBox />

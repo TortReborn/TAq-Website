@@ -288,7 +288,7 @@ export default function ProfilePage() {
   if (error) {
     return (
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
-        <p style={{ color: '#ef4444' }}>Failed to load profile data. Please try again later.</p>
+        <p style={{ color: '#ef4444' }}>We could not load your profile. Refresh the page to try again.</p>
       </main>
     );
   }
@@ -431,7 +431,7 @@ export default function ProfilePage() {
                 {!['7', '14', '30'].includes(selectedKey) && !selectedTf && periodLoading && (
                   <tr style={{ borderBottom: '1px solid var(--border-card)', background: 'rgba(59,130,246,0.05)' }}>
                     <td style={{ fontWeight: '600', color: 'var(--color-ocean-400)' }}>{selectedDays} Days</td>
-                    <td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</td>
+                    <td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Loading activity...</td>
                   </tr>
                 )}
               </tbody>
@@ -463,7 +463,7 @@ export default function ProfilePage() {
               }} />
               <span style={{ fontSize: '0.85rem' }}>
                 {kickStatus.isNewMember
-                  ? 'New member — exempt from kick requirements'
+                  ? 'New member, exempt from kick requirements'
                   : kickStatus.inDanger
                     ? `Below minimum playtime (${kickStatus.weeklyRequirement}h/week)`
                     : `Meeting playtime requirement (${kickStatus.weeklyRequirement}h/week)`}
@@ -486,9 +486,9 @@ export default function ProfilePage() {
               <span style={{ fontSize: '0.85rem' }}>
                 {kickStatus.onKickList
                   ? `On the kick list (Tier ${kickStatus.kickListTier}${
-                      kickStatus.kickListTier === 1 ? ' — Kick First'
-                      : kickStatus.kickListTier === 2 ? ' — If Needed'
-                      : ' — Last Resort'
+                      kickStatus.kickListTier === 1 ? ': Kick First'
+                      : kickStatus.kickListTier === 2 ? ': If Needed'
+                      : ': Last Resort'
                     })`
                   : 'Not on the kick list'}
               </span>
@@ -820,7 +820,7 @@ export default function ProfilePage() {
                 color: 'rgba(255,255,255,0.5)',
                 fontFamily: "'MinecraftFont', monospace",
               }}>
-                Loading...
+                Loading profile...
               </div>
             )}
           </div>

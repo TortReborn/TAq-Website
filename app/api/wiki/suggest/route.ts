@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
   if (targetPageId === null) {
     const clash = await getWikiPage(pool, validated.value.slug);
-    if (clash) return NextResponse.json({ error: `A page already exists at "${validated.value.slug}" — suggest an edit to it instead` }, { status: 409 });
+    if (clash) return NextResponse.json({ error: `A page already exists at "${validated.value.slug}". Suggest an edit to that page instead.` }, { status: 409 });
   }
 
   try {

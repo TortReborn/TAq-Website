@@ -83,7 +83,7 @@ export default function WikiUnverifiedBanner({
         <strong className="wiki-unverified__title">This page has not been checked by a person.</strong>
         <p className="wiki-unverified__text">
           It was drafted from archived sources by an automated pass, and may be incomplete or
-          wrong — particularly on treaties, dates and who was involved.{' '}
+          wrong, particularly on treaties, dates, and who was involved.{' '}
           <Link href={`/chronicle/${slug}/edit`} className="wiki-unverified__link">Correct it</Link>
           {' '}if you were there, or{' '}
           <Link href="/chronicle/admin#checking" className="wiki-unverified__link">see everything awaiting review</Link>.
@@ -108,7 +108,7 @@ export default function WikiUnverifiedBanner({
             )}
             <span className="wiki-unverified__count">
               {state.validations} of {WIKI_VALIDATIONS_REQUIRED}
-              {remaining > 0 && ` — ${remaining} more clears this notice`}
+              {remaining > 0 && `. ${remaining} more clears this notice`}
             </span>
           </div>
         )}

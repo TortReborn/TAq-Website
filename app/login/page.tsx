@@ -19,11 +19,11 @@ function LoginContent() {
   }, [loading, authenticated, isExec, router, redirect]);
 
   const errorMessages: Record<string, string> = {
-    denied: 'You cancelled the Discord authorization.',
-    missing_params: 'Invalid callback parameters. Please try again.',
-    invalid_state: 'Session expired. Please try again.',
-    auth_failed: 'Authentication failed. Please try again.',
-    config: 'Server configuration error. Contact an admin.',
+    denied: 'Discord sign-in was cancelled.',
+    missing_params: 'Discord did not return the required sign-in details. Try again.',
+    invalid_state: 'This sign-in link expired. Start again.',
+    auth_failed: 'Discord sign-in failed. Try again.',
+    config: 'Sign-in is unavailable. Contact an admin.',
   };
 
   if (loading || authenticated) {
@@ -110,7 +110,7 @@ function LoginContent() {
             color: '#ef4444',
             fontSize: '0.85rem',
           }}>
-            {errorMessages[error] || 'An unknown error occurred.'}
+            {errorMessages[error] || 'We could not sign you in. Try again.'}
           </div>
         )}
 
@@ -158,7 +158,7 @@ export default function LoginPage() {
         justifyContent: 'center',
         minHeight: 'calc(100vh - 80px)',
       }}>
-        <div style={{ color: 'var(--text-secondary)' }}>Loading...</div>
+        <div style={{ color: 'var(--text-secondary)' }}>Checking your session...</div>
       </main>
     }>
       <LoginContent />

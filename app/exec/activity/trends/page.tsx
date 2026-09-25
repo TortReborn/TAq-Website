@@ -42,7 +42,7 @@ interface MetricDef {
 const METRICS: MetricDef[] = [
   {
     key: 'playtime', label: 'Players online', short: 'Players', unit: 'avg online', hourly: false,
-    note: 'Average number of players online at any given moment. Short ranges come from presence sampling every 3 minutes, so they are hour-by-hour and follow the timezone picker; longer ranges come from Wynncraft’s daily counter, which reaches back years but resolves only to whole UTC days.',
+    note: 'Average players online. Short ranges use 3-minute samples; longer ranges use daily Wynncraft data.',
   },
   {
     // Not offered as its own trend: "Players online" already serves short
@@ -50,27 +50,27 @@ const METRICS: MetricDef[] = [
     // behind the hour-of-day grid, where it is the only source with real hours.
     key: 'presence', label: 'Players online', short: 'Players', unit: 'avg online',
     hourly: true, trendPill: false,
-    note: 'Sampled every 3 minutes, so this is the one measure with a real hour-of-day. Covers time since sampling was switched on.',
+    note: 'Average players online by hour since sampling began.',
   },
   {
     key: 'wars', label: 'Wars', unit: 'wars', hourly: false,
-    note: 'Wars fought by members, from the daily counter. Whole UTC days — Wynncraft’s counters cannot place activity within a day. “Territory captures” is the closest thing with real timestamps.',
+    note: 'Wars fought per UTC day.',
   },
   {
     key: 'raid_clears', label: 'Raid clears', unit: 'player-raids', hourly: false,
-    note: 'Raids completed, counted per person — a 4-player raid counts 4. From the bot’s daily counter, so whole UTC days; “Guild raids” covers the same activity with exact times.',
+    note: 'Raids completed per player and UTC day.',
   },
   {
     key: 'captures', label: 'Territory captures', short: 'Captures', unit: 'captures', hourly: true,
-    note: 'Territories taken by TAq, timestamped to the second. Captures only — losing land is a different question.',
+    note: 'TAq territory captures.',
   },
   {
     key: 'raids', label: 'Guild raids', unit: 'player-raids', hourly: true,
-    note: 'Logged guild raids, weighted by party size — a 4-player raid counts 4, a solo clear counts 1. Average party is about 3.4, and 13% of raids are solo, so counting raids as events would understate group activity. Hover a point for the raw raid count.',
+    note: 'Guild raids weighted by party size. Hover for the raid count.',
   },
   {
     key: 'snipes', label: 'Snipes', unit: 'snipes', hourly: true,
-    note: 'Logged snipe attempts against enemy HQs, timestamped.',
+    note: 'Logged attacks on enemy HQs.',
   },
 ];
 
@@ -341,15 +341,9 @@ export default function ExecTrendsPage() {
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.25rem 0 0', maxWidth: '62ch' }}>
             {uuid
-              ? 'This member’s own history.'
-              : 'Only members whose Discord account is linked at this rank — former '
-                + 'members keep their history but hold no rank, so cohorts will not sum '
-                + 'to the guild total.'}
-            {' '}Territory captures, guild raids and snipes are guild-wide and have no such
-            breakdown, so they are not shown here. Playtime and wars come from
-            Wynncraft&apos;s daily counter and are complete; anyone who hides their online
-            status is missing from the hour-by-hour view, because Wynncraft will not say
-            {' '}<em>which</em> members are online.
+              ? 'Member activity.'
+              : 'Activity for linked members in this group. Former members are excluded.'}
+            {' '}Guild-wide metrics are hidden. Hourly data excludes hidden online status.
           </p>
 
           {uuid && (
@@ -405,8 +399,7 @@ export default function ExecTrendsPage() {
         </div>
       ) : (
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: '0 0 1.25rem', maxWidth: '62ch' }}>
-          How much the guild is playing, and when — for spotting trends and finding the hours
-          we actually have people online.
+          Guild activity by date and time.
         </p>
       )}
 
@@ -512,22 +505,19 @@ export default function ExecTrendsPage() {
         {/* The guild note describes average concurrency, which is not what a
             single member's chart shows — it would contradict the tile. */}
         {uuid && effectiveChart === 'playtime'
-          ? 'Hours this member played, from Wynncraft’s daily counter. Whole UTC days, '
-            + 'so the timezone picker does not apply.'
+          ? 'Hours played per UTC day.'
           : chartDef.note}
         {/* Say which source answered, since the grain and timezone depend on it. */}
         {charted.data?.source === 'daily-snapshot' && (
-          <> Over this range a day is the finest grain available, so buckets are whole
-            UTC days and the timezone picker does not apply.</>
+          <> Shown by UTC day.</>
         )}
         {charted.data?.source === 'presence-samples' && effectiveChart === 'playtime' && (
-          <> Served from presence sampling here, so these are real hours in {tz}.</>
+          <> Shown by hour in {tz}.</>
         )}
         {/* Only the presence request carries this, and it only matters here. */}
         {effectiveChart === 'presence' && charted.data?.attributedShare !== undefined
           && charted.data.attributedShare < 0.999 && (
-          <> About {Math.round((1 - charted.data.attributedShare) * 100)}% of online members hide
-            their status — counted in this total, but absent from any per-member breakdown.</>
+          <> {Math.round((1 - charted.data.attributedShare) * 100)}% cannot be assigned to members due to hidden status.</>
         )}
       </p>
       <div style={{ ...card, marginBottom: '1.75rem' }}>
@@ -566,8 +556,7 @@ export default function ExecTrendsPage() {
         {/* The substitution below is real; say so rather than quietly showing a
             different period than the one selected. */}
         {range === '24h' && (
-          <> Showing 7 days here — one day gives each slot a single occurrence,
-            which is too little to average.</>
+          <> Uses 7 days for hourly averages.</>
         )}
       </p>
       <div style={card}>
@@ -603,28 +592,21 @@ export default function ExecTrendsPage() {
       {showNotes && (
         <div style={{ ...card, marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
           <p style={{ margin: '0 0 0.75rem' }}>
-            <strong style={{ color: 'var(--text-primary)' }}>Two different clocks.</strong>{' '}
-            Playtime, wars and raid clears come from a snapshot taken once a day at 00:01 UTC, so
-            they are whole UTC days with no time-of-day and the timezone picker does not apply to
-            them. Captures, guild raids, snipes and members-online carry real timestamps and do
-            follow the picker.
+            <strong style={{ color: 'var(--text-primary)' }}>Daily data.</strong>{' '}
+            Playtime, wars and raid clears use UTC-day snapshots. Other metrics use timestamps
+            and follow the timezone picker.
           </p>
           <p style={{ margin: '0 0 0.75rem' }}>
-            <strong style={{ color: 'var(--text-primary)' }}>Gaps are drawn as gaps.</strong>{' '}
-            Members-online is sampled every 3 minutes; hatched bands mark spans where the sampler
-            was not running. Those are missing data, not quiet hours.
+            <strong style={{ color: 'var(--text-primary)' }}>Missing samples.</strong>{' '}
+            Hatched spans contain no data.
           </p>
           <p style={{ margin: '0 0 0.75rem' }}>
-            <strong style={{ color: 'var(--text-primary)' }}>Hidden members are counted, but not named.</strong>{' '}
-            Wynncraft lets players hide their online status. They are included in the guild-wide
-            online count, but cannot be attributed to a specific member, so any per-member
-            breakdown omits them.
+            <strong style={{ color: 'var(--text-primary)' }}>Hidden status.</strong>{' '}
+            Guild totals include hidden players; member views cannot.
           </p>
           <p style={{ margin: 0 }}>
-            <strong style={{ color: 'var(--text-primary)' }}>Some days are adjusted.</strong>{' '}
-            Where a snapshot was missed, a day&apos;s value is spread evenly across the gap. Where
-            the counter moved backwards or implied more than 24 hours in a day, it was clamped.
-            Switch any chart to its table view to see what share of each bucket was adjusted.
+            <strong style={{ color: 'var(--text-primary)' }}>Adjusted days.</strong>{' '}
+            Missed or invalid snapshots are normalized. Table view shows adjusted shares.
           </p>
         </div>
       )}

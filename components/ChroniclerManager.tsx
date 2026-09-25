@@ -111,7 +111,7 @@ export default function ChroniclerManager() {
       </h3>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', margin: '0 0 0.75rem' }}>
         Anyone signed in with Discord can suggest an edit. Chroniclers are the people who publish
-        without review and decide on those suggestions — no guild rank or membership needed, just
+        without review and decide on those suggestions. No guild rank or membership is required, only
         the Discord account. Adding and removing them is exec-only.
       </p>
 
@@ -143,7 +143,7 @@ export default function ChroniclerManager() {
       {list.length === 0 ? (
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: 0 }}>
           No chroniclers yet.{canManageChroniclers
-            ? ' Add one above — you will need their Discord user ID (Developer Mode → right-click → Copy User ID).'
+            ? ' Add one above. You will need their Discord user ID (Developer Mode → right-click → Copy User ID).'
             : ''}
         </p>
       ) : (
@@ -222,7 +222,7 @@ export default function ChroniclerManager() {
                         <button
                           onClick={() => remove(c.discordId, c.displayName || c.discordId)}
                           disabled={busy}
-                          title="Revoke — past edits and vouches stay attributed"
+                          title="Revoke. Past edits and vouches stay attributed."
                           style={{
                             height: '25px', padding: '0 0.55rem', borderRadius: '0.375rem',
                             border: '1px solid var(--border-color)', background: 'var(--bg-secondary)',

@@ -210,7 +210,7 @@ function WikiMarkdown({
               const cite = citations
                 ? Object.values(citations).find(c => String(c.number) === citeNumber)
                 : undefined;
-              const tip = cite ? `${cite.title}${cite.locator ? ` — ${cite.locator}` : ""}` : undefined;
+              const tip = cite ? `${cite.title}${cite.locator ? `: ${cite.locator}` : ""}` : undefined;
               return (
                 <sup className="wiki-cite">
                   <a href={href} {...props} title={tip}>[{children}]</a>

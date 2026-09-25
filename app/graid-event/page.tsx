@@ -122,7 +122,7 @@ export default function GraidEventPage() {
 
           {isFallback && (
             <p style={{ textAlign: 'center', color: '#ef4444', fontWeight: '700', marginBottom: '1rem', marginTop: 0 }}>
-              There is no ongoing event, check the latest one below
+              No event is active. The latest event is shown below.
             </p>
           )}
 
@@ -248,9 +248,9 @@ export default function GraidEventPage() {
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                 margin: '0 0 0.5rem',
               }}>
-                No Event Data
+                No event to show
               </h1>
-              <p style={{ color: 'var(--text-muted)', margin: 0, textAlign: 'center' }}>No event data found in the database.</p>
+              <p style={{ color: 'var(--text-muted)', margin: 0, textAlign: 'center' }}>There are no guild raid events yet.</p>
             </>
           )}
         </div>

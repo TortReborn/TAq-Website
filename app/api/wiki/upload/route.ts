@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          `That file is ${formatBytes(file.size)}. The upload limit is ${formatBytes(MAX_UPLOAD_BYTES)} — ` +
+          `That file is ${formatBytes(file.size)}. The upload limit is ${formatBytes(MAX_UPLOAD_BYTES)}. ` +
           `resize or screenshot it smaller and try again.`,
       },
       { status: 413 },
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         {
           error:
             'Image storage rejected the upload. The Blob store’s access mode does not match ' +
-            'WIKI_BLOB_ACCESS — set it to "private" for a private store, or "public" for a public one.',
+            'WIKI_BLOB_ACCESS must be "private" for a private store or "public" for a public one.',
         },
         { status: 500 },
       );

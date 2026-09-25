@@ -484,9 +484,9 @@ function HistoryTimeline({
   ) : null;
 
   const tooltipWarningLine = hoverOutage ? (
-    <span style={{ color: WARNING_COLOR }}>Wars were down — nothing changed</span>
+    <span style={{ color: WARNING_COLOR }}>Wars were down. Nothing changed.</span>
   ) : hoverGap ? (
-    <span style={{ color: WARNING_COLOR }}>Logging gap — data missing</span>
+    <span style={{ color: WARNING_COLOR }}>Logging gap. Data is missing.</span>
   ) : null;
 
   const tooltipContent = hoverDate
@@ -846,7 +846,7 @@ function HistoryTimeline({
         onClick={(e) => { e.stopPropagation(); setSeasonZoom(null); }}
         onMouseDown={(e) => e.stopPropagation()}
         data-testid="timeline-reset-zoom"
-        title={`Zoomed to ${seasonZoom.label === 'Off' ? 'off-season' : seasonZoom.label} — back to full range`}
+        title={`Zoomed to ${seasonZoom.label === 'Off' ? 'off-season' : seasonZoom.label}. Return to full range.`}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
