@@ -31,9 +31,9 @@ interface SourceMeta {
 
 /** What each evidentiary tier means, stated on the page rather than assumed. */
 const TIER_NOTE: Record<string, string> = {
-  primary: 'Primary source — a record made at the time by the people involved.',
-  retrospective: 'Retrospective account — first-person, but recalled after the events. Treat dates and motives with care, and prefer a contemporaneous record where one exists.',
-  secondary: 'Secondary source — compiled or curated by others after the events, from sources of its own.',
+  primary: 'Primary source: a record made at the time by the people involved.',
+  retrospective: 'Retrospective account: a first-person record recalled after the events. Treat dates and motives with care, and prefer a contemporary record where one exists.',
+  secondary: 'Secondary source: a record compiled or curated by others after the events.',
   derived: 'Derived from our own records and analysis rather than an outside document; the method is described below.',
 };
 
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!found) return { title: 'Reference' };
   const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
   const title = found.meta.title ?? id;
-  return { title: `${canSeeRedacted(principal) ? title : redactText(title)} — Reference` };
+  return { title: `${canSeeRedacted(principal) ? title : redactText(title)} | Reference` };
 }
 
 const fmtCapture = (stamp: string) =>
@@ -149,7 +149,7 @@ export default async function ReferencePage({ params }: { params: Promise<{ id: 
             </a>
           ) : (
             <span style={{ color: 'var(--text-secondary)' }}>
-              Not a public web page — {meta.url || 'held only as this archived copy'}
+              Not a public web page. {meta.url || 'Held only as this archived copy.'}
             </span>
           )}
           {waybackUrl && (

@@ -221,11 +221,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           type="image/webp"
         />
         <title>The Aquarium</title>
-        <meta name="description" content="The Aquarium - Wynncraft guild territory map, leaderboards, and member statistics" />
+        <meta name="description" content="The Aquarium's Wynncraft guild map, leaderboards, member profiles, and raid tools." />
 
         {/* Open Graph */}
         <meta property="og:title" content="The Aquarium" />
-        <meta property="og:description" content="Wynncraft guild territory map, leaderboards, and member statistics" />
+        <meta property="og:description" content="The Aquarium's Wynncraft guild map, leaderboards, member profiles, and raid tools." />
         <meta property="og:image" content="https://the-aquarium.com/images/guildimages/icontransparent.png" />
         <meta property="og:url" content="https://the-aquarium.com" />
         <meta property="og:type" content="website" />
@@ -234,7 +234,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="The Aquarium" />
-        <meta name="twitter:description" content="Wynncraft guild territory map and statistics" />
+        <meta name="twitter:description" content="The Aquarium's Wynncraft guild map, leaderboards, member profiles, and raid tools." />
         <meta name="twitter:image" content="https://the-aquarium.com/images/guildimages/icontransparent.png" />
 
         {/* SEO */}
@@ -253,7 +253,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "The Aquarium",
-              "description": "Wynncraft guild territory tracking and statistics",
+              "description": "Wynncraft guild tools for maps, rankings, raids, and member stats",
               "url": "https://the-aquarium.com"
             })
           }}
@@ -605,7 +605,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 type="button"
                 disabled
                 title="You can only apply for Hammerhead once you reach Angler rank."
-                aria-label="Hammerhead Application — requires Angler rank"
+                aria-label="Hammerhead application, Angler rank required"
                 className="mobile-apply-button"
                 style={{
                   padding: '8px 16px',
@@ -682,7 +682,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.15)';
               }}
             >
-              Login
+              Sign in
             </Link>
             )}
 
@@ -1094,7 +1094,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 type="button"
                 disabled
                 title="You can only apply for Hammerhead once you reach Angler rank."
-                aria-label="Hammerhead Application — requires Angler rank"
+                aria-label="Hammerhead application, Angler rank required"
                 style={{
                   color: 'rgba(57, 106, 255, 0.55)',
                   fontWeight: 'bold',
@@ -1154,7 +1154,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
-              >Login</NavLink>
+              >Sign in</NavLink>
               )}
             </div>
           )}

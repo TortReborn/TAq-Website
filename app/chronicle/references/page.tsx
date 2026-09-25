@@ -13,7 +13,7 @@ import { canSeeRedacted, redactText } from '@/lib/wiki-redaction';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'References — Chronicle',
+  title: 'References | Chronicle',
   description: 'Every primary source the Chronicle wiki cites, archived and readable.',
 };
 

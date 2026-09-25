@@ -438,7 +438,7 @@ export default function ExecActivityTable({ members, timeFrame, searchTerm, sort
           textAlign: 'center',
           color: 'var(--text-secondary)',
         }}>
-          No members found.
+          No members match this view.
         </div>
       )}
     </div>

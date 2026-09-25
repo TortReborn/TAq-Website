@@ -155,7 +155,7 @@ export default function ExecShellExchangePage() {
     }
   };
 
-  if (loading) return <div style={{ color: 'var(--text-secondary)', padding: '2rem' }}>Loading...</div>;
+  if (loading) return <div style={{ color: 'var(--text-secondary)', padding: '2rem' }}>Loading shell exchange...</div>;
   if (error) return <div style={{ color: '#ef4444', padding: '2rem' }}>Error: {error}</div>;
 
   return (

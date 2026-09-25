@@ -549,7 +549,7 @@ export default function FactionPanel({
 
               {filteredGuilds.length === 0 && !searchTerm.trim() && (
                 <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", textAlign: "center", margin: "0.5rem 0" }}>
-                  No guilds found.
+                  No guilds match your search.
                 </p>
               )}
             </div>

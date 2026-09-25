@@ -218,7 +218,7 @@ export default function KickListPanel({
           textAlign: 'center',
           padding: '1rem 0',
         }}>
-          Loading...
+          Loading kick list...
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

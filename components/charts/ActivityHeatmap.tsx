@@ -154,8 +154,8 @@ export default function ActivityHeatmap({ cells, title, unit, tz, loading }: Pro
                       onMouseEnter={() => cell && setHover(cell)}
                       onMouseLeave={() => setHover(null)}
                       title={cell
-                        ? `${day} ${String(hour).padStart(2, '0')}:00 — ${cell.average.toFixed(2)} ${unit} avg (${cell.total.toFixed(0)} over ${cell.occurrences} occurrences)`
-                        : `${day} ${String(hour).padStart(2, '0')}:00 — no data`}
+                        ? `${day} ${String(hour).padStart(2, '0')}:00: ${cell.average.toFixed(2)} ${unit} avg (${cell.total.toFixed(0)} over ${cell.occurrences} occurrences)`
+                        : `${day} ${String(hour).padStart(2, '0')}:00: no data`}
                       style={{
                         height: '18px',
                         borderRadius: '2px',
@@ -180,7 +180,7 @@ export default function ActivityHeatmap({ cells, title, unit, tz, loading }: Pro
                 ))}
               </div>
               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                More — darkest is {max.toFixed(1)} {unit} in one hour
+                More. Darkest is {max.toFixed(1)} {unit} in one hour
               </span>
             </div>
           </div>

@@ -135,7 +135,7 @@ export default function ChroniclesAdmin() {
         suggestions waiting on a decision.{' '}
         {canReview
           ? <>Signed in as <strong>{user?.name}</strong>{user?.isChronicler && !user?.isExec ? ' (chronicler)' : user?.isExec ? ' (exec)' : ''}.</>
-          : <>You are reading this as a visitor — anyone can see what needs doing; acting on it needs a chronicler role.</>}
+          : <>You are reading this as a visitor. Anyone can see the work queue; a chronicler role is required to act on it.</>}
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.9rem', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
@@ -161,7 +161,7 @@ export default function ChroniclesAdmin() {
         </div>
         {stats && (
           <p style={{ margin: '0.8rem 0 0', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            {stats.revisions.toLocaleString()} revisions in all — {stats.humanRevisions.toLocaleString()} written
+            {stats.revisions.toLocaleString()} revisions total: {stats.humanRevisions.toLocaleString()} written
             by a person, {stats.aiRevisions.toLocaleString()} by an automated pass.
           </p>
         )}
@@ -210,7 +210,7 @@ export default function ChroniclesAdmin() {
               <Loading what="the work-list" />
             ) : unverified.length === 0 ? (
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
-                Nothing outstanding — every published page has been read by a person.
+                Nothing outstanding. Every published page has been read by a person.
               </p>
             ) : (
               <>

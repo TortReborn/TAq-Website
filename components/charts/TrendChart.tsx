@@ -166,7 +166,7 @@ export default function TrendChart({
   // nothing".
   const staleNotice =
     total === 0 && latest && new Date(latest) < new Date(points[0].t)
-      ? `No data in this range — this metric's most recent record is ${formatFull(latest, bucket, tz)}.`
+      ? `No data in this range. The latest record is ${formatFull(latest, bucket, tz)}.`
       : null;
   const hoverPoint = hover !== null ? points[hover] : null;
 
@@ -270,7 +270,7 @@ export default function TrendChart({
                 key={i} x={x1} y={PAD.top} width={Math.max(2, x2 - x1)} height={HEIGHT - PAD.top - PAD.bottom}
                 fill="url(#trend-gap)"
               >
-                <title>Sampler offline — no data recorded</title>
+                <title>Sampler offline. No data recorded.</title>
               </rect>
             );
           })}

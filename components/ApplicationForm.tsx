@@ -74,7 +74,7 @@ export default function ApplicationForm({ applicationType, questions, title }: A
     const trimmed = value.trim();
 
     if (question.required && trimmed.length === 0) {
-      return 'This field is required.';
+      return 'Enter an answer.';
     }
 
     if (trimmed.length > 0) {
@@ -178,9 +178,9 @@ export default function ApplicationForm({ applicationType, questions, title }: A
     const hasIgnField = questions.some(q => q.id === 'ign');
     if (hasIgnField && answers['ign']?.trim()) {
       if (ignStatus === 'idle' || ignStatus === 'checking') {
-        errors['ign'] = 'Please wait for IGN verification to complete.';
+        errors['ign'] = 'Wait for username verification to finish.';
       } else if (ignStatus === 'invalid') {
-        errors['ign'] = errors['ign'] || 'This player was not found. Please check your IGN.';
+        errors['ign'] = errors['ign'] || 'Player not found. Check the username.';
       }
     }
 
@@ -215,11 +215,11 @@ export default function ApplicationForm({ applicationType, questions, title }: A
         setSubmitError('You already have a pending application of this type.');
         setFormState('form');
       } else {
-        setSubmitError(data.error || 'Something went wrong. Please try again.');
+        setSubmitError(data.error || 'We could not send the application. Try again.');
         setFormState('form');
       }
     } catch {
-      setSubmitError('Network error. Please check your connection and try again.');
+      setSubmitError('We could not reach the server. Check your connection and try again.');
       setFormState('form');
     }
   };
@@ -268,7 +268,7 @@ export default function ApplicationForm({ applicationType, questions, title }: A
             color: 'var(--text-primary)',
             marginBottom: '1rem',
           }}>
-            Invalid or Expired Link
+            Application link expired
           </h2>
           <p style={{
             color: 'var(--text-secondary)',
@@ -276,8 +276,7 @@ export default function ApplicationForm({ applicationType, questions, title }: A
             lineHeight: '1.6',
             marginBottom: '2rem',
           }}>
-            This application link is no longer valid. Please go to the <strong>#applications</strong> channel
-            in our Discord server and click the application button to get a new link.
+            Open <strong>#applications</strong> in our Discord and use the application button to get a new link.
           </p>
           <a
             href="https://discord.gg/njRpZwKVaa"
@@ -325,15 +324,15 @@ export default function ApplicationForm({ applicationType, questions, title }: A
             color: 'var(--text-primary)',
             marginBottom: '1rem',
           }}>
-            Application Submitted!
+            Application sent
           </h2>
           <p style={{
             color: 'var(--text-secondary)',
             fontSize: '1rem',
             lineHeight: '1.6',
           }}>
-            We've received your {applicationType === 'guild' ? 'guild member' : 'community member'} application.
-            We'll review it and get back to you soon in Discord.
+            Your {applicationType === 'guild' ? 'guild member' : 'community member'} application is with the exec team.
+            We will reply in Discord.
           </p>
         </div>
       </div>
@@ -577,7 +576,7 @@ export default function ApplicationForm({ applicationType, questions, title }: A
                     onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                   >
-                    View stats page — please ensure it is public
+                    View stats page (make sure it is public)
                   </a>
                 </div>
               )}
@@ -617,7 +616,7 @@ export default function ApplicationForm({ applicationType, questions, title }: A
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(88, 101, 242, 0.3)';
           }}
         >
-          {formState === 'submitting' ? 'Submitting...' : 'Submit Application'}
+          {formState === 'submitting' ? 'Sending...' : 'Send application'}
         </button>
       </div>
     </div>

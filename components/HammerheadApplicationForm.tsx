@@ -91,7 +91,7 @@ export default function HammerheadApplicationForm() {
   const validateField = useCallback((question: ApplicationQuestion, value: string | string[] | undefined): string => {
     if (question.type === 'checkbox') {
       if (question.required && (!Array.isArray(value) || value.length === 0)) {
-        return 'Please select at least one option.';
+        return 'Choose at least one option.';
       }
       return '';
     }
@@ -99,7 +99,7 @@ export default function HammerheadApplicationForm() {
     if (question.type === 'select') {
       const strVal = typeof value === 'string' ? value : '';
       if (question.required && strVal.trim().length === 0) {
-        return 'Please select an option.';
+        return 'Choose an option.';
       }
       if (strVal && question.options && !question.options.includes(strVal)) {
         return 'Invalid selection.';
@@ -111,7 +111,7 @@ export default function HammerheadApplicationForm() {
     const trimmed = strVal.trim();
 
     if (question.required && trimmed.length === 0) {
-      return 'This field is required.';
+      return 'Enter an answer.';
     }
 
     if (trimmed.length > 0 && question.maxLength && strVal.length > question.maxLength) {
@@ -224,11 +224,11 @@ export default function HammerheadApplicationForm() {
         setSubmitError('You already have a pending Hammerhead application.');
         setFormState('form');
       } else {
-        setSubmitError(data.error || 'Something went wrong. Please try again.');
+        setSubmitError(data.error || 'We could not send the application. Try again.');
         setFormState('form');
       }
     } catch {
-      setSubmitError('Network error. Please check your connection and try again.');
+      setSubmitError('We could not reach the server. Check your connection and try again.');
       setFormState('form');
     }
   };
@@ -390,11 +390,10 @@ export default function HammerheadApplicationForm() {
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>&#x1F512;</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '1rem' }}>
-            Login Required
+            Sign in required
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6', marginBottom: '2rem' }}>
-            You need to be logged in to submit a Hammerhead application.
-            Please log in with your Discord account.
+            Sign in with Discord to send a Hammerhead application.
           </p>
           <a
             href="/login?redirect=%2Fapply%2Fhammerhead"
@@ -409,7 +408,7 @@ export default function HammerheadApplicationForm() {
               fontSize: '1rem',
             }}
           >
-            Log In
+            Sign in with Discord
           </a>
         </div>
       </div>
@@ -428,10 +427,10 @@ export default function HammerheadApplicationForm() {
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>&#x26A0;&#xFE0F;</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '1rem' }}>
-            Insufficient Rank
+            Angler rank required
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-            You must be <strong>Angler</strong> or <strong>Swordfish</strong> rank to apply for Hammerhead.
+            Hammerhead applications are open to <strong>Angler</strong> and <strong>Swordfish</strong> members.
             Your current rank is <strong>{user?.rank}</strong>.
           </p>
         </div>
@@ -451,10 +450,10 @@ export default function HammerheadApplicationForm() {
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>&#x2139;&#xFE0F;</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '1rem' }}>
-            Already Exec
+            No application needed
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-            You are already <strong>{user?.rank}</strong> rank and do not need to apply for Hammerhead.
+            Your <strong>{user?.rank}</strong> rank already includes exec access.
           </p>
         </div>
       </div>
@@ -473,11 +472,10 @@ export default function HammerheadApplicationForm() {
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>&#x2705;</div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '1rem' }}>
-            Application Submitted!
+            Application sent
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-            Your Hammerhead application has been received and will be reviewed by the exec team.
-            We'll get back to you soon.
+            The exec team will review it and reply in Discord.
           </p>
         </div>
       </div>
@@ -612,7 +610,7 @@ export default function HammerheadApplicationForm() {
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
-            Preview mode — you can browse the form but submission is disabled.
+            Preview mode. You can read the form, but you cannot send it.
           </div>
         )}
 
@@ -814,7 +812,7 @@ export default function HammerheadApplicationForm() {
                 e.currentTarget.style.boxShadow = isPreviewMode ? 'none' : '0 2px 8px rgba(57, 106, 255, 0.3)';
               }}
             >
-              {isPreviewMode ? 'Submission Disabled (Preview)' : formState === 'submitting' ? 'Submitting...' : 'Submit Application'}
+              {isPreviewMode ? 'Preview only' : formState === 'submitting' ? 'Sending...' : 'Send application'}
             </button>
           )}
         </div>

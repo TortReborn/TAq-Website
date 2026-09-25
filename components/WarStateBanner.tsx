@@ -154,7 +154,7 @@ export default function WarStateBanner({ current, gaps, onJump }: WarStateBanner
                 treat it as a reading of the sources rather than a record of what happened.
               </div>
               <div style={{ marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
-                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{synthetic.label}</span> — {synthetic.note}
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{synthetic.label}</span>: {synthetic.note}
               </div>
               {onJump && (
                 <button
@@ -177,12 +177,12 @@ export default function WarStateBanner({ current, gaps, onJump }: WarStateBanner
   const [title, detail, resumeDate] = outage
     ? [
         'Wars were down',
-        `Wynncraft disabled wars on ${DATE_FORMAT_UTC.format(outage.startMs)} and they stayed off for ${describeSpan(outage.startMs, outage.resumeMs)} — territory control was frozen, so the map is accurate and nothing is missing.`,
+        `Wynncraft disabled wars on ${DATE_FORMAT_UTC.format(outage.startMs)} for ${describeSpan(outage.startMs, outage.resumeMs)}. Territory control was frozen, so the map is accurate.`,
         new Date(outage.resumeMs),
       ]
     : [
         'Logging gap',
-        `No exchanges were recorded after ${DATE_FORMAT.format(gap!.start)} — wars continued, but the data is missing, so the map is frozen at the last known state. Have war logs from this era? We’d love a copy!`,
+        `No exchanges were recorded after ${DATE_FORMAT.format(gap!.start)}. Wars continued, but the data is missing, so the map is frozen at the last known state. Send us any war logs from this period.`,
         gap!.end,
       ];
 
