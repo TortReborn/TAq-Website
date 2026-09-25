@@ -243,7 +243,7 @@ async function computeWarChart(
   if (exchanges === 0 && peak === 0) {
     return {
       kind: 'error',
-      message: `Neither “${guildA}” nor “${guildB}” appears in that window — check the full guild names`,
+      message: `Neither “${guildA}” nor “${guildB}” appears in that window. Check the full guild names.`,
     };
   }
 

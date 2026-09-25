@@ -33,7 +33,7 @@ export default function WikiEmbed({ directive, data }: { directive: WikiEmbedDir
     return (
       <div style={{ ...cardStyle, border: '1px dashed var(--border-color)', padding: '0.6rem 0.9rem' }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-          Live embed — renders on the article page
+          Live embed. Renders on the article page.
         </div>
         <code style={{ fontSize: '0.78rem', color: 'var(--text-primary)' }}>{directive.raw}</code>
       </div>
@@ -224,7 +224,7 @@ function WarChart({ data }: { data: WarChartEmbedData }) {
   return (
     <figure className="wiki-warchart" style={{ ...cardStyle, padding: '0.6rem 0.9rem', margin: '0.9rem 0' }}>
       <figcaption style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-        Territories held — {data.guildA} vs {data.guildB}
+        Territories held: {data.guildA} vs {data.guildB}
       </figcaption>
       <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
         {fmtDate(data.start)} – {fmtDate(data.end)} · weekly average ·{' '}

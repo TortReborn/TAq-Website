@@ -789,7 +789,7 @@ export default function WoealerPanel({ canEdit }: { canEdit: boolean }) {
                   rows={3}
                   value={slotDraft.contents}
                   onChange={event => setSlotDraft({ ...slotDraft, contents: event.target.value })}
-                  placeholder="What is stored here — list item names so search can find them."
+                  placeholder="List the stored item names so search can find them."
                 />
               </label>
             </div>

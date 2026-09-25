@@ -94,7 +94,7 @@ export default function SourceArchivePanel({ entries, gaps, totals, imageBackend
     <div>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: '0 0 1rem', lineHeight: 1.55 }}>
         Every document the Chronicle holds a copy of. An uncited one is material nobody has written
-        up yet — the fastest way to add something the Chronicle does not know. The public index is
+        up yet. This is the fastest way to add something the Chronicle does not know. The public index is
         at <Link href="/chronicle/references" style={{ color: 'var(--accent-primary)' }}>References</Link>.
       </p>
 

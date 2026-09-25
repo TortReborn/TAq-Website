@@ -740,13 +740,13 @@ function MapHistoryControls({
               animation: 'spin 1s linear infinite',
             }}
           />
-          Loading...
+          Loading timeline...
         </div>
       ) : (loadProgress !== undefined && loadProgress < 1) ? (
         // Background gap-filling still running — show unobtrusive coverage %
         <div
           data-testid="history-load-progress"
-          title="Timeline events loading in the background — scrubbing works everywhere, already-loaded ranges respond instantly"
+          title="Timeline events are still loading. You can scrub anywhere; loaded ranges respond immediately."
           style={{
             display: 'flex',
             alignItems: 'center',
