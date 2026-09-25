@@ -81,7 +81,10 @@ export default function HomePage() {
           <div className="home-hero-right">
             <h1 className="home-hero-title">The Aquarium</h1>
             <p className="home-hero-description">
-              The Fish Tank themed Guild for wars, guild raids, events and a &quot;Community Home&quot;
+              Dive into Wynncraft's most established aquatic guild! Whether it's sniping HQs,
+              wiping claims, completing guild raids, participating in events, or just hanging
+              out with an active, welcoming and stress-free community, there's a place for
+              you here.
             </p>
             <a
               href="https://discord.gg/njRpZwKVaa"
