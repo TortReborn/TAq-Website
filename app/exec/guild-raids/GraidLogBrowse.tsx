@@ -121,9 +121,9 @@ export default function GraidLogBrowse({ meta, onViewStats }: Props) {
         {loading ? (
           <div style={{ height: '300px', animation: 'pulse 1.5s ease-in-out infinite' }} />
         ) : error ? (
-          <div style={{ padding: '1.5rem', textAlign: 'center', color: '#ef4444', fontSize: '0.85rem' }}>Failed to load logs</div>
+          <div style={{ padding: '1.5rem', textAlign: 'center', color: '#ef4444', fontSize: '0.85rem' }}>Could not load guild raid logs.</div>
         ) : logs.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No graid logs found.</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No guild raid logs match these filters.</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>

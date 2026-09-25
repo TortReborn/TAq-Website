@@ -58,9 +58,9 @@ export default function GraidLogLeaderboard({ onViewStats }: Props) {
         {loading ? (
           <div style={{ height: '300px', animation: 'pulse 1.5s ease-in-out infinite' }} />
         ) : error ? (
-          <div style={{ padding: '1.5rem', textAlign: 'center', color: '#ef4444', fontSize: '0.85rem' }}>Failed to load leaderboard</div>
+          <div style={{ padding: '1.5rem', textAlign: 'center', color: '#ef4444', fontSize: '0.85rem' }}>Could not load the guild raid leaderboard.</div>
         ) : players.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No data available.</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No guild raid records yet.</div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>

@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
       count: queueIds.length,
       status: 'pending',
       unlinked,
-      warning: 'Queued for the bot — will appear in Discord on the next bot tick (within ~3 minutes).',
+      warning: 'Queued for the bot. It will appear in Discord within about 3 minutes.',
     });
   } catch (error) {
     console.error('Guild raid queue error:', error);

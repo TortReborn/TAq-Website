@@ -410,7 +410,7 @@ export default function MemberGrid({ members, onRefresh, showOnlineOnly = false 
           color: 'var(--text-muted)',
           fontSize: '1.125rem'
         }}>
-          No members with Discord ranks found.
+          No members match these filters.
         </div>
       )}
     </div>

@@ -639,7 +639,7 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
                 type="button"
                 onClick={() => setQuality(q)}
                 disabled={recording}
-                title={`${QUALITY_PRESETS[q].label} — ${Math.round(CANVAS_W * QUALITY_PRESETS[q].scale)}×${Math.round(CANVAS_H * QUALITY_PRESETS[q].scale)} @ ${QUALITY_PRESETS[q].fps}fps, ${(QUALITY_PRESETS[q].bitrate / 1_000_000).toFixed(1)} Mbps`}
+                title={`${QUALITY_PRESETS[q].label}: ${Math.round(CANVAS_W * QUALITY_PRESETS[q].scale)}×${Math.round(CANVAS_H * QUALITY_PRESETS[q].scale)} @ ${QUALITY_PRESETS[q].fps}fps, ${(QUALITY_PRESETS[q].bitrate / 1_000_000).toFixed(1)} Mbps`}
                 style={{
                   flex: 1,
                   background: selected ? 'rgba(56, 189, 248, 0.18)' : 'var(--bg-primary)',

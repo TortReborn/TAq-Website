@@ -24,7 +24,7 @@ function UnauthorizedContent() {
   // "you are locked out" and "the guild pages are, the history is not".
   const chronicleNote = (
     <>
-      You are signed in, though — the{' '}
+      You are signed in. The{' '}
       <Link href="/chronicle" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Chronicle</Link>{' '}
       is open to you, and you can suggest edits to any article there.
     </>

@@ -60,7 +60,7 @@ export default function WikiSearchBox({ autoFocus = false }: { autoFocus?: boole
         }}>
           {loading && <div style={{ padding: "0.6rem 0.9rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>Searching…</div>}
           {!loading && results.length === 0 && (
-            <div style={{ padding: "0.6rem 0.9rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>No pages found.</div>
+            <div style={{ padding: "0.6rem 0.9rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>No Chronicle pages match your search.</div>
           )}
           {!loading && results.map(r => (
             <Link key={r.slug} href={`/chronicle/${r.slug}`} style={{
