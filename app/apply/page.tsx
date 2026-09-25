@@ -34,8 +34,7 @@ export default function ApplyPage() {
           lineHeight: '1.7',
           marginBottom: '2rem',
         }}>
-          To apply, join our Discord server and head to the <strong style={{ color: 'var(--text-primary)' }}>#applications</strong> channel.
-          Click the application button there to get started!
+          Join our Discord and open <strong style={{ color: 'var(--text-primary)' }}>#applications</strong> to start your application.
         </p>
         <a
           href="https://discord.gg/njRpZwKVaa"
@@ -62,7 +61,7 @@ export default function ApplyPage() {
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(88, 101, 242, 0.3)';
           }}
         >
-          Join Our Discord
+          Open Discord
         </a>
       </div>
     </div>

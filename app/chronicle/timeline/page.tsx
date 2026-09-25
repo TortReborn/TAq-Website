@@ -11,7 +11,7 @@ import { slugify } from '@/lib/wiki';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Timeline — Chronicle',
+  title: 'Timeline | Chronicle',
   description: 'The master timeline of Wynncraft guild history.',
 };
 

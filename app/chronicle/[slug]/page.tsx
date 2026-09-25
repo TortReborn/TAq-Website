@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!found) return { title: 'Chronicle' };
   const page = canSeeRedacted(principal) ? found.page : redactPage(found.page);
   return {
-    title: `${page.title} — Chronicle`,
+    title: `${page.title} | Chronicle`,
     description: page.summary || undefined,
   };
 }

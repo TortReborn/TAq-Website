@@ -115,8 +115,8 @@ export default function UniformModal({ isOpen, onClose }: Props) {
         {data && !isLoading && (
           <>
             <p className="uniform-blurb">
-              Your own head and hands, the guild&apos;s uniform on the rest. Nothing changes
-              until you upload it.
+              Preview the TAq uniform on your skin, choose the right fit, then download the
+              finished PNG. Your skin stays unchanged until you upload it.
             </p>
 
             <div className="uniform-preview" style={{ opacity: previewState === 'ready' ? 1 : 0.4 }}>
@@ -188,8 +188,8 @@ export default function UniformModal({ isOpen, onClose }: Props) {
               </a>
             </div>
             <p className="uniform-footnote">
-              Upload the downloaded PNG at minecraft.net (or the launcher&apos;s Skins tab) and pick
-              the same arm model there. Capes are separate.
+              Upload the PNG on minecraft.net or in the launcher&apos;s Skins tab. Choose the same
+              arm model; your cape stays separate.
             </p>
           </>
         )}

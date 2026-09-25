@@ -260,7 +260,7 @@ export function SubmitForm({
       if (!res.ok) { setError(body.error ?? `Submission failed (${res.status})`); return; }
       setSent(true);
     } catch {
-      setError('Network error — please try again');
+      setError('Could not reach the server. Try again.');
     } finally {
       setBusy(false);
     }
@@ -276,7 +276,7 @@ export function SubmitForm({
         <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
           {direct
             ? 'The change is live on the map.'
-            : 'An admin will approve or reject it — approved entries appear on the map.'}
+            : 'An admin will approve or reject it. Approved entries appear on the map.'}
         </div>
         <button type="button" style={{ ...smallBtn, marginTop: '0.75rem' }} onClick={onDone}>Done</button>
       </div>

@@ -60,8 +60,8 @@ export default function GraidLogDashboard() {
     );
   }
 
-  if (error) return <div style={{ ...cardStyle, textAlign: 'center', color: '#ef4444' }}>Failed to load dashboard</div>;
-  if (!data) return <div style={{ ...cardStyle, textAlign: 'center', color: 'var(--text-secondary)' }}>No data available</div>;
+  if (error) return <div style={{ ...cardStyle, textAlign: 'center', color: '#ef4444' }}>Could not load guild raid stats.</div>;
+  if (!data) return <div style={{ ...cardStyle, textAlign: 'center', color: 'var(--text-secondary)' }}>No guild raid data yet.</div>;
 
   const maxType = Math.max(...data.raidTypeDistribution.map(t => t.count), 1);
 
@@ -122,7 +122,7 @@ export default function GraidLogDashboard() {
             <div>
               <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                 {inDrilldown && selectedEvent
-                  ? `${selectedEvent.title} — Per-Day Distribution`
+                  ? `${selectedEvent.title}: Per-Day Distribution`
                   : 'Raids Per Week'}
               </h3>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
