@@ -2662,7 +2662,7 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
                 }
                 e.currentTarget.style.transform = 'scale(1)';
               }}
-              title="Chronicle — alliances & events"
+              title="Chronicle: alliances and events"
             >
               <BookOpen size={20} strokeWidth={2} />
             </button>

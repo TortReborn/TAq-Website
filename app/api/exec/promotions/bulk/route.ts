@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       }
       const targetRankIdx = RANK_HIERARCHY.indexOf(entry.currentRank);
       if (userRankIdx === -1 || targetRankIdx === -1 || targetRankIdx >= userRankIdx) {
-        return NextResponse.json({ error: `You cannot manage ${entry.ign} — their rank is at or above yours` }, { status: 403 });
+        return NextResponse.json({ error: `You cannot manage ${entry.ign} because their rank is at or above yours.` }, { status: 403 });
       }
       if (!['promote', 'demote', 'remove'].includes(entry.actionType)) {
         return NextResponse.json({ error: `Invalid action type for ${entry.ign}` }, { status: 400 });

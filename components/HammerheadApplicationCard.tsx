@@ -247,7 +247,7 @@ export default function HammerheadApplicationCard({ app, onVoteChange, onDecisio
               {submittedDate.toLocaleDateString()} {submittedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               {selectedTasks.length > 0 && (
                 <span style={{ marginLeft: '0.5rem', color: 'var(--text-muted)' }}>
-                  — {selectedTasks.join(', ')}
+                  : {selectedTasks.join(', ')}
                 </span>
               )}
             </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import ChroniclesAdmin from '@/components/ChroniclesAdmin';
 
 export const metadata: Metadata = {
-  title: 'Chronicle — editorial desk',
+  title: 'Chronicle | Editorial desk',
   description: 'Pages still unchecked, sources not yet written up, and suggestions awaiting a decision.',
 };
 
