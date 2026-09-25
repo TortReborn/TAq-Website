@@ -490,24 +490,6 @@ body, body *, html, html * {
   font-family: 'GameFont', var(--font-roboto), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
-/* Profile card uses its own fonts (5x5.ttf pixel font + game.ttf) */
-.profile-card, .profile-card * {
-  font-family: inherit !important;
-}
-
-/* Profile card wrapper — scales card uniformly to fit viewport */
-.profile-card-wrapper {
-  max-height: calc(100vh - 180px);
-  margin-bottom: 0.75rem;
-  overflow: visible;
-}
-
-.profile-card-scaled {
-  padding: 14px;
-  border-radius: 20px;
-  transform-origin: top center;
-}
-
 /* Soft card glass effect */
 .card {
   background: var(--bg-card);
@@ -651,8 +633,8 @@ body, body *, html, html * {
   }
 }
 
-/* Force the game font everywhere except navigation and profile card, which set their own font-family */
-* :not(.nav-font):not(.nav-font *):not(.profile-card):not(.profile-card *) {
+/* Force the game font everywhere except navigation, which sets its own font-family */
+* :not(.nav-font):not(.nav-font *) {
   font-family: 'GameFont', var(--font-roboto), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
@@ -1431,83 +1413,76 @@ body.site-fixed-bg-active > footer {
 @font-face {
   font-family: 'GameFont';
   /* 5KB Latin+punctuation subset (preloaded in the layout head), cut from
-     data/fonts/game.ttf by scripts/subset-game-font.cjs. The 14MB original is
-     deliberately not listed as a truetype fallback: it shipped with every
-     deployment, and html-to-image fetched it on every profile-card export. */
+     data/fonts/game.ttf by scripts/subset-game-font.cjs. */
   src: url('/images/profile/game.subset.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
-/* ========== PROFILE CARD STYLES ========== */
-
-/* 3D beveled pixel-art badge (matching bot's generate_badge()) */
-.profile-badge {
-  display: inline-block;
-  padding: 4px 14px;
-  font-family: 'PixelFont5x5', monospace;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-  image-rendering: pixelated;
-  border-width: 3px;
-  border-style: solid;
+/* ========== PROFILE CARD IMAGE ========== */
+.profile-card-image-shell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 900 / 1180;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  border-radius: 1rem;
 }
 
-/* Player name - game font with drop shadow */
-.profile-card-name {
-  font-family: 'GameFont', sans-serif;
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+.profile-card-image,
+.profile-card-image-placeholder,
+.profile-card-image-error {
+  width: 100%;
+  height: 100%;
 }
 
-/* Shells balance */
-.profile-card-balance {
-  font-family: 'GameFont', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+.profile-card-image {
+  display: block;
+  object-fit: contain;
 }
 
-/* Stat label - pixel font, gold color */
-.profile-stat-label {
-  font-family: 'PixelFont5x5', monospace;
-  font-size: 11px;
-  color: #fad51e;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.profile-card-image-placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.03) 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 70%
+  );
+  background-size: 200% 100%;
+  animation: profile-card-shimmer 1.5s ease-in-out infinite;
 }
 
-/* Stat value - game font, white, right-aligned */
-.profile-stat-value {
-  font-family: 'GameFont', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #fff;
-  text-align: right;
+.profile-card-image-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
 }
 
-/* Profile card mobile responsive */
-@media (max-width: 500px) {
-  .profile-badge {
-    font-size: 9px;
-    padding: 3px 10px;
-    border-width: 2px;
-  }
-  .profile-card-name {
-    font-size: 1.4rem;
-  }
-  .profile-stat-label {
-    font-size: 9px;
-  }
-  .profile-stat-value {
-    font-size: 0.85rem;
+.profile-card-image-error button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border-card);
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  background: transparent;
+  cursor: pointer;
+}
+
+@keyframes profile-card-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-card-image-placeholder {
+    animation: none;
   }
 }
 
@@ -1580,26 +1555,6 @@ body.site-fixed-bg-active > footer {
 
 .profile-panel td {
   color: var(--text-primary);
-}
-
-/* Background loading shimmer */
-.profile-bg-shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    110deg,
-    rgba(255, 255, 255, 0.03) 30%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.03) 70%
-  );
-  background-size: 200% 100%;
-  animation: profile-bg-shimmer 1.5s ease-in-out infinite;
-  z-index: 1;
-}
-
-@keyframes profile-bg-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 /* Onboarding tour animations */
