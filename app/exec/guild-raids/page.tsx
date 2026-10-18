@@ -45,6 +45,7 @@ export default function ExecGuildRaidsPage() {
     background: activeTab === tab ? 'var(--color-ocean-400)' : 'transparent',
     color: activeTab === tab ? '#fff' : 'var(--text-secondary)',
     transition: 'all 0.15s',
+    flexShrink: 0,
   });
 
   if (meta.loading) {
@@ -62,7 +63,7 @@ export default function ExecGuildRaidsPage() {
       <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '1.5rem' }}>Guild Raids</h1>
 
       <div style={{
-        display: 'flex', gap: '0.25rem', marginBottom: '1.5rem',
+        display: 'flex', gap: '0.25rem', marginBottom: '1.5rem', overflowX: 'auto',
         background: 'var(--bg-card)', borderRadius: '0.5rem', padding: '0.25rem',
         border: '1px solid var(--border-card)',
       }}>
