@@ -112,12 +112,12 @@ function BonusRowsEditor({ label, leftHeader, leftPlaceholder, rows, onChange, i
           <span />
           {rows.map((r, i) => (
             <div key={i} style={{ display: 'contents' }}>
-              <input value={r.left} onChange={e => update(i, { left: e.target.value })} style={compact} type="number" min={1} placeholder={leftPlaceholder} />
-              <input value={r.points} onChange={e => update(i, { points: e.target.value })} style={compact} type="number" min={0} placeholder="0" />
+              <input value={r.left} onChange={e => update(i, { left: e.target.value })} style={compact} type="number" min={1} placeholder={leftPlaceholder} aria-label={`${label} row ${i + 1}: ${leftHeader.toLowerCase()}`} />
+              <input value={r.points} onChange={e => update(i, { points: e.target.value })} style={compact} type="number" min={0} placeholder="0" aria-label={`${label} row ${i + 1}: bonus points`} />
               <button
                 type="button"
                 onClick={() => onChange(rows.filter((_, j) => j !== i))}
-                aria-label={`Remove ${label.toLowerCase()} row`}
+                aria-label={`Remove ${label.toLowerCase()} row ${i + 1}`}
                 style={{ width: '1.75rem', height: '1.75rem', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0.375rem', border: 'none', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', cursor: 'pointer' }}
               >
                 <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
@@ -522,7 +522,7 @@ export default function GraidEvents() {
                     )}
                     <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>{selectedEvent.title}</h2>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', minWidth: 0 }}>
                     {editingId === selectedEvent.id ? (
                       formActions(handleUpdate, 'Save Changes', () => { setEditingId(null); resetForm(); })
                     ) : (
