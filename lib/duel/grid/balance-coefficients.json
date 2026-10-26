@@ -1,0 +1,133 @@
+{
+  "budget": {
+    "base": 1,
+    "perCost": 2,
+    "quad": 0
+  },
+  "normalCostWeights": [
+    0,
+    3,
+    4,
+    4,
+    3,
+    1
+  ],
+  "tierBonus": {
+    "normal": 0,
+    "unique": 0,
+    "rare": 0,
+    "legendary": 0,
+    "fabled": 0,
+    "mythic": 0,
+    "member": 0,
+    "token": 0
+  },
+  "stats": {
+    "power": 1.528,
+    "health": 0.651
+  },
+  "elementBudget": {
+    "earth": 1.845,
+    "thunder": 1.552,
+    "water": 0.759,
+    "fire": -0.858,
+    "air": -1.844
+  },
+  "keywords": {
+    "guard": [
+      1.059,
+      0,
+      0.371
+    ],
+    "rush": [
+      0.76,
+      0.76,
+      0
+    ],
+    "ranged": [
+      0.33,
+      0.33,
+      0
+    ],
+    "stealth": [
+      0.264,
+      0.13,
+      0
+    ],
+    "shield": [
+      1.405,
+      0.043,
+      0
+    ],
+    "drain": [
+      0,
+      0.45,
+      0
+    ],
+    "pierce": [
+      0,
+      0.082,
+      0
+    ],
+    "regen": [
+      0.137,
+      0,
+      0.034
+    ]
+  },
+  "shieldOnGuard": 2.956,
+  "vanilla": -0.13,
+  "triggers": {
+    "death": 0.744,
+    "turn_start": 2.2,
+    "move": 0.91,
+    "moveTide": 0.8,
+    "moveFloor": 0.6
+  },
+  "effects": {
+    "damage:chosen:enemy": 2.959,
+    "damage:chosen:enemy_unit": 1.286,
+    "damage:chosen:any_unit": 1.2,
+    "damage:enemy_hero": 0.719,
+    "damage:all_enemy_units": 4.126,
+    "damage:all_other_units": 0.9,
+    "damage:random_enemy_unit": 0.9,
+    "damage:random_enemy": 1.281,
+    "damage:self": -0.5,
+    "damage:ally_hero": -0.3,
+    "heal:self": 0.25,
+    "heal:one": 0.41,
+    "heal:all": 0.9,
+    "buff:self:atk": 1,
+    "buff:self:hp": 1,
+    "buff:one:atk": 0.64,
+    "buff:one:hp": 0.289,
+    "buff:all:atk": 8.252,
+    "buff:all:hp": 3.359,
+    "draw": 1.127,
+    "freeze:one": 3.12,
+    "freeze:random": 1.1,
+    "freeze:all": 10.348,
+    "bounce:one": 1.141,
+    "bounce:enemies": 2.34,
+    "bounce:everyone": 0.4,
+    "summon": 0.53,
+    "tide": 1.2,
+    "grant:stealth:one": 0.6,
+    "grant:shield:one": 1.363,
+    "grant:guard:one": 1.237,
+    "grant:rush:one": 1.5,
+    "grant:stealth:all": 2.4,
+    "grant:shield:all": 4.8,
+    "grant:guard:all": 6,
+    "destroy": 1.1,
+    "chain": 0.985
+  },
+  "normalElementBudget": {
+    "earth": 1.381,
+    "thunder": 1.046,
+    "water": 0.675,
+    "fire": -1.362,
+    "air": -0.98
+  }
+}

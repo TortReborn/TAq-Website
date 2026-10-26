@@ -1,0 +1,1539 @@
+/* Three-Front War board. Built on the duel stylesheet (duel.module.css):
+   the root also carries its .battle class, so every --d-* theme token and
+   the shared card, unit, hand and overlay styles apply here unchanged. */
+
+.war {
+  --war-hero: 60px;
+  --war-red: var(--d-target);
+  --war-gold: #d97706;
+  --war-blue: #0284c7;
+}
+
+:global([data-theme="dark"]) .war {
+  --war-gold: #fbbf24;
+  --war-blue: #38bdf8;
+}
+
+/* Rows: opponent, the reveal's narration (empty while planning), the fronts, the strip, you. */
+.table {
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+}
+
+/* --- Side rows ------------------------------------------------------------- */
+
+.sideRow {
+  display: grid;
+  align-items: center;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+.foeRow {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.myRow {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: end;
+}
+
+.foeMid {
+  display: flex;
+  justify-content: center;
+}
+
+.counters {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.hq {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.towerCount {
+  position: absolute;
+  right: -8px;
+  bottom: -6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--d-chip-bg);
+  border: 1px solid var(--d-chip-border);
+  color: var(--d-ink);
+}
+
+.bank {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem 0.15rem 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #10b981 16%, var(--d-chip-bg));
+  border: 1px solid color-mix(in srgb, #10b981 55%, transparent);
+  color: var(--d-ink);
+  width: fit-content;
+}
+
+.bank svg {
+  color: #10b981;
+}
+
+.bank b {
+  font-size: 1.05rem;
+}
+
+.bankCap {
+  font-size: 0.75rem;
+  color: var(--d-ink-2);
+}
+
+.bankOver {
+  border-color: var(--d-target);
+  background: color-mix(in srgb, var(--d-target) 15%, var(--d-chip-bg));
+}
+
+.bankOver b {
+  color: var(--d-target);
+}
+
+.lockChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: var(--d-chip-bg);
+  border: 1px solid var(--d-chip-border);
+  color: var(--d-ink-2);
+  white-space: nowrap;
+}
+
+.lockDone {
+  border-color: var(--d-ready);
+  color: var(--d-ready);
+}
+
+/* Three dots, still: "planning" without motion that would pull the eye. */
+.dots {
+  width: 18px;
+  height: 6px;
+  background: radial-gradient(circle, currentColor 45%, transparent 50%) 0 0 / 6px 6px repeat-x;
+  opacity: 0.7;
+}
+
+/* --- The three fronts -------------------------------------------------------- */
+
+.board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+  min-height: 0;
+}
+
+.lane {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+  padding: 6px;
+  border-radius: 16px;
+  background: var(--d-lane-bg);
+  border: 1px solid var(--d-lane-border);
+}
+
+.laneCentre {
+  border-color: color-mix(in srgb, var(--war-gold) 55%, transparent);
+  background:
+    radial-gradient(80% 40% at 50% 50%, color-mix(in srgb, var(--war-gold) 12%, transparent), transparent 80%),
+    var(--d-lane-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--war-gold) 25%, transparent);
+}
+
+.laneHead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--d-ink);
+  padding: 2px 4px;
+  border-radius: 10px;
+  min-height: 24px;
+}
+
+.laneHead b {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.centreTag {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--war-gold) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--war-gold) 60%, transparent);
+  color: var(--war-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.holder {
+  flex-basis: 100%;
+  font-size: 0.72rem;
+  color: var(--d-ink-2);
+  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif !important;
+}
+
+.holderMine {
+  color: var(--d-ready);
+}
+
+.holderFoe {
+  color: var(--d-target);
+}
+
+.laneMid {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--d-ink-3);
+}
+
+.laneMid::before,
+.laneMid::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--d-line);
+  opacity: 0.5;
+}
+
+/* A slot sizes its unit to whichever runs out first: width or height. */
+.slot {
+  --uw: min(calc(100cqw - 16px), calc((100cqh - 14px) * 0.735), 210px);
+  container: slot / size;
+  position: relative;
+  flex: 1 1 0;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 2px dashed transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.slotMine {
+  background: color-mix(in srgb, var(--war-blue) 5%, transparent);
+}
+
+.slotFoe {
+  background: color-mix(in srgb, var(--d-target) 4%, transparent);
+}
+
+.slotTarget {
+  border-color: var(--d-target);
+  background: color-mix(in srgb, var(--d-target) 12%, transparent);
+  cursor: crosshair;
+}
+
+.slotAlly {
+  border-color: var(--d-ready);
+  background: color-mix(in srgb, var(--d-ready) 12%, transparent);
+  cursor: pointer;
+}
+
+.emptySlot {
+  font-size: 0.8rem;
+  color: var(--d-ink-3);
+  pointer-events: none;
+  text-align: center;
+}
+
+.slotTarget .emptySlot {
+  color: var(--d-target);
+  font-weight: 600;
+}
+
+.slotAlly .emptySlot {
+  color: var(--d-drop);
+  font-weight: 600;
+}
+
+.targetTag {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  transform: translateX(-50%);
+  z-index: 8;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: var(--d-target);
+  color: #fff;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.plannedUnit {
+  opacity: 0.62;
+  outline: 2px dashed var(--d-ready);
+  outline-offset: 3px;
+  cursor: pointer;
+}
+
+.plannedTag {
+  position: absolute;
+  inset: auto 8% 10%;
+  text-align: center;
+  padding: 0.15em 0.3em;
+  border-radius: 0.4em;
+  background: rgba(22, 163, 74, 0.92);
+  color: #fff;
+  font-size: 1em;
+  z-index: 3;
+}
+
+/* --- Towers ---------------------------------------------------------------- */
+
+.tower {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--d-chip-bg);
+  border: 1px solid var(--d-chip-border);
+  color: var(--d-ink);
+  min-height: 26px;
+}
+
+.towerFoe {
+  border-color: color-mix(in srgb, var(--d-target) 45%, transparent);
+}
+
+.towerMine {
+  border-color: color-mix(in srgb, var(--war-blue) 45%, transparent);
+}
+
+.towerPips {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.towerPips span {
+  width: 12px;
+  height: 8px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--d-ink) 15%, transparent);
+}
+
+.towerFoe .pipOn {
+  background: linear-gradient(180deg, #fca5a5, #dc2626);
+}
+
+.towerMine .pipOn {
+  background: linear-gradient(180deg, #7dd3fc, #0284c7);
+}
+
+.towerHp {
+  font-size: 0.9rem;
+  min-width: 1ch;
+}
+
+.towerDown {
+  opacity: 0.7;
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--d-ink) 10%, transparent) 0 6px, transparent 6px 12px), var(--d-chip-bg);
+}
+
+.towerRubble {
+  font-size: 0.75rem;
+  text-decoration: line-through;
+  color: var(--d-ink-2);
+}
+
+/* --- Unit overlays: order and speed ------------------------------------------- */
+
+.orderBadge {
+  position: absolute;
+  left: 50%;
+  top: -0.95em;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  font-size: max(10px, 0.95em);
+  white-space: nowrap;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif !important;
+  font-weight: 600;
+}
+
+.orderBadge em {
+  font-style: normal;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.orderAttack {
+  background: #dc2626;
+}
+
+.orderMove {
+  background: #b45309;
+}
+
+.orderBrace {
+  background: #475569;
+}
+
+.orderSwap {
+  background: #0369a1;
+}
+
+.orderDeploy {
+  background: #15803d;
+}
+
+.orderIdle {
+  background: color-mix(in srgb, var(--d-chip-bg) 90%, transparent);
+  color: var(--d-ink-2);
+  border: 1px dashed var(--d-chip-border);
+  box-shadow: none;
+}
+
+.speedChip {
+  position: absolute;
+  top: 0.35em;
+  right: 0.35em;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  font-size: max(9px, 0.95em);
+  color: #fff;
+  background: rgba(8, 16, 26, 0.82);
+  border: 0.12em solid #a5f3fc;
+  pointer-events: none;
+}
+
+/* A visible brace stance (WAR.braceStance): the unit is braced this round. */
+.stanceChip {
+  position: absolute;
+  top: 0.35em;
+  left: 0.35em;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  font-size: max(9px, 0.95em);
+  color: #fff;
+  background: #475569;
+  border: 0.12em solid #cbd5e1;
+  box-shadow: 0 0 0 0.15em rgba(71, 85, 105, 0.45);
+  pointer-events: none;
+}
+
+.stanced {
+  outline: 0.18em solid #94a3b8;
+  outline-offset: -0.18em;
+}
+
+/* --- Order picker ---------------------------------------------------------- */
+
+.menu {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 28px);
+  transform: translateX(-50%);
+  z-index: 45;
+  width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--d-dialog-bg);
+  border: 1px solid var(--d-dialog-border);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  color: var(--d-ink);
+}
+
+.menuHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px 4px;
+  font-size: 0.85rem;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 9px;
+  border: 1px solid var(--d-chip-border);
+  background: var(--d-chip-bg);
+  color: var(--d-ink);
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.menuItem:hover:not(:disabled) {
+  border-color: var(--war-blue);
+}
+
+.menuItem:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.menuOn {
+  border-color: var(--d-ready);
+  background: color-mix(in srgb, var(--d-ready) 14%, var(--d-chip-bg));
+}
+
+.menuRow {
+  display: flex;
+  gap: 4px;
+}
+
+.menuRow .menuItem {
+  justify-content: center;
+}
+
+.menuCost {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* --- Order arrows -------------------------------------------------------------- */
+
+.arrowLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 7;
+  overflow: visible;
+}
+
+.arrowAttack,
+.arrowMove,
+.arrowSwap {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.arrowAttack {
+  stroke: #dc2626;
+}
+
+.arrowMove {
+  stroke: var(--war-gold);
+  stroke-dasharray: 8 6;
+}
+
+.arrowSwap {
+  stroke: var(--war-blue);
+  stroke-dasharray: 2 6;
+}
+
+.head_attack {
+  fill: #dc2626;
+}
+
+.head_move {
+  fill: var(--war-gold);
+}
+
+.head_swap {
+  fill: var(--war-blue);
+}
+
+/* --- Strip and your row ------------------------------------------------------ */
+
+.strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--gap);
+  min-height: 50px;
+}
+
+.lockWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-self: end;
+}
+
+.planSummary {
+  font-size: 0.82rem;
+  color: var(--d-ink-2);
+  white-space: nowrap;
+}
+
+.skip {
+  white-space: nowrap;
+}
+
+.myLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding-bottom: 10px;
+}
+
+.myGarrison {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 10px;
+}
+
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--d-ink-2);
+}
+
+.garrison {
+  display: flex;
+  gap: 8px;
+}
+
+.gSlot {
+  --uw: 84px;
+  width: 92px;
+  height: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 2px dashed var(--d-lane-border);
+  background: var(--d-lane-bg);
+}
+
+.gSlotSmall {
+  --uw: 46px;
+  width: 52px;
+  height: 66px;
+  border-width: 1px;
+}
+
+.gSlotSmall .emptySlot {
+  font-size: 0.6rem;
+}
+
+.gSlot .unit {
+  flex: none;
+  width: var(--uw);
+}
+
+/* --- Round summary, prompts -------------------------------------------------- */
+
+.summary {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.8rem 1.4rem;
+  border-radius: 14px;
+  background: var(--d-dialog-bg);
+  border: 1px solid var(--d-dialog-border);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+  color: var(--d-ink);
+  pointer-events: none;
+  animation: summaryIn 0.35s ease both;
+  text-align: center;
+}
+
+.summary b {
+  font-size: 1.05rem;
+}
+
+.summary em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+.good {
+  color: var(--d-ready);
+}
+
+.bad {
+  color: var(--d-target);
+}
+
+.pickBar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--card-w, 120px) * 1.55 + 60px);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  background: var(--d-dialog-bg);
+  border: 1px solid var(--d-dialog-border);
+  color: var(--d-ink);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  font-size: 0.88rem;
+}
+
+/* --- Effects ------------------------------------------------------------------ */
+
+.fxSwitchIn {
+  animation: switchIn 0.55s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+}
+
+.fxSlide {
+  animation: slideIn 0.55s cubic-bezier(0.2, 1, 0.4, 1) both;
+}
+
+.fxPerk {
+  animation: perkGlow 0.9s ease;
+}
+
+.fxTowerFall {
+  animation: towerFall 0.9s ease;
+}
+
+@keyframes switchIn {
+  0% { transform: translateY(var(--from-y, 60%)) scale(0.8); opacity: 0.2; }
+}
+
+@keyframes slideIn {
+  0% { transform: translateX(calc(var(--from-x, 0%) * 1.35)); }
+}
+
+@keyframes perkGlow {
+  40% { background: color-mix(in srgb, var(--war-gold) 35%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--war-gold) 60%, transparent); }
+}
+
+@keyframes towerFall {
+  15% { transform: translateX(-4px); filter: brightness(1.8); }
+  30% { transform: translateX(4px); }
+  45% { transform: translateX(-2px); }
+  100% { transform: none; }
+}
+
+@keyframes summaryIn {
+  from { opacity: 0; transform: translate(-50%, -40%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fxSwitchIn, .fxSlide, .fxPerk, .fxTowerFall, .summary {
+    animation: none;
+  }
+}
+
+/* --- The round's reveal ------------------------------------------------------------ */
+
+/* The narration row sits between the opponent and the fronts. Empty, it
+   takes no room (the negative margin cancels the grid gap). */
+.narrationRow {
+  min-width: 0;
+}
+
+.narrationRowEmpty {
+  margin-top: calc(-1 * var(--gap));
+}
+
+.narration {
+  --side: var(--d-ink-3);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem 0.9rem;
+  padding: 0.55rem 0.9rem 0.65rem;
+  border-radius: 14px;
+  background: var(--d-dialog-bg);
+  border: 1px solid var(--d-dialog-border);
+  border-left: 5px solid var(--side);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  color: var(--d-ink);
+  overflow: hidden;
+}
+
+.nMine {
+  --side: var(--war-blue);
+}
+
+.nFoe {
+  --side: var(--war-red);
+}
+
+.nPhase {
+  align-self: start;
+  margin-top: 0.1rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  background: color-mix(in srgb, var(--side) 88%, #000);
+}
+
+.narration:not(.nMine):not(.nFoe) .nPhase {
+  background: #475569;
+}
+
+/* Three lines reserved, so the board does not jump between steps. */
+.nText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-height: 4.2em;
+  justify-content: flex-start;
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.nText b {
+  font-weight: 700;
+}
+
+.nResults {
+  color: var(--d-ink-2);
+  animation: nIn 0.3s ease both;
+}
+
+.nCount {
+  align-self: start;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--d-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.nProgress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: color-mix(in srgb, var(--d-ink) 10%, transparent);
+}
+
+.nProgress::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--p, 0) * 100%);
+  background: var(--side);
+  transition: width 0.3s ease;
+}
+
+/* Planning while the reveal narrates: one compact row. */
+.nCompact {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  padding: 0.35rem 0.6rem 0.45rem;
+  box-shadow: none;
+}
+
+.nCompact .nText {
+  min-height: 0;
+  font-size: 0.85rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nCompact .nText b::after {
+  content: ' ';
+}
+
+.nCompact .nResults {
+  display: inline;
+}
+
+.nCornerBtns {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nSmallBtn {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+@keyframes nIn {
+  from { opacity: 0; transform: translateY(3px); }
+}
+
+/* Controls */
+.rCentre {
+  justify-self: center;
+  min-width: 0;
+}
+
+.rControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--d-chip-bg);
+  border: 1px solid var(--d-chip-border);
+}
+
+.rControlsCompact {
+  padding: 0.1rem;
+}
+
+.rBtn {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--d-ink);
+  cursor: pointer;
+}
+
+.rControlsCompact .rBtn {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.rBtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--d-ink) 10%, transparent);
+}
+
+.rBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rBtn:focus-visible,
+.rSpeedBtn:focus-visible,
+.recapItem:focus-visible,
+.tab:focus-visible,
+.linkBtn:focus-visible {
+  outline: 2px solid var(--war-blue);
+  outline-offset: 2px;
+}
+
+.rPlay {
+  background: var(--war-blue);
+  color: #fff;
+}
+
+.rPlay:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--war-blue) 85%, #000);
+}
+
+.rSpeed {
+  display: inline-flex;
+  margin-left: 0.3rem;
+  padding: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--d-ink) 8%, transparent);
+}
+
+.rSpeedBtn {
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--d-ink-2);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.rSpeedOn {
+  background: var(--d-chip-bg);
+  color: var(--d-ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.planNow {
+  white-space: nowrap;
+}
+
+/* Who acts, and on whom. */
+.boardReplay .slot {
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.actor {
+  outline: 0.22em solid var(--war-gold);
+  outline-offset: 0.12em;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--war-gold) 70%, transparent);
+  z-index: 12;
+}
+
+.actorBadge {
+  background: var(--war-gold);
+  color: #1c1917;
+}
+
+.actorHq {
+  outline: 3px solid var(--war-gold);
+  outline-offset: 3px;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--war-gold) 70%, transparent);
+}
+
+.slotAimed {
+  border-color: var(--d-target);
+  border-style: solid;
+  background: color-mix(in srgb, var(--d-target) 13%, transparent);
+}
+
+.slotMine.slotAimed {
+  border-color: var(--war-blue);
+  background: color-mix(in srgb, var(--war-blue) 13%, transparent);
+}
+
+.arrowReplay {
+  stroke-width: 4.5;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: drawLine 0.45s ease-out forwards;
+}
+
+.arrowReplay.arrowMove,
+.arrowReplay.arrowSwap {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+/* A defeated unit fades after the hit lands. */
+.deathLate {
+  animation-delay: 0.55s !important;
+}
+
+.ghostStill {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.fxSwitchUp {
+  --from-y: 60%;
+  animation: switchIn 0.6s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+}
+
+.fxSwitchDown {
+  --from-y: -60%;
+  animation: switchIn 0.6s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+}
+
+.fxSlideFromLeft {
+  --from-x: -100%;
+  animation: slideIn 0.6s cubic-bezier(0.2, 1, 0.4, 1) both;
+}
+
+.fxSlideFromRight {
+  --from-x: 100%;
+  animation: slideIn 0.6s cubic-bezier(0.2, 1, 0.4, 1) both;
+}
+
+.summaryHint {
+  font-size: 0.78rem;
+  color: var(--d-ink-2);
+}
+
+/* --- Side panel: recap and log tabs ------------------------------------------------ */
+
+.tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--d-ink) 8%, transparent);
+}
+
+.tab {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--d-ink-2);
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tabOn {
+  background: var(--d-chip-bg);
+  color: var(--d-ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.recap {
+  flex: 1 1 auto;
+  min-height: 80px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+}
+
+.recapTally {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  background: var(--d-chip-bg);
+  border: 1px solid var(--d-chip-border);
+}
+
+.recapTally em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+.recapList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recapItem {
+  display: grid;
+  grid-template-columns: 5.6rem minmax(0, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.3rem 0.45rem;
+  border-radius: 7px;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--d-ink-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recapItem:hover {
+  background: color-mix(in srgb, var(--d-ink) 7%, transparent);
+  color: var(--d-ink);
+}
+
+.recapMine {
+  border-left-color: var(--war-blue);
+}
+
+.recapFoe {
+  border-left-color: var(--war-red);
+}
+
+.recapOn {
+  background: color-mix(in srgb, var(--war-gold) 18%, transparent);
+  color: var(--d-ink);
+}
+
+.recapKind {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--d-ink-3);
+  padding-top: 0.12rem;
+}
+
+.recapFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 0;
+  background: none;
+  padding: 0.2rem 0;
+  color: var(--war-blue);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.linkBtn:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrowReplay {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .nResults,
+  .nProgress::after {
+    animation: none;
+    transition: none;
+  }
+  .fxSwitchUp, .fxSwitchDown, .fxSlideFromLeft, .fxSlideFromRight {
+    animation: none;
+  }
+}
+
+/* --- Guide pieces ---------------------------------------------------------------- */
+
+.miniBoard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.miniLane {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--d-lane-bg);
+  border: 1px solid var(--d-lane-border);
+  min-width: 0;
+}
+
+.miniLane.laneCentre {
+  border-color: color-mix(in srgb, var(--war-gold, #d97706) 55%, transparent);
+}
+
+.miniSlot {
+  --uw: min(120px, 90%);
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.miniSlot .unit {
+  flex: none;
+  width: var(--uw);
+}
+
+.reachWrap {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reachFig {
+  flex: 1 1 280px;
+  max-width: 420px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.reachSvg {
+  width: 100%;
+  height: auto;
+}
+
+.reachFoe {
+  fill: color-mix(in srgb, #dc2626 16%, transparent);
+  stroke: #dc2626;
+  stroke-width: 1.5;
+}
+
+.reachMine {
+  fill: color-mix(in srgb, #0284c7 16%, transparent);
+  stroke: #0284c7;
+  stroke-width: 1.5;
+}
+
+.reachText {
+  fill: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
+}
+
+.reachLine,
+.reachLineStraight {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.reachLine {
+  stroke: #d97706;
+  stroke-dasharray: 5 4;
+}
+
+.reachLineStraight {
+  stroke: #dc2626;
+}
+
+.speedFig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* --- Responsive --------------------------------------------------------------- */
+
+@media (max-height: 820px) {
+  .war {
+    --war-hero: 50px;
+  }
+  .gSlot {
+    --uw: 70px;
+    width: 78px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .laneHead .holder {
+    font-size: 0.68rem;
+  }
+}
+
+/* Shorter screens: the narration runs as one paragraph, so the fronts keep their height. */
+@media (max-height: 980px) {
+  .narration {
+    padding: 0.35rem 0.75rem 0.45rem;
+    gap: 0.3rem 0.7rem;
+  }
+  .nText {
+    display: block;
+    min-height: 2.65em;
+    font-size: 0.9rem;
+    line-height: 1.32;
+  }
+  .nText b::after {
+    content: ' ';
+  }
+  .nResults {
+    display: inline;
+  }
+  .recapItem {
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .war {
+    --war-hero: 40px;
+  }
+  .table {
+    grid-template-rows: auto auto minmax(360px, 1fr) auto auto;
+  }
+  .foeRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'hq counters' 'g g';
+  }
+  .foeRow > .hq {
+    grid-area: hq;
+  }
+  .foeRow > .counters {
+    grid-area: counters;
+    gap: 0.4rem;
+  }
+  .foeRow > .foeMid {
+    grid-area: g;
+    display: none;
+  }
+  .myRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'left garrison' 'hand hand';
+  }
+  .myLeft {
+    grid-area: left;
+    padding-bottom: 0;
+  }
+  .myGarrison {
+    grid-area: garrison;
+    padding-bottom: 0;
+  }
+  .myRow > :last-child {
+    grid-area: hand;
+  }
+  .board {
+    gap: 4px;
+  }
+  .lane {
+    padding: 3px;
+    gap: 4px;
+    border-radius: 10px;
+  }
+  .laneHead {
+    font-size: 0.7rem;
+    gap: 2px;
+  }
+  .laneHead svg,
+  .holder {
+    display: none;
+  }
+  .centreTag {
+    font-size: 0.55rem;
+    padding: 0 4px;
+  }
+  .slot {
+    --uw: min(calc(100cqw - 8px), calc((100cqh - 10px) * 0.735), 120px);
+    min-height: 110px;
+  }
+  .tower {
+    padding: 2px 4px;
+    gap: 3px;
+    min-height: 22px;
+  }
+  .tower > svg {
+    display: none;
+  }
+  .towerPips span {
+    width: 7px;
+    height: 6px;
+  }
+  .laneMid span {
+    display: none;
+  }
+  .gSlot {
+    --uw: 54px;
+    width: 60px;
+    height: 78px;
+  }
+  .strip {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'pill lock' 'hint hint';
+  }
+  .strip > :first-child {
+    grid-area: pill;
+  }
+  .strip > :nth-child(2) {
+    grid-area: hint;
+  }
+  .lockWrap {
+    grid-area: lock;
+    gap: 0.35rem;
+  }
+  .planSummary {
+    display: none;
+  }
+  .menu {
+    width: 180px;
+  }
+  .orderBadge {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+  .summary {
+    width: 88%;
+    padding: 0.6rem;
+  }
+  .narration,
+  .nCompact {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.3rem 0.5rem;
+    padding: 0.45rem 0.6rem 0.55rem;
+  }
+  .nPhase {
+    justify-self: start;
+    font-size: 0.66rem;
+  }
+  .nText {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.86rem;
+    min-height: 3.6em;
+  }
+  .nCompact .nText {
+    min-height: 0;
+  }
+  .nCornerBtns {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-content: flex-end;
+  }
+  .rWord {
+    display: none;
+  }
+  .rBtn {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+  .rSpeedBtn {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.74rem;
+  }
+  .planNow {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
+  }
+}
