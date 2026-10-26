@@ -1,0 +1,3985 @@
+{
+ "source": "Tort-Reborn data/cards.json + data/card_sets.json (scripts/sync-duel-cards.mjs)",
+ "generated_at": "2026-09-21T22:12:53+00:00",
+ "cards": [
+  {
+   "slug": "a-hunter-s-calling",
+   "name": "??? (A Hunter's Calling)",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/AHunter%27sCallingStartNPC.png?edceec",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/%3F%3F%3F_(A_Hunter%27s_Calling)"
+  },
+  {
+   "slug": "abramod",
+   "name": "Abramod",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Abramod.png?68b575"
+  },
+  {
+   "slug": "achper",
+   "name": "Achper",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Achper.png?3696f4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Achper"
+  },
+  {
+   "slug": "adamastor",
+   "name": "Adamastor",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Adamastor.png?62ad08",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Adamastor",
+   "altar": "Aerie of the Recluse",
+   "level": 95
+  },
+  {
+   "slug": "adder",
+   "name": "Adder",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Adder.png?fffb26"
+  },
+  {
+   "slug": "adigard",
+   "name": "Adigard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Adigard.png?5f87fe",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Adigard"
+  },
+  {
+   "slug": "admiral-aegis",
+   "name": "Admiral Aegis",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/AdmiralAegis.png?8cbcad",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Admiral_Aegis"
+  },
+  {
+   "slug": "admiral-amerigo",
+   "name": "Admiral Amerigo",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/AdmiralAmerigo.png?e8d3d8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Admiral_Amerigo"
+  },
+  {
+   "slug": "adventuring-mage",
+   "name": "Adventuring Mage",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AdventuringMage.png?fad99b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Adventuring_Mage"
+  },
+  {
+   "slug": "afelis",
+   "name": "Afelis",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Afelis%28Ragni%29.png?739991",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Afelis"
+  },
+  {
+   "slug": "agent",
+   "name": "Agent",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Agent.png?449b74",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Agent"
+  },
+  {
+   "slug": "agitated-citizen",
+   "name": "Agitated Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AgitatedCitizen.png?4e87f1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Agitated_Citizen"
+  },
+  {
+   "slug": "ahmas",
+   "name": "Ahmas",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Ahmas.png?f09824",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ahmas"
+  },
+  {
+   "slug": "ahmsord-citizen",
+   "name": "Ahmsord Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/AhmsordCitizen.png?d17ade"
+  },
+  {
+   "slug": "airbase-attendant",
+   "name": "Airbase Attendant",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AirbaseAttendant.png?8c9241",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Airbase_Attendant"
+  },
+  {
+   "slug": "alchemist",
+   "name": "Alchemist",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Alchemist.png?83bba8"
+  },
+  {
+   "slug": "aldwell-guard",
+   "name": "Aldwell Guard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AldwellGuard.png?1735b4"
+  },
+  {
+   "slug": "aledar",
+   "name": "Aledar",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Aledar.png?eacfe7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Aledar"
+  },
+  {
+   "slug": "alein",
+   "name": "Alein",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Alein.png?f0eb60"
+  },
+  {
+   "slug": "alekin-guard",
+   "name": "Alekin Guard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AlekinGuard.png?b8f616"
+  },
+  {
+   "slug": "alem",
+   "name": "Alem",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Alem.png?3ea316",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Alem"
+  },
+  {
+   "slug": "almuj-bank-guard",
+   "name": "Almuj Bank Guard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/AlmujBankGuard.png?f62ff2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Almuj_Bank_Guard"
+  },
+  {
+   "slug": "almuj-citizen-a-sandy-scandal",
+   "name": "Almuj Citizen (A Sandy Scandal)",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/AlmujCitizen%28QuestNPC%29.png?a841ab",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Almuj_Citizen_%28A_Sandy_Scandal%29"
+  },
+  {
+   "slug": "aluxander",
+   "name": "Aluxander",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Aluxander2.png?68d4c6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Aluxander"
+  },
+  {
+   "slug": "amadel",
+   "name": "Amadel",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/WynnExcavationLeaderAmadel%28NPC%29.png?3e0c0a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Amadel"
+  },
+  {
+   "slug": "amadel-s-assistant",
+   "name": "Amadel's Assistant",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Amadel%27sAssistant.png?580e2c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Amadel%27s_Assistant"
+  },
+  {
+   "slug": "amber",
+   "name": "Amber",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Amber.png?ebabf8"
+  },
+  {
+   "slug": "amira",
+   "name": "Amira",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Amira.png?41521a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Amira"
+  },
+  {
+   "slug": "anast",
+   "name": "Anast",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Anast.png?d44b53",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Anast"
+  },
+  {
+   "slug": "anathema",
+   "name": "Anathema",
+   "tier": "mythic",
+   "image_url": "https://wynncraft.wiki.gg/images/Anathema%28Render%29.png?a83e45",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Anathema",
+   "raid": "Nexus of Light"
+  },
+  {
+   "slug": "angie",
+   "name": "Angie",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Angie%28AuburnForest%29.png?33c4bd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Angie"
+  },
+  {
+   "slug": "ankou",
+   "name": "Ankou",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Ankou.png?24dcbd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ankou"
+  },
+  {
+   "slug": "ann",
+   "name": "Ann",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Ann.png?9be532",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ann"
+  },
+  {
+   "slug": "annihilation",
+   "name": "Annihilation",
+   "tier": "mythic",
+   "image_url": "https://wynncraft.wiki.gg/images/Annihilation.png?2f0714",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Annihilation",
+   "raid": "Roots of Corruption"
+  },
+  {
+   "slug": "antikythera-supercomputer",
+   "name": "Antikythera Supercomputer",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/AntikytheraSupercomputer.png?a1226f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Antikythera_Supercomputer"
+  },
+  {
+   "slug": "arakadicus",
+   "name": "Arakadicus",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Arakadicus.png?cd7a14",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Arakadicus",
+   "dungeon": "Infested Pit"
+  },
+  {
+   "slug": "argus",
+   "name": "Argus",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Argus.png?2651a7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Argus"
+  },
+  {
+   "slug": "ariodo",
+   "name": "Ariodo",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Ariodo.png?cb3a34",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ariodo"
+  },
+  {
+   "slug": "arnod",
+   "name": "Arnod",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Arnod.png?2a4992",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Arnod"
+  },
+  {
+   "slug": "arrai-veretel",
+   "name": "Arrai-Veretel",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Arrai-Veretel.png?7d1a14",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Arrai-Veretel"
+  },
+  {
+   "slug": "aryn",
+   "name": "Aryn",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Aryn.png?1abba1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Aryn"
+  },
+  {
+   "slug": "asher",
+   "name": "Asher",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Asher.png?aebea9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Asher"
+  },
+  {
+   "slug": "aster",
+   "name": "Aster",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Aster.png?682f3c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Aster"
+  },
+  {
+   "slug": "atila",
+   "name": "Atila",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Atila.png?f11f12"
+  },
+  {
+   "slug": "atisun",
+   "name": "Atisun",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Atisun.png?5feb5c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Atisun"
+  },
+  {
+   "slug": "aunoa",
+   "name": "Aunoa",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Aunoa.png?2debdd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Aunoa"
+  },
+  {
+   "slug": "ava",
+   "name": "Ava",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Ava.png?54d7d7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ava"
+  },
+  {
+   "slug": "avos-chief",
+   "name": "Avos Chief",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/AvosChief.png?5d464c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Avos_Chief"
+  },
+  {
+   "slug": "avos-citizen",
+   "name": "Avos Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AvosCitizen.png?f30032"
+  },
+  {
+   "slug": "avos-shaman",
+   "name": "Avos Shaman",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/AvosShaman.png?ec5541",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Avos_Shaman"
+  },
+  {
+   "slug": "axelus",
+   "name": "Axelus",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Axelus.png?287e39",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Axelus"
+  },
+  {
+   "slug": "bak-al",
+   "name": "Bak'al",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Bak%27al.png?53b127",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bak%27al"
+  },
+  {
+   "slug": "baker",
+   "name": "Baker",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Baker.png?891f83"
+  },
+  {
+   "slug": "bandit",
+   "name": "Bandit",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Bandit%28Removed%29.png?26416f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bandit"
+  },
+  {
+   "slug": "bandit-leader",
+   "name": "Bandit Leader",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/BanditLeader%28NPC%29.png?5e7503"
+  },
+  {
+   "slug": "banker",
+   "name": "Banker",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/TheBanker.png?daad6d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Banker"
+  },
+  {
+   "slug": "barden",
+   "name": "Barden",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Barden.png?4553e4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Barden"
+  },
+  {
+   "slug": "barkeep-romu",
+   "name": "Barkeep Romu",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/BarkeepRomu.png?917322"
+  },
+  {
+   "slug": "bassow",
+   "name": "Bassow",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Bassow.png?3740ad"
+  },
+  {
+   "slug": "batelu",
+   "name": "Batelu",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Batelu.png?a933f5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Batelu"
+  },
+  {
+   "slug": "big-butch",
+   "name": "Big Butch",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/BigButch.png?9c89b0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Big_Butch"
+  },
+  {
+   "slug": "bip",
+   "name": "Bip",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Bip.png?e0f668",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bip"
+  },
+  {
+   "slug": "bishop-kaideus",
+   "name": "Bishop Kaideus",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/BishopKaideus.png?ff9b82",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bishop_Kaideus"
+  },
+  {
+   "slug": "blackjack-dealer",
+   "name": "Blackjack Dealer",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/BlackjackDealer.png?e7d518"
+  },
+  {
+   "slug": "blacksmith-dren",
+   "name": "Blacksmith Dren",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/BlacksmithDren.png?22be25",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Blacksmith_Dren"
+  },
+  {
+   "slug": "blacksmith-dwarf",
+   "name": "Blacksmith Dwarf",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/BlacksmithDwarf.png?79107a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Blacksmith_Dwarf"
+  },
+  {
+   "slug": "boat-captain",
+   "name": "Boat Captain",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/BoatCaptain.png?b165b8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Boat_Captain"
+  },
+  {
+   "slug": "bob",
+   "name": "Bob",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Bob.png?230166",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bob"
+  },
+  {
+   "slug": "bonfire-keeper",
+   "name": "Bonfire Keeper",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/BonfireKeeper%28BattlefortheBonfire%29.png?3c2cbe",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bonfire_Keeper"
+  },
+  {
+   "slug": "bored-farmer",
+   "name": "Bored Farmer",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/BoredFarmer.png?720c46",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bored_Farmer"
+  },
+  {
+   "slug": "brank",
+   "name": "Brank",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Brank.png?8f535d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Brank"
+  },
+  {
+   "slug": "bricot",
+   "name": "Bricot",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Bricot.png?adf208",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bricot"
+  },
+  {
+   "slug": "brie",
+   "name": "Brie",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Brie.png?c6e4fa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Brie"
+  },
+  {
+   "slug": "bucie-citizen",
+   "name": "Bucie Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/BucieCitizen.png?14de0a"
+  },
+  {
+   "slug": "buendo",
+   "name": "Buendo",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Buendo.png?9082e8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Buendo"
+  },
+  {
+   "slug": "bulbo",
+   "name": "Bulbo",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Bulbo%28FestivaloftheBonfire%29.png?326e3f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bulbo"
+  },
+  {
+   "slug": "burtur",
+   "name": "Burtur",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Burtur.png?3b7f93",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Burtur"
+  },
+  {
+   "slug": "butler-hayn",
+   "name": "Butler Hayn",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ButlerHayn.png?6c0eaa"
+  },
+  {
+   "slug": "bylvis",
+   "name": "Bylvis",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Bylvis.png?a639c3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Bylvis"
+  },
+  {
+   "slug": "c-s-s-sunrise-captain",
+   "name": "C.S.S. Sunrise Captain",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CSSSunriseCaptain.png?40a059",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/C.S.S._Sunrise_Captain"
+  },
+  {
+   "slug": "c-s-s-wavebreaker-captain",
+   "name": "C.S.S Wavebreaker Captain",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/CSSWavebreakerCaptain.png?5b0a25",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/C.S.S_Wavebreaker_Captain"
+  },
+  {
+   "slug": "caid",
+   "name": "Caid",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SailorCaid.png?17b2fb",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Caid"
+  },
+  {
+   "slug": "caissop",
+   "name": "Caissop",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Caissop.png?a48c7d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Caissop"
+  },
+  {
+   "slug": "calamaro",
+   "name": "Calamaro",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Calamaro.png?6d2d41",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Calamaro"
+  },
+  {
+   "slug": "calo",
+   "name": "Calo",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Calo%28Detlas%29.png?839451",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Calo"
+  },
+  {
+   "slug": "captain-ackbar",
+   "name": "Captain Ackbar",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Captainackbar.png?85d4c9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Ackbar"
+  },
+  {
+   "slug": "captain-cileon",
+   "name": "Captain Cileon",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CileonPortrait.png?ca9e12",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Cileon"
+  },
+  {
+   "slug": "captain-enduyn",
+   "name": "Captain Enduyn",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CaptainEnduyn.png?e812cf",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Enduyn"
+  },
+  {
+   "slug": "captain-fuhue",
+   "name": "Captain Fuhue",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/FuhuePortrait.png?ee2889",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Fuhue"
+  },
+  {
+   "slug": "captain-goruca",
+   "name": "Captain Goruca",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CaptainGoruca.png?7d3b06",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Goruca"
+  },
+  {
+   "slug": "captain-kymer",
+   "name": "Captain Kymer",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CaptainKymer.png?a81976",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Kymer"
+  },
+  {
+   "slug": "captain-olof",
+   "name": "Captain Olof",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CaptainOlof.png?47e1e9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Olof"
+  },
+  {
+   "slug": "captain-ragon",
+   "name": "Captain Ragon",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CaptainRagon.png?42ee7e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Ragon"
+  },
+  {
+   "slug": "captain-redbeard",
+   "name": "Captain Redbeard",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CaptainRedbeard.png?1b7235",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captain_Redbeard"
+  },
+  {
+   "slug": "captured-prisoner",
+   "name": "Captured Prisoner",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/CapturedPrisoner.png?75bb90",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Captured_Prisoner"
+  },
+  {
+   "slug": "caras",
+   "name": "Caras",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Caras.png?a6017e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Caras"
+  },
+  {
+   "slug": "caravan-driver",
+   "name": "Caravan Driver",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CaravanDriver.png?143534",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Caravan_Driver"
+  },
+  {
+   "slug": "carl",
+   "name": "\"Carl\"",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Carl.png?7642aa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/%22Carl%22"
+  },
+  {
+   "slug": "celuuse",
+   "name": "Celuuse",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Celuuse.png?97cd31",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Celuuse"
+  },
+  {
+   "slug": "cemor",
+   "name": "Cemor",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Cemor.png?ed852f"
+  },
+  {
+   "slug": "ceyquin",
+   "name": "Ceyquin",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ceyquin.png?2a3aff",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ceyquin"
+  },
+  {
+   "slug": "charlie",
+   "name": "Charlie",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Charlie.png?4a6da5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Charlie"
+  },
+  {
+   "slug": "charon",
+   "name": "Charon",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Charon.png?9b5175",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Charon",
+   "dungeon": "Underworld Crypt"
+  },
+  {
+   "slug": "cheese-merchant",
+   "name": "Cheese Merchant",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CheeseMerchant.png?fcebb0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Cheese_Merchant"
+  },
+  {
+   "slug": "chef-hamsey",
+   "name": "Chef Hamsey",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ChefHamsey.png?d49238",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Chef_Hamsey"
+  },
+  {
+   "slug": "chief-clight",
+   "name": "Chief Clight",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ChiefClight.png?6b4286"
+  },
+  {
+   "slug": "chieftain-paku",
+   "name": "Chieftain Paku",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/DogunChieftain.png?a4b47e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Chieftain_Paku"
+  },
+  {
+   "slug": "child",
+   "name": "Child",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Child.png?89a5f8"
+  },
+  {
+   "slug": "cidre",
+   "name": "Cidre",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Cidre.png?f1665f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Cidre"
+  },
+  {
+   "slug": "cikal",
+   "name": "Cikal",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Cikal.png?b09890",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Cikal"
+  },
+  {
+   "slug": "cinfras",
+   "name": "Cinfras",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Cinfras%28NPC%29.png?776671",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Cinfras"
+  },
+  {
+   "slug": "cinfras-citizen",
+   "name": "Cinfras Citizen",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CinfrasCitizen.png?fd6811"
+  },
+  {
+   "slug": "citizen",
+   "name": "Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/AlekinCitizen%28NPC1%29.png?44649a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Citizen"
+  },
+  {
+   "slug": "colonel-gailard",
+   "name": "Colonel Gailard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/ColonelGailard.png?aab11a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Colonel_Gailard"
+  },
+  {
+   "slug": "commander-ferreo",
+   "name": "Commander Ferreo",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CommanderFerreo_%28post-duel_challenge_2%29.png?43d20d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Commander_Ferreo"
+  },
+  {
+   "slug": "comor",
+   "name": "Comor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Comor.png?83fa24",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Comor"
+  },
+  {
+   "slug": "confectionery-merchant",
+   "name": "Confectionery Merchant",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ConfectioneryMerchant.png?baec99",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Confectionery_Merchant"
+  },
+  {
+   "slug": "construction-worker",
+   "name": "Construction Worker",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ConstructionWorker.png?cc161f"
+  },
+  {
+   "slug": "corak",
+   "name": "Corak",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Corak.png?fbd683",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Corak"
+  },
+  {
+   "slug": "corkus-citizen",
+   "name": "Corkus Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/CorkusCitizen.png?2fb5b1"
+  },
+  {
+   "slug": "corkus-city-citizen",
+   "name": "Corkus City Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CorkusCityCitizen%28Aqueduct%29.png?2395a8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Corkus_City_Citizen"
+  },
+  {
+   "slug": "corkus-delegate",
+   "name": "Corkus Delegate",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CorkusDelegate.png?5f6c85",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Corkus_Delegate"
+  },
+  {
+   "slug": "corkus-guard",
+   "name": "Corkus Guard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/CorkusGuard.png?ec45d6"
+  },
+  {
+   "slug": "corkus-jeweler",
+   "name": "Corkus Jeweler",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/CorkusJeweler.png?fe4ac8"
+  },
+  {
+   "slug": "corrupted-scout-lv-3",
+   "name": "Corrupted Scout (Lv. 3)",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/CorruptedScout%28Lv3%29.png?34f877",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Corrupted_Scout_%28Lv._3%29"
+  },
+  {
+   "slug": "coulmis",
+   "name": "Coulmis",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Coulmis.png?cf5736"
+  },
+  {
+   "slug": "creinu",
+   "name": "Creinu",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Creinu.png?6916e7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Creinu"
+  },
+  {
+   "slug": "croaquin",
+   "name": "Croaquin",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Croaquin.png?d267a3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Croaquin"
+  },
+  {
+   "slug": "customs-clerk",
+   "name": "Customs Clerk",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/CustomsClerk.png?9791e4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Customs_Clerk"
+  },
+  {
+   "slug": "czytash",
+   "name": "Czytash",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Czytash.png?3e3aa3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Czytash"
+  },
+  {
+   "slug": "dado",
+   "name": "Dado",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dado.png?dd822a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dado"
+  },
+  {
+   "slug": "dalben",
+   "name": "Dalben",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dalben.png?47f5b9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dalben"
+  },
+  {
+   "slug": "damien",
+   "name": "Damien",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Damien.png?f04daf",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Damien"
+  },
+  {
+   "slug": "damiral",
+   "name": "Damiral",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Damiral.png?8e275e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Damiral"
+  },
+  {
+   "slug": "darnes",
+   "name": "Darnes",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Darnes.png?736945",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Darnes"
+  },
+  {
+   "slug": "daxe",
+   "name": "Daxe",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Daxe.png?e5fd70",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Daxe"
+  },
+  {
+   "slug": "death",
+   "name": "Death",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Death.png?650731",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Death"
+  },
+  {
+   "slug": "dejected-identifier",
+   "name": "Dejected Identifier",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/DejectedIdentifier.png?98c9dd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dejected_Identifier"
+  },
+  {
+   "slug": "dejol",
+   "name": "Dejol",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dejol.png?45bc77",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dejol"
+  },
+  {
+   "slug": "demma",
+   "name": "Demma",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Demma.png?f03c61"
+  },
+  {
+   "slug": "dereg",
+   "name": "Dereg",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dereg.png?7b862c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dereg"
+  },
+  {
+   "slug": "detective-hart",
+   "name": "Detective Hart",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Detective_Hart.png?31dfef",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Detective_Hart"
+  },
+  {
+   "slug": "detective-jackson",
+   "name": "Detective Jackson",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/DetectiveJackson.png?4a5973",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Detective_Jackson"
+  },
+  {
+   "slug": "detective-lorias",
+   "name": "Detective Lorias",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/DetectiveLorias.png?d053b1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Detective_Lorias"
+  },
+  {
+   "slug": "detlas-citizen",
+   "name": "Detlas Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/DetlasCitizen.png?2dcfca"
+  },
+  {
+   "slug": "detlas-soldier",
+   "name": "Detlas Soldier",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Detlas_Soldier.png?961519"
+  },
+  {
+   "slug": "doan",
+   "name": "Doan",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Doan.png?98782f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Doan"
+  },
+  {
+   "slug": "dobile",
+   "name": "Dobile",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dobile.png?39c740",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dobile"
+  },
+  {
+   "slug": "document-merchant",
+   "name": "Document Merchant",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/DocumentMerchant.png?3aa803",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Document_Merchant"
+  },
+  {
+   "slug": "dodegar",
+   "name": "Dodegar",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Dodegar%28FestivaloftheBonfire%29.png?3b0915",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dodegar"
+  },
+  {
+   "slug": "dogun",
+   "name": "Dogun",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Dogun.png?1893be"
+  },
+  {
+   "slug": "dohstaj",
+   "name": "Dohstaj",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dohstaj.png?661b15",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dohstaj"
+  },
+  {
+   "slug": "dolem",
+   "name": "Dolem",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Dolem.png?f7f40d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dolem"
+  },
+  {
+   "slug": "dorroc",
+   "name": "Dorroc",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dorroc.png?954665",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dorroc"
+  },
+  {
+   "slug": "doubiss",
+   "name": "Doubiss",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Doubiss.png?7c8ef9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Doubiss"
+  },
+  {
+   "slug": "dr-legendary",
+   "name": "Dr. Legendary",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/DrLegendary.png?17e606",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dr._Legendary"
+  },
+  {
+   "slug": "dr-picard",
+   "name": "Dr. Picard",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Dr.Picard.png?f91eb7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dr._Picard"
+  },
+  {
+   "slug": "dr-urelix",
+   "name": "Dr. Urelix",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Dr.Urelix%28AnIronHeartPartII%2CFactory%29.png?ff1153",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dr._Urelix"
+  },
+  {
+   "slug": "drale",
+   "name": "Drale",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Drale%28Cowfusion%29.png?318a09",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Drale"
+  },
+  {
+   "slug": "drucksh",
+   "name": "Drucksh",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Drucksh.png?b45f97",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Drucksh"
+  },
+  {
+   "slug": "dullahan",
+   "name": "Dullahan",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Dullahan.png?c0f58c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dullahan"
+  },
+  {
+   "slug": "durbeo",
+   "name": "Durbeo",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Durbeo.png?c80682",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Durbeo"
+  },
+  {
+   "slug": "durum-protector",
+   "name": "Durum Protector",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/DurumProtector.png?b64fe1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Durum_Protector",
+   "altar": "Bovine Barn",
+   "level": 20
+  },
+  {
+   "slug": "duvale",
+   "name": "Duvale",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Duvale.png?121553",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Duvale"
+  },
+  {
+   "slug": "dwarf-salesman",
+   "name": "Dwarf Salesman",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/DwarfSalesman.png?45387b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Dwarf_Salesman"
+  },
+  {
+   "slug": "edula",
+   "name": "Edula",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Edula.png?9dda9b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Edula"
+  },
+  {
+   "slug": "edwin",
+   "name": "Edwin",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Edwin.png?e43f1d"
+  },
+  {
+   "slug": "efena",
+   "name": "Efena",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Efena.png?e1e4ed",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Efena"
+  },
+  {
+   "slug": "egpla",
+   "name": "Egpla",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Egpla.png?b8f9d4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Egpla"
+  },
+  {
+   "slug": "elder",
+   "name": "Elder",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Elder.png?de7181"
+  },
+  {
+   "slug": "elder-alder",
+   "name": "Elder Alder",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderAlder.png?28b343"
+  },
+  {
+   "slug": "elder-astal",
+   "name": "Elder Astal",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderAstal%28Frozen%29.png?943e2f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elder_Astal"
+  },
+  {
+   "slug": "elder-berusia",
+   "name": "Elder Berusia",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderBerusia.png?a79f54",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elder_Berusia"
+  },
+  {
+   "slug": "elder-birch",
+   "name": "Elder Birch",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderBirch.png?72afce"
+  },
+  {
+   "slug": "elder-desint",
+   "name": "Elder Desint",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderDesint%28Frozen%29.png?8785b7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elder_Desint"
+  },
+  {
+   "slug": "elder-oak",
+   "name": "Elder Oak",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderOak.png?bb55f5"
+  },
+  {
+   "slug": "elder-prometheus",
+   "name": "Elder Prometheus",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderPrometheus.png?8e642c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elder_Prometheus"
+  },
+  {
+   "slug": "elder-willow",
+   "name": "Elder Willow",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ElderWillow.png?603051"
+  },
+  {
+   "slug": "elio",
+   "name": "Elio",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Elio.png?970793",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elio"
+  },
+  {
+   "slug": "elise",
+   "name": "Elise",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/ElisePortraitNeutral.png?33b8fe",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elise"
+  },
+  {
+   "slug": "elphaba",
+   "name": "Elphaba",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Elphaba%28AJourneyBeyond%29.png?50cbf5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elphaba"
+  },
+  {
+   "slug": "elrund",
+   "name": "Elrund",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Elrund.png?e5d11d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Elrund"
+  },
+  {
+   "slug": "eltom-guard",
+   "name": "Eltom Guard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/EltomGuard.png?7b0089",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Eltom_Guard"
+  },
+  {
+   "slug": "eluzterp",
+   "name": "Eluzterp",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Eluzterp.png?9e1507",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Eluzterp"
+  },
+  {
+   "slug": "engineer-eric",
+   "name": "Engineer Eric",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/EngineerEric.png?ebdb5a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Engineer_Eric"
+  },
+  {
+   "slug": "enkser",
+   "name": "Enkser",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Enkser.png?3acd5e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Enkser"
+  },
+  {
+   "slug": "enzan",
+   "name": "Enzan",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Enzan.png?3f33ce",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Enzan"
+  },
+  {
+   "slug": "eppo",
+   "name": "Eppo",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Eppo.png?955079",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Eppo"
+  },
+  {
+   "slug": "espren-border-guard",
+   "name": "Espren Border Guard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/EsprenBorderGuard.png?53ca28"
+  },
+  {
+   "slug": "espren-child",
+   "name": "Espren Child",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/EsprenChild.png?5479f6"
+  },
+  {
+   "slug": "espren-citizen",
+   "name": "Espren Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/EsprenCitizen.png?db7897"
+  },
+  {
+   "slug": "etemitoro",
+   "name": "Etemitoro",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Etemitoro.png?ea5951",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Etemitoro"
+  },
+  {
+   "slug": "event-airship-pilot",
+   "name": "Event Airship Pilot",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/EventAirshipPilot.png?b488aa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Event_Airship_Pilot"
+  },
+  {
+   "slug": "excavator-admin-uci",
+   "name": "Excavator Admin Uci",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ExcavatorAdminUci.png?757c6e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Excavator_Admin_Uci"
+  },
+  {
+   "slug": "excavator-lykron",
+   "name": "Excavator Lykron",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ExcavatorLykron.png?d91da2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Excavator_Lykron"
+  },
+  {
+   "slug": "excavator-placardus",
+   "name": "Excavator Placardus",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ExcavatorPlacardus.png?9aa4ab",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Excavator_Placardus"
+  },
+  {
+   "slug": "excavator-vade",
+   "name": "Excavator Vade",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ExcavatorVade.png?6977b6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Excavator_Vade"
+  },
+  {
+   "slug": "excited-fan",
+   "name": "Excited Fan",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ExcitedFan.png?ad86b9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Excited_Fan"
+  },
+  {
+   "slug": "farcor",
+   "name": "Farcor",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Farcor%28Portrait%29.png?d0715f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Farcor"
+  },
+  {
+   "slug": "farmer-cevalus",
+   "name": "Farmer Cevalus",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/FarmerCevalus.png?d52139",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Farmer_Cevalus"
+  },
+  {
+   "slug": "favian",
+   "name": "Favian",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Favian.png?2fcbfa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Favian"
+  },
+  {
+   "slug": "ferndor",
+   "name": "Ferndor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Ferndor.png?9e98a1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ferndor"
+  },
+  {
+   "slug": "festival-goer",
+   "name": "Festival Goer",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/FestivalGoer%28Friendly%29.png?eb7f5d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Festival_Goer"
+  },
+  {
+   "slug": "festival-organizer",
+   "name": "Festival Organizer",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/FestivalOrganizer.png?1d94a7"
+  },
+  {
+   "slug": "festival-worker",
+   "name": "Festival Worker",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/FestivalWorker%28Performances%29.png?694cfa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Festival_Worker"
+  },
+  {
+   "slug": "fetu",
+   "name": "Fetu",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Fetu.png?7d453f"
+  },
+  {
+   "slug": "fia",
+   "name": "Fia",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Fia.png?7120c2"
+  },
+  {
+   "slug": "fichu",
+   "name": "Fichu",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Fichu.png?d184a8"
+  },
+  {
+   "slug": "fisherman",
+   "name": "Fisherman",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/FishyZombie.png?8a1f62"
+  },
+  {
+   "slug": "flodur",
+   "name": "Flodur",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Flodur.png?e3a0dc",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Flodur"
+  },
+  {
+   "slug": "forve",
+   "name": "Forve",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Forve%28Mission%2CDefendingtheGate%29.png?7e8c49",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Forve"
+  },
+  {
+   "slug": "frank",
+   "name": "Frank",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Frank.png?a0277a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Frank"
+  },
+  {
+   "slug": "fredris",
+   "name": "Fredris",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Fredris.png?9328d1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Fredris"
+  },
+  {
+   "slug": "gale",
+   "name": "Gale",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/SpiritofGale.png?bea6ba",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gale"
+  },
+  {
+   "slug": "galippe",
+   "name": "Galippe",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Galippe.png?64fbac",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Galippe"
+  },
+  {
+   "slug": "gana",
+   "name": "Gana",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Gana.png?5a6c97",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gana"
+  },
+  {
+   "slug": "gardener",
+   "name": "Gardener",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Gardener.png?6098aa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gardener"
+  },
+  {
+   "slug": "garoth",
+   "name": "Garoth, Keeper of the Sanctum",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Garoth%2CKeeperoftheSanctum%28Phase1%29.png?d700da",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Garoth",
+   "dungeon": "Timelost Sanctum"
+  },
+  {
+   "slug": "garull",
+   "name": "Garull",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Garull.png?85ee6c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Garull"
+  },
+  {
+   "slug": "garvan",
+   "name": "Garvan",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Garvan%28Past%29.png?4eddf6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Garvan"
+  },
+  {
+   "slug": "gawrick",
+   "name": "Gawrick",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Gawrick.png?d7e337",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gawrick"
+  },
+  {
+   "slug": "gelibord-citizen",
+   "name": "Gelibord Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/GelibordCitizen.png?9e4f30"
+  },
+  {
+   "slug": "gendarme-commander",
+   "name": "Gendarme Commander",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/GendarmeCommander.png?5096de"
+  },
+  {
+   "slug": "general-elix",
+   "name": "General Elix",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/GeneralElix.png?6cc279",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/General_Elix"
+  },
+  {
+   "slug": "general-graken",
+   "name": "General Graken",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/GeneralGraken.png?e18281",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/General_Graken"
+  },
+  {
+   "slug": "gernald",
+   "name": "Gernald",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Gernald.png?978331",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gernald"
+  },
+  {
+   "slug": "gert",
+   "name": "Gert",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Gert.png?cb171b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gert"
+  },
+  {
+   "slug": "gert-guard",
+   "name": "Gert Guard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/GertGuard.png?b7d53c"
+  },
+  {
+   "slug": "gerten-chief-lobo",
+   "name": "Gerten Chief Lobo",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/GertenChiefLobo.png?884acf",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gerten_Chief_Lobo"
+  },
+  {
+   "slug": "gerten-chief-snaga",
+   "name": "Gerten Chief Snaga",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/GertenChiefSnaga.png?4b1004",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gerten_Chief_Snaga"
+  },
+  {
+   "slug": "girazh",
+   "name": "Girazh",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Girazh.png?461e30"
+  },
+  {
+   "slug": "gordon",
+   "name": "Gordon",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Gordon.png?262f4b"
+  },
+  {
+   "slug": "gracen",
+   "name": "Gracen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Gracen.png?3abed2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gracen"
+  },
+  {
+   "slug": "grandmaster-shaman",
+   "name": "Grandmaster Shaman",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/GrandmasterShaman.png?bf8b81",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Grandmaster_Shaman"
+  },
+  {
+   "slug": "grandon",
+   "name": "Grandon",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Grandon.png?2363e2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Grandon"
+  },
+  {
+   "slug": "grapes",
+   "name": "Grapes",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Grapes.png?e6202c"
+  },
+  {
+   "slug": "grenot",
+   "name": "Grenot",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Grenot.png?717080",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Grenot"
+  },
+  {
+   "slug": "grootslang-wyrmling",
+   "name": "Grootslang Wyrmling",
+   "tier": "mythic",
+   "image_url": "https://wynncraft.wiki.gg/images/GrootslangWyrmling.png?4bfbb5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Grootslang_Wyrmling",
+   "raid": "The Nest of the Grootslangs"
+  },
+  {
+   "slug": "guardian-of-the-forest",
+   "name": "Guardian of The Forest",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/GuardianofTheForest.png?3d47fd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Guardian_of_The_Forest"
+  },
+  {
+   "slug": "gurix",
+   "name": "Gurix",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Gurix.png?bc0fa3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Gurix"
+  },
+  {
+   "slug": "hallfred",
+   "name": "Hallfred",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Hallfred.png?45fe25",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hallfred"
+  },
+  {
+   "slug": "hans",
+   "name": "Hans",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Hans.png?251aa6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hans"
+  },
+  {
+   "slug": "harker",
+   "name": "Harker",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Harker.png?9fce8a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Harker"
+  },
+  {
+   "slug": "haros",
+   "name": "Haros",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Haros.png?c18a1f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Haros",
+   "altar": "Rotten Passage",
+   "level": 25
+  },
+  {
+   "slug": "hashr",
+   "name": "Hashr",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Hashr%28Phase1%29.png?637f1d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hashr",
+   "dungeon": "Sand-Swept Tomb"
+  },
+  {
+   "slug": "head-engineer",
+   "name": "Head Engineer",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Head_Engineer.png?44aa3b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Head_Engineer"
+  },
+  {
+   "slug": "heliorion",
+   "name": "Heliorion",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Heliorion2.png?98b253",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Heliorion"
+  },
+  {
+   "slug": "her-majesty",
+   "name": "Her Majesty",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/QueenOfFruma.png?fcfc1e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Her_Majesty"
+  },
+  {
+   "slug": "herbert",
+   "name": "Herbert",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Herbert.png?12f55a"
+  },
+  {
+   "slug": "hermit",
+   "name": "Hermit",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Hermit.png?ee1504",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hermit"
+  },
+  {
+   "slug": "hive-servant",
+   "name": "Hive Servant",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Hive_Servant.png?9fdfe1"
+  },
+  {
+   "slug": "homeless-mayor",
+   "name": "Homeless Mayor",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/HomelessMayor.png?47fda1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Homeless_Mayor"
+  },
+  {
+   "slug": "honip",
+   "name": "Honip",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Honip%28Nemract%29.png?9b38f2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Honip"
+  },
+  {
+   "slug": "hot-air-balloon-captain",
+   "name": "Hot Air Balloon Captain",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/HotAirBalloonCaptain.png?67f523",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hot_Air_Balloon_Captain"
+  },
+  {
+   "slug": "hrona",
+   "name": "Hrona",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Hrona.png?d3c1a1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hrona"
+  },
+  {
+   "slug": "hyhet",
+   "name": "Hyhet, the Apostate",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Hyhet%2CtheApostate.png?ebfc45",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Hyhet",
+   "altar": "Deserter's Refuge",
+   "level": 119
+  },
+  {
+   "slug": "hyloch-citizen",
+   "name": "Hyloch Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/HylochCitizen.png?21bb09"
+  },
+  {
+   "slug": "ibele",
+   "name": "Ibele",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Ibele.png?9fbe8d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ibele"
+  },
+  {
+   "slug": "iboju-shaman",
+   "name": "Iboju Shaman",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/IbojuShaman.png?6dea16",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Iboju_Shaman"
+  },
+  {
+   "slug": "ildan",
+   "name": "Ildan",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ildan.png?14f380",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ildan"
+  },
+  {
+   "slug": "imperial-guard",
+   "name": "Imperial Guard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/ImperialGuard.png?9458fd"
+  },
+  {
+   "slug": "imperial-inquisitor",
+   "name": "Imperial Inquisitor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RoyalInquisitor.png?ca6b00"
+  },
+  {
+   "slug": "ineos",
+   "name": "Ineos",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ineos.png?4ac722"
+  },
+  {
+   "slug": "irlok",
+   "name": "Irlok",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Irlok.png?86bca7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Irlok"
+  },
+  {
+   "slug": "isfurus",
+   "name": "Isfurus",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Isfurus.png?b4028c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Isfurus"
+  },
+  {
+   "slug": "island-worker",
+   "name": "Island Worker",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/IslandWorker%28NPC%29.png?185cb5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Island_Worker"
+  },
+  {
+   "slug": "jamie",
+   "name": "Jamie",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Jamie.png?c8d09b"
+  },
+  {
+   "slug": "jankan",
+   "name": "Jankan",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/OldManJankan.png?18ece5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jankan"
+  },
+  {
+   "slug": "jaspur",
+   "name": "Jaspur",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Jaspur.png?e9f099",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jaspur"
+  },
+  {
+   "slug": "javen",
+   "name": "Javen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Javen.png?58561b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Javen"
+  },
+  {
+   "slug": "javier",
+   "name": "Javier",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Javier.png?31767b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Javier"
+  },
+  {
+   "slug": "jaybip",
+   "name": "Jaybip",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Jaybip%28Mission%29.png?a2bda4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jaybip"
+  },
+  {
+   "slug": "jenprest",
+   "name": "Jenprest",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Jenprest.png?bd2b3f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jenprest"
+  },
+  {
+   "slug": "jill",
+   "name": "Jill",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Jill.png?3703ad",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jill"
+  },
+  {
+   "slug": "jiro",
+   "name": "Jiro",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/JiroPortraitNeutral.png?d43ee6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jiro"
+  },
+  {
+   "slug": "jitak",
+   "name": "Jitak",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Jitak.png?6baf1c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jitak"
+  },
+  {
+   "slug": "jixy",
+   "name": "Jixy",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Jixy.png?eee4dd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jixy"
+  },
+  {
+   "slug": "jofash-clairvoyant",
+   "name": "Jofash Clairvoyant",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/JofashClairvoyant.png?77586c"
+  },
+  {
+   "slug": "jofash-resident",
+   "name": "Jofash Resident",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/JofashResident.png?57c672"
+  },
+  {
+   "slug": "jorkin",
+   "name": "Jorkin",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Jorkin.png?1a3b57",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Jorkin"
+  },
+  {
+   "slug": "juggler",
+   "name": "Juggler",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Juggler.png?b9518b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Juggler"
+  },
+  {
+   "slug": "junes",
+   "name": "Junes",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Junes.png?704a91",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Junes"
+  },
+  {
+   "slug": "ka-l-argwit",
+   "name": "Ka L'argwit",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/KaL%27argwit.png?98a33a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ka_L%27argwit"
+  },
+  {
+   "slug": "kaio",
+   "name": "Kaio",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/KaioPortraitNeutral.png?569c96",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kaio"
+  },
+  {
+   "slug": "kale",
+   "name": "Kale",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Kale.png?c78239",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kale"
+  },
+  {
+   "slug": "kansard",
+   "name": "Kansard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/KansardAd1.png?1b627c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kansard"
+  },
+  {
+   "slug": "kantor",
+   "name": "Kantor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Kantor.png?a06243",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kantor"
+  },
+  {
+   "slug": "karkun",
+   "name": "Karkun",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Karkun.png?55cea9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Karkun"
+  },
+  {
+   "slug": "karoc-miner",
+   "name": "Karoc Miner",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/KarocMiner.png?a771e1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Karoc_Miner"
+  },
+  {
+   "slug": "keibon",
+   "name": "Keibon",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Keibon.png?d7595c"
+  },
+  {
+   "slug": "kelight",
+   "name": "Kelight",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Kelight.png?317768",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kelight"
+  },
+  {
+   "slug": "king-burtan",
+   "name": "King Burtan",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/KingBurtan.png?f2312f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/King_Burtan"
+  },
+  {
+   "slug": "king-draani",
+   "name": "King Draani",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/KingDraani.png?6c09fa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/King_Draani"
+  },
+  {
+   "slug": "king-of-troms",
+   "name": "King of Troms",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/KingofTroms.png?c3f160",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/King_of_Troms"
+  },
+  {
+   "slug": "korun",
+   "name": "Korun",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Korun.png?4105da",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Korun"
+  },
+  {
+   "slug": "korzim",
+   "name": "Korzim",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Korzim.png?dec656",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Korzim"
+  },
+  {
+   "slug": "kreimu",
+   "name": "Kreimu",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Kreimu.png?625bea",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kreimu"
+  },
+  {
+   "slug": "kroac",
+   "name": "Kroac",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Kroac.png?692a63",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Kroac"
+  },
+  {
+   "slug": "laen",
+   "name": "Laen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Laen.png?83d50f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Laen"
+  },
+  {
+   "slug": "lanu",
+   "name": "Lanu",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Lanu.png?c958c9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lanu"
+  },
+  {
+   "slug": "lari",
+   "name": "Lari",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Lari.png?a4c818",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lari"
+  },
+  {
+   "slug": "larry",
+   "name": "Larry",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Larry.png?c40d1a"
+  },
+  {
+   "slug": "lazing-dogun",
+   "name": "Lazing Dogun",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LazingDogun.png?3e73cc",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lazing_Dogun"
+  },
+  {
+   "slug": "leacen",
+   "name": "Leacen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Leacen.png?fe37c9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Leacen"
+  },
+  {
+   "slug": "legendary-messenger",
+   "name": "Legendary Messenger",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LegendaryMessenger.png?fdbabd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Legendary_Messenger"
+  },
+  {
+   "slug": "legolus",
+   "name": "Legolus",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Legulus114.png?3419a0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Legolus"
+  },
+  {
+   "slug": "leif-pyle",
+   "name": "Leif Pyle",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/LeifPyle.png?b08a4b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Leif_Pyle"
+  },
+  {
+   "slug": "lekal",
+   "name": "Lekal",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Lekal.png?560700",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lekal"
+  },
+  {
+   "slug": "leucsaa",
+   "name": "Leucsaa",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Leucsaa.png?dd6382",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Leucsaa"
+  },
+  {
+   "slug": "lieutenant",
+   "name": "Lieutenant",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Lieutenant.png?f25dc6"
+  },
+  {
+   "slug": "lieutenant-van",
+   "name": "Lieutenant Van",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/LieutenantVan.png?38f5f8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lieutenant_Van"
+  },
+  {
+   "slug": "lighthouse-keeper",
+   "name": "Lighthouse Keeper",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LighthouseKeeper.png?bbd115",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lighthouse_Keeper"
+  },
+  {
+   "slug": "likeru",
+   "name": "Likeru",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Likeru.png?a5158e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Likeru"
+  },
+  {
+   "slug": "linton",
+   "name": "Linton",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/MinerLinton.png?c558e5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Linton"
+  },
+  {
+   "slug": "llevigar-archivist",
+   "name": "Llevigar Archivist",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LlevigarArchivist.png?1904c1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Llevigar_Archivist"
+  },
+  {
+   "slug": "llevigar-citizen",
+   "name": "Llevigar Citizen",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/LlevigarCitizen.png?b5833b"
+  },
+  {
+   "slug": "llevigar-professor",
+   "name": "Llevigar Professor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LlevigarProfessor.png?d54651"
+  },
+  {
+   "slug": "lodog",
+   "name": "Lodog",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Lodog.png?869cbd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lodog"
+  },
+  {
+   "slug": "lomoster",
+   "name": "Lomoster",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Lomoster.png?b7f462",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lomoster"
+  },
+  {
+   "slug": "lucio",
+   "name": "Lucio",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/LucioCropped.png?accdb4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lucio"
+  },
+  {
+   "slug": "lumilda",
+   "name": "Lumilda",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Lumilda.png?1578a4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lumilda"
+  },
+  {
+   "slug": "lusuco-citizen",
+   "name": "Lusuco Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LusucoCitizen.png?83975d"
+  },
+  {
+   "slug": "lutho-citizen",
+   "name": "Lutho Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/LuthoCitizen.png?892870",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Lutho_Citizen"
+  },
+  {
+   "slug": "mael-twain",
+   "name": "Mael Twain",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Mael.png?79812b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mael_Twain"
+  },
+  {
+   "slug": "mafia-prisoner",
+   "name": "Mafia Prisoner",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/MafiaPrisoner.png?4742d2"
+  },
+  {
+   "slug": "malo",
+   "name": "Malo",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Malo.png?3c0f1f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Malo"
+  },
+  {
+   "slug": "man",
+   "name": "Mané",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Man%C3%A9.png?bacdae"
+  },
+  {
+   "slug": "manager-nasea",
+   "name": "Manager Nasea",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ManagerNasea.png?197e72",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Manager_Nasea"
+  },
+  {
+   "slug": "mango",
+   "name": "Mango",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Mango.png?551f7b"
+  },
+  {
+   "slug": "marden",
+   "name": "Marden",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Marden.png?43514f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Marden"
+  },
+  {
+   "slug": "marston",
+   "name": "Marston",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Marston.png?dee48e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Marston"
+  },
+  {
+   "slug": "martim",
+   "name": "Martim",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Martim.png?1cda03",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Martim"
+  },
+  {
+   "slug": "mask-salesman",
+   "name": "Mask Salesman",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/MaskSalesman.png?568a17",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mask_Salesman"
+  },
+  {
+   "slug": "master-azael",
+   "name": "Master Azael",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/AzaelPortraitSmiling.png?cd28f2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Master_Azael"
+  },
+  {
+   "slug": "master-oshman",
+   "name": "Master Oshman",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/MasterOshman.png?6822bb"
+  },
+  {
+   "slug": "mastro",
+   "name": "Mastro",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Mastro.png?f3464a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mastro"
+  },
+  {
+   "slug": "maxie",
+   "name": "Maxie",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Maxie%28Hostile%2CAHunter%27sCalling%29.png?13f9cb",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Maxie"
+  },
+  {
+   "slug": "mayor-alvin",
+   "name": "Mayor Alvin",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/MayorAlvin.png?d49c8a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mayor_Alvin"
+  },
+  {
+   "slug": "mayor-eoric",
+   "name": "Mayor Eoric",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Mayor_Eoric.png?ad23e4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mayor_Eoric"
+  },
+  {
+   "slug": "mehme",
+   "name": "Mehme",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Mehme.png?8f7a48",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mehme"
+  },
+  {
+   "slug": "mel",
+   "name": "Mel",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Mel.png?272dfc",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mel"
+  },
+  {
+   "slug": "mercenary-leader",
+   "name": "Mercenary Leader",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/MercenaryLeader.png?851578",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mercenary_Leader"
+  },
+  {
+   "slug": "merchant-risch",
+   "name": "Merchant Risch",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/MerchantRisch.png?8fee13"
+  },
+  {
+   "slug": "merloni",
+   "name": "Merloni",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Merloni.png?549917",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Merloni"
+  },
+  {
+   "slug": "miliyus",
+   "name": "Miliyus",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Miliyus.png?c45268",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Miliyus"
+  },
+  {
+   "slug": "missing-child",
+   "name": "Missing Child",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/MissingChild.png?4cea35",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Missing_Child"
+  },
+  {
+   "slug": "mona",
+   "name": "Mona",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Mona.png?f84ad2"
+  },
+  {
+   "slug": "monte",
+   "name": "Monte",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Monte.png?b8dd9b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Monte"
+  },
+  {
+   "slug": "mora",
+   "name": "Mora",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Mora%28GuardUniform%29.png?2db8a8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mora"
+  },
+  {
+   "slug": "mother-aris",
+   "name": "Mother Aris",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/MotherAris.png?977ffb"
+  },
+  {
+   "slug": "mr-caritat",
+   "name": "Mr. Caritat",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Mr.Caritat.png?228b97",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mr._Caritat"
+  },
+  {
+   "slug": "mylo",
+   "name": "Mylo",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Mylo.png?d8fc53",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mylo"
+  },
+  {
+   "slug": "mysterious-figure",
+   "name": "Mysterious Figure",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/MysteriousFigure.png?2fa8b0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Mysterious_Figure"
+  },
+  {
+   "slug": "mysterious-leader",
+   "name": "Mysterious Leader",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/MysteriousLeader.png?47de73"
+  },
+  {
+   "slug": "nakoba",
+   "name": "Nakoba",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Naboka.png?3e12ed",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nakoba"
+  },
+  {
+   "slug": "nami-the-healer",
+   "name": "Nami The Healer",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/NamiTheHealer.png?844e41",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nami_The_Healer"
+  },
+  {
+   "slug": "narder",
+   "name": "Narder",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Narder.png?c32443",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Narder"
+  },
+  {
+   "slug": "nawild",
+   "name": "Nawild",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Nawild.png?50a49b"
+  },
+  {
+   "slug": "nedlom",
+   "name": "Nedlom",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Nedlom.png?5d8621",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nedlom"
+  },
+  {
+   "slug": "nesaak-citizen",
+   "name": "Nesaak Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/NesaakCitizen.png?b76080"
+  },
+  {
+   "slug": "nettik",
+   "name": "Nettik",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Nettik.png?ccc510",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nettik"
+  },
+  {
+   "slug": "nick",
+   "name": "Nick",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Nick.png?9207a6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nick"
+  },
+  {
+   "slug": "nikoler",
+   "name": "Nikoler",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Nikoler%28Stage7_1%29.png?3cb0d2"
+  },
+  {
+   "slug": "niren",
+   "name": "Niren",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Niren.png?f696fe"
+  },
+  {
+   "slug": "nohno",
+   "name": "Nohno",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Nohno.png?fd33ca",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nohno"
+  },
+  {
+   "slug": "norsten",
+   "name": "Norsten",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Norsten.png?8af759",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Norsten"
+  },
+  {
+   "slug": "nunexetor",
+   "name": "Nunexetor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Nunexetor.png?4493ce",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Nunexetor"
+  },
+  {
+   "slug": "obsessor",
+   "name": "Obsessor",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Obsessor%28Fake%29.png?94d052",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Obsessor"
+  },
+  {
+   "slug": "office-manager",
+   "name": "Office Manager",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/OfficeManager.png?3fec26",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Office_Manager"
+  },
+  {
+   "slug": "old-book",
+   "name": "Old Book",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/OldBook.png?da3e39"
+  },
+  {
+   "slug": "old-fisherman",
+   "name": "Old Fisherman",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/OldFisherman.png?1b9e98",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Old_Fisherman"
+  },
+  {
+   "slug": "old-mage",
+   "name": "Old Mage",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/OldMage.png?aa8156",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Old_Mage"
+  },
+  {
+   "slug": "old-man",
+   "name": "Old Man",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/OldMan%28HollowSerenity%29.png?8941d3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Old_Man"
+  },
+  {
+   "slug": "old-man-martyn",
+   "name": "Old Man Martyn",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/OldManMartyn.png?4ec37a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Old_Man_Martyn"
+  },
+  {
+   "slug": "old-siwel",
+   "name": "Old Siwel",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/OldSiwel.png?95ffcd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Old_Siwel"
+  },
+  {
+   "slug": "ollie",
+   "name": "Ollie",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ollie%28discovery%29.png?be9808",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ollie"
+  },
+  {
+   "slug": "olon",
+   "name": "Olon",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Olon.png?7548f3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Olon"
+  },
+  {
+   "slug": "olux-citizen",
+   "name": "Olux Citizen",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/OluxCitizen.png?a91192"
+  },
+  {
+   "slug": "omango",
+   "name": "Omango",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Omango.png?1ffe5d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Omango"
+  },
+  {
+   "slug": "onluk",
+   "name": "Onluk",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Onluk.png?543743",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Onluk"
+  },
+  {
+   "slug": "ope",
+   "name": "Ope",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Ope.png?f0bb93",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ope"
+  },
+  {
+   "slug": "orange-wybel",
+   "name": "Orange Wybel",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/OrangeWybel%28Boss%29.png?eec4f8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Orange_Wybel",
+   "altar": "Unknown Area",
+   "level": 99
+  },
+  {
+   "slug": "orikal",
+   "name": "Orikal",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Orikal.png?52ce14",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Orikal"
+  },
+  {
+   "slug": "orja",
+   "name": "Orja",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Orja.png?c72a96",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Orja"
+  },
+  {
+   "slug": "ormrod",
+   "name": "Ormrod",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ormrod.png?455cce",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ormrod"
+  },
+  {
+   "slug": "orphion",
+   "name": "Orphion",
+   "tier": "mythic",
+   "image_url": "https://wynncraft.wiki.gg/images/Orphion%2CLightIncarnate.png?4920da",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Orphion",
+   "raid": "Orphion's Nexus of Light"
+  },
+  {
+   "slug": "ostentatious-envoy",
+   "name": "Ostentatious Envoy",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/OstentatiousEnvoy.png?eecdaa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ostentatious_Envoy"
+  },
+  {
+   "slug": "otenu",
+   "name": "Otenu",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Otenu.png?76ad88",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Otenu"
+  },
+  {
+   "slug": "otium",
+   "name": "Otium",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Otium.png?4479f8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Otium"
+  },
+  {
+   "slug": "panic-zealot",
+   "name": "Panic Zealot",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/PanicZealot.png?5aed5c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Panic_Zealot_(Boss)",
+   "altar": "Bottomless Pit",
+   "level": 101
+  },
+  {
+   "slug": "pastor-arwes",
+   "name": "Pastor Arwes",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/PastorArwes.png?cf8994",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Pastor_Arwes"
+  },
+  {
+   "slug": "pastor-nitram",
+   "name": "Pastor Nitram",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/PastorNitram.png?389345",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Pastor_Nitram"
+  },
+  {
+   "slug": "peaches",
+   "name": "Peaches",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Peaches.png?713af4"
+  },
+  {
+   "slug": "peculiar-old-man",
+   "name": "Peculiar Old Man",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Peculiar_old_man.png?8f1561",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Peculiar_Old_Man"
+  },
+  {
+   "slug": "peli",
+   "name": "Peli",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Peli.png?367160"
+  },
+  {
+   "slug": "pete",
+   "name": "Pete",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Pete.png?38e162"
+  },
+  {
+   "slug": "phief",
+   "name": "Phief",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Phief.png?f26a5e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Phief"
+  },
+  {
+   "slug": "phinas",
+   "name": "Phinas",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Phinas.png?dba4d1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Phinas"
+  },
+  {
+   "slug": "piere",
+   "name": "Piere",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Piere.png?ed8af6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Piere"
+  },
+  {
+   "slug": "pirate",
+   "name": "Pirate",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Pirate.png?799038"
+  },
+  {
+   "slug": "plario",
+   "name": "Plario",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Plario.png?74d927",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Plario"
+  },
+  {
+   "slug": "poclo-wabblebuff-of-gelibord",
+   "name": "Poclo Wabblebuff of Gelibord",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/PocloWabblebuffofGelibord.png?35268d"
+  },
+  {
+   "slug": "pottur",
+   "name": "Pottur",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Pottur.png?aab03d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Pottur"
+  },
+  {
+   "slug": "prentiss",
+   "name": "Prentiss",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Prentiss.png?992ae6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Prentiss"
+  },
+  {
+   "slug": "prince-of-troms",
+   "name": "Prince of Troms",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/PrinceofTroms.png?2d85fb",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Prince_of_Troms"
+  },
+  {
+   "slug": "prison-guard",
+   "name": "Prison Guard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/PrisonGuard.png?ede81e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Prison_Guard"
+  },
+  {
+   "slug": "prisoner",
+   "name": "Prisoner",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Prisoner.png?449d05"
+  },
+  {
+   "slug": "private",
+   "name": "Private",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Private.png?ed16e9"
+  },
+  {
+   "slug": "private-cob",
+   "name": "Private Cob",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/PrivateCob.png?b4ec3b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Private_Cob"
+  },
+  {
+   "slug": "private-tylas",
+   "name": "Private Tylas",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/PrivateTylas.png?38c728",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Private_Tylas"
+  },
+  {
+   "slug": "private-walder",
+   "name": "Private Walder",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/PrivateWalder.png?c5bc01"
+  },
+  {
+   "slug": "psilo",
+   "name": "Psilo",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Psilo.png?a49f9c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Psilo"
+  },
+  {
+   "slug": "qira-mistress-of-the-hive",
+   "name": "Qira, Mistress of the Hive",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Qira%2CMistressoftheHive%28Phase1%29.png?28d3e1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Qira%2C_Mistress_of_the_Hive"
+  },
+  {
+   "slug": "qunit",
+   "name": "Qunit",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Qunit.png?fac5c5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Qunit"
+  },
+  {
+   "slug": "ragni-s-king",
+   "name": "Ragni's King",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Ragni%27sKing.png?278ac2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ragni%27s_King"
+  },
+  {
+   "slug": "ranol",
+   "name": "Ranol",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ranol.png?52435b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Ranol"
+  },
+  {
+   "slug": "rayshyroth",
+   "name": "Rayshyroth",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Rayshyroth.png?d7f010",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rayshyroth"
+  },
+  {
+   "slug": "receptionist",
+   "name": "Receptionist",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Receptionist.png?16646e"
+  },
+  {
+   "slug": "reddy",
+   "name": "Reddy",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Reddy.png?174188",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Reddy"
+  },
+  {
+   "slug": "referick",
+   "name": "Referick",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Referick.png?723413",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Referick"
+  },
+  {
+   "slug": "regular-humyn",
+   "name": "Regular Humyn",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RegularHumyn.png?a7fd0c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Regular_Humyn"
+  },
+  {
+   "slug": "regulux",
+   "name": "Regulux",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Regulux.png?b82f0b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Regulux"
+  },
+  {
+   "slug": "relend",
+   "name": "Relend",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Relend.png?de69d2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Relend"
+  },
+  {
+   "slug": "relos-citizen",
+   "name": "Relos Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RelosCitizen.png?97aaab"
+  },
+  {
+   "slug": "relos-mechanic",
+   "name": "Relos Mechanic",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RelosMechanic.png?75a9a5"
+  },
+  {
+   "slug": "rensa",
+   "name": "Rensa",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Rensa.png?d4e011",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rensa"
+  },
+  {
+   "slug": "representative-ernold",
+   "name": "Representative Ernold",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/RepresentativeErnold.png?aac980"
+  },
+  {
+   "slug": "revenant-of-skien",
+   "name": "Revenant of Skien",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/RevenantofSkien%28Phase1%29.png?996c17",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Revenant_of_Skien",
+   "altar": "Altar of Sanctification",
+   "level": 70
+  },
+  {
+   "slug": "rex",
+   "name": "Rex",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Rex%28Echoes_of_Change_stage_10%29.png?ab9a2c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rex"
+  },
+  {
+   "slug": "reynauld",
+   "name": "Reynauld",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/ScoutReynauld.png?fc65ba",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Reynauld"
+  },
+  {
+   "slug": "rhay",
+   "name": "Rhay",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Rhay.png?27bf6d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rhay"
+  },
+  {
+   "slug": "rileen",
+   "name": "Rileen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Rileen.png?2e0554",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rileen"
+  },
+  {
+   "slug": "rinire",
+   "name": "Rinire",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Rinire.png?564722",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rinire"
+  },
+  {
+   "slug": "rismor",
+   "name": "Rismor",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Rismor.png?ba635f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rismor"
+  },
+  {
+   "slug": "robboss",
+   "name": "Robboss",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Robboss.png?9fd1ee"
+  },
+  {
+   "slug": "rodoroc-citizen",
+   "name": "Rodoroc Citizen",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RodorocCitizen.png?b053b0"
+  },
+  {
+   "slug": "rohem",
+   "name": "Rohem",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Rohem.png?920d67",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rohem"
+  },
+  {
+   "slug": "rontaid",
+   "name": "Rontaid",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Rontaid.png?c04293",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rontaid"
+  },
+  {
+   "slug": "rotating-game-expert",
+   "name": "Rotating Game Expert",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RotatingGameExpert.png?5191f5"
+  },
+  {
+   "slug": "royal-advisor-carlos",
+   "name": "Royal Advisor Carlos",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/RoyalAdvisorCarlos.png?6ef5fd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Royal_Advisor_Carlos"
+  },
+  {
+   "slug": "runo",
+   "name": "Runo",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Runo.png?d0dcc1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Runo"
+  },
+  {
+   "slug": "rusty-bartender",
+   "name": "Rusty Bartender",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/RustyBartender.png?a802d9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rusty_Bartender"
+  },
+  {
+   "slug": "rymek-citizen",
+   "name": "Rymek Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/RymekCitizen%28NPC%29.png?c79a18"
+  },
+  {
+   "slug": "rymek-luke",
+   "name": "Rymek Luke",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/RymekLuke.png?b044b4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rymek_Luke",
+   "altar": "Sunrise Canyon",
+   "level": 40
+  },
+  {
+   "slug": "rynend",
+   "name": "Rynend",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Rynend.png?8a37df",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rynend"
+  },
+  {
+   "slug": "rynver",
+   "name": "Rynver",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Rynver.png?d7650a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Rynver"
+  },
+  {
+   "slug": "salesman",
+   "name": "Salesman",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Salesman.png?601a49",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Salesman"
+  },
+  {
+   "slug": "sanba",
+   "name": "Sanba",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Sanba.png?9f18da",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sanba"
+  },
+  {
+   "slug": "santa",
+   "name": "Santa",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/Santa%28CraftmasChaos%29.png?b0eee0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Santa"
+  },
+  {
+   "slug": "sasha-the-apothecary",
+   "name": "Sasha The Apothecary",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/SashaTheApothecary%28Appearance1%29.png?e78329",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sasha_The_Apothecary"
+  },
+  {
+   "slug": "sayleros",
+   "name": "Sayleros",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Sayleros.png?e231a8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sayleros"
+  },
+  {
+   "slug": "sayrr",
+   "name": "Sayrr",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Sayrr.png?35c75e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sayrr"
+  },
+  {
+   "slug": "scavenger-hunt-collector",
+   "name": "Scavenger Hunt Collector",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ScavengerHuntCollector.png?3c1c03",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Scavenger_Hunt_Collector"
+  },
+  {
+   "slug": "scientist-ynnos",
+   "name": "Scientist Ynnos",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Ynnos.png?cea9fe",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Scientist_Ynnos"
+  },
+  {
+   "slug": "seaskipper-captain",
+   "name": "Seaskipper Captain",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/SeaskipperCaptain.png?cb27ed",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Seaskipper_Captain"
+  },
+  {
+   "slug": "seasum",
+   "name": "Seasum",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Seasum.png?28aed7",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Seasum"
+  },
+  {
+   "slug": "secretary",
+   "name": "Secretary",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Secretary.png?482d1f"
+  },
+  {
+   "slug": "selchar-citizen",
+   "name": "Selchar Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SelcharCitizen.png?a32600"
+  },
+  {
+   "slug": "seluc",
+   "name": "Seluc",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Seluc%28Mob%29.png?8d8529",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Seluc"
+  },
+  {
+   "slug": "sensei-miyagi",
+   "name": "Sensei Miyagi",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/SenseiMiyagi.png?b90315",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sensei_Miyagi"
+  },
+  {
+   "slug": "sergeant-klafson",
+   "name": "Sergeant Klafson",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SergeantKlafson.png?6bb55c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sergeant_Klafson"
+  },
+  {
+   "slug": "sesad",
+   "name": "Sesad",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Sesad.png?7a6dde",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sesad"
+  },
+  {
+   "slug": "shaman-inrekei",
+   "name": "Shaman Inrekei",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/ShamanInrekei.png?71ae88",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Shaman_Inrekei"
+  },
+  {
+   "slug": "sherk",
+   "name": "Sherk",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Sherk.png?54f82e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sherk"
+  },
+  {
+   "slug": "shopkeeper",
+   "name": "Shopkeeper",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Shopkeeper.png?983585"
+  },
+  {
+   "slug": "siegfried",
+   "name": "Siegfried",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/MonumenttoSiegfried.png?d937ab",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Siegfried"
+  },
+  {
+   "slug": "silverbull-beacon-expert",
+   "name": "Silverbull Beacon Expert",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/SilverbullBeaconExpert.png?961d7a",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Silverbull_Beacon_Expert"
+  },
+  {
+   "slug": "silverbull-rank-expert",
+   "name": "Silverbull Rank Expert",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/SilverbullRankExpert.png?5a693f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Silverbull_Rank_Expert"
+  },
+  {
+   "slug": "silverbull-worker",
+   "name": "Silverbull Worker",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/SilverbullWorker%281%29.png?6812d3"
+  },
+  {
+   "slug": "siwel",
+   "name": "Siwel",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Siwel.png?f299d1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Siwel"
+  },
+  {
+   "slug": "skyraider-admirer",
+   "name": "Skyraider Admirer",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SkyraiderAdmirer.png?d19948",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Skyraider_Admirer"
+  },
+  {
+   "slug": "skyraider-elie",
+   "name": "Skyraider Elie",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SkyraiderElie.png?16ba2e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Skyraider_Elie"
+  },
+  {
+   "slug": "skyraider-guard",
+   "name": "Skyraider Guard",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/SkyraiderGuard.png?6b75f0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Skyraider_Guard"
+  },
+  {
+   "slug": "skyraider-lookout",
+   "name": "Skyraider Lookout",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SkyraiderLookout.png?922d3f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Skyraider_Lookout"
+  },
+  {
+   "slug": "skyraider-mercenary",
+   "name": "Skyraider Mercenary",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SkyraiderMercenary.png?42486d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Skyraider_Mercenary"
+  },
+  {
+   "slug": "slykaar",
+   "name": "Slykaar",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Slykaar%28Phase1%29.png?623693",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Slykaar"
+  },
+  {
+   "slug": "snail-race-supervisor",
+   "name": "Snail Race Supervisor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/SnailRaceSupervisor.png?cbb420"
+  },
+  {
+   "slug": "soldier",
+   "name": "Soldier",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Regular_Soldier.png?3cb51c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Soldier"
+  },
+  {
+   "slug": "souvenir-t-shirt-merchant",
+   "name": "Souvenir T-Shirt Merchant",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/SouvenirT-ShirtMerchant.png?ea091d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Souvenir_T-Shirt_Merchant"
+  },
+  {
+   "slug": "sovereign-gikyo",
+   "name": "Sovereign Gikyo",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/SovereignGikyo.png?1052e0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sovereign_Gikyo"
+  },
+  {
+   "slug": "sovereign-majin",
+   "name": "Sovereign Majin",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/SovereignMajin.png?49cb7b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sovereign_Majin"
+  },
+  {
+   "slug": "sovereign-soosu",
+   "name": "Sovereign Soosu",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/SovereignSoosu.png?1633cb",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sovereign_Soosu"
+  },
+  {
+   "slug": "sovereign-two",
+   "name": "Sovereign Two",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/SovereignTwo%28Queen%27sRecruit%29.png?88f4af",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sovereign_Two"
+  },
+  {
+   "slug": "sovereign-zhiraok",
+   "name": "Sovereign Zhiraok",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/SovereignZhiraok.png?5a93a0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sovereign_Zhiraok"
+  },
+  {
+   "slug": "soway",
+   "name": "Soway",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Soway.png?f44e1b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Soway"
+  },
+  {
+   "slug": "squidward",
+   "name": "Squidward",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Squidward.png?f18db3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Squidward"
+  },
+  {
+   "slug": "sui",
+   "name": "Sui",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Sui%28Revelations_in_Fall_stage_7%29.png?752aac",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sui"
+  },
+  {
+   "slug": "suspicious-cow",
+   "name": "Suspicious Cow",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/SuspiciousCow.png?ee441d"
+  },
+  {
+   "slug": "svin",
+   "name": "Svin",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Svin.png?66196d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Svin"
+  },
+  {
+   "slug": "sybil",
+   "name": "Sybil",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Sybil%28Detlas%29.png?2c9c5d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Sybil"
+  },
+  {
+   "slug": "syndra",
+   "name": "Syndra",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Syndra.png?8ce777",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Syndra"
+  },
+  {
+   "slug": "syni",
+   "name": "Syni",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Syni.png?4bffc1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Syni"
+  },
+  {
+   "slug": "takan",
+   "name": "Takan",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Takan.png?e1c3e8",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Takan"
+  },
+  {
+   "slug": "talking-mushroom",
+   "name": "Talking Mushroom",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Talking_mushroom_log1.png?963b91",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Talking_Mushroom"
+  },
+  {
+   "slug": "tarek",
+   "name": "Tarek",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Tarek.png?f3430e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tarek"
+  },
+  {
+   "slug": "tarod",
+   "name": "Tarod",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Tarod.png?6c20f6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tarod"
+  },
+  {
+   "slug": "tasim",
+   "name": "Tasim",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/Tasim%28InfestedPlants%29.png?fbd363",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tasim"
+  },
+  {
+   "slug": "tavern-owner",
+   "name": "Tavern Owner",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/TavernOwner.png?401ade"
+  },
+  {
+   "slug": "teiren",
+   "name": "Teiren",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Teiren.png?848c28",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Teiren"
+  },
+  {
+   "slug": "telvu",
+   "name": "Telvu",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Telvu.png?9c0d9f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Telvu"
+  },
+  {
+   "slug": "tesha",
+   "name": "Tesha",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Tesha.png?580e50",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tesha"
+  },
+  {
+   "slug": "thanos-dwarf",
+   "name": "Thanos Dwarf",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/ThanosDwarf%281%29.png?2f93e3"
+  },
+  {
+   "slug": "the-assistant",
+   "name": "The Assistant",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/TheAssistant.png?88ebf9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Assistant"
+  },
+  {
+   "slug": "the-blacksmith",
+   "name": "The Blacksmith",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/TheBlacksmith.png?fa0ba2",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Blacksmith"
+  },
+  {
+   "slug": "the-canyon-colossus",
+   "name": "The Canyon Colossus",
+   "tier": "mythic",
+   "image_url": "https://wynncraft.wiki.gg/images/TheColossus.png?7681cc",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Canyon_Colossus_(Boss)",
+   "raid": "The Canyon Colossus"
+  },
+  {
+   "slug": "the-cook",
+   "name": "The Cook",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/TheCook.png?9d1d43",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Cook"
+  },
+  {
+   "slug": "the-envoy",
+   "name": "The Envoy",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TheEnvoy.png?47bfb4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Envoy"
+  },
+  {
+   "slug": "the-eye",
+   "name": "The Eye",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TheEye%28Phase1%29.png?38f809",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Eye",
+   "dungeon": "Eldritch Outlook"
+  },
+  {
+   "slug": "the-guide",
+   "name": "The Guide",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/TheGuide.png?9310b4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Guide"
+  },
+  {
+   "slug": "the-hoarder",
+   "name": "The Hoarder",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TheHoarder.png?86242d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Hoarder"
+  },
+  {
+   "slug": "the-nameless-anomaly",
+   "name": "The Nameless Anomaly",
+   "tier": "mythic",
+   "image_url": "https://wynncraft.wiki.gg/images/TheNamelessAnomaly%28Boss%29.png?e7f35d",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Nameless_Anomaly_(Boss)",
+   "raid": "The Nameless Anomaly"
+  },
+  {
+   "slug": "the-scavenger",
+   "name": "The Scavenger",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TheScavenger.png?ad36ba",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Scavenger"
+  },
+  {
+   "slug": "the-seer",
+   "name": "The Seer",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TheSeer%28Appearance1%29.png?8b4705",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Seer"
+  },
+  {
+   "slug": "the-traveler",
+   "name": "The Traveler",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/TheTraveler.png?f4d766",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/The_Traveler"
+  },
+  {
+   "slug": "the-warden",
+   "name": "The Warden",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/TheWarden.png?158d10"
+  },
+  {
+   "slug": "theorick-twain",
+   "name": "Theorick Twain",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TheorickTwain.png?306363",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Theorick_Twain"
+  },
+  {
+   "slug": "therck",
+   "name": "Therck",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Therck.png?359a98",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Therck"
+  },
+  {
+   "slug": "thesead-citizen",
+   "name": "Thesead Citizen",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/TheseadCitizen.png?55da7a"
+  },
+  {
+   "slug": "thesead-coal-miner",
+   "name": "Thesead Coal Miner",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/TheseadCoalMiner.png?465cf6"
+  },
+  {
+   "slug": "thesead-miner",
+   "name": "Thesead Miner",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/TheseadMiner.png?e03dcc"
+  },
+  {
+   "slug": "thesead-s-mayor",
+   "name": "Thesead's Mayor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Thesead%27s_Mayor.png?1a0faa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Thesead%27s_Mayor"
+  },
+  {
+   "slug": "thomas",
+   "name": "Thomas",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Thomas.png?dd6648",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Thomas"
+  },
+  {
+   "slug": "tiek",
+   "name": "Tiek",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Sorceress_Tiek.png?d01463",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tiek"
+  },
+  {
+   "slug": "tinemild",
+   "name": "Tinemild",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Tinemild.png?ca57bd"
+  },
+  {
+   "slug": "tirt",
+   "name": "Tirt",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Tirt.png?2bc49e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tirt"
+  },
+  {
+   "slug": "todd",
+   "name": "Todd",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Todd.png?261f59",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Todd"
+  },
+  {
+   "slug": "togak",
+   "name": "Togak",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Togak.png?44c235",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Togak"
+  },
+  {
+   "slug": "tolem",
+   "name": "Tolem",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Tolem.png?2a4713",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tolem"
+  },
+  {
+   "slug": "tom",
+   "name": "Tom",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Tom.png?9759db",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tom"
+  },
+  {
+   "slug": "traitor-amadel",
+   "name": "Traitor Amadel",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/TraitorAmadel.png?1b668a"
+  },
+  {
+   "slug": "traitor-thomas",
+   "name": "Traitor Thomas",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/TraitorThomas.png?c5be18",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Traitor_Thomas"
+  },
+  {
+   "slug": "troll",
+   "name": "Troll",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Troll_Savage.png?663fc5",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Troll"
+  },
+  {
+   "slug": "troms-guard",
+   "name": "Troms Guard",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/TromsGuard%28WynnExcavationSiteD%29.png?843086"
+  },
+  {
+   "slug": "trunan",
+   "name": "Trunan",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Trunan.png?c81cf0",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Trunan"
+  },
+  {
+   "slug": "twendle",
+   "name": "Twendle",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Twendle.png?1a30b9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Twendle"
+  },
+  {
+   "slug": "tyko",
+   "name": "Tyko",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Tyko.png?b34ea6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Tyko"
+  },
+  {
+   "slug": "ureietun",
+   "name": "Ureietun",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Ureietun.png?e5b735"
+  },
+  {
+   "slug": "valimare",
+   "name": "Valimare",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Valimare.png?f45d69",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Valimare"
+  },
+  {
+   "slug": "veekhat",
+   "name": "Veekhat",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/VeekhattheMinotaur.png?ff5fc1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Veekhat"
+  },
+  {
+   "slug": "vera",
+   "name": "Vera",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Vera.png?e66ffa",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Vera"
+  },
+  {
+   "slug": "vesdar",
+   "name": "Vesdar",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Vesdar.png?bcf0d6",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Vesdar"
+  },
+  {
+   "slug": "villager",
+   "name": "Villager",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Villager.png?4a0135"
+  },
+  {
+   "slug": "voer",
+   "name": "Voer",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Voer.png?5b224b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Voer"
+  },
+  {
+   "slug": "volmor",
+   "name": "Volmor",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Volmor.png?95cb49"
+  },
+  {
+   "slug": "weaponsmith",
+   "name": "Weaponsmith",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Weaponsmith.png?433f91"
+  },
+  {
+   "slug": "wedyf",
+   "name": "Wedyf",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Wedyf.png?4c5b13",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Wedyf"
+  },
+  {
+   "slug": "winie",
+   "name": "Winie",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Winie.png?df4239"
+  },
+  {
+   "slug": "witch",
+   "name": "Witch",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Witch.png?3b3c66"
+  },
+  {
+   "slug": "witherhead",
+   "name": "Witherhead",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Witherhead.png?6cfbd3",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Witherhead",
+   "dungeon": "Decrepit Sewers"
+  },
+  {
+   "slug": "worid",
+   "name": "Worid",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Worid%28Iboju%29.png?f69226",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Worid"
+  },
+  {
+   "slug": "worker",
+   "name": "Worker",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Worker.png?541252"
+  },
+  {
+   "slug": "wynnston",
+   "name": "Wynnston",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Wynnston.png?4ffb03",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Wynnston",
+   "dungeon": "Fallen Factory"
+  },
+  {
+   "slug": "xoeinbor",
+   "name": "Xoeinbor",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Xoeinbor.png?e8c057",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Xoeinbor"
+  },
+  {
+   "slug": "yahya",
+   "name": "Yahya",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Yahya%28NivlaHouse%29.png?bd5ec1",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yahya"
+  },
+  {
+   "slug": "yansur",
+   "name": "Yansur",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Yansur.png?3d5b81",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yansur"
+  },
+  {
+   "slug": "yavlis",
+   "name": "Yavlis",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Yavlis.png?b4c3f9",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yavlis"
+  },
+  {
+   "slug": "yobon",
+   "name": "Yobon",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Yobon.png?f6e350",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yobon"
+  },
+  {
+   "slug": "yodbon",
+   "name": "Yodbon",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Yodbon.png?3d5c3e",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yodbon"
+  },
+  {
+   "slug": "yuge",
+   "name": "Yuge",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Yuge.png?e56b4c",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yuge"
+  },
+  {
+   "slug": "yuman",
+   "name": "Yuman",
+   "tier": "legendary",
+   "image_url": "https://wynncraft.wiki.gg/images/YumanSmilingPortrait.png?64558f",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yuman"
+  },
+  {
+   "slug": "yunelsu",
+   "name": "Yunelsu",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Yunelsu.png?6dabdd",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Yunelsu"
+  },
+  {
+   "slug": "zenam",
+   "name": "Zenam",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Zenam.png?2b2f91",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Zenam"
+  },
+  {
+   "slug": "zeph",
+   "name": "Zeph",
+   "tier": "fabled",
+   "image_url": "https://wynncraft.wiki.gg/images/ZephPortraitNeutral.png?b76c84",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Zeph"
+  },
+  {
+   "slug": "zhight",
+   "name": "Zhight",
+   "tier": "unique",
+   "image_url": "https://wynncraft.wiki.gg/images/Zhight.png?7796f4",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Zhight"
+  },
+  {
+   "slug": "zhight-tour-guide",
+   "name": "Zhight Tour Guide",
+   "tier": "normal",
+   "image_url": "https://wynncraft.wiki.gg/images/Zhight_Tour_Guide.png?df5534",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Zhight_Tour_Guide"
+  },
+  {
+   "slug": "zuett",
+   "name": "Zuett",
+   "tier": "rare",
+   "image_url": "https://wynncraft.wiki.gg/images/Zuett.png?13546b",
+   "wiki_url": "https://wynncraft.wiki.gg/wiki/Zuett"
+  }
+ ],
+ "sets": [
+  {
+   "id": "raid-pantheon",
+   "name": "The Raid Pantheon",
+   "slugs": [
+    "grootslang-wyrmling",
+    "orphion",
+    "anathema",
+    "the-canyon-colossus",
+    "the-nameless-anomaly"
+   ]
+  },
+  {
+   "id": "fruman-crown",
+   "name": "The Fruman Crown",
+   "slugs": [
+    "her-majesty",
+    "tasim",
+    "sovereign-majin",
+    "sovereign-two",
+    "sovereign-zhiraok",
+    "sovereign-gikyo",
+    "sovereign-soosu"
+   ]
+  },
+  {
+   "id": "fruman-resistance",
+   "name": "The Fruman Resistance",
+   "slugs": [
+    "syndra",
+    "mora",
+    "rex",
+    "zeph",
+    "sui",
+    "master-azael",
+    "captain-cileon",
+    "captain-fuhue",
+    "yuman",
+    "elise",
+    "dr-picard"
+   ]
+  },
+  {
+   "id": "legends-of-the-provinces",
+   "name": "Legends of the Provinces",
+   "slugs": [
+    "aledar",
+    "ava",
+    "lari",
+    "seaskipper-captain",
+    "elphaba",
+    "king-draani",
+    "siegfried",
+    "bak-al",
+    "caissop",
+    "chef-hamsey",
+    "dr-legendary",
+    "ragni-s-king",
+    "bob"
+   ]
+  },
+  {
+   "id": "festival-spirits",
+   "name": "Festival Spirits",
+   "slugs": [
+    "aster",
+    "bonfire-keeper",
+    "the-traveler",
+    "the-guide",
+    "the-envoy",
+    "the-seer",
+    "festival-worker"
+   ]
+  },
+  {
+   "id": "dungeon-keepers",
+   "name": "Dungeon Keepers",
+   "slugs": [
+    "witherhead",
+    "arakadicus",
+    "charon",
+    "garoth",
+    "hashr",
+    "theorick-twain",
+    "slykaar",
+    "captain-redbeard",
+    "antikythera-supercomputer",
+    "the-eye"
+   ]
+  },
+  {
+   "id": "boss-altars",
+   "name": "Boss Altars",
+   "slugs": [
+    "durum-protector",
+    "haros",
+    "rymek-luke",
+    "revenant-of-skien",
+    "adamastor",
+    "orange-wybel",
+    "panic-zealot",
+    "hyhet"
+   ]
+  }
+ ]
+}

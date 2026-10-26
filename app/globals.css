@@ -633,9 +633,15 @@ body, body *, html, html * {
   }
 }
 
-/* Force the game font everywhere except navigation, which sets its own font-family */
-* :not(.nav-font):not(.nav-font *) {
+/* Force the game font everywhere except navigation, which sets its own font-family,
+   and .readable-font: small body text (duel card rules, battle logs) that the pixel font makes illegible */
+* :not(.nav-font):not(.nav-font *):not(.readable-font):not(.readable-font *) {
   font-family: 'GameFont', var(--font-roboto), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+.readable-font,
+.readable-font * {
+  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
 }
 
 /* Override any potential framework font settings */

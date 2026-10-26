@@ -1,0 +1,134 @@
+{
+ "budget": {
+  "base": 1,
+  "perCost": 2,
+  "quad": 0
+ },
+ "normalCostWeights": [
+  0,
+  3,
+  4,
+  4,
+  3,
+  1,
+  1
+ ],
+ "tierBonus": {
+  "normal": 0,
+  "unique": 0,
+  "rare": 0,
+  "legendary": 0,
+  "fabled": 0,
+  "mythic": 0,
+  "member": 0,
+  "token": 0
+ },
+ "stats": {
+  "power": 1.978,
+  "health": 0.485
+ },
+ "elementBudget": {
+  "earth": 1.206,
+  "thunder": 1.677,
+  "water": -1.184,
+  "fire": 1.394,
+  "air": -0.895
+ },
+ "keywords": {
+  "guard": [
+   0.9,
+   0,
+   0.316
+  ],
+  "rush": [
+   0.698,
+   0.698,
+   0
+  ],
+  "ranged": [
+   0.179,
+   0.179,
+   0
+  ],
+  "stealth": [
+   0.429,
+   0.211,
+   0
+  ],
+  "shield": [
+   2.63,
+   0.081,
+   0
+  ],
+  "drain": [
+   0,
+   0.579,
+   0
+  ],
+  "pierce": [
+   0,
+   0.087,
+   0
+  ],
+  "regen": [
+   0.391,
+   0,
+   0.096
+  ]
+ },
+ "shieldOnGuard": 2.198,
+ "vanilla": -0.497,
+ "triggers": {
+  "death": 0.586,
+  "turn_start": 2.2,
+  "move": 1.242,
+  "moveTide": 0.8,
+  "moveFloor": 0.6
+ },
+ "effects": {
+  "damage:chosen:enemy": 2.472,
+  "damage:chosen:enemy_unit": 1.4,
+  "damage:chosen:any_unit": 1.2,
+  "damage:enemy_hero": 1.282,
+  "damage:all_enemy_units": 5.917,
+  "damage:all_other_units": 0.935,
+  "damage:random_enemy_unit": 0.9,
+  "damage:random_enemy": 0.953,
+  "damage:self": -0.5,
+  "damage:ally_hero": -0.3,
+  "heal:self": 0.25,
+  "heal:one": 0.744,
+  "heal:all": 0.9,
+  "buff:self:atk": 1,
+  "buff:self:hp": 1,
+  "buff:one:atk": 0.733,
+  "buff:one:hp": 1.134,
+  "buff:all:atk": 6.034,
+  "buff:all:hp": 7.856,
+  "draw": 0.766,
+  "freeze:one": 4.261,
+  "freeze:random": 1.1,
+  "freeze:all": 10.37,
+  "bounce:one": 0.879,
+  "bounce:enemies": 2.224,
+  "bounce:everyone": 0.4,
+  "summon": 0.413,
+  "tide": 1.2,
+  "grant:stealth:one": 0.6,
+  "grant:shield:one": 2.322,
+  "grant:guard:one": 1.373,
+  "grant:rush:one": 1.5,
+  "grant:stealth:all": 2.4,
+  "grant:shield:all": 4.8,
+  "grant:guard:all": 6,
+  "destroy": 1.1,
+  "chain": 0.868
+ },
+ "normalElementBudget": {
+  "earth": -0.466,
+  "thunder": 0.934,
+  "water": -1.464,
+  "fire": 1.246,
+  "air": 0.493
+ }
+}

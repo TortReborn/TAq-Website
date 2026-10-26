@@ -1,0 +1,20 @@
+{
+  "power": 1.1,
+  "health": 0.9,
+  "guard": 0.5,
+  "shield": 2,
+  "stealth": 0.5,
+  "ranged": 0.3,
+  "drain": 0.3,
+  "pierce": 0.2,
+  "regen": 0.8,
+  "move": 1.2,
+  "frozen": 0.3,
+  "hero": 1.2,
+  "lowHero": 0.08,
+  "hand": 1,
+  "reach": 0.3,
+  "lethal": 4,
+  "pass": 0.05,
+  "width": 5
+}

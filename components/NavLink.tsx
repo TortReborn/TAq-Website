@@ -11,6 +11,7 @@ const routePrefetchMap: Record<string, string[]> = {
   '/graid-event': ['/api/graid-event'],
   '/lootpools': ['/api/lootpools/lootruns', '/api/lootpools/aspects'],
   '/profile': ['/api/profile'],
+  '/duels': ['/api/duels'],
 };
 
 interface NavLinkProps {
