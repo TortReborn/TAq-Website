@@ -92,3 +92,27 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update record.' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  props: { params: Promise<{ type: string; id: string }> }
+) {
+  const params = await props.params;
+  const session = await requireNarwhalSession(request);
+  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
+
+  const id = Number(params.id);
+  if (!Number.isInteger(id) || id <= 0 || !['exception', 'alliance'].includes(params.type)) {
+    return NextResponse.json({ error: 'Invalid record.' }, { status: 400 });
+  }
+
+  const table = params.type === 'exception' ? 'management_exceptions' : 'guild_alliances';
+  try {
+    const result = await getPool().query(`DELETE FROM ${table} WHERE id = $1`, [id]);
+    if (result.rowCount === 0) return NextResponse.json({ error: 'Record not found.' }, { status: 404 });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Externals delete error:', error);
+    return NextResponse.json({ error: 'Failed to delete record.' }, { status: 500 });
+  }
+}
