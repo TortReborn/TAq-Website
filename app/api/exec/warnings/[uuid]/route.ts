@@ -128,7 +128,12 @@ export async function PATCH(
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
-  const parsed = parseDiscordIdInput(body?.discordId);
+  // Clearing must be explicit ({ discordId: null }): a body without the field
+  // is a malformed request, not a request to delete the saved account.
+  if (!body || typeof body !== 'object' || Array.isArray(body) || !('discordId' in body)) {
+    return NextResponse.json({ error: 'Send { discordId: string | null }' }, { status: 400 });
+  }
+  const parsed = parseDiscordIdInput(body.discordId);
   if (!parsed.ok) {
     return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
