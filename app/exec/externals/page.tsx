@@ -109,6 +109,27 @@ export default function ExternalsPage() {
     }
   }
 
+  async function remove(type: 'exception' | 'alliance') {
+    const draft = type === 'exception' ? exceptionDraft : allianceDraft;
+    if (!draft?.id) return;
+    const name = 'ign' in draft ? draft.ign : draft.guildName;
+    if (!window.confirm(`Delete ${type} "${name}"? This cannot be undone.`)) return;
+    setSaving(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/exec/externals/${type}/${draft.id}`, { method: 'DELETE' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Could not delete record.');
+      setExceptionDraft(null);
+      setAllianceDraft(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not delete record.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (sessionLoading || !NARWHAL_RANKS.has(user?.rank ?? '')) return null;
 
   return (
@@ -189,7 +210,7 @@ export default function ExternalsPage() {
               <label>Access notes<input value={exceptionDraft.accessNotes} onChange={event => setExceptionDraft({ ...exceptionDraft, accessNotes: event.target.value })} /></label>
               <label className={styles.full}>Notes<textarea rows={3} value={exceptionDraft.notes} onChange={event => setExceptionDraft({ ...exceptionDraft, notes: event.target.value })} /></label>
             </div>
-            <div className={styles.actions}><button type="button" onClick={() => setExceptionDraft(null)}>Cancel</button><button className={styles.save} disabled={saving}>Save exception</button></div>
+            <div className={styles.actions}>{exceptionDraft.id && <button type="button" className={styles.delete} disabled={saving} onClick={() => void remove('exception')}>Delete</button>}<button type="button" onClick={() => setExceptionDraft(null)}>Cancel</button><button className={styles.save} disabled={saving}>Save exception</button></div>
           </form>
         </div>
       )}
@@ -207,7 +228,7 @@ export default function ExternalsPage() {
               <label className={styles.full}>Notes<textarea rows={3} value={allianceDraft.notes} onChange={event => setAllianceDraft({ ...allianceDraft, notes: event.target.value })} /></label>
             </div>
             <p className={styles.hint}>The Discord role must already exist. Tort-Reborn will refuse registration if it cannot find it.</p>
-            <div className={styles.actions}><button type="button" onClick={() => setAllianceDraft(null)}>Cancel</button><button className={styles.save} disabled={saving}>Save alliance</button></div>
+            <div className={styles.actions}>{allianceDraft.id && <button type="button" className={styles.delete} disabled={saving} onClick={() => void remove('alliance')}>Delete</button>}<button type="button" onClick={() => setAllianceDraft(null)}>Cancel</button><button className={styles.save} disabled={saving}>Save alliance</button></div>
           </form>
         </div>
       )}
