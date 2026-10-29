@@ -21,41 +21,19 @@ export class PlayerNotFoundError extends Error {}
 export class PlayerLookupError extends Error {}
 
 /**
- * Resolve a typed name to a player. Order matters:
- *   1. discord_links — current name, and it carries the Discord id the bot needs for the role.
- *   2. warning_profiles — someone already on file who has since left or unlinked.
- *   3. Mojang — anyone else.
- * Whatever the source, the Discord id comes from discord_links by uuid when there is one.
+ * Resolve a typed name to a player. Everything after this keys on the uuid.
+ *   1. Mojang: whoever owns the name now. The names cached in discord_links and
+ *      warning_profiles go stale on renames, and a stale one can belong to someone
+ *      else today, so they never outrank Mojang.
+ *   2. A name nobody owns now: an old name of someone already on file or linked.
+ * The Discord id always comes from discord_links by uuid, never by name. A Mojang
+ * outage is an error, not a guess from the caches.
  */
 export async function resolveWarningPlayer(
   pool: Pool,
   name: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<ResolvedPlayer> {
-  const key = name.toLowerCase();
-
-  const linked = await pool.query(
-    `SELECT uuid::text AS uuid, ign, discord_id::text AS discord_id
-     FROM discord_links WHERE LOWER(ign) = $1
-     ORDER BY EXISTS (SELECT 1 FROM guild_roster gr WHERE gr.uuid = discord_links.uuid) DESC, linked_at DESC
-     LIMIT 1`,
-    [key]
-  );
-  if (linked.rows.length > 0) {
-    const r = linked.rows[0];
-    return { uuid: r.uuid, ign: r.ign, discordId: r.discord_id };
-  }
-
-  const onFile = await pool.query(
-    `SELECT uuid::text AS uuid, ign, discord_id::text AS discord_id
-     FROM warning_profiles WHERE LOWER(ign) = $1 LIMIT 1`,
-    [key]
-  );
-  if (onFile.rows.length > 0) {
-    const r = onFile.rows[0];
-    return { uuid: r.uuid, ign: r.ign, discordId: r.discord_id };
-  }
-
   let res: Response;
   try {
     res = await fetchImpl(
@@ -65,18 +43,35 @@ export async function resolveWarningPlayer(
   } catch {
     throw new PlayerLookupError('Could not reach Mojang to look up that player. Try again in a minute.');
   }
+
+  let uuid: string;
+  let ign: string;
   if (res.status === 404 || res.status === 204) {
-    throw new PlayerNotFoundError(`No Minecraft account is named "${name}".`);
-  }
-  if (!res.ok) {
+    const former = await pool.query(
+      `SELECT uuid::text AS uuid, ign FROM (
+         SELECT uuid, ign, updated_at AS seen FROM warning_profiles WHERE LOWER(ign) = $1
+         UNION ALL
+         SELECT uuid, ign, linked_at AS seen FROM discord_links WHERE LOWER(ign) = $1
+       ) names
+       ORDER BY seen DESC
+       LIMIT 1`,
+      [name.toLowerCase()]
+    );
+    if (former.rows.length === 0) {
+      throw new PlayerNotFoundError(`No Minecraft account is named "${name}".`);
+    }
+    ({ uuid, ign } = former.rows[0]);
+  } else if (res.ok) {
+    const data = await res.json();
+    uuid = dashUuid(data.id);
+    ign = data.name;
+  } else {
     throw new PlayerLookupError('Could not reach Mojang to look up that player. Try again in a minute.');
   }
-  const data = await res.json();
-  const uuid = dashUuid(data.id);
 
-  const byUuid = await pool.query(
+  const linked = await pool.query(
     `SELECT discord_id::text AS discord_id FROM discord_links WHERE uuid = $1 LIMIT 1`,
     [uuid]
   );
-  return { uuid, ign: data.name, discordId: byUuid.rows[0]?.discord_id ?? null };
+  return { uuid, ign, discordId: linked.rows[0]?.discord_id ?? null };
 }

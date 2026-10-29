@@ -40,7 +40,7 @@ export function KindChip({ kind, revoked }: { kind: WarningKind; revoked?: boole
   );
 }
 
-/** The red count badge plus per-level chips. */
+/** The red count badge plus per-level chips. Dishonored Fish is a current status, shown under the name instead. */
 export function CountSummary({ counts, size = 'md' }: { counts: WarningCounts; size?: 'md' | 'lg' }) {
   const badge = size === 'lg' ? 36 : 28;
   return (
@@ -63,16 +63,16 @@ export function CountSummary({ counts, size = 'md' }: { counts: WarningCounts; s
           {counts[k]} {KIND_META[k].label.toLowerCase()}
         </span>
       ))}
-      {counts.dishonored && <KindChip kind="dishonored_fish" />}
     </div>
   );
 }
 
-export function PlayerHead({ ign, size = 40 }: { ign: string; size?: number }) {
+/** By uuid: a cached name can belong to someone else after a rename. */
+export function PlayerHead({ uuid, size = 40 }: { uuid: string; size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`https://mc-heads.net/avatar/${encodeURIComponent(ign)}/${size}`}
+      src={`https://mc-heads.net/avatar/${uuid.replace(/-/g, '')}/${size}`}
       alt=""
       width={size}
       height={size}
