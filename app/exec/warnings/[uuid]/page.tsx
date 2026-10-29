@@ -56,25 +56,33 @@ function WarningProfile() {
 
   const active = profile.entries.filter(e => !e.revokedAt);
   const revoked = profile.entries.filter(e => e.revokedAt);
+  // Entries are newest first, so this is the one currently in force.
+  const dishonored = active.find(e => e.kind === 'dishonored_fish');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {back}
 
       <div style={{ ...cardStyle, padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <PlayerHead ign={profile.ign} size={56} />
+        <PlayerHead uuid={profile.uuid} size={56} />
         <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>{profile.ign}</h1>
+          {dishonored && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              <KindChip kind="dishonored_fish" />
+              <span>since {formatDate(dishonored.issuedAt)} · given by {dishonored.issuedByIgn ?? `Discord ${dishonored.issuedBy}`}</span>
+              {!profile.discordId && (
+                <span style={{ color: '#f59e0b' }}>
+                  No Discord account linked, so the role can&apos;t be applied.
+                </span>
+              )}
+            </div>
+          )}
           <CountSummary counts={profile.counts} size="lg" />
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             {profile.threadUrl
               ? <a href={profile.threadUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-ocean-400)' }}>Discussion thread in TE ↗</a>
               : 'The bot will create this player\'s forum post in TE.'}
-            {profile.counts.dishonored && !profile.discordId && (
-              <span style={{ color: '#f59e0b', marginLeft: '0.75rem' }}>
-                No Discord account linked, so the Dishonored Fish role can&apos;t be applied.
-              </span>
-            )}
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>

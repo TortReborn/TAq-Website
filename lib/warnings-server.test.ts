@@ -18,38 +18,42 @@ function mojang(status: number, body?: unknown) {
 }
 
 describe('resolveWarningPlayer', () => {
-  it('prefers discord_links and keeps the Discord id', async () => {
-    const { pool, query } = fakePool([{ uuid: 'u-1', ign: 'Player', discord_id: '42' }]);
-    const fetchImpl = mojang(200);
-    expect(await resolveWarningPlayer(pool, 'PLAYER', fetchImpl)).toEqual({ uuid: 'u-1', ign: 'Player', discordId: '42' });
-    expect(query.mock.calls[0][1]).toEqual(['player']);
-    expect(fetchImpl).not.toHaveBeenCalled();
-  });
-
-  it('falls back to an existing warning profile', async () => {
-    const { pool } = fakePool([], [{ uuid: 'u-2', ign: 'Gone', discord_id: null }]);
-    const fetchImpl = mojang(200);
-    expect(await resolveWarningPlayer(pool, 'gone', fetchImpl)).toEqual({ uuid: 'u-2', ign: 'Gone', discordId: null });
-    expect(fetchImpl).not.toHaveBeenCalled();
-  });
-
-  it('asks Mojang last, dashes the uuid, and picks up a Discord id by uuid', async () => {
-    const { pool, query } = fakePool([], [], [{ discord_id: '7' }]);
+  it('asks Mojang first, dashes the uuid, and takes the Discord id by uuid', async () => {
+    const { pool, query } = fakePool([{ discord_id: '7' }]);
     const fetchImpl = mojang(200, { id: '0123456789abcdef0123456789abcdef', name: 'Fresh' });
     expect(await resolveWarningPlayer(pool, 'fresh', fetchImpl)).toEqual({
       uuid: '01234567-89ab-cdef-0123-456789abcdef', ign: 'Fresh', discordId: '7',
     });
-    expect(query.mock.calls[2][1]).toEqual(['01234567-89ab-cdef-0123-456789abcdef']);
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(query.mock.calls[0][1]).toEqual(['01234567-89ab-cdef-0123-456789abcdef']);
+  });
+
+  it('never matches a cached name that Mojang says someone owns now', async () => {
+    // A linked member used to be "Taken"; Mojang says a different account has it now.
+    const { pool, query } = fakePool([]);
+    const fetchImpl = mojang(200, { id: 'ffffffffffffffffffffffffffffffff', name: 'Taken' });
+    expect(await resolveWarningPlayer(pool, 'taken', fetchImpl)).toEqual({
+      uuid: 'ffffffff-ffff-ffff-ffff-ffffffffffff', ign: 'Taken', discordId: null,
+    });
+    expect(query.mock.calls.every(c => !String(c[0]).includes('LOWER(ign)'))).toBe(true);
+  });
+
+  it('falls back to a former name on file when nobody owns it now', async () => {
+    const { pool, query } = fakePool([{ uuid: 'u-2', ign: 'Gone' }], [{ discord_id: '42' }]);
+    expect(await resolveWarningPlayer(pool, 'GONE', mojang(404))).toEqual({ uuid: 'u-2', ign: 'Gone', discordId: '42' });
+    expect(query.mock.calls[0][1]).toEqual(['gone']);
+    expect(query.mock.calls[1][1]).toEqual(['u-2']);
   });
 
   it('reports an unknown name as not found', async () => {
-    const { pool } = fakePool([], []);
+    const { pool } = fakePool([]);
     await expect(resolveWarningPlayer(pool, 'nobody', mojang(404))).rejects.toBeInstanceOf(PlayerNotFoundError);
   });
 
-  it('reports a Mojang outage as a lookup error, not a missing player', async () => {
-    const { pool } = fakePool([], []);
+  it('reports a Mojang outage as a lookup error and does not guess from the caches', async () => {
+    const { pool, query } = fakePool();
     await expect(resolveWarningPlayer(pool, 'someone', mojang(503))).rejects.toBeInstanceOf(PlayerLookupError);
+    expect(query).not.toHaveBeenCalled();
   });
 });
 
