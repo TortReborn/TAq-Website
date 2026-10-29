@@ -77,6 +77,11 @@ export function useWarningProfile(uuid: string | undefined) {
     mutate();
   };
 
+  const setDiscordId = async (discordId: string | null) => {
+    await send(`/api/exec/warnings/${uuid}`, 'PATCH', { discordId }, 'Failed to save the Discord account');
+    mutate();
+  };
+
   const addScreenshots = async (id: number, files: File[]) => {
     for (const file of files) await uploadWarningAttachment(id, file);
     mutate();
@@ -91,6 +96,7 @@ export function useWarningProfile(uuid: string | undefined) {
     restore,
     updateNotes,
     addScreenshots,
+    setDiscordId,
   };
 }
 

@@ -21,7 +21,7 @@ export default function WarningProfilePage() {
 function WarningProfile() {
   const { uuid } = useParams<{ uuid: string }>();
   const search = useSearchParams();
-  const { profile, loading, error, refresh, revoke, restore, updateNotes, addScreenshots } = useWarningProfile(uuid);
+  const { profile, loading, error, refresh, revoke, restore, updateNotes, addScreenshots, setDiscordId } = useWarningProfile(uuid);
   const [adding, setAdding] = useState(false);
   const [showRevoked, setShowRevoked] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -71,13 +71,18 @@ function WarningProfile() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
               <KindChip kind="dishonored_fish" />
               <span>since {formatDate(dishonored.issuedAt)} · given by {dishonored.issuedByIgn ?? `Discord ${dishonored.issuedBy}`}</span>
-              {!profile.discordId && (
+              {!profile.linkedDiscordId && !profile.discordId && (
                 <span style={{ color: '#f59e0b' }}>
-                  No Discord account linked, so the role can&apos;t be applied.
+                  No Discord account known, so the role can&apos;t be applied. Add one below.
                 </span>
               )}
             </div>
           )}
+          <DiscordAccount
+            linkedId={profile.linkedDiscordId}
+            typedId={profile.discordId}
+            onSave={setDiscordId}
+          />
           <CountSummary counts={profile.counts} size="lg" />
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             {profile.threadUrl
@@ -159,6 +164,80 @@ function WarningProfile() {
         </div>,
         document.body
       )}
+    </div>
+  );
+}
+
+/**
+ * Which Discord account the bot gives the Dishonored Fish role to. A linked
+ * account always wins and isn't editable here; otherwise exec can type one in.
+ */
+function DiscordAccount({ linkedId, typedId, onSave }: {
+  linkedId: string | null;
+  typedId: string | null;
+  onSave: (discordId: string | null) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(typedId ?? '');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const save = async (next: string | null) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await onSave(next);
+      setEditing(false);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const label: React.CSSProperties = { fontSize: '0.8rem', color: 'var(--text-secondary)' };
+  const mono: React.CSSProperties = { fontFamily: 'ui-monospace, monospace', color: 'var(--text-primary)' };
+
+  if (linkedId) {
+    return <div style={label}>Discord account: <span style={mono}>{linkedId}</span> (linked)</div>;
+  }
+
+  if (editing) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+        <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <label htmlFor="warning-discord-id" style={label}>Discord user id</label>
+          <input
+            id="warning-discord-id"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && save(value.trim() || null)}
+            inputMode="numeric"
+            placeholder="e.g. 170719819715313665"
+            style={{ ...inputStyle, width: '220px' }}
+            autoFocus
+          />
+          <button disabled={busy} onClick={() => save(value.trim() || null)} style={{ ...smallBtn, background: '#22c55e', color: '#fff' }}>Save</button>
+          {typedId && (
+            <button disabled={busy} onClick={() => save(null)} style={{ ...smallBtn, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>Clear</button>
+          )}
+          <button disabled={busy} onClick={() => { setEditing(false); setValue(typedId ?? ''); setError(null); }} style={{ ...smallBtn, background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>Cancel</button>
+        </div>
+        <span style={{ ...label, fontSize: '0.75rem' }}>
+          Right-click them in Discord and choose Copy User ID. Changing it doesn&apos;t take the role off the previous account.
+        </span>
+        {error && <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{error}</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div style={label}>
+      Discord account: {typedId ? <span style={mono}>{typedId}</span> : 'not linked'}
+      {' '}
+      <button onClick={() => { setValue(typedId ?? ''); setError(null); setEditing(true); }} style={{ ...smallBtn, background: 'transparent', color: 'var(--color-ocean-400)', padding: '0 0.25rem' }}>
+        {typedId ? 'Change' : 'Add Discord id'}
+      </button>
     </div>
   );
 }

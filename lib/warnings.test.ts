@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countWarnings, isWarningKind, parseWarningInput, RULE_MAX } from './warnings';
+import { countWarnings, isWarningKind, parseDiscordIdInput, parseWarningInput, RULE_MAX } from './warnings';
 
 describe('countWarnings', () => {
   it('counts only soft, written and formal toward the total', () => {
@@ -70,5 +70,31 @@ describe('isWarningKind', () => {
     for (const k of ['note', 'soft', 'written', 'formal', 'dishonored_fish', 'timeout', 'mute', 'demotion', 'kick', 'ban', 'blacklist']) {
       expect(isWarningKind(k)).toBe(true);
     }
+  });
+});
+
+describe('parseDiscordIdInput', () => {
+  it('accepts a snowflake and trims it', () => {
+    expect(parseDiscordIdInput(' 170719819715313665 ')).toEqual({ ok: true, value: '170719819715313665' });
+  });
+
+  it('treats empty or missing as clearing the id', () => {
+    expect(parseDiscordIdInput('')).toEqual({ ok: true, value: null });
+    expect(parseDiscordIdInput('   ')).toEqual({ ok: true, value: null });
+    expect(parseDiscordIdInput(null)).toEqual({ ok: true, value: null });
+    expect(parseDiscordIdInput(undefined)).toEqual({ ok: true, value: null });
+  });
+
+  it('rejects usernames, mentions and numbers', () => {
+    expect(parseDiscordIdInput('thundderr').ok).toBe(false);
+    expect(parseDiscordIdInput('<@170719819715313665>').ok).toBe(false);
+    expect(parseDiscordIdInput('12345').ok).toBe(false);
+    expect(parseDiscordIdInput(Number('170719819715313665')).ok).toBe(false);
+  });
+
+  it('rejects 20-digit values past the BIGINT column limit', () => {
+    expect(parseDiscordIdInput('9223372036854775807').ok).toBe(true);
+    expect(parseDiscordIdInput('9223372036854775808').ok).toBe(false);
+    expect(parseDiscordIdInput('99999999999999999999').ok).toBe(false);
   });
 });
