@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useExecWarnings } from '@/hooks/useExecWarnings';
 import AddWarningModal from './AddWarningModal';
-import { btnStyle, cardStyle, CountSummary, formatDate, inputStyle, PlayerHead } from './ui';
+import { btnStyle, cardStyle, CountSummary, formatDate, inputStyle, KindChip, PlayerHead } from './ui';
 
 export default function ExecWarningsPage() {
   const router = useRouter();
@@ -116,11 +116,12 @@ export default function ExecWarningsPage() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
-                <PlayerHead ign={p.ign} />
+                <PlayerHead uuid={p.uuid} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ color: 'var(--text-primary)', fontWeight: '700', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {p.ign}
                   </div>
+                  {p.counts.dishonored && <KindChip kind="dishonored_fish" />}
                   <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
                     {p.entryCount} entr{p.entryCount !== 1 ? 'ies' : 'y'} · last {formatDate(p.lastIssuedAt)}
                   </div>
