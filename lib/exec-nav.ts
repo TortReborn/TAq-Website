@@ -43,6 +43,7 @@ export const EXEC_NAV: ExecNavGroup[] = [
       { href: '/exec/activity', label: 'Activity', desc: 'Member activity, kick list, and guild trends', iconImage: '/images/icons/exec/activity.png' },
       { href: '/exec/promotions', label: 'Promotions', desc: 'Manage and suggest promotions', iconImage: '/images/icons/exec/promotions.png' },
       { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and add banned players', iconImage: '/images/icons/exec/blacklist.png' },
+      { href: '/exec/warnings', label: 'Warnings', desc: 'Warning profiles and proof for each player', icon: 'M12 9v3.75m0 3.75h.008M10.29 3.86L1.82 18a1.875 1.875 0 001.6 2.81h17.16a1.875 1.875 0 001.6-2.81L13.71 3.86a1.875 1.875 0 00-3.42 0z' },
     ],
   },
   {
