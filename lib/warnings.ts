@@ -31,6 +31,17 @@ export function isWarningKind(value: unknown): value is WarningKind {
   return typeof value === 'string' && (WARNING_KINDS as readonly string[]).includes(value);
 }
 
+/** A Discord user id (snowflake), or null/empty to clear. Returns the id, null, or an error. */
+export function parseDiscordIdInput(value: unknown): { ok: true; value: string | null } | { ok: false; error: string } {
+  if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
+    return { ok: true, value: null };
+  }
+  if (typeof value !== 'string' || !/^\d{17,20}$/.test(value.trim())) {
+    return { ok: false, error: 'A Discord id is 17 to 20 digits. Right-click the user in Discord and choose Copy User ID.' };
+  }
+  return { ok: true, value: value.trim() };
+}
+
 export const RULE_MAX = 500;
 export const NOTES_MAX = 4000;
 export const REVOKE_REASON_MAX = 500;
@@ -123,7 +134,10 @@ export interface WarningEntry {
 export interface WarningProfile {
   uuid: string;
   ign: string;
+  /** Typed in by exec for a player with no linked account. */
   discordId: string | null;
+  /** From discord_links. The bot uses this one when both exist. */
+  linkedDiscordId: string | null;
   threadUrl: string | null;
   legacyThreads: { url: string; title: string }[];
   counts: WarningCounts;
