@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
-import { countWarnings, type WarningEntry, type WarningProfile } from '@/lib/warnings';
+import { countWarnings, parseDiscordIdInput, type WarningEntry, type WarningProfile } from '@/lib/warnings';
 import { threadUrl } from '@/lib/warnings-server';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +26,8 @@ export async function GET(
     const pool = getPool();
     const profileResult = await pool.query(
       `SELECT uuid::text AS uuid, ign, discord_id::text AS discord_id,
+              (SELECT dl.discord_id::text FROM discord_links dl WHERE dl.uuid = warning_profiles.uuid LIMIT 1)
+                AS linked_discord_id,
               forum_thread_id::text AS forum_thread_id, legacy_threads
        FROM warning_profiles WHERE uuid = $1`,
       [uuid]
@@ -87,6 +89,7 @@ export async function GET(
       uuid: p.uuid,
       ign: p.ign,
       discordId: p.discord_id,
+      linkedDiscordId: p.linked_discord_id,
       threadUrl: threadUrl(p.forum_thread_id),
       legacyThreads: Array.isArray(p.legacy_threads) ? p.legacy_threads : [],
       counts: countWarnings(entries),
@@ -97,5 +100,59 @@ export async function GET(
   } catch (error) {
     console.error('Warning profile fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch warning profile' }, { status: 500 });
+  }
+}
+
+/**
+ * Set or clear the Discord account for a player with no linked account, so
+ * the bot can give them the Dishonored Fish role. Body: { discordId: string | null }.
+ * A linked account always wins in the bot, so this is refused once one exists.
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ uuid: string }> }
+) {
+  const session = await requireExecSession(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { uuid } = await params;
+  if (!UUID_RE.test(uuid)) {
+    return NextResponse.json({ error: 'Invalid player id' }, { status: 400 });
+  }
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+  const parsed = parseDiscordIdInput(body?.discordId);
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
+  }
+
+  try {
+    const pool = getPool();
+    const linked = await pool.query('SELECT 1 FROM discord_links WHERE uuid = $1 LIMIT 1', [uuid]);
+    if (linked.rows.length > 0) {
+      return NextResponse.json(
+        { error: 'This player has a linked Discord account, which the bot always uses.' },
+        { status: 409 }
+      );
+    }
+    const result = await pool.query(
+      `UPDATE warning_profiles SET discord_id = $2, needs_sync = TRUE, updated_at = NOW()
+       WHERE uuid = $1 RETURNING uuid`,
+      [uuid, parsed.value]
+    );
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'No warnings on file for this player' }, { status: 404 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Warning profile update error:', error);
+    return NextResponse.json({ error: 'Failed to save the Discord account' }, { status: 500 });
   }
 }
