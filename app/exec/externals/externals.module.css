@@ -47,7 +47,8 @@
 .modal .checkbox { flex-direction: row; align-items: center; align-self: end; min-height: 2.4rem; }
 .checkbox input { width: 1rem; min-height: 1rem; }
 .actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--border-card); }
-.hint { margin: .75rem 0 0; color: var(--text-secondary); font-size: .65rem; }
+.actions .delete { margin-right: auto; border-color: color-mix(in srgb, #ef4444 45%, transparent) !important; color: #fca5a5 !important; }
+.hint {margin: .75rem 0 0; color: var(--text-secondary); font-size: .65rem; }
 @media (max-width: 850px) { .allianceGrid { grid-template-columns: 1fr; } }
 @media (max-width: 620px) {
   .page > header { align-items: stretch; flex-direction: column; }
