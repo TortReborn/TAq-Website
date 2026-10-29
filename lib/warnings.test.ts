@@ -89,6 +89,12 @@ describe('parseDiscordIdInput', () => {
     expect(parseDiscordIdInput('thundderr').ok).toBe(false);
     expect(parseDiscordIdInput('<@170719819715313665>').ok).toBe(false);
     expect(parseDiscordIdInput('12345').ok).toBe(false);
-    expect(parseDiscordIdInput(170719819715313665).ok).toBe(false);
+    expect(parseDiscordIdInput(Number('170719819715313665')).ok).toBe(false);
+  });
+
+  it('rejects 20-digit values past the BIGINT column limit', () => {
+    expect(parseDiscordIdInput('9223372036854775807').ok).toBe(true);
+    expect(parseDiscordIdInput('9223372036854775808').ok).toBe(false);
+    expect(parseDiscordIdInput('99999999999999999999').ok).toBe(false);
   });
 });

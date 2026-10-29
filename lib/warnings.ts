@@ -31,14 +31,17 @@ export function isWarningKind(value: unknown): value is WarningKind {
   return typeof value === 'string' && (WARNING_KINDS as readonly string[]).includes(value);
 }
 
+const BIGINT_MAX = BigInt('9223372036854775807');
+
 /** A Discord user id (snowflake), or null/empty to clear. Returns the id, null, or an error. */
 export function parseDiscordIdInput(value: unknown): { ok: true; value: string | null } | { ok: false; error: string } {
   if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
     return { ok: true, value: null };
   }
-  if (typeof value !== 'string' || !/^\d{17,20}$/.test(value.trim())) {
-    return { ok: false, error: 'A Discord id is 17 to 20 digits. Right-click the user in Discord and choose Copy User ID.' };
-  }
+  const invalid = { ok: false as const, error: 'A Discord id is 17 to 20 digits. Right-click the user in Discord and choose Copy User ID.' };
+  if (typeof value !== 'string' || !/^\d{17,20}$/.test(value.trim())) return invalid;
+  // Stored as BIGINT; a 20-digit value can still overflow it.
+  if (BigInt(value.trim()) > BIGINT_MAX) return invalid;
   return { ok: true, value: value.trim() };
 }
 

@@ -235,7 +235,7 @@ function DiscordAccount({ linkedId, typedId, onSave }: {
     <div style={label}>
       Discord account: {typedId ? <span style={mono}>{typedId}</span> : 'not linked'}
       {' '}
-      <button onClick={() => setEditing(true)} style={{ ...smallBtn, background: 'transparent', color: 'var(--color-ocean-400)', padding: '0 0.25rem' }}>
+      <button onClick={() => { setValue(typedId ?? ''); setError(null); setEditing(true); }} style={{ ...smallBtn, background: 'transparent', color: 'var(--color-ocean-400)', padding: '0 0.25rem' }}>
         {typedId ? 'Change' : 'Add Discord id'}
       </button>
     </div>
