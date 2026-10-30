@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import useSWR from 'swr';
+import { fetcher } from '@/hooks/fetcher';
 import { useExecShellExchange, IngredientItem, MaterialItem } from '@/hooks/useExecShellExchange';
 
 type Tab = 'ingredients' | 'materials';
@@ -36,6 +38,88 @@ export default function ExecShellExchangePage() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const clearFeedback = () => { setActionError(null); setActionSuccess(null); };
+
+  /**
+   * Republish a bot panel as it stands and wait for the bot, returning what
+   * happened. Used for the rate images and after a conversion rate change.
+   * Returns null when the panel was never posted, so there's nothing to update.
+   */
+  const republishPanel = async (slug: string, label: string, note: string, onSent: (msg: string) => void): Promise<string | null> => {
+    const panelRes = await fetch(`/api/exec/bot-panels/${slug}`);
+    const panel = await panelRes.json();
+    if (!panelRes.ok) throw new Error(panel.error || `The ${label} panel was not found`);
+    if (!panel.latest) throw new Error(`The ${label} panel has no content yet. Set it up under Bot Messages first.`);
+    if (!panel.panel.message_ids?.length) return null;
+    const res = await fetch(`/api/exec/bot-panels/${slug}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: panel.latest.content, channel_id: panel.latest.channel_id ?? panel.panel.channel_id,
+        base_rev: panel.latest.rev_number, note,
+      }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error || `Failed to publish the ${label} panel`);
+    onSent(`Sent the ${label} panel to the bot; waiting for it to update Discord…`);
+
+    // Follow the revision until the bot finishes, so the result shows here.
+    for (let i = 0; i < 40; i++) {
+      await new Promise(r => setTimeout(r, 1500));
+      const check = await (await fetch(`/api/exec/bot-panels/${slug}`)).json();
+      const rev = check.revisions?.find((r: { rev_number: number }) => r.rev_number === body.rev_number);
+      if (!rev || rev.status === 'pending' || rev.status === 'publishing') continue;
+      if (rev.status === 'failed') throw new Error(`The bot couldn't publish the ${label} panel: ${rev.error ?? 'unknown error'}`);
+      if (rev.status === 'superseded') return `A newer save of the ${label} panel replaced this one before the bot got to it.`;
+      return `The ${label} panel is live in Discord (revision ${body.rev_number}).${rev.error ? ` Note: ${rev.error}` : ''}`;
+    }
+    return `The bot hasn't picked up the ${label} panel yet; check Bot Messages in a minute.`;
+  };
+
+  // Redraw the rate images from the values below and announce what changed.
+  const [publishing, setPublishing] = useState(false);
+  const publishRates = async () => {
+    clearFeedback();
+    setPublishing(true);
+    try {
+      const result = await republishPanel('shell-exchange', 'shell exchange', 'Rates update', setActionSuccess);
+      setActionSuccess(result ?? 'The shell exchange panel isn\'t posted yet. Place it under Bot Messages first.');
+    } catch (e: any) {
+      setActionError(e.message);
+    }
+    setPublishing(false);
+  };
+
+  // Shells -> aspects rate: the bot reads it on every conversion, and panels
+  // show it as {Shells per aspect}; saving republishes the posted ones that do.
+  const { data: conversion, mutate: refreshConversion } = useSWR<{ shells_per_aspect: number; max_aspects_per_conversion: number }>(
+    '/api/exec/shell-exchange/conversion', fetcher);
+  const [convDraft, setConvDraft] = useState<{ per: string; max: string } | null>(null);
+  const [savingConv, setSavingConv] = useState(false);
+  const convValues = convDraft ?? (conversion ? { per: String(conversion.shells_per_aspect), max: String(conversion.max_aspects_per_conversion) } : null);
+  const convChanged = !!(conversion && convDraft
+    && (convDraft.per !== String(conversion.shells_per_aspect) || convDraft.max !== String(conversion.max_aspects_per_conversion)));
+  const saveConversion = async () => {
+    if (!convDraft) return;
+    clearFeedback();
+    setSavingConv(true);
+    try {
+      const res = await fetch('/api/exec/shell-exchange/conversion', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shells_per_aspect: Number(convDraft.per), max_aspects_per_conversion: Number(convDraft.max) }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Failed to save the conversion rate');
+      await refreshConversion(body, { revalidate: false });
+      setConvDraft(null);
+      const panels: string[] = body.republished ?? [];
+      setActionSuccess(
+        `Conversion rate saved: ${body.shells_per_aspect} shells per aspect, at most ${body.max_aspects_per_conversion} per conversion. It applies to the next conversion.`
+        + (panels.length ? ` Updating ${panels.join(', ')} in Discord; see Bot Messages for the result.` : ''),
+      );
+    } catch (e: any) {
+      setActionError(e.message);
+    }
+    setSavingConv(false);
+  };
 
   const inputStyle: React.CSSProperties = {
     background: 'var(--bg-primary)', border: '1px solid var(--border-card)',
@@ -162,7 +246,13 @@ export default function ExecShellExchangePage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Shell Exchange</h1>
-        <button onClick={refresh} style={{ ...smallBtn, background: 'var(--bg-card)', color: 'var(--text-secondary)' }}>Refresh</button>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <a href="/exec/bot-panels/shell-exchange" style={{ ...smallBtn, background: 'var(--bg-card)', color: 'var(--text-secondary)', textDecoration: 'none' }}>Edit panel text</a>
+          <button onClick={publishRates} disabled={publishing} style={{ ...smallBtn, background: '#3b82f6', color: '#fff', opacity: publishing ? 0.6 : 1 }}>
+            {publishing ? 'Queuing…' : 'Publish rates to Discord'}
+          </button>
+          <button onClick={refresh} style={{ ...smallBtn, background: 'var(--bg-card)', color: 'var(--text-secondary)' }}>Refresh</button>
+        </div>
       </div>
 
       {/* Feedback */}
@@ -178,6 +268,39 @@ export default function ExecShellExchangePage() {
           <button onClick={clearFeedback} style={{ ...smallBtn, marginLeft: '0.5rem', background: 'transparent', color: '#22c55e' }}>Dismiss</button>
         </div>
       )}
+
+      {/* Shells -> aspects conversion */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.85rem 1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '0.75rem' }}>
+        <div style={{ flex: '1 1 16rem' }}>
+          <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>Shells → Aspects conversion</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+            Used by the conversion button in Discord. Bot messages that show these numbers update when you save.
+          </div>
+        </div>
+        {convValues ? (
+          <>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              Shells per aspect
+              <input type="number" min={1} max={10000} value={convValues.per}
+                onChange={e => setConvDraft({ ...convValues, per: e.target.value })} style={{ ...inputStyle, width: '8rem' }} />
+            </label>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              Max aspects per conversion
+              <input type="number" min={1} max={10000} value={convValues.max}
+                onChange={e => setConvDraft({ ...convValues, max: e.target.value })} style={{ ...inputStyle, width: '8rem' }} />
+            </label>
+            <button onClick={saveConversion} disabled={!convChanged || savingConv}
+              style={{ ...smallBtn, padding: '0.5rem 0.9rem', background: '#3b82f6', color: '#fff', opacity: !convChanged || savingConv ? 0.5 : 1 }}>
+              {savingConv ? 'Saving…' : 'Save rate'}
+            </button>
+            {convChanged && !savingConv && (
+              <button onClick={() => setConvDraft(null)} style={{ ...smallBtn, padding: '0.5rem 0.6rem', background: 'transparent', color: 'var(--text-secondary)' }}>Cancel</button>
+            )}
+          </>
+        ) : (
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Loading…</span>
+        )}
+      </div>
 
       {/* Tabs + Add button */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
