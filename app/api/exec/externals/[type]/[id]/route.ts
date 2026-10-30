@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireNarwhalSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { isAllyRank } from '@/lib/guild-alliances';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,13 +78,17 @@ export async function PATCH(
       if (!guildName || !prefix || !roleId || !/^\d{15,22}$/.test(roleId)) {
         return NextResponse.json({ error: 'Guild name, prefix, and an existing Discord role ID are required.' }, { status: 400 });
       }
+      const displayRank = text(body.displayRank) ?? 'Navigator';
+      if (!(await isAllyRank(pool, displayRank))) {
+        return NextResponse.json({ error: 'Choose a configured ally rank.' }, { status: 400 });
+      }
       await pool.query(
         `UPDATE guild_alliances
          SET guild_name = $1, guild_prefix = $2, discord_role_id = $3,
              display_rank = $4, notes = $5, enabled = $6,
              updated_by = $7, updated_at = NOW()
          WHERE id = $8`,
-        [guildName, prefix, roleId, text(body.displayRank) ?? 'Navigator', text(body.notes), body.enabled !== false, session.ign, id]
+        [guildName, prefix, roleId, displayRank, text(body.notes), body.enabled !== false, session.ign, id]
       );
     }
     return NextResponse.json({ success: true });
