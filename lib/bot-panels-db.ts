@@ -145,6 +145,16 @@ export async function getRegistry(): Promise<PanelRegistry | null> {
   return typeof data === 'string' ? JSON.parse(data) : data;
 }
 
+/** Ask the bot to rebuild the registry on its next tick (~10s). The request
+ *  lapses after ten minutes so a click while the bot is down isn't kept. */
+export async function requestRegistryRefresh(): Promise<void> {
+  await getPool().query(`
+    INSERT INTO cache_entries (cache_key, data, expires_at)
+    VALUES ('botPanelRegistryRefresh', '{}', NOW() + INTERVAL '10 minutes')
+    ON CONFLICT (cache_key) DO UPDATE SET expires_at = EXCLUDED.expires_at, created_at = NOW()
+  `);
+}
+
 /**
  * Queue a fresh copy of the latest revision of every posted panel whose text
  * uses one of these values ({{key}}), so the bot redraws it with the new value.
