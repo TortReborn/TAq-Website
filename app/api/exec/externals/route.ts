@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireNarwhalSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
+import { isAllyRank } from '@/lib/guild-alliances';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,11 +126,15 @@ export async function POST(request: NextRequest) {
       if (!guildName || !prefix || !roleId || !/^\d{15,22}$/.test(roleId)) {
         return NextResponse.json({ error: 'Guild name, prefix, and an existing Discord role ID are required.' }, { status: 400 });
       }
+      const displayRank = text(body.displayRank) ?? 'Navigator';
+      if (!(await isAllyRank(pool, displayRank))) {
+        return NextResponse.json({ error: 'Choose a configured ally rank.' }, { status: 400 });
+      }
       await pool.query(
         `INSERT INTO guild_alliances (
            guild_name, guild_prefix, discord_role_id, display_rank, notes, enabled, created_by, updated_by
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $7)`,
-        [guildName, prefix, roleId, text(body.displayRank) ?? 'Navigator', text(body.notes), body.enabled !== false, session.ign]
+        [guildName, prefix, roleId, displayRank, text(body.notes), body.enabled !== false, session.ign]
       );
     } else {
       return NextResponse.json({ error: 'Unknown externals action.' }, { status: 400 });
