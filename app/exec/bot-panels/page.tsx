@@ -5,13 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
-import { SLUG_RE, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
+import type { PanelRegistry, PanelSummary } from '@/lib/bot-panels';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 
 interface ListResponse { panels: PanelSummary[]; registry: PanelRegistry | null }
-
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
 
 export default function BotPanelsPage() {
   const router = useRouter();
@@ -20,8 +18,6 @@ export default function BotPanelsPage() {
   });
   const [showNew, setShowNew] = useState(false);
   const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [slugTouched, setSlugTouched] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -29,7 +25,7 @@ export default function BotPanelsPage() {
     setCreating(true); setCreateError(null);
     const res = await fetch('/api/exec/bot-panels', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), slug }),
+      body: JSON.stringify({ name: name.trim() }),
     });
     const body = await res.json();
     setCreating(false);
@@ -64,19 +60,14 @@ export default function BotPanelsPage() {
       )}
 
       {showNew && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.75rem', alignItems: 'end' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '1rem', display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.75rem', alignItems: 'end' }}>
           <div>
             <label style={labelStyle}>Name</label>
-            <input value={name} autoFocus placeholder="Event rules" style={inputStyle}
-              onChange={e => { setName(e.target.value); if (!slugTouched) setSlug(slugify(e.target.value)); }} />
+            <input value={name} autoFocus placeholder="Event rules" style={inputStyle} maxLength={100}
+              onChange={e => setName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && name.trim() && !creating) create(); }} />
           </div>
-          <div>
-            <label style={labelStyle}>Short id (used in the page address)</label>
-            <input value={slug} placeholder="event-rules" style={inputStyle}
-              onChange={e => { setSlug(slugify(e.target.value)); setSlugTouched(true); }} />
-          </div>
-          <button onClick={create} disabled={creating || !name.trim() || !SLUG_RE.test(slug)}
-            style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: creating || !name.trim() || !SLUG_RE.test(slug) ? 0.5 : 1 }}>
+          <button onClick={create} disabled={creating || !name.trim()}
+            style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: creating || !name.trim() ? 0.5 : 1 }}>
             {creating ? 'Creating…' : 'Create'}
           </button>
           {createError && <div style={{ gridColumn: '1 / -1', color: '#ef4444', fontSize: '0.8rem' }}>{createError}</div>}
