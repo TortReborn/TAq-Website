@@ -56,8 +56,11 @@ const banner = (color: string): React.CSSProperties => ({
 export default function BotPanelEditorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [polling, setPolling] = useState(false);
+  // The registry's updated_at when a refresh was asked for; cleared once it moves
+  const [refreshFrom, setRefreshFrom] = useState<string | null>(null);
+  const [refreshFailed, setRefreshFailed] = useState(false);
   const { data, error, isLoading, mutate } = useSWR<PanelResponse>(`/api/exec/bot-panels/${slug}`, fetcher, {
-    revalidateOnFocus: false, refreshInterval: polling ? 2500 : 30000,
+    revalidateOnFocus: false, refreshInterval: polling || refreshFrom != null ? 2500 : 30000,
   });
 
   const [tab, setTab] = useState<'edit' | 'history'>('edit');
@@ -99,6 +102,15 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
   useEffect(() => {
     if (polling && latestMeta && !['pending', 'publishing'].includes(latestMeta.status)) setPolling(false);
   }, [polling, latestMeta]);
+
+  // Stop once the bot has rewritten the registry, or give up after a minute
+  const registryAt = registry?.updated_at ?? '';
+  useEffect(() => {
+    if (refreshFrom == null) return;
+    if (registryAt !== refreshFrom) { setRefreshFrom(null); return; }
+    const t = setTimeout(() => { setRefreshFrom(null); setRefreshFailed(true); }, 60000);
+    return () => clearTimeout(t);
+  }, [refreshFrom, registryAt]);
 
   const dirty = useMemo(() => {
     if (!draft) return false;
@@ -158,6 +170,13 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
     saveDraft(slug, null);
     setAdoptText(''); setAdoptOpen(false); setNote(''); setConflict(null); setRestoredDraft(false);
     setPolling(true);
+  };
+
+  const refreshRegistry = async () => {
+    setRefreshFailed(false);
+    const res = await fetch('/api/exec/bot-panels/registry', { method: 'POST' });
+    if (res.ok) setRefreshFrom(registryAt);
+    else setRefreshFailed(true);
   };
 
   const loadTheirs = () => {
@@ -230,6 +249,14 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
                       Moving channels: the bot posts here first, then deletes the old messages in {channelLabel(data.panel.channel_id, registry)}.
                     </div>
                   )}
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
+                    {refreshFailed ? <span style={{ color: '#ef4444' }}>The bot didn&rsquo;t refresh; is it running?</span>
+                      : `Channels, roles and emojis from the bot${registry ? `, synced ${timeAgo(registry.updated_at)}` : ''}.`}
+                    <button onClick={refreshRegistry} disabled={refreshFrom != null}
+                      style={{ ...smallBtn, background: 'transparent', color: '#3b82f6', padding: '0 0.4rem', opacity: refreshFrom != null ? 0.6 : 1 }}>
+                      {refreshFrom != null ? 'Refreshing…' : 'Refresh'}
+                    </button>
+                  </div>
                 </div>
 
                 <div>

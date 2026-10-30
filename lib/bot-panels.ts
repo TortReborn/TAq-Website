@@ -117,7 +117,7 @@ export interface PanelRegistry {
 export const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/;
 
 // A slug becomes /api/exec/bot-panels/<slug>; these are routes of their own there.
-const RESERVED_SLUGS = new Set(['assets']);
+const RESERVED_SLUGS = new Set(['assets', 'registry']);
 
 /** A panel's slug (page address, API path), derived from its name once at creation:
  *  accents dropped, lowercase, every run of other characters one dash. Always
