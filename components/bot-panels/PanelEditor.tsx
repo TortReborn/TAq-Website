@@ -291,18 +291,38 @@ function ButtonEditor({ button, onChange, onRemove, registry }: {
   const groups = new Map<string, NonNullable<PanelRegistry>['actions']>();
   for (const a of registry?.actions ?? []) groups.set(a.group, [...(groups.get(a.group) ?? []), a]);
   const action = button.kind === 'action' ? registry?.actions.find(a => a.key === button.action) : undefined;
+  const roles = registry?.roles ?? [];
+  const role = button.kind === 'role' ? roles.find(r => r.id === button.role_id) : undefined;
+  // Only roles the bot's safety rule allows (no permissions, not bot-managed, below Tort)
+  const assignable = roles.filter(r => r.assignable !== false);
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '7.5rem minmax(0, 1fr) 10rem auto', gap: '0.35rem', alignItems: 'center', padding: '0.4rem', background: 'var(--bg-primary)', borderRadius: '0.375rem' }}>
       <select value={button.kind} style={inputStyle}
         onChange={e => onChange(e.target.value === 'link'
           ? { kind: 'link', label: button.label, emoji: button.emoji, url: '' }
-          : { kind: 'action', action: registry?.actions[0]?.key ?? '', label: button.label, emoji: button.emoji })}>
+          : e.target.value === 'role'
+            ? { kind: 'role', role_id: '', label: button.label, emoji: button.emoji }
+            : { kind: 'action', action: registry?.actions[0]?.key ?? '', label: button.label, emoji: button.emoji })}>
         <option value="link">Link</option>
         <option value="action">Bot button</option>
+        <option value="role">Role toggle</option>
       </select>
       {button.kind === 'link' ? (
         <input value={button.url} placeholder="https://…" onChange={e => onChange({ ...button, url: e.target.value })} style={{ ...inputStyle, gridColumn: 'span 2' }} />
+      ) : button.kind === 'role' ? (
+        <>
+          <select value={button.role_id} onChange={e => onChange({ ...button, role_id: e.target.value })} style={inputStyle} aria-label="Role to give">
+            <option value="">Choose a role…</option>
+            {button.role_id && role?.assignable === false && <option value={button.role_id}>{role.name} (not allowed: {role.why})</option>}
+            {button.role_id && !role && <option value={button.role_id}>Unknown role {button.role_id}</option>}
+            {assignable.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+          </select>
+          <select value={button.style ?? ''} onChange={e => onChange({ ...button, style: (e.target.value || undefined) as any })} style={inputStyle} aria-label="Button colour">
+            <option value="">{STYLE_NAMES.secondary} (default)</option>
+            {BUTTON_STYLES.map(s => <option key={s} value={s}>{STYLE_NAMES[s]}</option>)}
+          </select>
+        </>
       ) : (
         <>
           <select value={button.action} onChange={e => onChange({ ...button, action: e.target.value })} style={inputStyle}>
@@ -321,10 +341,22 @@ function ButtonEditor({ button, onChange, onRemove, registry }: {
       )}
       <button type="button" onClick={onRemove} style={dangerBtn} aria-label="Remove button">✕</button>
       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Label / emoji</span>
-      <input value={button.label ?? ''} placeholder={button.kind === 'action' ? action?.label ?? 'Label' : 'Label'} maxLength={LIMITS.buttonLabel}
-        onChange={e => onChange({ ...button, label: e.target.value })} style={inputStyle} />
+      <input value={button.label ?? ''} placeholder={button.kind === 'action' ? action?.label ?? 'Label' : button.kind === 'role' ? role?.name ?? 'Label' : 'Label'} maxLength={LIMITS.buttonLabel}
+        onChange={e => onChange({ ...button, label: e.target.value })}
+        onBlur={() => { if (button.kind === 'role' && !button.label && !button.emoji && role) onChange({ ...button, label: role.name }); }}
+        style={inputStyle} />
       <EmojiInput value={button.emoji ?? ''} registry={registry} onChange={v => onChange({ ...button, emoji: v })}
         placeholder={button.kind === 'action' && action?.emoji ? `${action.emoji} (default)` : undefined} />
+      {button.kind === 'role' && (
+        <>
+          <span style={{ gridColumn: '1', fontSize: '0.72rem', color: 'var(--text-muted)' }}>Only for</span>
+          <select value={button.requires_role_id ?? ''} style={{ ...inputStyle, gridColumn: 'span 2' }} aria-label="Role needed to use this button"
+            onChange={e => onChange({ ...button, requires_role_id: e.target.value || undefined })}>
+            <option value="">Everyone</option>
+            {roles.map(r => <option key={r.id} value={r.id}>Members with {r.name}</option>)}
+          </select>
+        </>
+      )}
     </div>
   );
 }

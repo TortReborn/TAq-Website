@@ -172,3 +172,47 @@ describe('slugFromName', () => {
     expect(slugFromName('y'.repeat(60), 12)).toBe('y'.repeat(45) + '-12');
   });
 });
+
+describe('role buttons', () => {
+  const MUNCH = '1311125265153265795';
+  const SOLO = '1154999995741769728';
+  const ADMIN = '729151133758783549';
+  const roles = new Map([
+    [MUNCH, { name: 'Territory Munching', assignable: true, why: null }],
+    [SOLO, { name: 'Soloer', assignable: true, why: null }],
+    [ADMIN, { name: 'Owner', assignable: false, why: 'it grants permissions' }],
+  ]);
+  const withButtons = (...buttons: unknown[]) => ({ messages: [{ content: 'x', rows: [buttons] }] });
+
+  it('keeps a valid role button, with its gate and colour', () => {
+    const { content, errors } = normalizeContent(withButtons(
+      { kind: 'role', role_id: MUNCH, label: 'Territory Munching', emoji: '🍃', style: 'primary', requires_role_id: SOLO },
+    ), { roles });
+    expect(errors).toEqual([]);
+    expect(content!.messages[0].rows![0][0]).toEqual(
+      { kind: 'role', role_id: MUNCH, requires_role_id: SOLO, label: 'Territory Munching', emoji: '🍃', style: 'primary' });
+  });
+
+  it('refuses roles the bot may not hand out, unknown roles and unpicked roles', () => {
+    expect(normalizeContent(withButtons({ kind: 'role', role_id: ADMIN, label: 'x' }), { roles }).errors[0]).toMatch(/can't hand out Owner \(it grants permissions\)/);
+    expect(normalizeContent(withButtons({ kind: 'role', role_id: '123456789012345678', label: 'x' }), { roles }).errors[0]).toMatch(/isn't in the server/);
+    expect(normalizeContent(withButtons({ kind: 'role', role_id: '', label: 'x' }), { roles }).errors[0]).toMatch(/pick the role/);
+    expect(normalizeContent(withButtons({ kind: 'role', role_id: MUNCH, label: 'x', requires_role_id: '123456789012345678' }), { roles }).errors[0]).toMatch(/required role isn't in the server/);
+  });
+
+  it('needs a label or emoji, and no duplicates', () => {
+    expect(normalizeContent(withButtons({ kind: 'role', role_id: MUNCH }), { roles }).errors[0]).toMatch(/label or an emoji/);
+    expect(normalizeContent(withButtons(
+      { kind: 'role', role_id: MUNCH, label: 'a' }, { kind: 'role', role_id: MUNCH, label: 'b' },
+    ), { roles }).errors[0]).toMatch(/appears twice/);
+  });
+
+  it('skips the role checks before the bot has published its registry', () => {
+    expect(normalizeContent(withButtons({ kind: 'role', role_id: ADMIN, label: 'x' })).errors).toEqual([]);
+  });
+
+  it('shows the role as a mention in the readable text', () => {
+    const text = contentToText({ messages: [{ rows: [[{ kind: 'role', role_id: MUNCH, requires_role_id: SOLO, label: 'Munch' }]] }] });
+    expect(text).toContain(`gives <@&${MUNCH}> (needs <@&${SOLO}>) "Munch"`);
+  });
+});

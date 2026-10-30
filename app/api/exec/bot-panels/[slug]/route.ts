@@ -53,6 +53,7 @@ export async function POST(
 
   const { content, errors } = normalizeContent(body?.content, {
     actionKeys: registry ? new Set(registry.actions.map(a => a.key)) : undefined,
+    roles: registry ? new Map(registry.roles.map(r => [r.id, r])) : undefined,
   });
   if (!content) return NextResponse.json({ error: errors[0], errors }, { status: 400 });
 
