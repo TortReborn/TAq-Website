@@ -59,7 +59,9 @@ export interface PanelEmbed {
 
 export type PanelButton =
   | { kind: 'link'; label?: string; url: string; emoji?: string }
-  | { kind: 'action'; action: string; label?: string; emoji?: string; style?: ButtonStyle };
+  | { kind: 'action'; action: string; label?: string; emoji?: string; style?: ButtonStyle }
+  /** Gives or takes a role when clicked (TAQ-114); requires_role_id gates who may use it. */
+  | { kind: 'role'; role_id: string; requires_role_id?: string; label?: string; emoji?: string; style?: ButtonStyle };
 
 export interface PanelMessage {
   /** 'box': one Components V2 container; `content` is its text, `color` its accent */
@@ -109,7 +111,8 @@ export interface PanelRegistry {
   default_color: number;
   guild: { id: string; name: string } | null;
   channels: { id: string; name: string; type: string; category: string | null; postable: boolean }[];
-  roles: { id: string; name: string; color: number }[];
+  /** assignable: a role button may hand it out (the bot's safety rule); why: the reason when not */
+  roles: { id: string; name: string; color: number; assignable?: boolean; why?: string | null }[];
   emojis: { id: string; name: string; animated: boolean; server?: string | null }[]; // server: set when not the main one
   updated_at: string;
 }
@@ -173,7 +176,11 @@ export function embedLength(e: PanelEmbed): number {
 interface NormalizeOptions {
   /** Action keys the bot accepts; skipped when the registry hasn't synced yet */
   actionKeys?: Set<string>;
+  /** The server's roles by id, for role buttons; skipped when the registry hasn't synced yet */
+  roles?: Map<string, { name: string; assignable?: boolean; why?: string | null }>;
 }
+
+const ROLE_ID_RE = /^\d{15,21}$/;
 
 export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { content?: PanelContent; errors: string[] } {
   const errors: string[] = [];
@@ -293,6 +300,24 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
           if (!label && !emoji) errors.push(`${at}: a link button needs a label or an emoji.`);
           return JSON.parse(JSON.stringify({ kind: 'link', label, url, emoji }));
         }
+        if (b?.kind === 'role') {
+          const roleId = str(b?.role_id).trim();
+          const requires = optional(b?.requires_role_id);
+          if (!ROLE_ID_RE.test(roleId)) errors.push(`${at}: pick the role this button gives.`);
+          else if (opts.roles) {
+            const role = opts.roles.get(roleId);
+            if (!role) errors.push(`${at}: that role isn't in the server.`);
+            else if (role.assignable === false) errors.push(`${at}: a button can't hand out ${role.name} (${role.why ?? 'not allowed'}).`);
+          }
+          if (requires && !ROLE_ID_RE.test(requires)) errors.push(`${at}: the required role isn't a role.`);
+          else if (requires && opts.roles && !opts.roles.has(requires)) errors.push(`${at}: the required role isn't in the server.`);
+          if (!label && !emoji) errors.push(`${at}: a role button needs a label or an emoji.`);
+          const key = `role:${roleId}:${requires ?? ''}`;
+          if (seen.has(key)) errors.push(`${at}: the same role button appears twice in one message.`);
+          seen.add(key);
+          const style = BUTTON_STYLES.includes(b?.style) ? b.style : undefined;
+          return JSON.parse(JSON.stringify({ kind: 'role', role_id: roleId, requires_role_id: requires, label, emoji, style }));
+        }
         const action = str(b?.action);
         if (b?.kind !== 'action' || !action) errors.push(`${at}: pick what the button does.`);
         else if (opts.actionKeys && !opts.actionKeys.has(action)) errors.push(`${at}: "${action}" is not a bot action.`);
@@ -356,9 +381,13 @@ export function contentToText(content: PanelContent, actionLabel: (key: string) 
     });
     (m.rows ?? []).forEach((row, ri) => row.forEach((b, bi) => {
       const B = `${M} › Row ${ri + 1} button ${bi + 1}`;
+      const extras = `${b.label ? ` "${b.label}"` : ''}${b.emoji ? ` ${b.emoji}` : ''}${b.kind !== 'link' && b.style ? ` [${b.style}]` : ''}`;
+      // role ids as mentions, so toReadable shows @[Role]
       lines.push(b.kind === 'link'
         ? `${B}: link "${b.label ?? ''}" ${b.emoji ?? ''} → ${b.url}`
-        : `${B}: ${actionLabel(b.action)}${b.label ? ` "${b.label}"` : ''}${b.emoji ? ` ${b.emoji}` : ''}${b.style ? ` [${b.style}]` : ''}`);
+        : b.kind === 'role'
+          ? `${B}: gives <@&${b.role_id}>${b.requires_role_id ? ` (needs <@&${b.requires_role_id}>)` : ''}${extras}`
+          : `${B}: ${actionLabel(b.action)}${extras}`);
     }));
     if (m.dynamic) lines.push(`${M} › Generated: shell exchange rate images`);
   });

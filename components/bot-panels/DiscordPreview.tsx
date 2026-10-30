@@ -102,12 +102,16 @@ function Embed({ embed, registry }: { embed: PanelEmbed; registry: PanelRegistry
 
 function Button({ button, registry }: { button: PanelButton; registry: PanelRegistry | null }) {
   const action = button.kind === 'action' ? registry?.actions.find(a => a.key === button.action) : undefined;
+  const role = button.kind === 'role' ? registry?.roles.find(r => r.id === button.role_id) : undefined;
   const style = button.kind === 'link' ? 'link' : (button.style ?? action?.style ?? 'secondary');
-  const label = (button.label ?? '') || (button.kind === 'action' ? action?.label ?? button.action : '');
+  const label = (button.label ?? '') || (button.kind === 'action' ? action?.label ?? button.action : button.kind === 'role' ? role?.name ?? '' : '');
   const emoji = button.emoji || (button.kind === 'action' ? action?.emoji : null);
+  const title = button.kind === 'link' ? button.url
+    : button.kind === 'role' ? `Gives or takes ${role ? `@${role.name}` : 'a role'}${button.requires_role_id ? ' (members with the required role only)' : ''}`
+      : `Bot button: ${action?.label ?? button.action}`;
   return (
     <span
-      title={button.kind === 'link' ? button.url : `Bot button: ${action?.label ?? button.action}`}
+      title={title}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, padding: '0 16px', borderRadius: 8,
         background: BUTTON_COLORS[style], color: '#fff', fontSize: '0.875rem', fontWeight: 500,
