@@ -116,6 +116,21 @@ export interface PanelRegistry {
 
 export const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/;
 
+// A slug becomes /api/exec/bot-panels/<slug>; these are routes of their own there.
+const RESERVED_SLUGS = new Set(['assets']);
+
+/** A panel's slug (page address, API path), derived from its name once at creation:
+ *  accents dropped, lowercase, every run of other characters one dash. Always
+ *  matches SLUG_RE; `n` > 1 gives the n-th free variant (name-2, name-3, ...). */
+export function slugFromName(name: string, n = 1): string {
+  let base = name.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (base.length < 3) base = base ? `${base}-panel` : 'panel';
+  if (RESERVED_SLUGS.has(base)) base = `${base}-panel`;
+  const suffix = n > 1 ? `-${n}` : '';
+  return base.slice(0, 48 - suffix.length).replace(/-+$/, '') + suffix;
+}
+
 export function assetName(url: string | undefined | null): string | null {
   if (!url || !url.startsWith(ASSET_SCHEME)) return null;
   const name = url.slice(ASSET_SCHEME.length);

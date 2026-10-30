@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
-import { SLUG_RE } from '@/lib/bot-panels';
+import { slugFromName } from '@/lib/bot-panels';
 import { createPanel, getRegistry, listPanels } from '@/lib/bot-panels-db';
 
 export const dynamic = 'force-dynamic';
@@ -30,20 +30,18 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
-  const slug = typeof body?.slug === 'string' ? body.slug.trim().toLowerCase() : '';
   const name = typeof body?.name === 'string' ? body.name.trim() : '';
-  if (!SLUG_RE.test(slug)) {
-    return NextResponse.json({ error: 'Slug must be 3-48 lowercase letters, numbers or dashes' }, { status: 400 });
-  }
   if (!name || name.length > 100) {
     return NextResponse.json({ error: 'Name must be 1-100 characters' }, { status: 400 });
   }
 
   try {
-    if (!(await createPanel(slug, name))) {
-      return NextResponse.json({ error: `A panel called "${slug}" already exists` }, { status: 409 });
+    // The slug comes from the name; a taken one gets -2, -3, ...
+    for (let n = 1; n <= 100; n++) {
+      const slug = slugFromName(name, n);
+      if (await createPanel(slug, name)) return NextResponse.json({ slug }, { status: 201 });
     }
-    return NextResponse.json({ slug }, { status: 201 });
+    return NextResponse.json({ error: 'Too many panels with this name' }, { status: 409 });
   } catch (error) {
     console.error('Bot panel create error:', error);
     return NextResponse.json({ error: 'Failed to create panel' }, { status: 500 });

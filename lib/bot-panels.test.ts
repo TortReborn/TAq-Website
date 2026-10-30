@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  SLUG_RE,
+  slugFromName,
   contentToText, fromReadable, imageSrc, normalizeContent, parseMessageLink, toReadable,
 } from './bot-panels';
 
@@ -143,5 +145,30 @@ describe('single-box layout', () => {
   it('shows up in the history text', () => {
     expect(contentToText({ messages: [{ layout: 'box', color: 0x123456, content: 'Hi' }] }))
       .toContain('Message 1 › Layout: single box\nMessage 1 › Colour: #123456\nMessage 1 › Text: Hi');
+  });
+});
+
+describe('slugFromName', () => {
+  it('lowercases the name and joins words with dashes', () => {
+    expect(slugFromName('Event Rules')).toBe('event-rules');
+    expect(slugFromName('  TAq FAQ!! (v2) ')).toBe('taq-faq-v2');
+    expect(slugFromName('Shells -> Aspects')).toBe('shells-aspects');
+  });
+  it('drops accents and anything that is not a letter or digit', () => {
+    expect(slugFromName('Café Été')).toBe('cafe-ete');
+    expect(slugFromName('🐚｜shell-exchange')).toBe('shell-exchange');
+  });
+  it('always gives a usable slug', () => {
+    for (const name of ['🐚', 'A', 'ab', 'x'.repeat(100), 'assets', 'Assets', '---', 'Role Info'])
+      for (const n of [1, 2, 37]) expect(slugFromName(name, n)).toMatch(SLUG_RE);
+    expect(slugFromName('🐚')).toBe('panel');
+    expect(slugFromName('A')).toBe('a-panel');
+  });
+  it('never takes a route of its own', () => {
+    expect(slugFromName('Assets')).toBe('assets-panel');
+  });
+  it('numbers later panels with the same name', () => {
+    expect(slugFromName('Event Rules', 2)).toBe('event-rules-2');
+    expect(slugFromName('y'.repeat(60), 12)).toBe('y'.repeat(45) + '-12');
   });
 });
