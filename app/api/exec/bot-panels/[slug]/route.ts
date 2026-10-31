@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
-import { LIMITS, normalizeContent, parseMessageLink } from '@/lib/bot-panels';
+import { LIMITS, channelGuild, isForum, normalizeContent, parseMessageLink, scopedRegistry } from '@/lib/bot-panels';
 import { createRevision, getPanel, getRegistry, messageOwner, RevisionConflict } from '@/lib/bot-panels-db';
 import { getPanelValues } from '@/lib/panel-values-db';
 
@@ -51,13 +51,16 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to load the bot registry' }, { status: 500 });
   }
 
+  let channelId = typeof body?.channel_id === 'string' ? body.channel_id.trim() : '';
+
+  // Role buttons are checked against the server the panel posts in (TAQ-115).
+  const roles = scopedRegistry(registry, channelGuild(registry, channelId))?.roles;
   const { content, errors } = normalizeContent(body?.content, {
     actionKeys: registry ? new Set(registry.actions.map(a => a.key)) : undefined,
-    roles: registry ? new Map(registry.roles.map(r => [r.id, r])) : undefined,
+    roles: roles ? new Map(roles.map(r => [r.id, r])) : undefined,
+    forum: isForum(registry, channelId),
   });
   if (!content) return NextResponse.json({ error: errors[0], errors }, { status: 400 });
-
-  let channelId = typeof body?.channel_id === 'string' ? body.channel_id.trim() : '';
 
   // Taking over messages that are already in Discord (posted by /generate)
   let adoptMessageIds: string[] | null = null;
@@ -78,8 +81,9 @@ export async function POST(
     if (channelId && channelId !== linkChannel) {
       return NextResponse.json({ error: 'The linked messages are in a different channel than the one picked' }, { status: 400 });
     }
-    if (registry?.guild && parsed.some(p => p!.guildId !== registry.guild!.id)) {
-      return NextResponse.json({ error: `Linked messages must be in ${registry.guild.name}` }, { status: 400 });
+    const servers = registry?.guilds?.length ? registry.guilds : registry?.guild ? [registry.guild] : [];
+    if (servers.length && parsed.some(p => !servers.some(g => g.id === p!.guildId))) {
+      return NextResponse.json({ error: `Linked messages must be in ${servers.map(g => g.name).join(' or ')}` }, { status: 400 });
     }
     channelId = linkChannel;
     adoptMessageIds = parsed.map(p => p!.messageId);
