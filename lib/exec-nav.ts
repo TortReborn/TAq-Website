@@ -43,7 +43,7 @@ export const EXEC_NAV: ExecNavGroup[] = [
       { href: '/exec/activity', label: 'Activity', desc: 'Member activity, kick list, and guild trends', iconImage: '/images/icons/exec/activity.png' },
       { href: '/exec/promotions', label: 'Promotions', desc: 'Manage and suggest promotions', iconImage: '/images/icons/exec/promotions.png' },
       { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and add banned players', iconImage: '/images/icons/exec/blacklist.png' },
-      { href: '/exec/warnings', label: 'Warnings', desc: 'Warning profiles and proof for each player', icon: 'M12 9v3.75m0 3.75h.008M10.29 3.86L1.82 18a1.875 1.875 0 001.6 2.81h17.16a1.875 1.875 0 001.6-2.81L13.71 3.86a1.875 1.875 0 00-3.42 0z' },
+      { href: '/exec/warnings', label: 'Warnings', desc: 'Warning profiles and proof for each player', iconImage: '/images/icons/exec/warnings.png' },
     ],
   },
   {
@@ -68,10 +68,10 @@ export const EXEC_NAV: ExecNavGroup[] = [
     category: 'Operations',
     items: [
       { href: '/exec/agenda', label: 'Agenda', desc: 'View and manage meeting agenda', iconImage: '/images/icons/exec/agenda.png' },
-      { href: '/exec/bot-panels', label: 'Bot Messages', desc: 'Edit the bot\'s info panels in Discord', icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z' },
+      { href: '/exec/bot-panels', label: 'Bot Messages', desc: 'Edit the bot\'s info panels in Discord', iconImage: '/images/icons/exec/bot-panels.png' },
       { href: '/exec/requests', label: 'Requests', desc: 'Report bugs and request features', iconImage: '/images/icons/exec/requests.png' },
-      { href: '/exec/chronicle', label: 'Chronicle', desc: 'Review map alliance and event submissions', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
-      { href: '/exec/analytics', label: 'Analytics', desc: 'Site usage analytics', icon: 'M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', requires: 'analytics' },
+      { href: '/exec/chronicle', label: 'Chronicle', desc: 'Review map alliance and event submissions', iconImage: '/images/icons/exec/chronicle.png' },
+      { href: '/exec/analytics', label: 'Analytics', desc: 'Site usage analytics', iconImage: '/images/icons/exec/analytics.png', requires: 'analytics' },
       { href: '/exec/externals', label: 'Externals', desc: 'Manage externals and alliances', iconImage: '/images/icons/exec/externals.png', requires: 'narwhal' },
     ],
   },
