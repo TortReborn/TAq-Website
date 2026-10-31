@@ -28,7 +28,7 @@ export function StatusBadge({ status, posted = true, current = true }: { status:
 export function channelLabel(id: string | null, registry: PanelRegistry | null): string {
   if (!id) return 'Not placed';
   const ch = registry?.channels.find(c => c.id === id);
-  return ch ? `#${ch.name}` : `#${id}`;
+  return ch ? (ch.parent_id ? `${ch.name} (forum post)` : `#${ch.name}`) : `#${id}`;
 }
 
 export function timeAgo(iso: string | null): string {

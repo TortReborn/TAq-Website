@@ -35,6 +35,7 @@ export const LIMITS = {
   note: 200,
   /** All text in a single-box (Components V2) message */
   boxText: 4000,
+  postTitle: 100,
 } as const;
 
 /** message.layout: one Components V2 box (text, full-width images, buttons) instead of embeds. */
@@ -74,7 +75,12 @@ export interface PanelMessage {
   dynamic?: string | null;
 }
 
-export interface PanelContent { messages: PanelMessage[] }
+export interface PanelContent {
+  messages: PanelMessage[];
+  /** The post's title when the panel's channel is a forum (TAQ-115): the first
+   *  publish opens the post, later ones edit it. */
+  post?: { title: string };
+}
 
 export type RevisionStatus = 'pending' | 'publishing' | 'published' | 'failed' | 'superseded';
 
@@ -109,12 +115,34 @@ export interface PanelRegistry {
   actions: { key: string; label: string; group: string; emoji: string | null; style: ButtonStyle }[];
   dynamic: { key: string; label: string }[];
   default_color: number;
+  /** The main server; channels and roles without a guild_id (older registries) are its */
   guild: { id: string; name: string } | null;
-  channels: { id: string; name: string; type: string; category: string | null; postable: boolean }[];
+  /** Every server panels can post in, main first (TAQ-115) */
+  guilds?: { id: string; name: string }[];
+  /** type 'forum': posting there opens a post; parent_id: set on a forum post a panel lives in */
+  channels: { id: string; name: string; type: string; category: string | null; postable: boolean; guild_id?: string; parent_id?: string }[];
   /** assignable: a role button may hand it out (the bot's safety rule); why: the reason when not */
-  roles: { id: string; name: string; color: number; assignable?: boolean; why?: string | null }[];
+  roles: { id: string; name: string; color: number; assignable?: boolean; why?: string | null; guild_id?: string }[];
   emojis: { id: string; name: string; animated: boolean; server?: string | null }[]; // server: set when not the main one
   updated_at: string;
+}
+
+/** The server a channel (or forum post) belongs to; null when the registry doesn't know it. */
+export function channelGuild(registry: PanelRegistry | null, channelId: string | null | undefined): string | null {
+  const ch = channelId ? registry?.channels.find(c => c.id === channelId) : undefined;
+  return ch ? ch.guild_id ?? registry?.guild?.id ?? null : null;
+}
+
+export function isForum(registry: PanelRegistry | null, channelId: string | null | undefined): boolean {
+  return !!channelId && registry?.channels.find(c => c.id === channelId)?.type === 'forum';
+}
+
+/** The registry with only one server's roles: a panel's role buttons and role
+ *  mentions name roles of the server it posts in. */
+export function scopedRegistry(registry: PanelRegistry | null, guildId: string | null): PanelRegistry | null {
+  if (!registry || !guildId) return registry;
+  const main = registry.guild?.id;
+  return { ...registry, roles: registry.roles.filter(r => (r.guild_id ?? main) === guildId) };
 }
 
 export const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/;
@@ -178,6 +206,8 @@ interface NormalizeOptions {
   actionKeys?: Set<string>;
   /** The server's roles by id, for role buttons; skipped when the registry hasn't synced yet */
   roles?: Map<string, { name: string; assignable?: boolean; why?: string | null }>;
+  /** The panel's channel is a forum, so the post needs a title */
+  forum?: boolean;
 }
 
 const ROLE_ID_RE = /^\d{15,21}$/;
@@ -265,7 +295,8 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
       const fields = fieldsRaw.map((f: any, fi: number) => {
         const name = str(f?.name).trim();
         const value = str(f?.value).trim();
-        if (!name || !value) errors.push(`${at}, field ${fi + 1}: a field needs both a name and a value.`);
+        // The name may be blank: the bot sends an invisible heading (TAQ-115).
+        if (!value) errors.push(`${at}, field ${fi + 1}: a field needs a value.`);
         tooLong(`${at}, field ${fi + 1}`, 'name', name, LIMITS.fieldName);
         tooLong(`${at}, field ${fi + 1}`, 'value', value, LIMITS.fieldValue);
         mentions(`${at}, field ${fi + 1}`, value);
@@ -342,7 +373,11 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
   });
 
   if (messages.filter(m => m.dynamic).length > 1) errors.push('Only one message can carry the generated images.');
-  return errors.length ? { errors } : { content: { messages }, errors };
+  const postTitle = optional((raw as any)?.post?.title);
+  tooLong('The forum post', 'title', postTitle, LIMITS.postTitle);
+  if (opts.forum && !postTitle) errors.push('Give the forum post a title.');
+  const content: PanelContent = postTitle ? { messages, post: { title: postTitle } } : { messages };
+  return errors.length ? { errors } : { content, errors };
 }
 
 // ---------------------------------------------------------------------------
@@ -356,6 +391,7 @@ export function contentToText(content: PanelContent, actionLabel: (key: string) 
     if (!value) return;
     value.split('\n').forEach((l, i) => lines.push(`${label}${i === 0 ? ':' : ' ·'} ${l}`));
   };
+  if (content.post?.title) lines.push(`Forum post title: ${content.post.title}`);
   content.messages.forEach((m, mi) => {
     const M = `Message ${mi + 1}`;
     lines.push(`── ${M} ──`);
