@@ -58,7 +58,7 @@ async function readModDisplayNames(modPath) {
 }
 
 async function fetchCatalog(baseUrl, token) {
-  const url = `${baseUrl.replace(/\/$/, '')}/api/inventory/catalog`;
+  const url = `${baseUrl.replace(/\/$/, '')}/api/inventory/catalog?include=archived`;
   const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   if (!response.ok) {
     throw new Error(`Catalog fetch failed: ${response.status} ${await response.text()}`);
@@ -84,19 +84,39 @@ async function main() {
   const modDisplayNames = [...modNames.consumables, ...modNames.ingredients];
   const modNormalized = new Set(modDisplayNames.map(normalizeInventoryName));
 
-  const catalogAliasesByNormalized = new Map();
-  for (const item of catalog.items ?? []) {
-    for (const candidate of [item.name, item.scanKey, ...(item.aliases ?? [])]) {
-      catalogAliasesByNormalized.set(normalizeInventoryName(candidate), item);
+  const indexByName = items => {
+    const byNormalized = new Map();
+    for (const item of items) {
+      for (const candidate of [item.name, item.scanKey, ...(item.aliases ?? [])]) {
+        if (candidate) byNormalized.set(normalizeInventoryName(candidate), item);
+      }
     }
-  }
+    return byNormalized;
+  };
+  const catalogAliasesByNormalized = indexByName(catalog.items ?? []);
+  const archivedByNormalized = indexByName(catalog.archivedItems ?? []);
 
-  const modOnly = modDisplayNames.filter(name => !catalogAliasesByNormalized.has(normalizeInventoryName(name)));
-  const catalogOnly = (catalog.items ?? []).filter(item => !modNormalized.has(normalizeInventoryName(item.name)));
+  const unmatched = modDisplayNames.filter(name => !catalogAliasesByNormalized.has(normalizeInventoryName(name)));
+  const modArchived = unmatched.filter(name => archivedByNormalized.has(normalizeInventoryName(name)));
+  const modOnly = unmatched.filter(name => !archivedByNormalized.has(normalizeInventoryName(name)));
+  // Materials have no enum: MaterialClassifier builds "<hover name> T<tier>" at scan time, so
+  // there's nothing static to diff them against.
+  const catalogOnly = (catalog.items ?? [])
+    .filter(item => item.kind !== 'material')
+    .filter(item => !modNormalized.has(normalizeInventoryName(item.name)));
 
   if (modOnly.length === 0 && catalogOnly.length === 0) {
-    console.log(`✓ ${modDisplayNames.length} mod item names all match a website catalog entry.`);
+    console.log(`✓ ${modDisplayNames.length - modArchived.length} mod item names all match a website catalog entry.`);
+    if (modArchived.length > 0) {
+      console.log(`  (${modArchived.length} more match items archived on the website, which the mod skips by design.)`);
+    }
     return;
+  }
+
+  if (modArchived.length > 0) {
+    console.log(`· ${modArchived.length} mod item name(s) match items archived on the website (skipped by design):`);
+    for (const name of modArchived) console.log(`  - "${name}"`);
+    console.log('');
   }
 
   if (modOnly.length > 0) {
