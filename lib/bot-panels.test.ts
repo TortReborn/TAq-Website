@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   SLUG_RE,
   slugFromName,
-  contentToText, fromReadable, imageSrc, normalizeContent, parseMessageLink, toReadable,
+  channelGuild, contentToText, fromReadable, imageSrc, isForum, normalizeContent, parseMessageLink, scopedRegistry, toReadable,
 } from './bot-panels';
 
 const ASSET = 'asset://0123456789abcdef.png';
@@ -214,5 +214,52 @@ describe('role buttons', () => {
   it('shows the role as a mention in the readable text', () => {
     const text = contentToText({ messages: [{ rows: [[{ kind: 'role', role_id: MUNCH, requires_role_id: SOLO, label: 'Munch' }]] }] });
     expect(text).toContain(`gives <@&${MUNCH}> (needs <@&${SOLO}>) "Munch"`);
+  });
+});
+
+describe('forum panels and servers (TAQ-115)', () => {
+  const MAIN = '729147655875199017', EXEC = '784795827808763904';
+  const registry = {
+    actions: [], dynamic: [], default_color: 0, updated_at: '',
+    guild: { id: MAIN, name: 'The Aquarium' },
+    guilds: [{ id: MAIN, name: 'The Aquarium' }, { id: EXEC, name: 'TAq Executive' }],
+    channels: [
+      { id: '1', name: 'faq', type: 'text', category: null, postable: true },
+      { id: '2', name: 'te-info', type: 'forum', category: 'TE', postable: true, guild_id: EXEC },
+      { id: '3', name: 'TE Roles', type: 'public_thread', category: 'TE', postable: true, guild_id: EXEC, parent_id: '2' },
+    ],
+    roles: [
+      { id: '11', name: 'Munch', color: 0 },
+      { id: '22', name: 'War Leader', color: 0, guild_id: EXEC },
+    ],
+    emojis: [],
+  };
+  const one = { messages: [{ content: 'Hi' }] };
+
+  it('keeps a trimmed post title and asks for one when posting to a forum', () => {
+    expect(normalizeContent({ ...one, post: { title: '  TE Roles ' } }).content).toEqual({ ...one, post: { title: 'TE Roles' } });
+    expect(normalizeContent(one).content).toEqual(one);
+    expect(normalizeContent(one, { forum: true }).errors[0]).toMatch(/forum post a title/);
+    expect(normalizeContent({ ...one, post: { title: 'x'.repeat(101) } }).errors[0]).toMatch(/title is 101/);
+  });
+
+  it('lets a field go without a heading but not without a value', () => {
+    const field = (name: string, value: string) => ({ messages: [{ embeds: [{ fields: [{ name, value }] }] }] });
+    expect(normalizeContent(field('', 'Paragraph')).errors).toEqual([]);
+    expect(normalizeContent(field('Heading', ' ')).errors[0]).toMatch(/needs a value/);
+  });
+
+  it('knows each channel\'s server and narrows roles to it', () => {
+    expect(channelGuild(registry, '1')).toBe(MAIN); // older entries are the main server's
+    expect(channelGuild(registry, '3')).toBe(EXEC);
+    expect(channelGuild(registry, '9')).toBeNull();
+    expect(isForum(registry, '2')).toBe(true);
+    expect(isForum(registry, '3')).toBe(false);
+    expect(scopedRegistry(registry, EXEC)!.roles.map(r => r.name)).toEqual(['War Leader']);
+    expect(scopedRegistry(registry, MAIN)!.roles.map(r => r.name)).toEqual(['Munch']);
+  });
+
+  it('shows the post title in the readable text', () => {
+    expect(contentToText({ ...one, post: { title: 'TE Roles' } })).toMatch(/^Forum post title: TE Roles/);
   });
 });
