@@ -61,6 +61,7 @@ export const EXEC_NAV: ExecNavGroup[] = [
       { href: '/exec/accounting', label: 'Accounting', desc: 'Track guild funds and transactions', iconImage: '/images/icons/exec/accounting.png' },
       { href: '/exec/shells', label: 'Shells', desc: 'Manage member shell balances', iconImage: '/images/icons/exec/shells.png' },
       { href: '/exec/shell-exchange', label: 'Shell Exchange', desc: 'Update exchange rates', iconImage: '/images/icons/exec/shell-exchange.png' },
+      { href: '/exec/tomes', label: 'Tome Queue', desc: 'Give out requested tomes and look up who has received what', iconImage: '/images/icons/exec/tomes.png' },
       { href: '/exec/backgrounds', label: 'Backgrounds', desc: 'Manage profile backgrounds', iconImage: '/images/icons/exec/backgrounds.png' },
     ],
   },
