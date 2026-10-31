@@ -3,7 +3,9 @@
 /**
  * Channel dropdown for the panel editor. The browser's own <select> can't be
  * themed (its category headers render white on white), so this is a button
- * that opens a searchable list grouped by category.
+ * that opens a searchable list grouped by category. `guildId` narrows it to
+ * one server; forums (posting opens a post) and the forum posts panels live in
+ * are marked.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -12,8 +14,10 @@ import { inputStyle } from './PanelEditor';
 
 type Channel = PanelRegistry['channels'][number];
 
-export default function ChannelPicker({ value, onChange, registry }: {
-  value: string; onChange: (id: string) => void; registry: PanelRegistry | null;
+const mark = (c: Channel) => (c.parent_id ? '↳' : c.type === 'forum' ? '▤' : '#');
+
+export default function ChannelPicker({ value, onChange, registry, guildId }: {
+  value: string; onChange: (id: string) => void; registry: PanelRegistry | null; guildId?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -21,8 +25,9 @@ export default function ChannelPicker({ value, onChange, registry }: {
   const root = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
 
-  const postable = useMemo(() => (registry?.channels ?? []).filter(c => c.postable), [registry]);
-  const current = postable.find(c => c.id === value);
+  const postable = useMemo(() => (registry?.channels ?? []).filter(c =>
+    c.postable && (!guildId || (c.guild_id ?? registry?.guild?.id) === guildId)), [registry, guildId]);
+  const current = registry?.channels.find(c => c.id === value);
   const matches = useMemo(() => {
     const q = search.trim().toLowerCase();
     return q ? postable.filter(c => c.name.toLowerCase().includes(q) || (c.category ?? '').toLowerCase().includes(q)) : postable;
@@ -68,7 +73,7 @@ export default function ChannelPicker({ value, onChange, registry }: {
       <button type="button" onClick={() => (open ? setOpen(false) : openList())}
         style={{ ...inputStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', textAlign: 'left' }}>
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, color: current || value ? 'var(--text-primary)' : 'var(--text-muted)' }}>
-          {current ? `#${current.name}` : value ? `Channel id ${value}` : 'Choose a channel…'}
+          {current ? `${mark(current)} ${current.name}${current.type === 'forum' ? ' (forum)' : ''}` : value ? `Channel id ${value}` : 'Choose a channel…'}
         </span>
         {current?.category && <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '40%' }}>{current.category}</span>}
         <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>{open ? '▴' : '▾'}</span>
@@ -106,8 +111,9 @@ export default function ChannelPicker({ value, onChange, registry }: {
                       cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-primary)',
                       background: i === active ? 'var(--bg-secondary)' : 'transparent',
                     }}>
-                    <span style={{ color: 'var(--text-muted)' }}>#</span>
+                    <span style={{ color: 'var(--text-muted)', paddingLeft: c.parent_id ? '0.8rem' : 0 }}>{mark(c)}</span>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                    {c.type === 'forum' && <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>forum: opens a new post</span>}
                     {c.id === value && <span style={{ marginLeft: 'auto', color: '#3b82f6', fontSize: '0.75rem' }}>✓</span>}
                   </div>
                 </div>
