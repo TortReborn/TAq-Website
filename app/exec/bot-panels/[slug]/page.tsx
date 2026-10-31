@@ -5,7 +5,7 @@ import { use, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
 import {
-  contentToText, normalizeContent, parseMessageLink, toReadable,
+  channelGuild, contentToText, isForum, normalizeContent, parseMessageLink, scopedRegistry, toReadable,
   type PanelContent, type PanelRegistry, type PanelSummary, type RevisionMeta,
 } from '@/lib/bot-panels';
 import { diffCollapsed } from '@/lib/wiki-diff';
@@ -73,6 +73,8 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string[] | null>(null);
   const [conflict, setConflict] = useState<{ latest_rev: number; latest_author: string | null } | null>(null);
+  // The server picked while no channel is chosen; otherwise the channel's server decides
+  const [serverPick, setServerPick] = useState<string | null>(null);
   const initialised = useRef(false);
 
   const latest = data?.latest ?? null;
@@ -135,8 +137,15 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
 
   const validation = useMemo(() => {
     if (!draft) return [];
-    return normalizeContent(draft.content, { actionKeys: registry ? new Set(registry.actions.map(a => a.key)) : undefined }).errors;
+    return normalizeContent(draft.content, {
+      actionKeys: registry ? new Set(registry.actions.map(a => a.key)) : undefined,
+      forum: isForum(registry, draft.channelId),
+    }).errors;
   }, [draft, registry]);
+
+  // One server's roles for the role pickers and mentions (TAQ-115)
+  const server = channelGuild(registry, draft?.channelId) ?? serverPick ?? registry?.guild?.id ?? null;
+  const serverRegistry = useMemo(() => scopedRegistry(registry, server), [registry, server]);
 
   if (isLoading || (!draft && !error)) return <div style={{ color: 'var(--text-secondary)', padding: '2rem' }}>Loading panel…</div>;
   if (error || !data || !draft) return <div style={{ color: '#ef4444', padding: '2rem' }}>Error: {error?.message ?? 'Panel not found'}</div>;
@@ -237,16 +246,48 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
             {/* Left: settings + form */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {(registry?.guilds?.length ?? 0) > 1 && (
+                  <div>
+                    <label style={labelStyle}>Server</label>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      {registry!.guilds!.map(g => (
+                        <button key={g.id} type="button" aria-pressed={g.id === server}
+                          onClick={() => {
+                            if (g.id === server) return;
+                            setServerPick(g.id);
+                            setDraft({ ...draft, channelId: '' });
+                          }}
+                          style={{ ...smallBtn, background: g.id === server ? '#3b82f6' : 'var(--bg-secondary)', color: g.id === server ? '#fff' : 'var(--text-secondary)' }}>
+                          {g.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label style={labelStyle}>Channel</label>
                   <div style={{ display: 'flex', gap: '0.4rem' }}>
-                    <ChannelPicker value={draft.channelId} registry={registry} onChange={id => setDraft({ ...draft, channelId: id })} />
+                    <ChannelPicker value={draft.channelId} registry={registry} guildId={server} onChange={id => setDraft({ ...draft, channelId: id })} />
                     <input value={draft.channelId} placeholder="or channel id" style={{ ...inputStyle, width: '11rem', fontFamily: 'ui-monospace, monospace' }}
                       onChange={e => setDraft({ ...draft, channelId: e.target.value.replace(/\D/g, '') })} />
                   </div>
-                  {latest && draft.channelId && data.panel.channel_id && data.panel.message_ids.length > 0 && draft.channelId !== data.panel.channel_id && (
+                  {latest && draft.channelId && data.panel.channel_id && data.panel.message_ids.length > 0 && draft.channelId !== data.panel.channel_id
+                    && registry?.channels.find(c => c.id === data.panel.channel_id)?.parent_id !== draft.channelId && (
                     <div style={{ fontSize: '0.72rem', color: '#eab308', marginTop: '0.3rem' }}>
                       Moving channels: the bot posts here first, then deletes the old messages in {channelLabel(data.panel.channel_id, registry)}.
+                    </div>
+                  )}
+                  {isForum(registry, draft.channelId) && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <label style={labelStyle}>Post title</label>
+                      <input value={draft.content.post?.title ?? ''} maxLength={100} placeholder="The forum post's title"
+                        style={inputStyle}
+                        onChange={e => setDraft({ ...draft, content: { ...draft.content, post: { title: e.target.value } } })} />
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
+                        {data.panel.channel_id && registry?.channels.find(c => c.id === data.panel.channel_id)?.parent_id === draft.channelId
+                          ? 'Publishing edits this panel’s post; a changed title renames it.'
+                          : 'The first publish opens a new post with this title; later ones edit it.'}
+                      </div>
                     </div>
                   )}
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
@@ -278,7 +319,7 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
 
               </div>
 
-              <PanelEditor content={draft.content} registry={registry} onFocus={setFocus}
+              <PanelEditor content={draft.content} registry={serverRegistry} onFocus={setFocus}
                 onChange={content => setDraft({ ...draft, content })} />
             </div>
 
