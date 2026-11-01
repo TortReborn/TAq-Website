@@ -2,41 +2,8 @@
 
 import { useState } from "react";
 import MemberGrid from "@/components/MemberGrid";
-import PageHeader from "@/components/PageHeader";
 import { useMembers } from "@/hooks/useMembers";
 import MemberGridSkeleton from "@/components/skeletons/MemberGridSkeleton";
-
-interface Guild {
-  name: string;
-  prefix: string;
-  level: number;
-  territories: number;
-  totalMembers: number;
-  onlineMembers: number;
-}
-
-interface Member {
-  username: string;
-  uuid: string;
-  online?: boolean;
-  server?: string | null;
-  contributed: number;
-  guildRank?: number;
-  contributionRank?: number;
-  joined?: string;
-  discordRank: string;
-  guildRankName: string;
-  wars: number;
-  raids: number;
-  shells: number;
-  lastJoin: string | null;
-  playtime: number;
-}
-
-interface MembersData {
-  guild: Guild;
-  members: Member[];
-}
 
 export default function MembersPage() {
   const { membersData, loading, error, refresh } = useMembers();
