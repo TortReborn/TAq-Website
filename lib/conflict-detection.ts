@@ -689,17 +689,6 @@ function computeBipartiteScore(
   const side1Names = new Set(factions[0].guilds.map(g => g.name));
   const side2Names = new Set(factions[1].guilds.map(g => g.name));
 
-  let interSideAttacks = 0;
-  let intraSideAttacks = 0;
-
-  for (const [pair, count] of pairAttacks) {
-    const [aIdx, bIdx] = pair.split("_").map(Number);
-    // We don't have name→idx reverse lookup here, so this is approximate
-    // based on the guild names in the faction sides
-    // Skip this detailed check and use a simpler heuristic
-    void aIdx; void bIdx; void count;
-  }
-
   // Simpler heuristic: ratio of guilds that appear in exactly one faction
   const allGuilds = new Set([...side1Names, ...side2Names]);
   const overlap = [...side1Names].filter(n => side2Names.has(n)).length;
