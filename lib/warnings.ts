@@ -10,6 +10,9 @@ export const WARNING_KINDS = [
 
 export type WarningKind = typeof WARNING_KINDS[number];
 
+/** The kinds the profile badge counts. Everything else is history only. */
+export const COUNTED_KINDS: readonly WarningKind[] = ['soft', 'written', 'formal'];
+
 export const KIND_META: Record<WarningKind, { label: string; color: string; hint: string }> = {
   note:            { label: 'Note',            color: '#94a3b8', hint: 'An incident worth recording, no warning given' },
   soft:            { label: 'Soft',            color: '#eab308', hint: 'A verbal or casual warning' },

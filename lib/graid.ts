@@ -1,7 +1,7 @@
 import { getPool } from "./db";
-import { RAID_NAMES } from "./raid-constants";
+import { RAID_NAMES, RAID_SHORT_NAMES } from "./raid-constants";
 
-export { RAID_NAMES };
+export { RAID_NAMES, RAID_SHORT_NAMES };
 
 export type PointConfig = {
   threshold: number;

@@ -162,6 +162,19 @@ export const EXEC_RANK_NAMES = [
   'Hammerhead', 'Sailfish', 'Dolphin', 'Narwhal', 'Hydra', '✫✪✫ Hydra - Leader',
 ];
 
+/**
+ * Ranks the picker offers by default.
+ *
+ * Not exhaustive, and deliberately not treated as such: discord_links also
+ * holds Barracuda and a few one-offs. The UI builds its list from the live
+ * roster instead, and any rank not named here still resolves — a rank cohort
+ * is validated against the roster, not against this array.
+ */
+export const ALL_RANK_NAMES = [
+  'Hydra', 'Narwhal', 'Dolphin', 'Sailfish', 'Hammerhead',
+  'Swordfish', 'Angler', 'Barracuda', 'Piranha', 'Manatee', 'Starfish',
+];
+
 /** Resolve a URL cohort token to the scope it covers. */
 export function scopeFromParams(uuid?: string, cohort?: string): MemberScope {
   if (uuid) return { uuid };

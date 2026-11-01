@@ -122,5 +122,48 @@ export function getTestBounds(): { earliest: string; latest: string } {
   };
 }
 
+export function getTestSnapshotsInRange(center: Date, rangeMs: number): HistorySnapshot[] {
+  const snapshots = getTestSnapshots();
+  const halfRange = rangeMs / 2;
+
+  return snapshots.filter(s => {
+    const time = new Date(s.timestamp).getTime();
+    return Math.abs(time - center.getTime()) <= halfRange;
+  });
+}
+
+/**
+ * Generate test exchange events in the compact indexed format.
+ * Produces ~360 events over 6 hours (1 per minute) across test territories.
+ */
+export function getTestExchangeEvents() {
+  const now = new Date();
+  const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+
+  const territories = Object.keys(TERRITORY_TO_ABBREV);
+  const guilds = TEST_GUILDS.map(g => g.name);
+  const prefixes = TEST_GUILDS.map(g => g.prefix);
+
+  const events: number[][] = [];
+  const rng = seededRandom(99999);
+
+  for (let i = 0; i < 360; i++) {
+    const time = new Date(sixHoursAgo.getTime() + i * 60 * 1000);
+    const unixSec = Math.floor(time.getTime() / 1000);
+    const tIdx = Math.floor(rng() * territories.length);
+    const gIdx = Math.floor(rng() * guilds.length);
+    events.push([unixSec, tIdx, gIdx]);
+  }
+
+  return {
+    territories,
+    guilds,
+    prefixes,
+    events,
+    earliest: sixHoursAgo.toISOString(),
+    latest: now.toISOString(),
+  };
+}
+
 // Flag to enable/disable test data (set to false to use real database)
 export const USE_TEST_DATA = false;

@@ -46,6 +46,8 @@ export const RECONSTRUCTION_START = new Date(`${DATA.start}T00:00:00Z`);
 /** First moment the exchange log covers. Everything before this is synthetic. */
 export const RECONSTRUCTION_END = new Date(`${DATA.handover}T00:00:00Z`);
 
+export const PROVENANCE_LABELS = ['guessed', 'inferred', 'attested'] as const;
+
 const ANCHOR_MS = DATA.anchors.map((a) => Date.parse(`${a.date}T00:00:00Z`));
 const N = DATA.territories.length;
 
