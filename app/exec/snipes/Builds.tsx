@@ -8,7 +8,6 @@ import {
   versionsEqual,
   type BuildDefinition,
   type BuildRole,
-  type BuildVersion,
   type VersionRef,
 } from '@/lib/build-constants';
 

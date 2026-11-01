@@ -368,15 +368,6 @@ function LootrunColumn({ regionName, regionData, icons }: {
 
   const regionInfo = regionMap[regionName] || { name: regionName, image: '' };
   
-  const rarityColors = {
-    Mythic: '#aa00aa',
-    Fabled: '#ff5555',
-    Legendary: '#55ffff',
-    Rare: '#ffff55',
-    Unique: '#ff7f50'
-  };
-
-  const shinyItem = regionData.Shiny?.Item;
   const shinyTracker = regionData.Shiny?.Tracker;
 
   return (

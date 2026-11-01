@@ -26,8 +26,6 @@ export default function SnipeLeaderboard({ meta, onViewStats }: Props) {
   const [colSort, setColSort] = useState<{ col: SortCol; dir: SortDir }>({ col: 'total', dir: 'desc' });
   const { players, loading, error } = useExecSnipeLeaderboard('Total Snipes', season);
 
-  const seasonValue = season ?? meta.currentSeason;
-
   const toggleColSort = (col: SortCol) => {
     setColSort(prev => prev.col === col && prev.dir === 'desc' ? { col, dir: 'asc' } : { col, dir: 'desc' });
   };

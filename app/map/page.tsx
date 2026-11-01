@@ -1556,21 +1556,6 @@ export function MapPageContent({ initialMode, initialLayer }: { initialMode?: 'l
     return time;
   }, [historyBounds]);
 
-  // Skip a timestamp backward past any gap it falls inside.
-  const skipGapBackward = useCallback((time: Date): Date => {
-    const gaps = historyBounds?.gaps;
-    if (!gaps || gaps.length === 0) return time;
-    const ms = time.getTime();
-    for (const gap of gaps) {
-      const gapStart = new Date(gap.start).getTime();
-      const gapEnd = new Date(gap.end).getTime();
-      if (ms >= gapStart && ms <= gapEnd) {
-        return new Date(gapStart);
-      }
-    }
-    return time;
-  }, [historyBounds]);
-
   // Playback logic — stable interval, steps by time (no dependency on loaded
   // snapshot arrays). playbackSpeed is minutes of history per real second;
   // a fixed 100ms tick advances a tenth of that, so every tier scrubs
