@@ -572,6 +572,49 @@ export default function ConflictFinder({
 }
 
 // ---------------------------------------------------------------------------
+// Timeline Sparkline
+// ---------------------------------------------------------------------------
+
+function TimelineSparkline({
+  data,
+  filteredIds,
+}: {
+  data: { minTime: number; maxTime: number; span: number; conflicts: ConflictEvent[] };
+  filteredIds: Set<string>;
+}) {
+  const WIDTH = 380;
+  const HEIGHT = 24;
+
+  return (
+    <div style={{
+      padding: "0.25rem 0.75rem",
+      borderBottom: "1px solid var(--border-color)",
+      flexShrink: 0,
+    }}>
+      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none">
+        {data.conflicts.map(c => {
+          const x = ((c.startTime.getTime() - data.minTime) / data.span) * WIDTH;
+          const w = Math.max(2, ((c.endTime.getTime() - c.startTime.getTime()) / data.span) * WIDTH);
+          const intensity = Math.min(1, c.peakHourly / 80);
+          const isFiltered = filteredIds.has(c.id);
+          return (
+            <rect
+              key={c.id}
+              x={x}
+              y={2}
+              width={w}
+              height={HEIGHT - 4}
+              rx={2}
+              fill={isFiltered ? `rgba(245, 124, 0, ${0.3 + intensity * 0.7})` : "rgba(128,128,128,0.15)"}
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // War group (collapsible)
 // ---------------------------------------------------------------------------
 

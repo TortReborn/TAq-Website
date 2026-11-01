@@ -296,6 +296,15 @@ export async function listWikiRevisions(pool: Pool, pageId: number): Promise<Wik
   return result.rows.map(rowToRevision);
 }
 
+export async function getWikiRevision(pool: Pool, pageId: number, revNumber: number): Promise<WikiRevision | null> {
+  await ensureWikiTables(pool);
+  const result = await pool.query(
+    `SELECT * FROM wiki_page_revisions WHERE page_id = $1 AND rev_number = $2`,
+    [pageId, revNumber],
+  );
+  return result.rows.length ? rowToRevision(result.rows[0]) : null;
+}
+
 /** Published pages that link TO this slug ("What links here"). */
 export async function wikiBacklinks(pool: Pool, slug: string): Promise<WikiPageSummary[]> {
   await ensureWikiTables(pool);
