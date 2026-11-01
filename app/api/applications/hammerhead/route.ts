@@ -3,7 +3,6 @@ import { getPool } from '@/lib/db';
 import { getExecSession, checkDiscordLink } from '@/lib/exec-auth';
 import {
   HAMMERHEAD_GENERAL_QUESTIONS,
-  HAMMERHEAD_TASK_SELECTOR,
   HAMMERHEAD_SECTION_QUESTIONS,
   HAMMERHEAD_FINAL_QUESTIONS,
   HAMMERHEAD_TASK_OPTIONS,

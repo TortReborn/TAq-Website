@@ -8,52 +8,6 @@ import { useLeaderboard } from "@/hooks/useLeaderboard";
 import { useExecSession } from "@/hooks/useExecSession";
 import LeaderboardSkeleton from "@/components/skeletons/LeaderboardSkeleton";
 
-interface Guild {
-  name: string;
-  prefix: string;
-  level: number;
-  territories: number;
-  totalMembers: number;
-  onlineMembers: number;
-}
-
-interface TimeFrameStats {
-  wars: number;
-  raids: number;
-  shells: number;
-  contributed: number;
-  playtime: number;
-  hasCompleteData: boolean;
-}
-
-interface Member {
-  username: string;
-  uuid: string;
-  online?: boolean;
-  server?: string | null;
-  contributed: number;
-  guildRank?: number;
-  contributionRank?: number;
-  joined?: string;
-  discordRank: string;
-  discordId?: string;
-  discordUsername?: string;
-  guildRankName: string;
-  wars: number;
-  raids: number;
-  shells: number;
-  lastJoin: string | null;
-  playtime: number;
-  // All time frame stats pre-calculated
-  timeFrames: Record<string, TimeFrameStats>;
-}
-
-interface MembersData {
-  guild: Guild;
-  members: Member[];
-  hasHistoricalData: Record<string, boolean>;
-}
-
 export default function LeaderboardPage() {
   const { authenticated, loading: sessionLoading } = useExecSession();
   const { membersData, loading, error, refresh } = useLeaderboard();

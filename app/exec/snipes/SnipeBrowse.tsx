@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useExecSnipeLogs, useExecSnipeMutations, type SnipeFilters, type SnipeLog, type SnipeParticipant } from '@/hooks/useExecSnipes';
 import { SNIPE_ROLES, getDifficultyColor, isDry, ROLE_COLORS } from '@/lib/snipe-constants';
 
@@ -36,7 +36,7 @@ export default function SnipeBrowse({ meta, onViewStats }: Props) {
 
   // Filters
   const [filters, setFilters] = useState<SnipeFilters>({ sort: 'date_desc' });
-  const { logs, total, page, perPage, loading, error, refresh } = useExecSnipeLogs(filters);
+  const { logs, total, page, perPage, loading, refresh } = useExecSnipeLogs(filters);
 
   // UI state
   const [expandedId, setExpandedId] = useState<number | null>(null);
