@@ -106,13 +106,3 @@ export function getMaxPossibleExternals(
   const possibleExternals = externalsData[territoryName];
   return possibleExternals ? possibleExternals.length : 0;
 }
-
-// Get all guild-owned territories
-export function getGuildTerritories(
-  guildName: string,
-  territories: Record<string, Territory>
-): string[] {
-  return Object.entries(territories)
-    .filter(([, territory]) => territory.guild.name === guildName)
-    .map(([name]) => name);
-}

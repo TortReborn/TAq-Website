@@ -8,8 +8,6 @@ export const RAID_NAMES = [
   'The Wartorn Palace',
 ] as const;
 
-export type RaidName = (typeof RAID_NAMES)[number];
-
 export const RAID_SHORT: Record<string, string> = {
   'Nest of the Grootslangs': 'NOTG',
   'The Canyon Colossus': 'TCC',
