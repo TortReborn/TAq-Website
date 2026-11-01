@@ -74,3 +74,12 @@ export function useActivityHeatmap(
   );
   return { data, error, loading: isLoading };
 }
+
+/** The viewer's own zone, so the charts default to the hours they live in. */
+export function detectTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+}

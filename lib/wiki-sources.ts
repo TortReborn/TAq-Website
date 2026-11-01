@@ -82,3 +82,10 @@ export function resolveWikiCitations(body: string): WikiCitationMap {
   }
   return out;
 }
+
+/** Archived source ids, for the editor's citation picker. */
+export function listArchivedSources(): { id: string; title: string; kind: string; note?: string }[] {
+  return Object.entries(loadManifest())
+    .map(([id, s]) => ({ id, title: s.title ? tidyTitle(s.title) : id, kind: s.kind ?? 'web', note: s.note }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+}

@@ -918,3 +918,19 @@ export function toAbbrev(territoryName: string): string {
 export function fromAbbrev(abbrev: string): string {
   return ABBREV_TO_TERRITORY[abbrev] || abbrev;
 }
+
+/**
+ * Check if a string is a known territory name
+ */
+export function isKnownTerritory(name: string): boolean {
+  return name in TERRITORY_TO_ABBREV
+    || normalizeApostrophes(name) in NORMALIZED_LOOKUP
+    || (DB_NAME_ALIASES[name] ?? "") in TERRITORY_TO_ABBREV;
+}
+
+/**
+ * Check if a string is a known abbreviation
+ */
+export function isKnownAbbrev(abbrev: string): boolean {
+  return abbrev in ABBREV_TO_TERRITORY;
+}

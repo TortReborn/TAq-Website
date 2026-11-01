@@ -6,6 +6,7 @@ import { Territory } from "./utils";
 import {
   toAbbrev,
   fromAbbrev,
+  ABBREV_TO_TERRITORY,
   REKINDLED_WORLD_CUTOFF_MS,
   OLD_TERRITORY_NAMES,
   ROL_UPDATE_CUTOFF_MS,
@@ -135,6 +136,38 @@ export function expandSnapshot(
     _lastExpansion = { verboseData, snapshot: snapshotTerritories, result: territories, size };
   }
   return territories;
+}
+
+/**
+ * Format a timestamp for display
+ */
+export function formatHistoryTimestamp(date: Date): string {
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * Format a timestamp for short display (timeline)
+ */
+export function formatShortTimestamp(date: Date): string {
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * Get all known territory full names
+ */
+export function getAllTerritoryNames(): string[] {
+  return Object.values(ABBREV_TO_TERRITORY);
 }
 
 // ---------------------------------------------------------------------------
