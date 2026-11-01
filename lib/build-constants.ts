@@ -51,12 +51,6 @@ export const formatVersion = (v: VersionRef): string => `${v.major}.${v.minor}`;
 export const versionsEqual = (a: VersionRef, b: VersionRef): boolean =>
   a.major === b.major && a.minor === b.minor;
 
-// Sort newest-first (descending major, then descending minor).
-export const compareVersionsDesc = (a: VersionRef, b: VersionRef): number => {
-  if (a.major !== b.major) return b.major - a.major;
-  return b.minor - a.minor;
-};
-
 // Compute the next version number from the latest, applying the
 // "minor rolls into major at .10" rule the user wants:
 //   1.0 -> 1.1 -> ... -> 1.9 -> 2.0
@@ -71,12 +65,6 @@ export const computeNextVersion = (
   if (nextMinor >= 10) return { major: latest.major + 1, minor: 0 };
   return { major: latest.major, minor: nextMinor };
 };
-
-// Member war flags
-export const MEMBER_FLAGS = {
-  frequent_sniper: { label: 'Frequent Sniper' },
-  alt: { label: 'Alt' },
-} as const;
 
 export const FLAG_KEYS = ['frequent_sniper', 'alt'] as const;
 export type FlagKey = (typeof FLAG_KEYS)[number];

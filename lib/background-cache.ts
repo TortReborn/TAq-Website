@@ -84,9 +84,3 @@ export async function warmCache(ids: number[]) {
 
   await Promise.allSettled(toFetch.map(id => getBackground(String(id))));
 }
-
-/** Check if a background is already cached (without fetching). */
-export function isCached(id: string): boolean {
-  const cached = bgCache.get(id);
-  return !!cached && Date.now() - cached.cachedAt < CACHE_TTL;
-}

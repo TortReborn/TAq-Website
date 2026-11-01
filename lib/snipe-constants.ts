@@ -3,8 +3,6 @@
 export const SNIPE_ROLES = ['Tank', 'Healer', 'DPS'] as const;
 export type SnipeRole = (typeof SNIPE_ROLES)[number];
 
-export const ROLE_ORDER: SnipeRole[] = ['Healer', 'Tank', 'DPS'];
-
 export const ROLE_COLORS: Record<SnipeRole, string> = {
   Healer: '#51D868',
   Tank:   '#00D2E6',
