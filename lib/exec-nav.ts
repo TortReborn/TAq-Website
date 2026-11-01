@@ -41,6 +41,7 @@ export const EXEC_NAV: ExecNavGroup[] = [
       // Trends is a tab inside Activity rather than its own entry: same
       // subject, different zoom level.
       { href: '/exec/activity', label: 'Activity', desc: 'Member activity, kick list, and guild trends', iconImage: '/images/icons/exec/activity.png' },
+      { href: '/exec/recruitment', label: 'Recruitment', desc: 'Clock in to pfinder and log the day\'s shouts', iconImage: '/images/icons/exec/recruitment.png' },
       { href: '/exec/promotions', label: 'Promotions', desc: 'Manage and suggest promotions', iconImage: '/images/icons/exec/promotions.png' },
       { href: '/exec/blacklist', label: 'Blacklist', desc: 'View and add banned players', iconImage: '/images/icons/exec/blacklist.png' },
       { href: '/exec/warnings', label: 'Warnings', desc: 'Warning profiles and proof for each player', iconImage: '/images/icons/exec/warnings.png' },
