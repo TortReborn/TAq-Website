@@ -185,7 +185,6 @@ function MapHistoryControls({
   // they fold behind a disclosure so the scrubber and transport still fit.
   const secondaryFolds = viewportNarrow && !showSpeedInPlayback;
   const showSecondary = !secondaryFolds || secondaryOpen;
-  const stackDateRow = panelWidth < 420;
 
   // Clamp position to the map container's edges only. The panel may slide
   // underneath the permanent fixtures (zoom stack, mode/settings cluster,

@@ -7,50 +7,6 @@ import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 
 export const dynamic = 'force-dynamic';
 
-// Define types for the API response
-interface Member {
-  username: string;
-  online: boolean;
-  server: string | null;
-  contributed: number;
-  guildRank: number;
-  contributionRank?: number;
-  joined: string;
-}
-
-interface GuildApiResponse {
-  uuid: string;
-  name: string;
-  prefix: string;
-  level: number;
-  xpPercent: number;
-  territories: number;
-  wars: number;
-  created: string;
-  members: {
-    total: number;
-    owner: Record<string, Member>;
-    chief: Record<string, Member>;
-    strategist: Record<string, Member>;
-    captain: Record<string, Member>;
-    recruiter: Record<string, Member>;
-    recruit: Record<string, Member>;
-  };
-  online: number;
-  banner: any;
-  seasonRanks: any;
-}
-
-interface DiscordLink {
-  ign: string;
-  rank: string;
-}
-
-interface MemberWithDiscordRank extends Member {
-  discordRank: string | null;
-  guildRankName: string;
-}
-
 export async function GET(request: NextRequest) {
   // Check rate limit
   const rateLimitCheck = checkRateLimit(request, 'members');
@@ -136,16 +92,6 @@ export async function GET(request: NextRequest) {
       });
       const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
       const guildAccounts = await guildAccountUuids(client);
-
-      // Convert guild ranks to readable names
-      const guildRankNames: Record<string, string> = {
-        'owner': 'Owner',
-        'chief': 'Chief',
-        'strategist': 'Strategist', 
-        'captain': 'Captain',
-        'recruiter': 'Recruiter',
-        'recruit': 'Recruit'
-      };
 
       // Guild-owned storage accounts are on the roster but are not members
       // to display or count (TAQ-88).
