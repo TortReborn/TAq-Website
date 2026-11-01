@@ -95,8 +95,6 @@ export const CHRONICLE_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
 export const CHRONICLE_EVENT_TYPES: ChronicleEventType[] = ['war', 'treaty', 'founding', 'disband', 'other'];
 
-export const CHRONICLE_ALLIANCE_KINDS: ChronicleAllianceKind[] = ['war', 'community'];
-
 export const CHRONICLE_LIMITS = {
   nameMax: 60,
   tagMax: 8,

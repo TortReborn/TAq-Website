@@ -16,10 +16,6 @@ export const COLUMN_ORDER: TicketStatus[] = [
    off to the right and can be scrolled to. */
 export const VISIBLE_COLUMN_COUNT = 5;
 
-/* Deployed/declined tickets older than this roll over into `archived` on
-   the next list fetch. Kept in sync with server-side archival logic. */
-export const AUTO_ARCHIVE_DAYS = 7;
-
 /* Height of the site navbar in the root layout. Fixed-position overlays on
    exec pages must start below it — the navbar sits in a stacking context that
    paints over them, so anything drawn under it is invisible and unclickable.
@@ -48,12 +44,6 @@ export const PRIORITY_LABELS: Record<string, string> = {
 export const TYPE_LABELS: Record<string, string> = {
   bug: 'Bug',
   feature: 'Feature',
-};
-
-export const SYSTEM_LABELS: Record<string, string> = {
-  discord_bot: 'Discord Bot',
-  minecraft_mod: 'Minecraft Mod',
-  website: 'Website',
 };
 
 /* ─── Colors ─── */

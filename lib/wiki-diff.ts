@@ -43,7 +43,3 @@ export function diffCollapsed(aText: string, bText: string, context = 2): DiffRo
   });
   return collapsed;
 }
-
-export function hasChanges(aText: string, bText: string): boolean {
-  return aText !== bText;
-}
