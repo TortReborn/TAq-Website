@@ -385,9 +385,6 @@ function StackedAreaChart({ buckets, titlePrefix }: { buckets: Bucket[]; titlePr
     }
     if (points.length === 1) {
       // Degenerate single-point case: render a thin centered rect via path
-      const p0 = points[0];
-      const w = 20;
-      const top = margin.top + plotH - ((points[0].types[type] || 0) / maxTotal) * plotH; // not used, fallback
       // Instead, fall back to no path; the user shouldn't really hit this with weekly data.
       return { type, path: '', single: true };
     }

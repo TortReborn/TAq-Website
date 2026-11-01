@@ -1,13 +1,6 @@
 import { getPool } from './db';
 import { rateLimitDisabled } from './rate-limit';
 
-interface CacheEntry<T> {
-  cache_key: string;
-  data: T;
-  created_at: Date;
-  expires_at: Date;
-}
-
 class SimpleDatabaseCache {
   private pool = getPool();
   private initialized = false;

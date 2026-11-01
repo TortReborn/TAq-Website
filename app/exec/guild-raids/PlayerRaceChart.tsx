@@ -140,7 +140,6 @@ export default function PlayerRaceChart({ dateFrom: parentDateFrom, dateTo: pare
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
   const avatarsRef = useRef<Map<string, HTMLImageElement>>(new Map());
   const recordingRef = useRef(false);
 

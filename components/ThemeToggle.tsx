@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function ThemeToggle({ dark, setDark }: { dark: boolean, setDark: (d: boolean) => void }) {
   // On mount, read theme from localStorage

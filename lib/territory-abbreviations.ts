@@ -837,19 +837,6 @@ Object.assign(TERRITORY_TO_ABBREV, OLD_TERRITORY_TO_ABBREV);
 // Set for server-side era filtering (hide old territories in post-Rekindled snapshots)
 export const OLD_TERRITORY_NAMES = new Set(Object.keys(OLD_TERRITORY_TO_ABBREV));
 
-/**
- * Territories that were removed *before* the Rekindled World update (Aug 2024)
- * without a corresponding "None" capture event to mark their removal, and which
- * are NOT covered by OLD_TERRITORY_TO_ABBREV.  buildSnapshotAt applies a
- * 3-year staleness guard for these names to prevent stale Fox-coloured ghost
- * territories from rendering in pre-Rekindled history.
- *
- * Currently empty — the apostrophe-normalisation fix in the API route merges
- * old-era (Unicode apostrophe) and new-era (ASCII apostrophe) DB entries for
- * the same territory, so no staleness guard is needed.
- */
-export const EARLY_RETIRED_TERRITORY_NAMES = new Set<string>([]);
-
 // Abbreviation → Full name mapping (reverse lookup)
 export const ABBREV_TO_TERRITORY: Record<string, string> = Object.fromEntries(
   Object.entries(TERRITORY_TO_ABBREV).map(([name, abbrev]) => [abbrev, name])

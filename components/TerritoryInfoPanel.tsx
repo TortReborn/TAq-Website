@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Territory, getContrastColor, currentGenerationByKey, fmtInt } from "@/lib/utils";
 import {
   MAX_TOWER_LEVEL,

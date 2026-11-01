@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useExecSnipeStats } from '@/hooks/useExecSnipes';
-import { getDifficultyColor, ROLE_COLORS, isDry } from '@/lib/snipe-constants';
+import { getDifficultyColor, ROLE_COLORS } from '@/lib/snipe-constants';
 
 interface Props {
   meta: {
