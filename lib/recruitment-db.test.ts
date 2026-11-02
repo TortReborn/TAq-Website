@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import {
-  RecruitmentError, clockIn, clockOut, deleteSession, deleteShout, getLive, getRange, logSession, logShout,
+  RecruitmentError, clockIn, clockOut, deleteSession, deleteShout, getLive, getRange, logSession, logShout, saveMessage,
 } from './recruitment-db';
 
 // Integration test against the local test database. The tables are made from
@@ -74,7 +74,7 @@ describe.skipIf(!available)('recruitment-db', () => {
   });
 
   beforeEach(async () => {
-    await pool.query('TRUNCATE recruitment_pfinder_sessions, recruitment_shouts, audit_log, applications');
+    await pool.query('TRUNCATE recruitment_pfinder_sessions, recruitment_shouts, recruitment_messages, audit_log, applications');
   });
 
   describe('applications', () => {
@@ -156,34 +156,80 @@ describe.skipIf(!available)('recruitment-db', () => {
     });
   });
 
+  describe('messages', () => {
+    it('saves, replaces and returns each kind, one line, and audits', async () => {
+      const first = await saveMessage(A, 'pfinder', '  Join TAq!\nWe war  ', null, pool);
+      expect(first.body).toBe('Join TAq! We war');
+      const second = await saveMessage(B, 'pfinder', 'New text', first.updated_at, pool);
+      await saveMessage(A, 'shout', 'Shout text', null, pool);
+      const { messages } = await getLive(pool);
+      expect(messages.map(m => [m.kind, m.body, m.ign])).toEqual([['pfinder', 'New text', 'Bravo'], ['shout', 'Shout text', 'Alpha']]);
+      expect(messages[0].updated_at).toBe(second.updated_at);
+      const { rows } = await pool.query(`SELECT count(*)::int AS n FROM audit_log WHERE log_type = 'recruitment'`);
+      expect(rows[0].n).toBe(3);
+    });
+
+    it('holds each kind to its in-game limit, counting characters not UTF-16 units', async () => {
+      expect(await refused(saveMessage(A, 'pfinder', 'x'.repeat(141), null, pool), 400)).toMatch(/at most 140/);
+      await saveMessage(A, 'pfinder', '🐟'.repeat(140), null, pool);
+      await saveMessage(A, 'shout', 'x'.repeat(250), null, pool);
+      expect(await refused(saveMessage(A, 'shout', 'x'.repeat(251), null, pool), 400)).toMatch(/at most 250/);
+      // the table refuses it too, whatever writes to it. Through a checked-out
+      // client: a failed pool.query discards the connection, and the temp tables with it
+      const c = await pool.connect();
+      try {
+        await expect(c.query(`UPDATE recruitment_messages SET body = repeat('x', 141) WHERE kind = 'pfinder'`)).rejects.toThrow(/check/);
+      } finally {
+        c.release();
+      }
+    });
+
+    it("refuses to overwrite an edit made since the editor opened", async () => {
+      const first = await saveMessage(A, 'shout', 'one', null, pool);
+      await saveMessage(B, 'shout', 'two', first.updated_at, pool);
+      expect(await refused(saveMessage(A, 'shout', 'three', first.updated_at, pool))).toMatch(/Bravo changed the shout message/);
+      expect(await refused(saveMessage(A, 'pfinder', 'x', first.updated_at, pool))).toMatch(/isn't there/);
+      expect(await refused(saveMessage(A, 'shout', 'x', null, pool))).toMatch(/Bravo changed/);
+    });
+  });
+
   describe('shouts', () => {
     it('allows three a UTC day for the whole guild, then refuses', async () => {
       const day = new Date('2026-10-01T00:00Z').getTime();
-      await logShout(A, new Date(day + 1 * H), null, pool);
-      await logShout(B, new Date(day + 2 * H), 'world 12', pool);
-      await logShout(A, new Date(day + 23 * H), null, pool);
-      expect(await refused(logShout(B, new Date(day + 23.5 * H), null, pool))).toMatch(/All 3 shouts for 2026-10-01/);
+      await logShout(A, new Date(day + 1 * H), pool);
+      await logShout(B, new Date(day + 2 * H), pool);
+      await logShout(A, new Date(day + 23 * H), pool);
+      expect(await refused(logShout(B, new Date(day + 23.5 * H), pool))).toMatch(/All 3 shouts for 2026-10-01/);
       // the next UTC day starts fresh
-      await logShout(B, new Date(day + 24 * H), null, pool);
+      await logShout(B, new Date(day + 24 * H), pool);
       const { shouts } = await getRange(new Date('2026-10-01T00:00Z'), new Date('2026-11-01T00:00Z'), pool);
       expect(shouts.map(s => s.slot)).toEqual([1, 2, 3, 1]);
-      expect(shouts[1].note).toBe('world 12');
     });
 
     it('frees a slot when a shout is deleted', async () => {
       const day = new Date('2026-10-01T00:00Z').getTime();
-      const first = await logShout(A, new Date(day + H), null, pool);
-      await logShout(A, new Date(day + 2 * H), null, pool);
-      await logShout(A, new Date(day + 3 * H), null, pool);
+      const first = await logShout(A, new Date(day + H), pool);
+      await logShout(A, new Date(day + 2 * H), pool);
+      await logShout(A, new Date(day + 3 * H), pool);
       expect(await refused(deleteShout(first.id, B, false, pool), 403)).toMatch(/you logged/);
       await deleteShout(first.id, A, false, pool);
-      expect((await logShout(B, new Date(day + 4 * H), null, pool)).slot).toBe(1);
+      expect((await logShout(B, new Date(day + 4 * H), pool)).slot).toBe(1);
     });
 
     it("counts today's shouts in UTC", async () => {
-      await logShout(A, new Date(), null, pool);
-      await logShout(A, ago(48), null, pool);
+      await logShout(A, new Date(), pool);
+      await logShout(A, ago(48), pool);
       expect((await getLive(pool)).today).toHaveLength(1);
+    });
+
+    it('lists the latest shouts newest first, across days', async () => {
+      const day = new Date('2026-10-01T00:00Z').getTime();
+      await logShout(A, new Date(day + H), pool);
+      await logShout(B, new Date(day + 25 * H), pool);
+      await logShout(A, new Date(day + 2 * H), pool);
+      expect((await getLive(pool)).recent.map(s => s.shouted_at)).toEqual([
+        '2026-10-02T01:00:00.000Z', '2026-10-01T02:00:00.000Z', '2026-10-01T01:00:00.000Z',
+      ]);
     });
   });
 });

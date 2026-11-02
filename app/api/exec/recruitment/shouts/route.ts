@@ -5,7 +5,7 @@ import { parseTime } from '@/lib/recruitment';
 
 export const dynamic = 'force-dynamic';
 
-// POST { at?, note? } — log a shout; a missing `at` means now
+// POST { at? } — log a shout; a missing `at` means now
 export async function POST(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -16,10 +16,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
   const at = parseTime(body?.at) ?? new Date();
-  const note = typeof body?.note === 'string' ? body.note.trim().slice(0, 200) || null : null;
 
   try {
-    return NextResponse.json({ shout: await logShout({ id: session.discord_id, name: session.ign }, at, note) });
+    return NextResponse.json({ shout: await logShout({ id: session.discord_id, name: session.ign }, at) });
   } catch (error) {
     if (error instanceof RecruitmentError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error('Shout log error:', error);

@@ -8,8 +8,8 @@
 import type { Pool, PoolClient } from 'pg';
 import { getPool } from '@/lib/db';
 import {
-  MAX_SESSION_HOURS, SHOUTS_PER_DAY, utcDay, utcTime,
-  type Application, type PfinderSession, type Shout,
+  MAX_SESSION_HOURS, MESSAGE_LIMITS, SHOUTS_PER_DAY, cleanMessage, messageLength, utcDay, utcTime,
+  type Application, type MessageKind, type PfinderSession, type RecruitmentMessage, type Shout,
 } from '@/lib/recruitment';
 
 export interface Actor { id: string; name: string }
@@ -43,14 +43,14 @@ async function audit(c: PoolClient, actor: Actor, action: string) {
 }
 
 const SESSION_COLS = `id, discord_id::text, ign, started_at, ended_at`;
-const SHOUT_COLS = `id, discord_id::text, ign, shouted_at, slot, note`;
+const SHOUT_COLS = `id, discord_id::text, ign, shouted_at, slot`;
 
 const toSession = (r: any): PfinderSession => ({
   id: r.id, discord_id: r.discord_id, ign: r.ign,
   started_at: r.started_at.toISOString(), ended_at: r.ended_at ? r.ended_at.toISOString() : null,
 });
 const toShout = (r: any): Shout => ({
-  id: r.id, discord_id: r.discord_id, ign: r.ign, shouted_at: r.shouted_at.toISOString(), slot: r.slot, note: r.note,
+  id: r.id, discord_id: r.discord_id, ign: r.ign, shouted_at: r.shouted_at.toISOString(), slot: r.slot,
 });
 
 const stamp = (d: Date) => `${utcDay(d)} ${utcTime(d)} UTC`;
@@ -79,14 +79,54 @@ export async function getRange(start: Date, end: Date, db: Pool = getPool()): Pr
   };
 }
 
-/** Who is clocked in right now, and today's (UTC) shouts. */
-export async function getLive(db: Pool = getPool()): Promise<{ open: PfinderSession[]; today: Shout[] }> {
-  const [open, today] = await Promise.all([
+const toMessage = (r: any): RecruitmentMessage => ({ kind: r.kind, body: r.body, ign: r.ign, updated_at: r.updated_at.toISOString() });
+
+/** How many of the latest shouts the history lists, whatever week the calendar is on. */
+export const RECENT_SHOUTS = 60;
+
+/** Who is clocked in right now, today's (UTC) shouts, the latest shouts newest first, and the saved messages. */
+export async function getLive(db: Pool = getPool()): Promise<{ open: PfinderSession[]; today: Shout[]; recent: Shout[]; messages: RecruitmentMessage[] }> {
+  const [open, today, recent, messages] = await Promise.all([
     db.query(`SELECT ${SESSION_COLS} FROM recruitment_pfinder_sessions WHERE ended_at IS NULL ORDER BY started_at`),
     db.query(`SELECT ${SHOUT_COLS} FROM recruitment_shouts
               WHERE shout_day = (NOW() AT TIME ZONE 'UTC')::date ORDER BY shouted_at`),
+    db.query(`SELECT ${SHOUT_COLS} FROM recruitment_shouts ORDER BY shouted_at DESC LIMIT $1`, [RECENT_SHOUTS]),
+    db.query(`SELECT kind, body, ign, updated_at FROM recruitment_messages ORDER BY kind`),
   ]);
-  return { open: open.rows.map(toSession), today: today.rows.map(toShout) };
+  return {
+    open: open.rows.map(toSession), today: today.rows.map(toShout), recent: recent.rows.map(toShout), messages: messages.rows.map(toMessage),
+  };
+}
+
+/**
+ * Replace the guild's pfinder or shout message. `seen` is the updated_at the
+ * editor started from (null if there was none), so an edit made meanwhile by
+ * someone else is refused rather than silently overwritten.
+ */
+export async function saveMessage(actor: Actor, kind: MessageKind, text: string, seen: string | null, db: Pool = getPool()): Promise<RecruitmentMessage> {
+  const body = cleanMessage(text);
+  const limit = MESSAGE_LIMITS[kind];
+  if (messageLength(body) > limit) throw new RecruitmentError(`The ${kind} message can be at most ${limit} characters.`, 400);
+  const changed = (ign: string, at: Date) =>
+    new RecruitmentError(`${ign} changed the ${kind} message at ${stamp(at)}. Copy your text, then reload to see theirs.`);
+  try {
+    return await tx(db, async c => {
+      const { rows: [cur] } = await c.query(`SELECT ign, updated_at FROM recruitment_messages WHERE kind = $1 FOR UPDATE`, [kind]);
+      if ((cur?.updated_at.toISOString() ?? null) !== seen) {
+        throw cur ? changed(cur.ign, cur.updated_at) : new RecruitmentError(`The ${kind} message isn't there any more. Reload and try again.`);
+      }
+      // The first save inserts; if two race, the primary key refuses the second
+      const { rows: [r] } = await c.query(cur
+        ? `UPDATE recruitment_messages SET body = $2, discord_id = $3, ign = $4, updated_at = NOW() WHERE kind = $1 RETURNING kind, body, ign, updated_at`
+        : `INSERT INTO recruitment_messages (kind, body, discord_id, ign) VALUES ($1, $2, $3, $4) RETURNING kind, body, ign, updated_at`,
+        [kind, body, actor.id, actor.name]);
+      await audit(c, actor, `Set the ${kind} message: "${body}"`);
+      return toMessage(r);
+    });
+  } catch (e: any) {
+    if (e?.code === '23505') throw new RecruitmentError(`Someone saved the ${kind} message at the same moment. Copy your text, then reload to see theirs.`);
+    throw e;
+  }
 }
 
 /** Serializes one member's session writes, so two can't race past the overlap check. */
@@ -174,17 +214,17 @@ export async function deleteSession(id: number, actor: Actor, canManage: boolean
  * nothing is written; if someone takes the last slot at the same moment, the
  * unique key refuses the second insert.
  */
-export async function logShout(actor: Actor, at: Date, note: string | null, db: Pool = getPool()): Promise<Shout> {
+export async function logShout(actor: Actor, at: Date, db: Pool = getPool()): Promise<Shout> {
   notFuture(at, 'The shout time');
   try {
     return await tx(db, async c => {
       const { rows: [r] } = await c.query(
-        `INSERT INTO recruitment_shouts (discord_id, ign, shouted_at, slot, note)
-         SELECT $1::bigint, $2::text, $3::timestamptz, s, $4::text FROM generate_series(1, $5::int) s
+        `INSERT INTO recruitment_shouts (discord_id, ign, shouted_at, slot)
+         SELECT $1::bigint, $2::text, $3::timestamptz, s FROM generate_series(1, $4::int) s
          WHERE s NOT IN (SELECT slot FROM recruitment_shouts WHERE shout_day = ($3::timestamptz AT TIME ZONE 'UTC')::date)
          ORDER BY s LIMIT 1
          RETURNING ${SHOUT_COLS}`,
-        [actor.id, actor.name, at, note, SHOUTS_PER_DAY]);
+        [actor.id, actor.name, at, SHOUTS_PER_DAY]);
       if (!r) throw new RecruitmentError(`All ${SHOUTS_PER_DAY} shouts for ${utcDay(at)} (UTC) are already logged.`);
       await audit(c, actor, `Logged a shout at ${stamp(at)}`);
       return toShout(r);
