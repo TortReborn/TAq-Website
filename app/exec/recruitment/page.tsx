@@ -592,9 +592,22 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
   const hourPx = useFitHourPx(gridRef, [data]);
   const week = Array.from({ length: 7 }, (_, i) => clock.addDays(from, i));
   const cols = '2.4rem repeat(7, minmax(0, 1fr))';
+  // The card under the pointer for whatever it's over: who, when, how long
+  const [tip, setTip] = useState<(TipContent & { x: number; y: number }) | null>(null);
+  const hover = (content: TipContent) => ({
+    onMouseEnter: (e: React.MouseEvent) => setTip({ ...content, x: e.clientX, y: e.clientY }),
+    onMouseMove: (e: React.MouseEvent) => setTip({ ...content, x: e.clientX, y: e.clientY }),
+    onMouseLeave: () => setTip(null),
+  });
+  const at = (t: string) => `${clock.dateFmt(clock.day(t), { weekday: 'short', month: 'short', day: 'numeric' })} ${clock.time(t)}`;
+  const span = (from: string, to: string | null) => {
+    const sameDay = to !== null && clock.day(from) === clock.day(to);
+    return to === null ? `${at(from)} – now` : sameDay ? `${at(from)} – ${clock.time(to)}` : `${at(from)} – ${at(to)}`;
+  };
 
   return (
     <div>
+      {tip && <Tooltip tip={tip} />}
       {/* Day headers: date, pfinder total, shouts and applications; pick a day for its details below */}
       <div style={{ display: 'grid', gridTemplateColumns: cols, gap: '0.25rem', marginBottom: '0.25rem' }}>
         <div />
@@ -640,10 +653,14 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
             }}>
               {blocks.map(b => {
                 const s = b.session;
-                const tip = `${s.ign} · ${clock.time(s.started_at)}–${s.ended_at ? clock.time(s.ended_at) : 'now'} · ${formatDuration(b.ms)}`;
+                const total = (s.ended_at ? Date.parse(s.ended_at) : now) - Date.parse(s.started_at);
+                const content: TipContent = {
+                  kind: 'Pfinder session', accent: 'var(--chart-seq-3)', who: s.ign,
+                  rows: [span(s.started_at, s.ended_at), s.ended_at ? formatDuration(total) : `${formatDuration(total)} so far, still clocked in`],
+                };
                 const height = Math.max(3, (b.endMin - b.startMin) / 60 * hourPx);
                 return (
-                  <div key={s.id} title={tip} aria-label={tip} style={{
+                  <div key={s.id} aria-label={`${content.kind}: ${s.ign}, ${content.rows.join(', ')}`} {...hover(content)} style={{
                     position: 'absolute', top: b.startMin / 60 * hourPx, height,
                     left: `calc(${(b.lane / lanes) * 100}% + 1px)`, width: `calc(${100 / lanes}% - 2px)`,
                     background: SESSION_FILL, borderLeft: '3px solid var(--chart-seq-3)', borderRadius: '3px',
@@ -658,14 +675,16 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
               {/* shouts label on the right, applications on the left, so the two don't stack */}
               {shouts.map(s => (
                 <Marker key={`s${s.id}`} min={clock.wallMinutes(s.shouted_at)} hourPx={hourPx} side="right" line="var(--text-secondary)"
-                  tip={`Shout at ${clock.time(s.shouted_at)} by ${s.ign}`} label={`Shout ${clock.time(s.shouted_at)}`} />
+                  tip={{ kind: 'Shout', accent: 'var(--text-secondary)', who: s.ign, rows: [at(s.shouted_at), `Shout ${s.slot} of ${SHOUTS_PER_DAY} on ${utcDay(s.shouted_at)} (UTC)`] }}
+                  hover={hover} label={`Shout ${clock.time(s.shouted_at)}`} />
               ))}
               {apps.map(a => (
                 <Marker key={`a${a.id}`} min={clock.wallMinutes(a.submitted_at)} hourPx={hourPx} side="left" line={APP_COLOR}
-                  tip={`Application from ${a.ign ?? 'unknown'} at ${clock.time(a.submitted_at)} · ${a.status}`} label={`+ ${a.ign ?? 'app'}`} />
+                  tip={{ kind: 'Guild application', accent: APP_COLOR, who: a.ign ?? 'Unknown IGN', rows: [`Submitted ${at(a.submitted_at)}`, STATUS_LABEL[a.status] ?? a.status] }}
+                  hover={hover} label={`+ ${a.ign ?? 'app'}`} />
               ))}
               {day === today && (
-                <div aria-hidden style={{ position: 'absolute', top: clock.wallMinutes(now) / 60 * hourPx - 1, left: 0, right: 0, borderTop: '2px solid #ef4444', zIndex: 2 }} />
+                <div aria-hidden style={{ position: 'absolute', top: clock.wallMinutes(now) / 60 * hourPx - 1, left: 0, right: 0, borderTop: '2px solid #ef4444', zIndex: 2, pointerEvents: 'none' }} />
               )}
             </div>
           );
@@ -684,19 +703,45 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
           <span style={{ width: '0.8rem', borderTop: '2px solid #ef4444' }} />now
         </span>
-        <span>Times in {clock.zone}. Hover anything for its exact time.</span>
+        <span>Times in {clock.zone}. Hover a session, shout or application for who and when.</span>
       </div>
     </div>
   );
 }
 
-/** A moment in a week-view day: a line across the column with a small label at one side. */
-function Marker({ min, hourPx, side, line, tip, label }: { min: number; hourPx: number; side: 'left' | 'right'; line: string; tip: string; label: string }) {
+/** What the week view's hover card says about one session, shout or application. */
+interface TipContent { kind: string; who: string; rows: string[]; accent: string }
+
+/** The hover card, beside the pointer; it flips left or up near the window's edge. */
+function Tooltip({ tip }: { tip: TipContent & { x: number; y: number } }) {
+  const flipX = tip.x > window.innerWidth - 280;
+  const flipY = tip.y > window.innerHeight - 120;
   return (
-    <div title={tip} aria-label={tip} style={{ position: 'absolute', top: min / 60 * hourPx - 1, left: 0, right: 0, zIndex: 1 }}>
-      <div style={{ borderTop: `2px solid ${line}` }} />
+    <div role="tooltip" style={{
+      position: 'fixed', left: tip.x + (flipX ? -14 : 14), top: tip.y + (flipY ? -14 : 14), zIndex: 60, pointerEvents: 'none',
+      transform: `translate(${flipX ? '-100%' : '0'}, ${flipY ? '-100%' : '0'})`, maxWidth: '18rem',
+      background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderLeft: `3px solid ${tip.accent}`,
+      borderRadius: '0.5rem', padding: '0.45rem 0.6rem', boxShadow: '0 8px 24px rgba(0,0,0,0.35)', fontSize: '0.78rem', color: 'var(--text-primary)',
+    }}>
+      <div style={{ ...muted, fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{tip.kind}</div>
+      <div style={{ fontWeight: 700, fontSize: '0.9rem', margin: '0.1rem 0 0.15rem' }}>{tip.who}</div>
+      {tip.rows.map((r, i) => <div key={i} style={{ color: i === 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{r}</div>)}
+    </div>
+  );
+}
+
+/** A moment in a week-view day: a line across the column with a small label at one side. */
+function Marker({ min, hourPx, side, line, tip, hover, label }: {
+  min: number; hourPx: number; side: 'left' | 'right'; line: string; tip: TipContent;
+  hover: (c: TipContent) => Record<string, (e: React.MouseEvent) => void>; label: string;
+}) {
+  return (
+    // a 10px band around the 2px line, so it's easy to hover
+    <div aria-label={`${tip.kind}: ${tip.who}, ${tip.rows.join(', ')}`} {...hover(tip)}
+      style={{ position: 'absolute', top: min / 60 * hourPx - 5, height: 10, left: 0, right: 0, zIndex: 1, display: 'flex', alignItems: 'center' }}>
+      <div style={{ borderTop: `2px solid ${line}`, width: '100%' }} />
       <span style={{
-        position: 'absolute', [side]: 2, top: -8, maxWidth: 'calc(100% - 4px)', overflow: 'hidden', textOverflow: 'ellipsis',
+        position: 'absolute', [side]: 2, top: -4, maxWidth: 'calc(100% - 4px)', overflow: 'hidden', textOverflow: 'ellipsis',
         fontSize: '0.58rem', fontWeight: 700, padding: '0 3px', borderRadius: '3px',
         background: 'var(--bg-card-solid)', color: 'var(--text-primary)', border: `1px solid ${line}`, whiteSpace: 'nowrap',
       }}>{label}</span>
