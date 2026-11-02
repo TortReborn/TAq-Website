@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS bot_panels (
     message_ids   BIGINT[]     NOT NULL DEFAULT '{}',  -- live bot messages, top to bottom
     published_rev INT,                             -- rev_number now live in Discord
     template      VARCHAR(32)  UNIQUE,             -- set: never posted, sent on this event (TAQ-142)
+    archived_at   TIMESTAMPTZ,                     -- set: in the Archive, can't publish until restored (TAQ-144)
+    archived_by   VARCHAR(64),
     created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
