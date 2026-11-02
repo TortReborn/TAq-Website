@@ -263,3 +263,33 @@ describe('forum panels and servers (TAQ-115)', () => {
     expect(contentToText({ ...one, post: { title: 'TE Roles' } })).toMatch(/^Forum post title: TE Roles/);
   });
 });
+
+describe('template panels (TAQ-142)', () => {
+  const dm = (message: object) => ({ messages: [message] });
+
+  it('take member values and the member avatar as an image', () => {
+    const { content, errors } = normalizeContent(dm({
+      content: 'Welcome {{member}} ({{ign}})',
+      embeds: [{ author: { name: 'Welcome Aboard!', icon_url: '{{member_avatar}}' } }],
+      rows: [[{ kind: 'link', label: 'Get Verge', url: 'https://modrinth.com/project/37mIxdyU' }]],
+    }), { template: true });
+    expect(errors).toEqual([]);
+    expect(content!.messages[0].embeds![0].author!.icon_url).toBe('{{member_avatar}}');
+  });
+
+  it('only have link buttons and nothing generated', () => {
+    const errors = normalizeContent(dm({
+      content: 'x', dynamic: 'shell_exchange_panels',
+      rows: [[{ kind: 'action', action: 'raid_claim' }, { kind: 'role', role_id: '123456789012345678', label: 'r' }]],
+    }), { template: true }).errors;
+    expect(errors).toContain("Message 1: a template can't carry generated images.");
+    expect(errors.filter(e => /only have link buttons/.test(e))).toHaveLength(2);
+  });
+
+  it('are the only panels member values work in', () => {
+    expect(normalizeContent(dm({ content: 'hi {{member}}' })).errors)
+      .toEqual(['Message 1: {{member}} only works in a welcome template.']);
+    expect(normalizeContent(dm({ embeds: [{ description: 'x', thumbnail: '{{member_avatar}}' }] })).errors[0])
+      .toMatch(/image links must start with https/);
+  });
+});

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
-import type { PanelRegistry, PanelSummary } from '@/lib/bot-panels';
+import { PANEL_TEMPLATES, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 
@@ -85,11 +85,13 @@ export default function BotPanelsPage() {
                 <td style={td}>
                   <Link href={`/exec/bot-panels/${p.slug}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{p.name}</Link>
                 </td>
-                <td style={{ ...td, color: 'var(--text-secondary)' }}>{channelLabel(p.channel_id, data.registry)}</td>
+                <td style={{ ...td, color: 'var(--text-secondary)' }}>
+                  {p.template ? <span title={PANEL_TEMPLATES[p.template]?.sentWhen}>Sent to each new member</span> : channelLabel(p.channel_id, data.registry)}
+                </td>
                 <td style={td}>
                   {p.latest_status
-                    ? <span title={p.message_ids.length ? undefined : 'Imported from the old /generate command. Link the messages already in Discord, or publish to post new ones.'}>
-                        <StatusBadge status={p.latest_status} posted={p.message_ids.length > 0} />
+                    ? <span title={p.template || p.message_ids.length ? undefined : 'Imported from the old /generate command. Link the messages already in Discord, or publish to post new ones.'}>
+                        <StatusBadge status={p.latest_status} posted={!!p.template || p.message_ids.length > 0} />
                       </span>
                     : <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Empty</span>}
                 </td>
