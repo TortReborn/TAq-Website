@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   SLUG_RE,
   slugFromName,
-  channelGuild, contentToText, fromReadable, imageSrc, isForum, normalizeContent, parseMessageLink, scopedRegistry, toReadable,
+  channelGuild, contentToText, groupPanels, fromReadable, imageSrc, isForum, normalizeContent, parseMessageLink, scopedRegistry, toReadable,
 } from './bot-panels';
 
 const ASSET = 'asset://0123456789abcdef.png';
@@ -291,5 +291,45 @@ describe('template panels (TAQ-142)', () => {
       .toEqual(['Message 1: {{member}} only works in a welcome template.']);
     expect(normalizeContent(dm({ embeds: [{ description: 'x', thumbnail: '{{member_avatar}}' }] })).errors[0])
       .toMatch(/image links must start with https/);
+  });
+});
+
+describe('panel list groups (TAQ-143)', () => {
+  const MAIN = '729147655875199017', EXEC = '784795827808763904';
+  const registry = {
+    actions: [], dynamic: [], default_color: 0, updated_at: '', roles: [], emojis: [],
+    guild: { id: MAIN, name: 'The Aquarium' },
+    guilds: [{ id: MAIN, name: 'The Aquarium' }, { id: EXEC, name: 'TAq Executive' }],
+    channels: [
+      { id: '1', name: 'rules', type: 'text', category: 'Info', postable: true, guild_id: MAIN },
+      { id: '2', name: 'faq', type: 'text', category: 'Info', postable: true, guild_id: MAIN },
+      { id: '5', name: 'te-info', type: 'forum', category: 'TE', postable: true, guild_id: EXEC },
+      { id: '6', name: 'TE 101', type: 'public_thread', category: 'TE', postable: true, guild_id: EXEC, parent_id: '5' },
+      { id: '7', name: 'TE Roles', type: 'public_thread', category: 'TE', postable: true, guild_id: EXEC, parent_id: '5' },
+    ],
+  };
+  const panel = (name: string, channel_id: string | null, template: string | null = null) => ({ name, channel_id, template });
+  const shape = (groups: ReturnType<typeof groupPanels>) => groups.map(g => [g.label, g.panels.map(p => p.name)]);
+
+  it('puts templates first, then each server in its channel order', () => {
+    const panels = [
+      panel('TE Roles', '7'), panel('Welcome DM', null, 'welcome_dm'), panel('FAQ', '2'), panel('TE 101', '6'),
+      panel('Rules', '1'), panel('Welcome Aboard Post', null, 'welcome_post'),
+    ];
+    expect(shape(groupPanels(panels, registry))).toEqual([
+      ['Sent automatically', ['Welcome Aboard Post', 'Welcome DM']],
+      ['The Aquarium', ['Rules', 'FAQ']],
+      ['TAq Executive', ['TE 101', 'TE Roles']],
+    ]);
+  });
+
+  it('breaks ties by name, puts unknown channels last in the main server, and drops empty groups', () => {
+    const panels = [panel('Zeta', '2'), panel('Lost', '99'), panel('Alpha', '2'), panel('Unplaced', null)];
+    expect(shape(groupPanels(panels, registry))).toEqual([['The Aquarium', ['Alpha', 'Zeta', 'Lost', 'Unplaced']]]);
+  });
+
+  it('still lists everything before the bot has reported a registry', () => {
+    expect(shape(groupPanels([panel('B', '1'), panel('A', '2'), panel('W', null, 'welcome_dm')], null)))
+      .toEqual([['Sent automatically', ['W']], ['Panels', ['A', 'B']]]);
   });
 });

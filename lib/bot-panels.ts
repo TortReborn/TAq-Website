@@ -147,6 +147,41 @@ export function channelGuild(registry: PanelRegistry | null, channelId: string |
   return ch ? ch.guild_id ?? registry?.guild?.id ?? null : null;
 }
 
+export interface PanelGroup<P> { key: string; label: string; panels: P[] }
+
+/** The panel list split for the Bot Messages page (TAQ-143): templates first,
+ *  then one group per server, main first. A server's panels follow its channel
+ *  list as Discord shows it, which is the registry's order (forum posts sit
+ *  under their forum); panels in a channel the registry doesn't know go last
+ *  in the main server's group. Empty groups are left out. */
+export function groupPanels<P extends Pick<PanelSummary, 'name' | 'channel_id' | 'template'>>(
+  panels: P[], registry: PanelRegistry | null,
+): PanelGroup<P>[] {
+  const position = new Map(registry?.channels.map((c, i) => [c.id, i]) ?? []);
+  const main = registry?.guild ?? null;
+  const servers = registry?.guilds?.length ? registry.guilds : main ? [main] : [];
+  const ordered = [main, ...servers].filter((g, i, all): g is { id: string; name: string } =>
+    !!g && all.findIndex(o => o?.id === g.id) === i);
+
+  const byName = (a: P, b: P) => a.name.localeCompare(b.name);
+  const inChannelOrder = (a: P, b: P) =>
+    (position.get(a.channel_id ?? '') ?? Infinity) - (position.get(b.channel_id ?? '') ?? Infinity) || byName(a, b);
+
+  const groups: PanelGroup<P>[] = [{ key: 'templates', label: 'Sent automatically', panels: [] }];
+  const server = new Map<string, PanelGroup<P>>();
+  for (const g of ordered) server.set(g.id, { key: g.id, label: g.name, panels: [] });
+  const fallback: PanelGroup<P> = server.get(ordered[0]?.id ?? '') ?? { key: 'panels', label: 'Panels', panels: [] };
+  groups.push(...(server.size ? server.values() : [fallback]));
+
+  for (const p of panels) {
+    if (p.template) groups[0].panels.push(p);
+    else (server.get(channelGuild(registry, p.channel_id) ?? '') ?? fallback).panels.push(p);
+  }
+  groups[0].panels.sort(byName);
+  for (const g of groups.slice(1)) g.panels.sort(inChannelOrder);
+  return groups.filter(g => g.panels.length > 0);
+}
+
 export function isForum(registry: PanelRegistry | null, channelId: string | null | undefined): boolean {
   return !!channelId && registry?.channels.find(c => c.id === channelId)?.type === 'forum';
 }
