@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
-import { PANEL_TEMPLATES, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
+import { PANEL_TEMPLATES, groupPanels, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 
@@ -38,6 +38,7 @@ export default function BotPanelsPage() {
 
   const th: React.CSSProperties = { padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase' };
   const td: React.CSSProperties = { padding: '0.6rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', borderTop: '1px solid var(--border-card)' };
+  const groupTd: React.CSSProperties = { ...td, padding: '0.9rem 0.75rem 0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', background: 'var(--bg-secondary)' };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -80,7 +81,10 @@ export default function BotPanelsPage() {
             <tr><th style={th}>Panel</th><th style={th}>Channel</th><th style={th}>Status</th><th style={th}>Last change</th><th style={th} /></tr>
           </thead>
           <tbody>
-            {data.panels.map(p => (
+            {groupPanels(data.panels, data.registry).map(group => (
+              <Fragment key={group.key}>
+              <tr><td colSpan={5} style={groupTd}>{group.label}</td></tr>
+              {group.panels.map(p => (
               <tr key={p.slug}>
                 <td style={td}>
                   <Link href={`/exec/bot-panels/${p.slug}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{p.name}</Link>
@@ -102,6 +106,8 @@ export default function BotPanelsPage() {
                   <Link href={`/exec/bot-panels/${p.slug}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>Edit</Link>
                 </td>
               </tr>
+              ))}
+              </Fragment>
             ))}
             {data.panels.length === 0 && (
               <tr><td colSpan={5} style={{ ...td, color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No panels yet.</td></tr>
