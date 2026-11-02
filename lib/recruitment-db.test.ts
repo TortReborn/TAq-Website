@@ -64,6 +64,9 @@ describe.skipIf(!available)('recruitment-db', () => {
     await pool.query(`CREATE TEMP TABLE audit_log (
       id SERIAL PRIMARY KEY, log_type VARCHAR(50) NOT NULL, actor_name VARCHAR(100), actor_id BIGINT,
       action TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW())`);
+    await pool.query(`CREATE TEMP TABLE applications (
+      id SERIAL PRIMARY KEY, application_type VARCHAR(20) NOT NULL, status VARCHAR(20) DEFAULT 'pending',
+      answers JSONB NOT NULL, submitted_at TIMESTAMPTZ DEFAULT NOW())`);
   });
 
   afterAll(async () => {
@@ -71,7 +74,18 @@ describe.skipIf(!available)('recruitment-db', () => {
   });
 
   beforeEach(async () => {
-    await pool.query('TRUNCATE recruitment_pfinder_sessions, recruitment_shouts, audit_log');
+    await pool.query('TRUNCATE recruitment_pfinder_sessions, recruitment_shouts, audit_log, applications');
+  });
+
+  describe('applications', () => {
+    it('returns guild applications submitted in the range, with the IGN from the form', async () => {
+      await pool.query(`INSERT INTO applications (application_type, status, answers, submitted_at) VALUES
+        ('guild', 'accepted', '{"ign":"NewFish"}', '2026-11-03T10:00Z'),
+        ('community', 'pending', '{"ign":"Visitor"}', '2026-11-03T11:00Z'),
+        ('guild', 'pending', '{"ign":"TooLate"}', '2026-11-10T00:00Z')`);
+      const { applications } = await getRange(new Date('2026-11-02T00:00Z'), new Date('2026-11-10T00:00Z'), pool);
+      expect(applications.map(a => [a.ign, a.status, a.submitted_at])).toEqual([['NewFish', 'accepted', '2026-11-03T10:00:00.000Z']]);
+    });
   });
 
   describe('pfinder sessions', () => {
