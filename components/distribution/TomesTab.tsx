@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * Tome Queue (TAQ-116): members request tomes with the bot's "Request tomes"
- * button; any exec member gives them out here. "Give out tomes" works like
- * aspects: say how many you have, check who they go to, confirm. The bot
- * posts every grant in the tomes channel.
+ * The Tomes tab of /exec/distribution (TAQ-116): members request tomes with
+ * the bot's "Request tomes" button; any exec member gives them out here.
+ * "Give out tomes" works like aspects: say how many you have, check who they
+ * go to, confirm. The bot posts every grant in the tomes channel.
  */
 
 import { useState } from 'react';
@@ -14,6 +14,7 @@ import {
   BUCKETS, PRIORITIES, kindLabel, servingOrder, warTomesEarned, warsNeeded,
   type Allocation, type OpenRequest, type TomeBucket,
 } from '@/lib/tomes';
+import { ago, btn, card, h2, input, td, th } from './ui';
 
 type Row = OpenRequest & { shells_spent: number; source: string; note: string | null };
 interface Event { id: number; ign: string | null; action: string; kind: string | null; count: number; actor_name: string | null; note: string | null; created_at: string }
@@ -23,19 +24,6 @@ interface Member {
   requests: (Row & { status: string })[]; events: Event[];
 }
 
-const card: React.CSSProperties = { background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.75rem', padding: '1rem' };
-const input: React.CSSProperties = {
-  background: 'var(--bg-primary)', border: '1px solid var(--border-card)', borderRadius: '0.375rem',
-  padding: '0.45rem 0.65rem', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none',
-};
-const btn = (bg: string): React.CSSProperties => ({
-  padding: '0.45rem 0.9rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer',
-  fontSize: '0.8rem', fontWeight: 600, background: bg, color: '#fff',
-});
-const th: React.CSSProperties = { textAlign: 'left', padding: '0.4rem 0.5rem', fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' };
-const td: React.CSSProperties = { padding: '0.45rem 0.5rem', fontSize: '0.83rem', color: 'var(--text-primary)', borderTop: '1px solid var(--border-card)' };
-const h2: React.CSSProperties = { fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.75rem' };
-
 async function post(url: string, body: unknown) {
   const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));
@@ -43,17 +31,12 @@ async function post(url: string, body: unknown) {
   return j;
 }
 
-const ago = (iso: string) => {
-  const s = (Date.now() - new Date(iso).getTime()) / 1000;
-  return s < 3600 ? `${Math.max(1, Math.floor(s / 60))}m` : s < 86400 ? `${Math.floor(s / 3600)}h` : `${Math.floor(s / 86400)}d`;
-};
-
 function Priority({ p }: { p: string }) {
   const meta = PRIORITIES.find(x => x.key === p);
   return <span style={{ color: meta?.color ?? 'inherit', fontWeight: 600 }}>{meta?.label ?? p}</span>;
 }
 
-export default function TomeQueuePage() {
+export default function TomesTab() {
   const { data, error, mutate } = useSWR<{ requests: Row[]; recent: Event[] }>('/api/exec/tomes', fetcher, { refreshInterval: 30000 });
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -70,12 +53,9 @@ export default function TomeQueuePage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Tome Queue</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '0.35rem 0 0' }}>
-          Members request tomes with the bot&rsquo;s <b>Request tomes</b> button. Give them out in-game, then record it here; the bot posts each grant in the tomes channel.
-        </p>
-      </div>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
+        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button. Give them out in-game, then record it here; the bot posts each grant in the tomes channel.
+      </p>
       {message && (
         <div style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
       )}
