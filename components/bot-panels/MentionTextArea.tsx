@@ -9,8 +9,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { fromReadable, toReadable, type PanelRegistry } from '@/lib/bot-panels';
-import { PANEL_VALUES } from '@/lib/panel-values';
-import { usePanelValues } from './values';
+import { PANEL_VALUES, TEMPLATE_VALUES } from '@/lib/panel-values';
+import { useIsTemplate, usePanelValues } from './values';
 
 type Option = { key: string; insert: string; name: string; detail?: string; color?: number; image?: string; glyph?: string };
 type Query = { start: number; options: Option[] };
@@ -104,13 +104,16 @@ function rank<T extends { name: string }>(items: T[], q: string): T[] {
 }
 
 /** What the text just before the caret is asking for, if anything. */
-function findQuery(before: string, reg: PanelRegistry, standard: StandardEmoji[] | null, values: Record<string, string>): Query | null {
-  // {value, shown as {Label} and stored as {{key}}
+function findQuery(before: string, reg: PanelRegistry, standard: StandardEmoji[] | null, values: Record<string, string>, template: boolean): Query | null {
+  // {value, shown as {Label} and stored as {{key}}; a template also offers the member's (TAQ-142)
   const v = /(?:^|[^{])\{([^{}\n]*)$/.exec(before);
   if (v) {
-    const options: Option[] = rank(PANEL_VALUES.map(d => ({ ...d, name: d.label })), v[1]).map(d => ({
-      key: d.key, insert: `{${d.label}}`, name: d.label,
-      detail: values[d.key] != null ? `now ${values[d.key]}` : undefined,
+    const defs = [
+      ...(template ? TEMPLATE_VALUES.filter(d => d.key !== 'member_avatar').map(d => ({ ...d, detail: 'each member' })) : []),
+      ...PANEL_VALUES.map(d => ({ ...d, detail: values[d.key] != null ? `now ${values[d.key]}` : undefined })),
+    ];
+    const options: Option[] = rank(defs.map(d => ({ ...d, name: d.label })), v[1]).map(d => ({
+      key: d.key, insert: `{${d.label}}`, name: d.label, detail: d.detail,
     }));
     return options.length ? { start: before.length - v[1].length - 1, options } : null;
   }
@@ -143,6 +146,7 @@ export default function MentionTextArea({ id, value, onChange, registry, rows, p
   const [active, setActive] = useState(0);
   const standard = useStandardEmojis();
   const values = usePanelValues();
+  const template = useIsTemplate();
 
   // Re-read the stored value when it changes from outside (undo, restore, discard)
   // or when the server list arrives; our own edits are already in `text`.
@@ -159,7 +163,7 @@ export default function MentionTextArea({ id, value, onChange, registry, rows, p
     const stored = fromReadable(next, registry);
     pushed.current = stored;
     onChange(stored);
-    setQuery(registry ? findQuery(next.slice(0, caret), registry, standard, values) : null);
+    setQuery(registry ? findQuery(next.slice(0, caret), registry, standard, values, template) : null);
     setActive(0);
   };
 

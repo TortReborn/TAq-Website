@@ -9,7 +9,7 @@
  * Helpers/bot_panels.py, which re-validates everything before sending.
  */
 
-import { contentValueKeys, isPanelValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
+import { MEMBER_AVATAR, contentValueKeys, isPanelValue, isTemplateValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
 
 export const ASSET_SCHEME = 'asset://';
 export const ASSET_NAME_RE = /^[0-9a-f]{16}\.(png|jpg|jpeg|gif|webp)$/;
@@ -82,6 +82,18 @@ export interface PanelContent {
   post?: { title: string };
 }
 
+/**
+ * Template panels (TAQ-142): bot_panels.template names the event that sends
+ * one. They are never posted; publishing makes a revision the one the bot
+ * sends, to one member at a time, with that member's values filled in
+ * (TEMPLATE_VALUES in lib/panel-values.ts). Keys match Tort-Reborn
+ * Helpers/bot_panels.TEMPLATES.
+ */
+export const PANEL_TEMPLATES: Record<string, { sentWhen: string }> = {
+  welcome_dm: { sentWhen: 'Sent by DM to each new guild member when they are registered' },
+  welcome_post: { sentWhen: 'Posted in the welcome channel when a new guild member is registered' },
+};
+
 export type RevisionStatus = 'pending' | 'publishing' | 'published' | 'failed' | 'superseded';
 
 export interface PanelSummary {
@@ -90,6 +102,8 @@ export interface PanelSummary {
   channel_id: string | null;
   message_ids: string[];
   published_rev: number | null;
+  /** Set on a template panel: the event that sends it */
+  template: string | null;
   updated_at: string;
   latest_rev: number | null;
   latest_status: RevisionStatus | null;
@@ -208,6 +222,8 @@ interface NormalizeOptions {
   roles?: Map<string, { name: string; assignable?: boolean; why?: string | null }>;
   /** The panel's channel is a forum, so the post needs a title */
   forum?: boolean;
+  /** A template panel: member values allowed, link buttons only, nothing generated */
+  template?: boolean;
 }
 
 const ROLE_ID_RE = /^\d{15,21}$/;
@@ -224,6 +240,7 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
   const image = (where: string, v: unknown): string | undefined => {
     const s = optional(v);
     if (!s) return undefined;
+    if (opts.template && s === MEMBER_AVATAR) return s;
     if (s.startsWith(ASSET_SCHEME)) {
       if (!assetName(s)) errors.push(`${where}: not an uploaded image.`);
       return s;
@@ -325,6 +342,7 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
         const label = optional(b?.label);
         const emoji = optional(b?.emoji);
         tooLong(at, 'label', label, LIMITS.buttonLabel);
+        if (opts.template && b?.kind !== 'link') errors.push(`${at}: a template can only have link buttons.`);
         if (b?.kind === 'link') {
           const url = str(b?.url).trim();
           if (!/^(https?|discord):\/\//.test(url)) errors.push(`${at}: a link button needs an http(s) url.`);
@@ -362,12 +380,14 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
 
     if (m?.dynamic) {
       if (m.dynamic !== DYNAMIC_SHELL_EXCHANGE) errors.push(`${where}: unknown generated block.`);
+      else if (opts.template) errors.push(`${where}: a template can't carry generated images.`);
       out.dynamic = m.dynamic;
     }
 
     if (!out.content && !out.images && !out.embeds && !out.dynamic) errors.push(`${where}: the message is empty.`);
     for (const key of contentValueKeys(out)) {
-      if (!isPanelValue(key)) errors.push(`${where}: {{${key}}} isn't a value panels can use.`);
+      if (isTemplateValue(key) && !opts.template) errors.push(`${where}: {{${key}}} only works in a welcome template.`);
+      else if (!isPanelValue(key) && !isTemplateValue(key)) errors.push(`${where}: {{${key}}} isn't a value panels can use.`);
     }
     return out;
   });
