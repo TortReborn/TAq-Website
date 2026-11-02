@@ -249,7 +249,7 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
       </div>
 
       {archived && (
-        <div style={{ ...banner('#6b7280'), display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ ...banner('#eab308'), display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <span>
             <strong>Archived</strong> by {data.panel.archived_by ?? 'unknown'}, {timeAgo(data.panel.archived_at)}. Its messages were left in Discord as they are,
             and its history is kept below. Restore it to edit and publish again.
