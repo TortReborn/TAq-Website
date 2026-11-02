@@ -28,7 +28,18 @@ CREATE TABLE IF NOT EXISTS recruitment_shouts (
   shouted_at  TIMESTAMPTZ  NOT NULL,
   shout_day   DATE         GENERATED ALWAYS AS ((shouted_at AT TIME ZONE 'UTC')::date) STORED,
   slot        SMALLINT     NOT NULL CHECK (slot BETWEEN 1 AND 3),
-  note        TEXT,
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   UNIQUE (shout_day, slot)
+);
+
+-- The guild's current pfinder and shout messages, kept here so anyone on the
+-- page can edit and copy them. One row per kind; the length limits are the
+-- in-game ones.
+CREATE TABLE IF NOT EXISTS recruitment_messages (
+  kind        VARCHAR(16)  PRIMARY KEY CHECK (kind IN ('pfinder', 'shout')),
+  body        TEXT         NOT NULL,
+  discord_id  BIGINT       NOT NULL,     -- who last edited it
+  ign         VARCHAR(64)  NOT NULL,
+  updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  CHECK (char_length(body) <= CASE kind WHEN 'pfinder' THEN 140 ELSE 250 END)
 );

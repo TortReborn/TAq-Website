@@ -12,20 +12,21 @@
  * always counts UTC days.
  */
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
 import {
-  MAX_SESSION_HOURS, SHADE_LEGEND, SHOUTS_PER_DAY, calendarDays, formatDuration, nextUtcMidnight, shadeStep, utcDay,
-  type Application, type CalendarDays, type DaySummary, type PfinderSession, type Shout,
+  MAX_SESSION_HOURS, MESSAGE_LIMITS, SHADE_LEGEND, SHOUTS_PER_DAY, calendarDays, cleanMessage, formatDuration, messageLength,
+  nextUtcMidnight, shadeStep, utcDay,
+  type Application, type CalendarDays, type DaySummary, type MessageKind, type PfinderSession, type RecruitmentMessage, type Shout,
 } from '@/lib/recruitment';
 
 interface Data {
   /** the range served, as ISO times */
   from: string; to: string;
   sessions: PfinderSession[]; shouts: Shout[]; applications: Application[];
-  open: PfinderSession[]; today: Shout[];
+  open: PfinderSession[]; today: Shout[]; recent: Shout[]; messages: RecruitmentMessage[];
   me: { discord_id: string; can_manage: boolean };
 }
 
@@ -40,8 +41,9 @@ const btn = (bg: string): React.CSSProperties => ({
 });
 const navBtn: React.CSSProperties = { ...btn('var(--bg-primary)'), color: 'var(--text-primary)', border: '1px solid var(--border-card)' };
 const linkBtn: React.CSSProperties = { background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '0.78rem', textDecoration: 'underline' };
-const h2: React.CSSProperties = { fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.75rem' };
+const h2: React.CSSProperties = { fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.6rem' };
 const muted: React.CSSProperties = { fontSize: '0.78rem', color: 'var(--text-muted)' };
+const subhead: React.CSSProperties = { fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', margin: '0.75rem 0 0.3rem' };
 const SHADES = ['var(--chart-empty)', 'var(--chart-seq-1)', 'var(--chart-seq-2)', 'var(--chart-seq-3)', 'var(--chart-seq-4)', 'var(--chart-seq-5)'];
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const SESSION_FILL = 'color-mix(in srgb, var(--chart-seq-3) 28%, var(--bg-card-solid))';
@@ -140,19 +142,24 @@ export default function RecruitmentPage() {
     catch (e: any) { setMessage({ ok: false, text: e.message }); }
     finally { setBusy(false); }
   };
+  // The result floats over the page rather than pushing it down; a success
+  // clears itself, an error stays until it's read and closed
+  useEffect(() => {
+    if (!message?.ok) return;
+    const t = setTimeout(() => setMessage(null), 4000);
+    return () => clearTimeout(t);
+  }, [message]);
 
   if (error) return <div style={{ color: '#ef4444', padding: '2rem' }}>Failed to load recruitment: {error.message}</div>;
 
   return (
     <ClockContext.Provider value={clock}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 24rem' }}>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Recruitment</h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '0.35rem 0 0' }}>
-              Clock in when you start recruiting in party finder and out when you stop, and log every shout the moment it goes out.
-              Guild applications show on the calendar when they were submitted. Times are in {utc ? 'UTC' : `your time zone (${clock.zone})`};
-              the guild&rsquo;s {SHOUTS_PER_DAY} shouts a day reset at 00:00 UTC{utc ? '' : `, which is ${clock.time(nextUtcMidnight(now))} for you`}.
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem 1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 24rem', display: 'flex', alignItems: 'baseline', gap: '0.25rem 1rem', flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Recruitment</h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: 0 }}>
+              Clock in while you pfinder, log each shout as it goes out; applications show when they were submitted.
             </p>
           </div>
           <div role="radiogroup" aria-label="Show times in" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -168,17 +175,26 @@ export default function RecruitmentPage() {
           </div>
         </div>
         {message && (
-          <div role="status" style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
+          <div role="status" style={{
+            ...card, background: 'var(--bg-card-solid)', position: 'fixed', right: '1rem', bottom: '1rem', zIndex: 50, maxWidth: 'min(28rem, calc(100vw - 2rem))',
+            padding: '0.6rem 0.8rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+            color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e88' : '#ef444488', fontSize: '0.85rem',
+          }}>
+            <span>{message.text}</span>
+            <button aria-label="Dismiss" onClick={() => setMessage(null)}
+              style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1 }}>×</button>
+          </div>
         )}
         {!data ? <section style={{ ...card, height: '14rem', opacity: 0.6 }} /> : (
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 20rem), 1fr))', gap: '1rem' }}>
+          <div className="recruitment-layout">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minHeight: 0 }}>
               <Pfinder data={data} now={now} busy={busy} run={run} />
               <Shouts data={data} now={now} busy={busy} run={run} />
+              <ShoutHistory data={data} busy={busy} run={run} />
             </div>
             <Calendar data={data} view={view} setView={setView} anchor={anchor} setAnchor={setAnchor}
               range={{ from, to }} now={now} busy={busy} run={run} />
-          </>
+          </div>
         )}
       </div>
     </ClockContext.Provider>
@@ -250,7 +266,9 @@ function Pfinder({ data, now, busy, run }: { data: Data; now: number; busy: bool
         </>
       )}
 
-      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', margin: '1rem 0 0.35rem' }}>On now</div>
+      <SavedMessage kind="pfinder" data={data} busy={busy} run={run} />
+
+      <div style={subhead}>On now</div>
       {data.open.length === 0 ? <div style={muted}>Nobody is clocked in.</div> : (
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
           {data.open.map(s => (
@@ -267,7 +285,6 @@ function Pfinder({ data, now, busy, run }: { data: Data; now: number; busy: bool
 
 function Shouts({ data, now, busy, run }: { data: Data; now: number; busy: boolean; run: Run }) {
   const clock = useClock();
-  const [note, setNote] = useState('');
   const [earlier, setEarlier] = useState(false);
   const [at, setAt] = useState('');
   // The limit counts UTC days whatever the page shows, and follows the clock:
@@ -282,22 +299,24 @@ function Shouts({ data, now, busy, run }: { data: Data; now: number; busy: boole
       <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.6rem' }}>
         <b>{today.length}</b> of {SHOUTS_PER_DAY} used · resets in {formatDuration(nextUtcMidnight(now) - now)}, at {reset}
       </div>
-      <ol style={{ listStyle: 'none', margin: '0 0 0.75rem', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+      {/* one slot per shout, side by side; hover a used one for the full name */}
+      <ol style={{ listStyle: 'none', margin: '0 0 0.6rem', padding: 0, display: 'grid', gridTemplateColumns: `repeat(${SHOUTS_PER_DAY}, minmax(0, 1fr))`, gap: '0.3rem' }}>
         {Array.from({ length: SHOUTS_PER_DAY }, (_, i) => {
           const s = today[i];
+          const tip = s ? `Shout ${i + 1} at ${clock.time(s.shouted_at)} by ${s.ign}` : `Shout ${i + 1}: not used`;
           return (
-            <li key={i} style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.6rem', borderRadius: '0.375rem',
-              border: `1px ${s ? 'solid' : 'dashed'} var(--border-card)`, fontSize: '0.83rem', color: s ? 'var(--text-primary)' : 'var(--text-muted)',
+            <li key={i} title={tip} aria-label={tip} style={{
+              display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.3rem 0.45rem', borderRadius: '0.375rem', minWidth: 0,
+              border: `1px ${s ? 'solid' : 'dashed'} var(--border-card)`, fontSize: '0.78rem', color: s ? 'var(--text-primary)' : 'var(--text-muted)',
             }}>
-              <span style={{ fontWeight: 700, width: '1rem' }}>{i + 1}</span>
+              <span style={{ fontWeight: 700 }}>{i + 1}</span>
               {s ? (
                 <>
-                  <span><b>{clock.time(s.shouted_at)}</b> · {s.ign}{s.note && <span style={muted}> · {s.note}</span>}</span>
+                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><b>{clock.time(s.shouted_at)}</b> {s.ign}</span>
                   <DeleteButton show={s.discord_id === data.me.discord_id || data.me.can_manage} busy={busy} label="Remove this shout"
                     onClick={() => run(async () => { await send(`/api/exec/recruitment/shouts/${s.id}`, 'DELETE'); return 'Removed the shout.'; })} />
                 </>
-              ) : 'Not used'}
+              ) : 'open'}
             </li>
           );
         })}
@@ -305,23 +324,138 @@ function Shouts({ data, now, busy, run }: { data: Data; now: number; busy: boole
       {left > 0 ? (
         <>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <input style={{ ...input, flex: '1 1 10rem' }} placeholder="Note (optional), e.g. world or message" maxLength={200} value={note} onChange={e => setNote(e.target.value)} />
             <button style={btn('#3b82f6')} disabled={busy || (earlier && !at)}
               onClick={() => run(async () => {
-                await send('/api/exec/recruitment/shouts', 'POST', { note, at: earlier ? clock.fromInput(at) : undefined });
-                setNote(''); setEarlier(false);
+                await send('/api/exec/recruitment/shouts', 'POST', { at: earlier ? clock.fromInput(at) : undefined });
+                setEarlier(false);
                 return 'Logged the shout.';
               })}>{earlier ? 'Log shout at this time' : 'Log shout now'}</button>
+            <button style={linkBtn} onClick={() => { setEarlier(!earlier); setAt(clock.toInput(Date.now())); }}>{earlier ? 'Use current time' : 'Shouted earlier?'}</button>
           </div>
-          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button style={linkBtn} onClick={() => { setEarlier(!earlier); setAt(clock.toInput(Date.now())); }}>{earlier ? 'Use the time now' : 'Shouted earlier?'}</button>
-            {earlier && <label style={muted}>Shouted at ({clock.zone}) <input type="datetime-local" style={input} value={at} onChange={e => setAt(e.target.value)} /></label>}
-          </div>
+          {earlier && (
+            <label style={{ ...muted, display: 'block', marginTop: '0.5rem' }}>
+              Shouted at ({clock.zone}) <input type="datetime-local" style={input} value={at} onChange={e => setAt(e.target.value)} />
+            </label>
+          )}
         </>
       ) : (
         <div style={{ fontSize: '0.83rem', color: '#eab308' }}>All {SHOUTS_PER_DAY} of today&rsquo;s shouts are used. The next one is available at {reset}.</div>
       )}
+
+      <SavedMessage kind="shout" data={data} busy={busy} run={run} />
     </section>
+  );
+}
+
+/**
+ * The latest shouts, newest first, under days in the zone shown. On wide
+ * screens it fills the side column down to the calendar's bottom and scrolls.
+ */
+function ShoutHistory({ data, busy, run }: { data: Data; busy: boolean; run: Run }) {
+  const clock = useClock();
+  const byDay: [string, Shout[]][] = [];
+  for (const s of data.recent) {
+    const day = clock.day(s.shouted_at);
+    if (byDay.at(-1)?.[0] === day) byDay.at(-1)![1].push(s);
+    else byDay.push([day, [s]]);
+  }
+
+  return (
+    <section style={{ ...card, flex: '1 1 0', minHeight: '12rem', display: 'flex', flexDirection: 'column' }}>
+      <h2 style={h2}>Shout history</h2>
+      {byDay.length === 0 ? <div style={muted}>No shouts logged yet.</div> : (
+        <div style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', marginRight: '-0.5rem', paddingRight: '0.5rem' }}>
+          {byDay.map(([day, shouts]) => (
+            <div key={day} style={{ marginBottom: '0.6rem' }}>
+              <div style={{ ...muted, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                {clock.dateFmt(day, { weekday: 'short', month: 'short', day: 'numeric' })} · {shouts.length}
+              </div>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                {shouts.map(s => (
+                  <li key={s.id} style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-primary)', minWidth: 0 }}>
+                    <b style={{ fontVariantNumeric: 'tabular-nums' }}>{clock.time(s.shouted_at)}</b>
+                    <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.ign}
+                    </span>
+                    <DeleteButton show={s.discord_id === data.me.discord_id || data.me.can_manage} busy={busy} label="Remove this shout"
+                      onClick={() => run(async () => { await send(`/api/exec/recruitment/shouts/${s.id}`, 'DELETE'); return 'Removed the shout.'; })} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+const MESSAGE_TITLE: Record<MessageKind, string> ={ pfinder: 'Pfinder message', shout: 'Shout message' };
+
+/** The guild's saved message of one kind: shown ready to copy, and editable by anyone on the page. */
+function SavedMessage({ kind, data, busy, run }: { kind: MessageKind; data: Data; busy: boolean; run: Run }) {
+  const clock = useClock();
+  const saved = data.messages.find(m => m.kind === kind);
+  const limit = MESSAGE_LIMITS[kind];
+  // null while not editing; the draft keeps what was being typed through the 30s refreshes
+  const [draft, setDraft] = useState<string | null>(null);
+  // the version the edit started from, so someone else's save meanwhile isn't overwritten
+  const [seen, setSeen] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const length = draft === null ? 0 : messageLength(cleanMessage(draft));
+
+  const edit = () => { setDraft(saved?.body ?? ''); setSeen(saved?.updated_at ?? null); };
+  const save = () => run(async () => {
+    await send('/api/exec/recruitment/messages', 'PUT', { kind, body: draft, seen });
+    setDraft(null);
+    return `Saved the ${kind} message.`;
+  });
+  const copy = async () => {
+    if (!saved?.body) return;
+    try {
+      await navigator.clipboard.writeText(saved.body);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard blocked: the text is still there to select */ }
+  };
+
+  return (
+    <div>
+      <div style={{ ...subhead, display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+        {MESSAGE_TITLE[kind]}
+        {draft === null && <button style={{ ...linkBtn, marginLeft: 'auto', fontWeight: 400 }} onClick={edit}>{saved?.body ? 'Edit' : 'Write one'}</button>}
+      </div>
+      {draft !== null ? (
+        <>
+          <textarea style={{ ...input, width: '100%', boxSizing: 'border-box', resize: 'vertical', minHeight: '4.5rem', fontFamily: 'inherit' }}
+            autoFocus value={draft} aria-label={MESSAGE_TITLE[kind]}
+            // in-game chat is one line: Enter saves, and pasted line breaks become spaces
+            onChange={e => setDraft(e.target.value.replace(/[\r\n]+/g, ' '))}
+            onKeyDown={e => {
+              if (e.key === 'Enter') { e.preventDefault(); if (!busy && length <= limit) save(); }
+              if (e.key === 'Escape') setDraft(null);
+            }} />
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.35rem' }}>
+            <span style={{ ...muted, color: length > limit ? '#ef4444' : 'var(--text-muted)' }}>{length}/{limit}</span>
+            <button style={{ ...navBtn, marginLeft: 'auto' }} onClick={() => setDraft(null)}>Cancel</button>
+            <button style={btn('#3b82f6')} disabled={busy || length > limit} onClick={save}>Save</button>
+          </div>
+        </>
+      ) : saved?.body ? (
+        <>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+            <div style={{
+              flex: 1, minWidth: 0, padding: '0.5rem 0.65rem', borderRadius: '0.375rem', background: 'var(--bg-primary)',
+              border: '1px solid var(--border-card)', fontSize: '0.83rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
+            }}>{saved.body}</div>
+            <button style={{ ...btn(copied ? '#22c55e' : '#3b82f6'), minWidth: '4.5rem' }} onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
+          </div>
+          <div style={{ ...muted, marginTop: '0.3rem' }}>
+            {messageLength(saved.body)}/{limit} · edited by {saved.ign}, {clock.day(saved.updated_at)} {clock.time(saved.updated_at)}
+          </div>
+        </>
+      ) : <div style={muted}>No {kind} message saved yet.</div>}
+    </div>
   );
 }
 
@@ -419,15 +553,43 @@ function Calendar({ data, view, setView, anchor, setAnchor, range, now, busy, ru
   );
 }
 
-/** Pixels per hour in the week view: the whole day fits without scrolling. */
-const HOUR_PX = 26;
+/**
+ * Pixels per hour in the week view. The day is stretched or squeezed between
+ * these so 00:00 to 24:00 ends at the bottom of the window, not below it.
+ */
+const HOUR_PX = { min: 14, max: 48 };
+/** What sits under the time grid inside the window: the legend, the week's totals line and the card's padding. */
+const BELOW_GRID_PX = 112;
 const HOUR_LABELS = [0, 3, 6, 9, 12, 15, 18, 21];
+
+/** The hour height that fits the grid at `ref` into the window, kept up to date on resize. */
+function useFitHourPx(ref: React.RefObject<HTMLElement | null>, deps: unknown[]): number {
+  const [hourPx, setHourPx] = useState(HOUR_PX.max);
+  useLayoutEffect(() => {
+    const fit = () => {
+      const el = ref.current;
+      if (!el) return;
+      // from where the grid starts on the page, so scrolling doesn't change it
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const px = Math.floor((window.innerHeight - top - BELOW_GRID_PX) / 24);
+      setHourPx(Math.min(HOUR_PX.max, Math.max(HOUR_PX.min, px)));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return hourPx;
+}
 
 function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
   data: Data | null; from: string; days: Record<string, DaySummary>; today: string; now: number;
   selected: string | null; onSelect: (day: string) => void;
 }) {
   const clock = useClock();
+  const gridRef = useRef<HTMLDivElement>(null);
+  // re-fit when what's above the grid can change height: the cards beside it don't, the day headers do
+  const hourPx = useFitHourPx(gridRef, [data]);
   const week = Array.from({ length: 7 }, (_, i) => clock.addDays(from, i));
   const cols = '2.4rem repeat(7, minmax(0, 1fr))';
 
@@ -459,9 +621,9 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
 
       {/* Time grid: 00:00 at the top, 24:00 at the bottom */}
       <div style={{ display: 'grid', gridTemplateColumns: cols, gap: '0.25rem' }}>
-        <div style={{ position: 'relative', height: 24 * HOUR_PX }}>
+        <div ref={gridRef} style={{ position: 'relative', height: 24 * hourPx }}>
           {HOUR_LABELS.map(h => (
-            <span key={h} style={{ position: 'absolute', top: h * HOUR_PX - 6, right: '0.2rem', fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+            <span key={h} style={{ position: 'absolute', top: h * hourPx - 6, right: '0.2rem', fontSize: '0.62rem', color: 'var(--text-muted)' }}>
               {String(h).padStart(2, '0')}:00
             </span>
           ))}
@@ -472,17 +634,17 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
           const apps = data ? data.applications.filter(a => clock.day(a.submitted_at) === day) : [];
           return (
             <div key={day} onClick={() => onSelect(day)} style={{
-              position: 'relative', height: 24 * HOUR_PX, minWidth: 0, overflow: 'hidden', cursor: 'pointer',
+              position: 'relative', height: 24 * hourPx, minWidth: 0, overflow: 'hidden', cursor: 'pointer',
               borderRadius: '0.375rem', border: '1px solid var(--border-card)',
-              background: `repeating-linear-gradient(to bottom, transparent 0, transparent ${HOUR_PX - 1}px, var(--border-card) ${HOUR_PX - 1}px, var(--border-card) ${HOUR_PX}px), var(--bg-primary)`,
+              background: `repeating-linear-gradient(to bottom, transparent 0, transparent ${hourPx - 1}px, var(--border-card) ${hourPx - 1}px, var(--border-card) ${hourPx}px), var(--bg-primary)`,
             }}>
               {blocks.map(b => {
                 const s = b.session;
                 const tip = `${s.ign} · ${clock.time(s.started_at)}–${s.ended_at ? clock.time(s.ended_at) : 'now'} · ${formatDuration(b.ms)}`;
-                const height = Math.max(3, (b.endMin - b.startMin) / 60 * HOUR_PX);
+                const height = Math.max(3, (b.endMin - b.startMin) / 60 * hourPx);
                 return (
                   <div key={s.id} title={tip} aria-label={tip} style={{
-                    position: 'absolute', top: b.startMin / 60 * HOUR_PX, height,
+                    position: 'absolute', top: b.startMin / 60 * hourPx, height,
                     left: `calc(${(b.lane / lanes) * 100}% + 1px)`, width: `calc(${100 / lanes}% - 2px)`,
                     background: SESSION_FILL, borderLeft: '3px solid var(--chart-seq-3)', borderRadius: '3px',
                     borderBottom: s.ended_at ? undefined : '2px dashed var(--chart-seq-3)',
@@ -495,15 +657,15 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
               })}
               {/* shouts label on the right, applications on the left, so the two don't stack */}
               {shouts.map(s => (
-                <Marker key={`s${s.id}`} min={clock.wallMinutes(s.shouted_at)} side="right" line="var(--text-secondary)"
-                  tip={`Shout at ${clock.time(s.shouted_at)} by ${s.ign}${s.note ? ` · ${s.note}` : ''}`} label={`Shout ${clock.time(s.shouted_at)}`} />
+                <Marker key={`s${s.id}`} min={clock.wallMinutes(s.shouted_at)} hourPx={hourPx} side="right" line="var(--text-secondary)"
+                  tip={`Shout at ${clock.time(s.shouted_at)} by ${s.ign}`} label={`Shout ${clock.time(s.shouted_at)}`} />
               ))}
               {apps.map(a => (
-                <Marker key={`a${a.id}`} min={clock.wallMinutes(a.submitted_at)} side="left" line={APP_COLOR}
+                <Marker key={`a${a.id}`} min={clock.wallMinutes(a.submitted_at)} hourPx={hourPx} side="left" line={APP_COLOR}
                   tip={`Application from ${a.ign ?? 'unknown'} at ${clock.time(a.submitted_at)} · ${a.status}`} label={`+ ${a.ign ?? 'app'}`} />
               ))}
               {day === today && (
-                <div aria-hidden style={{ position: 'absolute', top: clock.wallMinutes(now) / 60 * HOUR_PX - 1, left: 0, right: 0, borderTop: '2px solid #ef4444', zIndex: 2 }} />
+                <div aria-hidden style={{ position: 'absolute', top: clock.wallMinutes(now) / 60 * hourPx - 1, left: 0, right: 0, borderTop: '2px solid #ef4444', zIndex: 2 }} />
               )}
             </div>
           );
@@ -529,9 +691,9 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
 }
 
 /** A moment in a week-view day: a line across the column with a small label at one side. */
-function Marker({ min, side, line, tip, label }: { min: number; side: 'left' | 'right'; line: string; tip: string; label: string }) {
+function Marker({ min, hourPx, side, line, tip, label }: { min: number; hourPx: number; side: 'left' | 'right'; line: string; tip: string; label: string }) {
   return (
-    <div title={tip} aria-label={tip} style={{ position: 'absolute', top: min / 60 * HOUR_PX - 1, left: 0, right: 0, zIndex: 1 }}>
+    <div title={tip} aria-label={tip} style={{ position: 'absolute', top: min / 60 * hourPx - 1, left: 0, right: 0, zIndex: 1 }}>
       <div style={{ borderTop: `2px solid ${line}` }} />
       <span style={{
         position: 'absolute', [side]: 2, top: -8, maxWidth: 'calc(100% - 4px)', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -646,7 +808,7 @@ function DayDetail({ day, data, now, busy, run }: { day: string; data: Data; now
       {shouts.map(s => (
         <div key={`s${s.id}`} style={row}>
           <span>Shout at {clock.time(s.shouted_at)}</span>
-          <span style={muted}>{s.ign}{s.note ? ` · ${s.note}` : ''}</span>
+          <span style={muted}>{s.ign}</span>
           <DeleteButton show={mayDelete(s.discord_id)} busy={busy} label="Remove this shout"
             onClick={() => run(async () => { await send(`/api/exec/recruitment/shouts/${s.id}`, 'DELETE'); return 'Removed the shout.'; })} />
         </div>

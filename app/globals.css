@@ -725,6 +725,23 @@ body.site-fixed-bg-active > footer {
   }
 }
 
+/* Exec Recruitment: the clock-in and shout cards in a side column beside the
+   calendar on wide screens, so the week fits in the window; stacked otherwise. */
+.recruitment-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .recruitment-layout {
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    /* the side column runs as tall as the calendar; the shout history fills it and scrolls */
+    align-items: stretch;
+  }
+}
+
 /* Near-opaque reading surface for long-form pages (the Chronicles). Rendered
    in the root layout as a sibling of PageTransition, deliberately: when this
    darkening lived inside the route layout it was a child of the transition

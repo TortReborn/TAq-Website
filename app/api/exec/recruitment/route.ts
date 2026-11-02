@@ -9,7 +9,8 @@ const DAY = 86_400_000;
 
 // GET ?from=ISO&to=ISO (`to` exclusive; the browser sends its own local
 // midnights, defaulting to the last 7 days) — the range's pfinder sessions,
-// shouts and guild applications, who is clocked in now, and today's (UTC) shouts
+// shouts and guild applications, who is clocked in now, today's (UTC) shouts,
+// the latest shouts for the history, and the saved pfinder and shout messages
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -20,9 +21,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: `Ask for up to ${MAX_RANGE_DAYS} days` }, { status: 400 });
   }
   try {
-    const [{ sessions, shouts, applications }, { open, today }] = await Promise.all([getRange(from, to), getLive()]);
+    const [{ sessions, shouts, applications }, { open, today, recent, messages }] = await Promise.all([getRange(from, to), getLive()]);
     return NextResponse.json({
-      from: from.toISOString(), to: to.toISOString(), sessions, shouts, applications, open, today,
+      from: from.toISOString(), to: to.toISOString(), sessions, shouts, applications, open, today, recent, messages,
       me: { discord_id: session.discord_id, can_manage: isNarwhalRank(session.rank) },
     });
   } catch (error) {
