@@ -15,10 +15,20 @@ export const SHOUTS_PER_DAY = 3;
 export const MAX_SESSION_HOURS = 24;
 /** The longest range the page asks for at once: a month view's six weeks, with room to spare. */
 export const MAX_RANGE_DAYS = 62;
+/** The in-game length limits of the guild's saved messages. */
+export const MESSAGE_LIMITS = { pfinder: 140, shout: 250 } as const;
 const DAY = 86_400_000;
 
+export type MessageKind = keyof typeof MESSAGE_LIMITS;
+export const isMessageKind = (v: unknown): v is MessageKind => typeof v === 'string' && Object.hasOwn(MESSAGE_LIMITS, v);
+/** In-game chat is one line: line breaks become spaces. */
+export const cleanMessage = (v: string) => v.replace(/\s*[\r\n]+\s*/g, ' ').trim();
+/** Characters as Postgres's char_length counts them (code points, not UTF-16 units). */
+export const messageLength = (v: string) => [...v].length;
+export interface RecruitmentMessage { kind: MessageKind; body: string; ign: string; updated_at: string }
+
 export interface PfinderSession { id: number; discord_id: string; ign: string; started_at: string; ended_at: string | null }
-export interface Shout { id: number; discord_id: string; ign: string; shouted_at: string; slot: number; note: string | null }
+export interface Shout { id: number; discord_id: string; ign: string; shouted_at: string; slot: number }
 
 export interface DaySummary {
   ms: number;

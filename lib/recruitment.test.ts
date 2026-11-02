@@ -74,7 +74,7 @@ describe('splitByDay', () => {
 describe('summarize', () => {
   const s = (id: number, ign: string, start: string, end: string | null): PfinderSession =>
     ({ id, discord_id: String(id), ign, started_at: start, ended_at: end });
-  const shout = (at: string): Shout => ({ id: 1, discord_id: '1', ign: 'A', shouted_at: at, slot: 1, note: null });
+  const shout = (at: string): Shout => ({ id: 1, discord_id: '1', ign: 'A', shouted_at: at, slot: 1 });
   const app = (at: string): Application => ({ id: 1, ign: 'New', status: 'pending', submitted_at: at });
 
   it('adds up time per local day and per member, counting open sessions to now', () => {
