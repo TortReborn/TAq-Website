@@ -198,6 +198,32 @@ export async function logSession(actor: Actor, start: Date, end: Date, db: Pool 
   });
 }
 
+/**
+ * Correct a session's times: your own, or anyone's when canManage. `end` is
+ * null only to leave an open session open (moving its clock-in); a finished
+ * session keeps an end. The same limits as logging apply.
+ */
+export async function updateSession(id: number, actor: Actor, canManage: boolean, start: Date, end: Date | null, db: Pool = getPool()): Promise<PfinderSession> {
+  notFuture(end ?? start, end ? 'The end time' : 'The start time');
+  if (end && end <= start) throw new RecruitmentError('The end has to be after the start.', 400);
+  if (end && end.getTime() - start.getTime() > MAX_SESSION_MS) throw new RecruitmentError(`A session can be at most ${MAX_SESSION_HOURS} hours.`, 400);
+  return tx(db, async c => {
+    const { rows: [s] } = await c.query(`SELECT ${SESSION_COLS} FROM recruitment_pfinder_sessions WHERE id = $1 FOR UPDATE`, [id]);
+    if (!s) throw new RecruitmentError('That session is already gone.', 404);
+    if (s.discord_id !== actor.id && !canManage) throw new RecruitmentError('You can only change your own sessions.', 403);
+    if (!end && s.ended_at) throw new RecruitmentError('A finished session needs an end time.', 400);
+    if (!end && Date.now() - start.getTime() > MAX_SESSION_MS) {
+      throw new RecruitmentError(`That would make the open session over ${MAX_SESSION_HOURS} hours. Set when it ended instead.`, 400);
+    }
+    await lockMember(c, s.discord_id);
+    await assertNoOverlap(c, s.discord_id, start, end, id);
+    const { rows: [r] } = await c.query(
+      `UPDATE recruitment_pfinder_sessions SET started_at = $2, ended_at = $3 WHERE id = $1 RETURNING ${SESSION_COLS}`, [id, start, end]);
+    await audit(c, actor, `Changed ${s.ign}'s pfinder session #${id} from ${stamp(s.started_at)}–${s.ended_at ? stamp(s.ended_at) : 'open'} to ${stamp(start)}–${end ? stamp(end) : 'open'}`);
+    return toSession(r);
+  });
+}
+
 /** Your own session, or anyone's when canManage. */
 export async function deleteSession(id: number, actor: Actor, canManage: boolean, db: Pool = getPool()): Promise<void> {
   await tx(db, async c => {
@@ -231,6 +257,37 @@ export async function logShout(actor: Actor, at: Date, db: Pool = getPool()): Pr
     });
   } catch (e: any) {
     if (e?.code === '23505') throw new RecruitmentError('Someone logged a shout at the same moment. Refresh and check the count.');
+    throw e;
+  }
+}
+
+/**
+ * Correct when a shout went out: your own, or anyone's when canManage. On the
+ * same UTC day it keeps its slot; moved to another day it takes that day's
+ * first free slot, and is refused if the day is full.
+ */
+export async function updateShout(id: number, actor: Actor, canManage: boolean, at: Date, db: Pool = getPool()): Promise<Shout> {
+  notFuture(at, 'The shout time');
+  try {
+    return await tx(db, async c => {
+      const { rows: [s] } = await c.query(`SELECT ${SHOUT_COLS} FROM recruitment_shouts WHERE id = $1 FOR UPDATE`, [id]);
+      if (!s) throw new RecruitmentError('That shout is already gone.', 404);
+      if (s.discord_id !== actor.id && !canManage) throw new RecruitmentError('You can only change shouts you logged.', 403);
+      const { rows: [r] } = await c.query(
+        utcDay(at) === utcDay(s.shouted_at)
+          ? `UPDATE recruitment_shouts SET shouted_at = $2 WHERE id = $1 RETURNING ${SHOUT_COLS}`
+          : `UPDATE recruitment_shouts SET shouted_at = $2, slot = free.s
+             FROM (SELECT s FROM generate_series(1, $3::int) s
+                   WHERE s NOT IN (SELECT slot FROM recruitment_shouts WHERE shout_day = ($2::timestamptz AT TIME ZONE 'UTC')::date)
+                   ORDER BY s LIMIT 1) free
+             WHERE id = $1 RETURNING ${SHOUT_COLS}`,
+        utcDay(at) === utcDay(s.shouted_at) ? [id, at] : [id, at, SHOUTS_PER_DAY]);
+      if (!r) throw new RecruitmentError(`All ${SHOUTS_PER_DAY} shouts for ${utcDay(at)} (UTC) are already logged.`);
+      await audit(c, actor, `Moved ${s.ign}'s shout from ${stamp(s.shouted_at)} to ${stamp(at)}`);
+      return toShout(r);
+    });
+  } catch (e: any) {
+    if (e?.code === '23505') throw new RecruitmentError('Someone logged a shout on that day at the same moment. Refresh and check the count.');
     throw e;
   }
 }
