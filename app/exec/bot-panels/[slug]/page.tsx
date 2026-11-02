@@ -152,6 +152,10 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
   const serverRegistry = useMemo(() => scopedRegistry(registry, server), [registry, server]);
 
   const needsChannel = !template && !draft?.channelId;
+  // An archived panel keeps its history but can't publish until restored (TAQ-144)
+  const archived = !!data?.panel.archived_at;
+  const [archiving, setArchiving] = useState(false);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
 
   if (isLoading || (!draft && !error)) return <div style={{ color: 'var(--text-secondary)', padding: '2rem' }}>Loading panel…</div>;
   if (error || !data || !draft) return <div style={{ color: '#ef4444', padding: '2rem' }}>Error: {error?.message ?? 'Panel not found'}</div>;
@@ -201,6 +205,18 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
     mutate();
   };
 
+  const setArchived = async (to: boolean) => {
+    if (to && !confirm(`Archive "${data.panel.name}"? Its messages stay in Discord as they are, and its history stays here. Restore it any time from the Archive.`)) return;
+    setArchiving(true); setArchiveError(null);
+    const res = await fetch(`/api/exec/bot-panels/${slug}/archive`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archived: to }),
+    });
+    const body = await res.json().catch(() => ({}));
+    setArchiving(false);
+    if (!res.ok) { setArchiveError(body.error ?? 'Failed to update the panel'); return; }
+    await mutate();
+  };
+
   const restore = (rev: number, content: PanelContent, channelId: string | null) => {
     setDraft({ content, channelId: channelId ?? draft.channelId, baseRev: latest?.rev_number ?? null, restoredFrom: rev });
     setNote(`Revert to revision ${rev}`);
@@ -217,7 +233,13 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
         <Link href="/exec/bot-panels" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none' }}>← Bot Messages</Link>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{data.panel.name}</h1>
         {latestMeta && <StatusBadge status={latestMeta.status} posted={!!template || data.panel.message_ids.length > 0} />}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem' }}>
+        {!template && !archived && (
+          <button onClick={() => setArchived(true)} disabled={archiving}
+            style={{ ...btnStyle, marginLeft: 'auto', background: 'transparent', color: 'var(--text-secondary)', opacity: archiving ? 0.5 : 1 }}>
+            {archiving ? 'Archiving…' : 'Archive'}
+          </button>
+        )}
+        <div style={{ marginLeft: !template && !archived ? 0 : 'auto', display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem' }}>
           {(['edit', 'history'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ ...btnStyle, background: tab === t ? '#3b82f6' : 'transparent', color: tab === t ? '#fff' : 'var(--text-secondary)' }}>
               {t === 'edit' ? 'Edit' : `History (${data.revisions.length})`}
@@ -226,6 +248,19 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
 
+      {archived && (
+        <div style={{ ...banner('#eab308'), display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <span>
+            <strong>Archived</strong> by {data.panel.archived_by ?? 'unknown'}, {timeAgo(data.panel.archived_at)}. Its messages were left in Discord as they are,
+            and its history is kept below. Restore it to edit and publish again.
+          </span>
+          <button onClick={() => setArchived(false)} disabled={archiving}
+            style={{ ...smallBtn, marginLeft: 'auto', background: '#3b82f6', color: '#fff', opacity: archiving ? 0.5 : 1 }}>
+            {archiving ? 'Restoring…' : 'Restore'}
+          </button>
+        </div>
+      )}
+      {archiveError && <div style={banner('#ef4444')}>{archiveError}</div>}
       <LatestStatus meta={latestMeta} panel={data.panel} registry={registry} />
       {template && <TemplateInfo slug={slug} template={template} content={draft.content} valid={validation.length === 0} />}
 
@@ -340,13 +375,13 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
                   placeholder="What changed? (shown in the history)" style={inputStyle} />
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <button onClick={() => publish(false)}
-                    disabled={saving || !dirty || validation.length > 0 || adoptProblems.length > 0 || needsChannel}
-                    style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: saving || !dirty || validation.length > 0 || adoptProblems.length > 0 || needsChannel ? 0.45 : 1 }}>
+                    disabled={saving || archived || !dirty || validation.length > 0 || adoptProblems.length > 0 || needsChannel}
+                    style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: saving || archived || !dirty || validation.length > 0 || adoptProblems.length > 0 || needsChannel ? 0.45 : 1 }}>
                     {saving ? 'Publishing…' : template ? 'Publish' : 'Publish to Discord'}
                   </button>
                   {dirty && <button onClick={discard} style={{ ...btnStyle, background: 'transparent', color: 'var(--text-secondary)' }}>Discard</button>}
                   <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {needsChannel ? 'Pick a channel first' : dirty ? 'Unsaved changes' : 'No changes'}
+                    {archived ? 'Restore the panel to publish' : needsChannel ? 'Pick a channel first' : dirty ? 'Unsaved changes' : 'No changes'}
                   </span>
                 </div>
                 {validation.length > 0 && dirty && (

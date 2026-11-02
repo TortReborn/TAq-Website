@@ -104,6 +104,9 @@ export interface PanelSummary {
   published_rev: number | null;
   /** Set on a template panel: the event that sends it */
   template: string | null;
+  /** Set while the panel is archived (TAQ-144): history kept, publishing off, Discord untouched */
+  archived_at: string | null;
+  archived_by: string | null;
   updated_at: string;
   latest_rev: number | null;
   latest_status: RevisionStatus | null;
@@ -150,11 +153,11 @@ export function channelGuild(registry: PanelRegistry | null, channelId: string |
 export interface PanelGroup<P> { key: string; label: string; panels: P[] }
 
 /** The panel list split for the Bot Messages page (TAQ-143): templates first,
- *  then one group per server, main first. A server's panels follow its channel
+ *  then one group per server, main first, then the Archive (TAQ-144). A server's panels follow its channel
  *  list as Discord shows it, which is the registry's order (forum posts sit
  *  under their forum); panels in a channel the registry doesn't know go last
  *  in the main server's group. Empty groups are left out. */
-export function groupPanels<P extends Pick<PanelSummary, 'name' | 'channel_id' | 'template'>>(
+export function groupPanels<P extends Pick<PanelSummary, 'name' | 'channel_id' | 'template' | 'archived_at'>>(
   panels: P[], registry: PanelRegistry | null,
 ): PanelGroup<P>[] {
   const position = new Map(registry?.channels.map((c, i) => [c.id, i]) ?? []);
@@ -172,13 +175,17 @@ export function groupPanels<P extends Pick<PanelSummary, 'name' | 'channel_id' |
   for (const g of ordered) server.set(g.id, { key: g.id, label: g.name, panels: [] });
   const fallback: PanelGroup<P> = server.get(ordered[0]?.id ?? '') ?? { key: 'panels', label: 'Panels', panels: [] };
   groups.push(...(server.size ? server.values() : [fallback]));
+  const archive: PanelGroup<P> = { key: 'archive', label: 'Archive', panels: [] };
+  groups.push(archive);
 
   for (const p of panels) {
-    if (p.template) groups[0].panels.push(p);
+    if (p.archived_at) archive.panels.push(p);
+    else if (p.template) groups[0].panels.push(p);
     else (server.get(channelGuild(registry, p.channel_id) ?? '') ?? fallback).panels.push(p);
   }
   groups[0].panels.sort(byName);
-  for (const g of groups.slice(1)) g.panels.sort(inChannelOrder);
+  for (const g of groups.slice(1, -1)) g.panels.sort(inChannelOrder);
+  archive.panels.sort(byName);
   return groups.filter(g => g.panels.length > 0);
 }
 
