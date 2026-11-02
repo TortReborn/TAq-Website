@@ -68,7 +68,7 @@ export default function AspectsTab() {
         <h2 style={h2}>Recent distributions</h2>
         {data.recent.length === 0 ? <div style={muted}>None yet.</div> : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr><th style={th}>When</th><th style={th}>By</th><th style={th}>Aspects</th><th style={th}>Emeralds</th><th style={th}>Recipients</th></tr></thead>
+            <thead><tr><th style={th}>When</th><th style={th}>By</th><th style={th}>Aspects</th><th style={th}>Recipients</th></tr></thead>
             <tbody>{data.recent.map(d => {
               const owed = d.recipients.filter(r => r.source === 'uncollected');
               return (
@@ -76,7 +76,6 @@ export default function AspectsTab() {
                   <td style={{ ...td, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{ago(d.created_at)} ago</td>
                   <td style={td}>{d.by ?? '?'}</td>
                   <td style={td}>{d.total_aspects}</td>
-                  <td style={td}>{d.total_emeralds ? d.total_emeralds.toLocaleString() : '—'}</td>
                   <td style={{ ...td, color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
                     {d.recipients.map(r => `${r.ign}${r.count > 1 ? ` ×${r.count}` : ''}`).join(', ')}
                     {owed.length > 0 && <span style={{ color: 'var(--text-muted)' }}> ({owed.length} paid owed aspects)</span>}

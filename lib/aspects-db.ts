@@ -19,7 +19,7 @@ export interface AspectOverview {
   rotation: { position: number; uuid: string; ign: string | null }[];
   rotation_size: number;
   rotation_updated_at: string | null;
-  recent: { id: number; created_at: string; by: string | null; total_aspects: number; total_emeralds: number; recipients: AspectRecipient[] }[];
+  recent: { id: number; created_at: string; by: string | null; total_aspects: number; recipients: AspectRecipient[] }[];
   blacklist: { uuid: string; ign: string | null; added_at: string }[];
 }
 
@@ -37,7 +37,7 @@ export async function getAspectOverview(): Promise<AspectOverview> {
     pool.query(`SELECT queue, marker, updated_at::text FROM aspect_queue WHERE id = 1`),
     pool.query(`
       SELECT id, created_at::text, COALESCE(distributed_by_ign, distributed_by::text) AS by,
-             total_aspects, COALESCE(total_emeralds, 0) AS total_emeralds, distributions AS recipients
+             total_aspects, distributions AS recipients
       FROM distribution_log ORDER BY created_at DESC LIMIT 15`),
     pool.query(`
       SELECT b.uuid::text, ${name('b')} AS ign, b.added_at::text
