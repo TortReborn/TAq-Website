@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import {
-  RecruitmentError, clockIn, clockOut, deleteSession, deleteShout, getLive, getRange, logSession, logShout, saveMessage,
+  RecruitmentError, clockIn, clockOut, deleteSession, deleteShout, getLive, getRange, logSession, logShout, saveMessage, updateSession, updateShout,
 } from './recruitment-db';
 
 // Integration test against the local test database. The tables are made from
@@ -139,6 +139,34 @@ describe.skipIf(!available)('recruitment-db', () => {
       expect(await refused(logSession(A, ago(2), ago(3), pool), 400)).toMatch(/after the start/);
     });
 
+    it('corrects a session within the same limits, and only yours unless a manager', async () => {
+      const s = await logSession(A, ago(5), ago(3), pool);
+      const moved = await updateSession(s.id, A, false, ago(6), ago(4), pool);
+      expect(Date.parse(moved.ended_at!) - Date.parse(moved.started_at)).toBe(2 * H);
+      expect(await refused(updateSession(s.id, B, false, ago(6), ago(4), pool), 403)).toMatch(/your own/);
+      await updateSession(s.id, B, true, ago(7), ago(5), pool);
+      expect(await refused(updateSession(s.id, A, false, ago(3), ago(4), pool), 400)).toMatch(/after the start/);
+      expect(await refused(updateSession(s.id, A, false, ago(30), ago(4), pool), 400)).toMatch(/at most 24/);
+      expect(await refused(updateSession(s.id, A, false, ago(5), null, pool), 400)).toMatch(/needs an end/);
+      // not onto another of the owner's sessions, but it may overlap its own old times
+      await logSession(A, ago(3), ago(2), pool);
+      expect(await refused(updateSession(s.id, A, false, ago(4), ago(2.5), pool))).toMatch(/overlaps/);
+      await updateSession(s.id, A, false, ago(6), ago(3.5), pool);
+      const { rows } = await pool.query(`SELECT count(*)::int AS n FROM audit_log WHERE action LIKE 'Changed%'`);
+      expect(rows[0].n).toBe(3);
+    });
+
+    it('moves the clock-in of an open session and keeps it open', async () => {
+      const s = await clockIn(A, ago(1), pool);
+      const moved = await updateSession(s.id, A, false, ago(2), null, pool);
+      expect(moved.ended_at).toBeNull();
+      expect(Date.parse(moved.started_at)).toBeLessThan(Date.parse(s.started_at));
+      expect(await refused(updateSession(s.id, A, false, ago(30), null, pool), 400)).toMatch(/over 24 hours/);
+      // giving it an end clocks it out
+      expect((await updateSession(s.id, A, false, ago(2), ago(1), pool)).ended_at).not.toBeNull();
+      expect((await getLive(pool)).open).toEqual([]);
+    });
+
     it('lets you delete your own session, and only a manager delete others', async () => {
       const s = await logSession(A, ago(3), ago(2), pool);
       expect(await refused(deleteSession(s.id, B, false, pool), 403)).toMatch(/your own/);
@@ -204,6 +232,24 @@ describe.skipIf(!available)('recruitment-db', () => {
       await logShout(B, new Date(day + 24 * H), pool);
       const { shouts } = await getRange(new Date('2026-10-01T00:00Z'), new Date('2026-11-01T00:00Z'), pool);
       expect(shouts.map(s => s.slot)).toEqual([1, 2, 3, 1]);
+    });
+
+    it('moves a shout within its day keeping its slot, and to another day only into a free slot', async () => {
+      const day = new Date('2026-10-01T00:00Z').getTime();
+      await logShout(A, new Date(day + H), pool);
+      const second = await logShout(A, new Date(day + 2 * H), pool);
+      expect((await updateShout(second.id, A, false, new Date(day + 5 * H), pool)).slot).toBe(2);
+      expect(await refused(updateShout(second.id, B, false, new Date(day + 6 * H), pool), 403)).toMatch(/you logged/);
+      // the next day has slot 1 taken, so it lands in 2
+      await logShout(B, new Date(day + 25 * H), pool);
+      const moved = await updateShout(second.id, B, true, new Date(day + 26 * H), pool);
+      expect([moved.slot, moved.shouted_at]).toEqual([2, '2026-10-02T02:00:00.000Z']);
+      // and the first day's slot 2 is free again
+      expect((await logShout(A, new Date(day + 7 * H), pool)).slot).toBe(2);
+      // a full day refuses it
+      await logShout(A, new Date(day + 8 * H), pool);
+      expect(await refused(updateShout(moved.id, A, false, new Date(day + 9 * H), pool))).toMatch(/All 3 shouts for 2026-10-01/);
+      expect(await refused(updateShout(moved.id, A, false, new Date(Date.now() + H), pool), 400)).toMatch(/future/);
     });
 
     it('frees a slot when a shout is deleted', async () => {
