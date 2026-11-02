@@ -521,7 +521,7 @@ function Calendar({ data, view, setView, anchor, setAnchor, range, now, busy, ru
 
       <div style={{ opacity: current ? 1 : 0.4 }}>
         {view === 'week'
-          ? <WeekGrid data={current ? data : null} from={range.from} days={days} today={today} now={now} selected={selected} onSelect={setSelected} />
+          ? <WeekGrid data={current ? data : null} from={range.from} days={days} today={today} now={now} selected={selected} onSelect={setSelected} busy={busy} run={run} />
           : <MonthGrid month={month} days={current ? days : {}} today={today} onPick={day => { setAnchor(day); setSelected(day); setView('week'); }} />}
       </div>
 
@@ -582,9 +582,9 @@ function useFitHourPx(ref: React.RefObject<HTMLElement | null>, deps: unknown[])
   return hourPx;
 }
 
-function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
+function WeekGrid({ data, from, days, today, now, selected, onSelect, busy, run }: {
   data: Data | null; from: string; days: Record<string, DaySummary>; today: string; now: number;
-  selected: string | null; onSelect: (day: string) => void;
+  selected: string | null; onSelect: (day: string) => void; busy: boolean; run: Run;
 }) {
   const clock = useClock();
   const gridRef = useRef<HTMLDivElement>(null);
@@ -592,13 +592,29 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
   const hourPx = useFitHourPx(gridRef, [data]);
   const week = Array.from({ length: 7 }, (_, i) => clock.addDays(from, i));
   const cols = '2.4rem repeat(7, minmax(0, 1fr))';
-  // The card under the pointer for whatever it's over: who, when, how long
+  // The card under the pointer for whatever it's over: who, when, how long.
+  // A click pins it where it is, to edit or delete the entry, until its x.
+  const rootRef = useRef<HTMLDivElement>(null);
   const [tip, setTip] = useState<(TipContent & { x: number; y: number }) | null>(null);
+  const [pinned, setPinned] = useState<(TipContent & { x: number; y: number }) | null>(null);
   const hover = (content: TipContent) => ({
     onMouseEnter: (e: React.MouseEvent) => setTip({ ...content, x: e.clientX, y: e.clientY }),
     onMouseMove: (e: React.MouseEvent) => setTip({ ...content, x: e.clientX, y: e.clientY }),
     onMouseLeave: () => setTip(null),
+    onClick: (e: React.MouseEvent) => {
+      const box = rootRef.current!.getBoundingClientRect();
+      setPinned({ ...content, x: e.clientX - box.left, y: e.clientY - box.top });
+      setTip(null);
+    },
   });
+  useEffect(() => {
+    if (!pinned) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPinned(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [pinned]);
+  // a different week takes the entry off the page
+  useEffect(() => setPinned(null), [from]);
   const at = (t: string) => `${clock.dateFmt(clock.day(t), { weekday: 'short', month: 'short', day: 'numeric' })} ${clock.time(t)}`;
   const span = (from: string, to: string | null) => {
     const sameDay = to !== null && clock.day(from) === clock.day(to);
@@ -606,8 +622,9 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
   };
 
   return (
-    <div>
-      {tip && <Tooltip tip={tip} />}
+    <div ref={rootRef} style={{ position: 'relative' }}>
+      {tip && !pinned && <Tooltip tip={tip} />}
+      {pinned && data && <PinnedCard key={entryKey(pinned)} tip={pinned} me={data.me} busy={busy} run={run} onClose={() => setPinned(null)} />}
       {/* Day headers: date, pfinder total, shouts and applications; pick a day for its details below */}
       <div style={{ display: 'grid', gridTemplateColumns: cols, gap: '0.25rem', marginBottom: '0.25rem' }}>
         <div />
@@ -655,7 +672,7 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
                 const s = b.session;
                 const total = (s.ended_at ? Date.parse(s.ended_at) : now) - Date.parse(s.started_at);
                 const content: TipContent = {
-                  kind: 'Pfinder session', accent: 'var(--chart-seq-3)', who: s.ign,
+                  kind: 'Pfinder session', accent: 'var(--chart-seq-3)', who: s.ign, entry: { kind: 'session', session: s },
                   rows: [span(s.started_at, s.ended_at), s.ended_at ? formatDuration(total) : `${formatDuration(total)} so far, still clocked in`],
                 };
                 const height = Math.max(3, (b.endMin - b.startMin) / 60 * hourPx);
@@ -675,7 +692,7 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
               {/* shouts label on the right, applications on the left, so the two don't stack */}
               {shouts.map(s => (
                 <Marker key={`s${s.id}`} min={clock.wallMinutes(s.shouted_at)} hourPx={hourPx} side="right" line="var(--text-secondary)"
-                  tip={{ kind: 'Shout', accent: 'var(--text-secondary)', who: s.ign, rows: [at(s.shouted_at), `Shout ${s.slot} of ${SHOUTS_PER_DAY} on ${utcDay(s.shouted_at)} (UTC)`] }}
+                  tip={{ kind: 'Shout', accent: 'var(--text-secondary)', who: s.ign, entry: { kind: 'shout', shout: s }, rows: [at(s.shouted_at), `Shout ${s.slot} of ${SHOUTS_PER_DAY} on ${utcDay(s.shouted_at)} (UTC)`] }}
                   hover={hover} label={`Shout ${clock.time(s.shouted_at)}`} />
               ))}
               {apps.map(a => (
@@ -703,14 +720,130 @@ function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
           <span style={{ width: '0.8rem', borderTop: '2px solid #ef4444' }} />now
         </span>
-        <span>Times in {clock.zone}. Hover a session, shout or application for who and when.</span>
+        <span>Times in {clock.zone}. Hover a session, shout or application for who and when; click a session or shout to fix or remove it.</span>
       </div>
     </div>
   );
 }
 
-/** What the week view's hover card says about one session, shout or application. */
-interface TipContent { kind: string; who: string; rows: string[]; accent: string }
+/** What the week view's hover card says about one session, shout or application, and the entry it's about. */
+interface TipContent {
+  kind: string; who: string; rows: string[]; accent: string;
+  entry?: { kind: 'session'; session: PfinderSession } | { kind: 'shout'; shout: Shout };
+}
+
+const entryKey = (t: TipContent) =>
+  t.entry?.kind === 'session' ? `session${t.entry.session.id}` : t.entry?.kind === 'shout' ? `shout${t.entry.shout.id}` : `${t.kind}${t.who}${t.rows[0]}`;
+
+const cardStyle = (accent: string): React.CSSProperties => ({
+  background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderLeft: `3px solid ${accent}`,
+  borderRadius: '0.5rem', padding: '0.45rem 0.6rem', boxShadow: '0 8px 24px rgba(0,0,0,0.35)', fontSize: '0.78rem', color: 'var(--text-primary)',
+});
+
+function TipBody({ tip }: { tip: TipContent }) {
+  return (
+    <>
+      <div style={{ ...muted, fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{tip.kind}</div>
+      <div style={{ fontWeight: 700, fontSize: '0.9rem', margin: '0.1rem 0 0.15rem' }}>{tip.who}</div>
+      {tip.rows.map((r, i) => <div key={i} style={{ color: i === 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{r}</div>)}
+    </>
+  );
+}
+
+/**
+ * A clicked entry's card, held where it was clicked until its x (or Escape).
+ * The entry's owner, or Narwhal+, can correct its time or remove it there.
+ */
+function PinnedCard({ tip, me, busy, run, onClose }: {
+  tip: TipContent & { x: number; y: number }; me: Data['me']; busy: boolean; run: Run; onClose: () => void;
+}) {
+  const clock = useClock();
+  const ref = useRef<HTMLDivElement>(null);
+  const entry = tip.entry;
+  const owner = entry?.kind === 'session' ? entry.session.discord_id : entry?.kind === 'shout' ? entry.shout.discord_id : null;
+  const canEdit = owner !== null && (owner === me.discord_id || me.can_manage);
+  const stillOpen = entry?.kind === 'session' && !entry.session.ended_at;
+  const [editing, setEditing] = useState(false);
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+  // beside the click, flipped left or up where it would run off the calendar
+  const [flip, setFlip] = useState({ x: false, y: false });
+  useLayoutEffect(() => {
+    const el = ref.current, parent = el?.offsetParent as HTMLElement | null;
+    if (!el || !parent) return;
+    setFlip({ x: tip.x + 14 + el.offsetWidth > parent.clientWidth, y: tip.y + 14 + el.offsetHeight > parent.clientHeight });
+  }, [tip.x, tip.y, editing]);
+
+  const edit = () => {
+    if (entry?.kind === 'session') {
+      setStart(clock.toInput(Date.parse(entry.session.started_at)));
+      setEnd(entry.session.ended_at ? clock.toInput(Date.parse(entry.session.ended_at)) : '');
+    } else if (entry?.kind === 'shout') {
+      setStart(clock.toInput(Date.parse(entry.shout.shouted_at)));
+    }
+    setEditing(true);
+  };
+  // the card closes once the change is in; on an error it stays, with the times as typed
+  const save = () => run(async () => {
+    if (entry?.kind === 'session') {
+      await send(`/api/exec/recruitment/pfinder/${entry.session.id}`, 'PATCH', { started_at: clock.fromInput(start), ended_at: end ? clock.fromInput(end) : null });
+      onClose();
+      return `Changed ${entry.session.ign}'s session.`;
+    }
+    if (entry?.kind === 'shout') {
+      await send(`/api/exec/recruitment/shouts/${entry.shout.id}`, 'PATCH', { at: clock.fromInput(start) });
+      onClose();
+      return `Moved ${entry.shout.ign}'s shout.`;
+    }
+    return '';
+  });
+  const remove = () => {
+    if (!entry || !confirm(`Remove this ${entry.kind === 'session' ? 'pfinder session' : 'shout'}?`)) return;
+    run(async () => {
+      if (entry.kind === 'session') await send(`/api/exec/recruitment/pfinder/${entry.session.id}`, 'DELETE');
+      else await send(`/api/exec/recruitment/shouts/${entry.shout.id}`, 'DELETE');
+      onClose();
+      return entry.kind === 'session' ? 'Removed the session.' : 'Removed the shout.';
+    });
+  };
+  const small: React.CSSProperties = { padding: '0.3rem 0.7rem' };
+  const field: React.CSSProperties = { ...input, width: '100%', boxSizing: 'border-box', marginTop: '0.15rem' };
+
+  return (
+    <div ref={ref} role="dialog" aria-label={`${tip.kind}: ${tip.who}`} onClick={e => e.stopPropagation()} style={{
+      ...cardStyle(tip.accent), position: 'absolute', zIndex: 60, width: '17rem',
+      left: tip.x + (flip.x ? -14 : 14), top: tip.y + (flip.y ? -14 : 14),
+      transform: `translate(${flip.x ? '-100%' : '0'}, ${flip.y ? '-100%' : '0'})`,
+    }}>
+      <button aria-label="Close" onClick={onClose}
+        style={{ position: 'absolute', top: '0.3rem', right: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.05rem', lineHeight: 1 }}>×</button>
+      <TipBody tip={tip} />
+      {canEdit && !editing && (
+        <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+          <button style={{ ...navBtn, ...small }} disabled={busy} onClick={edit}>Edit time</button>
+          <button style={{ ...btn('#ef4444'), ...small }} disabled={busy} onClick={remove}>Delete</button>
+        </div>
+      )}
+      {canEdit && editing && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginTop: '0.5rem' }}>
+          <label style={muted}>{entry?.kind === 'shout' ? 'Shouted at' : 'Start'} ({clock.zone})
+            <input type="datetime-local" style={field} value={start} onChange={e => setStart(e.target.value)} />
+          </label>
+          {entry?.kind === 'session' && (
+            <label style={muted}>End{stillOpen && ' (empty while still clocked in)'}
+              <input type="datetime-local" style={field} value={end} onChange={e => setEnd(e.target.value)} />
+            </label>
+          )}
+          <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+            <button style={{ ...navBtn, ...small }} onClick={() => setEditing(false)}>Cancel</button>
+            <button style={{ ...btn('#3b82f6'), ...small }} disabled={busy || !start || (entry?.kind === 'session' && !stillOpen && !end)} onClick={save}>Save</button>
+          </div>
+        </div>
+      )}
+      {owner !== null && !canEdit && <div style={{ ...muted, marginTop: '0.4rem' }}>Only {tip.who} or Narwhal+ can change this.</div>}
+    </div>
+  );
+}
 
 /** The hover card, beside the pointer; it flips left or up near the window's edge. */
 function Tooltip({ tip }: { tip: TipContent & { x: number; y: number } }) {
@@ -718,14 +851,10 @@ function Tooltip({ tip }: { tip: TipContent & { x: number; y: number } }) {
   const flipY = tip.y > window.innerHeight - 120;
   return (
     <div role="tooltip" style={{
-      position: 'fixed', left: tip.x + (flipX ? -14 : 14), top: tip.y + (flipY ? -14 : 14), zIndex: 60, pointerEvents: 'none',
+      ...cardStyle(tip.accent), position: 'fixed', left: tip.x + (flipX ? -14 : 14), top: tip.y + (flipY ? -14 : 14), zIndex: 60, pointerEvents: 'none',
       transform: `translate(${flipX ? '-100%' : '0'}, ${flipY ? '-100%' : '0'})`, maxWidth: '18rem',
-      background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderLeft: `3px solid ${tip.accent}`,
-      borderRadius: '0.5rem', padding: '0.45rem 0.6rem', boxShadow: '0 8px 24px rgba(0,0,0,0.35)', fontSize: '0.78rem', color: 'var(--text-primary)',
     }}>
-      <div style={{ ...muted, fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{tip.kind}</div>
-      <div style={{ fontWeight: 700, fontSize: '0.9rem', margin: '0.1rem 0 0.15rem' }}>{tip.who}</div>
-      {tip.rows.map((r, i) => <div key={i} style={{ color: i === 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{r}</div>)}
+      <TipBody tip={tip} />
     </div>
   );
 }
@@ -736,7 +865,7 @@ function Marker({ min, hourPx, side, line, tip, hover, label }: {
   hover: (c: TipContent) => Record<string, (e: React.MouseEvent) => void>; label: string;
 }) {
   return (
-    // a 10px band around the 2px line, so it's easy to hover
+    // a 10px band around the 2px line, so it's easy to hover and click
     <div aria-label={`${tip.kind}: ${tip.who}, ${tip.rows.join(', ')}`} {...hover(tip)}
       style={{ position: 'absolute', top: min / 60 * hourPx - 5, height: 10, left: 0, right: 0, zIndex: 1, display: 'flex', alignItems: 'center' }}>
       <div style={{ borderTop: `2px solid ${line}`, width: '100%' }} />
