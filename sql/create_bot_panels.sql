@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS bot_panels (
     channel_id    BIGINT,                          -- where the live messages are
     message_ids   BIGINT[]     NOT NULL DEFAULT '{}',  -- live bot messages, top to bottom
     published_rev INT,                             -- rev_number now live in Discord
+    template      VARCHAR(32)  UNIQUE,             -- set: never posted, sent on this event (TAQ-142)
     created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
