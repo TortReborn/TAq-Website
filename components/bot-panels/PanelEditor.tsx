@@ -11,7 +11,8 @@ import {
   type PanelButton, type PanelContent, type PanelEmbed, type PanelMessage, type PanelRegistry,
 } from '@/lib/bot-panels';
 import MentionTextArea, { EmojiInput } from './MentionTextArea';
-import { valuesToReadable } from '@/lib/panel-values';
+import { useIsTemplate, usePanelValues } from './values';
+import { MEMBER_AVATAR, fillValues, valuesToReadable } from '@/lib/panel-values';
 
 // ---- shared styles (match the other exec pages) ----
 
@@ -117,14 +118,22 @@ function UploadButton({ onUploaded, label = 'Upload' }: { onUploaded: (url: stri
 
 /** URL field that also takes an upload; shows a thumbnail of what it holds. */
 function ImageField({ label, value, onChange }: { label: string; value?: string; onChange: (v: string) => void }) {
-  const src = imageSrc(value);
+  const values = usePanelValues();
+  const template = useIsTemplate();
+  const avatar = value === MEMBER_AVATAR;
+  const src = imageSrc(fillValues(value, values));
   return (
     <div>
       <label style={labelStyle}>{label}</label>
       <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {src && <img src={src} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />}
-        <input value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder="https://… or upload" style={inputStyle} />
+        {avatar
+          ? <span style={{ ...inputStyle, color: 'var(--text-secondary)' }}>The member&apos;s avatar</span>
+          : <input value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder="https://… or upload" style={inputStyle} />}
+        {template && !avatar && (
+          <button type="button" onClick={() => onChange(MEMBER_AVATAR)} style={{ ...ghostBtn, whiteSpace: 'nowrap' }}>Member avatar</button>
+        )}
         <UploadButton onUploaded={onChange} />
         {value && <button type="button" onClick={() => onChange('')} style={dangerBtn} aria-label={`Clear ${label}`}>✕</button>}
       </div>
@@ -295,6 +304,7 @@ function ButtonEditor({ button, onChange, onRemove, registry }: {
   const role = button.kind === 'role' ? roles.find(r => r.id === button.role_id) : undefined;
   // Only roles the bot's safety rule allows (no permissions, not bot-managed, below Tort)
   const assignable = roles.filter(r => r.assignable !== false);
+  const template = useIsTemplate();
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '7.5rem minmax(0, 1fr) 10rem auto', gap: '0.35rem', alignItems: 'center', padding: '0.4rem', background: 'var(--bg-primary)', borderRadius: '0.375rem' }}>
@@ -305,8 +315,9 @@ function ButtonEditor({ button, onChange, onRemove, registry }: {
             ? { kind: 'role', role_id: '', label: button.label, emoji: button.emoji }
             : { kind: 'action', action: registry?.actions[0]?.key ?? '', label: button.label, emoji: button.emoji })}>
         <option value="link">Link</option>
-        <option value="action">Bot button</option>
-        <option value="role">Role toggle</option>
+        {/* A template goes to one member, often by DM: nothing there could answer these */}
+        {(!template || button.kind === 'action') && <option value="action">Bot button</option>}
+        {(!template || button.kind === 'role') && <option value="role">Role toggle</option>}
       </select>
       {button.kind === 'link' ? (
         <input value={button.url} placeholder="https://…" onChange={e => onChange({ ...button, url: e.target.value })} style={{ ...inputStyle, gridColumn: 'span 2' }} />
@@ -416,6 +427,7 @@ function MessageEditor({ message, mi, count, edit, registry, onFocus }: {
   const embeds = message.embeds ?? [];
   const images = message.images ?? [];
   const box = message.layout === LAYOUT_BOX;
+  const template = useIsTemplate();
 
   // Embeds -> box: their text joins the box text and the first one's colour is kept.
   // Box -> embeds: the text becomes one embed. Images and buttons carry over.
@@ -517,14 +529,16 @@ function MessageEditor({ message, mi, count, edit, registry, onFocus }: {
 
         <RowsEditor message={message} mi={mi} edit={edit} registry={registry} />
 
-        <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-          <input type="checkbox" checked={message.dynamic === DYNAMIC_SHELL_EXCHANGE}
-            onChange={ev => edit(d => {
-              d.messages.forEach(m => { delete m.dynamic; });
-              if (ev.target.checked) d.messages[mi].dynamic = DYNAMIC_SHELL_EXCHANGE;
-            })} />
-          Add the shell exchange rate images after this message&apos;s {box ? 'images' : 'embeds'}
-        </label>
+        {(!template || message.dynamic) && (
+          <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+            <input type="checkbox" checked={message.dynamic === DYNAMIC_SHELL_EXCHANGE}
+              onChange={ev => edit(d => {
+                d.messages.forEach(m => { delete m.dynamic; });
+                if (ev.target.checked) d.messages[mi].dynamic = DYNAMIC_SHELL_EXCHANGE;
+              })} />
+            Add the shell exchange rate images after this message&apos;s {box ? 'images' : 'embeds'}
+          </label>
+        )}
       </div>
     </details>
   );
