@@ -2,22 +2,23 @@
 
 /**
  * Recruitment (TAQ-140): exec members clock in and out of pfinder recruiting
- * and log the guild's shouts. The calendar shows how much pfindering each
- * day had and how many of the day's 3 shouts went out. Every day and time on
- * the page is UTC, the days the shout limit resets on.
+ * and log the guild's shouts. The calendar opens on the week, which draws
+ * each session at the times it covered and each shout at the minute it went
+ * out; the month view zooms out to how much pfindering each day had. Every
+ * day and time on the page is UTC, the days the shout limit resets on.
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
 import {
-  MAX_SESSION_HOURS, SHADE_LEGEND, SHOUTS_PER_DAY, formatDuration, monthWeeks, nextUtcMidnight, shadeStep,
-  shiftMonth, splitByUtcDay, summarize, utcDay, utcTime,
+  MAX_SESSION_HOURS, SHADE_LEGEND, SHOUTS_PER_DAY, addDays, dayBlocks, formatDuration, monthWeeks, nextUtcMidnight,
+  shadeStep, shiftMonth, splitByUtcDay, summarize, utcDay, utcTime, weekStart,
   type PfinderSession, type Shout,
 } from '@/lib/recruitment';
 
 interface Data {
-  month: string; sessions: PfinderSession[]; shouts: Shout[]; open: PfinderSession[]; today: Shout[];
+  from: string; to: string; sessions: PfinderSession[]; shouts: Shout[]; open: PfinderSession[]; today: Shout[];
   me: { discord_id: string; can_manage: boolean };
 }
 
@@ -47,16 +48,35 @@ async function send(url: string, method: string, body?: unknown) {
 const toInput = (ms: number) => new Date(ms).toISOString().slice(0, 16);
 const fromInput = (v: string) => `${v}:00Z`;
 
-const monthLabel = (month: string) =>
-  new Date(`${month}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const dayLabel = (day: string) =>
-  new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const dateFmt = (day: string, opts: Intl.DateTimeFormatOptions) =>
+  new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { ...opts, timeZone: 'UTC' });
+const monthLabel = (month: string) => dateFmt(`${month}-01`, { month: 'long', year: 'numeric' });
+const dayLabel = (day: string) => dateFmt(day, { weekday: 'long', month: 'long', day: 'numeric' });
+const weekLabel = (start: string) => {
+  const end = addDays(start, 6);
+  const sameMonth = start.slice(0, 7) === end.slice(0, 7);
+  return `${dateFmt(start, { month: 'short', day: 'numeric' })} – ${dateFmt(end, sameMonth ? { day: 'numeric' } : { month: 'short', day: 'numeric' })}, ${end.slice(0, 4)}`;
+};
 
 type Run = (fn: () => Promise<string>) => Promise<void>;
+type View = 'week' | 'month';
+
+/** The days the calendar shows: the week, or the month's whole grid including its neighbours' days. */
+function visibleRange(view: View, anchor: string): { from: string; to: string } {
+  if (view === 'week') {
+    const from = weekStart(anchor);
+    return { from, to: addDays(from, 7) };
+  }
+  const weeks = monthWeeks(anchor.slice(0, 7));
+  return { from: weeks[0][0], to: addDays(weeks.at(-1)![6], 1) };
+}
 
 export default function RecruitmentPage() {
-  const [month, setMonth] = useState(() => utcDay(Date.now()).slice(0, 7));
-  const { data, error, mutate } = useSWR<Data>(`/api/exec/recruitment?month=${month}`, fetcher, { refreshInterval: 30000, keepPreviousData: true });
+  const [view, setView] = useState<View>('week');
+  // The day the calendar is on; its week or month is what's shown
+  const [anchor, setAnchor] = useState(() => utcDay(Date.now()));
+  const { from, to } = visibleRange(view, anchor);
+  const { data, error, mutate } = useSWR<Data>(`/api/exec/recruitment?from=${from}&to=${to}`, fetcher, { refreshInterval: 30000, keepPreviousData: true });
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
   // Open sessions count up to now; tick so the durations and the calendar move.
@@ -93,7 +113,8 @@ export default function RecruitmentPage() {
             <Pfinder data={data} now={now} busy={busy} run={run} />
             <Shouts data={data} now={now} busy={busy} run={run} />
           </div>
-          <Calendar data={data} month={month} setMonth={setMonth} now={now} busy={busy} run={run} />
+          <Calendar data={data} view={view} setView={setView} anchor={anchor} setAnchor={setAnchor}
+            range={{ from, to }} now={now} busy={busy} run={run} />
         </>
       )}
     </div>
@@ -244,96 +265,63 @@ function DeleteButton({ show, busy, label, onClick }: { show: boolean; busy: boo
   );
 }
 
-function Calendar({ data, month, setMonth, now, busy, run }: {
-  data: Data; month: string; setMonth: (m: string) => void; now: number; busy: boolean; run: Run;
+const navBtn: React.CSSProperties = { ...btn('var(--bg-primary)'), color: 'var(--text-primary)', border: '1px solid var(--border-card)' };
+
+function Calendar({ data, view, setView, anchor, setAnchor, range, now, busy, run }: {
+  data: Data; view: View; setView: (v: View) => void; anchor: string; setAnchor: (d: string) => void;
+  range: { from: string; to: string }; now: number; busy: boolean; run: Run;
 }) {
   const today = utcDay(now);
   const [selected, setSelected] = useState<string | null>(today);
   const days = useMemo(() => summarize(data.sessions, data.shouts, now), [data.sessions, data.shouts, now]);
-  // keepPreviousData shows the last month while the next loads; don't draw it under the new heading
-  const current = data.month === month;
+  // keepPreviousData shows the last range while the next loads; don't draw it under the new heading
+  const current = data.from === range.from && data.to === range.to;
+  const month = anchor.slice(0, 7);
+  // The totals cover what the heading names: the week, or the month without its neighbours' days
+  const counts = (day: string) => (view === 'week' ? day >= range.from && day < range.to : day.startsWith(month));
 
-  const totals = useMemo(() => {
+  const totals = (() => {
     const people: Record<string, number> = {};
     let ms = 0, active = 0, shouts = 0;
     for (const [day, d] of Object.entries(days)) {
-      if (!day.startsWith(month)) continue;
+      if (!counts(day)) continue;
       ms += d.ms; shouts += d.shouts; if (d.ms > 0) active++;
       for (const [ign, t] of Object.entries(d.people)) people[ign] = (people[ign] ?? 0) + t;
     }
     return { ms, active, shouts, people: Object.entries(people).sort((a, b) => b[1] - a[1]) };
-  }, [days, month]);
+  })();
+
+  const shift = (by: number) => setAnchor(view === 'week' ? addDays(anchor, 7 * by) : `${shiftMonth(month, by)}-01`);
 
   return (
     <section style={card}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-        <h2 style={{ ...h2, margin: 0 }}>{monthLabel(month)}</h2>
+        <h2 style={{ ...h2, margin: 0 }}>{view === 'week' ? weekLabel(range.from) : monthLabel(month)}</h2>
+        <div role="tablist" aria-label="Calendar view" style={{ display: 'flex', border: '1px solid var(--border-card)', borderRadius: '0.375rem', overflow: 'hidden' }}>
+          {(['week', 'month'] as const).map(v => (
+            <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}
+              style={{ ...btn(view === v ? 'var(--chart-tile-active)' : 'var(--bg-primary)'), borderRadius: 0, color: 'var(--text-primary)', fontWeight: view === v ? 700 : 500 }}>
+              {v === 'week' ? 'Week' : 'Month'}
+            </button>
+          ))}
+        </div>
         <div style={{ display: 'flex', gap: '0.25rem', marginLeft: 'auto' }}>
-          <button style={{ ...btn('var(--bg-primary)'), color: 'var(--text-primary)', border: '1px solid var(--border-card)' }} aria-label="Previous month"
-            onClick={() => { setMonth(shiftMonth(month, -1)); setSelected(null); }}>‹</button>
-          <button style={{ ...btn('var(--bg-primary)'), color: 'var(--text-primary)', border: '1px solid var(--border-card)' }}
-            onClick={() => { setMonth(today.slice(0, 7)); setSelected(today); }}>This month</button>
-          <button style={{ ...btn('var(--bg-primary)'), color: 'var(--text-primary)', border: '1px solid var(--border-card)' }} aria-label="Next month"
-            onClick={() => { setMonth(shiftMonth(month, 1)); setSelected(null); }}>›</button>
+          <button style={navBtn} aria-label={`Previous ${view}`} onClick={() => shift(-1)}>‹</button>
+          <button style={navBtn} onClick={() => { setAnchor(today); setSelected(today); }}>Today</button>
+          <button style={navBtn} aria-label={`Next ${view}`} onClick={() => shift(1)}>›</button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '0.25rem', opacity: current ? 1 : 0.4 }}>
-        {WEEKDAYS.map(w => <div key={w} style={{ ...muted, fontSize: '0.7rem', fontWeight: 600, textAlign: 'center', textTransform: 'uppercase' }}>{w}</div>)}
-        {monthWeeks(month).flat().map((day, i) => {
-          if (!day) return <div key={`pad-${i}`} />;
-          const d = current ? days[day] : undefined;
-          const ms = d?.ms ?? 0, shouts = d?.shouts ?? 0;
-          const future = day > today;
-          const isSel = day === selected;
-          const desc = `${dayLabel(day)}: ${ms ? `${formatDuration(ms)} pfinder` : 'no pfinder'}, ${shouts} of ${SHOUTS_PER_DAY} shouts`;
-          return (
-            <button key={day} onClick={() => setSelected(isSel ? null : day)} aria-label={desc} aria-pressed={isSel} title={desc}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.2rem', minWidth: 0, overflow: 'hidden',
-                minHeight: '4.2rem', padding: '0.35rem 0.4rem', borderRadius: '0.5rem', cursor: 'pointer', textAlign: 'left',
-                background: isSel ? 'var(--chart-tile-active)' : 'var(--bg-primary)',
-                border: day === today ? '2px solid var(--color-ocean-400)' : '1px solid var(--border-card)',
-                opacity: future ? 0.45 : 1, color: 'var(--text-primary)',
-              }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>{Number(day.slice(8))}</span>
-              {ms > 0 && (
-                <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0 0.25rem', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                  <span style={{ width: '0.6rem', height: '0.6rem', borderRadius: '2px', flexShrink: 0, background: SHADES[shadeStep(ms)] }} />
-                  {formatDuration(ms)}
-                </span>
-              )}
-              {shouts > 0 && (
-                <span style={{ display: 'flex', gap: '2px' }} aria-hidden>
-                  {Array.from({ length: SHOUTS_PER_DAY }, (_, k) => (
-                    <span key={k} style={{
-                      width: '0.4rem', height: '0.4rem', borderRadius: '50%',
-                      background: k < shouts ? 'var(--text-secondary)' : 'transparent', border: '1px solid var(--text-muted)',
-                    }} />
-                  ))}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '0.6rem', ...muted, fontSize: '0.72rem' }}>
-        <span>Pfinder time:</span>
-        {SHADE_LEGEND.map((label, i) => (
-          <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-            <span style={{ width: '0.6rem', height: '0.6rem', borderRadius: '2px', background: SHADES[i + 1] }} />{label}
-          </span>
-        ))}
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: '0.4rem', height: '0.4rem', borderRadius: '50%', background: 'var(--text-secondary)' }} />one shout
-        </span>
+      <div style={{ opacity: current ? 1 : 0.4 }}>
+        {view === 'week'
+          ? <WeekGrid data={current ? data : null} from={range.from} days={days} today={today} now={now} selected={selected} onSelect={setSelected} />
+          : <MonthGrid month={month} days={current ? days : {}} today={today} onPick={day => { setAnchor(day); setSelected(day); setView('week'); }} />}
       </div>
 
       {current && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))', gap: '1rem', marginTop: '1rem' }}>
           <div>
-            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>This month</div>
+            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>{view === 'week' ? 'This week' : 'This month'}</div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
               <b>{formatDuration(totals.ms)}</b> of pfinder over <b>{totals.active}</b> day{totals.active === 1 ? '' : 's'} · <b>{totals.shouts}</b> shout{totals.shouts === 1 ? '' : 's'}
             </div>
@@ -348,10 +336,187 @@ function Calendar({ data, month, setMonth, now, busy, run }: {
               </table>
             )}
           </div>
-          {selected?.startsWith(month) && <DayDetail day={selected} data={data} now={now} busy={busy} run={run} />}
+          {view === 'week' && selected && selected >= range.from && selected < range.to && (
+            <DayDetail day={selected} data={data} now={now} busy={busy} run={run} />
+          )}
         </div>
       )}
     </section>
+  );
+}
+
+/** Pixels per hour in the week view: the whole day fits without scrolling. */
+const HOUR_PX = 26;
+const HOUR_LABELS = [0, 3, 6, 9, 12, 15, 18, 21];
+
+function WeekGrid({ data, from, days, today, now, selected, onSelect }: {
+  data: Data | null; from: string; days: ReturnType<typeof summarize>; today: string; now: number;
+  selected: string | null; onSelect: (day: string) => void;
+}) {
+  const week = Array.from({ length: 7 }, (_, i) => addDays(from, i));
+  const nowMin = (now - Date.parse(`${today}T00:00:00Z`)) / 60_000;
+  const cols = '2.4rem repeat(7, minmax(0, 1fr))';
+
+  return (
+    <div>
+      {/* Day headers: date, pfinder total and shouts; pick a day for its details below */}
+      <div style={{ display: 'grid', gridTemplateColumns: cols, gap: '0.25rem', marginBottom: '0.25rem' }}>
+        <div />
+        {week.map((day, i) => {
+          const d = data ? days[day] : undefined;
+          const isSel = day === selected;
+          return (
+            <button key={day} onClick={() => onSelect(day)} aria-pressed={isSel}
+              aria-label={`${dayLabel(day)}: ${d?.ms ? `${formatDuration(d.ms)} pfinder` : 'no pfinder'}, ${d?.shouts ?? 0} of ${SHOUTS_PER_DAY} shouts`}
+              style={{
+                minWidth: 0, overflow: 'hidden', padding: '0.3rem 0.35rem', borderRadius: '0.5rem', cursor: 'pointer', textAlign: 'left',
+                background: isSel ? 'var(--chart-tile-active)' : 'var(--bg-primary)', color: 'var(--text-primary)',
+                border: day === today ? '2px solid var(--color-ocean-400)' : '1px solid var(--border-card)',
+              }}>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>{WEEKDAYS[i]}</div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{Number(day.slice(8))}</div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', minHeight: '0.9rem' }}>{d?.ms ? formatDuration(d.ms) : ''}</div>
+              <ShoutPips n={d?.shouts ?? 0} />
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Time grid: 00:00 at the top, 24:00 at the bottom */}
+      <div style={{ display: 'grid', gridTemplateColumns: cols, gap: '0.25rem' }}>
+        <div style={{ position: 'relative', height: 24 * HOUR_PX }}>
+          {HOUR_LABELS.map(h => (
+            <span key={h} style={{ position: 'absolute', top: h * HOUR_PX - 6, right: '0.2rem', fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+              {String(h).padStart(2, '0')}:00
+            </span>
+          ))}
+        </div>
+        {week.map(day => {
+          const { blocks, lanes } = data ? dayBlocks(data.sessions, day, now) : { blocks: [], lanes: 1 };
+          const shouts = data ? data.shouts.filter(s => utcDay(s.shouted_at) === day) : [];
+          return (
+            <div key={day} onClick={() => onSelect(day)} style={{
+              position: 'relative', height: 24 * HOUR_PX, minWidth: 0, overflow: 'hidden', cursor: 'pointer',
+              borderRadius: '0.375rem', border: '1px solid var(--border-card)',
+              background: `repeating-linear-gradient(to bottom, transparent 0, transparent ${HOUR_PX - 1}px, var(--border-card) ${HOUR_PX - 1}px, var(--border-card) ${HOUR_PX}px), var(--bg-primary)`,
+            }}>
+              {blocks.map(b => {
+                const s = b.session;
+                const tip = `${s.ign} · ${utcTime(s.started_at)}–${s.ended_at ? utcTime(s.ended_at) : 'now'} UTC · ${formatDuration((b.endMin - b.startMin) * 60_000)}`;
+                const height = Math.max(3, (b.endMin - b.startMin) / 60 * HOUR_PX);
+                return (
+                  <div key={s.id} title={tip} aria-label={tip} style={{
+                    position: 'absolute', top: b.startMin / 60 * HOUR_PX, height,
+                    left: `calc(${(b.lane / lanes) * 100}% + 1px)`, width: `calc(${100 / lanes}% - 2px)`,
+                    background: 'color-mix(in srgb, var(--chart-seq-3) 28%, var(--bg-card-solid))',
+                    borderLeft: '3px solid var(--chart-seq-3)', borderRadius: '3px',
+                    borderBottom: s.ended_at ? undefined : '2px dashed var(--chart-seq-3)',
+                    padding: height > 14 ? '1px 3px' : 0, overflow: 'hidden', fontSize: '0.64rem', lineHeight: 1.25, color: 'var(--text-primary)',
+                  }}>
+                    {height > 14 && <div style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.ign}</div>}
+                    {height > 28 && <div style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{utcTime(s.started_at)}–{s.ended_at ? utcTime(s.ended_at) : 'now'}</div>}
+                  </div>
+                );
+              })}
+              {shouts.map(s => {
+                const min = (Date.parse(s.shouted_at) - Date.parse(`${day}T00:00:00Z`)) / 60_000;
+                const tip = `Shout at ${utcTime(s.shouted_at)} UTC by ${s.ign}${s.note ? ` · ${s.note}` : ''}`;
+                return (
+                  <div key={`s${s.id}`} title={tip} aria-label={tip} style={{ position: 'absolute', top: min / 60 * HOUR_PX - 1, left: 0, right: 0, zIndex: 1 }}>
+                    <div style={{ borderTop: '2px solid var(--text-secondary)' }} />
+                    <span style={{
+                      position: 'absolute', right: 2, top: -8, fontSize: '0.58rem', fontWeight: 700, padding: '0 3px', borderRadius: '3px',
+                      background: 'var(--bg-card-solid)', color: 'var(--text-primary)', border: '1px solid var(--text-secondary)', whiteSpace: 'nowrap',
+                    }}>Shout {utcTime(s.shouted_at)}</span>
+                  </div>
+                );
+              })}
+              {day === today && (
+                <div aria-hidden style={{ position: 'absolute', top: nowMin / 60 * HOUR_PX - 1, left: 0, right: 0, borderTop: '2px solid #ef4444', zIndex: 2 }} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '0.6rem', ...muted, fontSize: '0.72rem' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: '0.8rem', height: '0.6rem', borderLeft: '3px solid var(--chart-seq-3)', background: 'color-mix(in srgb, var(--chart-seq-3) 28%, var(--bg-card-solid))' }} />pfinder session
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: '0.8rem', borderTop: '2px solid var(--text-secondary)' }} />shout
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: '0.8rem', borderTop: '2px solid #ef4444' }} />now
+        </span>
+        <span>Hover a session or shout for its exact time.</span>
+      </div>
+    </div>
+  );
+}
+
+function ShoutPips({ n }: { n: number }) {
+  if (!n) return null;
+  return (
+    <span style={{ display: 'flex', gap: '2px' }} aria-hidden>
+      {Array.from({ length: SHOUTS_PER_DAY }, (_, k) => (
+        <span key={k} style={{
+          width: '0.4rem', height: '0.4rem', borderRadius: '50%',
+          background: k < n ? 'var(--text-secondary)' : 'transparent', border: '1px solid var(--text-muted)',
+        }} />
+      ))}
+    </span>
+  );
+}
+
+function MonthGrid({ month, days, today, onPick }: {
+  month: string; days: ReturnType<typeof summarize>; today: string; onPick: (day: string) => void;
+}) {
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '0.25rem' }}>
+        {WEEKDAYS.map(w => <div key={w} style={{ ...muted, fontSize: '0.7rem', fontWeight: 600, textAlign: 'center', textTransform: 'uppercase' }}>{w}</div>)}
+        {monthWeeks(month).flat().map(day => {
+          const d = days[day];
+          const ms = d?.ms ?? 0, shouts = d?.shouts ?? 0;
+          // the neighbouring months' days fill the first and last rows, dimmed
+          const outside = !day.startsWith(month);
+          const desc = `${dayLabel(day)}: ${ms ? `${formatDuration(ms)} pfinder` : 'no pfinder'}, ${shouts} of ${SHOUTS_PER_DAY} shouts. Open its week`;
+          return (
+            <button key={day} onClick={() => onPick(day)} aria-label={desc} title={desc}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.2rem', minWidth: 0, overflow: 'hidden',
+                minHeight: '4.2rem', padding: '0.35rem 0.4rem', borderRadius: '0.5rem', cursor: 'pointer', textAlign: 'left',
+                background: 'var(--bg-primary)', color: 'var(--text-primary)',
+                border: day === today ? '2px solid var(--color-ocean-400)' : '1px solid var(--border-card)',
+                opacity: outside ? 0.4 : day > today ? 0.6 : 1,
+              }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>
+                {Number(day.slice(8))}{outside && Number(day.slice(8)) === 1 ? ` ${dateFmt(day, { month: 'short' })}` : ''}
+              </span>
+              {ms > 0 && (
+                <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0 0.25rem', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ width: '0.6rem', height: '0.6rem', borderRadius: '2px', flexShrink: 0, background: SHADES[shadeStep(ms)] }} />
+                  {formatDuration(ms)}
+                </span>
+              )}
+              <ShoutPips n={shouts} />
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '0.6rem', ...muted, fontSize: '0.72rem' }}>
+        <span>Pfinder time:</span>
+        {SHADE_LEGEND.map((label, i) => (
+          <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ width: '0.6rem', height: '0.6rem', borderRadius: '2px', background: SHADES[i + 1] }} />{label}
+          </span>
+        ))}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: '0.4rem', height: '0.4rem', borderRadius: '50%', background: 'var(--text-secondary)' }} />one shout
+        </span>
+        <span>Pick a day to open its week.</span>
+      </div>
+    </>
   );
 }
 

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import {
-  RecruitmentError, clockIn, clockOut, deleteSession, deleteShout, getLive, getMonth, logSession, logShout,
+  RecruitmentError, clockIn, clockOut, deleteSession, deleteShout, getLive, getRange, logSession, logShout,
 } from './recruitment-db';
 
 // Integration test against the local test database. The tables are made from
@@ -132,12 +132,12 @@ describe.skipIf(!available)('recruitment-db', () => {
       expect(await refused(deleteSession(s.id, A, false, pool), 404)).toMatch(/gone/);
     });
 
-    it('returns sessions overlapping a month, open ones included', async () => {
+    it('returns sessions overlapping a range, open ones included', async () => {
       await pool.query(`INSERT INTO recruitment_pfinder_sessions (discord_id, ign, started_at, ended_at) VALUES
         (100, 'Alpha', '2026-10-31T23:00Z', '2026-11-01T01:00Z'),
         (100, 'Alpha', '2026-10-30T10:00Z', '2026-10-30T11:00Z'),
         (200, 'Bravo', '2026-11-20T10:00Z', NULL)`);
-      const { sessions } = await getMonth('2026-11', pool);
+      const { sessions } = await getRange(new Date('2026-11-01T00:00Z'), new Date('2026-12-01T00:00Z'), pool);
       expect(sessions.map(s => s.started_at)).toEqual(['2026-10-31T23:00:00.000Z', '2026-11-20T10:00:00.000Z']);
     });
   });
@@ -151,7 +151,7 @@ describe.skipIf(!available)('recruitment-db', () => {
       expect(await refused(logShout(B, new Date(day + 23.5 * H), null, pool))).toMatch(/All 3 shouts for 2026-10-01/);
       // the next UTC day starts fresh
       await logShout(B, new Date(day + 24 * H), null, pool);
-      const { shouts } = await getMonth('2026-10', pool);
+      const { shouts } = await getRange(new Date('2026-10-01T00:00Z'), new Date('2026-11-01T00:00Z'), pool);
       expect(shouts.map(s => s.slot)).toEqual([1, 2, 3, 1]);
       expect(shouts[1].note).toBe('world 12');
     });

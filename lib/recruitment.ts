@@ -63,14 +63,59 @@ export function shiftMonth(month: string, by: number): string {
   return new Date(Date.UTC(y, m - 1 + by, 1)).toISOString().slice(0, 7);
 }
 
-/** The month's days as Monday-first weeks; null pads the first and last week. */
-export function monthWeeks(month: string): (string | null)[][] {
-  const { start, end } = monthRange(month);
-  const cells: (string | null)[] = Array((start.getUTCDay() + 6) % 7).fill(null);
-  for (let t = start.getTime(); t < end.getTime(); t += DAY) cells.push(utcDay(t));
-  while (cells.length % 7) cells.push(null);
-  const weeks: (string | null)[][] = [];
-  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+/** 'YYYY-MM-DD' if it is a real day, else null. */
+export function parseDay(v: string | null | undefined): string | null {
+  return v && /^\d{4}-\d{2}-\d{2}$/.test(v) && utcDay(`${v}T00:00:00Z`) === v ? v : null;
+}
+
+export const addDays = (day: string, n: number) => utcDay(Date.parse(`${day}T00:00:00Z`) + n * DAY);
+
+/** The Monday starting day's week. */
+export function weekStart(day: string): string {
+  const dow = new Date(`${day}T00:00:00Z`).getUTCDay();
+  return addDays(day, -((dow + 6) % 7));
+}
+
+/** The longest range the page asks for at once: a month view's 31 days, with room to spare. */
+export const MAX_RANGE_DAYS = 62;
+
+export interface DayBlock { session: PfinderSession; startMin: number; endMin: number; lane: number }
+
+/**
+ * Sessions' parts on one UTC day, in minutes from midnight, for the week
+ * view. Sessions that overlap in time share the column side by side: each
+ * takes the first lane free at its start, and `lanes` is how many the day needs.
+ */
+export function dayBlocks(sessions: PfinderSession[], day: string, now: number): { blocks: DayBlock[]; lanes: number } {
+  const dayStart = Date.parse(`${day}T00:00:00Z`);
+  const parts = sessions
+    .map(s => {
+      const start = Math.max(Date.parse(s.started_at), dayStart);
+      const end = Math.min(s.ended_at ? Date.parse(s.ended_at) : now, dayStart + DAY);
+      return { session: s, startMin: (start - dayStart) / 60_000, endMin: (end - dayStart) / 60_000 };
+    })
+    .filter(p => p.endMin > p.startMin)
+    .sort((a, b) => a.startMin - b.startMin || b.endMin - a.endMin);
+  const laneEnds: number[] = [];
+  const blocks = parts.map(p => {
+    let lane = laneEnds.findIndex(end => end <= p.startMin);
+    if (lane < 0) lane = laneEnds.length;
+    laneEnds[lane] = p.endMin;
+    return { ...p, lane };
+  });
+  return { blocks, lanes: Math.max(1, laneEnds.length) };
+}
+
+/**
+ * The month as Monday-first weeks, the first and last filled out with the
+ * neighbouring months' days, as a wall calendar shows them.
+ */
+export function monthWeeks(month: string): string[][] {
+  const { end } = monthRange(month);
+  const first = weekStart(`${month}-01`);
+  const last = addDays(weekStart(utcDay(end.getTime() - DAY)), 7);
+  const weeks: string[][] = [];
+  for (let d = first; d < last; d = addDays(d, 7)) weeks.push(Array.from({ length: 7 }, (_, i) => addDays(d, i)));
   return weeks;
 }
 

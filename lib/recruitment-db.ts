@@ -8,7 +8,7 @@
 import type { Pool, PoolClient } from 'pg';
 import { getPool } from '@/lib/db';
 import {
-  MAX_SESSION_HOURS, SHOUTS_PER_DAY, monthRange, utcDay, utcTime,
+  MAX_SESSION_HOURS, SHOUTS_PER_DAY, utcDay, utcTime,
   type PfinderSession, type Shout,
 } from '@/lib/recruitment';
 
@@ -59,9 +59,8 @@ function notFuture(at: Date, what: string) {
   if (at.getTime() > Date.now() + FUTURE_SLACK_MS) throw new RecruitmentError(`${what} can't be in the future.`, 400);
 }
 
-/** Sessions overlapping the month (open ones included) and its shouts. */
-export async function getMonth(month: string, db: Pool = getPool()): Promise<{ sessions: PfinderSession[]; shouts: Shout[] }> {
-  const { start, end } = monthRange(month);
+/** Sessions overlapping [start, end) (open ones included) and the shouts in it. */
+export async function getRange(start: Date, end: Date, db: Pool = getPool()): Promise<{ sessions: PfinderSession[]; shouts: Shout[] }> {
   const [sessions, shouts] = await Promise.all([
     db.query(`SELECT ${SESSION_COLS} FROM recruitment_pfinder_sessions
               WHERE started_at < $2 AND (ended_at IS NULL OR ended_at > $1) ORDER BY started_at`, [start, end]),
