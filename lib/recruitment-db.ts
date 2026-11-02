@@ -9,7 +9,7 @@ import type { Pool, PoolClient } from 'pg';
 import { getPool } from '@/lib/db';
 import {
   MAX_SESSION_HOURS, SHOUTS_PER_DAY, utcDay, utcTime,
-  type PfinderSession, type Shout,
+  type Application, type PfinderSession, type Shout,
 } from '@/lib/recruitment';
 
 export interface Actor { id: string; name: string }
@@ -59,15 +59,24 @@ function notFuture(at: Date, what: string) {
   if (at.getTime() > Date.now() + FUTURE_SLACK_MS) throw new RecruitmentError(`${what} can't be in the future.`, 400);
 }
 
-/** Sessions overlapping [start, end) (open ones included) and the shouts in it. */
-export async function getRange(start: Date, end: Date, db: Pool = getPool()): Promise<{ sessions: PfinderSession[]; shouts: Shout[] }> {
-  const [sessions, shouts] = await Promise.all([
+/**
+ * Sessions overlapping [start, end) (open ones included), the shouts in it,
+ * and the guild applications submitted in it: what the recruiting led to.
+ */
+export async function getRange(start: Date, end: Date, db: Pool = getPool()): Promise<{ sessions: PfinderSession[]; shouts: Shout[]; applications: Application[] }> {
+  const [sessions, shouts, applications] = await Promise.all([
     db.query(`SELECT ${SESSION_COLS} FROM recruitment_pfinder_sessions
               WHERE started_at < $2 AND (ended_at IS NULL OR ended_at > $1) ORDER BY started_at`, [start, end]),
     db.query(`SELECT ${SHOUT_COLS} FROM recruitment_shouts
               WHERE shouted_at >= $1 AND shouted_at < $2 ORDER BY shouted_at`, [start, end]),
+    db.query(`SELECT id, answers->>'ign' AS ign, status, submitted_at FROM applications
+              WHERE application_type = 'guild' AND submitted_at >= $1 AND submitted_at < $2 ORDER BY submitted_at`, [start, end]),
   ]);
-  return { sessions: sessions.rows.map(toSession), shouts: shouts.rows.map(toShout) };
+  return {
+    sessions: sessions.rows.map(toSession),
+    shouts: shouts.rows.map(toShout),
+    applications: applications.rows.map(r => ({ id: r.id, ign: r.ign, status: r.status, submitted_at: r.submitted_at.toISOString() })),
+  };
 }
 
 /** Who is clocked in right now, and today's (UTC) shouts. */
