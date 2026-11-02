@@ -1,29 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isNarwhalRank, requireExecSession } from '@/lib/exec-auth';
-import { MAX_RANGE_DAYS, addDays, parseDay, utcDay, weekStart } from '@/lib/recruitment';
+import { MAX_RANGE_DAYS, parseTime } from '@/lib/recruitment';
 import { getLive, getRange } from '@/lib/recruitment-db';
 
 export const dynamic = 'force-dynamic';
 
-// GET ?from=YYYY-MM-DD&to=YYYY-MM-DD (UTC days, `to` exclusive; defaults to
-// this week) — the range's pfinder sessions and shouts, who is clocked in
-// now, and today's (UTC) shouts
+const DAY = 86_400_000;
+
+// GET ?from=ISO&to=ISO (`to` exclusive; the browser sends its own local
+// midnights, defaulting to the last 7 days) — the range's pfinder sessions,
+// shouts and guild applications, who is clocked in now, and today's (UTC) shouts
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const params = request.nextUrl.searchParams;
-  const from = parseDay(params.get('from')) ?? weekStart(utcDay(Date.now()));
-  const to = parseDay(params.get('to')) ?? addDays(from, 7);
-  if (to <= from || to > addDays(from, MAX_RANGE_DAYS)) {
-    return NextResponse.json({ error: `Ask for 1 to ${MAX_RANGE_DAYS} days` }, { status: 400 });
+  const to = parseTime(params.get('to')) ?? new Date();
+  const from = parseTime(params.get('from')) ?? new Date(to.getTime() - 7 * DAY);
+  if (to <= from || to.getTime() - from.getTime() > MAX_RANGE_DAYS * DAY) {
+    return NextResponse.json({ error: `Ask for up to ${MAX_RANGE_DAYS} days` }, { status: 400 });
   }
   try {
-    const [{ sessions, shouts }, { open, today }] = await Promise.all([
-      getRange(new Date(`${from}T00:00:00Z`), new Date(`${to}T00:00:00Z`)),
-      getLive(),
-    ]);
+    const [{ sessions, shouts, applications }, { open, today }] = await Promise.all([getRange(from, to), getLive()]);
     return NextResponse.json({
-      from, to, sessions, shouts, open, today,
+      from: from.toISOString(), to: to.toISOString(), sessions, shouts, applications, open, today,
       me: { discord_id: session.discord_id, can_manage: isNarwhalRank(session.rank) },
     });
   } catch (error) {
