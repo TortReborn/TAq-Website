@@ -31,3 +31,10 @@ describe('panel values', () => {
     expect(normalizeContent({ messages: [{ content: '{{shells_per_aspect}} hi' }] }).errors).toEqual([]);
   });
 });
+
+describe('template values (TAQ-142)', () => {
+  it('read as {Label} in the editor like panel values', () => {
+    expect(valuesToReadable('Hi {{member}} ({{ign}})')).toBe('Hi {Member} ({IGN})');
+    expect(valuesFromReadable('Hi {member} ({IGN})')).toBe('Hi {{member}} ({{ign}})');
+  });
+});

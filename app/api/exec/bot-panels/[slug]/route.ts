@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { LIMITS, channelGuild, isForum, normalizeContent, parseMessageLink, scopedRegistry } from '@/lib/bot-panels';
-import { createRevision, getPanel, getRegistry, messageOwner, RevisionConflict } from '@/lib/bot-panels-db';
+import { createRevision, getPanel, getPanelTemplate, getRegistry, messageOwner, RevisionConflict } from '@/lib/bot-panels-db';
 import { getPanelValues } from '@/lib/panel-values-db';
 
 export const dynamic = 'force-dynamic';
@@ -43,15 +43,17 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  let registry;
+  let registry, template;
   try {
-    registry = await getRegistry();
+    [registry, template] = await Promise.all([getRegistry(), getPanelTemplate(slug)]);
   } catch (error) {
     console.error('Bot panel registry fetch error:', error);
     return NextResponse.json({ error: 'Failed to load the bot registry' }, { status: 500 });
   }
+  if (template === undefined) return NextResponse.json({ error: 'Panel not found' }, { status: 404 });
 
-  let channelId = typeof body?.channel_id === 'string' ? body.channel_id.trim() : '';
+  // A template is never posted (TAQ-142): no channel, no messages to take over.
+  let channelId = template ? '' : typeof body?.channel_id === 'string' ? body.channel_id.trim() : '';
 
   // Role buttons are checked against the server the panel posts in (TAQ-115).
   const roles = scopedRegistry(registry, channelGuild(registry, channelId))?.roles;
@@ -59,13 +61,14 @@ export async function POST(
     actionKeys: registry ? new Set(registry.actions.map(a => a.key)) : undefined,
     roles: roles ? new Map(roles.map(r => [r.id, r])) : undefined,
     forum: isForum(registry, channelId),
+    template: !!template,
   });
   if (!content) return NextResponse.json({ error: errors[0], errors }, { status: 400 });
 
   // Taking over messages that are already in Discord (posted by /generate)
   let adoptMessageIds: string[] | null = null;
   const adoptLinks: unknown[] = Array.isArray(body?.adopt_links) ? body.adopt_links.filter((l: unknown) => typeof l === 'string' && l.trim()) : [];
-  if (adoptLinks.length) {
+  if (adoptLinks.length && !template) {
     if (adoptLinks.length > LIMITS.messages) {
       return NextResponse.json({ error: `Link at most ${LIMITS.messages} messages` }, { status: 400 });
     }
@@ -94,7 +97,7 @@ export async function POST(
     }
   }
 
-  if (!SNOWFLAKE_RE.test(channelId)) {
+  if (!template && !SNOWFLAKE_RE.test(channelId)) {
     return NextResponse.json({ error: 'Pick a channel for this panel' }, { status: 400 });
   }
 
@@ -105,7 +108,7 @@ export async function POST(
 
   try {
     const rev = await createRevision(slug, {
-      content, channelId, adoptMessageIds, note, restoredFrom, baseRev,
+      content, channelId: template ? null : channelId, adoptMessageIds, note, restoredFrom, baseRev,
       force: body?.force === true,
       authorId: session.discord_id,
       authorName: session.ign || session.discord_username,

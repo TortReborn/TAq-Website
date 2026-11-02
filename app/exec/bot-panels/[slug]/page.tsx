@@ -5,12 +5,13 @@ import { use, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
 import {
-  channelGuild, contentToText, isForum, normalizeContent, parseMessageLink, scopedRegistry, toReadable,
+  PANEL_TEMPLATES, channelGuild, contentToText, isForum, normalizeContent, parseMessageLink, scopedRegistry, toReadable,
   type PanelContent, type PanelRegistry, type PanelSummary, type RevisionMeta,
 } from '@/lib/bot-panels';
+import { TEMPLATE_SAMPLES } from '@/lib/panel-values';
 import { diffCollapsed } from '@/lib/wiki-diff';
 import ChannelPicker from '@/components/bot-panels/ChannelPicker';
-import { PanelValuesContext } from '@/components/bot-panels/values';
+import { PanelValuesContext, TemplateContext } from '@/components/bot-panels/values';
 import DiscordPreview from '@/components/bot-panels/DiscordPreview';
 import PanelEditor, { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
@@ -80,6 +81,8 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
   const latest = data?.latest ?? null;
   const latestMeta = data?.revisions[0];
   const registry = data?.registry ?? null;
+  // A template is sent to each new member, never posted (TAQ-142)
+  const template = data?.panel.template ?? null;
 
   // First load: start from the latest revision, or from an unsaved draft of it
   useEffect(() => {
@@ -139,13 +142,16 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
     if (!draft) return [];
     return normalizeContent(draft.content, {
       actionKeys: registry ? new Set(registry.actions.map(a => a.key)) : undefined,
-      forum: isForum(registry, draft.channelId),
+      forum: !template && isForum(registry, draft.channelId),
+      template: !!template,
     }).errors;
-  }, [draft, registry]);
+  }, [draft, registry, template]);
 
   // One server's roles for the role pickers and mentions (TAQ-115)
   const server = channelGuild(registry, draft?.channelId) ?? serverPick ?? registry?.guild?.id ?? null;
   const serverRegistry = useMemo(() => scopedRegistry(registry, server), [registry, server]);
+
+  const needsChannel = !template && !draft?.channelId;
 
   if (isLoading || (!draft && !error)) return <div style={{ color: 'var(--text-secondary)', padding: '2rem' }}>Loading panel…</div>;
   if (error || !data || !draft) return <div style={{ color: '#ef4444', padding: '2rem' }}>Error: {error?.message ?? 'Panel not found'}</div>;
@@ -203,13 +209,14 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
 
 
   return (
-    <PanelValuesContext.Provider value={data.values ?? {}}>
+    <PanelValuesContext.Provider value={template ? { ...data.values, ...TEMPLATE_SAMPLES } : data.values ?? {}}>
+    <TemplateContext.Provider value={!!template}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
         <Link href="/exec/bot-panels" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none' }}>← Bot Messages</Link>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{data.panel.name}</h1>
-        {latestMeta && <StatusBadge status={latestMeta.status} posted={data.panel.message_ids.length > 0} />}
+        {latestMeta && <StatusBadge status={latestMeta.status} posted={!!template || data.panel.message_ids.length > 0} />}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem' }}>
           {(['edit', 'history'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ ...btnStyle, background: tab === t ? '#3b82f6' : 'transparent', color: tab === t ? '#fff' : 'var(--text-secondary)' }}>
@@ -220,9 +227,10 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
       </div>
 
       <LatestStatus meta={latestMeta} panel={data.panel} registry={registry} />
+      {template && <TemplateInfo slug={slug} template={template} content={draft.content} valid={validation.length === 0} />}
 
       {tab === 'history' ? (
-        <History slug={slug} revisions={data.revisions} posted={data.panel.message_ids.length > 0} publishedRev={data.panel.published_rev} registry={registry} onRestore={restore} />
+        <History slug={slug} revisions={data.revisions} posted={!!template || data.panel.message_ids.length > 0} publishedRev={data.panel.published_rev} registry={registry} onRestore={restore} />
       ) : (
         <>
           {restoredDraft && dirty && (
@@ -245,7 +253,7 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1rem', alignItems: 'start' }} className="bot-panel-grid">
             {/* Left: settings + form */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {!template && <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                 {(registry?.guilds?.length ?? 0) > 1 && (
                   <div>
                     <label style={labelStyle}>Server</label>
@@ -317,7 +325,7 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
                   )}
                 </div>
 
-              </div>
+              </div>}
 
               <PanelEditor content={draft.content} registry={serverRegistry} onFocus={setFocus}
                 onChange={content => setDraft({ ...draft, content })} />
@@ -332,13 +340,13 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
                   placeholder="What changed? (shown in the history)" style={inputStyle} />
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <button onClick={() => publish(false)}
-                    disabled={saving || !dirty || validation.length > 0 || adoptProblems.length > 0 || !draft.channelId}
-                    style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: saving || !dirty || validation.length > 0 || adoptProblems.length > 0 || !draft.channelId ? 0.45 : 1 }}>
-                    {saving ? 'Publishing…' : 'Publish to Discord'}
+                    disabled={saving || !dirty || validation.length > 0 || adoptProblems.length > 0 || needsChannel}
+                    style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: saving || !dirty || validation.length > 0 || adoptProblems.length > 0 || needsChannel ? 0.45 : 1 }}>
+                    {saving ? 'Publishing…' : template ? 'Publish' : 'Publish to Discord'}
                   </button>
                   {dirty && <button onClick={discard} style={{ ...btnStyle, background: 'transparent', color: 'var(--text-secondary)' }}>Discard</button>}
                   <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {!draft.channelId ? 'Pick a channel first' : dirty ? 'Unsaved changes' : 'No changes'}
+                    {needsChannel ? 'Pick a channel first' : dirty ? 'Unsaved changes' : 'No changes'}
                   </span>
                 </div>
                 {validation.length > 0 && dirty && (
@@ -362,11 +370,80 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
         </>
       )}
     </div>
+    </TemplateContext.Provider>
     </PanelValuesContext.Provider>
   );
 }
 
+interface TemplateTest { status: 'pending' | 'sending' | 'sent' | 'failed'; error: string | null; requested_at: string; expired: boolean }
+
+/** What a template is for, and "send a test to me": the bot DMs the draft to
+ *  the exec member, filled in as if they had just joined. */
+function TemplateInfo({ slug, template, content, valid }: { slug: string; template: string; content: PanelContent; valid: boolean }) {
+  const [waiting, setWaiting] = useState(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
+  const { data, mutate } = useSWR<{ test: TemplateTest | null }>(`/api/exec/bot-panels/${slug}/test`, fetcher, {
+    revalidateOnFocus: false, refreshInterval: waiting ? 2000 : 0,
+  });
+  const test = data?.test ?? null;
+  const done = test && (test.status === 'sent' || test.status === 'failed');
+
+  useEffect(() => {
+    if (waiting && (done || test?.expired)) setWaiting(false);
+  }, [waiting, done, test]);
+
+  const send = async () => {
+    setRequestError(null);
+    const res = await fetch(`/api/exec/bot-panels/${slug}/test`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) { setRequestError(body.error ?? 'Failed to send the test'); return; }
+    await mutate();
+    setWaiting(true);
+  };
+
+  const status = requestError ? <span style={{ color: '#ef4444' }}>{requestError}</span>
+    : waiting ? <span>Waiting for the bot…</span>
+    : test?.status === 'sent' ? <span style={{ color: '#22c55e' }}>Sent to your DMs {timeAgo(test.requested_at)}.</span>
+    : test?.status === 'failed' ? <span style={{ color: '#ef4444' }}>The test didn&apos;t send: {test.error}</span>
+    : test?.expired ? <span style={{ color: '#ef4444' }}>The bot didn&apos;t pick the test up; is it running?</span>
+    : null;
+
+  return (
+    <div style={{ ...banner('#3b82f6'), display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+      <span>
+        <strong>Welcome template.</strong> {PANEL_TEMPLATES[template]?.sentWhen ?? 'Sent by the bot'}, with {'{Member}'}, {'{IGN}'} and
+        their avatar filled in. Publishing changes what the next new member gets; nothing is posted now.
+      </span>
+      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
+        {status}
+        <button onClick={send} disabled={!valid || waiting}
+          style={{ ...smallBtn, background: '#3b82f6', color: '#fff', opacity: !valid || waiting ? 0.5 : 1 }}>
+          Send a test to me
+        </button>
+      </span>
+    </div>
+  );
+}
+
 function LatestStatus({ meta, panel, registry }: { meta?: RevisionMeta; panel: PanelSummary; registry: PanelRegistry | null }) {
+  if (panel.template) {
+    if (!meta) return <div style={banner('#6b7280')}>Nothing published yet: new members get the bot&apos;s built-in message.</div>;
+    if (meta.status === 'pending' || meta.status === 'publishing') return <div style={banner('#eab308')}>The bot is checking revision {meta.rev_number}…</div>;
+    if (meta.status === 'failed') {
+      return (
+        <div style={banner('#ef4444')}>
+          <strong>Revision {meta.rev_number} wasn&apos;t accepted.</strong> New members still get {panel.published_rev ? `revision ${panel.published_rev}` : 'the built-in message'}. {meta.error}
+        </div>
+      );
+    }
+    return (
+      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+        New members get revision {meta.rev_number}, by {meta.author_name ?? 'unknown'}, {timeAgo(meta.published_at ?? meta.created_at)}.
+      </div>
+    );
+  }
   if (!meta) return <div style={banner('#6b7280')}>This panel is empty. Build it below and publish to post it.</div>;
   const where = channelLabel(meta.channel_id ?? panel.channel_id, registry);
   if (meta.status === 'pending') return <div style={banner('#eab308')}>Revision {meta.rev_number} is waiting for the bot. It usually takes under 15 seconds.</div>;
