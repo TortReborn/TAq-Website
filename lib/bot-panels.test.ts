@@ -308,7 +308,8 @@ describe('panel list groups (TAQ-143)', () => {
       { id: '7', name: 'TE Roles', type: 'public_thread', category: 'TE', postable: true, guild_id: EXEC, parent_id: '5' },
     ],
   };
-  const panel = (name: string, channel_id: string | null, template: string | null = null) => ({ name, channel_id, template });
+  const panel = (name: string, channel_id: string | null, template: string | null = null, archived_at: string | null = null) =>
+    ({ name, channel_id, template, archived_at });
   const shape = (groups: ReturnType<typeof groupPanels>) => groups.map(g => [g.label, g.panels.map(p => p.name)]);
 
   it('puts templates first, then each server in its channel order', () => {
@@ -326,6 +327,16 @@ describe('panel list groups (TAQ-143)', () => {
   it('breaks ties by name, puts unknown channels last in the main server, and drops empty groups', () => {
     const panels = [panel('Zeta', '2'), panel('Lost', '99'), panel('Alpha', '2'), panel('Unplaced', null)];
     expect(shape(groupPanels(panels, registry))).toEqual([['The Aquarium', ['Alpha', 'Zeta', 'Lost', 'Unplaced']]]);
+  });
+
+  it('puts archived panels in an Archive group at the end, by name (TAQ-144)', () => {
+    const at = '2026-11-02T00:00:00Z';
+    const panels = [panel('Old Rules', '1', null, at), panel('FAQ', '2'), panel('Kick List', '7', null, at), panel('TE 101', '6')];
+    expect(shape(groupPanels(panels, registry))).toEqual([
+      ['The Aquarium', ['FAQ']],
+      ['TAq Executive', ['TE 101']],
+      ['Archive', ['Kick List', 'Old Rules']],
+    ]);
   });
 
   it('still lists everything before the bot has reported a registry', () => {

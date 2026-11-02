@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { LIMITS, channelGuild, isForum, normalizeContent, parseMessageLink, scopedRegistry } from '@/lib/bot-panels';
-import { createRevision, getPanel, getPanelTemplate, getRegistry, messageOwner, RevisionConflict } from '@/lib/bot-panels-db';
+import { createRevision, getPanel, getPanelTemplate, getRegistry, messageOwner, PanelArchived, RevisionConflict } from '@/lib/bot-panels-db';
 import { getPanelValues } from '@/lib/panel-values-db';
 
 export const dynamic = 'force-dynamic';
@@ -117,6 +117,7 @@ export async function POST(
     if (rev === null) return NextResponse.json({ error: 'Panel not found' }, { status: 404 });
     return NextResponse.json({ rev_number: rev }, { status: 201 });
   } catch (error) {
+    if (error instanceof PanelArchived) return NextResponse.json({ error: error.message }, { status: 409 });
     if (error instanceof RevisionConflict) {
       return NextResponse.json(
         { error: error.message, conflict: { latest_rev: error.latestRev, latest_author: error.latestAuthor } },
