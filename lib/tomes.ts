@@ -3,8 +3,8 @@
  *
  * Keep the rules in step with Tort-Reborn/Helpers/tomes.py, which makes the
  * requests: war tomes come from lifetime wars at 10/25/50/100 and then every
- * 50 more; raid tomes cost 10 shells for the first four and 20 after,
- * counting raid tomes only. lib/tomes.test.ts checks the same table as the
+ * 50 more; shell tomes (stored as kind 'raid') cost 10 shells for the first
+ * four and 20 after, counting shell tomes only. lib/tomes.test.ts checks the same table as the
  * bot's tests.
  *
  * Handing out works like aspects: whoever gives says how many tomes they
@@ -111,4 +111,56 @@ export function allocate(requests: OpenRequest[], tomes: number): Allocation[] {
   return out;
 }
 
-export const kindLabel = (kind: TomeKind | null) => (kind === 'war' ? 'War' : kind === 'raid' ? 'Raid' : 'Any');
+export const kindLabel = (kind: TomeKind | null) => (kind === 'war' ? 'War' : kind === 'raid' ? 'Shell' : 'Any');
+
+/** Screenshots of a give, at most this many, stored under keys from screenshotKey. */
+export const MAX_SCREENSHOTS = 10;
+const SCREENSHOT_KEY = /^tome_screenshots\/[0-9a-f-]{36}\.(png|jpg|gif|webp)$/;
+export const screenshotKey = (id: string, ext: string) => `tome_screenshots/${id}.${ext}`;
+export const isScreenshotKey = (key: unknown): key is string => typeof key === 'string' && SCREENSHOT_KEY.test(key);
+/** The keys a give was sent with, or null if there are too many or any is not ours. */
+export const parseScreenshots = (keys: unknown): string[] | null => {
+  if (keys === undefined || keys === null) return [];
+  return Array.isArray(keys) && keys.length <= MAX_SCREENSHOTS && keys.every(isScreenshotKey) ? keys : null;
+};
+
+const PRIORITY_EMOJI: Record<TomePriority, string> = { very_high: '❤️', high: '🧡', medium: '💛', low: '💚' };
+export const QUEUE_TEXT_LIMIT = 3900;
+
+/**
+ * The queue as a panel's {{tome_queue}} shows it: one line a member per section,
+ * in serving order, leaving out who a give skips. The bot draws the real one;
+ * this is the editor's preview. Keep in step with queue_text in
+ * Tort-Reborn/Helpers/tomes.py (the tests of both check the same table).
+ */
+export function queueText(requests: OpenRequest[]): string {
+  const rows = requests.filter(r => r.bucket !== 'dormant' && r.in_guild && r.count > r.given).sort(servingOrder);
+  if (!rows.length) return 'Nothing is waiting.';
+  const sections = new Map<string, { heading: string; members: Map<string, number> }>();
+  for (const r of rows) {
+    const numbered = r.bucket === 'queue';
+    const key = numbered ? r.priority : r.bucket;
+    if (!sections.has(key)) {
+      const label = numbered ? PRIORITIES.find(p => p.key === r.priority)!.label : BUCKETS.find(b => b.key === r.bucket)!.label;
+      sections.set(key, { heading: numbered ? `${PRIORITY_EMOJI[r.priority]} **${label}**` : `**${label}**`, members: new Map() });
+    }
+    const members = sections.get(key)!.members;
+    members.set(r.ign, (members.get(r.ign) ?? 0) + r.count - r.given);
+  }
+
+  const lines: { text: string; ign?: string; tomes: number }[] = [];
+  for (const s of sections.values()) {
+    lines.push({ text: `\n${s.heading}`, tomes: 0 });
+    for (const [ign, n] of s.members) lines.push({ text: `\`${ign}\`: ${n}`, ign, tomes: n });
+  }
+  let text = '';
+  for (let i = 0; i < lines.length; i++) {
+    if (text.length + lines[i].text.length + 1 > QUEUE_TEXT_LIMIT - 60) {
+      const rest = lines.slice(i).filter(l => l.ign);
+      const who = new Set(rest.map(l => l.ign)).size;
+      return `${text.trimStart()}\n…and ${who} more member${who === 1 ? '' : 's'} (${rest.reduce((n, l) => n + l.tomes, 0)} tomes)`;
+    }
+    text += `\n${lines[i].text}`;
+  }
+  return text.trimStart();
+}

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
-import { BUCKETS, type TomeBucket } from '@/lib/tomes';
+import { BUCKETS, parseScreenshots, type TomeBucket } from '@/lib/tomes';
 import { cancelRequest, give, moveRequest, TomeConflict } from '@/lib/tomes-db';
 
 export const dynamic = 'force-dynamic';
 
-// POST { action: 'give', count } | { action: 'move', bucket } | { action: 'cancel', reason? }
+// POST { action: 'give', count, screenshots? } | { action: 'move', bucket } | { action: 'cancel', reason? }
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -24,7 +24,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (body?.action === 'give') {
       const count = Number(body.count);
       if (!Number.isInteger(count) || count < 1) return NextResponse.json({ error: 'Give at least one tome' }, { status: 400 });
-      return NextResponse.json({ given: await give([{ request_id: id, count }], actor) });
+      const screenshots = parseScreenshots(body.screenshots);
+      if (!screenshots) return NextResponse.json({ error: 'Those screenshots were not uploaded here' }, { status: 400 });
+      return NextResponse.json({ given: await give([{ request_id: id, count }], actor, screenshots) });
     }
     if (body?.action === 'move') {
       if (!BUCKETS.some(b => b.key === body.bucket)) return NextResponse.json({ error: 'Unknown bucket' }, { status: 400 });

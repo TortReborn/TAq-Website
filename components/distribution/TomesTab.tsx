@@ -4,20 +4,22 @@
  * The Tomes tab of /exec/distribution (TAQ-116): members request tomes with
  * the bot's "Request tomes" button; any exec member gives them out here.
  * "Give out tomes" works like aspects: say how many you have, check who they
- * go to, confirm. The bot posts every grant in the tomes channel.
+ * go to, confirm. Screenshots of the in-game grant go with the next give. The
+ * bot logs every grant in the tome log channel, with its screenshots.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
+import { compressImageInBrowser } from '@/lib/compress-image-client';
 import {
-  BUCKETS, PRIORITIES, kindLabel, servingOrder, warTomesEarned, warsNeeded,
-  type Allocation, type OpenRequest, type TomeBucket,
+  BUCKETS, MAX_SCREENSHOTS, PRIORITIES, kindLabel, servingOrder, warTomesEarned, warsNeeded,
+  type Allocation, type OpenRequest, type TomeBucket, type TomeKind,
 } from '@/lib/tomes';
 import { ago, btn, card, h2, input, td, th } from './ui';
 
 type Row = OpenRequest & { shells_spent: number; source: string; note: string | null };
-interface Event { id: number; ign: string | null; action: string; kind: string | null; count: number; actor_name: string | null; note: string | null; created_at: string }
+interface Event { id: number; ign: string | null; action: string; kind: string | null; count: number; actor_name: string | null; note: string | null; screenshots: string[]; created_at: string }
 interface Member {
   uuid: string; ign: string; in_guild: boolean; wars: number | null;
   received: { war: number; raid: number; any: number }; debt: number;
@@ -31,6 +33,17 @@ async function post(url: string, body: unknown) {
   return j;
 }
 
+/** One file per request: the platform caps a request body at 4.5 MB. */
+async function uploadScreenshot(file: File): Promise<string> {
+  const { file: toSend } = await compressImageInBrowser(file);
+  const form = new FormData();
+  form.append('file', toSend);
+  const r = await fetch('/api/exec/tomes/screenshots', { method: 'POST', body: form });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error ?? `Couldn't upload ${file.name}`);
+  return j.key;
+}
+
 function Priority({ p }: { p: string }) {
   const meta = PRIORITIES.find(x => x.key === p);
   return <span style={{ color: meta?.color ?? 'inherit', fontWeight: 600 }}>{meta?.label ?? p}</span>;
@@ -40,6 +53,16 @@ export default function TomesTab() {
   const { data, error, mutate } = useSWR<{ requests: Row[]; recent: Event[] }>('/api/exec/tomes', fetcher, { refreshInterval: 30000 });
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shots, setShots] = useState<File[]>([]);
+
+  // Screenshots are in the bucket before the give is recorded, so the bot
+  // never sees a grant whose screenshots are still on their way.
+  const give: Give = async (url, body) => {
+    const screenshots = await Promise.all(shots.map(uploadScreenshot));
+    const out = await post(url, { ...body, screenshots });
+    setShots([]);
+    return out;
+  };
 
   const run = async (fn: () => Promise<string>) => {
     setBusy(true); setMessage(null);
@@ -54,13 +77,13 @@ export default function TomesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
-        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button. Give them out in-game, then record it here; the bot posts each grant in the tomes channel.
+        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button. Give them out in-game, then record it here with your screenshots; the bot logs each grant in the tome log channel and pings the member.
       </p>
       {message && (
         <div style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
       )}
-      <Distribute busy={busy} run={run} />
-      <Queue requests={requests} loading={!data} busy={busy} run={run} />
+      <Distribute busy={busy} run={run} give={give} shots={shots} setShots={setShots} />
+      <Queue requests={requests} loading={!data} busy={busy} run={run} give={give} />
       <MemberLookup busy={busy} run={run} />
       <Recent events={data?.recent ?? []} />
     </div>
@@ -68,8 +91,54 @@ export default function TomesTab() {
 }
 
 type Run = (fn: () => Promise<string>) => Promise<void>;
+type Give = (url: string, body: object) => Promise<any>;
 
-function Distribute({ busy, run }: { busy: boolean; run: Run }) {
+function Screenshots({ shots, setShots, busy }: { shots: File[]; setShots: (f: File[]) => void; busy: boolean }) {
+  const [previews, setPreviews] = useState<string[]>([]);
+  useEffect(() => {
+    const urls = shots.map(f => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => urls.forEach(u => URL.revokeObjectURL(u));
+  }, [shots]);
+  const add = (files: File[]) => {
+    const images = files.filter(f => f.type.startsWith('image/'));
+    if (images.length) setShots([...shots, ...images].slice(0, MAX_SCREENSHOTS));
+  };
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => add(Array.from(e.clipboardData?.files ?? []));
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  });
+
+  return (
+    <div style={{ marginTop: '0.75rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <label style={{ ...btn('#6b7280'), display: 'inline-block', opacity: busy ? 0.6 : 1 }}>
+          Add screenshots
+          <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden disabled={busy} aria-label="Add screenshots"
+            onChange={e => { add(Array.from(e.target.files ?? [])); e.target.value = ''; }} />
+        </label>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          Or paste them. Optional, up to {MAX_SCREENSHOTS}; they go with your next give, from here or a row below.
+        </span>
+      </div>
+      {shots.length > 0 && (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+          {previews.map((src, i) => (
+            <div key={src} style={{ position: 'relative' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`Screenshot ${i + 1}`} style={{ height: '5rem', borderRadius: '0.35rem', display: 'block' }} />
+              <button aria-label={`Remove screenshot ${i + 1}`} disabled={busy} onClick={() => setShots(shots.filter((_, j) => j !== i))}
+                style={{ ...btn('#ef4444'), position: 'absolute', top: 2, right: 2, padding: '0 0.35rem', lineHeight: 1.4 }}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Distribute({ busy, run, give, shots, setShots }: { busy: boolean; run: Run; give: Give; shots: File[]; setShots: (f: File[]) => void }) {
   const [tomes, setTomes] = useState('');
   const [plan, setPlan] = useState<Allocation[] | null>(null);
   const total = plan?.reduce((n, p) => n + p.count, 0) ?? 0;
@@ -90,6 +159,7 @@ function Distribute({ busy, run }: { busy: boolean; run: Run }) {
           The queue first (by priority, then oldest), then give when available, then give when full. Members not in the guild are skipped.
         </span>
       </div>
+      <Screenshots shots={shots} setShots={setShots} busy={busy} />
       {plan && plan.length > 0 && (
         <div style={{ marginTop: '0.75rem' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -101,7 +171,7 @@ function Distribute({ busy, run }: { busy: boolean; run: Run }) {
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
             <button style={btn('#22c55e')} disabled={busy}
               onClick={() => run(async () => {
-                const { given } = await post('/api/exec/tomes/distribute', { plan: plan.map(p => ({ request_id: p.request_id, count: p.count })) });
+                const { given } = await give('/api/exec/tomes/distribute', { plan: plan.map(p => ({ request_id: p.request_id, count: p.count })) });
                 setPlan(null); setTomes('');
                 return `Recorded ${given} tome(s) as given.`;
               })}>I gave these {total} tomes</button>
@@ -113,7 +183,7 @@ function Distribute({ busy, run }: { busy: boolean; run: Run }) {
   );
 }
 
-function Queue({ requests, loading, busy, run }: { requests: Row[]; loading: boolean; busy: boolean; run: Run }) {
+function Queue({ requests, loading, busy, run, give }: { requests: Row[]; loading: boolean; busy: boolean; run: Run; give: Give }) {
   const [showDormant, setShowDormant] = useState(false);
   if (loading) return <section style={{ ...card, height: '12rem', opacity: 0.6 }} />;
   return (
@@ -145,7 +215,7 @@ function Queue({ requests, loading, busy, run }: { requests: Row[]; loading: boo
                     <th style={th}>Member</th><th style={th}>Kind</th><th style={th}>Tomes</th><th style={th}>Priority</th>
                     <th style={th}>Shells</th><th style={th}>Age</th><th style={th}></th>
                   </tr></thead>
-                  <tbody>{rows.map(r => <QueueRow key={r.id} r={r} busy={busy} run={run} />)}</tbody>
+                  <tbody>{rows.map(r => <QueueRow key={r.id} r={r} busy={busy} run={run} give={give} />)}</tbody>
                 </table>
               </div>
             )}
@@ -156,7 +226,7 @@ function Queue({ requests, loading, busy, run }: { requests: Row[]; loading: boo
   );
 }
 
-function QueueRow({ r, busy, run }: { r: Row; busy: boolean; run: Run }) {
+function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; give: Give }) {
   const left = r.count - r.given;
   const [n, setN] = useState(String(left));
   return (
@@ -173,7 +243,7 @@ function QueueRow({ r, busy, run }: { r: Row; busy: boolean; run: Run }) {
       <td style={{ ...td, whiteSpace: 'nowrap' }}>
         <input style={{ ...input, width: '3.5rem', padding: '0.3rem 0.4rem' }} value={n} onChange={e => setN(e.target.value.replace(/\D/g, ''))} aria-label="Tomes to give" />
         <button style={{ ...btn('#22c55e'), marginLeft: '0.3rem' }} disabled={busy || !Number(n)}
-          onClick={() => run(async () => { await post(`/api/exec/tomes/${r.id}`, { action: 'give', count: Number(n) }); return `Gave ${n} to ${r.ign}.`; })}>Give</button>
+          onClick={() => run(async () => { await give(`/api/exec/tomes/${r.id}`, { action: 'give', count: Number(n) }); return `Gave ${n} to ${r.ign}.`; })}>Give</button>
         <select style={{ ...input, marginLeft: '0.3rem', padding: '0.3rem', width: '6.5rem' }} value="" disabled={busy}
           onChange={e => {
             const bucket = e.target.value as TomeBucket;
@@ -218,7 +288,7 @@ function MemberLookup({ busy, run }: { busy: boolean; run: Run }) {
             <div style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
               War tomes: {m.received.war} received{m.debt ? ` (${m.debt} of them debt)` : ''}
               {earned != null && <> · {earned} earned from {m.wars!.toLocaleString()} lifetime wars (last count the bot saw) · next at {warsNeeded(Math.max(earned, m.received.war) + 1).toLocaleString()}</>}
-              <br />Raid tomes: {m.received.raid} received{m.received.any ? ` · ${m.received.any} with no kind recorded` : ''}
+              <br />Shell tomes: {m.received.raid} received{m.received.any ? ` · ${m.received.any} with no kind recorded` : ''}
             </div>
           </div>
           <form style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}
@@ -227,7 +297,7 @@ function MemberLookup({ busy, run }: { busy: boolean; run: Run }) {
               run(async () => {
                 await post('/api/exec/tomes/member', { ign: m.ign, action: form.action, kind: form.kind, count: Number(form.count), note: form.note });
                 setForm({ ...form, count: '', note: '' }); await mutate();
-                return form.action === 'debt' ? `Recorded ${form.count} war tome(s) of debt for ${m.ign}.` : `Adjusted ${m.ign}'s ${form.kind} tomes by ${form.count}.`;
+                return form.action === 'debt' ? `Recorded ${form.count} war tome(s) of debt for ${m.ign}.` : `Adjusted ${m.ign}'s ${kindLabel(form.kind as TomeKind).toLowerCase()} tomes by ${form.count}.`;
               });
             }}>
             <select style={input} value={form.action} onChange={e => setForm({ ...form, action: e.target.value })}>
@@ -236,7 +306,7 @@ function MemberLookup({ busy, run }: { busy: boolean; run: Run }) {
             </select>
             {form.action === 'adjust' && (
               <select style={input} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })}>
-                <option value="war">War</option><option value="raid">Raid</option>
+                <option value="war">War</option><option value="raid">Shell</option>
               </select>
             )}
             <input style={{ ...input, width: '6rem' }} placeholder={form.action === 'adjust' ? '+/- tomes' : 'Tomes'} value={form.count}
@@ -263,7 +333,14 @@ function EventTable({ events, showMember }: { events: Event[]; showMember: boole
           {showMember && <td style={td}>{e.ign ?? '?'}</td>}
           <td style={td}>{e.action}{e.count ? ` ${e.count}` : ''} {e.kind ?? ''}</td>
           <td style={{ ...td, color: 'var(--text-secondary)' }}>{e.actor_name ?? ''}</td>
-          <td style={{ ...td, color: 'var(--text-muted)' }}>{e.note ?? ''}</td>
+          <td style={{ ...td, color: 'var(--text-muted)' }}>
+            {e.note ?? ''}
+            {e.screenshots?.map((key, i) => (
+              <a key={key} href={`/api/exec/tomes/screenshots?key=${encodeURIComponent(key)}`} target="_blank" rel="noreferrer" style={{ marginRight: '0.4rem' }}>
+                Screenshot{e.screenshots.length > 1 ? ` ${i + 1}` : ''}
+              </a>
+            ))}
+          </td>
         </tr>
       ))}</tbody>
     </table>

@@ -9,7 +9,7 @@
  * Helpers/bot_panels.py, which re-validates everything before sending.
  */
 
-import { MEMBER_AVATAR, contentValueKeys, isPanelValue, isTemplateValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
+import { MEMBER_AVATAR, contentValueKeys, DESCRIPTION_ONLY_VALUES, isPanelValue, isTemplateValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
 
 export const ASSET_SCHEME = 'asset://';
 export const ASSET_NAME_RE = /^[0-9a-f]{16}\.(png|jpg|jpeg|gif|webp)$/;
@@ -430,6 +430,10 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
     for (const key of contentValueKeys(out)) {
       if (isTemplateValue(key) && !opts.template) errors.push(`${where}: {{${key}}} only works in a welcome template.`);
       else if (!isPanelValue(key) && !isTemplateValue(key)) errors.push(`${where}: {{${key}}} isn't a value panels can use.`);
+    }
+    const outsideDescriptions = contentValueKeys({ ...out, embeds: out.embeds?.map(e => ({ ...e, description: undefined })) });
+    for (const key of DESCRIPTION_ONLY_VALUES) {
+      if (outsideDescriptions.includes(key)) errors.push(`${where}: {{${key}}} only fits in an embed's description.`);
     }
     return out;
   });
