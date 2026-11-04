@@ -78,6 +78,7 @@ export interface OpenRequest {
   id: number;
   uuid: string;
   ign: string;
+  discord_id?: string | null;
   kind: TomeKind | null;
   count: number;
   given: number;
@@ -129,9 +130,10 @@ export const QUEUE_TEXT_LIMIT = 3900;
 
 /**
  * The queue as a panel's {{tome_queue}} shows it: one line a member per section,
- * in serving order, leaving out who a give skips. The bot draws the real one;
- * this is the editor's preview. Keep in step with queue_text in
- * Tort-Reborn/Helpers/tomes.py (the tests of both check the same table).
+ * in serving order, leaving out who a give skips. The bot draws the real one,
+ * with a mention for each linked member; this is the editor's preview, which
+ * writes those as @IGN because it can't look members up. Keep in step with
+ * queue_text in Tort-Reborn/Helpers/tomes.py (the tests of both check the same table).
  */
 export function queueText(requests: OpenRequest[]): string {
   const rows = requests.filter(r => r.bucket !== 'dormant' && r.in_guild && r.count > r.given).sort(servingOrder);
@@ -145,13 +147,14 @@ export function queueText(requests: OpenRequest[]): string {
       sections.set(key, { heading: numbered ? `${PRIORITY_EMOJI[r.priority]} **${label}**` : `**${label}**`, members: new Map() });
     }
     const members = sections.get(key)!.members;
-    members.set(r.ign, (members.get(r.ign) ?? 0) + r.count - r.given);
+    const who = r.discord_id ? `@${r.ign}` : `\`${r.ign}\``;
+    members.set(who, (members.get(who) ?? 0) + r.count - r.given);
   }
 
   const lines: { text: string; ign?: string; tomes: number }[] = [];
   for (const s of sections.values()) {
     lines.push({ text: `\n${s.heading}`, tomes: 0 });
-    for (const [ign, n] of s.members) lines.push({ text: `\`${ign}\`: ${n}`, ign, tomes: n });
+    for (const [who, n] of s.members) lines.push({ text: `${who}: ${n}`, ign: who, tomes: n });
   }
   let text = '';
   for (let i = 0; i < lines.length; i++) {
