@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
+import { parseScreenshots } from '@/lib/tomes';
 import { give, previewDistribution, TomeConflict } from '@/lib/tomes-db';
 
 export const dynamic = 'force-dynamic';
@@ -7,7 +8,7 @@ export const dynamic = 'force-dynamic';
 const MAX_TOMES = 1000;
 
 // POST { tomes } — preview who `tomes` tomes would go to
-// POST { plan: [{ request_id, count }] } — give out a previewed plan
+// POST { plan: [{ request_id, count }], screenshots? } — give out a previewed plan
 export async function POST(request: NextRequest) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,7 +26,9 @@ export async function POST(request: NextRequest) {
         .map((p: any) => ({ request_id: Number(p?.request_id), count: Number(p?.count) }))
         .filter((p: { request_id: number; count: number }) => Number.isInteger(p.request_id) && Number.isInteger(p.count) && p.count > 0);
       if (!plan.length || plan.length !== body.plan.length) return NextResponse.json({ error: 'The plan is empty or malformed' }, { status: 400 });
-      const total = await give(plan, { id: session.discord_id, name: session.ign });
+      const screenshots = parseScreenshots(body.screenshots);
+      if (!screenshots) return NextResponse.json({ error: 'Those screenshots were not uploaded here' }, { status: 400 });
+      const total = await give(plan, { id: session.discord_id, name: session.ign }, screenshots);
       return NextResponse.json({ given: total });
     }
     const tomes = Number(body?.tomes);

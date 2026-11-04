@@ -9,7 +9,7 @@
  * Helpers/bot_panels.py, which re-validates everything before sending.
  */
 
-import { contentValueKeys, isPanelValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
+import { contentValueKeys, DESCRIPTION_ONLY_VALUES, isPanelValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
 
 export const ASSET_SCHEME = 'asset://';
 export const ASSET_NAME_RE = /^[0-9a-f]{16}\.(png|jpg|jpeg|gif|webp)$/;
@@ -368,6 +368,10 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
     if (!out.content && !out.images && !out.embeds && !out.dynamic) errors.push(`${where}: the message is empty.`);
     for (const key of contentValueKeys(out)) {
       if (!isPanelValue(key)) errors.push(`${where}: {{${key}}} isn't a value panels can use.`);
+    }
+    const outsideDescriptions = contentValueKeys({ ...out, embeds: out.embeds?.map(e => ({ ...e, description: undefined })) });
+    for (const key of DESCRIPTION_ONLY_VALUES) {
+      if (outsideDescriptions.includes(key)) errors.push(`${where}: {{${key}}} only fits in an embed's description.`);
     }
     return out;
   });

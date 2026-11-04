@@ -3,12 +3,13 @@
  * the bot's "Request tomes" button; here exec gives them out, moves them
  * between buckets, cancels them (refunding shells) and records debt and
  * adjustments. Every change is one transaction that writes a tome_events
- * row and an audit_log line; 'given' events are posted to Discord by the bot.
+ * row and an audit_log line; the bot posts 'given' and 'cancelled' events to
+ * the tome log channel.
  */
 
 import type { PoolClient } from 'pg';
 import { getPool } from '@/lib/db';
-import { allocate, raidRefund, type Allocation, type OpenRequest, type TomeBucket, type TomeKind } from '@/lib/tomes';
+import { allocate, kindLabel, raidRefund, type Allocation, type OpenRequest, type TomeBucket, type TomeKind } from '@/lib/tomes';
 
 export interface Actor { id: string; name: string }
 
@@ -16,7 +17,7 @@ export class TomeConflict extends Error {}
 
 export interface TomeEvent {
   id: number; ign: string | null; action: string; kind: TomeKind | null; count: number;
-  actor_name: string | null; note: string | null; created_at: string;
+  actor_name: string | null; note: string | null; screenshots: string[]; created_at: string;
 }
 
 async function tx<T>(fn: (c: PoolClient) => Promise<T>): Promise<T> {
@@ -38,7 +39,7 @@ async function audit(c: PoolClient, actor: Actor, action: string) {
   await c.query(`INSERT INTO audit_log (log_type, actor_name, actor_id, action) VALUES ('tome', $1, $2, $3)`, [actor.name, actor.id, action]);
 }
 
-const plural = (n: number, kind: TomeKind | null) => `${n} ${kind ? `${kind} ` : ''}tome${n === 1 ? '' : 's'}`;
+const plural = (n: number, kind: TomeKind | null) => `${n} ${kind ? `${kindLabel(kind).toLowerCase()} ` : ''}tome${n === 1 ? '' : 's'}`;
 
 export async function getOpenRequests(): Promise<(OpenRequest & { shells_spent: number; source: string; note: string | null; discord_id: string | null })[]> {
   const { rows } = await getPool().query(`
@@ -52,7 +53,7 @@ export async function getOpenRequests(): Promise<(OpenRequest & { shells_spent: 
 
 export async function getRecentEvents(limit = 40): Promise<TomeEvent[]> {
   const { rows } = await getPool().query(`
-    SELECT e.id, COALESCE(r.ign, l.ign, g.ign) AS ign, e.action, e.kind, e.count, e.actor_name, e.note, e.created_at::text
+    SELECT e.id, COALESCE(r.ign, l.ign, g.ign) AS ign, e.action, e.kind, e.count, e.actor_name, e.note, e.screenshots, e.created_at::text
     FROM tome_events e
     LEFT JOIN tome_requests r ON r.id = e.request_id
     LEFT JOIN discord_links l ON l.uuid = e.uuid
@@ -70,9 +71,10 @@ export async function previewDistribution(tomes: number): Promise<Allocation[]> 
 /**
  * Give out a plan from previewDistribution (or one request's tomes). Each
  * request is locked and re-checked: if someone changed it since the preview,
- * nothing is written and the caller previews again.
+ * nothing is written and the caller previews again. `screenshots` are bucket
+ * keys from the screenshots route, kept on every 'given' event of this give.
  */
-export async function give(plan: { request_id: number; count: number }[], actor: Actor): Promise<number> {
+export async function give(plan: { request_id: number; count: number }[], actor: Actor, screenshots: string[] = []): Promise<number> {
   if (!plan.length) return 0;
   return tx(async c => {
     let total = 0;
@@ -87,8 +89,8 @@ export async function give(plan: { request_id: number; count: number }[], actor:
         `UPDATE tome_requests SET given = $2, status = CASE WHEN $2 = count THEN 'done' ELSE 'open' END, updated_at = NOW() WHERE id = $1`,
         [r.id, given]);
       await c.query(
-        `INSERT INTO tome_events (uuid, request_id, action, kind, count, actor_id, actor_name) VALUES ($1, $2, 'given', $3, $4, $5, $6)`,
-        [r.uuid, r.id, r.kind, item.count, actor.id, actor.name]);
+        `INSERT INTO tome_events (uuid, request_id, action, kind, count, actor_id, actor_name, screenshots) VALUES ($1, $2, 'given', $3, $4, $5, $6, $7)`,
+        [r.uuid, r.id, r.kind, item.count, actor.id, actor.name, screenshots]);
       await audit(c, actor, `Gave ${plural(item.count, r.kind)} to ${r.ign} (request #${r.id}, ${given}/${r.count})`);
       total += item.count;
     }
@@ -128,8 +130,8 @@ export async function cancelRequest(id: number, actor: Actor, reason: string): P
     }
     await c.query(`UPDATE tome_requests SET status = 'cancelled', updated_at = NOW() WHERE id = $1`, [id]);
     await c.query(
-      `INSERT INTO tome_events (uuid, request_id, action, kind, count, actor_id, actor_name, note) VALUES ($1, $2, 'cancelled', $3, $4, $5, $6, $7)`,
-      [r.uuid, id, r.kind, r.count - r.given, actor.id, actor.name, reason || null]);
+      `INSERT INTO tome_events (uuid, request_id, action, kind, count, actor_id, actor_name, note, shells) VALUES ($1, $2, 'cancelled', $3, $4, $5, $6, $7, $8)`,
+      [r.uuid, id, r.kind, r.count - r.given, actor.id, actor.name, reason || null, refund]);
     await audit(c, actor, `Cancelled ${plural(r.count - r.given, r.kind)} of ${r.ign}'s request #${id}`
       + (refund ? `, refunding ${refund} shells` : '') + (reason ? `: ${reason}` : ''));
     return { refunded: refund };
@@ -158,7 +160,7 @@ export async function findMember(name: string): Promise<MemberTomes | null> {
                 WHERE uuid = $1 AND action IN ('given', 'debt', 'adjusted') GROUP BY kind, action`, [m.uuid]),
     pool.query(`SELECT id, uuid::text, ign, kind, count, given, priority, bucket, status, shells_spent, note, created_at::text, TRUE AS in_guild
                 FROM tome_requests WHERE uuid = $1 ORDER BY created_at DESC`, [m.uuid]),
-    pool.query(`SELECT e.id, NULL AS ign, e.action, e.kind, e.count, e.actor_name, e.note, e.created_at::text
+    pool.query(`SELECT e.id, NULL AS ign, e.action, e.kind, e.count, e.actor_name, e.note, e.screenshots, e.created_at::text
                 FROM tome_events e WHERE e.uuid = $1 ORDER BY e.created_at DESC, e.id DESC LIMIT 100`, [m.uuid]),
     pool.query(`SELECT EXISTS (SELECT 1 FROM guild_roster WHERE uuid = $1) AS in_guild,
                        (SELECT discord_id::text FROM discord_links WHERE uuid = $1 LIMIT 1) AS discord_id,
@@ -185,6 +187,6 @@ export async function recordForMember(uuid: string, action: 'debt' | 'adjusted',
       [uuid, action, action === 'debt' ? 'war' : kind, count, actor.id, actor.name, note]);
     await audit(c, actor, action === 'debt'
       ? `Recorded ${plural(count, 'war')} of debt for ${ign}: ${note}`
-      : `Adjusted ${ign}'s ${kind ?? 'unsorted'} tomes by ${count > 0 ? '+' : ''}${count}: ${note}`);
+      : `Adjusted ${ign}'s ${kind ? kindLabel(kind).toLowerCase() : 'unsorted'} tomes by ${count > 0 ? '+' : ''}${count}: ${note}`);
   });
 }

@@ -1,5 +1,53 @@
 import { describe, expect, it } from 'vitest';
-import { allocate, raidRefund, raidTomePrice, raidTomesCost, warsNeeded, warTomesEarned, type OpenRequest } from './tomes';
+import { allocate, MAX_SCREENSHOTS, parseScreenshots, QUEUE_TEXT_LIMIT, queueText, raidRefund, raidTomePrice, raidTomesCost, screenshotKey, warsNeeded, warTomesEarned, type OpenRequest } from './tomes';
+
+describe('queue text (in step with the bot)', () => {
+  let id = 0;
+  const row = (ign: string, kind: OpenRequest['kind'], left: number, priority: OpenRequest['priority'], bucket: OpenRequest['bucket'], in_guild = true): OpenRequest => ({
+    id: ++id, uuid: 'u', ign, kind, count: left + 1, given: 1, priority, bucket, created_at: `2026-01-01 00:00:${String(id % 60).padStart(2, '0')}`, in_guild,
+  });
+
+  it('matches Tort-Reborn/tests/test_tomes.py, in serving order', () => {
+    const rows = [
+      row('Eve', 'war', 20, 'high', 'give_when_full'),
+      row('Dee', null, 4, 'low', 'give_when_available'),
+      row('Cy', 'war', 5, 'high', 'queue'),
+      row('Ann_1', 'war', 3, 'very_high', 'queue'),
+      row('Bob', 'raid', 2, 'very_high', 'queue'),
+      row('Bob', 'war', 1, 'very_high', 'queue'),
+      row('Asleep', 'war', 9, 'high', 'dormant'),
+      row('Left', 'war', 9, 'very_high', 'queue', false),
+    ];
+    expect(queueText(rows)).toBe([
+      '❤️ **Very High**', '`Ann_1`: 3', '`Bob`: 3', '',
+      '🧡 **High**', '`Cy`: 5', '',
+      '**Give when available**', '`Dee`: 4', '',
+      '**Give when full**', '`Eve`: 20',
+    ].join('\n'));
+  });
+
+  it('says when nothing is waiting, and counts what would not fit', () => {
+    expect(queueText([row('Asleep', 'war', 1, 'low', 'dormant')])).toBe('Nothing is waiting.');
+    const text = queueText(Array.from({ length: 400 }, (_, i) => row(`Member${String(i).padStart(4, '0')}`, 'war', 2, 'low', 'queue')));
+    const shown = (text.match(/`/g) ?? []).length / 2;
+    expect(text.length).toBeLessThanOrEqual(QUEUE_TEXT_LIMIT);
+    expect(text.endsWith(`…and ${400 - shown} more members (${(400 - shown) * 2} tomes)`)).toBe(true);
+  });
+});
+
+describe('screenshot keys', () => {
+  const key = screenshotKey('3f2b8c1e-0000-4000-8000-000000000001', 'png');
+  it('accepts none, or keys the upload route made', () => {
+    expect(parseScreenshots(undefined)).toEqual([]);
+    expect(parseScreenshots([key])).toEqual([key]);
+  });
+  it('refuses any other bucket path, and too many', () => {
+    expect(parseScreenshots(['warning_attachments/1/2.png'])).toBeNull();
+    expect(parseScreenshots(['tome_screenshots/../secret.png'])).toBeNull();
+    expect(parseScreenshots('nope')).toBeNull();
+    expect(parseScreenshots(Array(MAX_SCREENSHOTS + 1).fill(key))).toBeNull();
+  });
+});
 
 // The same table as Tort-Reborn/tests/test_tomes.py: the two must agree.
 describe('rules (in step with the bot)', () => {

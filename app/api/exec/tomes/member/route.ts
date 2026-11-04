@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   if (body?.action === 'debt' && count < 0) return NextResponse.json({ error: 'Debt is a positive number of tomes' }, { status: 400 });
   if (body?.action !== 'debt' && body?.action !== 'adjust') return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   const kind = body?.kind === 'war' || body?.kind === 'raid' ? body.kind : null;
-  if (body.action === 'adjust' && !kind) return NextResponse.json({ error: 'Pick war or raid tomes' }, { status: 400 });
+  if (body.action === 'adjust' && !kind) return NextResponse.json({ error: 'Pick war or shell tomes' }, { status: 400 });
 
   try {
     const member = await findMember(String(body?.ign ?? ''));

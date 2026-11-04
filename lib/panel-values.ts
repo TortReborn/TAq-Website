@@ -16,12 +16,16 @@ export interface PanelValueDef {
 export const PANEL_VALUES: PanelValueDef[] = [
   { key: 'shells_per_aspect', label: 'Shells per aspect', editHref: '/exec/shell-exchange', editLabel: 'Shell Exchange' },
   { key: 'max_aspects_per_conversion', label: 'Max aspects per conversion', editHref: '/exec/shell-exchange', editLabel: 'Shell Exchange' },
+  { key: 'tome_queue', label: 'Tome queue', editHref: '/exec/distribution', editLabel: 'Distribution' },
 ];
 
 const BY_KEY = new Map(PANEL_VALUES.map(v => [v.key, v]));
 const VALUE_RE = /\{\{\s*([a-z_]+)\s*\}\}/g;
 
 export const isPanelValue = (key: string) => BY_KEY.has(key);
+
+/** Long text that keeps growing, so only an embed description has room for it. */
+export const DESCRIPTION_ONLY_VALUES = ['tome_queue'];
 
 /** Keys a piece of stored text uses, known or not. */
 export function valueKeysIn(text: string): string[] {

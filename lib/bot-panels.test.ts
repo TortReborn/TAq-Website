@@ -49,6 +49,13 @@ describe('normalizeContent', () => {
     expect(errors.join('\n')).toMatch(/"role:admin" is not a bot action/);
   });
 
+  it('keeps the tome queue to embed descriptions', () => {
+    expect(normalizeContent({ messages: [{ embeds: [{ description: '{{tome_queue}}' }] }] }).errors).toEqual([]);
+    for (const m of [{ content: '{{tome_queue}}' }, { embeds: [{ description: 'x', fields: [{ name: 'q', value: '{{tome_queue}}' }] }] }]) {
+      expect(normalizeContent({ messages: [m] }).errors.join()).toContain('only fits');
+    }
+  });
+
   it('allows the generated block on one message only', () => {
     const msg = { embeds: [{ description: 'x' }], dynamic: 'shell_exchange_panels' };
     expect(normalizeContent({ messages: [msg] }).errors).toEqual([]);
