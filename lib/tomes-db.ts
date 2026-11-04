@@ -44,7 +44,8 @@ const plural = (n: number, kind: TomeKind | null) => `${n} ${kind ? `${kindLabel
 export async function getOpenRequests(): Promise<(OpenRequest & { shells_spent: number; source: string; note: string | null; discord_id: string | null })[]> {
   const { rows } = await getPool().query(`
     SELECT r.id, r.uuid::text, r.ign, r.kind, r.count, r.given, r.priority, r.bucket, r.shells_spent, r.source, r.note,
-           r.discord_id::text, r.created_at::text,
+           COALESCE(r.discord_id, (SELECT l.discord_id FROM discord_links l WHERE l.uuid = r.uuid LIMIT 1))::text AS discord_id,
+           r.created_at::text,
            EXISTS (SELECT 1 FROM guild_roster g WHERE g.uuid = r.uuid) AS in_guild
     FROM tome_requests r WHERE r.status = 'open'
   `);

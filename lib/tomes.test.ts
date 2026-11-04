@@ -3,15 +3,15 @@ import { allocate, MAX_SCREENSHOTS, parseScreenshots, QUEUE_TEXT_LIMIT, queueTex
 
 describe('queue text (in step with the bot)', () => {
   let id = 0;
-  const row = (ign: string, kind: OpenRequest['kind'], left: number, priority: OpenRequest['priority'], bucket: OpenRequest['bucket'], in_guild = true): OpenRequest => ({
-    id: ++id, uuid: 'u', ign, kind, count: left + 1, given: 1, priority, bucket, created_at: `2026-01-01 00:00:${String(id % 60).padStart(2, '0')}`, in_guild,
+  const row = (ign: string, kind: OpenRequest['kind'], left: number, priority: OpenRequest['priority'], bucket: OpenRequest['bucket'], in_guild = true, discord_id: string | null = '1'): OpenRequest => ({
+    id: ++id, uuid: 'u', ign, discord_id, kind, count: left + 1, given: 1, priority, bucket, created_at: `2026-01-01 00:00:${String(id % 60).padStart(2, '0')}`, in_guild,
   });
 
   it('matches Tort-Reborn/tests/test_tomes.py, in serving order', () => {
     const rows = [
       row('Eve', 'war', 20, 'high', 'give_when_full'),
       row('Dee', null, 4, 'low', 'give_when_available'),
-      row('Cy', 'war', 5, 'high', 'queue'),
+      row('Cy', 'war', 5, 'high', 'queue', true, null),
       row('Ann_1', 'war', 3, 'very_high', 'queue'),
       row('Bob', 'raid', 2, 'very_high', 'queue'),
       row('Bob', 'war', 1, 'very_high', 'queue'),
@@ -19,16 +19,16 @@ describe('queue text (in step with the bot)', () => {
       row('Left', 'war', 9, 'very_high', 'queue', false),
     ];
     expect(queueText(rows)).toBe([
-      '❤️ **Very High**', '`Ann_1`: 3', '`Bob`: 3', '',
+      '❤️ **Very High**', '@Ann_1: 3', '@Bob: 3', '',
       '🧡 **High**', '`Cy`: 5', '',
-      '**Give when available**', '`Dee`: 4', '',
-      '**Give when full**', '`Eve`: 20',
+      '**Give when available**', '@Dee: 4', '',
+      '**Give when full**', '@Eve: 20',
     ].join('\n'));
   });
 
   it('says when nothing is waiting, and counts what would not fit', () => {
     expect(queueText([row('Asleep', 'war', 1, 'low', 'dormant')])).toBe('Nothing is waiting.');
-    const text = queueText(Array.from({ length: 400 }, (_, i) => row(`Member${String(i).padStart(4, '0')}`, 'war', 2, 'low', 'queue')));
+    const text = queueText(Array.from({ length: 400 }, (_, i) => row(`Member${String(i).padStart(4, '0')}`, 'war', 2, 'low', 'queue', true, null)));
     const shown = (text.match(/`/g) ?? []).length / 2;
     expect(text.length).toBeLessThanOrEqual(QUEUE_TEXT_LIMIT);
     expect(text.endsWith(`…and ${400 - shown} more members (${(400 - shown) * 2} tomes)`)).toBe(true);
