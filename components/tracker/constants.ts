@@ -1,4 +1,4 @@
-import type { TicketStatus, TicketPriority } from '@/hooks/useExecTracker';
+import type { TicketStatus } from '@/hooks/useExecTracker';
 
 /* ─── Column order ─── */
 

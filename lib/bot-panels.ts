@@ -9,7 +9,7 @@
  * Helpers/bot_panels.py, which re-validates everything before sending.
  */
 
-import { contentValueKeys, DESCRIPTION_ONLY_VALUES, isPanelValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
+import { MEMBER_AVATAR, contentValueKeys, DESCRIPTION_ONLY_VALUES, isPanelValue, isTemplateValue, valuesFromReadable, valuesToReadable } from '@/lib/panel-values';
 
 export const ASSET_SCHEME = 'asset://';
 export const ASSET_NAME_RE = /^[0-9a-f]{16}\.(png|jpg|jpeg|gif|webp)$/;
@@ -82,6 +82,18 @@ export interface PanelContent {
   post?: { title: string };
 }
 
+/**
+ * Template panels (TAQ-142): bot_panels.template names the event that sends
+ * one. They are never posted; publishing makes a revision the one the bot
+ * sends, to one member at a time, with that member's values filled in
+ * (TEMPLATE_VALUES in lib/panel-values.ts). Keys match Tort-Reborn
+ * Helpers/bot_panels.TEMPLATES.
+ */
+export const PANEL_TEMPLATES: Record<string, { sentWhen: string }> = {
+  welcome_dm: { sentWhen: 'Sent by DM to each new guild member when they are registered' },
+  welcome_post: { sentWhen: 'Posted in the welcome channel when a new guild member is registered' },
+};
+
 export type RevisionStatus = 'pending' | 'publishing' | 'published' | 'failed' | 'superseded';
 
 export interface PanelSummary {
@@ -90,6 +102,11 @@ export interface PanelSummary {
   channel_id: string | null;
   message_ids: string[];
   published_rev: number | null;
+  /** Set on a template panel: the event that sends it */
+  template: string | null;
+  /** Set while the panel is archived (TAQ-144): history kept, publishing off, Discord untouched */
+  archived_at: string | null;
+  archived_by: string | null;
   updated_at: string;
   latest_rev: number | null;
   latest_status: RevisionStatus | null;
@@ -131,6 +148,45 @@ export interface PanelRegistry {
 export function channelGuild(registry: PanelRegistry | null, channelId: string | null | undefined): string | null {
   const ch = channelId ? registry?.channels.find(c => c.id === channelId) : undefined;
   return ch ? ch.guild_id ?? registry?.guild?.id ?? null : null;
+}
+
+export interface PanelGroup<P> { key: string; label: string; panels: P[] }
+
+/** The panel list split for the Bot Messages page (TAQ-143): templates first,
+ *  then one group per server, main first, then the Archive (TAQ-144). A server's panels follow its channel
+ *  list as Discord shows it, which is the registry's order (forum posts sit
+ *  under their forum); panels in a channel the registry doesn't know go last
+ *  in the main server's group. Empty groups are left out. */
+export function groupPanels<P extends Pick<PanelSummary, 'name' | 'channel_id' | 'template' | 'archived_at'>>(
+  panels: P[], registry: PanelRegistry | null,
+): PanelGroup<P>[] {
+  const position = new Map(registry?.channels.map((c, i) => [c.id, i]) ?? []);
+  const main = registry?.guild ?? null;
+  const servers = registry?.guilds?.length ? registry.guilds : main ? [main] : [];
+  const ordered = [main, ...servers].filter((g, i, all): g is { id: string; name: string } =>
+    !!g && all.findIndex(o => o?.id === g.id) === i);
+
+  const byName = (a: P, b: P) => a.name.localeCompare(b.name);
+  const inChannelOrder = (a: P, b: P) =>
+    (position.get(a.channel_id ?? '') ?? Infinity) - (position.get(b.channel_id ?? '') ?? Infinity) || byName(a, b);
+
+  const groups: PanelGroup<P>[] = [{ key: 'templates', label: 'Sent automatically', panels: [] }];
+  const server = new Map<string, PanelGroup<P>>();
+  for (const g of ordered) server.set(g.id, { key: g.id, label: g.name, panels: [] });
+  const fallback: PanelGroup<P> = server.get(ordered[0]?.id ?? '') ?? { key: 'panels', label: 'Panels', panels: [] };
+  groups.push(...(server.size ? server.values() : [fallback]));
+  const archive: PanelGroup<P> = { key: 'archive', label: 'Archive', panels: [] };
+  groups.push(archive);
+
+  for (const p of panels) {
+    if (p.archived_at) archive.panels.push(p);
+    else if (p.template) groups[0].panels.push(p);
+    else (server.get(channelGuild(registry, p.channel_id) ?? '') ?? fallback).panels.push(p);
+  }
+  groups[0].panels.sort(byName);
+  for (const g of groups.slice(1, -1)) g.panels.sort(inChannelOrder);
+  archive.panels.sort(byName);
+  return groups.filter(g => g.panels.length > 0);
 }
 
 export function isForum(registry: PanelRegistry | null, channelId: string | null | undefined): boolean {
@@ -208,6 +264,8 @@ interface NormalizeOptions {
   roles?: Map<string, { name: string; assignable?: boolean; why?: string | null }>;
   /** The panel's channel is a forum, so the post needs a title */
   forum?: boolean;
+  /** A template panel: member values allowed, link buttons only, nothing generated */
+  template?: boolean;
 }
 
 const ROLE_ID_RE = /^\d{15,21}$/;
@@ -224,6 +282,7 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
   const image = (where: string, v: unknown): string | undefined => {
     const s = optional(v);
     if (!s) return undefined;
+    if (opts.template && s === MEMBER_AVATAR) return s;
     if (s.startsWith(ASSET_SCHEME)) {
       if (!assetName(s)) errors.push(`${where}: not an uploaded image.`);
       return s;
@@ -325,6 +384,7 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
         const label = optional(b?.label);
         const emoji = optional(b?.emoji);
         tooLong(at, 'label', label, LIMITS.buttonLabel);
+        if (opts.template && b?.kind !== 'link') errors.push(`${at}: a template can only have link buttons.`);
         if (b?.kind === 'link') {
           const url = str(b?.url).trim();
           if (!/^(https?|discord):\/\//.test(url)) errors.push(`${at}: a link button needs an http(s) url.`);
@@ -362,12 +422,14 @@ export function normalizeContent(raw: unknown, opts: NormalizeOptions = {}): { c
 
     if (m?.dynamic) {
       if (m.dynamic !== DYNAMIC_SHELL_EXCHANGE) errors.push(`${where}: unknown generated block.`);
+      else if (opts.template) errors.push(`${where}: a template can't carry generated images.`);
       out.dynamic = m.dynamic;
     }
 
     if (!out.content && !out.images && !out.embeds && !out.dynamic) errors.push(`${where}: the message is empty.`);
     for (const key of contentValueKeys(out)) {
-      if (!isPanelValue(key)) errors.push(`${where}: {{${key}}} isn't a value panels can use.`);
+      if (isTemplateValue(key) && !opts.template) errors.push(`${where}: {{${key}}} only works in a welcome template.`);
+      else if (!isPanelValue(key) && !isTemplateValue(key)) errors.push(`${where}: {{${key}}} isn't a value panels can use.`);
     }
     const outsideDescriptions = contentValueKeys({ ...out, embeds: out.embeds?.map(e => ({ ...e, description: undefined })) });
     for (const key of DESCRIPTION_ONLY_VALUES) {

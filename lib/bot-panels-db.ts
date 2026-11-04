@@ -12,16 +12,46 @@ const ids = (arr: (string | number)[] | null): string[] => (arr ?? []).map(Strin
 
 export async function listPanels(): Promise<PanelSummary[]> {
   const { rows } = await getPool().query(`
-    SELECT p.slug, p.name, p.channel_id::text, p.message_ids::text[] AS message_ids, p.published_rev, p.updated_at,
+    SELECT p.slug, p.name, p.channel_id::text, p.message_ids::text[] AS message_ids, p.published_rev, p.template, p.archived_at, p.archived_by, p.updated_at,
            r.rev_number AS latest_rev, r.status AS latest_status, r.author_name AS latest_author, r.created_at AS latest_at
     FROM bot_panels p
     LEFT JOIN LATERAL (
       SELECT rev_number, status, author_name, created_at FROM bot_panel_revisions
       WHERE panel_id = p.id ORDER BY rev_number DESC LIMIT 1
     ) r ON TRUE
-    ORDER BY p.name
+    ORDER BY p.template IS NOT NULL, p.name
   `);
   return rows.map(r => ({ ...r, message_ids: ids(r.message_ids) }));
+}
+
+/** The event a template panel is sent on (TAQ-142); null for a posted panel, undefined when there's no such panel. */
+export async function getPanelTemplate(slug: string): Promise<string | null | undefined> {
+  const { rows } = await getPool().query(`SELECT template FROM bot_panels WHERE slug = $1`, [slug]);
+  return rows.length ? rows[0].template : undefined;
+}
+
+const TEST_PREFIX = 'botPanelTest:';
+
+/** A template draft for the bot to DM to this exec member (Tort-Reborn
+ *  Tasks/publish_bot_panels.py answers on the same row). One per member: a
+ *  new request replaces theirs. Lapses after ten minutes if the bot is down. */
+export async function requestTemplateTest(discordId: string, request: { slug: string; content: PanelContent; ign: string }): Promise<void> {
+  await getPool().query(`
+    INSERT INTO cache_entries (cache_key, data, expires_at)
+    VALUES ($1, $2, NOW() + INTERVAL '10 minutes')
+    ON CONFLICT (cache_key) DO UPDATE SET data = EXCLUDED.data, expires_at = EXCLUDED.expires_at, created_at = NOW()
+  `, [TEST_PREFIX + discordId, JSON.stringify({ ...request, status: 'pending', requested_at: new Date().toISOString() })]);
+}
+
+export interface TemplateTest { slug: string; status: 'pending' | 'sending' | 'sent' | 'failed'; error: string | null; requested_at: string; expired: boolean }
+
+export async function getTemplateTest(discordId: string): Promise<TemplateTest | null> {
+  const { rows } = await getPool().query(
+    `SELECT data, expires_at < NOW() AS expired FROM cache_entries WHERE cache_key = $1`, [TEST_PREFIX + discordId],
+  );
+  if (!rows.length) return null;
+  const data = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
+  return { slug: data.slug, status: data.status, error: data.error ?? null, requested_at: data.requested_at, expired: rows[0].expired };
 }
 
 /** Another panel that already owns any of these Discord messages, if one does. */
@@ -77,6 +107,27 @@ export async function createPanel(slug: string, name: string): Promise<boolean> 
   return (rowCount ?? 0) > 0;
 }
 
+/** Archive or restore a panel (TAQ-144). Only the panel's flag changes: its
+ *  history, its links to Discord messages and the messages themselves stay. */
+export async function setPanelArchived(
+  slug: string, archived: boolean, authorName: string,
+): Promise<'ok' | 'missing' | 'template'> {
+  const { rows } = await getPool().query(`
+    UPDATE bot_panels
+       SET archived_at = CASE WHEN $2 THEN COALESCE(archived_at, NOW()) END,
+           archived_by = CASE WHEN $2 THEN COALESCE(archived_by, $3) END,
+           updated_at = NOW()
+     WHERE slug = $1 AND (template IS NULL OR NOT $2)
+    RETURNING id
+  `, [slug, archived, authorName]);
+  if (rows.length) return 'ok';
+  return (await getPanelTemplate(slug)) === undefined ? 'missing' : 'template';
+}
+
+export class PanelArchived extends Error {
+  constructor() { super('This panel is archived. Restore it to publish.'); }
+}
+
 export class RevisionConflict extends Error {
   constructor(public latestRev: number, public latestAuthor: string | null) {
     super(`Revision ${latestRev} was saved by ${latestAuthor ?? 'someone'} while you were editing.`);
@@ -85,7 +136,8 @@ export class RevisionConflict extends Error {
 
 export interface NewRevision {
   content: PanelContent;
-  channelId: string;
+  /** null for a template panel, which is never posted */
+  channelId: string | null;
   adoptMessageIds: string[] | null;
   note: string;
   restoredFrom: number | null;
@@ -103,9 +155,10 @@ export async function createRevision(slug: string, r: NewRevision): Promise<numb
   try {
     await client.query('BEGIN');
     const { rows: [panel] } = await client.query(
-      `SELECT id FROM bot_panels WHERE slug = $1 FOR UPDATE`, [slug],
+      `SELECT id, archived_at FROM bot_panels WHERE slug = $1 FOR UPDATE`, [slug],
     );
     if (!panel) { await client.query('ROLLBACK'); return null; }
+    if (panel.archived_at) { await client.query('ROLLBACK'); throw new PanelArchived(); }
 
     const { rows: [latest] } = await client.query(
       `SELECT rev_number, author_name FROM bot_panel_revisions WHERE panel_id = $1 ORDER BY rev_number DESC LIMIT 1`,
@@ -172,7 +225,7 @@ export async function republishPanelsUsing(
     JOIN LATERAL (
       SELECT content FROM bot_panel_revisions WHERE panel_id = p.id ORDER BY rev_number DESC LIMIT 1
     ) r ON TRUE
-    WHERE cardinality(p.message_ids) > 0 AND r.content::text ~ $1
+    WHERE cardinality(p.message_ids) > 0 AND p.archived_at IS NULL AND r.content::text ~ $1
     ORDER BY p.name
   `, [`\{\{\s*(${safe.join('|')})\s*\}\}`]);
 
@@ -182,8 +235,9 @@ export async function republishPanelsUsing(
     try {
       await client.query('BEGIN');
       const { rows: [panel] } = await client.query(
-        `SELECT id, name, channel_id FROM bot_panels WHERE slug = $1 FOR UPDATE`, [slug],
+        `SELECT id, name, channel_id, archived_at FROM bot_panels WHERE slug = $1 FOR UPDATE`, [slug],
       );
+      if (panel.archived_at) { await client.query('ROLLBACK'); continue; } // archived since the scan
       const { rows: [latest] } = await client.query(
         `SELECT rev_number, content, channel_id FROM bot_panel_revisions WHERE panel_id = $1 ORDER BY rev_number DESC LIMIT 1`,
         [panel.id],

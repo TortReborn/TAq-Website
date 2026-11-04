@@ -19,10 +19,28 @@ export const PANEL_VALUES: PanelValueDef[] = [
   { key: 'tome_queue', label: 'Tome queue', editHref: '/exec/distribution', editLabel: 'Distribution' },
 ];
 
-const BY_KEY = new Map(PANEL_VALUES.map(v => [v.key, v]));
+/**
+ * The member a template panel is being sent to (TAQ-142), filled in by the bot
+ * per send (Tort-Reborn Helpers/bot_panels.member_values, keep in sync). Only
+ * template panels may use them; the sample is what the preview shows.
+ */
+export interface TemplateValueDef { key: string; label: string; sample: string }
+
+export const MEMBER_AVATAR = '{{member_avatar}}';
+
+export const TEMPLATE_VALUES: TemplateValueDef[] = [
+  { key: 'member', label: 'Member', sample: '@NewFish' },
+  { key: 'ign', label: 'IGN', sample: 'NewFish' },
+  { key: 'member_avatar', label: 'Member avatar', sample: 'https://cdn.discordapp.com/embed/avatars/0.png' },
+];
+
+export const TEMPLATE_SAMPLES: Record<string, string> = Object.fromEntries(TEMPLATE_VALUES.map(v => [v.key, v.sample]));
+
+const BY_KEY = new Map<string, { label: string }>([...PANEL_VALUES, ...TEMPLATE_VALUES].map(v => [v.key, v]));
 const VALUE_RE = /\{\{\s*([a-z_]+)\s*\}\}/g;
 
-export const isPanelValue = (key: string) => BY_KEY.has(key);
+export const isPanelValue = (key: string) => PANEL_VALUES.some(v => v.key === key);
+export const isTemplateValue = (key: string) => key in TEMPLATE_SAMPLES;
 
 /** Long text that keeps growing, so only an embed description has room for it. */
 export const DESCRIPTION_ONLY_VALUES = ['tome_queue'];
@@ -58,7 +76,7 @@ export function valuesToReadable(text: string): string {
 /** {Label} -> stored {{key}}; anything that isn't a value's label is left alone. */
 export function valuesFromReadable(text: string): string {
   return text.replace(/(?<!\{)\{([^{}\n]+)\}(?!\})/g, (whole, label: string) => {
-    const def = PANEL_VALUES.find(v => v.label.toLowerCase() === label.trim().toLowerCase());
+    const def = [...PANEL_VALUES, ...TEMPLATE_VALUES].find(v => v.label.toLowerCase() === label.trim().toLowerCase());
     return def ? `{{${def.key}}}` : whole;
   });
 }

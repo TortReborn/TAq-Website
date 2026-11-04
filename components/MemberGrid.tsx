@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { getRankGradientCss, getRankGradientColorAt } from "@/lib/rank-constants";
 
 interface Member {
@@ -341,21 +341,6 @@ function RankSection({ rankName, members, showOnlineOnly }: { rankName: string; 
 }
 
 export default function MemberGrid({ members, onRefresh, showOnlineOnly = false }: MemberGridProps) {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleRefresh = async () => {
-    if (!onRefresh) return;
-
-    setIsRefreshing(true);
-    try {
-      await onRefresh();
-    } catch (error) {
-      console.error('Error refreshing:', error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
   // Filter members based on online toggle
   const filteredMembers = showOnlineOnly ? members.filter(member => isOnline(member)) : members;
 
