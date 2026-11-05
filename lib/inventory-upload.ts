@@ -9,7 +9,7 @@ import {
   matchInventoryLocations,
   matchInventorySnapshot,
 } from '@/lib/inventory-snapshots';
-import { isAuthorizedInventoryClient } from '@/lib/inventory-auth';
+import { authorizeInventoryClient, InventoryAuthError } from '@/lib/inventory-auth';
 
 // Non-character-bank sources; everything else looks up location_prefix by source_key.
 const FIXED_LOCATION_PREFIXES: Record<string, string> = {
@@ -64,10 +64,13 @@ function asLocationReports(value: unknown): Array<{ name: string; page: number; 
 }
 
 export async function handleInventoryUpload(request: NextRequest) {
-  if (!isAuthorizedInventoryClient(request)) {
-    return NextResponse.json({ error: 'Only Woealer can upload inventory snapshots.' }, { status: 403 });
+  let uploader: string;
+  try {
+    uploader = (await authorizeInventoryClient(request, 'upload')).name;
+  } catch (error) {
+    if (error instanceof InventoryAuthError) return NextResponse.json({ error: error.message }, { status: error.status });
+    throw error;
   }
-  const uploader = 'Woealer';
 
   let body: Record<string, unknown>;
   try {
