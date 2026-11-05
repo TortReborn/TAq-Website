@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { escapeDiscordMarkdown } from '@/lib/discord-markdown';
+import { authorizeManagementClient, ManagementClientAuthError } from '@/lib/management-client-auth';
 
 export const dynamic = 'force-dynamic';
-
-const STORAGE_ACCOUNT = 'GordLonner';
-
-function authorizedAccount(request: NextRequest): string | null {
-  const header = request.headers.get('authorization') ?? '';
-  const match = header.match(/^Bearer\s+(.+)$/i);
-  if (!match || match[1].trim().toLocaleLowerCase('en-US') !== STORAGE_ACCOUNT.toLocaleLowerCase('en-US')) {
-    return null;
-  }
-  return STORAGE_ACCOUNT;
-}
 
 function formatBalance(balance: number): string {
   return `${Math.floor(balance / 64)} stx + ${balance % 64} LE`;
@@ -59,8 +49,11 @@ async function postDiscordUpdate(entry: {
 }
 
 export async function GET(request: NextRequest) {
-  if (!authorizedAccount(request)) {
-    return NextResponse.json({ success: false, error: 'Only GordLonner may read the guild balance.' }, { status: 403 });
+  try {
+    await authorizeManagementClient(request, 'le-balance', 'canRead');
+  } catch (error) {
+    if (error instanceof ManagementClientAuthError) return NextResponse.json({ success: false, error: error.message }, { status: error.status });
+    throw error;
   }
 
   try {
@@ -77,7 +70,7 @@ export async function GET(request: NextRequest) {
       balance,
       formatted_balance: formatBalance(balance),
       updated_at: latest?.created_at ?? null,
-    });
+    }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('LE balance fetch error:', error);
     return NextResponse.json({ success: false, error: 'Could not read the guild balance.' }, { status: 500 });
@@ -85,9 +78,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const storageAccount = authorizedAccount(request);
-  if (!storageAccount) {
-    return NextResponse.json({ success: false, error: 'Only GordLonner may update the guild balance.' }, { status: 403 });
+  let storageAccount: string;
+  try {
+    storageAccount = (await authorizeManagementClient(request, 'le-balance', 'canWrite')).name;
+  } catch (error) {
+    if (error instanceof ManagementClientAuthError) return NextResponse.json({ success: false, error: error.message }, { status: error.status });
+    throw error;
   }
 
   let body: Record<string, unknown>;
@@ -135,7 +131,7 @@ export async function POST(request: NextRequest) {
       formatted_balance: formatBalance(balance),
       timestamp: timestamp.toISOString(),
       discord_posted: discordPosted,
-    });
+    }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('LE balance update error:', error);
     return NextResponse.json({ success: false, error: 'Could not record the guild balance.' }, { status: 500 });
