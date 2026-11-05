@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
-import { isAuthorizedInventoryClient } from '@/lib/inventory-auth';
+import { authorizeInventoryClient, InventoryAuthError } from '@/lib/inventory-auth';
 import { listScanProfiles } from '@/lib/inventory-scan-profiles';
 
 export const dynamic = 'force-dynamic';
@@ -19,8 +19,11 @@ const toCatalogItem = (row: CatalogRow) => ({
 // mod's login fetch. `?include=archived` adds `archivedItems` so the sync check can tell an
 // item execs retired from one the website never had; the mod doesn't send it.
 export async function GET(request: NextRequest) {
-  if (!isAuthorizedInventoryClient(request)) {
-    return NextResponse.json({ error: 'Unauthorized.' }, { status: 403 });
+  try {
+    await authorizeInventoryClient(request, 'read');
+  } catch (error) {
+    if (error instanceof InventoryAuthError) return NextResponse.json({ error: error.message }, { status: error.status });
+    throw error;
   }
 
   const includeArchived = request.nextUrl.searchParams.get('include') === 'archived';
@@ -47,7 +50,7 @@ export async function GET(request: NextRequest) {
         startPage: profile.startPage,
         totalPages: profile.totalPages,
       })),
-    });
+    }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('Inventory catalog fetch error:', error);
     return NextResponse.json({ error: 'Failed to load inventory catalog.' }, { status: 500 });
