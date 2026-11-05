@@ -3,7 +3,7 @@
 //
 // Usage:
 //   node scripts/check-inventory-catalog-sync.js \
-//     --base-url https://www.the-aquarium.com --token Woealer --mod-path ../taq-management-utils
+//     --base-url https://www.the-aquarium.com --mod-path ../taq-management-utils
 //
 // Flags fall back to env vars (CATALOG_BASE_URL, CATALOG_TOKEN, MOD_REPO_PATH).
 
@@ -69,7 +69,8 @@ async function fetchCatalog(baseUrl, token) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const baseUrl = args['base-url'] || process.env.CATALOG_BASE_URL || 'https://www.the-aquarium.com';
-  const token = args.token || process.env.CATALOG_TOKEN || 'Woealer';
+  const token = process.env.CATALOG_TOKEN;
+  if (!token) throw new Error('Set CATALOG_TOKEN to a verified inventory session token.');
   const modPath = path.resolve(args['mod-path'] || process.env.MOD_REPO_PATH || '../taq-management-utils');
 
   console.log(`Mod source:   ${modPath}`);
