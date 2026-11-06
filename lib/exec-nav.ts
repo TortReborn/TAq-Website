@@ -69,7 +69,7 @@ export const EXEC_NAV: ExecNavGroup[] = [
     category: 'Operations',
     items: [
       { href: '/exec/agenda', label: 'Agenda', desc: 'View and manage meeting agenda', iconImage: '/images/icons/exec/agenda.png' },
-      { href: '/exec/bot-panels', label: 'Bot Messages', desc: 'Edit the bot\'s info panels in Discord', iconImage: '/images/icons/exec/bot-panels.png' },
+      { href: '/exec/bot-panels', label: 'Bot Messages', desc: 'The bot\'s info panels in Discord', iconImage: '/images/icons/exec/bot-panels.png' },
       { href: '/exec/requests', label: 'Requests', desc: 'Report bugs and request features', iconImage: '/images/icons/exec/requests.png' },
       { href: '/exec/chronicle', label: 'Chronicle', desc: 'Review map alliance and event submissions', iconImage: '/images/icons/exec/chronicle.png' },
       { href: '/exec/analytics', label: 'Analytics', desc: 'Site usage analytics', iconImage: '/images/icons/exec/analytics.png', requires: 'analytics' },

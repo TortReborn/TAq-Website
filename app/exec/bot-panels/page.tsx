@@ -9,7 +9,7 @@ import { PANEL_TEMPLATES, groupPanels, type PanelRegistry, type PanelSummary } f
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 
-interface ListResponse { panels: PanelSummary[]; registry: PanelRegistry | null }
+interface ListResponse { panels: PanelSummary[]; registry: PanelRegistry | null; can_edit: boolean }
 
 export default function BotPanelsPage() {
   const router = useRouter();
@@ -46,21 +46,25 @@ export default function BotPanelsPage() {
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Bot Messages</h1>
           <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            The bot&apos;s info panels in Discord. Edit one and publish, and the bot updates the live message within a few seconds.
+            {data.can_edit
+              ? <>The bot&apos;s info panels in Discord. Edit one and publish, and the bot updates the live message within a few seconds.</>
+              : <>The bot&apos;s info panels in Discord. You can view them and their history; only Narwhals can edit them.</>}
           </p>
         </div>
-        <button onClick={() => setShowNew(v => !v)} style={{ ...btnStyle, background: showNew ? 'var(--bg-card)' : 'rgba(34, 197, 94, 0.15)', color: showNew ? 'var(--text-secondary)' : '#22c55e' }}>
-          {showNew ? 'Cancel' : '+ New panel'}
-        </button>
+        {data.can_edit && (
+          <button onClick={() => setShowNew(v => !v)} style={{ ...btnStyle, background: showNew ? 'var(--bg-card)' : 'rgba(34, 197, 94, 0.15)', color: showNew ? 'var(--text-secondary)' : '#22c55e' }}>
+            {showNew ? 'Cancel' : '+ New panel'}
+          </button>
+        )}
       </div>
 
-      {!data.registry && (
+      {data.can_edit && !data.registry && (
         <div style={{ padding: '0.75rem', borderRadius: '0.375rem', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', color: '#eab308', fontSize: '0.85rem' }}>
           The bot hasn&apos;t reported its channels and buttons yet. Pickers stay empty until it has been online once with this update.
         </div>
       )}
 
-      {showNew && (
+      {data.can_edit && showNew && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '1rem', display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.75rem', alignItems: 'end' }}>
           <div>
             <label style={labelStyle}>Name</label>
@@ -103,7 +107,7 @@ export default function BotPanelsPage() {
                   {p.latest_rev ? <>rev {p.latest_rev} · {p.latest_author ?? 'unknown'} · {timeAgo(p.latest_at)}</> : '—'}
                 </td>
                 <td style={{ ...td, textAlign: 'right' }}>
-                  <Link href={`/exec/bot-panels/${p.slug}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>Edit</Link>
+                  <Link href={`/exec/bot-panels/${p.slug}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>{data.can_edit ? 'Edit' : 'View'}</Link>
                 </td>
               </tr>
               ))}
