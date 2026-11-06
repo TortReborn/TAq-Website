@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Ticket, TicketStatus } from '@/hooks/useExecTracker';
-import { COLUMN_ORDER, VISIBLE_COLUMN_COUNT } from './constants';
+import { COLUMN_ORDER, PEEK_COLUMN_FRACTION, VISIBLE_COLUMN_COUNT } from './constants';
 import KanbanColumn from './KanbanColumn';
 
 export default function KanbanBoard({
@@ -44,13 +44,14 @@ export default function KanbanBoard({
     onMoveTicket(ticketId, status, position);
   };
 
-  // Fit exactly VISIBLE_COLUMN_COUNT columns in the visible area; the
-  // extra columns (declined, archived) scroll off to the right.
-  // 0.75rem gap * (N - 1) between the visible N columns.
-  const colBasis = `calc((100% - ${(VISIBLE_COLUMN_COUNT - 1) * 0.75}rem) / ${VISIBLE_COLUMN_COUNT})`;
+  // Fit VISIBLE_COLUMN_COUNT columns plus part of the next one (deployed) in
+  // the visible area; the rest (declined, archived) scroll off to the right.
+  // 0.75rem gap after each of the visible N columns. 100% is the content box,
+  // so --kanban-bleed (see globals.css) adds back the page padding it runs into.
+  const colBasis = `calc((100% + var(--kanban-bleed) - ${VISIBLE_COLUMN_COUNT * 0.75}rem) / ${VISIBLE_COLUMN_COUNT + PEEK_COLUMN_FRACTION})`;
 
   return (
-    <div style={{
+    <div className="kanban-board" style={{
       display: 'flex',
       gap: '0.75rem',
       flex: 1,

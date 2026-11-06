@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS tracker_tickets (
   title         VARCHAR(200)  NOT NULL,
   description   TEXT          NOT NULL,
   status        VARCHAR(20)   NOT NULL DEFAULT 'untriaged'
-                              CHECK (status IN ('untriaged', 'todo', 'blocked', 'in_progress', 'deployed', 'declined', 'archived')),
+                              CHECK (status IN ('untriaged', 'todo', 'blocked', 'in_progress', 'ready_for_deploy', 'deployed', 'declined', 'archived')),
   priority      VARCHAR(10)   NOT NULL DEFAULT 'medium'
                               CHECK (priority IN ('low', 'medium', 'high', 'critical')),
   submitted_by  BIGINT        NOT NULL,
