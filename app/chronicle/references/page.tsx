@@ -3,7 +3,7 @@ import path from 'path';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
-import { canSeeRedacted, redactText } from '@/lib/wiki-redaction';
+import { canSeeRedacted, redactSourceMeta } from '@/lib/wiki-redaction';
 
 /**
  * Index of every archived source the wiki cites, so a reader can browse the
@@ -49,10 +49,7 @@ export default async function ReferencesIndex() {
   const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
   if (!canSeeRedacted(principal)) {
     sources = Object.fromEntries(
-      Object.entries(sources).map(([id, s]) => [
-        id,
-        { ...s, title: s.title ? redactText(s.title) : s.title, note: s.note ? redactText(s.note) : s.note },
-      ]),
+      Object.entries(sources).map(([id, s]) => [id, redactSourceMeta(s)]),
     );
   }
   const byKind = new Map<string, [string, SourceMeta][]>();

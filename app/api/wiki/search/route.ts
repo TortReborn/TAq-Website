@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { searchWikiPages } from '@/lib/wiki-db';
 import { resolveWikiPrincipal } from '@/lib/wiki-auth';
-import { canSeeRedacted, redactSummaries } from '@/lib/wiki-redaction';
+import { canSeeRedacted, redactSearchResults } from '@/lib/wiki-redaction';
 import { canEnterChronicle } from '@/lib/chronicle-gate';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const found = await searchWikiPages(getPool(), q, 20);
     // Searching a redacted name must not confirm the page exists, and must not
     // return the summaries of other pages that mention it verbatim.
-    const results = canSeeRedacted(principal) ? found : redactSummaries(found);
+    const results = canSeeRedacted(principal) ? found : redactSearchResults(found, q);
     return NextResponse.json({ results });
   } catch (error) {
     console.error('[api:wiki/search] failed:', error);
