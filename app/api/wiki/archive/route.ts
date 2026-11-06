@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { canSeeRedacted, isRedactedSlug, redactText } from '@/lib/wiki-redaction';
+import { canSeeRedacted, isRedactedSlug, redactSourceMeta, redactText } from '@/lib/wiki-redaction';
 import { canEnterChronicle } from '@/lib/chronicle-gate';
 import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
 import fs from 'fs';
@@ -144,7 +144,7 @@ export async function GET() {
         title: unredacted ? (s.title?.trim() || id) : redactText(s.title?.trim() || id),
         tier: s.tier ?? 'unclassified',
         kind: s.kind ?? 'web',
-        url: s.url ?? '',
+        url: unredacted ? (s.url ?? '') : (redactSourceMeta({ url: s.url ?? '' }).url ?? ''),
         words: words.get(id) ?? 0,
         // Trimmed here rather than in the browser: the panel shows 160
         // characters, and a few hundred notes at full length is the bulk of

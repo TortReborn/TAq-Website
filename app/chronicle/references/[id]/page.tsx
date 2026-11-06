@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ExternalLink, Archive } from 'lucide-react';
 import { resolveWikiPrincipalFromCookies } from '@/lib/wiki-auth';
-import { canSeeRedacted, redactText } from '@/lib/wiki-redaction';
+import { canSeeRedacted, redactSourceMeta, redactText } from '@/lib/wiki-redaction';
 
 /**
  * A reference page: our archived copy of one source, so every citation in the
@@ -81,9 +81,7 @@ export default async function ReferencePage({ params }: { params: Promise<{ id: 
   // from the page that hid it.
   const principal = await resolveWikiPrincipalFromCookies().catch(() => null);
   const unredacted = canSeeRedacted(principal);
-  const meta = unredacted
-    ? found.meta
-    : { ...found.meta, title: found.meta.title ? redactText(found.meta.title) : found.meta.title };
+  const meta = unredacted ? found.meta : redactSourceMeta(found.meta);
   const body = unredacted ? found.body : redactText(found.body);
 
   const isUrl = /^https?:\/\//.test(meta.url ?? '');

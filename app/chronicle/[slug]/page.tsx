@@ -13,6 +13,7 @@ import {
   redactLinkRows,
   redactPage,
   redactSlugSet,
+  redactText,
 } from '@/lib/wiki-redaction';
 import WikiArticleView from '@/components/WikiArticleView';
 
@@ -80,7 +81,11 @@ export default async function WikiArticlePage({ params }: { params: Promise<{ sl
       citations={unredacted ? citations : redactCitations(citations)}
       redirectedFrom={redirectedFrom}
       verification={verification}
-      lastEditor={last ? { name: last.authorName, note: last.note, kind: last.authorKind } : null}
+      lastEditor={last ? {
+        name: unredacted ? last.authorName : redactText(last.authorName),
+        note: unredacted ? last.note : redactText(last.note),
+        kind: last.authorKind,
+      } : null}
     />
   );
 }

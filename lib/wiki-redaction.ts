@@ -39,9 +39,9 @@ export interface RedactedIdentity {
   /** The person's own page. Unreachable, and absent from every listing. */
   slug: string;
   /**
-   * Every spelling that occurs in stored text, longest first. Matched on word
-   * boundaries and case-insensitively, so "Godenn" is caught before "Goden"
-   * and neither matches inside a longer word.
+   * Every spelling that occurs in stored text, longest first. Matched
+   * case-insensitively and never inside a longer word. See identityPattern for
+   * the account-name forms each spelling also covers.
    */
   names: string[];
   /**
@@ -97,6 +97,18 @@ export function isRedactedSlug(slug: string): boolean {
 
 function escapeRe(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * A name as it appears in stored text, including the forms accounts take: an
+ * @-mention, trailing digits or underscores, and a Discord #discriminator, all
+ * of which identify the person as well as the name does. `\b` can't express
+ * this, because a digit counts as a word character, so "Goden02" has no boundary
+ * after "Goden".
+ */
+function identityPattern(identity: RedactedIdentity): string {
+  const names = [...identity.names].sort((a, b) => b.length - a.length).map(escapeRe).join('|');
+  return `(?<![\\p{L}\\p{N}_])@?(?:${names})[0-9_]*(?:#\\d{4})?(?![\\p{L}\\p{N}_])`;
 }
 
 /** `[[goden|Goden]]`, `[[goden]]`, `[[Goden|the officer]]` — any link at a redacted slug. */
@@ -169,8 +181,7 @@ export function redactText(text: string | null | undefined): string {
   // 3. Bare names, wherever they occur — prose, infobox values, citation
   //    locators, captured source documents.
   for (const identity of REDACTED_IDENTITIES) {
-    const names = [...identity.names].sort((a, b) => b.length - a.length);
-    const re = new RegExp(`\\b(?:${names.map(escapeRe).join('|')})\\b`, 'gi');
+    const re = new RegExp(identityPattern(identity), 'giu');
     out = out.replace(re, (_m, offset: number) =>
       insideQuotation(out, offset) ? `[${identity.alias}]` : identity.alias,
     );
@@ -183,8 +194,7 @@ export function redactText(text: string | null | undefined): string {
 export function hasRedactedContent(text: string | null | undefined): boolean {
   if (!text) return false;
   for (const identity of REDACTED_IDENTITIES) {
-    const re = new RegExp(`\\b(?:${identity.names.map(escapeRe).join('|')})\\b`, 'i');
-    if (re.test(text)) return true;
+    if (new RegExp(identityPattern(identity), 'iu').test(text)) return true;
     if (identity.assets.some((a) => text.includes(a))) return true;
     if (new RegExp(`\\[\\[\\s*${escapeRe(identity.slug)}\\s*[|\\]]`, 'i').test(text)) return true;
   }
@@ -243,6 +253,42 @@ export function redactSummaries<T extends WikiPageSummary & { note?: string }>(r
     }));
 }
 
+/**
+ * Search results for a reader without review rights.
+ *
+ * Redacting the rows isn't enough, because search still matches the stored text.
+ * Searching a name would list every page that mentions it, tying the alias to
+ * the name, so a query naming someone returns nothing. A partial name can also
+ * hit a stored title, so a row is kept only if the query matches what this reader
+ * can see of its title, or the title never carried a name.
+ */
+export function redactSearchResults<T extends WikiPageSummary & { note?: string }>(
+  rows: T[],
+  query: string,
+): T[] {
+  const q = query.trim().toLowerCase();
+  const namesSomeone = REDACTED_IDENTITIES.some(
+    (identity) => identity.names.some((name) => q.includes(name.toLowerCase())) || q.includes(identity.slug),
+  );
+  if (namesSomeone) return [];
+  return redactSummaries(
+    rows.filter((row) => !hasRedactedContent(row.title) || redactText(row.title).toLowerCase().includes(q)),
+  );
+}
+
+/**
+ * Source manifest entries. A URL can't be rewritten and still work, so one that
+ * names someone is dropped rather than served.
+ */
+export function redactSourceMeta<T extends { title?: string; note?: string; url?: string }>(meta: T): T {
+  return {
+    ...meta,
+    ...(typeof meta.title === 'string' ? { title: redactText(meta.title) } : {}),
+    ...(typeof meta.note === 'string' ? { note: redactText(meta.note) } : {}),
+    ...(typeof meta.url === 'string' && hasRedactedContent(meta.url) ? { url: '' } : {}),
+  };
+}
+
 /** Backlink rows and anything else shaped `{ slug, title }`. */
 export function redactLinkRows<T extends { slug: string; title: string }>(rows: T[]): T[] {
   return rows
@@ -280,7 +326,14 @@ export function redactSlugSet(slugs: Iterable<string>): string[] {
 
 /** Page history: revision bodies are stored text and carry names like any other. */
 export function redactRevisions<
-  T extends { title: string; summary: string; body: string; infobox: WikiInfoboxRow[] },
+  T extends {
+    title: string;
+    summary: string;
+    body: string;
+    infobox: WikiInfoboxRow[];
+    note?: string;
+    authorName?: string;
+  },
 >(revisions: T[]): T[] {
   return revisions.map((r) => ({
     ...r,
@@ -288,6 +341,8 @@ export function redactRevisions<
     summary: redactText(r.summary),
     body: redactText(r.body),
     infobox: redactInfobox(r.infobox),
+    ...(typeof r.note === 'string' ? { note: redactText(r.note) } : {}),
+    ...(typeof r.authorName === 'string' ? { authorName: redactText(r.authorName) } : {}),
   }));
 }
 
