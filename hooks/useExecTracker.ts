@@ -3,7 +3,7 @@ import { fetcher } from './fetcher';
 
 export type TicketType = 'bug' | 'feature';
 export type TicketSystem = 'discord_bot' | 'minecraft_mod' | 'website';
-export type TicketStatus = 'untriaged' | 'todo' | 'blocked' | 'in_progress' | 'deployed' | 'declined' | 'archived';
+export type TicketStatus = 'untriaged' | 'todo' | 'blocked' | 'in_progress' | 'ready_for_deploy' | 'deployed' | 'declined' | 'archived';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Ticket {
