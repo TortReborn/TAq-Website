@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession, isNarwhalRank } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
+import { loadPromotionTargets, promotionTarget } from '@/lib/promotion-targets';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
@@ -205,12 +206,23 @@ export async function POST(request: NextRequest) {
       if (actionType === 'promote' && newIdx <= currentIdx) {
         return NextResponse.json({ error: 'New rank must be higher for promotion' }, { status: 400 });
       }
+      if (actionType === 'promote' && newIdx >= userRankIdx) {
+        return NextResponse.json({ error: 'You can only promote members to a rank below your own' }, { status: 403 });
+      }
       if (actionType === 'demote' && newIdx >= currentIdx) {
         return NextResponse.json({ error: 'New rank must be lower for demotion' }, { status: 400 });
       }
     }
 
     const pool = getPool();
+
+    const target = promotionTarget(await loadPromotionTargets(pool, [uuid]), uuid);
+    if (!target) {
+      return NextResponse.json({ error: 'This player has no linked account' }, { status: 404 });
+    }
+    if (target.rank !== currentRank) {
+      return NextResponse.json({ error: 'This player\'s rank has changed. Refresh and try again' }, { status: 409 });
+    }
 
     // Check for duplicate pending entry
     const existing = await pool.query(
@@ -224,7 +236,7 @@ export async function POST(request: NextRequest) {
     await pool.query(
       `INSERT INTO promotion_queue (uuid, ign, current_rank, new_rank, action_type, queued_by_discord_id, queued_by_ign, grant_honorific)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [uuid, ign, currentRank, newRank || null, actionType, session.discord_id, session.ign, honorific]
+      [uuid, target.ign, target.rank, newRank || null, actionType, session.discord_id, session.ign, honorific]
     );
 
     // Auto-remove from promo suggestions if present

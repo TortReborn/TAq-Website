@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession, isNarwhalRank } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
+import { loadPromotionTargets, promotionTarget } from '@/lib/promotion-targets';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,9 @@ export async function POST(request: NextRequest) {
         if (entry.actionType === 'promote' && newIdx <= currentIdx) {
           return NextResponse.json({ error: `New rank must be higher for ${entry.ign}` }, { status: 400 });
         }
+        if (entry.actionType === 'promote' && newIdx >= userRankIdx) {
+          return NextResponse.json({ error: `You can only promote ${entry.ign} to a rank below your own` }, { status: 403 });
+        }
         if (entry.actionType === 'demote' && newIdx >= currentIdx) {
           return NextResponse.json({ error: `New rank must be lower for ${entry.ign}` }, { status: 400 });
         }
@@ -67,6 +71,18 @@ export async function POST(request: NextRequest) {
     }
 
     const pool = getPool();
+
+    const targets = await loadPromotionTargets(pool, entries.map((e: any) => e.uuid));
+    for (const entry of entries) {
+      const target = promotionTarget(targets, entry.uuid);
+      if (!target) {
+        return NextResponse.json({ error: `${entry.ign} has no linked account` }, { status: 404 });
+      }
+      if (target.rank !== entry.currentRank) {
+        return NextResponse.json({ error: `${entry.ign}'s rank has changed. Refresh and try again` }, { status: 409 });
+      }
+    }
+
     const client = await pool.connect();
 
     try {
@@ -88,10 +104,11 @@ export async function POST(request: NextRequest) {
           skipped++;
           continue;
         }
+        const target = promotionTarget(targets, entry.uuid)!;
         await client.query(
           `INSERT INTO promotion_queue (uuid, ign, current_rank, new_rank, action_type, queued_by_discord_id, queued_by_ign, grant_honorific)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [entry.uuid, entry.ign, entry.currentRank, entry.newRank || null,
+          [entry.uuid, target.ign, target.rank, entry.newRank || null,
            entry.actionType, session.discord_id, session.ign, entry.grantHonorific || null]
         );
         inserted++;
