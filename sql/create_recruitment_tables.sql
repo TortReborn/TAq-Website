@@ -41,5 +41,5 @@ CREATE TABLE IF NOT EXISTS recruitment_messages (
   discord_id  BIGINT       NOT NULL,     -- who last edited it
   ign         VARCHAR(64)  NOT NULL,
   updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  CHECK (char_length(body) <= CASE kind WHEN 'pfinder' THEN 140 ELSE 250 END)
+  CHECK (char_length(body) <= CASE kind WHEN 'pfinder' THEN 140 ELSE 200 END)
 );

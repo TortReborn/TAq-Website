@@ -200,8 +200,8 @@ describe.skipIf(!available)('recruitment-db', () => {
     it('holds each kind to its in-game limit, counting characters not UTF-16 units', async () => {
       expect(await refused(saveMessage(A, 'pfinder', 'x'.repeat(141), null, pool), 400)).toMatch(/at most 140/);
       await saveMessage(A, 'pfinder', '🐟'.repeat(140), null, pool);
-      await saveMessage(A, 'shout', 'x'.repeat(250), null, pool);
-      expect(await refused(saveMessage(A, 'shout', 'x'.repeat(251), null, pool), 400)).toMatch(/at most 250/);
+      await saveMessage(A, 'shout', 'x'.repeat(200), null, pool);
+      expect(await refused(saveMessage(A, 'shout', 'x'.repeat(201), null, pool), 400)).toMatch(/at most 200/);
       // the table refuses it too, whatever writes to it. Through a checked-out
       // client: a failed pool.query discards the connection, and the temp tables with it
       const c = await pool.connect();
