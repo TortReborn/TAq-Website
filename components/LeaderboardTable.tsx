@@ -21,13 +21,10 @@ interface Member {
   contributionRank?: number;
   joined?: string;
   discordRank: string;
-  discordId?: string;
-  discordUsername?: string;
   guildRankName: string;
   wars: number;
   raids: number;
   shells: number;
-  lastJoin: string | null;
   playtime: number;
   // All time frame stats pre-calculated
   timeFrames: Record<string, TimeFrameStats>;
