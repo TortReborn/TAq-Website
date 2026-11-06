@@ -1,0 +1,20 @@
+name: Private inventory data
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Fail if item rows or saved recipe links are committed
+        run: |
+          # -l prints file names only, because this repo's CI logs are public
+          if git grep -lE "crafter/#[A-Za-z0-9]|\('(consumable|ingredient):"; then
+            echo "Keep item rows and recipe links in the database, not in this repo."
+            exit 1
+          fi
