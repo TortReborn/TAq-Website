@@ -1249,6 +1249,27 @@ body.site-fixed-bg-active > footer {
   }
 }
 
+/* The tracker board runs through the right padding of .exec-main to the window
+   edge, so a column cut off there reads as scrollable. The padding keeps the
+   last column off the edge once scrolled to the end. */
+.kanban-board {
+  --kanban-bleed: 2rem;
+  margin-right: calc(-1 * var(--kanban-bleed));
+  padding-right: var(--kanban-bleed);
+}
+
+@media (max-width: 900px) {
+  .kanban-board {
+    --kanban-bleed: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-board {
+    --kanban-bleed: 0.75rem;
+  }
+}
+
 /* Side-by-side exec columns have px minimums that together exceed a phone's
    width, so the narrow first column could not hold its own buttons and they
    hung outside it. Stack them and let the page scroll instead of pinning the

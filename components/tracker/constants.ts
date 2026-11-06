@@ -7,14 +7,16 @@ export const COLUMN_ORDER: TicketStatus[] = [
   'todo',
   'blocked',
   'in_progress',
+  'ready_for_deploy',
   'deployed',
   'declined',
   'archived',
 ];
 
-/* Columns visible without horizontal scrolling. Remaining columns hang
-   off to the right and can be scrolled to. */
+/* Columns fully visible without horizontal scrolling. The next one is cut off
+   by the edge of the window at this fraction, so the board reads as scrollable. */
 export const VISIBLE_COLUMN_COUNT = 5;
+export const PEEK_COLUMN_FRACTION = 0.5;
 
 /* Deployed/declined tickets older than this roll over into `archived` on
    the next list fetch. Kept in sync with server-side archival logic. */
@@ -33,6 +35,7 @@ export const STATUS_LABELS: Record<string, string> = {
   todo: 'Todo',
   blocked: 'Blocked',
   in_progress: 'In Progress',
+  ready_for_deploy: 'Ready for Deploy',
   deployed: 'Deployed',
   declined: 'Declined',
   archived: 'Archived',
@@ -63,6 +66,7 @@ export const COLUMN_COLORS: Record<string, string> = {
   todo: '#a855f7',
   blocked: '#ec4899',
   in_progress: '#f59e0b',
+  ready_for_deploy: '#06b6d4',
   deployed: '#22c55e',
   declined: '#6b7280',
   archived: '#475569',
