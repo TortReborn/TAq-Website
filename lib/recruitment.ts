@@ -16,7 +16,7 @@ export const MAX_SESSION_HOURS = 24;
 /** The longest range the page asks for at once: a month view's six weeks, with room to spare. */
 export const MAX_RANGE_DAYS = 62;
 /** The in-game length limits of the guild's saved messages. */
-export const MESSAGE_LIMITS = { pfinder: 140, shout: 250 } as const;
+export const MESSAGE_LIMITS = { pfinder: 140, shout: 200 } as const;
 const DAY = 86_400_000;
 
 export type MessageKind = keyof typeof MESSAGE_LIMITS;
