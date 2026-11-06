@@ -121,7 +121,7 @@ export async function PATCH(
     let paramIdx = 1;
 
     if (body.status !== undefined) {
-      if (!['untriaged', 'todo', 'blocked', 'in_progress', 'deployed', 'declined', 'archived'].includes(body.status)) {
+      if (!['untriaged', 'todo', 'blocked', 'in_progress', 'ready_for_deploy', 'deployed', 'declined', 'archived'].includes(body.status)) {
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
       }
       // The same parameter is used twice; cast both uses or Postgres cannot

@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       created_at: 't.created_at',
       updated_at: 't.updated_at',
       priority: `CASE t.priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END`,
-      status: `CASE t.status WHEN 'untriaged' THEN 0 WHEN 'todo' THEN 1 WHEN 'blocked' THEN 2 WHEN 'in_progress' THEN 3 WHEN 'deployed' THEN 4 WHEN 'declined' THEN 5 WHEN 'archived' THEN 6 END`,
+      status: `CASE t.status WHEN 'untriaged' THEN 0 WHEN 'todo' THEN 1 WHEN 'blocked' THEN 2 WHEN 'in_progress' THEN 3 WHEN 'ready_for_deploy' THEN 4 WHEN 'deployed' THEN 5 WHEN 'declined' THEN 6 WHEN 'archived' THEN 7 END`,
     };
     const sortParam = searchParams.get('sort') || 'created_at';
     const sortColumn = allowedSorts[sortParam] || 't.created_at';
