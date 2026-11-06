@@ -1,5 +1,5 @@
 -- Management-only ingredient and consumable stock tracking.
--- Seed values were transcribed from TAq Data.xlsx on 2026-07-26.
+-- Item rows are kept in the database, not in this file.
 
 CREATE TABLE IF NOT EXISTS inventory_categories (
   id         BIGSERIAL   PRIMARY KEY,
@@ -88,99 +88,6 @@ VALUES
   ('consumable', 'Food', 'food', 30)
 ON CONFLICT (kind, slug) DO UPDATE
 SET name = EXCLUDED.name, sort_order = EXCLUDED.sort_order;
-
-WITH seed(
-  seed_key, category_slug, name, scan_key, aliases, quantity, desired_quantity,
-  texture_slug, sort_order
-) AS (
-  VALUES
-
-
-)
-INSERT INTO inventory_items (
-  seed_key, kind, category_id, name, scan_key, aliases, quantity, desired_quantity,
-  storage_bucket, texture_path, sort_order
-)
-SELECT
-  seed.seed_key, 'ingredient', category.id, seed.name, seed.scan_key, seed.aliases,
-  seed.quantity, seed.desired_quantity, 'misc_bucket',
-  '/inventory/ingredients/' || seed.texture_slug || '.png', seed.sort_order
-FROM seed
-JOIN inventory_categories category
-  ON category.kind = 'ingredient' AND category.slug = seed.category_slug
-ON CONFLICT (seed_key) DO NOTHING;
-
-WITH reserve_seed(seed_key, category_slug, name, aliases, texture_path, sort_order) AS (
-  VALUES
-)
-INSERT INTO inventory_items (
-  seed_key, kind, category_id, name, scan_key, aliases, quantity, reserve_quantity,
-  desired_quantity, storage_bucket, notes, texture_path, sort_order
-)
-SELECT
-  seed.seed_key, 'consumable', category.id, seed.name, seed.name, seed.aliases,
-  0, 0, NULL, 'character_bank', 'Reserve stock from Bonus Consu scans.',
-  seed.texture_path, seed.sort_order
-FROM reserve_seed seed
-JOIN inventory_categories category
-  ON category.kind = 'consumable' AND category.slug = seed.category_slug
-ON CONFLICT (seed_key) DO NOTHING;
-
-WITH seed(
-  seed_key, category_slug, name, aliases, quantity, desired_quantity, used_by,
-  bank_page, charges, storage_bucket, texture_file, sort_order
-) AS (
-  VALUES
-
-
-)
-INSERT INTO inventory_items (
-  seed_key, kind, category_id, name, scan_key, aliases, quantity, desired_quantity,
-  used_by, bank_page, charges, recipe_url, storage_bucket, texture_path, sort_order
-)
-SELECT
-  seed.seed_key, 'consumable', category.id, seed.name, seed.name, seed.aliases,
-  seed.quantity, seed.desired_quantity, seed.used_by, seed.bank_page, seed.charges,
-  CASE
-    WHEN seed.seed_key = 'consumable:current:twisted-food'
-      THEN 'https://hppeng-wynn.github.io/crafter/'
-    ELSE 'https://wynnbuilder.github.io/crafter/'
-  END,
-  seed.storage_bucket,
-  '/inventory/consumables/' || seed.texture_file, seed.sort_order
-FROM seed
-JOIN inventory_categories category
-  ON category.kind = 'consumable' AND category.slug = seed.category_slug
-ON CONFLICT (seed_key) DO NOTHING;
-
-WITH seed(seed_key, category_slug, name, notes, texture_file, sort_order) AS (
-  VALUES
-)
-INSERT INTO inventory_items (
-  seed_key, kind, category_id, name, scan_key, quantity, recipe_url, storage_bucket,
-  notes, texture_path, sort_order, archived, archived_at
-)
-SELECT
-  seed.seed_key, 'consumable', category.id, seed.name, seed.name, 0,
-  'https://wynnbuilder.github.io/crafter/', 'character_bank', seed.notes,
-  '/inventory/consumables/' || seed.texture_file, seed.sort_order, TRUE, NOW()
-FROM seed
-JOIN inventory_categories category
-  ON category.kind = 'consumable' AND category.slug = seed.category_slug
-ON CONFLICT (seed_key) DO NOTHING;
-
-INSERT INTO inventory_items (
-  seed_key, kind, category_id, name, scan_key, aliases, quantity, recipe_url,
-  storage_bucket, notes, texture_path, sort_order, archived, archived_at
-)
-SELECT
-  'consumable:archive:dex-pot', 'consumable', category.id, 'Dex Pot', 'Dex Pot',
-  ARRAY['Dexterity Pot'], 0, NULL, 'character_bank',
-  'Legacy Dexterity potion stock stored on a Bonus Consu class.',
-  '/inventory/unassigned/pot_dex.png', 1150, TRUE, NOW()
-FROM inventory_categories category
-WHERE category.kind = 'consumable' AND category.slug = 'potions'
-ON CONFLICT (seed_key) DO NOTHING;
 
 UPDATE inventory_items
 SET quantity = 0, reserve_quantity = 0
