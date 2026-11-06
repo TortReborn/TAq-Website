@@ -45,7 +45,7 @@ async function postToSnipeLogChannel(
   }
 
   const formData = new FormData();
-  formData.append('payload_json', JSON.stringify({ content: logText }));
+  formData.append('payload_json', JSON.stringify({ content: logText, allowed_mentions: { parse: [] } }));
   formData.append('files[0]', new Blob([imageBuffer]), imageFilename);
 
   const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
