@@ -13,6 +13,10 @@
  *      provenance only.
  *   2. No findings file is tracked by git. They live under docs/, gitignored.
  *   3. No article quotes a private source. The archive is never quoted.
+ *   4. A withdrawn source stays down: no document, url, images or source
+ *      folder, and no article embeds its images. Articles may still cite it.
+ *   5. A source that describes itself as private can't pass under another
+ *      kind. It must be private, withdrawn, or carry an explicit `consent` note.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,6 +41,43 @@ for (const id of privateIds) {
   const imgs = path.join(ROOT, 'public/images/chronicles', id);
   if (fs.existsSync(imgs)) breaches.push(`private source ${id} has images under public/ at ${path.relative(ROOT, imgs)}`);
   if (sources[id].url) breaches.push(`private source ${id} carries a url; it must be empty`);
+}
+
+// 4 — a withdrawn source stays down
+const articleData = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/wiki/seed-articles.json'), 'utf8')).articles;
+for (const [id, v] of Object.entries(sources).filter(([, s]) => s.withdrawn)) {
+  const paths = [
+    path.join('data/wiki/sources/docs', `${id}.md`),
+    path.join('data/wiki/sources/raw', `${id}.html.gz`),
+    path.join('data/wiki/research/dossiers', `${id}.md`),
+    path.join('public/images/chronicles', id),
+  ];
+  for (const dir of v.assetDirs ?? []) {
+    paths.push(path.join('data/wiki/sources', dir), path.join('public/images/chronicles', dir));
+    for (const a of articleData) {
+      if (JSON.stringify(a).includes(`/images/chronicles/${dir}/`)) {
+        breaches.push(`${a.slug} embeds an image from withdrawn source ${id}`);
+      }
+    }
+  }
+  for (const rel of paths) {
+    if (fs.existsSync(path.join(ROOT, rel))) breaches.push(`withdrawn source ${id} still has ${rel}`);
+  }
+  if (v.url) breaches.push(`withdrawn source ${id} carries a url; it must be empty`);
+}
+
+// 5 — a source can't describe itself as private and pass under another kind
+const SAYS_PRIVATE = /\bprivate\s+(?:guild\s+|discord\s+)?(?:channel|server|archive|chat|message)s?\b|\bno public url\b/i;
+for (const [id, v] of Object.entries(sources)) {
+  // discord-export is Tier A: announcement channels, published on purpose.
+  if (v.private || v.kind === 'discord-private' || v.kind === 'discord-export' || v.withdrawn || v.consent) continue;
+  const doc = path.join(ROOT, 'data/wiki/sources/docs', `${id}.md`);
+  const front = fs.existsSync(doc)
+    ? (fs.readFileSync(doc, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '').match(/^url:.*$/m)?.[0] ?? ''
+    : '';
+  if (SAYS_PRIVATE.test(v.url ?? '') || SAYS_PRIVATE.test(front)) {
+    breaches.push(`source ${id} describes itself as private but is published as kind "${v.kind ?? 'web'}"`);
+  }
 }
 
 // 2 — findings must never be tracked

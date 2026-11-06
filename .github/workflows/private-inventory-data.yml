@@ -2,6 +2,8 @@ name: Private inventory data
 
 on:
   pull_request:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -18,3 +20,5 @@ jobs:
             echo "Keep item rows and recipe links in the database, not in this repo."
             exit 1
           fi
+      - name: Check the source boundary
+        run: node scripts/check-private-sources.mjs --strict
