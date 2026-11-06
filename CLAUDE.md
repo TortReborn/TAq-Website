@@ -61,8 +61,9 @@ node scripts/check-private-sources.mjs --strict
 ```
 
 Verifies no private source has a document, url or public images; no findings
-file is tracked; and no article quotes a private source. Run it before any
-commit that touches wiki data.
+file is tracked; no article quotes a private source; a withdrawn source stays
+down; and no source describing itself as private is published under another
+kind. It also runs in CI. Run it before any commit that touches wiki data.
 
 ### What may never be published, from either tier
 

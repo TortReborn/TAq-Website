@@ -433,13 +433,15 @@
    "registeredAt": "2026-09-08T06:00:24.230Z"
   },
   "drew1011-storytime": {
-   "url": "(Discord, private guild channel)",
+   "url": "",
    "kind": "testimony",
    "title": "Drew1011 storytime — first-person account of early Wynncraft guild history",
-   "fetchedAt": "2026-09-03T19:36:43.560Z",
-   "textChars": 135283,
-   "note": "Partisan first-person account by the Federation founder; 62 images in data/sources/storytime/",
-   "tier": "retrospective"
+   "tier": "retrospective",
+   "withdrawn": true,
+   "assetDirs": [
+    "storytime"
+   ],
+   "note": "Held offline and not published here. Quoted by permission of its author."
   },
   "emorians-guild-profile-discord-private": {
    "url": "",
