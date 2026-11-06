@@ -23,6 +23,8 @@ interface PanelResponse {
   registry: PanelRegistry | null;
   /** Current panel values, see lib/panel-values.ts */
   values: Record<string, string>;
+  /** Narwhal+ edit; every other exec rank gets this page read-only */
+  can_edit: boolean;
 }
 
 const EMPTY: PanelContent = { messages: [{ embeds: [{ color: 0x94c1ff, description: '' }] }] };
@@ -83,10 +85,12 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
   const registry = data?.registry ?? null;
   // A template is sent to each new member, never posted (TAQ-142)
   const template = data?.panel.template ?? null;
+  const canEdit = !!data?.can_edit;
 
-  // First load: start from the latest revision, or from an unsaved draft of it
+  // First load: start from the latest revision, or from an unsaved draft of it.
+  // A viewer has no draft of their own, so theirs simply follows the latest.
   useEffect(() => {
-    if (!data || initialised.current) return;
+    if (!data || (initialised.current && data.can_edit)) return;
     initialised.current = true;
     const base: Draft = {
       content: latest?.content ?? EMPTY,
@@ -94,7 +98,7 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
       baseRev: latest?.rev_number ?? null,
       restoredFrom: null,
     };
-    const saved = loadDraft(slug);
+    const saved = data.can_edit ? loadDraft(slug) : null;
     if (saved && saved.baseRev === base.baseRev && JSON.stringify(saved) !== JSON.stringify(base)) {
       setDraft(saved);
       setRestoredDraft(true);
@@ -118,11 +122,11 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
   }, [refreshFrom, registryAt]);
 
   const dirty = useMemo(() => {
-    if (!draft) return false;
+    if (!draft || !canEdit) return false;
     return JSON.stringify(draft.content) !== JSON.stringify(latest?.content ?? EMPTY)
       || draft.channelId !== (latest?.channel_id ?? data?.panel.channel_id ?? '')
       || !!adoptText.trim();
-  }, [draft, latest, data, adoptText]);
+  }, [draft, canEdit, latest, data, adoptText]);
 
   useEffect(() => {
     if (draft && initialised.current) saveDraft(slug, dirty ? draft : null);
@@ -233,16 +237,16 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
         <Link href="/exec/bot-panels" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none' }}>← Bot Messages</Link>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{data.panel.name}</h1>
         {latestMeta && <StatusBadge status={latestMeta.status} posted={!!template || data.panel.message_ids.length > 0} />}
-        {!template && !archived && (
+        {canEdit && !template && !archived && (
           <button onClick={() => setArchived(true)} disabled={archiving}
             style={{ ...btnStyle, marginLeft: 'auto', background: 'transparent', color: 'var(--text-secondary)', opacity: archiving ? 0.5 : 1 }}>
             {archiving ? 'Archiving…' : 'Archive'}
           </button>
         )}
-        <div style={{ marginLeft: !template && !archived ? 0 : 'auto', display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem' }}>
+        <div style={{ marginLeft: canEdit && !template && !archived ? 0 : 'auto', display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem' }}>
           {(['edit', 'history'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ ...btnStyle, background: tab === t ? '#3b82f6' : 'transparent', color: tab === t ? '#fff' : 'var(--text-secondary)' }}>
-              {t === 'edit' ? 'Edit' : `History (${data.revisions.length})`}
+              {t === 'edit' ? (canEdit ? 'Edit' : 'View') : `History (${data.revisions.length})`}
             </button>
           ))}
         </div>
@@ -252,20 +256,23 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
         <div style={{ ...banner('#eab308'), display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <span>
             <strong>Archived</strong> by {data.panel.archived_by ?? 'unknown'}, {timeAgo(data.panel.archived_at)}. Its messages were left in Discord as they are,
-            and its history is kept below. Restore it to edit and publish again.
+            and its history is kept below.{canEdit && ' Restore it to edit and publish again.'}
           </span>
-          <button onClick={() => setArchived(false)} disabled={archiving}
-            style={{ ...smallBtn, marginLeft: 'auto', background: '#3b82f6', color: '#fff', opacity: archiving ? 0.5 : 1 }}>
-            {archiving ? 'Restoring…' : 'Restore'}
-          </button>
+          {canEdit && (
+            <button onClick={() => setArchived(false)} disabled={archiving}
+              style={{ ...smallBtn, marginLeft: 'auto', background: '#3b82f6', color: '#fff', opacity: archiving ? 0.5 : 1 }}>
+              {archiving ? 'Restoring…' : 'Restore'}
+            </button>
+          )}
         </div>
       )}
       {archiveError && <div style={banner('#ef4444')}>{archiveError}</div>}
-      <LatestStatus meta={latestMeta} panel={data.panel} registry={registry} />
-      {template && <TemplateInfo slug={slug} template={template} content={draft.content} valid={validation.length === 0} />}
+      {!canEdit && <div style={{ ...banner('#6b7280'), color: 'var(--text-secondary)' }}>View only. Only Narwhals can edit bot messages.</div>}
+      <LatestStatus meta={latestMeta} panel={data.panel} registry={registry} canEdit={canEdit} />
+      {template && <TemplateInfo slug={slug} template={template} content={draft.content} valid={validation.length === 0} canEdit={canEdit} />}
 
       {tab === 'history' ? (
-        <History slug={slug} revisions={data.revisions} posted={!!template || data.panel.message_ids.length > 0} publishedRev={data.panel.published_rev} registry={registry} onRestore={restore} />
+        <History slug={slug} revisions={data.revisions} posted={!!template || data.panel.message_ids.length > 0} publishedRev={data.panel.published_rev} registry={registry} onRestore={canEdit ? restore : undefined} />
       ) : (
         <>
           {restoredDraft && dirty && (
@@ -288,7 +295,21 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1rem', alignItems: 'start' }} className="bot-panel-grid">
             {/* Left: settings + form */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {!template && <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {!template && !canEdit && (
+                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                  <div>
+                    <span style={labelStyle}>Channel</span>
+                    {channelLabel(draft.channelId || null, registry)}
+                  </div>
+                  {draft.content.post?.title && (
+                    <div>
+                      <span style={labelStyle}>Post title</span>
+                      {draft.content.post.title}
+                    </div>
+                  )}
+                </div>
+              )}
+              {!template && canEdit && <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                 {(registry?.guilds?.length ?? 0) > 1 && (
                   <div>
                     <label style={labelStyle}>Server</label>
@@ -362,15 +383,19 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
 
               </div>}
 
-              <PanelEditor content={draft.content} registry={serverRegistry} onFocus={setFocus}
-                onChange={content => setDraft({ ...draft, content })} />
+              {/* Disabling the fieldset locks every control in the form for a viewer;
+                  the sections still expand, and the style rule below hides the edit buttons. */}
+              <fieldset disabled={!canEdit} className={canEdit ? undefined : 'bot-panel-readonly'} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+                <PanelEditor content={draft.content} registry={serverRegistry} onFocus={setFocus}
+                  onChange={content => setDraft({ ...draft, content })} />
+              </fieldset>
             </div>
 
             {/* Right: sticky preview + publish. Sticky offsets count from inside
                 .exec-main's 2rem padding, so pull up to sit just under its top edge,
                 and fit the 100vh - 80px area the exec layout gives it. */}
             <div style={{ position: 'sticky', top: '-1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: 'calc(100vh - 80px - 2rem)' }}>
-              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {canEdit && <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <input value={note} onChange={e => setNote(e.target.value)} maxLength={200}
                   placeholder="What changed? (shown in the history)" style={inputStyle} />
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -395,13 +420,13 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
                     {saveError.map((e, i) => <li key={i}>{e}</li>)}
                   </ul>
                 )}
-              </div>
+              </div>}
               <div style={{ overflowY: 'auto', borderRadius: '0.5rem' }}>
                 <DiscordPreview content={draft.content} registry={registry} highlight={focus} />
               </div>
             </div>
           </div>
-          <style>{`@media (max-width: 1100px) { .bot-panel-grid { grid-template-columns: minmax(0, 1fr) !important; } .bot-panel-grid > div:last-child { position: static !important; max-height: none !important; } }`}</style>
+          <style>{`@media (max-width: 1100px) { .bot-panel-grid { grid-template-columns: minmax(0, 1fr) !important; } .bot-panel-grid > div:last-child { position: static !important; max-height: none !important; } } .bot-panel-readonly button:not([aria-pressed]) { display: none; }`}</style>
         </>
       )}
     </div>
@@ -414,10 +439,10 @@ interface TemplateTest { status: 'pending' | 'sending' | 'sent' | 'failed'; erro
 
 /** What a template is for, and "send a test to me": the bot DMs the draft to
  *  the exec member, filled in as if they had just joined. */
-function TemplateInfo({ slug, template, content, valid }: { slug: string; template: string; content: PanelContent; valid: boolean }) {
+function TemplateInfo({ slug, template, content, valid, canEdit }: { slug: string; template: string; content: PanelContent; valid: boolean; canEdit: boolean }) {
   const [waiting, setWaiting] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
-  const { data, mutate } = useSWR<{ test: TemplateTest | null }>(`/api/exec/bot-panels/${slug}/test`, fetcher, {
+  const { data, mutate } = useSWR<{ test: TemplateTest | null }>(canEdit ? `/api/exec/bot-panels/${slug}/test` : null, fetcher, {
     revalidateOnFocus: false, refreshInterval: waiting ? 2000 : 0,
   });
   const test = data?.test ?? null;
@@ -449,20 +474,22 @@ function TemplateInfo({ slug, template, content, valid }: { slug: string; templa
     <div style={{ ...banner('#3b82f6'), display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
       <span>
         <strong>Welcome template.</strong> {PANEL_TEMPLATES[template]?.sentWhen ?? 'Sent by the bot'}, with {'{Member}'}, {'{IGN}'} and
-        their avatar filled in. Publishing changes what the next new member gets; nothing is posted now.
+        their avatar filled in.{canEdit && ' Publishing changes what the next new member gets; nothing is posted now.'}
       </span>
-      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
-        {status}
-        <button onClick={send} disabled={!valid || waiting}
-          style={{ ...smallBtn, background: '#3b82f6', color: '#fff', opacity: !valid || waiting ? 0.5 : 1 }}>
-          Send a test to me
-        </button>
-      </span>
+      {canEdit && (
+        <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
+          {status}
+          <button onClick={send} disabled={!valid || waiting}
+            style={{ ...smallBtn, background: '#3b82f6', color: '#fff', opacity: !valid || waiting ? 0.5 : 1 }}>
+            Send a test to me
+          </button>
+        </span>
+      )}
     </div>
   );
 }
 
-function LatestStatus({ meta, panel, registry }: { meta?: RevisionMeta; panel: PanelSummary; registry: PanelRegistry | null }) {
+function LatestStatus({ meta, panel, registry, canEdit }: { meta?: RevisionMeta; panel: PanelSummary; registry: PanelRegistry | null; canEdit: boolean }) {
   if (panel.template) {
     if (!meta) return <div style={banner('#6b7280')}>Nothing published yet: new members get the bot&apos;s built-in message.</div>;
     if (meta.status === 'pending' || meta.status === 'publishing') return <div style={banner('#eab308')}>The bot is checking revision {meta.rev_number}…</div>;
@@ -479,7 +506,7 @@ function LatestStatus({ meta, panel, registry }: { meta?: RevisionMeta; panel: P
       </div>
     );
   }
-  if (!meta) return <div style={banner('#6b7280')}>This panel is empty. Build it below and publish to post it.</div>;
+  if (!meta) return <div style={banner('#6b7280')}>This panel is empty.{canEdit && ' Build it below and publish to post it.'}</div>;
   const where = channelLabel(meta.channel_id ?? panel.channel_id, registry);
   if (meta.status === 'pending') return <div style={banner('#eab308')}>Revision {meta.rev_number} is waiting for the bot. It usually takes under 15 seconds.</div>;
   if (meta.status === 'publishing') return <div style={banner('#3b82f6')}>The bot is posting revision {meta.rev_number} to {where}…</div>;
@@ -494,7 +521,7 @@ function LatestStatus({ meta, panel, registry }: { meta?: RevisionMeta; panel: P
     return (
       <div style={banner('#eab308')}>
         This content was imported from the old /generate command and isn&apos;t linked to the messages in Discord yet.
-        Use &quot;Link existing messages&quot; below to take them over, or publish to post fresh ones.
+        {canEdit && <> Use &quot;Link existing messages&quot; below to take them over, or publish to post fresh ones.</>}
       </div>
     );
   }
@@ -508,7 +535,8 @@ function LatestStatus({ meta, panel, registry }: { meta?: RevisionMeta; panel: P
 
 function History({ slug, revisions, posted, publishedRev, registry, onRestore }: {
   slug: string; revisions: RevisionMeta[]; posted: boolean; publishedRev: number | null; registry: PanelRegistry | null;
-  onRestore: (rev: number, content: PanelContent, channelId: string | null) => void;
+  /** Left out for a viewer, who can't restore */
+  onRestore?: (rev: number, content: PanelContent, channelId: string | null) => void;
 }) {
   const [selected, setSelected] = useState<number | null>(revisions[0]?.rev_number ?? null);
   const [view, setView] = useState<'diff' | 'preview'>('diff');
@@ -566,7 +594,7 @@ function History({ slug, revisions, posted, publishedRev, registry, onRestore }:
                 </button>
               ))}
             </div>
-            {current.rev_number !== latestRev && (
+            {onRestore && current.rev_number !== latestRev && (
               <button onClick={() => onRestore(current.rev_number, current.content, current.channel_id)}
                 style={{ ...btnStyle, marginLeft: 'auto', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>
                 Restore this version

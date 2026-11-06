@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireNarwhalSession } from '@/lib/exec-auth';
 import { setPanelArchived } from '@/lib/bot-panels-db';
 
 export const dynamic = 'force-dynamic';
@@ -9,8 +9,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const session = await requireExecSession(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await requireNarwhalSession(request);
+  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
 
   const { slug } = await params;
   let body: any;
