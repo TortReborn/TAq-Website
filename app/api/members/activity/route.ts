@@ -4,6 +4,7 @@ import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLim
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 import { requireGuildSession } from '@/lib/exec-auth';
+import { guildAccountUuids, withoutGuildAccounts } from '@/lib/guild-accounts';
 
 export const dynamic = 'force-dynamic';
 
@@ -169,8 +170,9 @@ export async function GET(request: NextRequest) {
 
     try {
       const discordLinksResult = await client.query(
-        'SELECT uuid, rank, discord_id, ign FROM discord_links'
+        'SELECT uuid, rank FROM discord_links'
       );
+      const guildAccounts = await guildAccountUuids(client);
       const discordLinks: Record<string, any> = {};
       discordLinksResult.rows.forEach((row: any) => {
         discordLinks[row.uuid] = row;
@@ -179,7 +181,7 @@ export async function GET(request: NextRequest) {
       const allTimeGraidRaids = await getAllTimeGraidRaidTotals(client);
 
       // Calculate time-based stats for ALL time periods for each member
-      const membersWithAllTimeStats = allMembers.map(member => {
+      const membersWithAllTimeStats = withoutGuildAccounts(allMembers, guildAccounts).map(member => {
         const discord = discordLinks[member.uuid];
         const allTimeRaids = allTimeGraidRaids.get(member.uuid) || 0;
 
@@ -201,12 +203,18 @@ export async function GET(request: NextRequest) {
           hasCompleteData: true
         };
 
+        // Only what the leaderboard reads; the guild data blob stays server-side.
         return {
-          ...member,
+          username: member.username,
+          uuid: member.uuid,
+          online: member.online,
+          guildRankName: member.guildRankName,
           discordRank: discord ? discord.rank : '',
-          discordId: discord ? discord.discord_id : '',
-          discordUsername: discord ? discord.ign : '',
+          contributed: member.contributed,
+          wars: member.wars,
           raids: allTimeRaids,
+          shells: member.shells,
+          playtime: member.playtime,
           timeFrames
         };
       });
@@ -257,7 +265,8 @@ export async function GET(request: NextRequest) {
         headers: {
           'X-Cache': 'HIT',
           'X-Cache-Timestamp': Date.now().toString(),
-          'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=120'
+          // Guild members only: a shared cache would skip the session check above.
+          'Cache-Control': 'private, no-store'
         }
       });
 
