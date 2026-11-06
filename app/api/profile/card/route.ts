@@ -3,6 +3,8 @@ import { requireGuildSession } from '@/lib/exec-auth';
 
 export const dynamic = 'force-dynamic';
 
+const WAKE_RETRY_DELAY_MS = 1000;
+
 export async function GET(request: NextRequest) {
   const session = await requireGuildSession(request);
   if (!session) {
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
   const days = Number.isFinite(rawDays) ? Math.max(1, Math.min(3650, rawDays)) : 7;
 
   try {
-    const response = await fetch(`${serviceUrl}/v1/cards/profile`, {
+    const requestCard = () => fetch(`${serviceUrl}/v1/cards/profile`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${serviceToken}`,
@@ -31,6 +33,13 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
       signal: AbortSignal.timeout(30_000),
     });
+
+    let response = await requestCard();
+    // Tort-API sleeps when idle, and the request that wakes it may get a 502.
+    if (response.status === 502) {
+      await new Promise((resolve) => setTimeout(resolve, WAKE_RETRY_DELAY_MS));
+      response = await requestCard();
+    }
 
     if (!response.ok) {
       console.error('Tort-API profile render failed:', response.status);
