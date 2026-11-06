@@ -54,6 +54,47 @@ describe('profile card proxy', () => {
     }));
   });
 
+  it('retries once when the request that wakes Tort-API gets a 502', async () => {
+    requireGuildSession.mockResolvedValue(session);
+    vi.stubEnv('TORT_API_URL', 'https://tort-api.example');
+    vi.stubEnv('TORT_API_TOKEN', 'secret');
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(null, { status: 502 }))
+      .mockResolvedValueOnce(new Response(new Uint8Array([1, 2, 3]), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await GET(new NextRequest('http://localhost/api/profile/card'));
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives up after one retry', async () => {
+    requireGuildSession.mockResolvedValue(session);
+    vi.stubEnv('TORT_API_URL', 'https://tort-api.example');
+    vi.stubEnv('TORT_API_TOKEN', 'secret');
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(null, { status: 502 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await GET(new NextRequest('http://localhost/api/profile/card'));
+
+    expect(response.status).toBe(503);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not retry other failures', async () => {
+    requireGuildSession.mockResolvedValue(session);
+    vi.stubEnv('TORT_API_URL', 'https://tort-api.example');
+    vi.stubEnv('TORT_API_TOKEN', 'secret');
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(null, { status: 500 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await GET(new NextRequest('http://localhost/api/profile/card'));
+
+    expect(response.status).toBe(503);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('caps the requested period', async () => {
     requireGuildSession.mockResolvedValue(session);
     vi.stubEnv('TORT_API_URL', 'https://tort-api.example');
