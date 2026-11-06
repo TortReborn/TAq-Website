@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireNarwhalSession } from '@/lib/exec-auth';
 import { requestRegistryRefresh } from '@/lib/bot-panels-db';
 
 export const dynamic = 'force-dynamic';
@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic';
 // POST — ask the bot to re-read channels, roles and emojis now instead of at
 // its hourly sync; the editor polls until the registry's updated_at moves
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await requireNarwhalSession(request);
+  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
 
   try {
     await requestRegistryRefresh();

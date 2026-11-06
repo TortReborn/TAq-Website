@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireExecSession } from '@/lib/exec-auth';
+import { isNarwhalRank, requireExecSession, requireNarwhalSession } from '@/lib/exec-auth';
 import { slugFromName } from '@/lib/bot-panels';
 import { createPanel, getRegistry, listPanels } from '@/lib/bot-panels-db';
 
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const [panels, registry] = await Promise.all([listPanels(), getRegistry()]);
-    return NextResponse.json({ panels, registry });
+    return NextResponse.json({ panels, registry, can_edit: isNarwhalRank(session.rank) });
   } catch (error) {
     console.error('Bot panels list error:', error);
     return NextResponse.json({ error: 'Failed to load bot panels' }, { status: 500 });
@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
 
 // POST — create an empty panel; its first revision comes from the editor
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await requireNarwhalSession(request);
+  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
 
   let body: any;
   try {

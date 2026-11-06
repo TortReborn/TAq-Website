@@ -40,25 +40,17 @@ export default function ExecShellExchangePage() {
   const clearFeedback = () => { setActionError(null); setActionSuccess(null); };
 
   /**
-   * Republish a bot panel as it stands and wait for the bot, returning what
-   * happened. Used for the rate images and after a conversion rate change.
-   * Returns null when the panel was never posted, so there's nothing to update.
+   * Republish the shell exchange panel as it stands and wait for the bot,
+   * returning what happened. Returns null when the panel was never posted, so
+   * there's nothing to update.
    */
-  const republishPanel = async (slug: string, label: string, note: string, onSent: (msg: string) => void): Promise<string | null> => {
-    const panelRes = await fetch(`/api/exec/bot-panels/${slug}`);
-    const panel = await panelRes.json();
-    if (!panelRes.ok) throw new Error(panel.error || `The ${label} panel was not found`);
-    if (!panel.latest) throw new Error(`The ${label} panel has no content yet. Set it up under Bot Messages first.`);
-    if (!panel.panel.message_ids?.length) return null;
-    const res = await fetch(`/api/exec/bot-panels/${slug}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: panel.latest.content, channel_id: panel.latest.channel_id ?? panel.panel.channel_id,
-        base_rev: panel.latest.rev_number, note,
-      }),
-    });
+  const republishPanel = async (onSent: (msg: string) => void): Promise<string | null> => {
+    const slug = 'shell-exchange';
+    const label = 'shell exchange';
+    const res = await fetch('/api/exec/shell-exchange/publish', { method: 'POST' });
     const body = await res.json();
     if (!res.ok) throw new Error(body.error || `Failed to publish the ${label} panel`);
+    if (body.rev_number == null) return null;
     onSent(`Sent the ${label} panel to the bot; waiting for it to update Discord…`);
 
     // Follow the revision until the bot finishes, so the result shows here.
@@ -80,7 +72,7 @@ export default function ExecShellExchangePage() {
     clearFeedback();
     setPublishing(true);
     try {
-      const result = await republishPanel('shell-exchange', 'shell exchange', 'Rates update', setActionSuccess);
+      const result = await republishPanel(setActionSuccess);
       setActionSuccess(result ?? 'The shell exchange panel isn\'t posted yet. Place it under Bot Messages first.');
     } catch (e: any) {
       setActionError(e.message);
@@ -247,7 +239,7 @@ export default function ExecShellExchangePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Shell Exchange</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <a href="/exec/bot-panels/shell-exchange" style={{ ...smallBtn, background: 'var(--bg-card)', color: 'var(--text-secondary)', textDecoration: 'none' }}>Edit panel text</a>
+          <a href="/exec/bot-panels/shell-exchange" style={{ ...smallBtn, background: 'var(--bg-card)', color: 'var(--text-secondary)', textDecoration: 'none' }}>Panel text</a>
           <button onClick={publishRates} disabled={publishing} style={{ ...smallBtn, background: '#3b82f6', color: '#fff', opacity: publishing ? 0.6 : 1 }}>
             {publishing ? 'Queuing…' : 'Publish rates to Discord'}
           </button>

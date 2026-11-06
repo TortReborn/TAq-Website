@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { GetObjectCommand, HeadObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
-import { requireExecSession } from '@/lib/exec-auth';
+import { requireExecSession, requireNarwhalSession } from '@/lib/exec-auth';
 import { getS3 } from '@/lib/s3';
 import { ASSET_NAME_RE, ASSET_SCHEME } from '@/lib/bot-panels';
 
@@ -22,8 +22,8 @@ const FORMATS: Record<string, { ext: string; type: string }> = {
 // Stored as uploaded (GIFs keep their animation), named by content hash so
 // the same banner uploaded twice is one object.
 export async function POST(request: NextRequest) {
-  const session = await requireExecSession(request);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await requireNarwhalSession(request);
+  if (!session) return NextResponse.json({ error: 'Narwhal access required.' }, { status: 403 });
 
   let file: File | null;
   try {
