@@ -69,8 +69,11 @@ export default function KanbanColumn({
         minWidth: '220px',
         background: dragOver ? `${color}0A` : 'var(--bg-card)',
         borderRadius: '0.75rem',
-        border: `1px solid ${dragOver ? color : 'var(--border-card)'}`,
-        borderTop: `3px solid ${color}`,
+        // Longhands only: React re-applies just the style keys that changed, so
+        // a `border` shorthand changing on drag would wipe out a `borderTop`.
+        borderStyle: 'solid',
+        borderWidth: '3px 1px 1px',
+        borderColor: dragOver ? color : `${color} var(--border-card) var(--border-card)`,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
