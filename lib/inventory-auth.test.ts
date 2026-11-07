@@ -37,3 +37,33 @@ describe('inventory client verification', () => {
     await expect(authorizeInventoryClient(request(), 'upload')).rejects.toMatchObject({ status: 503 });
   });
 });
+
+describe('choosing the verifying service', () => {
+  const tokenFrom = (claims: unknown) => `e30.${Buffer.from(JSON.stringify(claims)).toString('base64url')}.signature`;
+  const OLD_SESSION = 'https://taq-management-api-production.up.railway.app/api/inventory/session';
+  const VERGE_SESSION = 'https://verge-api.the-aquarium.com/v1/inventory/session';
+
+  it.each([
+    ['a Verge token', tokenFrom({ iss: 'verge-api' }), VERGE_SESSION],
+    ['an old service token', tokenFrom({ iss: 'taq-management-api' }), OLD_SESSION],
+    ['an unknown issuer', tokenFrom({ iss: 'someone-else' }), OLD_SESSION],
+    ['no issuer', tokenFrom({}), OLD_SESSION],
+    ['a null payload', tokenFrom(null), OLD_SESSION],
+    ['an unreadable payload', 'test.payload.signature', OLD_SESSION],
+  ])('sends %s to the right service', async (_, token, url) => {
+    const fetch = vi.fn().mockResolvedValue(Response.json(identity)); vi.stubGlobal('fetch', fetch);
+    await authorizeInventoryClient(request(token), 'read');
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(fetch.mock.calls[0][0]).toBe(url);
+  });
+  it('forwards the token unchanged', async () => {
+    const token = tokenFrom({ iss: 'verge-api' });
+    const fetch = vi.fn().mockResolvedValue(Response.json(identity)); vi.stubGlobal('fetch', fetch);
+    await authorizeInventoryClient(request(token), 'read');
+    expect(fetch.mock.calls[0][1].headers).toEqual({ Authorization: `Bearer ${token}` });
+  });
+  it.each([401, 403])('grants nothing to a claimed Verge issuer that the service refuses with %i', async (status) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status })));
+    await expect(authorizeInventoryClient(request(tokenFrom({ iss: 'verge-api' })), 'read')).rejects.toMatchObject({ status });
+  });
+});
