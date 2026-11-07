@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession, isNarwhalRank } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
-import { loadPromotionTargets, promotionTarget } from '@/lib/promotion-targets';
+import { loadPromotionTargets, promotionTarget, requiresGuildMembership } from '@/lib/promotion-targets';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 
 export const dynamic = 'force-dynamic';
@@ -219,6 +219,9 @@ export async function POST(request: NextRequest) {
     const target = promotionTarget(await loadPromotionTargets(pool, [uuid]), uuid);
     if (!target) {
       return NextResponse.json({ error: 'This player has no linked account' }, { status: 404 });
+    }
+    if (requiresGuildMembership(actionType) && !target.inGuild) {
+      return NextResponse.json({ error: 'This player is no longer in the guild' }, { status: 409 });
     }
     if (target.rank !== currentRank) {
       return NextResponse.json({ error: 'This player\'s rank has changed. Refresh and try again' }, { status: 409 });

@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useExecPromotions } from '@/hooks/useExecPromotions';
 import { useExecSession } from '@/hooks/useExecSession';
 import { RANK_HIERARCHY, RANK_ORDER, getRankColor, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
+import { splitStagedByMembership } from '@/lib/promotion-targets';
 
 type Honorific = 'honored_fish' | 'retired_chief';
 const HONORIFIC_LABELS: Record<Honorific, string> = { honored_fish: 'Honored Fish', retired_chief: 'Retired Chief' };
@@ -56,6 +57,7 @@ export default function ExecPromotionsPage() {
   const [bulkAction, setBulkAction] = useState<'promote' | 'demote' | 'remove'>('promote');
   const [bulkTargetRank, setBulkTargetRank] = useState('');
   const [stagedActions, setStagedActions] = useState<StagedAction[]>([]);
+  const [departedNotice, setDepartedNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -72,6 +74,16 @@ export default function ExecPromotionsPage() {
       suggestInputRef.current.focus();
     }
   }, [suggestingUuid]);
+
+  // Unstage anyone who left the guild. An empty list means the roster hasn't
+  // loaded, so it says nothing about who left.
+  useEffect(() => {
+    if (members.length === 0) return;
+    const { kept, departed } = splitStagedByMembership(stagedActions, members.map(m => m.uuid));
+    if (departed.length === 0) return;
+    setStagedActions(kept);
+    setDepartedNotice(`Unstaged because they left the guild: ${departed.map(a => a.ign).join(', ')}`);
+  }, [members, stagedActions]);
 
   const userRankIdx = user ? RANK_HIERARCHY.indexOf(user.rank) : -1;
 
@@ -232,8 +244,9 @@ export default function ExecPromotionsPage() {
     setSubmitting(true);
     setActionError(null);
     try {
-      await queueBulkPromotions(stagedActions);
+      const { departed } = await queueBulkPromotions(stagedActions);
       setStagedActions([]);
+      setDepartedNotice(departed?.length ? `Not queued because they left the guild: ${departed.join(', ')}` : null);
     } catch (e: any) {
       setActionError(e.message);
     } finally {
@@ -714,6 +727,19 @@ export default function ExecPromotionsPage() {
                 )}
               </h2>
             </div>
+
+            {departedNotice && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.425rem', marginBottom: '0.64rem', flexShrink: 0, color: '#f59e0b', fontSize: '0.68rem', background: 'rgba(245, 158, 11, 0.1)', padding: '0.425rem 0.53rem', borderRadius: '0.32rem' }}>
+                <span style={{ wordBreak: 'break-word' }}>{departedNotice}</span>
+                <button
+                  onClick={() => setDepartedNotice(null)}
+                  aria-label="Dismiss"
+                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, fontSize: '0.72rem', lineHeight: 1 }}
+                >
+                  {'×'}
+                </button>
+              </div>
+            )}
 
             <div className="themed-scrollbar" style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
               {stagedActions.length === 0 ? (
