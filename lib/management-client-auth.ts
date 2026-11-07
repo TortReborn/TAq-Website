@@ -1,9 +1,27 @@
 import { NextRequest } from 'next/server';
 
 const MANAGEMENT_API = 'https://taq-management-api-production.up.railway.app';
+const VERGE_API = 'https://verge-api.the-aquarium.com';
+const VERGE_ISSUER = 'verge-api';
 
 export class ManagementClientAuthError extends Error {
   constructor(readonly status: number, message: string) { super(message); }
+}
+
+function tokenIssuer(authorization: string): unknown {
+  try {
+    return JSON.parse(Buffer.from(authorization.split('.')[1], 'base64url').toString()).iss;
+  } catch {
+    return undefined;
+  }
+}
+
+// Both services can verify mod tokens until the old one is retired. The issuer is unverified
+// here and only picks which service checks the signature, so forging it gains nothing.
+function sessionUrl(authorization: string, service: 'inventory' | 'le-balance'): string {
+  return tokenIssuer(authorization) === VERGE_ISSUER
+    ? `${VERGE_API}/v1/${service}/session`
+    : `${MANAGEMENT_API}/api/${service}/session`;
 }
 
 export async function authorizeManagementClient(request: NextRequest, service: 'inventory' | 'le-balance',
@@ -15,7 +33,7 @@ export async function authorizeManagementClient(request: NextRequest, service: '
   }
   let response: Response;
   try {
-    response = await fetch(`${MANAGEMENT_API}/api/${service}/session`, {
+    response = await fetch(sessionUrl(authorization, service), {
       headers: { Authorization: authorization }, cache: 'no-store', signal: AbortSignal.timeout(5000),
       redirect: 'error',
     });
