@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession, isNarwhalRank } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
-import { loadPromotionTargets, promotionTarget } from '@/lib/promotion-targets';
+import { loadPromotionTargets, promotionTarget, requiresGuildMembership } from '@/lib/promotion-targets';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,11 +73,19 @@ export async function POST(request: NextRequest) {
     const pool = getPool();
 
     const targets = await loadPromotionTargets(pool, entries.map((e: any) => e.uuid));
+    // A player who left is dropped so the rest of the batch can still go through.
+    const departed: string[] = [];
+    const queueable: any[] = [];
     for (const entry of entries) {
       const target = promotionTarget(targets, entry.uuid);
       if (!target) {
         return NextResponse.json({ error: `${entry.ign} has no linked account` }, { status: 404 });
       }
+      if (requiresGuildMembership(entry.actionType) && !target.inGuild) {
+        departed.push(target.ign);
+        continue;
+      }
+      queueable.push(entry);
       if (target.rank !== entry.currentRank) {
         return NextResponse.json({ error: `${entry.ign}'s rank has changed. Refresh and try again` }, { status: 409 });
       }
@@ -89,7 +97,7 @@ export async function POST(request: NextRequest) {
       await client.query('BEGIN');
 
       // Check for duplicates
-      const uuids = entries.map((e: any) => e.uuid);
+      const uuids = queueable.map((e: any) => e.uuid);
       const existing = await client.query(
         `SELECT uuid FROM promotion_queue WHERE uuid = ANY($1::uuid[]) AND status = 'pending'`,
         [uuids]
@@ -99,7 +107,7 @@ export async function POST(request: NextRequest) {
       let inserted = 0;
       let skipped = 0;
 
-      for (const entry of entries) {
+      for (const entry of queueable) {
         if (existingUuids.has(entry.uuid)) {
           skipped++;
           continue;
@@ -115,7 +123,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Auto-remove queued players from promo suggestions
-      const insertedUuids = entries
+      const insertedUuids = queueable
         .filter((e: any) => !existingUuids.has(e.uuid))
         .map((e: any) => e.uuid);
       if (insertedUuids.length > 0) {
@@ -126,7 +134,7 @@ export async function POST(request: NextRequest) {
       }
 
       await client.query('COMMIT');
-      return NextResponse.json({ success: true, inserted, skipped });
+      return NextResponse.json({ success: true, inserted, skipped, departed });
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;
