@@ -4,6 +4,7 @@ import { getPool } from '@/lib/db';
 import { RANK_HIERARCHY, PROMO_VISIBILITY_RANK_THRESHOLD_IDX, PROMO_VISIBILITY_MIN_VIEWER_IDX } from '@/lib/rank-constants';
 import { loadPromotionTargets, promotionTarget, requiresGuildMembership } from '@/lib/promotion-targets';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
+import { counterDelta } from '@/lib/counter-delta';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,9 +85,8 @@ export async function GET(request: NextRequest) {
     }
 
     const members = guildMembers.map(m => {
-      const h = hist7[m.uuid] as { playtime: number; wars: number; raids: number } | undefined;
+      const h = hist7[m.uuid] as { playtime: number; wars: number | null; raids: number } | undefined;
       const playtime = (m.playtime || 0);
-      const wars = (m.wars || 0);
       const raids = (m.raids || 0);
       return {
         uuid: m.uuid,
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
         discordId: memberDiscordIds[m.uuid] || null,
         honorifics: memberHonorifics[m.uuid] || [],
         playtime7d: h ? Math.max(0, playtime - h.playtime) : 0,
-        wars7d: h ? Math.max(0, wars - h.wars) : 0,
+        wars7d: h ? counterDelta(m.wars, h.wars).value : 0,
         raids7d: h ? Math.max(0, raids - h.raids) : 0,
         hasStats: !!h,
         joined: m.joined || null,

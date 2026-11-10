@@ -5,6 +5,7 @@ import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 import { requireGuildSession } from '@/lib/exec-auth';
 import { guildAccountUuids, withoutGuildAccounts } from '@/lib/guild-accounts';
+import { counterDelta } from '@/lib/counter-delta';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ interface Member {
   discordId?: string;
   discordUsername?: string;
   guildRankName: string;
-  wars: number;
+  wars: number | null;
   raids: number;
   shells: number;
   lastJoin: string | null;
@@ -30,7 +31,7 @@ interface Member {
 
 interface HistoricalMember {
   uuid: string;
-  wars: number;
+  wars: number | null;
   raids: number;
   shells: number;
   playtime: number;
@@ -54,18 +55,8 @@ function calculateTimeDelta(
   historicalValue: number | undefined
 ): { value: number; hasCompleteData: boolean } {
   // If no historical data, member is new
-  if (historicalValue === undefined) {
-    return { value: 0, hasCompleteData: false };
-  }
-
-  // Calculate delta (current - baseline)
-  const delta = currentValue - historicalValue;
-
-  // Protect against negative values (data resets/corrections)
-  return {
-    value: Math.max(0, delta),
-    hasCompleteData: true
-  };
+  const { value, hasData } = counterDelta(currentValue, historicalValue);
+  return { value, hasCompleteData: hasData };
 }
 
 // Calculate stats for a specific time period
@@ -84,20 +75,21 @@ function calculateTimeFrameStats(
     };
   }
 
-  const warsDelta = calculateTimeDelta(member.wars, historical.wars);
+  // Hidden wars (unknown on either side) count as 0 for the period, and don't
+  // mark the member's other stats incomplete.
+  const wars = counterDelta(member.wars, historical.wars).value;
   const raidsDelta = calculateTimeDelta(member.raids, historical.raids);
   const shellsDelta = calculateTimeDelta(member.shells, historical.shells);
   const contributedDelta = calculateTimeDelta(member.contributed, historical.contributed);
   const playtimeDelta = calculateTimeDelta(member.playtime, historical.playtime);
 
   return {
-    wars: warsDelta.value,
+    wars,
     raids: raidsDelta.value,
     shells: shellsDelta.value,
     contributed: contributedDelta.value,
     playtime: playtimeDelta.value,
-    hasCompleteData: warsDelta.hasCompleteData &&
-                     raidsDelta.hasCompleteData &&
+    hasCompleteData: raidsDelta.hasCompleteData &&
                      shellsDelta.hasCompleteData &&
                      contributedDelta.hasCompleteData &&
                      playtimeDelta.hasCompleteData
@@ -154,7 +146,7 @@ export async function GET(request: NextRequest) {
           ...member,
           username: member.name,
           guildRankName: member.rank,
-          wars: member.wars || 0,
+          wars: member.wars ?? null,  // private: unknown, not 0 (TAQ-208)
           raids: member.raids || 0,
           shells: member.shells || 0,
           lastJoin: member.lastJoin,
@@ -195,7 +187,7 @@ export async function GET(request: NextRequest) {
 
         // Add "all" time frame (current values)
         timeFrames['all'] = {
-          wars: member.wars,
+          wars: member.wars ?? 0,
           raids: allTimeRaids,
           shells: member.shells,
           contributed: member.contributed,

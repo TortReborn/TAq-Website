@@ -3,6 +3,7 @@ import { requireGuildSession } from '@/lib/exec-auth';
 import { getPool } from '@/lib/db';
 import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotal } from '@/lib/graid-raid-totals';
+import { counterDelta } from '@/lib/counter-delta';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,9 +103,10 @@ export async function GET(request: NextRequest) {
       if (!hist) {
         timeFrames[String(days)] = { playtime: 0, wars: 0, raids: 0, shells: 0, contributed: 0, hasCompleteData: false };
       } else {
+        const wars = counterDelta(memberData.wars, hist.wars);
         timeFrames[String(days)] = {
           playtime: Math.max(0, (memberData.playtime || 0) - hist.playtime),
-          wars: Math.max(0, (memberData.wars || 0) - hist.wars),
+          wars: wars.value,
           raids: Math.max(0, (memberData.raids || 0) - hist.raids),
           shells: Math.max(0, (memberData.shells || 0) - hist.shells),
           contributed: Math.max(0, (memberData.contributed || 0) - hist.contributed),
