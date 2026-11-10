@@ -50,7 +50,7 @@ describe('LE balance verification boundary', () => {
     const token = `e30.${Buffer.from(JSON.stringify({ iss: 'verge-api' })).toString('base64url')}.signature`;
     const fetch = vi.fn().mockResolvedValue(new Response('', { status: 403 })); vi.stubGlobal('fetch', fetch);
     expect((await GET(request('GET', token))).status).toBe(403);
-    expect(fetch.mock.calls[0][0]).toBe('https://verge-api.the-aquarium.com/v1/le-balance/session');
+    expect(fetch.mock.calls[0][0]).toBe('https://verge-api-production-aead.up.railway.app/v1/le-balance/session');
     expect(database.query).not.toHaveBeenCalled();
   });
   it('blocks reads and writes on network failure', async () => {

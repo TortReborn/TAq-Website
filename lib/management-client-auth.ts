@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 
 const MANAGEMENT_API = 'https://taq-management-api-production.up.railway.app';
-const VERGE_API = 'https://verge-api.the-aquarium.com';
+// The custom domain sits behind Cloudflare, which refuses requests from Vercel's servers.
+const VERGE_API = 'https://verge-api-production-aead.up.railway.app';
 const VERGE_ISSUER = 'verge-api';
 
 export class ManagementClientAuthError extends Error {
