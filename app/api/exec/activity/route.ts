@@ -5,6 +5,7 @@ import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 import { countPendingJoins } from '@/lib/pending-joins';
 import { guildAccountUuids, withoutGuildAccounts } from '@/lib/guild-accounts';
+import { counterDelta } from '@/lib/counter-delta';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ interface Member {
   contributed: number;
   joined?: string;
   guildRankName: string;
-  wars: number;
+  wars: number | null;
   raids: number;
   shells: number;
   lastJoin: string | null;
@@ -42,7 +43,7 @@ interface Member {
 
 interface HistoricalMember {
   uuid: string;
-  wars: number;
+  wars: number | null;
   raids: number;
   shells: number;
   playtime: number;
@@ -51,10 +52,7 @@ interface HistoricalMember {
 
 const TIME_PERIODS = [7, 14, 30] as const;
 
-function calculateDelta(current: number, historical: number | undefined): { value: number; hasData: boolean } {
-  if (historical === undefined) return { value: 0, hasData: false };
-  return { value: Math.max(0, current - historical), hasData: true };
-}
+const calculateDelta = counterDelta;
 
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
@@ -81,7 +79,7 @@ export async function GET(request: NextRequest) {
           ...m,
           username: m.name,
           guildRankName: m.rank,
-          wars: m.wars || 0,
+          wars: m.wars ?? null,  // private: unknown, not 0 (TAQ-208)
           raids: m.raids || 0,
           shells: m.shells || 0,
           lastJoin: m.lastJoin,
@@ -169,7 +167,7 @@ export async function GET(request: NextRequest) {
           guildRankName: member.guildRankName,
           contributed: member.contributed,
           totalPlaytime: member.playtime,
-          totalWars: member.wars,
+          totalWars: member.wars ?? 0,
           totalRaids: allTimeGraidRaids.get(member.uuid) || 0,
           joined: member.joined,
           lastJoin: member.lastJoin,

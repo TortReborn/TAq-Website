@@ -5,6 +5,7 @@ import simpleDatabaseCache from '@/lib/db-cache-simple';
 import { getAllTimeGraidRaidTotals } from '@/lib/graid-raid-totals';
 import { requireGuildSession } from '@/lib/exec-auth';
 import { guildAccountUuids, withoutGuildAccounts } from '@/lib/guild-accounts';
+import { counterDelta } from '@/lib/counter-delta';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ interface Member {
   discordId?: string;
   discordUsername?: string;
   guildRankName: string;
-  wars: number;
+  wars: number | null;
   raids: number;
   shells: number;
   lastJoin: string | null;
@@ -30,7 +31,7 @@ interface Member {
 
 interface HistoricalMember {
   uuid: string;
-  wars: number;
+  wars: number | null;
   raids: number;
   shells: number;
   playtime: number;
@@ -50,22 +51,12 @@ const TIME_PERIODS = [1, 7, 14, 30] as const;
 
 // Calculate the difference between current and historical values
 function calculateTimeDelta(
-  currentValue: number,
-  historicalValue: number | undefined
+  currentValue: number | null,
+  historicalValue: number | null | undefined
 ): { value: number; hasCompleteData: boolean } {
-  // If no historical data, member is new
-  if (historicalValue === undefined) {
-    return { value: 0, hasCompleteData: false };
-  }
-
-  // Calculate delta (current - baseline)
-  const delta = currentValue - historicalValue;
-
-  // Protect against negative values (data resets/corrections)
-  return {
-    value: Math.max(0, delta),
-    hasCompleteData: true
-  };
+  // No baseline (a new member) or an unknown reading (private) is no data.
+  const { value, hasData } = counterDelta(currentValue, historicalValue);
+  return { value, hasCompleteData: hasData };
 }
 
 // Calculate stats for a specific time period
@@ -154,7 +145,7 @@ export async function GET(request: NextRequest) {
           ...member,
           username: member.name,
           guildRankName: member.rank,
-          wars: member.wars || 0,
+          wars: member.wars ?? null,  // private: unknown, not 0 (TAQ-208)
           raids: member.raids || 0,
           shells: member.shells || 0,
           lastJoin: member.lastJoin,
@@ -195,7 +186,7 @@ export async function GET(request: NextRequest) {
 
         // Add "all" time frame (current values)
         timeFrames['all'] = {
-          wars: member.wars,
+          wars: member.wars ?? 0,
           raids: allTimeRaids,
           shells: member.shells,
           contributed: member.contributed,
