@@ -52,7 +52,6 @@ interface HistoricalMember {
 
 const TIME_PERIODS = [7, 14, 30] as const;
 
-const calculateDelta = counterDelta;
 
 export async function GET(request: NextRequest) {
   const session = await requireExecSession(request);
@@ -125,18 +124,20 @@ export async function GET(request: NextRequest) {
               hasCompleteData: false,
             };
           } else {
-            const pt = calculateDelta(member.playtime, hist.playtime);
-            const wa = calculateDelta(member.wars, hist.wars);
-            const ra = calculateDelta(member.raids, hist.raids);
-            const sh = calculateDelta(member.shells, hist.shells);
-            const co = calculateDelta(member.contributed, hist.contributed);
+            const pt = counterDelta(member.playtime, hist.playtime);
+            const wa = counterDelta(member.wars, hist.wars);
+            const ra = counterDelta(member.raids, hist.raids);
+            const sh = counterDelta(member.shells, hist.shells);
+            const co = counterDelta(member.contributed, hist.contributed);
             timeFrames[String(days)] = {
               playtime: pt.value,
               wars: wa.value,
               raids: ra.value,
               shells: sh.value,
               contributed: co.value,
-              hasCompleteData: pt.hasData && wa.hasData,
+              // Hidden wars count as 0 for the period; they don't make the
+              // playtime the activity check runs on incomplete.
+              hasCompleteData: pt.hasData,
             };
           }
         }

@@ -247,7 +247,7 @@ class SimpleDatabaseCache {
   // Get player activity baselines for multiple time periods using datetime-based
   // snapshot lookup (matches the Discord bot's Helpers/database.py approach).
   // Period N finds the most recent snapshot on or before CURRENT_DATE - N days.
-  async getPlayerActivitySnapshots(daysArray: number[], requestId?: string): Promise<Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>>> {
+  async getPlayerActivitySnapshots(daysArray: number[], requestId?: string): Promise<Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number | null; raids: number; shells: number }>>> {
     const rateCheck = this.checkRateLimit('members', requestId);
     if (!rateCheck.allowed) {
       console.warn('🚫 Rate limit exceeded for player activity');
@@ -283,7 +283,7 @@ class SimpleDatabaseCache {
 
       if (targetDatesSet.size === 0) {
         console.log('📊 Player activity: no snapshots available');
-        const empty: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number }>> = {};
+        const empty: Record<number, Record<string, { uuid: string; playtime: number; contributed: number; wars: number | null; raids: number; shells: number }>> = {};
         for (const d of daysArray) empty[d] = {};
         return empty;
       }
@@ -294,7 +294,7 @@ class SimpleDatabaseCache {
       //    the nearest neighbor on each side via two LIMIT 1 probes of the
       //    (uuid, snapshot_date) primary key, instead of the previous
       //    full-table DISTINCT ON sort per period. All dates go in one query.
-      type SnapshotRow = { uuid: string; playtime: number; contributed: number; wars: number; raids: number; shells: number };
+      type SnapshotRow = { uuid: string; playtime: number; contributed: number; wars: number | null; raids: number; shells: number };
 
       const result = await client.query(
         `WITH uuids AS (SELECT DISTINCT uuid FROM player_activity)

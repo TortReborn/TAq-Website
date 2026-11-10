@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
           raids: Math.max(0, (memberData.raids || 0) - hist.raids),
           shells: Math.max(0, (memberData.shells || 0) - hist.shells),
           contributed: Math.max(0, (memberData.contributed || 0) - hist.contributed),
-          hasCompleteData: wars.hasData,
+          hasCompleteData: true,
         };
       }
     }

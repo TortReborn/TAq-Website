@@ -51,10 +51,10 @@ const TIME_PERIODS = [1, 7, 14, 30] as const;
 
 // Calculate the difference between current and historical values
 function calculateTimeDelta(
-  currentValue: number | null,
-  historicalValue: number | null | undefined
+  currentValue: number,
+  historicalValue: number | undefined
 ): { value: number; hasCompleteData: boolean } {
-  // No baseline (a new member) or an unknown reading (private) is no data.
+  // If no historical data, member is new
   const { value, hasData } = counterDelta(currentValue, historicalValue);
   return { value, hasCompleteData: hasData };
 }
@@ -75,20 +75,21 @@ function calculateTimeFrameStats(
     };
   }
 
-  const warsDelta = calculateTimeDelta(member.wars, historical.wars);
+  // Hidden wars (unknown on either side) count as 0 for the period, and don't
+  // mark the member's other stats incomplete.
+  const wars = counterDelta(member.wars, historical.wars).value;
   const raidsDelta = calculateTimeDelta(member.raids, historical.raids);
   const shellsDelta = calculateTimeDelta(member.shells, historical.shells);
   const contributedDelta = calculateTimeDelta(member.contributed, historical.contributed);
   const playtimeDelta = calculateTimeDelta(member.playtime, historical.playtime);
 
   return {
-    wars: warsDelta.value,
+    wars,
     raids: raidsDelta.value,
     shells: shellsDelta.value,
     contributed: contributedDelta.value,
     playtime: playtimeDelta.value,
-    hasCompleteData: warsDelta.hasCompleteData &&
-                     raidsDelta.hasCompleteData &&
+    hasCompleteData: raidsDelta.hasCompleteData &&
                      shellsDelta.hasCompleteData &&
                      contributedDelta.hasCompleteData &&
                      playtimeDelta.hasCompleteData
