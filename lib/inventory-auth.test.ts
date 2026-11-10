@@ -41,7 +41,7 @@ describe('inventory client verification', () => {
 describe('choosing the verifying service', () => {
   const tokenFrom = (claims: unknown) => `e30.${Buffer.from(JSON.stringify(claims)).toString('base64url')}.signature`;
   const OLD_SESSION = 'https://taq-management-api-production.up.railway.app/api/inventory/session';
-  const VERGE_SESSION = 'https://verge-api.the-aquarium.com/v1/inventory/session';
+  const VERGE_SESSION = 'https://verge-api-production-aead.up.railway.app/v1/inventory/session';
 
   it.each([
     ['a Verge token', tokenFrom({ iss: 'verge-api' }), VERGE_SESSION],
