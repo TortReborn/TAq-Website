@@ -81,10 +81,13 @@ export async function give(plan: { request_id: number; count: number }[], actor:
     let total = 0;
     for (const item of plan) {
       const { rows: [r] } = await c.query(
-        `SELECT id, uuid::text, ign, kind, count, given, status FROM tome_requests WHERE id = $1 FOR UPDATE`, [item.request_id]);
+        `SELECT r.id, r.uuid::text, r.ign, r.kind, r.count, r.given, r.status,
+                EXISTS (SELECT 1 FROM guild_roster g WHERE g.uuid = r.uuid) AS in_guild
+         FROM tome_requests r WHERE r.id = $1 FOR UPDATE`, [item.request_id]);
       if (!r || r.status !== 'open' || !Number.isInteger(item.count) || item.count < 1 || r.given + item.count > r.count) {
         throw new TomeConflict(`Request #${item.request_id} changed since the preview; preview again.`);
       }
+      if (!r.in_guild) throw new TomeConflict(`${r.ign} has left the guild, so their tomes wait until they return.`);
       const given = r.given + item.count;
       await c.query(
         `UPDATE tome_requests SET given = $2, status = CASE WHEN $2 = count THEN 'done' ELSE 'open' END, updated_at = NOW() WHERE id = $1`,
@@ -101,10 +104,12 @@ export async function give(plan: { request_id: number; count: number }[], actor:
 
 export async function moveRequest(id: number, bucket: TomeBucket, actor: Actor): Promise<void> {
   await tx(async c => {
-    const { rows: [r] } = await c.query(`SELECT uuid::text, ign, bucket, status FROM tome_requests WHERE id = $1 FOR UPDATE`, [id]);
+    const { rows: [r] } = await c.query(`SELECT r.uuid::text, r.ign, r.bucket, r.status, EXISTS (SELECT 1 FROM guild_roster g WHERE g.uuid = r.uuid) AS in_guild
+       FROM tome_requests r WHERE r.id = $1 FOR UPDATE`, [id]);
     if (!r || r.status !== 'open') throw new TomeConflict('That request is no longer open.');
+    if (!r.in_guild) throw new TomeConflict(`${r.ign} has left the guild; their request moves back by itself if they return.`);
     if (r.bucket === bucket) return;
-    await c.query(`UPDATE tome_requests SET bucket = $2, updated_at = NOW() WHERE id = $1`, [id, bucket]);
+    await c.query(`UPDATE tome_requests SET bucket = $2, left_from = NULL, updated_at = NOW() WHERE id = $1`, [id, bucket]);
     await c.query(
       `INSERT INTO tome_events (uuid, request_id, action, actor_id, actor_name, note) VALUES ($1, $2, 'moved', $3, $4, $5)`,
       [r.uuid, id, actor.id, actor.name, `${r.bucket} -> ${bucket}`]);

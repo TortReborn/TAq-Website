@@ -242,9 +242,9 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
       <td style={{ ...td, color: 'var(--text-muted)' }}>{ago(r.created_at)}</td>
       <td style={{ ...td, whiteSpace: 'nowrap' }}>
         <input style={{ ...input, width: '3.5rem', padding: '0.3rem 0.4rem' }} value={n} onChange={e => setN(e.target.value.replace(/\D/g, ''))} aria-label="Tomes to give" />
-        <button style={{ ...btn('#22c55e'), marginLeft: '0.3rem' }} disabled={busy || !Number(n)}
+        <button style={{ ...btn('#22c55e'), marginLeft: '0.3rem' }} disabled={busy || !Number(n) || !r.in_guild} title={r.in_guild ? undefined : 'Left the guild; their tomes wait until they return'}
           onClick={() => run(async () => { await give(`/api/exec/tomes/${r.id}`, { action: 'give', count: Number(n) }); return `Gave ${n} to ${r.ign}.`; })}>Give</button>
-        <select style={{ ...input, marginLeft: '0.3rem', padding: '0.3rem', width: '6.5rem' }} value="" disabled={busy}
+        <select style={{ ...input, marginLeft: '0.3rem', padding: '0.3rem', width: '6.5rem' }} value="" disabled={busy || !r.in_guild}
           onChange={e => {
             const bucket = e.target.value as TomeBucket;
             if (bucket) run(async () => { await post(`/api/exec/tomes/${r.id}`, { action: 'move', bucket }); return `Moved ${r.ign}'s request.`; });
