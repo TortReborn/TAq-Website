@@ -3,7 +3,7 @@ import { allocate, MAX_SCREENSHOTS, parseScreenshots, QUEUE_TEXT_LIMIT, queueTex
 
 describe('very low priority', () => {
   const r = (id: number, priority: OpenRequest['priority'], hoursAgo: number): OpenRequest => ({
-    id, uuid: 'u', ign: `M${id}`, kind: 'war', count: 1, given: 0, priority, bucket: 'queue',
+    id, uuid: 'u', ign: `M${id}`, kind: 'war', count: 1, given: 0, priority, bucket: 'give_when_available', discord_id: null,
     created_at: new Date(Date.UTC(2026, 0, 1) - hoursAgo * 3600e3).toISOString(), in_guild: true,
   });
 
@@ -11,9 +11,9 @@ describe('very low priority', () => {
     expect(allocate([r(1, 'very_low', 30), r(2, 'low', 1)], 1).map(a => a.request_id)).toEqual([2]);
   });
 
-  it('gets its own grey heart section in the queue, below low', () => {
+  it('is listed after low, with the grey heart', () => {
     const text = queueText([r(1, 'very_low', 30), r(2, 'low', 1)]);
-    expect(text.indexOf('🩶 **Very Low**')).toBeGreaterThan(text.indexOf('**Low**'));
+    expect(text.indexOf('🩶 `M1`')).toBeGreaterThan(text.indexOf('💚 `M2`'));
   });
 });
 
@@ -25,26 +25,25 @@ describe('queue text (in step with the bot)', () => {
 
   it('matches Tort-Reborn/tests/test_tomes.py, in serving order', () => {
     const rows = [
-      row('Eve', 'war', 20, 'high', 'give_when_full'),
-      row('Dee', null, 4, 'low', 'give_when_available'),
-      row('Cy', 'war', 5, 'high', 'queue', true, null),
-      row('Ann_1', 'war', 3, 'very_high', 'queue'),
-      row('Bob', 'raid', 2, 'very_high', 'queue'),
-      row('Bob', 'war', 1, 'very_high', 'queue'),
+      row('Eve', 'war', 20, 'high', 'last_resort'),
+      row('Dee', null, 4, 'low', 'give_when_full'),
+      row('Cy', 'war', 5, 'high', 'give_when_available', true, null),
+      row('Ann_1', 'war', 3, 'very_high', 'give_when_available'),
+      row('Bob', 'raid', 2, 'very_high', 'give_when_available'),
+      row('Bob', 'war', 1, 'high', 'give_when_available'),
       row('Asleep', 'war', 9, 'high', 'dormant'),
-      row('Left', 'war', 9, 'very_high', 'queue', false),
+      row('Left', 'war', 9, 'very_high', 'give_when_available', false),
     ];
     expect(queueText(rows)).toBe([
-      '❤️ **Very High**', '@Ann_1: 3', '@Bob: 3', '',
-      '🧡 **High**', '`Cy`: 5', '',
-      '**Give when available**', '@Dee: 4', '',
-      '**Give when full**', '@Eve: 20',
+      '__**Give when available**__', '❤️ @Ann_1: 3', '❤️ @Bob: 3', '🧡 `Cy`: 5', '',
+      '__**Give when full**__', '💚 @Dee: 4', '',
+      '__**Give if no other option**__', '🧡 @Eve: 20',
     ].join('\n'));
   });
 
   it('says when nothing is waiting, and counts what would not fit', () => {
     expect(queueText([row('Asleep', 'war', 1, 'low', 'dormant')])).toBe('Nothing is waiting.');
-    const text = queueText(Array.from({ length: 400 }, (_, i) => row(`Member${String(i).padStart(4, '0')}`, 'war', 2, 'low', 'queue', true, null)));
+    const text = queueText(Array.from({ length: 400 }, (_, i) => row(`Member${String(i).padStart(4, '0')}`, 'war', 2, 'low', 'give_when_available', true, null)));
     const shown = (text.match(/`/g) ?? []).length / 2;
     expect(text.length).toBeLessThanOrEqual(QUEUE_TEXT_LIMIT);
     expect(text.endsWith(`…and ${400 - shown} more members (${(400 - shown) * 2} tomes)`)).toBe(true);
@@ -104,7 +103,7 @@ describe('refunds', () => {
 
 const req = (id: number, over: Partial<OpenRequest>): OpenRequest => ({
   id, uuid: `u${id}`, ign: `p${id}`, kind: 'war', count: 1, given: 0, priority: 'low',
-  bucket: 'queue', created_at: `2026-10-${String(10 + id).padStart(2, '0')}`, in_guild: true, ...over,
+  bucket: 'give_when_available', created_at: `2026-10-${String(10 + id).padStart(2, '0')}`, in_guild: true, ...over,
 });
 
 describe('allocate', () => {
@@ -118,7 +117,7 @@ describe('allocate', () => {
     req(7, { bucket: 'dormant', count: 9 }),
   ];
 
-  it('serves the queue by priority, then give when available, then give when full', () => {
+  it('serves give when available by priority then age, then give when full', () => {
     expect(allocate(open, 100).map(a => [a.request_id, a.count])).toEqual([[2, 2], [3, 1], [1, 3], [5, 2], [4, 10]]);
   });
 
@@ -127,8 +126,14 @@ describe('allocate', () => {
   });
 
   it('only reaches give when full once nothing else is waiting', () => {
-    expect(allocate(open, 9).some(a => a.request_id === 4)).toBe(true); // 6 queued + 2 available, then this
+    expect(allocate(open, 9).some(a => a.request_id === 4)).toBe(true); // 8 available, then this
     expect(allocate(open, 8).some(a => a.request_id === 4)).toBe(false);
+  });
+
+  it('reaches give if no other option last of all', () => {
+    const withLast = [...open, req(8, { bucket: 'last_resort', count: 4, priority: 'very_high', created_at: '2026-01-01' })];
+    expect(allocate(withLast, 100).map(a => a.request_id).at(-1)).toBe(8);
+    expect(allocate(withLast, 18).some(a => a.request_id === 8)).toBe(false);
   });
 
   it('skips members who left and dormant requests', () => {

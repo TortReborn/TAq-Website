@@ -83,9 +83,16 @@ export default function TomesTab() {
         <div style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
       )}
       <Distribute busy={busy} run={run} give={give} shots={shots} setShots={setShots} />
-      <Queue requests={requests} loading={!data} busy={busy} run={run} give={give} />
-      <MemberLookup busy={busy} run={run} />
-      <Recent events={data?.recent ?? []} />
+      {/* Side by side when there's room; the lookup and activity drop below on narrow screens. */}
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ flex: '2 1 44rem', minWidth: 0 }}>
+          <Queue requests={requests} loading={!data} busy={busy} run={run} give={give} />
+        </div>
+        <div style={{ flex: '1 1 20rem', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <MemberLookup busy={busy} run={run} />
+          <Recent events={data?.recent ?? []} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -156,7 +163,7 @@ function Distribute({ busy, run, give, shots, setShots }: { busy: boolean; run: 
             return plan.length ? `Preview: ${plan.reduce((n: number, p: Allocation) => n + p.count, 0)} tome(s) to ${plan.length} request(s).` : 'Nothing is waiting.';
           })}>Preview</button>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          The queue first (by priority, then oldest), then give when available, then give when full. Members not in the guild are skipped.
+          Give when available first (by priority, then oldest), then give when full, then give if no other option. Members not in the guild are skipped.
         </span>
       </div>
       <Screenshots shots={shots} setShots={setShots} busy={busy} />
@@ -191,25 +198,33 @@ function Queue({ requests, loading, busy, run, give }: { requests: Row[]; loadin
       <h2 style={h2}>Open requests</h2>
       {BUCKETS.map(b => {
         const rows = requests.filter(r => r.bucket === b.key).sort(servingOrder);
-        if (b.key === 'dormant' && !showDormant) {
-          return rows.length ? (
-            <button key={b.key} onClick={() => setShowDormant(true)} style={{ ...btn('transparent'), color: 'var(--text-secondary)', padding: '0.4rem 0' }}>
-              ▸ {b.label}: {rows.length} request(s), {rows.reduce((n, r) => n + r.count - r.given, 0)} tomes
-            </button>
-          ) : null;
-        }
+        const tomes = rows.reduce((n, r) => n + r.count - r.given, 0);
+        const dormant = b.key === 'dormant';
+        if (dormant && !rows.length) return null;
+        // A clear title and a rule above each bucket, so they don't run together.
+        const heading: React.CSSProperties = { fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 0.4rem', textDecoration: 'underline', textUnderlineOffset: '0.2em' };
         return (
-          <div key={b.key} style={{ marginBottom: '0.9rem' }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', margin: '0.3rem 0' }}>
-              {b.label} · {rows.reduce((n, r) => n + r.count - r.given, 0)} tomes
-            </div>
-            {rows.length === 0 ? <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Nothing here.</div> : (
+          <div key={b.key} style={{ borderTop: '2px solid var(--border-card)', paddingTop: '0.7rem', marginTop: '0.7rem' }}>
+            {dormant ? (
+              // Dormant (members not in the guild) folds away; the heading opens and closes it.
+              <button type="button" onClick={() => setShowDormant(v => !v)} aria-expanded={showDormant}
+                style={{ ...heading, background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"
+                  style={{ transform: showDormant ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>
+                  <path d="M3 1.5 6.5 5 3 8.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {b.label} · {tomes} tomes, {rows.length} request{rows.length === 1 ? '' : 's'}
+              </button>
+            ) : (
+              <div style={heading}>{b.label} · {tomes} tomes</div>
+            )}
+            {dormant && !showDormant ? null : rows.length === 0 ? <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Nothing here.</div> : (
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', minWidth: '52rem', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+                <table style={{ width: '100%', minWidth: '42rem', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   {/* the same widths in every bucket, so the columns line up down the page */}
                   <colgroup>
-                    <col style={{ width: '24%' }} /><col style={{ width: '7%' }} /><col style={{ width: '15%' }} />
-                    <col style={{ width: '10%' }} /><col style={{ width: '7%' }} /><col style={{ width: '6%' }} /><col style={{ width: '31%' }} />
+                    <col style={{ width: '9rem' }} /><col style={{ width: '3.6rem' }} /><col style={{ width: '3.6rem' }} />
+                    <col style={{ width: '5.6rem' }} /><col style={{ width: '3.6rem' }} /><col style={{ width: '3rem' }} /><col style={{ width: '15rem' }} />
                   </colgroup>
                   <thead><tr>
                     <th style={th}>Member</th><th style={th}>Kind</th><th style={th}>Tomes</th><th style={th}>Priority</th>
@@ -226,12 +241,16 @@ function Queue({ requests, loading, busy, run, give }: { requests: Row[]; loadin
   );
 }
 
+// Row buttons sit four to a cell, so they're a little tighter than the page's.
+const compact: React.CSSProperties = { padding: '0.3rem 0.55rem', fontSize: '0.78rem' };
+
 function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; give: Give }) {
   const left = r.count - r.given;
-  const [n, setN] = useState(String(left));
+  // Empty, not prefilled: giving should be a number exec types on purpose.
+  const [n, setN] = useState('');
   return (
     <tr>
-      <td style={td}>
+      <td style={{ ...td, overflow: 'hidden', textOverflow: 'ellipsis' }} title={r.ign}>
         {r.ign}{!r.in_guild && r.bucket !== 'dormant' && <span style={{ color: '#eab308', fontSize: '0.72rem' }}> (left the guild)</span>}
         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
           {r.note}
@@ -248,15 +267,24 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
         </div>
       </td>
       <td style={td}>{kindLabel(r.kind)}</td>
-      <td style={td}>{left}{r.given ? <span style={{ color: 'var(--text-muted)' }}> ({r.given} of {r.count} given)</span> : null}</td>
+      <td style={td}>{left}</td>
       <td style={td}><Priority p={r.priority} /></td>
       <td style={td}>{r.shells_spent || '—'}</td>
       <td style={{ ...td, color: 'var(--text-muted)' }}>{ago(r.created_at)}</td>
       <td style={{ ...td, whiteSpace: 'nowrap' }}>
-        <input style={{ ...input, width: '3.5rem', padding: '0.3rem 0.4rem' }} value={n} onChange={e => setN(e.target.value.replace(/\D/g, ''))} aria-label="Tomes to give" />
-        <button style={{ ...btn('#22c55e'), marginLeft: '0.3rem' }} disabled={busy || !Number(n) || !r.in_guild} title={r.in_guild ? undefined : 'Left the guild; their tomes wait until they return'}
-          onClick={() => run(async () => { await give(`/api/exec/tomes/${r.id}`, { action: 'give', count: Number(n) }); return `Gave ${n} to ${r.ign}.`; })}>Give</button>
-        <select style={{ ...input, marginLeft: '0.3rem', padding: '0.3rem', width: '6.5rem' }} value="" disabled={busy || !r.in_guild}
+        <input style={{ ...input, width: '2.6rem', padding: '0.3rem 0.35rem' }} value={n} placeholder="#" onChange={e => setN(e.target.value.replace(/\D/g, ''))} aria-label="Tomes to give" />
+        <button style={{ ...btn('#22c55e'), ...compact, marginLeft: '0.25rem' }} disabled={busy || !Number(n) || Number(n) > left || !r.in_guild}
+          title={!r.in_guild ? 'Left the guild; their tomes wait until they return' : Number(n) > left ? `Only ${left} left on this request` : undefined}
+          onClick={() => {
+            const count = Number(n);
+            if (!window.confirm(`Record ${count} ${kindLabel(r.kind).toLowerCase()} tome${count === 1 ? '' : 's'} as given to ${r.ign}?\n\nOnly confirm once you've given them in-game. ${r.ign} is pinged in the tome log.`)) return;
+            run(async () => {
+              await give(`/api/exec/tomes/${r.id}`, { action: 'give', count });
+              setN('');
+              return `Gave ${count} to ${r.ign}.`;
+            });
+          }}>Give</button>
+        <select style={{ ...input, marginLeft: '0.25rem', padding: '0.3rem 0.2rem', width: '5.2rem' }} value="" disabled={busy || !r.in_guild}
           onChange={e => {
             const bucket = e.target.value as TomeBucket;
             if (bucket) run(async () => { await post(`/api/exec/tomes/${r.id}`, { action: 'move', bucket }); return `Moved ${r.ign}'s request.`; });
@@ -264,9 +292,11 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
           <option value="">Move…</option>
           {BUCKETS.filter(b => b.key !== r.bucket).map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
         </select>
-        <button style={{ ...btn('#ef4444'), marginLeft: '0.3rem' }} disabled={busy}
+        <button style={{ ...btn('#ef4444'), ...compact, marginLeft: '0.25rem' }} disabled={busy}
           onClick={() => {
-            const reason = window.prompt(`Cancel ${left} ${kindLabel(r.kind).toLowerCase()} tome(s) for ${r.ign}?${r.kind === 'raid' ? ' Their shells for these go back.' : ''}\nReason:`);
+            const what = `${left} ${kindLabel(r.kind).toLowerCase()} tome${left === 1 ? '' : 's'}`;
+            if (!window.confirm(`Cancel ${r.ign}'s request for ${what}?${r.kind === 'raid' ? ' Their shells for these go back.' : ''}\n\n${r.ign} is pinged in the tome log.`)) return;
+            const reason = window.prompt('Reason (optional, shown in the tome log):', '');
             if (reason === null) return;
             run(async () => {
               const { refunded } = await post(`/api/exec/tomes/${r.id}`, { action: 'cancel', reason });
@@ -289,7 +319,7 @@ function MemberLookup({ busy, run }: { busy: boolean; run: Run }) {
     <section style={card}>
       <h2 style={h2}>Look up a member</h2>
       <form onSubmit={e => { e.preventDefault(); setQuery(ign.trim()); }} style={{ display: 'flex', gap: '0.5rem' }}>
-        <input style={{ ...input, width: '14rem' }} placeholder="IGN" value={ign} onChange={e => setIgn(e.target.value)} />
+        <input style={{ ...input, flex: 1, minWidth: 0 }} placeholder="IGN" value={ign} onChange={e => setIgn(e.target.value)} />
         <button style={btn('#3b82f6')} type="submit">Look up</button>
       </form>
       {error && query && <div style={{ color: '#ef4444', fontSize: '0.83rem', marginTop: '0.5rem' }}>{error.message}</div>}
@@ -323,7 +353,7 @@ function MemberLookup({ busy, run }: { busy: boolean; run: Run }) {
             )}
             <input style={{ ...input, width: '6rem' }} placeholder={form.action === 'adjust' ? '+/- tomes' : 'Tomes'} value={form.count}
               onChange={e => setForm({ ...form, count: e.target.value.replace(/[^\d-]/g, '') })} />
-            <input style={{ ...input, flex: 1, minWidth: '12rem' }} placeholder="Why (required)" value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} />
+            <input style={{ ...input, flex: 1, minWidth: '9rem' }} placeholder="Why (required)" value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} />
             <button style={btn('#a855f7')} type="submit" disabled={busy || !form.count || !form.note.trim()}>Record</button>
           </form>
           <details>

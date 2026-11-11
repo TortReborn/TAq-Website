@@ -14,7 +14,7 @@
  */
 
 export type TomeKind = 'war' | 'raid';
-export type TomeBucket = 'queue' | 'give_when_available' | 'give_when_full' | 'dormant';
+export type TomeBucket = 'give_when_available' | 'give_when_full' | 'last_resort' | 'dormant';
 export type TomePriority = 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
 
 export const PRIORITIES: { key: TomePriority; label: string; color: string }[] = [
@@ -28,9 +28,9 @@ export const PRIORITY_RANK: Record<TomePriority, number> = { very_high: 0, high:
 
 /** Order tomes are given out in; dormant requests wait for their member to rejoin. */
 export const BUCKETS: { key: TomeBucket; label: string }[] = [
-  { key: 'queue', label: 'Queue' },
   { key: 'give_when_available', label: 'Give when available' },
   { key: 'give_when_full', label: 'Give when full' },
+  { key: 'last_resort', label: 'Give if no other option' },
   { key: 'dormant', label: 'Dormant (not in the guild)' },
 ];
 
@@ -139,23 +139,22 @@ export const QUEUE_TEXT_LIMIT = 3900;
 export function queueText(requests: OpenRequest[]): string {
   const rows = requests.filter(r => r.bucket !== 'dormant' && r.in_guild && r.count > r.given).sort(servingOrder);
   if (!rows.length) return 'Nothing is waiting.';
-  const sections = new Map<string, { heading: string; members: Map<string, number> }>();
+  // A heading per bucket in serving order; under it one line a member, with the
+  // heart of their highest priority there (rows are in serving order, so the first seen).
+  const sections = new Map<TomeBucket, Map<string, { n: number; priority: TomePriority }>>();
   for (const r of rows) {
-    const numbered = r.bucket === 'queue';
-    const key = numbered ? r.priority : r.bucket;
-    if (!sections.has(key)) {
-      const label = numbered ? PRIORITIES.find(p => p.key === r.priority)!.label : BUCKETS.find(b => b.key === r.bucket)!.label;
-      sections.set(key, { heading: numbered ? `${PRIORITY_EMOJI[r.priority]} **${label}**` : `**${label}**`, members: new Map() });
-    }
-    const members = sections.get(key)!.members;
+    if (!sections.has(r.bucket)) sections.set(r.bucket, new Map());
+    const members = sections.get(r.bucket)!;
     const who = r.discord_id ? `@${r.ign}` : `\`${r.ign}\``;
-    members.set(who, (members.get(who) ?? 0) + r.count - r.given);
+    const m = members.get(who);
+    if (m) m.n += r.count - r.given;
+    else members.set(who, { n: r.count - r.given, priority: r.priority });
   }
 
   const lines: { text: string; ign?: string; tomes: number }[] = [];
-  for (const s of sections.values()) {
-    lines.push({ text: `\n${s.heading}`, tomes: 0 });
-    for (const [who, n] of s.members) lines.push({ text: `${who}: ${n}`, ign: who, tomes: n });
+  for (const [bucket, members] of sections) {
+    lines.push({ text: `\n__**${BUCKETS.find(b => b.key === bucket)!.label}**__`, tomes: 0 });
+    for (const [who, m] of members) lines.push({ text: `${PRIORITY_EMOJI[m.priority]} ${who}: ${m.n}`, ign: who, tomes: m.n });
   }
   let text = '';
   for (let i = 0; i < lines.length; i++) {
