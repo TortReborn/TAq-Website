@@ -287,7 +287,7 @@ function MemberLookup({ busy, run }: { busy: boolean; run: Run }) {
             <b>{m.ign}</b>{!m.in_guild && <span style={{ color: '#eab308' }}> · not in the guild</span>}
             <div style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
               War tomes: {m.received.war} received{m.debt ? ` (${m.debt} of them debt)` : ''}
-              {earned != null && <> · {earned} earned from {m.wars!.toLocaleString()} lifetime wars (last count the bot saw) · next at {warsNeeded(Math.max(earned, m.received.war) + 1).toLocaleString()}</>}
+              {earned != null && <> · {earned} earned from {m.wars!.toLocaleString()} TAq wars (as of the bot's last reading) · next at {warsNeeded(Math.max(earned, m.received.war) + 1).toLocaleString()}</>}
               <br />Shell tomes: {m.received.raid} received{m.received.any ? ` · ${m.received.any} with no kind recorded` : ''}
             </div>
           </div>

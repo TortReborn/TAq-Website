@@ -144,6 +144,20 @@ export async function cancelRequest(id: number, actor: Actor, reason: string): P
   });
 }
 
+/**
+ * Wars done in TAq for the member in $1, which is what war tomes reward
+ * (Tort-Reborn Helpers/roster.taq_wars): per stint, the count on leaving (or
+ * the latest reading, for the open stint) minus the count on joining. NULL
+ * when nothing can be counted. Wars in other guilds don't count.
+ */
+const TAQ_WARS_SQL = `(
+  SELECT SUM(GREATEST(e.end_wars - s.wars_on_join, 0))::int
+  FROM membership_stints s
+  CROSS JOIN LATERAL (SELECT CASE WHEN s.left_at IS NULL
+      THEN (SELECT wars FROM player_activity WHERE uuid = $1 AND wars IS NOT NULL ORDER BY snapshot_date DESC LIMIT 1)
+      ELSE s.wars_on_leave END AS end_wars) e
+  WHERE s.uuid = $1 AND s.wars_on_join IS NOT NULL AND e.end_wars IS NOT NULL)`;
+
 export interface MemberTomes {
   uuid: string; ign: string; discord_id: string | null; in_guild: boolean; wars: number | null;
   received: { war: number; raid: number; any: number }; debt: number;
@@ -170,7 +184,7 @@ export async function findMember(name: string): Promise<MemberTomes | null> {
                 FROM tome_events e WHERE e.uuid = $1 ORDER BY e.created_at DESC, e.id DESC LIMIT 100`, [m.uuid]),
     pool.query(`SELECT EXISTS (SELECT 1 FROM guild_roster WHERE uuid = $1) AS in_guild,
                        (SELECT discord_id::text FROM discord_links WHERE uuid = $1 LIMIT 1) AS discord_id,
-                       (SELECT wars FROM player_activity WHERE uuid = $1 AND wars > 0 ORDER BY snapshot_date DESC LIMIT 1) AS wars`, [m.uuid]),
+                       ${TAQ_WARS_SQL} AS wars`, [m.uuid]),
   ]);
   const received = { war: 0, raid: 0, any: 0 };
   let debt = 0;

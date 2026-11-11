@@ -2,7 +2,7 @@
  * Tome requests (TAQ-116): the rules and handing tomes out.
  *
  * Keep the rules in step with Tort-Reborn/Helpers/tomes.py, which makes the
- * requests: war tomes come from lifetime wars at 10/25/50/100 and then every
+ * requests: war tomes come from wars done in TAq at 10/25/50/100 and then every
  * 50 more; shell tomes (stored as kind 'raid') cost 10 shells for the first
  * four and 20 after, counting shell tomes only. lib/tomes.test.ts checks the same table as the
  * bot's tests.
@@ -38,7 +38,7 @@ const WAR_STEP = 50;
 const RAID_PRICES = [10, 10, 10, 10];
 const RAID_PRICE_AFTER = 20;
 
-/** Lifetime wars needed for the k-th war tome (1-based). */
+/** TAq wars needed for the k-th war tome (1-based). */
 export function warsNeeded(k: number): number {
   return k <= WAR_MILESTONES.length ? WAR_MILESTONES[k - 1] : WAR_MILESTONES[WAR_MILESTONES.length - 1] + WAR_STEP * (k - WAR_MILESTONES.length);
 }
