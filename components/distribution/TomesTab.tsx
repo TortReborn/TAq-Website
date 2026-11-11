@@ -83,16 +83,16 @@ export default function TomesTab() {
         <div style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
       )}
       <Distribute busy={busy} run={run} give={give} shots={shots} setShots={setShots} />
-      {/* Side by side when there's room; the lookup drops below on narrow screens. */}
+      {/* Side by side when there's room; the lookup and activity drop below on narrow screens. */}
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '2 1 44rem', minWidth: 0 }}>
           <Queue requests={requests} loading={!data} busy={busy} run={run} give={give} />
         </div>
-        <div style={{ flex: '1 1 20rem', minWidth: 0 }}>
+        <div style={{ flex: '1 1 20rem', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <MemberLookup busy={busy} run={run} />
+          <Recent events={data?.recent ?? []} />
         </div>
       </div>
-      <Recent events={data?.recent ?? []} />
     </div>
   );
 }
