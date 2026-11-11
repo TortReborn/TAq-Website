@@ -117,6 +117,18 @@ export async function moveRequest(id: number, bucket: TomeBucket, actor: Actor):
   });
 }
 
+/** Change (or clear, with an empty note) the note shown under an open request. */
+export async function setNote(id: number, note: string, actor: Actor): Promise<void> {
+  await tx(async c => {
+    const { rows: [r] } = await c.query(`SELECT ign, note, status FROM tome_requests WHERE id = $1 FOR UPDATE`, [id]);
+    if (!r || r.status !== 'open') throw new TomeConflict('That request is no longer open.');
+    const next = note.trim() || null;
+    if ((r.note ?? null) === next) return;
+    await c.query(`UPDATE tome_requests SET note = $2, updated_at = NOW() WHERE id = $1`, [id, next]);
+    await audit(c, actor, `Changed the note on ${r.ign}'s request #${id}` + (next ? `: ${next}` : ' (cleared)'));
+  });
+}
+
 /** Cancel what hasn't been given yet; raid tomes' shells for it go back. */
 export async function cancelRequest(id: number, actor: Actor, reason: string): Promise<{ refunded: number }> {
   return tx(async c => {

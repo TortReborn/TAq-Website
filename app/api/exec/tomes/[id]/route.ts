@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
 import { BUCKETS, parseScreenshots, type TomeBucket } from '@/lib/tomes';
-import { cancelRequest, give, moveRequest, TomeConflict } from '@/lib/tomes-db';
+import { cancelRequest, give, moveRequest, setNote, TomeConflict } from '@/lib/tomes-db';
 
 export const dynamic = 'force-dynamic';
 
 // POST { action: 'give', count, screenshots? } | { action: 'move', bucket } | { action: 'cancel', reason? }
+//    | { action: 'note', note } (an empty note clears it)
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireExecSession(request);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -31,6 +32,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (body?.action === 'move') {
       if (!BUCKETS.some(b => b.key === body.bucket)) return NextResponse.json({ error: 'Unknown bucket' }, { status: 400 });
       await moveRequest(id, body.bucket as TomeBucket, actor);
+      return NextResponse.json({ ok: true });
+    }
+    if (body?.action === 'note') {
+      if (typeof body.note !== 'string') return NextResponse.json({ error: 'Send a note' }, { status: 400 });
+      if (body.note.trim().length > 200) return NextResponse.json({ error: 'Keep the note to 200 characters' }, { status: 400 });
+      await setNote(id, body.note, actor);
       return NextResponse.json({ ok: true });
     }
     if (body?.action === 'cancel') {

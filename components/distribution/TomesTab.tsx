@@ -233,7 +233,19 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
     <tr>
       <td style={td}>
         {r.ign}{!r.in_guild && r.bucket !== 'dormant' && <span style={{ color: '#eab308', fontSize: '0.72rem' }}> (left the guild)</span>}
-        {r.note && <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{r.note}</div>}
+        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+          {r.note}
+          <button type="button" disabled={busy} aria-label={`Edit the note on ${r.ign}'s request`}
+            style={{ background: 'none', border: 'none', padding: 0, marginLeft: r.note ? '0.4rem' : 0, color: '#60a5fa', cursor: 'pointer', fontSize: 'inherit' }}
+            onClick={() => {
+              const note = window.prompt(`Note on ${r.ign}'s request (leave empty to clear):`, r.note ?? '');
+              if (note === null || note.trim() === (r.note ?? '')) return;
+              run(async () => {
+                await post(`/api/exec/tomes/${r.id}`, { action: 'note', note });
+                return note.trim() ? `Updated the note on ${r.ign}'s request.` : `Cleared the note on ${r.ign}'s request.`;
+              });
+            }}>{r.note ? 'edit' : 'add note'}</button>
+        </div>
       </td>
       <td style={td}>{kindLabel(r.kind)}</td>
       <td style={td}>{left}{r.given ? <span style={{ color: 'var(--text-muted)' }}> ({r.given} of {r.count} given)</span> : null}</td>
