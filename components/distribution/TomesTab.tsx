@@ -2,10 +2,10 @@
 
 /**
  * The Tomes tab of /exec/distribution (TAQ-116): members request tomes with
- * the bot's "Request tomes" button; any exec member gives them out here.
- * "Give out tomes" works like aspects: say how many you have, check who they
- * go to, confirm. Screenshots of the in-game grant go with the next give. The
- * bot logs every grant in the tome log channel, with its screenshots.
+ * the bot's "Request tomes" button, and the mod's Distribute hands the queue
+ * out in-game (TAQ-118). Here exec edits requests and records one-off gives;
+ * screenshots of the in-game grant go with the next give. The bot logs every
+ * grant in the tome log channel, with its screenshots.
  */
 
 import { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ import { fetcher } from '@/hooks/fetcher';
 import { compressImageInBrowser } from '@/lib/compress-image-client';
 import {
   BUCKETS, MAX_SCREENSHOTS, PRIORITIES, kindLabel, servingOrder, warTomesEarned, warsNeeded,
-  type Allocation, type OpenRequest, type TomeBucket, type TomeKind,
+  type OpenRequest, type TomeBucket, type TomeKind, type TomePriority,
 } from '@/lib/tomes';
 import { ago, btn, card, h2, input, td, th } from './ui';
 
@@ -42,11 +42,6 @@ async function uploadScreenshot(file: File): Promise<string> {
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error ?? `Couldn't upload ${file.name}`);
   return j.key;
-}
-
-function Priority({ p }: { p: string }) {
-  const meta = PRIORITIES.find(x => x.key === p);
-  return <span style={{ color: meta?.color ?? 'inherit', fontWeight: 600 }}>{meta?.label ?? p}</span>;
 }
 
 export default function TomesTab() {
@@ -77,16 +72,15 @@ export default function TomesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
-        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button. Give them out in-game, then record it here with your screenshots; the bot logs each grant in the tome log channel and pings the member.
+        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button, and the mod&rsquo;s <b>Distribute</b> hands them out in-game and records them. Use a row&rsquo;s <b>Give</b> only for tomes given another way; the bot logs each grant in the tome log channel and pings the member.
       </p>
       {message && (
         <div style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
       )}
-      <Distribute busy={busy} run={run} give={give} shots={shots} setShots={setShots} />
       {/* Side by side when there's room; the lookup and activity drop below on narrow screens. */}
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '2 1 44rem', minWidth: 0 }}>
-          <Queue requests={requests} loading={!data} busy={busy} run={run} give={give} />
+          <Queue requests={requests} loading={!data} busy={busy} run={run} give={give} shots={shots} setShots={setShots} />
         </div>
         <div style={{ flex: '1 1 20rem', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <MemberLookup busy={busy} run={run} />
@@ -126,7 +120,7 @@ function Screenshots({ shots, setShots, busy }: { shots: File[]; setShots: (f: F
             onChange={e => { add(Array.from(e.target.files ?? [])); e.target.value = ''; }} />
         </label>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Or paste them. Optional, up to {MAX_SCREENSHOTS}; they go with your next give, from here or a row below.
+          Or paste them. Optional, up to {MAX_SCREENSHOTS}; they go with your next Give from a row below.
         </span>
       </div>
       {shots.length > 0 && (
@@ -145,57 +139,15 @@ function Screenshots({ shots, setShots, busy }: { shots: File[]; setShots: (f: F
   );
 }
 
-function Distribute({ busy, run, give, shots, setShots }: { busy: boolean; run: Run; give: Give; shots: File[]; setShots: (f: File[]) => void }) {
-  const [tomes, setTomes] = useState('');
-  const [plan, setPlan] = useState<Allocation[] | null>(null);
-  const total = plan?.reduce((n, p) => n + p.count, 0) ?? 0;
-
-  return (
-    <section style={card}>
-      <h2 style={h2}>Give out tomes</h2>
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <input style={{ ...input, width: '9rem' }} inputMode="numeric" placeholder="Tomes you have" value={tomes}
-          onChange={e => { setTomes(e.target.value.replace(/\D/g, '')); setPlan(null); }} />
-        <button style={btn('#3b82f6')} disabled={busy || !tomes}
-          onClick={() => run(async () => {
-            const { plan } = await post('/api/exec/tomes/distribute', { tomes: Number(tomes) });
-            setPlan(plan);
-            return plan.length ? `Preview: ${plan.reduce((n: number, p: Allocation) => n + p.count, 0)} tome(s) to ${plan.length} request(s).` : 'Nothing is waiting.';
-          })}>Preview</button>
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          Give when available first (by priority, then oldest), then give when full, then give if no other option. Members not in the guild are skipped.
-        </span>
-      </div>
-      <Screenshots shots={shots} setShots={setShots} busy={busy} />
-      {plan && plan.length > 0 && (
-        <div style={{ marginTop: '0.75rem' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr><th style={th}>Member</th><th style={th}>Kind</th><th style={th}>Tomes</th><th style={th}>Request</th></tr></thead>
-            <tbody>{plan.map(p => (
-              <tr key={p.request_id}><td style={td}>{p.ign}</td><td style={td}>{kindLabel(p.kind)}</td><td style={td}>{p.count}</td><td style={{ ...td, color: 'var(--text-muted)' }}>#{p.request_id}</td></tr>
-            ))}</tbody>
-          </table>
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
-            <button style={btn('#22c55e')} disabled={busy}
-              onClick={() => run(async () => {
-                const { given } = await give('/api/exec/tomes/distribute', { plan: plan.map(p => ({ request_id: p.request_id, count: p.count })) });
-                setPlan(null); setTomes('');
-                return `Recorded ${given} tome(s) as given.`;
-              })}>I gave these {total} tomes</button>
-            <button style={btn('#6b7280')} onClick={() => setPlan(null)}>Cancel</button>
-          </div>
-        </div>
-      )}
-    </section>
-  );
-}
-
-function Queue({ requests, loading, busy, run, give }: { requests: Row[]; loading: boolean; busy: boolean; run: Run; give: Give }) {
+function Queue({ requests, loading, busy, run, give, shots, setShots }: {
+  requests: Row[]; loading: boolean; busy: boolean; run: Run; give: Give; shots: File[]; setShots: (f: File[]) => void;
+}) {
   const [showDormant, setShowDormant] = useState(false);
   if (loading) return <section style={{ ...card, height: '12rem', opacity: 0.6 }} />;
   return (
     <section style={card}>
       <h2 style={h2}>Open requests</h2>
+      <Screenshots shots={shots} setShots={setShots} busy={busy} />
       {BUCKETS.map(b => {
         const rows = requests.filter(r => r.bucket === b.key).sort(servingOrder);
         const tomes = rows.reduce((n, r) => n + r.count - r.given, 0);
@@ -223,8 +175,8 @@ function Queue({ requests, loading, busy, run, give }: { requests: Row[]; loadin
                 <table style={{ width: '100%', minWidth: '42rem', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   {/* the same widths in every bucket, so the columns line up down the page */}
                   <colgroup>
-                    <col style={{ width: '9rem' }} /><col style={{ width: '3.6rem' }} /><col style={{ width: '3.6rem' }} />
-                    <col style={{ width: '5.6rem' }} /><col style={{ width: '3.6rem' }} /><col style={{ width: '3rem' }} /><col style={{ width: '15rem' }} />
+                    <col style={{ width: '8.6rem' }} /><col style={{ width: '3.4rem' }} /><col style={{ width: '3.6rem' }} />
+                    <col style={{ width: '6.6rem' }} /><col style={{ width: '3.2rem' }} /><col style={{ width: '3rem' }} /><col style={{ width: '15rem' }} />
                   </colgroup>
                   <thead><tr>
                     <th style={th}>Member</th><th style={th}>Kind</th><th style={th}>Tomes</th><th style={th}>Priority</th>
@@ -267,8 +219,38 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
         </div>
       </td>
       <td style={td}>{kindLabel(r.kind)}</td>
-      <td style={td}>{left}</td>
-      <td style={td}><Priority p={r.priority} /></td>
+      <td style={td}>
+        {left}
+        <div style={{ fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+          <button type="button" disabled={busy} aria-label={`Correct how many of ${r.ign}'s tomes were given`}
+            style={{ background: 'none', border: 'none', padding: 0, color: '#60a5fa', cursor: 'pointer', fontSize: 'inherit' }}
+            onClick={() => {
+              const answer = window.prompt(`How many of ${r.ign}'s ${r.count} tomes on this request have been given? (Now ${r.given}.)\n\nThis corrects the record quietly; the bot doesn't announce it.`, String(r.given));
+              if (answer === null || answer.trim() === String(r.given)) return;
+              const given = Number(answer.trim());
+              if (!Number.isInteger(given) || given < 0 || given > r.count) { window.alert(`Enter a whole number from 0 to ${r.count}.`); return; }
+              const reason = window.prompt('Why? (required, shown in the history)', '');
+              if (!reason?.trim()) return;
+              run(async () => {
+                await post(`/api/exec/tomes/${r.id}`, { action: 'given', given, reason });
+                return `${r.ign}'s request now has ${given} of ${r.count} given.`;
+              });
+            }}>fix given</button>
+        </div>
+      </td>
+      <td style={td}>
+        <select aria-label={`Priority of ${r.ign}'s request`} disabled={busy} value={r.priority}
+          style={{ ...input, padding: '0.25rem 0.15rem', width: '100%', fontWeight: 600, color: PRIORITIES.find(p => p.key === r.priority)?.color }}
+          onChange={e => {
+            const priority = e.target.value as TomePriority;
+            run(async () => {
+              await post(`/api/exec/tomes/${r.id}`, { action: 'priority', priority });
+              return `${r.ign}'s request is now ${PRIORITIES.find(p => p.key === priority)!.label} priority.`;
+            });
+          }}>
+          {PRIORITIES.map(p => <option key={p.key} value={p.key} style={{ color: p.color }}>{p.label}</option>)}
+        </select>
+      </td>
       <td style={td}>{r.shells_spent || '—'}</td>
       <td style={{ ...td, color: 'var(--text-muted)' }}>{ago(r.created_at)}</td>
       <td style={{ ...td, whiteSpace: 'nowrap' }}>

@@ -7,10 +7,11 @@
  * four and 20 after, counting shell tomes only. lib/tomes.test.ts checks the same table as the
  * bot's tests.
  *
- * Handing out works like aspects: whoever gives says how many tomes they
- * have, and `allocate` shares them out, the queue first (priority, then
- * age), then 'give when available', then 'give when full' only once nothing
- * else is waiting. Members no longer in the guild are skipped.
+ * The queue is handed out in-game by the mod's Distribute, through verge-api
+ * (TAQ-118). `allocate` is the serving order it follows: give when available,
+ * then give when full, then give if no other option, by priority then age
+ * within each; the mod serves the last two only when its toggle is on.
+ * Members no longer in the guild are skipped.
  */
 
 export type TomeKind = 'war' | 'raid';
