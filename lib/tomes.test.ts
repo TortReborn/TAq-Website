@@ -1,6 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { allocate, MAX_SCREENSHOTS, parseScreenshots, QUEUE_TEXT_LIMIT, queueText, raidRefund, raidTomePrice, raidTomesCost, screenshotKey, warsNeeded, warTomesEarned, type OpenRequest } from './tomes';
 
+describe('very low priority', () => {
+  const r = (id: number, priority: OpenRequest['priority'], hoursAgo: number): OpenRequest => ({
+    id, uuid: 'u', ign: `M${id}`, kind: 'war', count: 1, given: 0, priority, bucket: 'queue',
+    created_at: new Date(Date.UTC(2026, 0, 1) - hoursAgo * 3600e3).toISOString(), in_guild: true,
+  });
+
+  it('is served after low, even when older', () => {
+    expect(allocate([r(1, 'very_low', 30), r(2, 'low', 1)], 1).map(a => a.request_id)).toEqual([2]);
+  });
+
+  it('gets its own grey heart section in the queue, below low', () => {
+    const text = queueText([r(1, 'very_low', 30), r(2, 'low', 1)]);
+    expect(text.indexOf('🩶 **Very Low**')).toBeGreaterThan(text.indexOf('**Low**'));
+  });
+});
+
 describe('queue text (in step with the bot)', () => {
   let id = 0;
   const row = (ign: string, kind: OpenRequest['kind'], left: number, priority: OpenRequest['priority'], bucket: OpenRequest['bucket'], in_guild = true, discord_id: string | null = '1'): OpenRequest => ({

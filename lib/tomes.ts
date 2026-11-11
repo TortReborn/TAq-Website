@@ -15,15 +15,16 @@
 
 export type TomeKind = 'war' | 'raid';
 export type TomeBucket = 'queue' | 'give_when_available' | 'give_when_full' | 'dormant';
-export type TomePriority = 'low' | 'medium' | 'high' | 'very_high';
+export type TomePriority = 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
 
 export const PRIORITIES: { key: TomePriority; label: string; color: string }[] = [
   { key: 'very_high', label: 'Very High', color: '#ef4444' },
   { key: 'high', label: 'High', color: '#f97316' },
   { key: 'medium', label: 'Medium', color: '#eab308' },
   { key: 'low', label: 'Low', color: '#22c55e' },
+  { key: 'very_low', label: 'Very Low', color: '#94a3b8' },
 ];
-export const PRIORITY_RANK: Record<TomePriority, number> = { very_high: 0, high: 1, medium: 2, low: 3 };
+export const PRIORITY_RANK: Record<TomePriority, number> = { very_high: 0, high: 1, medium: 2, low: 3, very_low: 4 };
 
 /** Order tomes are given out in; dormant requests wait for their member to rejoin. */
 export const BUCKETS: { key: TomeBucket; label: string }[] = [
@@ -125,7 +126,7 @@ export const parseScreenshots = (keys: unknown): string[] | null => {
   return Array.isArray(keys) && keys.length <= MAX_SCREENSHOTS && keys.every(isScreenshotKey) ? keys : null;
 };
 
-const PRIORITY_EMOJI: Record<TomePriority, string> = { very_high: '❤️', high: '🧡', medium: '💛', low: '💚' };
+const PRIORITY_EMOJI: Record<TomePriority, string> = { very_high: '❤️', high: '🧡', medium: '💛', low: '💚', very_low: '🩶' };
 export const QUEUE_TEXT_LIMIT = 3900;
 
 /**
