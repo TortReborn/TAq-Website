@@ -228,7 +228,8 @@ function Queue({ requests, loading, busy, run, give }: { requests: Row[]; loadin
 
 function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; give: Give }) {
   const left = r.count - r.given;
-  const [n, setN] = useState(String(left));
+  // Empty, not prefilled: giving should be a number exec types on purpose.
+  const [n, setN] = useState('');
   return (
     <tr>
       <td style={td}>
@@ -253,9 +254,18 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
       <td style={td}>{r.shells_spent || '—'}</td>
       <td style={{ ...td, color: 'var(--text-muted)' }}>{ago(r.created_at)}</td>
       <td style={{ ...td, whiteSpace: 'nowrap' }}>
-        <input style={{ ...input, width: '3.5rem', padding: '0.3rem 0.4rem' }} value={n} onChange={e => setN(e.target.value.replace(/\D/g, ''))} aria-label="Tomes to give" />
-        <button style={{ ...btn('#22c55e'), marginLeft: '0.3rem' }} disabled={busy || !Number(n) || !r.in_guild} title={r.in_guild ? undefined : 'Left the guild; their tomes wait until they return'}
-          onClick={() => run(async () => { await give(`/api/exec/tomes/${r.id}`, { action: 'give', count: Number(n) }); return `Gave ${n} to ${r.ign}.`; })}>Give</button>
+        <input style={{ ...input, width: '3.5rem', padding: '0.3rem 0.4rem' }} value={n} placeholder="#" onChange={e => setN(e.target.value.replace(/\D/g, ''))} aria-label="Tomes to give" />
+        <button style={{ ...btn('#22c55e'), marginLeft: '0.3rem' }} disabled={busy || !Number(n) || Number(n) > left || !r.in_guild}
+          title={!r.in_guild ? 'Left the guild; their tomes wait until they return' : Number(n) > left ? `Only ${left} left on this request` : undefined}
+          onClick={() => {
+            const count = Number(n);
+            if (!window.confirm(`Record ${count} ${kindLabel(r.kind).toLowerCase()} tome${count === 1 ? '' : 's'} as given to ${r.ign}?\n\nOnly confirm once you've given them in-game. ${r.ign} is pinged in the tome log.`)) return;
+            run(async () => {
+              await give(`/api/exec/tomes/${r.id}`, { action: 'give', count });
+              setN('');
+              return `Gave ${count} to ${r.ign}.`;
+            });
+          }}>Give</button>
         <select style={{ ...input, marginLeft: '0.3rem', padding: '0.3rem', width: '6.5rem' }} value="" disabled={busy || !r.in_guild}
           onChange={e => {
             const bucket = e.target.value as TomeBucket;
