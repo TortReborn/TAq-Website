@@ -1,16 +1,11 @@
 /**
- * Tome requests on the exec Tome Queue page (TAQ-116). Requests are made by
- * the bot's "Request tomes" button and handed out by the mod's Distribute
- * (TAQ-118); here exec records one-off gives, moves requests between buckets,
- * changes their priority, corrects how many were given, cancels them
- * (refunding shells) and records debt and adjustments. Every change is one transaction that writes a tome_events
- * row and an audit_log line; the bot posts 'given' and 'cancelled' events to
- * the tome log channel.
+ * Every change is one transaction that writes a tome_events row and an
+ * audit_log line; the bot posts 'given' and 'cancelled' events to the tome log.
  */
 
 import type { PoolClient } from 'pg';
 import { getPool } from '@/lib/db';
-import { kindLabel, raidRefund, type OpenRequest, type TomeBucket, type TomeKind, type TomePriority } from '@/lib/tomes';
+import { bucketLabel, kindLabel, priorityLabel, raidRefund, type OpenRequest, type TomeBucket, type TomeKind, type TomePriority } from '@/lib/tomes';
 
 export interface Actor { id: string; name: string }
 
@@ -66,10 +61,9 @@ export async function getRecentEvents(limit = 40): Promise<TomeEvent[]> {
 }
 
 /**
- * Record tomes given by hand. The mod's Distribute hands out and records the
- * queue (through verge-api); this is for one-off gives. Each request is
- * locked and re-checked, and nothing is written if one changed. `screenshots`
- * are bucket keys from the screenshots route, kept on every 'given' event.
+ * Record tomes given by hand. Each request is locked and re-checked, and
+ * nothing is written if one changed. `screenshots` are bucket keys from the
+ * screenshots route, kept on every 'given' event.
  */
 export async function give(plan: { request_id: number; count: number }[], actor: Actor, screenshots: string[] = []): Promise<number> {
   if (!plan.length) return 0;
@@ -108,8 +102,8 @@ export async function moveRequest(id: number, bucket: TomeBucket, actor: Actor):
     await c.query(`UPDATE tome_requests SET bucket = $2, left_from = NULL, updated_at = NOW() WHERE id = $1`, [id, bucket]);
     await c.query(
       `INSERT INTO tome_events (uuid, request_id, action, actor_id, actor_name, note) VALUES ($1, $2, 'moved', $3, $4, $5)`,
-      [r.uuid, id, actor.id, actor.name, `${r.bucket} -> ${bucket}`]);
-    await audit(c, actor, `Moved ${r.ign}'s request #${id} from ${r.bucket} to ${bucket}`);
+      [r.uuid, id, actor.id, actor.name, `${bucketLabel(r.bucket)} to ${bucketLabel(bucket)}`]);
+    await audit(c, actor, `Moved ${r.ign}'s request #${id} from ${bucketLabel(r.bucket)} to ${bucketLabel(bucket)}`);
   });
 }
 
@@ -121,15 +115,14 @@ export async function setPriority(id: number, priority: TomePriority, actor: Act
     await c.query(`UPDATE tome_requests SET priority = $2, updated_at = NOW() WHERE id = $1`, [id, priority]);
     await c.query(
       `INSERT INTO tome_events (uuid, request_id, action, actor_id, actor_name, note) VALUES ($1, $2, 'moved', $3, $4, $5)`,
-      [r.uuid, id, actor.id, actor.name, `priority ${r.priority} -> ${priority}`]);
-    await audit(c, actor, `Changed ${r.ign}'s request #${id} from ${r.priority} to ${priority} priority`);
+      [r.uuid, id, actor.id, actor.name, `${priorityLabel(r.priority)} to ${priorityLabel(priority)} priority`]);
+    await audit(c, actor, `Changed ${r.ign}'s request #${id} from ${priorityLabel(r.priority)} to ${priorityLabel(priority)} priority`);
   });
 }
 
 /**
  * Correct how many of an open request's tomes have been given. The difference
- * is an 'adjusted' event, so the member's tomes received stay right, and the
- * bot doesn't announce it the way it does a give.
+ * is an 'adjusted' event, so the member's tomes received stay right.
  */
 export async function setGiven(id: number, given: number, reason: string, actor: Actor): Promise<void> {
   await tx(async c => {
@@ -143,7 +136,7 @@ export async function setGiven(id: number, given: number, reason: string, actor:
       [id, given]);
     await c.query(
       `INSERT INTO tome_events (uuid, request_id, action, kind, count, actor_id, actor_name, note) VALUES ($1, $2, 'adjusted', $3, $4, $5, $6, $7)`,
-      [r.uuid, id, r.kind, given - r.given, actor.id, actor.name, `Given ${r.given} -> ${given}: ${reason}`]);
+      [r.uuid, id, r.kind, given - r.given, actor.id, actor.name, `${r.given} to ${given} of ${r.count} given: ${reason}`]);
     await audit(c, actor, `Corrected ${r.ign}'s request #${id} from ${r.given} to ${given} of ${r.count} given: ${reason}`);
   });
 }

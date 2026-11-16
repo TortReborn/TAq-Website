@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocate, MAX_SCREENSHOTS, parseScreenshots, QUEUE_TEXT_LIMIT, queueText, raidRefund, raidTomePrice, raidTomesCost, screenshotKey, warsNeeded, warTomesEarned, type OpenRequest } from './tomes';
+import { MAX_SCREENSHOTS, parseScreenshots, QUEUE_TEXT_LIMIT, queueText, raidRefund, raidTomePrice, raidTomesCost, screenshotKey, servingOrder, warsNeeded, warTomesEarned, type OpenRequest } from './tomes';
 
 describe('very low priority', () => {
   const r = (id: number, priority: OpenRequest['priority'], hoursAgo: number): OpenRequest => ({
@@ -8,7 +8,7 @@ describe('very low priority', () => {
   });
 
   it('is served after low, even when older', () => {
-    expect(allocate([r(1, 'very_low', 30), r(2, 'low', 1)], 1).map(a => a.request_id)).toEqual([2]);
+    expect([r(1, 'very_low', 30), r(2, 'low', 1)].sort(servingOrder).map(x => x.id)).toEqual([2, 1]);
   });
 
   it('is listed after low, with the grey heart', () => {
@@ -106,44 +106,21 @@ const req = (id: number, over: Partial<OpenRequest>): OpenRequest => ({
   bucket: 'give_when_available', created_at: `2026-10-${String(10 + id).padStart(2, '0')}`, in_guild: true, ...over,
 });
 
-describe('allocate', () => {
-  const open = [
-    req(1, { priority: 'low', count: 3 }),
-    req(2, { priority: 'very_high', count: 2 }),
-    req(3, { priority: 'high', count: 5, given: 4 }),
-    req(4, { bucket: 'give_when_full', count: 10 }),
-    req(5, { bucket: 'give_when_available', count: 2 }),
-    req(6, { priority: 'very_high', count: 9, in_guild: false }),
-    req(7, { bucket: 'dormant', count: 9 }),
-  ];
+describe('serving order', () => {
+  const order = (requests: OpenRequest[]) => [...requests].sort(servingOrder).map(r => r.id);
 
-  it('serves give when available by priority then age, then give when full', () => {
-    expect(allocate(open, 100).map(a => [a.request_id, a.count])).toEqual([[2, 2], [3, 1], [1, 3], [5, 2], [4, 10]]);
-  });
-
-  it('stops when the tomes run out, part-filling the last request', () => {
-    expect(allocate(open, 4).map(a => [a.request_id, a.count])).toEqual([[2, 2], [3, 1], [1, 1]]);
-  });
-
-  it('only reaches give when full once nothing else is waiting', () => {
-    expect(allocate(open, 9).some(a => a.request_id === 4)).toBe(true); // 8 available, then this
-    expect(allocate(open, 8).some(a => a.request_id === 4)).toBe(false);
-  });
-
-  it('reaches give if no other option last of all', () => {
-    const withLast = [...open, req(8, { bucket: 'last_resort', count: 4, priority: 'very_high', created_at: '2026-01-01' })];
-    expect(allocate(withLast, 100).map(a => a.request_id).at(-1)).toBe(8);
-    expect(allocate(withLast, 18).some(a => a.request_id === 8)).toBe(false);
-  });
-
-  it('skips members who left and dormant requests', () => {
-    const ids = allocate(open, 100).map(a => a.request_id);
-    expect(ids).not.toContain(6);
-    expect(ids).not.toContain(7);
+  it('serves give when available by priority then age, then give when full, then give if no other option', () => {
+    expect(order([
+      req(1, { priority: 'low' }),
+      req(2, { priority: 'very_high' }),
+      req(3, { priority: 'high' }),
+      req(4, { bucket: 'give_when_full', priority: 'very_high' }),
+      req(5, { priority: 'low' }),
+      req(8, { bucket: 'last_resort', priority: 'very_high', created_at: '2026-01-01' }),
+    ])).toEqual([2, 3, 1, 5, 4, 8]);
   });
 
   it('ties go to the oldest', () => {
-    const tie = [req(2, { created_at: '2026-10-20' }), req(1, { created_at: '2026-10-01' })];
-    expect(allocate(tie, 1)[0].request_id).toBe(1);
+    expect(order([req(2, { created_at: '2026-10-20' }), req(1, { created_at: '2026-10-01' })])).toEqual([1, 2]);
   });
 });

@@ -13,7 +13,7 @@ import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
 import { compressImageInBrowser } from '@/lib/compress-image-client';
 import {
-  BUCKETS, MAX_SCREENSHOTS, PRIORITIES, kindLabel, servingOrder, warTomesEarned, warsNeeded,
+  BUCKETS, MAX_SCREENSHOTS, PRIORITIES, kindLabel, priorityLabel, servingOrder, warTomesEarned, warsNeeded,
   type OpenRequest, type TomeBucket, type TomeKind, type TomePriority,
 } from '@/lib/tomes';
 import { ago, btn, card, h2, input, td, th } from './ui';
@@ -72,7 +72,7 @@ export default function TomesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
-        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button, and the mod&rsquo;s <b>Distribute</b> hands them out in-game and records them. Use a row&rsquo;s <b>Give</b> only for tomes given another way; the bot logs each grant in the tome log channel and pings the member.
+        Members request tomes with the bot&rsquo;s <b>Request tomes</b> button, and the mod&rsquo;s <b>Distribute</b> hands them out in-game and records them. Use a row&rsquo;s <b>Give</b> only for tomes given another way.
       </p>
       {message && (
         <div style={{ ...card, padding: '0.6rem 0.8rem', color: message.ok ? '#22c55e' : '#ef4444', borderColor: message.ok ? '#22c55e55' : '#ef444455' }}>{message.text}</div>
@@ -225,17 +225,17 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
           <button type="button" disabled={busy} aria-label={`Correct how many of ${r.ign}'s tomes were given`}
             style={{ background: 'none', border: 'none', padding: 0, color: '#60a5fa', cursor: 'pointer', fontSize: 'inherit' }}
             onClick={() => {
-              const answer = window.prompt(`How many of ${r.ign}'s ${r.count} tomes on this request have been given? (Now ${r.given}.)\n\nThis corrects the record quietly; the bot doesn't announce it.`, String(r.given));
+              const answer = window.prompt(`How many of ${r.ign}'s ${r.count} tomes have been given?`, String(r.given));
               if (answer === null || answer.trim() === String(r.given)) return;
               const given = Number(answer.trim());
               if (!Number.isInteger(given) || given < 0 || given > r.count) { window.alert(`Enter a whole number from 0 to ${r.count}.`); return; }
-              const reason = window.prompt('Why? (required, shown in the history)', '');
+              const reason = window.prompt('Reason (required, shown in the history):', '');
               if (!reason?.trim()) return;
               run(async () => {
                 await post(`/api/exec/tomes/${r.id}`, { action: 'given', given, reason });
                 return `${r.ign}'s request now has ${given} of ${r.count} given.`;
               });
-            }}>fix given</button>
+            }}>correct</button>
         </div>
       </td>
       <td style={td}>
@@ -245,10 +245,10 @@ function QueueRow({ r, busy, run, give }: { r: Row; busy: boolean; run: Run; giv
             const priority = e.target.value as TomePriority;
             run(async () => {
               await post(`/api/exec/tomes/${r.id}`, { action: 'priority', priority });
-              return `${r.ign}'s request is now ${PRIORITIES.find(p => p.key === priority)!.label} priority.`;
+              return `${r.ign}'s request is now ${priorityLabel(priority)} priority.`;
             });
           }}>
-          {PRIORITIES.map(p => <option key={p.key} value={p.key} style={{ color: p.color }}>{p.label}</option>)}
+          {PRIORITIES.map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
         </select>
       </td>
       <td style={td}>{r.shells_spent || '—'}</td>
