@@ -100,6 +100,31 @@ function frontOrder(key: string, from: number[], to: number[]): Float32Array {
     list.push(i);
   }
 
+  // A guild that held nothing before the interval still has to start
+  // somewhere. Grow it out from the heart of the ground it ends up with (the
+  // tile closest on average to the rest of its holding) rather than having its
+  // whole holding appear at once.
+  if (centres) {
+    const incoming = new Map<number, number[]>();
+    for (let i = 0; i < N; i++) {
+      const g = to[i];
+      if (g < 0 || holders.has(g)) continue;
+      let list = incoming.get(g);
+      if (!list) { list = []; incoming.set(g, list); }
+      list.push(i);
+    }
+    for (const [g, tiles] of incoming) {
+      let core = tiles[0];
+      let bestSum = Infinity;
+      for (const i of tiles) {
+        let sum = 0;
+        for (const j of tiles) sum += Math.hypot(centres[i][0] - centres[j][0], centres[i][1] - centres[j][1]);
+        if (sum < bestSum) { bestSum = sum; core = i; }
+      }
+      holders.set(g, [core]);
+    }
+  }
+
   const changing: Array<[number, number]> = [];
   for (let i = 0; i < N; i++) {
     if (to[i] < 0 || from[i] === to[i]) continue;

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ChevronDown, FastForward, Layers } from "lucide-react";
 import { outageAt } from "@/lib/war-outages";
-import { anchorAt, isReconstructed, RECONSTRUCTION_END } from "@/lib/reconstruction";
+import { isReconstructed, RECONSTRUCTION_END } from "@/lib/reconstruction";
 
 // Formatters cached at module level (Intl construction is expensive)
 const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
@@ -70,7 +70,7 @@ export default function WarStateBanner({ current, gaps, onJump }: WarStateBanner
   const compact = useCompact();
   const [open, setOpen] = useState(false);
   const showDetail = !compact || open;
-  const synthetic = useMemo(() => (isReconstructed(current) ? anchorAt(current) : null), [current]);
+  const synthetic = useMemo(() => isReconstructed(current), [current]);
   const outage = useMemo(() => outageAt(current), [current]);
   // Half-open: g.end is the day data resumed, so jumping there is clean
   const gap = useMemo(
@@ -152,9 +152,6 @@ export default function WarStateBanner({ current, gaps, onJump }: WarStateBanner
                 No territory data was recorded before {DATE_FORMAT_UTC.format(RECONSTRUCTION_END)}. This map is
                 reconstructed from surviving screenshots, one archived leaderboard capture and written accounts, so
                 treat it as a reading of the sources rather than a record of what happened.
-              </div>
-              <div style={{ marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
-                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{synthetic.label}</span>: {synthetic.note}
               </div>
               {onJump && (
                 <button
