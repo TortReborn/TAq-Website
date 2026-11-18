@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireExecSession } from '@/lib/exec-auth';
-import { BUCKETS, parseScreenshots, type TomeBucket } from '@/lib/tomes';
-import { cancelRequest, give, moveRequest, setNote, TomeConflict } from '@/lib/tomes-db';
+import { BUCKETS, PRIORITIES, parseScreenshots, type TomeBucket, type TomePriority } from '@/lib/tomes';
+import { cancelRequest, give, moveRequest, setGiven, setNote, setPriority, TomeConflict } from '@/lib/tomes-db';
 
 export const dynamic = 'force-dynamic';
 
 // POST { action: 'give', count, screenshots? } | { action: 'move', bucket } | { action: 'cancel', reason? }
+//    | { action: 'priority', priority } | { action: 'given', given, reason }
 //    | { action: 'note', note } (an empty note clears it)
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireExecSession(request);
@@ -32,6 +33,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (body?.action === 'move') {
       if (!BUCKETS.some(b => b.key === body.bucket)) return NextResponse.json({ error: 'Unknown bucket' }, { status: 400 });
       await moveRequest(id, body.bucket as TomeBucket, actor);
+      return NextResponse.json({ ok: true });
+    }
+    if (body?.action === 'priority') {
+      if (!PRIORITIES.some(p => p.key === body.priority)) return NextResponse.json({ error: 'Unknown priority' }, { status: 400 });
+      await setPriority(id, body.priority as TomePriority, actor);
+      return NextResponse.json({ ok: true });
+    }
+    if (body?.action === 'given') {
+      const given = Number(body.given);
+      const reason = typeof body.reason === 'string' ? body.reason.trim() : '';
+      if (!Number.isInteger(given) || given < 0) return NextResponse.json({ error: 'Given must be a whole number' }, { status: 400 });
+      if (!reason || reason.length > 200) return NextResponse.json({ error: 'Say why, in up to 200 characters' }, { status: 400 });
+      await setGiven(id, given, reason, actor);
       return NextResponse.json({ ok: true });
     }
     if (body?.action === 'note') {

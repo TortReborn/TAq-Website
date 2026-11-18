@@ -7,10 +7,9 @@
  * four and 20 after, counting shell tomes only. lib/tomes.test.ts checks the same table as the
  * bot's tests.
  *
- * Handing out works like aspects: whoever gives says how many tomes they
- * have, and `allocate` shares them out, the queue first (priority, then
- * age), then 'give when available', then 'give when full' only once nothing
- * else is waiting. Members no longer in the guild are skipped.
+ * The queue is handed out in-game by the mod's Distribute, through verge-api
+ * (TAQ-118), in `servingOrder`: give when available, then give when full, then
+ * give if no other option, by priority then age within each.
  */
 
 export type TomeKind = 'war' | 'raid';
@@ -89,8 +88,6 @@ export interface OpenRequest {
   in_guild: boolean;
 }
 
-export interface Allocation { request_id: number; ign: string; kind: TomeKind | null; count: number }
-
 export function servingOrder(a: OpenRequest, b: OpenRequest): number {
   const tier = (r: OpenRequest) => BUCKETS.findIndex(x => x.key === r.bucket);
   return tier(a) - tier(b)
@@ -99,19 +96,9 @@ export function servingOrder(a: OpenRequest, b: OpenRequest): number {
     || a.id - b.id;
 }
 
-/** Share `tomes` out over the open requests, in serving order. */
-export function allocate(requests: OpenRequest[], tomes: number): Allocation[] {
-  const out: Allocation[] = [];
-  let left = Math.max(0, Math.floor(tomes));
-  for (const r of [...requests].filter(r => r.bucket !== 'dormant' && r.in_guild).sort(servingOrder)) {
-    if (left <= 0) break;
-    const n = Math.min(left, r.count - r.given);
-    if (n <= 0) continue;
-    out.push({ request_id: r.id, ign: r.ign, kind: r.kind, count: n });
-    left -= n;
-  }
-  return out;
-}
+export const bucketLabel = (bucket: TomeBucket) => BUCKETS.find(b => b.key === bucket)?.label ?? bucket;
+
+export const priorityLabel = (priority: TomePriority) => PRIORITIES.find(p => p.key === priority)?.label ?? priority;
 
 export const kindLabel = (kind: TomeKind | null) => (kind === 'war' ? 'War' : kind === 'raid' ? 'Shell' : 'Any');
 
