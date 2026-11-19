@@ -50,9 +50,24 @@ describe('reconstructed states', () => {
   });
 
   it('holds Wynn only before Gavel opened, and the whole map after', () => {
-    const before = reconstructAt(at('2015-08-15'), geo)!;
-    const after = reconstructAt(at('2016-02-10'), geo)!;
-    expect(Object.keys(before.territories).length).toBeLessThan(Object.keys(after.territories).length);
+    const held = (iso: string) => Object.keys(reconstructAt(at(iso), geo)!.territories);
+    // Gavel territories became capturable on 28 August 2016
+    expect(held('2016-07-28').length).toBe(held('2015-08-15').length);
+    expect(held('2016-07-28').length).toBeLessThan(held('2016-09-23').length);
+    // Corkus arrived on 7 April 2017
+    expect(held('2017-03-16')).not.toContain('Corkus City');
+    expect(held('2017-06-15')).toContain('Corkus City');
+  });
+
+  it('reproduces the territory lists the game published', () => {
+    const count = (when: Date, guild: string) =>
+      Object.values(reconstructAt(when, geo)!.territories).filter(t => t.n === guild).length;
+    const dec23 = new Date('2014-12-23T10:05:08Z');
+    expect(count(dec23, 'Holders of LE')).toBe(13);
+    expect(count(dec23, 'Chex Mix')).toBe(13);
+    const jun13 = new Date('2016-06-13T11:11:07Z');
+    expect(count(jun13, "Nether's Ascent")).toBe(51);
+    expect(reconstructAt(jun13, geo)!.provenance[2]).toBe(Object.keys(reconstructAt(jun13, geo)!.territories).length);
   });
 
   it('holds nothing on the day guilds are released', () => {
@@ -61,9 +76,9 @@ describe('reconstructed states', () => {
     expect(anchorAt(RECONSTRUCTION_START)!.label).toBe('Guilds are released');
   });
 
-  it('has the whole province claimed by the end of the first day', () => {
+  it('has the whole province claimed by the morning of the second day', () => {
     const held = (iso: string) => Object.keys(reconstructAt(at(iso), geo)!.territories).length;
-    const full = held('2014-12-23');
+    const full = Object.keys(reconstructAt(new Date('2014-12-23T10:05:08Z'), geo)!.territories).length;
     expect(held('2014-12-22')).toBe(0);
     expect(full).toBeGreaterThan(100);
     // and it stays claimed — no drifting back towards an empty map
