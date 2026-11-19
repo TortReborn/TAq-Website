@@ -2,10 +2,12 @@
  * Territory ownership before the exchange log begins.
  *
  * `territory_exchanges` starts on 3 January 2018. For the three years before
- * that no event stream exists and no per-territory ownership capture survives,
- * so this module serves a *reconstruction* instead: thirteen dated anchor
- * states built from labelled map screenshots, one archived guild-leaderboard
- * capture and dated forum statements, with the ground between them filled in.
+ * that no event stream exists. Three copies of the game's own territory list
+ * survive (23 and 24 December 2014, 13 June 2016), and those anchors are exact.
+ * The rest are built from labelled map screenshots, one archived
+ * guild-leaderboard capture, in-game screenshots and dated forum statements, so
+ * this module serves a *reconstruction*: dated anchor states with the ground
+ * between them filled in.
  *
  * It is not a record and must never be presented as one. Every tile carries a
  * provenance code and the map shows a standing banner while the scrubber sits
@@ -48,7 +50,8 @@ export const RECONSTRUCTION_END = new Date(`${DATA.handover}T00:00:00Z`);
 
 export const PROVENANCE_LABELS = ['guessed', 'inferred', 'attested'] as const;
 
-const ANCHOR_MS = DATA.anchors.map((a) => Date.parse(`${a.date}T00:00:00Z`));
+// An anchor taken from a timed capture carries its full UTC instant; the rest are whole days.
+const ANCHOR_MS = DATA.anchors.map((a) => Date.parse(a.date.includes('T') ? a.date : `${a.date}T00:00:00Z`));
 const N = DATA.territories.length;
 
 /** True while the scrubber is in reconstructed time. */
