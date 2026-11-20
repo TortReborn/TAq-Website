@@ -5,7 +5,8 @@
  * that no event stream exists. Three copies of the game's own territory list
  * survive (23 and 24 December 2014, 13 June 2016), and those anchors are exact.
  * The rest are built from labelled map screenshots, one archived
- * guild-leaderboard capture, in-game screenshots and dated forum statements, so
+ * guild-leaderboard capture, in-game screenshots, guild tags on territory boss
+ * bars in archived gameplay videos and dated forum statements, so
  * this module serves a *reconstruction*: dated anchor states with the ground
  * between them filled in.
  *
