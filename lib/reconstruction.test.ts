@@ -81,6 +81,22 @@ describe('reconstructed states', () => {
     expect(owner('2015-08-15', 'Almuj City')).toBe("Nether's Ascent");
   });
 
+  it('places the territories filmed in 2016 and 2017 with the guild on their boss bar', () => {
+    const owner = (iso: string, terr: string) => reconstructAt(at(iso), geo)!.territories[terr]?.n;
+    expect(owner('2016-01-24', 'Almuj City')).toBe('HackForums');
+    expect(owner('2016-08-12', 'Ragni Main Entrance')).toBe('HackForums');
+    expect(owner('2016-12-01', "Orphion's Seal")).toBe('UltimateXeons');
+    expect(owner('2017-04-20', 'Corkus City')).toBe('Libertas');
+    expect(owner('2017-09-24', 'Light Forest Canyon')).toBe('HackForums');
+  });
+
+  it('keeps HackForums on most of the map until the footage shows the break-up', () => {
+    const hax = (iso: string) =>
+      Object.values(reconstructAt(at(iso), geo)!.territories).filter(t => t.n === 'HackForums').length;
+    expect(hax('2017-09-24')).toBeGreaterThan(250);   // still holding nearly everything filmed
+    expect(hax('2017-10-01')).toBeLessThan(50);       // first fragmented footage is 30 Sep
+  });
+
   it('holds nothing on the day guilds are released', () => {
     const first = reconstructAt(RECONSTRUCTION_START, geo)!;
     expect(Object.keys(first.territories)).toHaveLength(0);
