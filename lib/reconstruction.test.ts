@@ -70,6 +70,17 @@ describe('reconstructed states', () => {
     expect(reconstructAt(jun13, geo)!.provenance[2]).toBe(Object.keys(reconstructAt(jun13, geo)!.territories).length);
   });
 
+  it('places the territories filmed in 2015 with the guild on their boss bar', () => {
+    const owner = (iso: string, terr: string) => reconstructAt(at(iso), geo)!.territories[terr]?.n;
+    expect(owner('2015-01-20', 'Volcano Upper')).toBe('Terrian');
+    expect(owner('2015-02-10', 'Detlas')).toBe('Imperial');
+    expect(owner('2015-03-09', 'Detlas')).toBe('Frosted Pants');
+    expect(owner('2015-07-31', 'Almuj City')).toBe("Nether's Ascent");
+    expect(owner('2015-07-31', 'Detlas')).toBe('Kangronomicon');
+    // the July footage, not an inference, decides the desert in mid-August
+    expect(owner('2015-08-15', 'Almuj City')).toBe("Nether's Ascent");
+  });
+
   it('holds nothing on the day guilds are released', () => {
     const first = reconstructAt(RECONSTRUCTION_START, geo)!;
     expect(Object.keys(first.territories)).toHaveLength(0);

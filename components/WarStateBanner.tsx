@@ -151,7 +151,8 @@ export default function WarStateBanner({ current, gaps, onJump }: WarStateBanner
               <div style={{ color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
                 Territory changes were not logged before {DATE_FORMAT_UTC.format(RECONSTRUCTION_END)}. This map is
                 reconstructed from three surviving copies of the game&apos;s territory list, map and in-game
-                screenshots, one archived leaderboard capture and written accounts, so treat it as a reading of the
+                screenshots, gameplay videos, one archived leaderboard capture and written accounts, so treat it as a
+                reading of the
                 sources rather than a record of what happened.
               </div>
               {onJump && (
