@@ -106,6 +106,20 @@ describe('reconstructed states', () => {
     expect(owner('2015-11-23', 'City of Troms')).toBe("Nether's Ascent");
   });
 
+  it('places the captures and dated footage of the first weeks, and late August 2017', () => {
+    const owner = (iso: string, terr: string) => reconstructAt(at(iso), geo)!.territories[terr]?.n;
+    expect(owner('2014-12-27', 'City of Troms')).toBe('Hippies Of Wynn');
+    expect(owner('2015-01-09', 'Volcano Upper')).toBe('Terrian');
+    expect(owner('2017-08-21', 'Ternaves')).toBe('Paladins United');
+    expect(owner('2017-08-21', 'Almuj City')).toBe('HackForums');
+  });
+
+  it('keeps HackForums below their July total through August', () => {
+    const hax = (iso: string) =>
+      Object.values(reconstructAt(at(iso), geo)!.territories).filter(t => t.n === 'HackForums').length;
+    expect(hax('2017-08-21')).toBeLessThanOrEqual(hax('2017-07-18'));
+  });
+
   it('holds nothing on the day guilds are released', () => {
     const first = reconstructAt(RECONSTRUCTION_START, geo)!;
     expect(Object.keys(first.territories)).toHaveLength(0);
