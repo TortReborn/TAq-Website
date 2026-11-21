@@ -97,6 +97,15 @@ describe('reconstructed states', () => {
     expect(hax('2017-10-01')).toBeLessThan(50);       // first fragmented footage is 30 Sep
   });
 
+  it('shows Wynn split between many guilds three weeks after HackForums', () => {
+    const owner = (iso: string, terr: string) => reconstructAt(at(iso), geo)!.territories[terr]?.n;
+    expect(owner('2017-10-21', 'Detlas')).toBe('Titans Valor');
+    expect(owner('2017-10-21', 'Nemract Town')).toBe('DogsAmongUs');
+    expect(owner('2017-10-21', 'Nether Gate')).toBe('New York Nibbas');
+    expect(owner('2015-06-08', 'Detlas')).toBe('Kangronomicon');
+    expect(owner('2015-11-23', 'City of Troms')).toBe("Nether's Ascent");
+  });
+
   it('holds nothing on the day guilds are released', () => {
     const first = reconstructAt(RECONSTRUCTION_START, geo)!;
     expect(Object.keys(first.territories)).toHaveLength(0);
