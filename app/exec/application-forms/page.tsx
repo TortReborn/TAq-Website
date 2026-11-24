@@ -300,7 +300,7 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
   const blocked = saving || !dirty || validation.length > 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="appforms-root" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
         <BackLink />
@@ -323,7 +323,7 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
       )}
 
       {tab === 'history' && ready ? (
-        <div style={{ ...card, padding: 0, overflowX: 'auto' }}>
+        <div className="appforms-history" style={{ ...card, padding: 0, overflowX: 'auto' }}>
           {data.revisions.length === 0
             ? <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No saves yet.</div>
             : data.revisions.map((r, i) => (
@@ -347,8 +347,8 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
         </div>
       ) : (
         <div className="appforms-grid">
-          {/* Left: which form, then its questions */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: 0 }}>
+          {/* Left: which form (stays put), then its questions (scroll) */}
+          <div className="appforms-col" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: 0 }}>
             <div style={{ ...card, padding: '0.75rem' }}>
               <label style={labelStyle}>Form</label>
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
@@ -360,17 +360,18 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
                 ))}
               </div>
             </div>
-            {!ready ? <QuestionsSkeleton steps={type === 'hammerhead'} />
-              : type === 'hammerhead'
-                ? <HammerheadEditor form={draft.content as HammerheadForm} readOnly={readOnly} onChange={setContent}
-                    onFocusArea={(step, task) => setFocus(f => ({ step, task, n: (f?.n ?? 0) + 1 }))} />
-                : <QuestionList questions={(draft.content as SimpleForm).questions} formType={type} readOnly={readOnly}
-                    onChange={questions => setContent({ questions })} />}
+            <div className="appforms-scroll">
+              {!ready ? <QuestionsSkeleton steps={type === 'hammerhead'} />
+                : type === 'hammerhead'
+                  ? <HammerheadEditor form={draft.content as HammerheadForm} readOnly={readOnly} onChange={setContent}
+                      onFocusArea={(step, task) => setFocus(f => ({ step, task, n: (f?.n ?? 0) + 1 }))} />
+                  : <QuestionList questions={(draft.content as SimpleForm).questions} formType={type} readOnly={readOnly}
+                      onChange={questions => setContent({ questions })} />}
+            </div>
           </div>
 
-          {/* Right: sticky save strip + preview. Offsets match Bot Messages: they count from
-              inside .exec-main's 2rem padding, and the column fits the 100vh - 80px area. */}
-          <div className="appforms-side" style={{ position: 'sticky', top: '-1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: 'calc(100vh - 80px - 2rem)', minWidth: 0 }}>
+          {/* Right: save strip (stays put), then the preview (scrolls) */}
+          <div className="appforms-col" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: 0 }}>
             {canEdit && (
               <div style={{ ...card, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <input value={note} onChange={e => setNote(e.target.value)} maxLength={200} disabled={!ready}
@@ -407,7 +408,7 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
                 )}
               </div>
             )}
-            <div style={{ overflowY: 'auto', borderRadius: '0.5rem' }}>
+            <div className="appforms-scroll" style={{ borderRadius: '0.5rem' }}>
               {ready ? <FormPreview type={type} content={draft.content} focus={focus} /> : <PreviewSkeleton />}
             </div>
           </div>
@@ -431,12 +432,21 @@ function ApplicationFormsPage() {
   return (
     <>
       <FormEditor key={type} type={type} onSwitch={t => router.replace(`/exec/application-forms?form=${t}`)} />
-      {/* Two columns like Bot Messages; stacked below the same 1100px breakpoint. */}
+      {/* Two columns like Bot Messages. On wide screens the editor fills .exec-main's
+          box (100vh less the 80px navbar and its 2rem padding top and bottom), so the
+          header, form picker and save strip stay put and only the questions and the
+          preview scroll, each on its own. Stacked below 1100px, the page scrolls as usual. */}
       <style>{`
         .appforms-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+        @media (min-width: 1101px) {
+          .appforms-root { height: calc(100vh - 80px - 4rem); }
+          .appforms-grid { flex: 1; min-height: 0; align-items: stretch; }
+          .appforms-col { min-height: 0; }
+          .appforms-history { min-height: 0; overflow-y: auto; }
+          .appforms-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 0.25rem; }
+        }
         @media (max-width: 1100px) {
           .appforms-grid { grid-template-columns: minmax(0, 1fr); }
-          .appforms-side { position: static !important; max-height: none !important; }
         }
       `}</style>
     </>
