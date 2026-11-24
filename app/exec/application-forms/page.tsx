@@ -10,7 +10,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { preload } from 'swr';
 import { fetcher } from '@/hooks/fetcher';
 import {
   FORM_LIMITS, FORM_NAMES, FORM_TYPES, LOCKED_IDS, answerTypes, newQuestionId,
@@ -198,6 +198,35 @@ function HammerheadEditor({ form, readOnly, onChange }: { form: HammerheadForm; 
 
 // ---------------------------------------------------------------------------
 
+/** Holds the editor's shape while a form loads, so switching forms doesn't jump. */
+function FormSkeleton({ steps }: { steps: boolean }) {
+  const bar = (width: string, height = '0.8rem', extra: React.CSSProperties = {}) =>
+    <div className="skeleton" style={{ width, height, borderRadius: '0.25rem', ...extra }} />;
+  return (
+    <div aria-busy="true" aria-label="Loading the form" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {bar('18rem', '0.8rem', { maxWidth: '100%' })}
+      <div style={{ display: 'flex', gap: '0.25rem', borderBottom: '1px solid var(--border-card)', paddingBottom: '0.35rem' }}>
+        {bar('3.5rem', '1.6rem')}{bar('5.5rem', '1.6rem')}
+      </div>
+      {steps && bar('11rem', '0.8rem')}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+      {[0, 1, 2].map(i => (
+        <div key={i} style={{ ...card, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>{bar('5rem')}{bar('3.5rem', '1.2rem')}</div>
+          <div>{bar('4rem', '0.6rem', { marginBottom: '0.35rem' })}{bar('100%', '2.75rem', { borderRadius: '0.375rem' })}</div>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'end' }}>
+            <div>{bar('3.5rem', '0.6rem', { marginBottom: '0.35rem' })}{bar('9rem', '2rem', { borderRadius: '0.375rem' })}</div>
+            <div>{bar('5.5rem', '0.6rem', { marginBottom: '0.35rem' })}{bar('8rem', '2rem', { borderRadius: '0.375rem' })}</div>
+            {bar('5rem', '1rem', { marginBottom: '0.5rem' })}
+          </div>
+          <div>{bar('12rem', '0.6rem', { marginBottom: '0.35rem', maxWidth: '100%' })}{bar('100%', '2rem', { borderRadius: '0.375rem' })}</div>
+        </div>
+      ))}
+      </div>
+    </div>
+  );
+}
+
 function FormEditor({ type }: { type: FormType }) {
   const { data, error, isLoading, mutate } = useSWR<FormResponse>(`/api/exec/application-forms/${type}`, fetcher, { revalidateOnFocus: false });
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -219,7 +248,7 @@ function FormEditor({ type }: { type: FormType }) {
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
 
-  if (isLoading || (data && !draft)) return <div style={{ color: 'var(--text-secondary)', padding: '1rem 0' }}>Loading the form…</div>;
+  if (isLoading || (data && !draft)) return <FormSkeleton steps={type === 'hammerhead'} />;
   if (error || !data || !draft) return <div style={{ color: '#ef4444', padding: '1rem 0' }}>Error: {error?.message ?? 'no data'}</div>;
 
   const readOnly = !data.can_edit;
@@ -340,6 +369,11 @@ function ApplicationFormsPage() {
   const params = useSearchParams();
   const requested = params.get('form');
   const type: FormType = (FORM_TYPES as string[]).includes(requested ?? '') ? requested as FormType : 'guild';
+
+  // Fetch all three forms up front, so switching between them is usually instant.
+  useEffect(() => {
+    for (const t of FORM_TYPES) preload(`/api/exec/application-forms/${t}`, fetcher);
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
