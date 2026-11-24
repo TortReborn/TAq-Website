@@ -316,12 +316,6 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
         </div>
       </div>
 
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minHeight: '1.2rem' }}>
-        {!data ? skel('22rem', '0.8rem', { maxWidth: '100%' })
-          : live ? <>Live on the apply page: revision {live.rev_number}, by {live.author_name ?? 'unknown'}, {timeAgo(live.created_at)}. Applications already sent keep the wording they were asked in.</>
-          : <>Live on the apply page: the original questions. Nobody has edited this form yet.</>}
-      </div>
-
       {error && <div style={banner('#ef4444')}>Couldn&apos;t load the form: {error.message}</div>}
       {data && readOnly && <div style={{ ...banner('#6b7280'), color: 'var(--text-secondary)' }}>View only. Only Narwhals can edit application forms.</div>}
       {draft?.restoredFrom != null && dirty && (
