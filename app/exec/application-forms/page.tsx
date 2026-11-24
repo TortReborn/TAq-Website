@@ -208,8 +208,9 @@ function FormSkeleton({ steps }: { steps: boolean }) {
       <div style={{ display: 'flex', gap: '0.25rem', borderBottom: '1px solid var(--border-card)', paddingBottom: '0.35rem' }}>
         {bar('3.5rem', '1.6rem')}{bar('5.5rem', '1.6rem')}
       </div>
+      <div className="appforms-edit">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', minWidth: 0 }}>
       {steps && bar('11rem', '0.8rem')}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
       {[0, 1, 2].map(i => (
         <div key={i} style={{ ...card, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>{bar('5rem')}{bar('3.5rem', '1.2rem')}</div>
@@ -222,6 +223,12 @@ function FormSkeleton({ steps }: { steps: boolean }) {
           <div>{bar('12rem', '0.6rem', { marginBottom: '0.35rem', maxWidth: '100%' })}{bar('100%', '2rem', { borderRadius: '0.375rem' })}</div>
         </div>
       ))}
+      </div>
+      <div className="appforms-side" style={{ ...card, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {bar('7rem', '0.9rem')}{bar('9rem', '0.6rem')}
+        <div>{bar('8rem', '0.6rem', { marginBottom: '0.35rem' })}{bar('100%', '4.5rem', { borderRadius: '0.375rem' })}</div>
+        {bar('100%', '2rem', { borderRadius: '0.375rem' })}{bar('100%', '2rem', { borderRadius: '0.375rem' })}
+      </div>
       </div>
     </div>
   );
@@ -312,42 +319,55 @@ function FormEditor({ type }: { type: FormType }) {
             ))}
         </div>
       ) : (
-        <>
-          {type === 'hammerhead'
-            ? <HammerheadEditor form={draft.content as HammerheadForm} readOnly={readOnly} onChange={setContent} />
-            : <QuestionList questions={(draft.content as SimpleForm).questions} formType={type} readOnly={readOnly}
-                onChange={questions => setContent({ questions })} />}
+        <div className="appforms-edit">
+          <div style={{ minWidth: 0 }}>
+            {type === 'hammerhead'
+              ? <HammerheadEditor form={draft.content as HammerheadForm} readOnly={readOnly} onChange={setContent} />
+              : <QuestionList questions={(draft.content as SimpleForm).questions} formType={type} readOnly={readOnly}
+                  onChange={questions => setContent({ questions })} />}
+          </div>
 
-          {!readOnly && (
-            <div style={{ ...card, position: 'sticky', bottom: '0.75rem', zIndex: 5, display: 'flex', flexDirection: 'column', gap: '0.6rem', boxShadow: '0 4px 18px rgba(0,0,0,0.25)' }}>
-              {errors.length > 0 && (
-                <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#ef4444', fontSize: '0.8rem' }}>
-                  {errors.map(e => <li key={e}>{e}</li>)}
-                </ul>
-              )}
-              {draft.restoredFrom != null && dirty && (
-                <div style={{ fontSize: '0.8rem', color: '#eab308' }}>Showing rev {draft.restoredFrom}. Save to make it live again.</div>
-              )}
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                <input value={note} onChange={e => setNote(e.target.value)} maxLength={200}
-                  placeholder="What changed? (optional)" style={{ ...inputStyle, flex: '1 1 14rem', width: 'auto' }} />
-                <button type="button" disabled={!dirty || saving} onClick={() => { reset(data); setNote(''); setErrors([]); }}
-                  style={{ ...btnStyle, background: 'var(--bg-secondary)', color: 'var(--text-secondary)', opacity: dirty && !saving ? 1 : 0.5 }}>
-                  Discard changes
-                </button>
+          <aside className="appforms-side" style={{ ...card, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {readOnly ? (
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                View only. Narwhals can edit these questions.
+              </div>
+            ) : (
+              <>
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>Save changes</div>
+                  <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', color: dirty ? '#eab308' : 'var(--text-muted)' }}>
+                    {dirty ? 'You have unsaved changes.' : 'No changes yet.'}
+                  </div>
+                </div>
+                {draft.restoredFrom != null && dirty && (
+                  <div style={{ fontSize: '0.8rem', color: '#eab308' }}>Showing rev {draft.restoredFrom}. Save to make it live again.</div>
+                )}
+                {errors.length > 0 && (
+                  <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#ef4444', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    {errors.map(e => <li key={e}>{e}</li>)}
+                  </ul>
+                )}
+                <div>
+                  <label style={labelStyle}>What changed? (optional)</label>
+                  <textarea value={note} onChange={e => setNote(e.target.value)} maxLength={200} rows={3}
+                    placeholder="e.g. Reworded the raid question" style={{ ...inputStyle, resize: 'vertical' }} />
+                </div>
                 <button type="button" disabled={!dirty || saving} onClick={save}
-                  style={{ ...btnStyle, background: '#3b82f6', color: '#fff', opacity: dirty && !saving ? 1 : 0.5 }}>
+                  style={{ ...btnStyle, width: '100%', background: '#3b82f6', color: '#fff', opacity: dirty && !saving ? 1 : 0.5 }}>
                   {saving ? 'Saving…' : 'Save and make live'}
                 </button>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <span>
+                <button type="button" disabled={!dirty || saving} onClick={() => { reset(data); setNote(''); setErrors([]); }}
+                  style={{ ...btnStyle, width: '100%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', opacity: dirty && !saving ? 1 : 0.5 }}>
+                  Discard changes
+                </button>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   {saved != null
                     ? <span style={{ color: '#22c55e' }}>Saved as rev {saved}. New applicants see it now.</span>
                     : 'Applications already sent keep the wording they were asked in.'}
-                </span>
+                </div>
                 {live && (
-                  <button type="button" style={{ ...ghostBtn, background: 'transparent', border: 'none', padding: 0, textDecoration: 'underline' }}
+                  <button type="button" style={{ ...ghostBtn, background: 'transparent', border: 'none', padding: 0, textDecoration: 'underline', alignSelf: 'flex-start' }}
                     onClick={() => {
                       setDraft({ content: data.defaults, baseRev: data.live.rev_number, restoredFrom: null });
                       setNote('Back to the original questions'); setSaved(null); setErrors([]);
@@ -355,10 +375,10 @@ function FormEditor({ type }: { type: FormType }) {
                     Start from the original questions
                   </button>
                 )}
-              </div>
-            </div>
-          )}
-        </>
+              </>
+            )}
+          </aside>
+        </div>
       )}
     </div>
   );
@@ -397,6 +417,16 @@ function ApplicationFormsPage() {
       </div>
 
       <FormEditor key={type} type={type} />
+
+      {/* Questions on the left, the save panel beside them; stacked on narrow screens. */}
+      <style>{`
+        .appforms-edit { display: grid; grid-template-columns: minmax(0, 1fr) 17rem; gap: 1rem; align-items: start; }
+        .appforms-side { position: sticky; top: 6rem; }
+        @media (max-width: 900px) {
+          .appforms-edit { grid-template-columns: minmax(0, 1fr); }
+          .appforms-side { position: static; }
+        }
+      `}</style>
     </div>
   );
 }
