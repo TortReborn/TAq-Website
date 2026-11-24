@@ -8,14 +8,19 @@ import { fetcher } from '@/hooks/fetcher';
 import { PANEL_TEMPLATES, groupPanels, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
+import { FORM_NAMES, FORM_TYPES } from '@/lib/application-questions';
+import type { FormSummary } from '@/lib/application-forms-db';
 
 interface ListResponse { panels: PanelSummary[]; registry: PanelRegistry | null; can_edit: boolean }
+interface FormsResponse { forms: FormSummary[]; can_edit: boolean }
 
 export default function BotPanelsPage() {
   const router = useRouter();
   const { data, error, isLoading } = useSWR<ListResponse>('/api/exec/bot-panels', fetcher, {
     refreshInterval: 15000, revalidateOnFocus: true,
   });
+  // The website's application forms (TAQ-217), edited at /exec/application-forms
+  const { data: forms } = useSWR<FormsResponse>('/api/exec/application-forms', fetcher, { revalidateOnFocus: true });
   const [showNew, setShowNew] = useState(false);
   const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -116,6 +121,25 @@ export default function BotPanelsPage() {
             {data.panels.length === 0 && (
               <tr><td colSpan={5} style={{ ...td, color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No panels yet.</td></tr>
             )}
+            <tr><td colSpan={5} style={groupTd}>Application forms</td></tr>
+            {FORM_TYPES.map(t => {
+              const latest = forms?.forms.find(f => f.form_type === t);
+              return (
+                <tr key={t}>
+                  <td style={td}>
+                    <Link href={`/exec/application-forms?form=${t}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{FORM_NAMES[t]}</Link>
+                  </td>
+                  <td style={{ ...td, color: 'var(--text-secondary)' }}>Questions on the apply page</td>
+                  <td style={td}><StatusBadge status="published" /></td>
+                  <td style={{ ...td, color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                    {latest ? <>rev {latest.rev_number} · {latest.author_name ?? 'unknown'} · {timeAgo(latest.created_at)}</> : 'Original questions'}
+                  </td>
+                  <td style={{ ...td, textAlign: 'right' }}>
+                    <Link href={`/exec/application-forms?form=${t}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>{data.can_edit ? 'Edit' : 'View'}</Link>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

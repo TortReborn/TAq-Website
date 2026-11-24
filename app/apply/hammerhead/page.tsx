@@ -1,9 +1,12 @@
-"use client";
-
 import { Suspense } from 'react';
 import HammerheadApplicationForm from '@/components/HammerheadApplicationForm';
+import { getLiveForm } from '@/lib/application-forms-db';
 
-export default function HammerheadApplicationPage() {
+// Questions are edited at /exec/application-forms (TAQ-217); load them per request.
+export const dynamic = 'force-dynamic';
+
+export default async function HammerheadApplicationPage() {
+  const form = await getLiveForm('hammerhead');
   return (
     <Suspense fallback={
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
@@ -18,7 +21,7 @@ export default function HammerheadApplicationPage() {
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     }>
-      <HammerheadApplicationForm />
+      <HammerheadApplicationForm form={form.content} />
     </Suspense>
   );
 }

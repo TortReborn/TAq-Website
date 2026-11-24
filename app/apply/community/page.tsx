@@ -1,10 +1,12 @@
-"use client";
-
 import { Suspense } from 'react';
 import ApplicationForm from '@/components/ApplicationForm';
-import { COMMUNITY_QUESTIONS } from '@/lib/application-questions';
+import { getLiveForm } from '@/lib/application-forms-db';
 
-export default function CommunityApplicationPage() {
+// Questions are edited at /exec/application-forms (TAQ-217); load them per request.
+export const dynamic = 'force-dynamic';
+
+export default async function CommunityApplicationPage() {
+  const form = await getLiveForm('community');
   return (
     <Suspense fallback={
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
@@ -21,7 +23,7 @@ export default function CommunityApplicationPage() {
     }>
       <ApplicationForm
         applicationType="community"
-        questions={COMMUNITY_QUESTIONS}
+        questions={form.content.questions}
         title="Community Member Application"
       />
     </Suspense>
