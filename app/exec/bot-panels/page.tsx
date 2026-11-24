@@ -121,7 +121,7 @@ export default function BotPanelsPage() {
             {data.panels.length === 0 && (
               <tr><td colSpan={5} style={{ ...td, color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No panels yet.</td></tr>
             )}
-            <tr><td colSpan={5} style={groupTd}>Application forms (website)</td></tr>
+            <tr><td colSpan={5} style={groupTd}>Application forms</td></tr>
             {FORM_TYPES.map(t => {
               const latest = forms?.forms.find(f => f.form_type === t);
               return (
