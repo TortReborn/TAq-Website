@@ -1,14 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  HAMMERHEAD_GENERAL_QUESTIONS,
-  HAMMERHEAD_TASK_SELECTOR,
-  HAMMERHEAD_SECTION_QUESTIONS,
-  HAMMERHEAD_FINAL_QUESTIONS,
-  HAMMERHEAD_TASK_OPTIONS,
-} from '@/lib/application-questions';
-import type { ApplicationQuestion } from '@/lib/application-questions';
+import { taskSelector } from '@/lib/application-questions';
+import type { ApplicationQuestion, HammerheadForm } from '@/lib/application-questions';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
 import { useViewAs } from '@/hooks/useViewAs';
 
@@ -27,7 +21,14 @@ const ANGLER_INDEX = RANK_HIERARCHY.indexOf('Angler');
 const HAMMERHEAD_INDEX = RANK_HIERARCHY.indexOf('Hammerhead');
 const TOTAL_STEPS = 3;
 
-export default function HammerheadApplicationForm() {
+export default function HammerheadApplicationForm({ form }: { form: HammerheadForm }) {
+  // The live form (TAQ-217), under the names the steps below were written with.
+  const HAMMERHEAD_GENERAL_QUESTIONS = form.general;
+  const HAMMERHEAD_FINAL_QUESTIONS = form.final;
+  const HAMMERHEAD_TASK_SELECTOR = taskSelector(form);
+  const HAMMERHEAD_TASK_OPTIONS = form.tasks.map(t => t.name);
+  const HAMMERHEAD_SECTION_QUESTIONS: Record<string, ApplicationQuestion[]> =
+    Object.fromEntries(form.tasks.map(t => [t.name, t.questions]));
   const viewAs = useViewAs();
   const isPreviewMode = viewAs === 'angler';
   const [formState, setFormState] = useState<FormState>('loading');
@@ -160,7 +161,7 @@ export default function HammerheadApplicationForm() {
     }
 
     return true;
-  }, [answers, selectedTasks, validateField]);
+  }, [answers, selectedTasks, validateField, form]);
 
   const handleChange = (questionId: string, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));

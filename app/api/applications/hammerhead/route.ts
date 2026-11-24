@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { getExecSession, checkDiscordLink } from '@/lib/exec-auth';
-import {
-  HAMMERHEAD_GENERAL_QUESTIONS,
-  HAMMERHEAD_SECTION_QUESTIONS,
-  HAMMERHEAD_FINAL_QUESTIONS,
-  HAMMERHEAD_TASK_OPTIONS,
-  getAllHammerheadQuestions,
-} from '@/lib/application-questions';
-import type { ApplicationQuestion } from '@/lib/application-questions';
+import { checkAnswers, questionSnapshot } from '@/lib/application-questions';
+import { getLiveForm } from '@/lib/application-forms-db';
 import { RANK_HIERARCHY } from '@/lib/rank-constants';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 
@@ -68,90 +62,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate hh_tasks
-    const selectedTasks: string[] = answers.hh_tasks;
-    if (!Array.isArray(selectedTasks) || selectedTasks.length === 0) {
-      return NextResponse.json(
-        { error: 'You must select at least one task area.' },
-        { status: 400 }
-      );
+    // The live form decides what is asked; the submission keeps a copy of
+    // its wording for the bot (TAQ-217).
+    const form = await getLiveForm('hammerhead');
+    const checked = checkAnswers('hammerhead', form.content, answers);
+    if ('error' in checked) {
+      return NextResponse.json({ error: checked.error }, { status: 400 });
     }
-
-    const validTasks = new Set<string>(HAMMERHEAD_TASK_OPTIONS);
-    for (const task of selectedTasks) {
-      if (!validTasks.has(task)) {
-        return NextResponse.json(
-          { error: `Invalid task selection: "${task}"` },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Build the set of questions that should be validated
-    const questionsToValidate: ApplicationQuestion[] = [
-      ...HAMMERHEAD_GENERAL_QUESTIONS,
-      ...HAMMERHEAD_FINAL_QUESTIONS,
-    ];
-
-    // Add section questions for selected tasks only
-    for (const task of selectedTasks) {
-      const sectionQuestions = HAMMERHEAD_SECTION_QUESTIONS[task];
-      if (sectionQuestions) {
-        questionsToValidate.push(...sectionQuestions);
-      }
-    }
-
-    // Validate required fields and length limits
-    for (const question of questionsToValidate) {
-      const answer = answers[question.id];
-
-      if (question.required) {
-        if (question.type === 'select') {
-          if (!answer || (typeof answer === 'string' && answer.trim().length === 0)) {
-            return NextResponse.json(
-              { error: `"${question.label}" is required.` },
-              { status: 400 }
-            );
-          }
-          // Validate select value is one of the options
-          if (question.options && !question.options.includes(answer)) {
-            return NextResponse.json(
-              { error: `Invalid selection for "${question.label}".` },
-              { status: 400 }
-            );
-          }
-        } else {
-          if (!answer || (typeof answer === 'string' && answer.trim().length === 0)) {
-            return NextResponse.json(
-              { error: `"${question.label}" is required.` },
-              { status: 400 }
-            );
-          }
-        }
-      }
-
-      if (answer && typeof answer === 'string') {
-        if (question.maxLength && answer.length > question.maxLength) {
-          return NextResponse.json(
-            { error: `"${question.label}" exceeds the maximum length of ${question.maxLength} characters.` },
-            { status: 400 }
-          );
-        }
-      }
-    }
-
-    // Build sanitized answers: only keep known question IDs + hh_tasks
-    const allQuestions = getAllHammerheadQuestions();
-    const knownIds = new Set(allQuestions.map(q => q.id));
-    const sanitizedAnswers: Record<string, string | string[]> = {
-      hh_tasks: selectedTasks,
-    };
-    for (const [key, value] of Object.entries(answers)) {
-      if (key === 'hh_tasks') continue;
-      if (knownIds.has(key) && typeof value === 'string') {
-        sanitizedAnswers[key] = value.trim();
-      }
-    }
+    const sanitizedAnswers = checked.answers;
+    const snapshot = questionSnapshot('hammerhead', form.content);
 
     // Insert into database
     const pool = getPool();
@@ -188,8 +107,8 @@ export async function POST(request: NextRequest) {
 
     try {
       const result = await client.query(
-        `INSERT INTO applications (application_type, discord_id, discord_username, discord_avatar, answers)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO applications (application_type, discord_id, discord_username, discord_avatar, answers, questions)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, submitted_at`,
         [
           'hammerhead',
@@ -197,6 +116,7 @@ export async function POST(request: NextRequest) {
           session.discord_username,
           session.discord_avatar,
           JSON.stringify(sanitizedAnswers),
+          JSON.stringify(snapshot),
         ]
       );
 

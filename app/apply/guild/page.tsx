@@ -1,10 +1,12 @@
-"use client";
-
 import { Suspense } from 'react';
 import ApplicationForm from '@/components/ApplicationForm';
-import { GUILD_QUESTIONS } from '@/lib/application-questions';
+import { getLiveForm } from '@/lib/application-forms-db';
 
-export default function GuildApplicationPage() {
+// Questions are edited at /exec/application-forms (TAQ-217); load them per request.
+export const dynamic = 'force-dynamic';
+
+export default async function GuildApplicationPage() {
+  const form = await getLiveForm('guild');
   return (
     <Suspense fallback={
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
@@ -21,7 +23,7 @@ export default function GuildApplicationPage() {
     }>
       <ApplicationForm
         applicationType="guild"
-        questions={GUILD_QUESTIONS}
+        questions={form.content.questions}
         title="Guild Member Application"
       />
     </Suspense>

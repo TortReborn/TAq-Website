@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { getSession, clearSessionCookie } from '@/lib/auth';
-import { getQuestionsForType } from '@/lib/application-questions';
+import { checkAnswers, questionSnapshot } from '@/lib/application-questions';
+import { getLiveForm } from '@/lib/application-forms-db';
 import { checkRateLimit, incrementRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rate-limit';
 import { consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 
@@ -59,45 +60,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const questions = getQuestionsForType(application_type);
-
-    // Check required fields and length limits
-    for (const question of questions) {
-      const answer = answers[question.id];
-
-      if (question.required) {
-        if (!answer || (typeof answer === 'string' && answer.trim().length === 0)) {
-          return NextResponse.json(
-            { error: `"${question.label}" is required.` },
-            { status: 400 }
-          );
-        }
-      }
-
-      if (answer && typeof answer === 'string') {
-        if (question.maxLength && answer.length > question.maxLength) {
-          return NextResponse.json(
-            { error: `"${question.label}" exceeds the maximum length of ${question.maxLength} characters.` },
-            { status: 400 }
-          );
-        }
-        if (question.minLength && answer.trim().length < question.minLength) {
-          return NextResponse.json(
-            { error: `"${question.label}" must be at least ${question.minLength} characters.` },
-            { status: 400 }
-          );
-        }
-      }
+    // The live form decides what is asked; the submission keeps a copy of
+    // its wording for the bot (TAQ-217).
+    const form = await getLiveForm(application_type);
+    const checked = checkAnswers(application_type, form.content, answers);
+    if ('error' in checked) {
+      return NextResponse.json({ error: checked.error }, { status: 400 });
     }
-
-    // Only keep answers for known question IDs
-    const questionIds = new Set(questions.map(q => q.id));
-    const sanitizedAnswers: Record<string, string> = {};
-    for (const [key, value] of Object.entries(answers)) {
-      if (questionIds.has(key) && typeof value === 'string') {
-        sanitizedAnswers[key] = value.trim();
-      }
-    }
+    const sanitizedAnswers = checked.answers;
+    const snapshot = questionSnapshot(application_type, form.content);
 
     // Insert into database
     const pool = getPool();
@@ -129,8 +100,8 @@ export async function POST(request: NextRequest) {
 
     try {
       const result = await client.query(
-        `INSERT INTO applications (application_type, discord_id, discord_username, discord_avatar, answers)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO applications (application_type, discord_id, discord_username, discord_avatar, answers, questions)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, submitted_at`,
         [
           application_type,
@@ -138,6 +109,7 @@ export async function POST(request: NextRequest) {
           session.discord_username,
           session.discord_avatar,
           JSON.stringify(sanitizedAnswers),
+          JSON.stringify(snapshot),
         ]
       );
 
