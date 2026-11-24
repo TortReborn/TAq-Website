@@ -29,7 +29,7 @@ interface FormResponse {
 
 interface Draft { content: FormContent; baseRev: number | null; restoredFrom: number | null }
 
-const card: React.CSSProperties = { background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '1rem' };
+const card: React.CSSProperties = { background: 'var(--bg-card-solid)', border: '1px solid var(--border-card)', borderRadius: '0.5rem', padding: '1rem' };
 const ghostBtn: React.CSSProperties = { ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1px solid var(--border-card)' };
 const addBtn: React.CSSProperties = { ...smallBtn, background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' };
 const dangerBtn: React.CSSProperties = { ...smallBtn, background: 'transparent', color: '#ef4444' };
@@ -63,7 +63,7 @@ function QuestionCard({ q, n, formType, readOnly, onChange, onMove, onRemove, fi
   };
 
   return (
-    <div style={{ ...card, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', background: 'var(--bg-secondary)' }}>
+    <div style={{ ...card, padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Question {n}</span>
         {locked && (
@@ -251,7 +251,7 @@ function FormEditor({ type }: { type: FormType }) {
       <div style={{ display: 'flex', gap: '0.25rem', borderBottom: '1px solid var(--border-card)' }}>
         {(['edit', 'history'] as const).map(t => (
           <button key={t} type="button" onClick={() => setTab(t)} style={{
-            ...btnStyle, borderRadius: '0.375rem 0.375rem 0 0', background: tab === t ? 'var(--bg-card)' : 'transparent',
+            ...btnStyle, borderRadius: '0.375rem 0.375rem 0 0', background: tab === t ? 'var(--bg-card-solid)' : 'transparent',
             color: tab === t ? 'var(--text-primary)' : 'var(--text-secondary)',
           }}>
             {t === 'edit' ? (readOnly ? 'View' : 'Edit') : `History (${data.revisions.length})`}
@@ -290,7 +290,7 @@ function FormEditor({ type }: { type: FormType }) {
                 onChange={questions => setContent({ questions })} />}
 
           {!readOnly && (
-            <div style={{ ...card, background: 'var(--bg-card-solid)', position: 'sticky', bottom: '0.75rem', zIndex: 5, display: 'flex', flexDirection: 'column', gap: '0.6rem', boxShadow: '0 4px 18px rgba(0,0,0,0.25)' }}>
+            <div style={{ ...card, position: 'sticky', bottom: '0.75rem', zIndex: 5, display: 'flex', flexDirection: 'column', gap: '0.6rem', boxShadow: '0 4px 18px rgba(0,0,0,0.25)' }}>
               {errors.length > 0 && (
                 <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#ef4444', fontSize: '0.8rem' }}>
                   {errors.map(e => <li key={e}>{e}</li>)}
@@ -354,7 +354,7 @@ function ApplicationFormsPage() {
       <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
         {FORM_TYPES.map(t => (
           <button key={t} type="button" onClick={() => router.replace(`/exec/application-forms?form=${t}`)} style={{
-            ...btnStyle, background: t === type ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-card)',
+            ...btnStyle, background: t === type ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-card-solid)',
             color: t === type ? '#60a5fa' : 'var(--text-secondary)', border: '1px solid var(--border-card)',
           }}>
             {FORM_NAMES[t]}
