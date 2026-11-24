@@ -226,7 +226,7 @@ function FormSkeleton({ steps }: { steps: boolean }) {
       </div>
       <div className="appforms-side" style={{ ...card, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {bar('7rem', '0.9rem')}{bar('9rem', '0.6rem')}
-        <div>{bar('8rem', '0.6rem', { marginBottom: '0.35rem' })}{bar('100%', '4.5rem', { borderRadius: '0.375rem' })}</div>
+        <div>{bar('8rem', '0.6rem', { marginBottom: '0.35rem' })}{bar('100%', '198px', { borderRadius: '0.375rem' })}</div>
         {bar('100%', '2rem', { borderRadius: '0.375rem' })}{bar('100%', '2rem', { borderRadius: '0.375rem' })}
       </div>
       </div>
@@ -350,8 +350,8 @@ function FormEditor({ type }: { type: FormType }) {
                 )}
                 <div>
                   <label style={labelStyle}>What changed? (optional)</label>
-                  <textarea value={note} onChange={e => setNote(e.target.value)} maxLength={200} rows={3}
-                    placeholder="e.g. Reworded the raid question" style={{ ...inputStyle, resize: 'vertical' }} />
+                  <textarea value={note} onChange={e => setNote(e.target.value)} maxLength={200}
+                    placeholder="e.g. Reworded the raid question" style={{ ...inputStyle, height: '198px', resize: 'vertical' }} />
                 </div>
                 <button type="button" disabled={!dirty || saving} onClick={save}
                   style={{ ...btnStyle, width: '100%', background: '#3b82f6', color: '#fff', opacity: dirty && !saving ? 1 : 0.5 }}>
