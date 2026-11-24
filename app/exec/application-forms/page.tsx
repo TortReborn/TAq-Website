@@ -7,7 +7,6 @@
  * asked in, so the bot and old applications are never relabelled.
  */
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import useSWR, { preload } from 'swr';
@@ -20,6 +19,7 @@ import type { FormRevisionMeta } from '@/lib/application-forms-db';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 import { StatusBadge, timeAgo } from '@/components/bot-panels/status';
 import FormPreview, { type PreviewFocus } from '@/components/application-forms/FormPreview';
+import BackLink from '@/components/bot-panels/BackLink';
 
 interface FormResponse {
   live: { content: FormContent; rev_number: number | null };
@@ -303,7 +303,7 @@ function FormEditor({ type, onSwitch }: { type: FormType; onSwitch: (t: FormType
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <Link href="/exec/bot-panels" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none' }}>← Bot Messages</Link>
+        <BackLink />
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Application Forms</h1>
         <StatusBadge status="published" />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.25rem', background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '0.5rem' }}>

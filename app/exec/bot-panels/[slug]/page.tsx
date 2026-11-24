@@ -1,6 +1,5 @@
 "use client";
 
-import Link from 'next/link';
 import { use, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
@@ -15,6 +14,7 @@ import { PanelValuesContext, TemplateContext } from '@/components/bot-panels/val
 import DiscordPreview from '@/components/bot-panels/DiscordPreview';
 import PanelEditor, { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
+import BackLink from '@/components/bot-panels/BackLink';
 
 interface PanelResponse {
   panel: PanelSummary;
@@ -234,7 +234,7 @@ export default function BotPanelEditorPage({ params }: { params: Promise<{ slug:
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <Link href="/exec/bot-panels" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textDecoration: 'none' }}>← Bot Messages</Link>
+        <BackLink />
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{data.panel.name}</h1>
         {latestMeta && <StatusBadge status={latestMeta.status} posted={!!template || data.panel.message_ids.length > 0} />}
         {canEdit && !template && !archived && (
