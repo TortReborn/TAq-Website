@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Fragment, useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/hooks/fetcher';
-import { PANEL_TEMPLATES, groupPanels, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
+import { PANEL_TEMPLATES, groupPanels, type PanelGroup, type PanelRegistry, type PanelSummary } from '@/lib/bot-panels';
 import { StatusBadge, channelLabel, timeAgo } from '@/components/bot-panels/status';
 import { btnStyle, inputStyle, labelStyle, smallBtn } from '@/components/bot-panels/PanelEditor';
 import { FORM_NAMES, FORM_TYPES } from '@/lib/application-questions';
@@ -44,6 +44,61 @@ export default function BotPanelsPage() {
   const th: React.CSSProperties = { padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase' };
   const td: React.CSSProperties = { padding: '0.6rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', borderTop: '1px solid var(--border-card)' };
   const groupTd: React.CSSProperties = { ...td, padding: '0.9rem 0.75rem 0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', background: 'var(--bg-secondary)' };
+
+  // Order: Sent automatically, then the website's application forms, then each
+  // server's panels and the Archive.
+  const groups = groupPanels(data.panels, data.registry);
+  const renderGroup = (group: PanelGroup<PanelSummary>) => (
+    <Fragment key={group.key}>
+    <tr><td colSpan={5} style={groupTd}>{group.label}</td></tr>
+    {group.panels.map(p => (
+    <tr key={p.slug}>
+      <td style={td}>
+        <Link href={`/exec/bot-panels/${p.slug}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{p.name}</Link>
+      </td>
+      <td style={{ ...td, color: 'var(--text-secondary)' }}>
+        {p.template ? <span title={PANEL_TEMPLATES[p.template]?.sentWhen}>Sent to each new member</span> : channelLabel(p.channel_id, data.registry)}
+      </td>
+      <td style={td}>
+        {p.latest_status
+          ? <span title={p.template || p.message_ids.length ? undefined : 'Imported from the old /generate command. Link the messages already in Discord, or publish to post new ones.'}>
+              <StatusBadge status={p.latest_status} posted={!!p.template || p.message_ids.length > 0} />
+            </span>
+          : <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Empty</span>}
+      </td>
+      <td style={{ ...td, color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+        {p.latest_rev ? <>rev {p.latest_rev} · {p.latest_author ?? 'unknown'} · {timeAgo(p.latest_at)}</> : '—'}
+      </td>
+      <td style={{ ...td, textAlign: 'right' }}>
+        <Link href={`/exec/bot-panels/${p.slug}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>{data.can_edit ? 'Edit' : 'View'}</Link>
+      </td>
+    </tr>
+    ))}
+    </Fragment>
+  );
+  const formRows = (
+    <>
+      <tr><td colSpan={5} style={groupTd}>Application forms</td></tr>
+      {FORM_TYPES.map(t => {
+        const latest = forms?.forms.find(f => f.form_type === t);
+        return (
+          <tr key={t}>
+            <td style={td}>
+              <Link href={`/exec/application-forms?form=${t}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{FORM_NAMES[t]}</Link>
+            </td>
+            <td style={{ ...td, color: 'var(--text-secondary)' }}>Questions on the apply page</td>
+            <td style={td}><StatusBadge status="published" /></td>
+            <td style={{ ...td, color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+              {latest ? <>rev {latest.rev_number} · {latest.author_name ?? 'unknown'} · {timeAgo(latest.created_at)}</> : 'Original questions'}
+            </td>
+            <td style={{ ...td, textAlign: 'right' }}>
+              <Link href={`/exec/application-forms?form=${t}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>{data.can_edit ? 'Edit' : 'View'}</Link>
+            </td>
+          </tr>
+        );
+      })}
+    </>
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -90,56 +145,12 @@ export default function BotPanelsPage() {
             <tr><th style={th}>Panel</th><th style={th}>Channel</th><th style={th}>Status</th><th style={th}>Last change</th><th style={th} /></tr>
           </thead>
           <tbody>
-            {groupPanels(data.panels, data.registry).map(group => (
-              <Fragment key={group.key}>
-              <tr><td colSpan={5} style={groupTd}>{group.label}</td></tr>
-              {group.panels.map(p => (
-              <tr key={p.slug}>
-                <td style={td}>
-                  <Link href={`/exec/bot-panels/${p.slug}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{p.name}</Link>
-                </td>
-                <td style={{ ...td, color: 'var(--text-secondary)' }}>
-                  {p.template ? <span title={PANEL_TEMPLATES[p.template]?.sentWhen}>Sent to each new member</span> : channelLabel(p.channel_id, data.registry)}
-                </td>
-                <td style={td}>
-                  {p.latest_status
-                    ? <span title={p.template || p.message_ids.length ? undefined : 'Imported from the old /generate command. Link the messages already in Discord, or publish to post new ones.'}>
-                        <StatusBadge status={p.latest_status} posted={!!p.template || p.message_ids.length > 0} />
-                      </span>
-                    : <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Empty</span>}
-                </td>
-                <td style={{ ...td, color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                  {p.latest_rev ? <>rev {p.latest_rev} · {p.latest_author ?? 'unknown'} · {timeAgo(p.latest_at)}</> : '—'}
-                </td>
-                <td style={{ ...td, textAlign: 'right' }}>
-                  <Link href={`/exec/bot-panels/${p.slug}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>{data.can_edit ? 'Edit' : 'View'}</Link>
-                </td>
-              </tr>
-              ))}
-              </Fragment>
-            ))}
+            {groups.filter(g => g.key === 'templates').map(renderGroup)}
+            {formRows}
+            {groups.filter(g => g.key !== 'templates').map(renderGroup)}
             {data.panels.length === 0 && (
               <tr><td colSpan={5} style={{ ...td, color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No panels yet.</td></tr>
             )}
-            <tr><td colSpan={5} style={groupTd}>Application forms</td></tr>
-            {FORM_TYPES.map(t => {
-              const latest = forms?.forms.find(f => f.form_type === t);
-              return (
-                <tr key={t}>
-                  <td style={td}>
-                    <Link href={`/exec/application-forms?form=${t}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{FORM_NAMES[t]}</Link>
-                  </td>
-                  <td style={{ ...td, color: 'var(--text-secondary)' }}>Questions on the apply page</td>
-                  <td style={td}><StatusBadge status="published" /></td>
-                  <td style={{ ...td, color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                    {latest ? <>rev {latest.rev_number} · {latest.author_name ?? 'unknown'} · {timeAgo(latest.created_at)}</> : 'Original questions'}
-                  </td>
-                  <td style={{ ...td, textAlign: 'right' }}>
-                    <Link href={`/exec/application-forms?form=${t}`} style={{ ...smallBtn, background: 'var(--bg-secondary)', color: 'var(--text-primary)', textDecoration: 'none', display: 'inline-block' }}>{data.can_edit ? 'Edit' : 'View'}</Link>
-                  </td>
-                </tr>
-              );
-            })}
           </tbody>
         </table>
       </div>
